@@ -1,35 +1,27 @@
+# Wistla DevOps
+
 Wistla automated operations, for development through to production
 
 TODO proper description
 
 TODO quick start instructions
 
-
-Setting up the development environment
-======================================
+## Setting up the development environment
 
 TODO description
 
-
-Prerequisites
--------------
+### Prerequisites
 
 TODO
 
-
-Virtual machine
----------------
+### Virtual machine
 
 TODO
 
-
-Development environment
------------------------
+### Development environment
 
 TODO
 
-
-Start and stop the service
---------------------------
+### Start and stop the service
 
 TODO
