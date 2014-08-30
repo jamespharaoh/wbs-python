@@ -8,17 +8,20 @@ ln -snf /vagrant/etc/bash-rc /home/vagrant/.bashrc
 cd /vagrant
 
 PROJECTS=(
-	"wistla-api"
-	"wistla-web"
+	"wistla-api:master"
+	"wistla-web:master"
 )
 
 for project in "${PROJECTS[@]}"; do
 
-	if test -d $project; then continue; fi
+	IFS=":" read project_name project_branch <<< "$project"
 
-	echo "=== checking out $project" >&2
+	if test -d $project_name; then continue; fi
+
+	echo "=== checking out $project_name" >&2
 	
-	git clone "git@github.com:wistla/$project.git"
+	git clone "git@github.com:wistla/$project_name.git" \
+		--branch "$project_branch"
 
 done
 

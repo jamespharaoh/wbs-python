@@ -1,27 +1,60 @@
 set -e
 
+REMOVE_PACKAGES=(
+	"grub-common"
+	"grub-gfxpayload-lists"
+	"grub-pc"
+	"grub-pc-bin"
+	"grub2-common"
+)
+
+INSTALL_PACKAGES=(
+	"git"
+	"lxc"
+	"ngrep"
+	"python-pip"
+	"whois"
+)
+
+PYTHON_PACKAGES=(
+	"paramiko"
+	"PyYAML"
+	"jinja2"
+	"httplib2"
+)
+
 export DEBIAN_FRONTEND=noninteractive
 
 echo "=== updating package lists" >&2
 
 apt-get update -qqy
 
-echo "=== removing packages" >&2
+echo "=== removing system packages" >&2
 
-apt-get remove -qqy \
-	grub-{common,gfxpayload-lists,pc,pc-bin} \
-	grub2-common
+apt-get remove -qqy "${REMOVE_PACKAGES[@]}"
 
-echo "=== upgrading packages" >&2
+echo "=== upgrading system packages" >&2
 
 apt-get dist-upgrade -qqy
 
-echo "=== installing packages" >&2
+echo "=== installing system packages" >&2
 
-apt-get install -qqy git
+apt-get install -qqy "${INSTALL_PACKAGES[@]}"
+
+echo "=== installing python packages" >&2
+
+pip install "${PYTHON_PACKAGES[@]}"
 
 echo "=== configuring system" >&2
 
 ln -snf /vagrant/etc/ssh-host-keys /etc/ssh/ssh_known_hosts
+
+echo "=== running ansible" >&2
+
+cd /vagrant
+
+source ansible/hacking/env-setup >/dev/null
+
+ansible-playbook -i vagrant-local-inventory vagrant-local-task.yml
 
 # ex: noet ts=4 filetype=sh

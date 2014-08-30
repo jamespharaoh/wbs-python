@@ -54,4 +54,8 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 	source /etc/bash_completion
 fi
 
+# enable ansible
+
+source /vagrant/ansible/hacking/env-setup
+
 # ex: noet ts=4 filetype=sh
