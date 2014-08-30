@@ -2,26 +2,6 @@
 
 Wistla automated operations, for development through to production
 
-TODO proper description
+For full instructions, please refer to the documents in Google Drive:
 
-TODO quick start instructions
-
-## Setting up the development environment
-
-TODO description
-
-### Prerequisites
-
-TODO
-
-### Virtual machine
-
-TODO
-
-### Development environment
-
-TODO
-
-### Start and stop the service
-
-TODO
+https://drive.google.com/a/wistla.com/folderview?id=0BweetH2YSc8mRXk5M05KLVJrczg&usp=sharing
