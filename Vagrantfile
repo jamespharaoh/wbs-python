@@ -3,18 +3,22 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure VAGRANTFILE_API_VERSION do
 	|config|
 
+	# general config
+
 	config.vm.box = "hashicorp/precise64"
 
 	config.ssh.forward_agent = true
 
-	# run provisioning scripts
+	# setup ansible
 
 	config.vm.provision "shell",
-		path: "etc/provision-root",
+		path: "etc/ansible-setup",
 		privileged: true
 
+	# run ansible
+
 	config.vm.provision "shell",
-		path: "etc/provision-user",
+		path: "etc/ansible-invoke",
 		privileged: false
 
 end

@@ -1,0 +1,18 @@
+---
+
+- name: "install vagrant packages"
+  action:
+    module: "apt"
+    state: "present"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items: "vagrant_packages"
+
+- name: "install ssh known hosts"
+  action:
+    module: "template"
+    src: "ssh-known-hosts"
+    dest: "/etc/ssh/ssh_known_hosts"
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

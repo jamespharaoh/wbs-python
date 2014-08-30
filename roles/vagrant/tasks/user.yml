@@ -1,0 +1,17 @@
+---
+
+- name: "link to bash profile"
+  action:
+    module: "file"
+    state: "link"
+    path: "/home/vagrant/.bash_profile"
+    src: "/vagrant/etc/bash-profile"
+
+- name: "link to bash rc"
+  action:
+    module: "file"
+    state: "link"
+    path: "/home/vagrant/.bashrc"
+    src: "/vagrant/etc/bash-rc"
+
+# ex: et ts=2 filetype=yaml

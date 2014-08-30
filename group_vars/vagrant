@@ -1,5 +1,15 @@
 vagrant_packages:
-- "git"
-- "lxc"
-- "ngrep"
-- "whois"
+  - "git"
+  - "lxc"
+  - "ngrep"
+  - "whois"
+
+vagrant_checkouts:
+
+  - name: "wistla-api"
+    branch: "master"
+
+  - name: "wistla-web"
+    branch: "master"
+
+# ex: et ts=2 filetype=yaml

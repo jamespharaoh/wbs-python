@@ -1,0 +1,11 @@
+echo "=== running ansible" >&2
+
+cd /vagrant
+
+source ansible/hacking/env-setup >/dev/null
+
+ansible-playbook \
+	-i vagrant-local-inventory \
+	vagrant-local-task.yml
+
+# ex: noet ts=4 filetype=sh

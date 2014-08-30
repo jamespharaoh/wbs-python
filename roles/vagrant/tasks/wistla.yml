@@ -1,0 +1,11 @@
+---
+
+- name: "checkout projects from git"
+  action:
+    module: "git"
+    dest: "/vagrant/{{ item.name }}"
+    repo: "git@github.com:/wistla/{{ item.name }}"
+    version: "{{ item.branch }}"
+  with_items: "vagrant_checkouts"
+
+# ex: et ts=2 filetype=yaml
