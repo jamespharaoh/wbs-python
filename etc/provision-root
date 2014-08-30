@@ -9,11 +9,7 @@ REMOVE_PACKAGES=(
 )
 
 INSTALL_PACKAGES=(
-	"git"
-	"lxc"
-	"ngrep"
 	"python-pip"
-	"whois"
 )
 
 PYTHON_PACKAGES=(
@@ -23,31 +19,30 @@ PYTHON_PACKAGES=(
 	"httplib2"
 )
 
-export DEBIAN_FRONTEND=noninteractive
+if test -f /etc/ansible-flag; then
 
-echo "=== updating package lists" >&2
+	echo "=== skipping first time setup for ansible" >&2
+	echo "remove /etc/ansible-flag to run this again" >&2
 
-apt-get update -qqy
+else
 
-echo "=== removing system packages" >&2
+	export DEBIAN_FRONTEND=noninteractive
 
-apt-get remove -qqy "${REMOVE_PACKAGES[@]}"
+	echo "=== running first time setup for ansible" >&2
 
-echo "=== upgrading system packages" >&2
+	apt-get update -qqy
 
-apt-get dist-upgrade -qqy
+	apt-get remove -qqy "${REMOVE_PACKAGES[@]}"
 
-echo "=== installing system packages" >&2
+	apt-get dist-upgrade -qqy
 
-apt-get install -qqy "${INSTALL_PACKAGES[@]}"
+	apt-get install -qqy "${INSTALL_PACKAGES[@]}"
 
-echo "=== installing python packages" >&2
+	pip install "${PYTHON_PACKAGES[@]}"
 
-pip install "${PYTHON_PACKAGES[@]}"
+	touch /etc/ansible-flag
 
-echo "=== configuring system" >&2
-
-ln -snf /vagrant/etc/ssh-host-keys /etc/ssh/ssh_known_hosts
+fi
 
 echo "=== running ansible" >&2
 

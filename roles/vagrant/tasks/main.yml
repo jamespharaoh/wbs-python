@@ -1,4 +1,16 @@
 ---
 
-- name: "hello"
-  command: echo hello world
+- name: "install vagrant packages"
+  action:
+    module: "apt"
+    state: "present"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items: "vagrant_packages"
+
+- name: "install ssh known hosts"
+  action:
+    module: "template"
+    src: "ssh-known-hosts"
+    dest: "/etc/ssh/ssh_known_hosts"
+  sudo: "yes"
