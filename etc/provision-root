@@ -1,14 +1,10 @@
 set -e
 
 REMOVE_PACKAGES=(
-	"grub-common"
-	"grub-gfxpayload-lists"
-	"grub-pc"
-	"grub-pc-bin"
-	"grub2-common"
 )
 
 INSTALL_PACKAGES=(
+	"python-dev"
 	"python-pip"
 )
 
@@ -30,9 +26,11 @@ else
 
 	echo "=== running first time setup for ansible" >&2
 
+	echo "set grub-pc/install_devices /dev/sda" | debconf-communicate
+
 	apt-get update -qqy
 
-	apt-get remove -qqy "${REMOVE_PACKAGES[@]}"
+	apt-get purge -qqy "${REMOVE_PACKAGES[@]}"
 
 	apt-get dist-upgrade -qqy
 
