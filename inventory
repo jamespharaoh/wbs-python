@@ -1,0 +1,14 @@
+[vagrant]
+localhost
+
+[template]
+template
+
+[mongo]
+mongo
+
+[api]
+api
+
+[web]
+web

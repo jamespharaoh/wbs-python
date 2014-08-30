@@ -1,5 +1,6 @@
 ---
 - include: "system.yml"
+- include: "btrfs.yml"
 - include: "user.yml"
 - include: "wistla.yml"
 

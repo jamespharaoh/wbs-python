@@ -1,0 +1,51 @@
+---
+
+# configure vagrant box
+
+- hosts: "localhost"
+  roles: [ "vagrant" ]
+  tags: "localhost"
+
+# create template
+
+- hosts: "template"
+  gather_facts: "no"
+  roles: [ "create" ]
+  tags: "template"
+
+- hosts: "template"
+  roles: [ "template" ]
+  tags: "template"
+
+# create mongo
+
+- hosts: "mongo"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  tags: "mongo"
+
+- hosts: "mongo"
+  roles: [ "template", "mongo", "start" ]
+  tags: "mongo"
+
+# create api
+
+- hosts: "api"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  tags: "api"
+
+- hosts: "api"
+  roles: [ "template", "api", "start" ]
+  tags: "api"
+
+# create web
+
+- hosts: "web"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  tags: "web"
+
+- hosts: "web"
+  roles: [ "template", "mongo", "start" ]
+  tags: "web"

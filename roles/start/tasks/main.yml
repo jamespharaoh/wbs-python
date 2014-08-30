@@ -1,0 +1,12 @@
+---
+
+- name: "start lxc container"
+  action: shell
+    lxc-start
+      --name {{ inventory_hostname }}
+      --daemon
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

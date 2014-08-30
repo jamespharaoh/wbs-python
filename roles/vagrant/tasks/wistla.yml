@@ -1,11 +1,15 @@
 ---
 
 - name: "checkout projects from git"
-  action:
-    module: "git"
-    dest: "/vagrant/{{ item.name }}"
-    repo: "git@github.com:/wistla/{{ item.name }}"
-    version: "{{ item.branch }}"
+  action: shell
+    cd /vagrant;
+    git clone
+      git@github.com:/wistla/{{ item.name }}
+      --branch {{ item.branch }}
+  args:
+    creates: "/vagrant/{{ item.name }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
   with_items: "vagrant_checkouts"
 
 # ex: et ts=2 filetype=yaml

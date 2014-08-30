@@ -2,4 +2,8 @@
 
 cd /vagrant
 
+# run rc as well
+
+source "$HOME/.bashrc"
+
 # ex: noet ts=4 filetype=sh

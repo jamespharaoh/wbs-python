@@ -6,6 +6,9 @@
     state: "link"
     path: "/home/vagrant/.bash_profile"
     src: "/vagrant/etc/bash-profile"
+    force: "yes"
+  sudo: "yes"
+  sudo_user: "vagrant"
 
 - name: "link to bash rc"
   action:
@@ -13,5 +16,8 @@
     state: "link"
     path: "/home/vagrant/.bashrc"
     src: "/vagrant/etc/bash-rc"
+    force: "yes"
+  sudo: "yes"
+  sudo_user: "vagrant"
 
 # ex: et ts=2 filetype=yaml

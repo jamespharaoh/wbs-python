@@ -5,7 +5,7 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 
 	# general config
 
-	config.vm.box = "hashicorp/precise64"
+	config.vm.box = "ubuntu/trusty64"
 
 	config.ssh.forward_agent = true
 
@@ -19,7 +19,7 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 
 	config.vm.provision "shell",
 		path: "etc/ansible-invoke",
-		privileged: false
+		privileged: true
 
 end
 

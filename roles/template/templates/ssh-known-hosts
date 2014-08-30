@@ -1,0 +1,3 @@
+{% for ssh_host_key in ssh_host_keys %}
+{{ ssh_host_key.name }} {{ ssh_host_key.type }} {{ ssh_host_key.data | join }}
+{% endfor %}

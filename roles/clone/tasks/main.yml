@@ -1,0 +1,17 @@
+---
+
+- name: "clone lxc container"
+  action: shell
+    lxc-clone
+      --backingstore btrfs
+      {{ template }}
+      {{ inventory_hostname }}
+    &&
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
+  args:
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

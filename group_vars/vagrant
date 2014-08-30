@@ -1,8 +1,22 @@
+---
+
+ansible_connection: "local"
+
 vagrant_packages:
+
+  - "btrfs-tools"
   - "git"
   - "lxc"
   - "ngrep"
+  - "parted"
   - "whois"
+
+vagrant_remove_packages:
+
+  - "chef"
+  - "chef-zero"
+  - "puppet"
+  - "puppet-common"
 
 vagrant_checkouts:
 
@@ -11,5 +25,9 @@ vagrant_checkouts:
 
   - name: "wistla-web"
     branch: "master"
+
+vagrant_templates:
+
+  - "template"
 
 # ex: et ts=2 filetype=yaml

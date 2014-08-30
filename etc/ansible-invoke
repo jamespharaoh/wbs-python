@@ -5,7 +5,7 @@ cd /vagrant
 source ansible/hacking/env-setup >/dev/null
 
 ansible-playbook \
-	-i vagrant-local-inventory \
-	vagrant-local-task.yml
+	-i inventory \
+	site.yml
 
 # ex: noet ts=4 filetype=sh

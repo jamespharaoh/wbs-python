@@ -1,0 +1,30 @@
+---
+
+- name: "create lxc container"
+  action: shell
+    lxc-create
+      --template download
+      --name {{ inventory_hostname }}
+      --bdev btrfs
+      --
+      --dist ubuntu
+      --release trusty
+      --arch amd64
+    &&
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
+    apt-get update -qqy
+    &&
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
+    apt-get dist-upgrade -qqy
+    &&
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
+    apt-get install -qqy python
+    &&
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
+  args:
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml
