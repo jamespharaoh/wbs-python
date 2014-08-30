@@ -1,0 +1,57 @@
+# exit if non-interactive
+
+[ -z "$PS1" ] && return
+
+# general settings
+
+shopt -s histappend
+shopt -s checkwinsize
+HISTCONTROL=ignoreboth
+HISTSIZE=10000
+HISTFILESIZE=10000
+
+# configure editor
+
+export EDITOR=nano
+
+# configure less
+
+export PAGER=less
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# configure window title
+
+case "$TERM" in
+
+xterm*|rxvt*)
+
+	PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	;;
+
+*)
+
+	;;
+
+esac
+
+# enable colour in ls and grep
+
+if [ -x /usr/bin/dircolors ]; then
+
+	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+
+	alias ls='ls --color=auto'
+
+	alias grep='grep --color=auto'
+	alias fgrep='fgrep --color=auto'
+	alias egrep='egrep --color=auto'
+
+fi
+
+# enable completion
+
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+	source /etc/bash_completion
+fi
+
+# ex: noet ts=4 filetype=sh

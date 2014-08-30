@@ -1,0 +1,5 @@
+# default to vagrant directory
+
+cd /vagrant
+
+# ex: noet ts=4 filetype=sh

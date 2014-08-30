@@ -1,0 +1,27 @@
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+
+echo "=== updating package lists" >&2
+
+apt-get update -qqy
+
+echo "=== removing packages" >&2
+
+apt-get remove -qqy \
+	grub-{common,gfxpayload-lists,pc,pc-bin} \
+	grub2-common
+
+echo "=== upgrading packages" >&2
+
+apt-get dist-upgrade -qqy
+
+echo "=== installing packages" >&2
+
+apt-get install -qqy git
+
+echo "=== configuring system" >&2
+
+ln -snf /vagrant/etc/ssh-host-keys /etc/ssh/ssh_known_hosts
+
+# ex: noet ts=4 filetype=sh
