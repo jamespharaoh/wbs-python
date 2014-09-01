@@ -1,14 +1,14 @@
 [vagrant]
-localhost
+vagrant   adr=1.1 hw=00:16:c3:82:a7:4f
 
 [template]
-template
+template  adr=2.1 hw=00:16:5b:f4:8e:33
 
 [mongo]
-mongo
+mongo     adr=3.1 hw=00:16:b7:4c:6d:4e
 
 [api]
-api
+api       adr=4.1 hw=00:16:0d:66:78:8b
 
 [web]
-web
+web       adr=5.1 hw=00:16:1d:15:60:ab

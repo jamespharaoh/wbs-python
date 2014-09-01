@@ -1,5 +1,21 @@
 ---
 
+- name: "create apt sources.list"
+  action:
+    module: "template"
+    src: "apt-sources-list"
+    dest: "/etc/apt/sources.list"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create hosts file"
+  action:
+    module: "template"
+    src: "hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+  sudo_user: "root"
+
 - name: "update system packages"
   action:
     module: "apt"
@@ -9,14 +25,14 @@
   sudo_user: "root"
   tags: "update"
 
-- name: "install template packages"
+- name: "install system packages"
   action:
     module: "apt"
     state: "present"
     name: "{{ item }}"
   sudo: "yes"
   sudo_user: "root"
-  with_items: "template_packages"
+  with_items: "global_install_packages"
 
 - name: "install ssh known hosts"
   action:

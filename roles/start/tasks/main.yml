@@ -2,11 +2,28 @@
 
 - name: "start lxc container"
   action: shell
+
+    state=$(
+      lxc-info
+        --name {{ inventory_hostname }}
+        --state
+        --no-humanize
+      | head --lines 1
+    );
+
+    if test "$state" = "RUNNING"; then
+      echo "UNCHANGED";
+      return;
+    fi;
+
     lxc-start
       --name {{ inventory_hostname }}
-      --daemon
+      --daemon;
+
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"
+  register: start_result
+  changed_when: start_result.stdout != 'UNCHANGED'
 
 # ex: et ts=2 filetype=yaml

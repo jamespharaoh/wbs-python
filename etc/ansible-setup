@@ -6,13 +6,18 @@ REMOVE_PACKAGES=(
 INSTALL_PACKAGES=(
 	"python-dev"
 	"python-pip"
+
+	"python-httplib2"
+	"python-jinja2"
+	"python-paramiko"
+	"python-yaml"
 )
 
 PYTHON_PACKAGES=(
-	"paramiko"
-	"PyYAML"
-	"jinja2"
-	"httplib2"
+#	"paramiko"
+#	"PyYAML"
+#	"jinja2"
+#	"httplib2"
 )
 
 if test -f /etc/ansible-flag; then
@@ -26,7 +31,11 @@ else
 
 	echo "=== running first time setup for ansible" >&2
 
-	echo "set grub-pc/install_devices /dev/sda" | debconf-communicate
+	#echo "set grub-pc/install_devices /dev/sda" | debconf-communicate
+
+	sed "s|{{ ubuntu_url }}|http://10.0.2.2/ubuntu/mirror/archive.ubuntu.com/ubuntu|" \
+		</vagrant/roles/vagrant/templates/apt-sources-list \
+		>/etc/apt/sources.list
 
 	apt-get update -qqy
 

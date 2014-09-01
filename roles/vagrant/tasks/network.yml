@@ -1,0 +1,36 @@
+---
+
+- name: "create hosts file"
+  action:
+    module: "template"
+    src: "hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create bridge network interface"
+  action:
+    module: "template"
+    src: "bridge-interface"
+    dest: "/etc/network/interfaces.d/brprv0.cfg"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "start brprv0"
+  action: shell
+
+    set -e
+
+    if ifquery --state brprv0 >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifup brprv0;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+
+# ex: et ts=2 filetype=yaml

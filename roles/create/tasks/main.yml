@@ -3,11 +3,11 @@
 - name: "create lxc container"
   action: shell
     lxc-create
-      --template download
+      --template ubuntu
       --name {{ inventory_hostname }}
       --bdev btrfs
       --
-      --dist ubuntu
+      --mirror {{ ubuntu_url }}
       --release trusty
       --arch amd64
     &&
@@ -23,6 +23,15 @@
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
   args:
     creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create lxc config"
+  action:
+    module: "template"
+    src: "lxc-config"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"

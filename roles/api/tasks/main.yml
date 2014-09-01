@@ -11,9 +11,17 @@
 
 - name: "deploy projects"
   local_action: shell
-    rsync --archive --checksum
-    /vagrant/{{ item }}/
-    /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+
+    rsync
+      --archive
+      --delete
+      --checksum
+      --itemize-changes
+      /vagrant/{{ item }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
   with_items:
     - "wistla-api"
 

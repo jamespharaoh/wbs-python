@@ -14,4 +14,13 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "create lxc config"
+  action:
+    module: "template"
+    src: "lxc-config"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
 # ex: et ts=2 filetype=yaml

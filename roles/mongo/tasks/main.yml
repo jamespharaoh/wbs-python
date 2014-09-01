@@ -1,5 +1,13 @@
 ---
 
+- name: "create mongo.conf"
+  action:
+    module: "template"
+    src: "mongo-conf"
+    dest: "/etc/mongodb.conf"
+  sudo: "yes"
+  sudo_user: "root"
+
 - name: "install system packages"
   action:
     module: "apt"

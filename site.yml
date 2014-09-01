@@ -2,9 +2,9 @@
 
 # configure vagrant box
 
-- hosts: "localhost"
+- hosts: "vagrant"
   roles: [ "vagrant" ]
-  tags: "localhost"
+  tags: "vagrant"
 
 # create template
 
@@ -47,5 +47,5 @@
   tags: "web"
 
 - hosts: "web"
-  roles: [ "template", "mongo", "start" ]
+  roles: [ "template", "web", "start" ]
   tags: "web"

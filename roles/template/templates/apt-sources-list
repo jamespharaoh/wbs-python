@@ -1,0 +1,26 @@
+deb {{ ubuntu_url }} trusty main
+deb-src {{ ubuntu_url }} trusty main
+
+deb {{ ubuntu_url }} trusty-updates main
+deb-src {{ ubuntu_url }} trusty-updates main
+
+deb {{ ubuntu_url }} trusty universe
+deb-src {{ ubuntu_url }} trusty universe
+deb {{ ubuntu_url }} trusty-updates universe
+deb-src {{ ubuntu_url }} trusty-updates universe
+
+# deb {{ ubuntu_url }} trusty multiverse
+# deb-src {{ ubuntu_url }} trusty multiverse
+# deb {{ ubuntu_url }} trusty-updates multiverse
+# deb-src {{ ubuntu_url }} trusty-updates multiverse
+
+# deb {{ ubuntu_url }} trusty-backports main restricted universe multiverse
+# deb-src {{ ubuntu_url }} trusty-backports main restricted universe multiverse
+
+deb {{ ubuntu_url }} trusty-security main
+deb-src {{ ubuntu_url }} trusty-security main
+deb {{ ubuntu_url }} trusty-security universe
+deb-src {{ ubuntu_url }} trusty-security universe
+
+# deb http://security.ubuntu.com/ubuntu trusty-security multiverse
+# deb-src http://security.ubuntu.com/ubuntu trusty-security multiverse

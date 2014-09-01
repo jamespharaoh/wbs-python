@@ -12,4 +12,8 @@ source ansible/hacking/env-setup >/dev/null
 
 # run ansible-playbook
 
-exec ansible-playbook -i inventory site.yml "${@}"
+exec ansible-playbook \
+	--inventory-file inventory \
+	--extra-vars @config \
+	site.yml \
+	"${@}"

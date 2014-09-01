@@ -25,7 +25,7 @@
     name: "{{ item }}"
   sudo: "yes"
   sudo_user: "root"
-  with_items: "vagrant_packages"
+  with_items: "vagrant_install_packages"
 
 - name: "setup sudo"
   action:

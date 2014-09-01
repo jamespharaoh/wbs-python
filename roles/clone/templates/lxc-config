@@ -1,0 +1,12 @@
+lxc.include = /usr/share/lxc/config/ubuntu.common.conf
+
+lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
+lxc.mount = /var/lib/lxc/{{ inventory_hostname }}/fstab
+lxc.utsname = {{ inventory_hostname }}
+lxc.arch = amd64
+
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = brprv0
+lxc.network.hwaddr = {{ hw }}
+lxc.network.ipv4 = {{ ip }}

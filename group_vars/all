@@ -12,9 +12,12 @@ ssh_host_keys:
       - "lJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGX"
       - "A8VJiS5ap43JXiUFFAaQ=="
 
-template_packages:
+global_install_packages:
 
   - "btrfs-tools"
   - "git"
   - "ngrep"
   - "whois"
+
+net: "10.210"
+ip: "{{ net }}.{{ adr }}"
