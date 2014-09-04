@@ -9,4 +9,5 @@ lxc.network.type = veth
 lxc.network.flags = up
 lxc.network.link = brprv0
 lxc.network.hwaddr = {{ hw }}
-lxc.network.ipv4 = {{ ip }}
+lxc.network.ipv4 = {{ ip }}/16
+lxc.network.ipv4.gateway = {{ net }}.{{ hostvars.vagrant.adr }}

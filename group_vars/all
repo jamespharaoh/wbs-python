@@ -17,6 +17,7 @@ global_install_packages:
   - "btrfs-tools"
   - "git"
   - "ngrep"
+  - "super"
   - "whois"
 
 net: "10.210"

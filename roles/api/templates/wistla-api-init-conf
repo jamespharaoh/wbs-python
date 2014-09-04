@@ -1,0 +1,15 @@
+description "wistla api"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+env NODE_ENV=vagrant
+
+script
+
+	cd /home/ubuntu/wistla-api
+
+	setuid ubuntu \
+	nodejs server.js
+
+end script

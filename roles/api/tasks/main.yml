@@ -20,9 +20,20 @@
       /vagrant/{{ item }}/
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
 
+  sudo: "yes"
+  sudo_user: "root"
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
   with_items:
     - "wistla-api"
+
+- name: "create api init config"
+  action:
+    module: "template"
+    src: "wistla-api-init-conf"
+    dest: "/etc/init/wistla-api.conf"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "reload upstart config"
 
 # ex: et ts=2 filetype=yaml
