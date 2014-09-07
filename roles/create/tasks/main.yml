@@ -12,7 +12,8 @@
       lxc-destroy
         --name {{ inventory_hostname }};
       btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
-      rm -r /var/lib/lxc/{{ inventory_hostname }};
+      rm -rf /var/lib/lxc/{{ inventory_hostname }};
+      true;
     );
 
     lxc-create
