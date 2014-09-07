@@ -7,6 +7,7 @@ vagrant_install_packages:
   - "btrfs-tools"
   - "git"
   - "lxc"
+  - "mongodb-clients"
   - "ngrep"
   - "parted"
   - "whois"
