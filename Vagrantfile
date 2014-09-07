@@ -7,6 +7,8 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 
 	config.vm.box = "ubuntu/trusty64"
 
+	config.vm.hostname = "wistla-dev"
+
 	config.vm.network "private_network",
 		ip: "172.28.128.3"
 

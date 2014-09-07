@@ -1,14 +1,17 @@
 #!/bin/bash
 
+# always run from vagrant machine
+
+if ! test "$HOSTNAME" = "wistla-dev"; then
+	vagrant up
+	exec vagrant ssh --command "./run-ansible"
+fi
+
 # always run as root
 
 if test "$UID" != "0"; then
 	exec sudo "$0" "$@"
 fi
-
-# don't run from host
-
-# TODO
 
 # load ansible environment
 

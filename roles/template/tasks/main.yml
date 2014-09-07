@@ -16,6 +16,14 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "create network interfaces"
+  action:
+    module: "template"
+    src: "network-interfaces"
+    dest: "/etc/network/interfaces"
+  sudo: "yes"
+  sudo_user: "root"
+
 - name: "update system packages"
   action:
     module: "apt"
