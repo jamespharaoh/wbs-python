@@ -33,7 +33,15 @@ else
 
 	#echo "set grub-pc/install_devices /dev/sda" | debconf-communicate
 
-	sed "s|{{ ubuntu_url }}|http://10.0.2.2/ubuntu/mirror/archive.ubuntu.com/ubuntu|" \
+	mirror=$(
+		gawk -- "
+			BEGIN { mirror = \"http://archive.ubuntu.com/ubuntu\" }
+			match (\$0, /^ubuntu_url: \"([^\"]+)\"$/, ary) { mirror = ary [1] }
+			END { print mirror }
+		" < /vagrant/config
+	)
+
+	sed "s|{{ ubuntu_url }}|$mirror|" \
 		</vagrant/roles/vagrant/templates/apt-sources-list \
 		>/etc/apt/sources.list
 
