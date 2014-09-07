@@ -41,6 +41,8 @@ else
 		" < /vagrant/config
 	)
 
+	echo "Using ubuntu mirror: $mirror" >&2
+
 	sed "s|{{ ubuntu_url }}|$mirror|" \
 		</vagrant/roles/vagrant/templates/apt-sources-list \
 		>/etc/apt/sources.list
