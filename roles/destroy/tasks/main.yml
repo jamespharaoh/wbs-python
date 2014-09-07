@@ -1,0 +1,24 @@
+---
+
+- name: "destroy lxc container"
+  action: shell
+
+    lxc-info
+      --name {{ inventory_hostname }}
+      >/dev/null
+    
+    if test $? != 0; then
+      echo "UNCHANGED";
+      return;
+    fi;
+
+    lxc-destroy
+      --name {{ inventory_hostname }};
+
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+  register: destroy_result
+  changed_when: destroy_result.stdout != 'UNCHANGED'
+
+# ex: et ts=2 filetype=yaml

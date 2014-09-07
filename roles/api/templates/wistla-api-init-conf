@@ -8,9 +8,12 @@ env NODE_ENV=vagrant
 script
 
 	cd /home/ubuntu/wistla-api
-	setuid ubuntu mkdir -p logs
 
 	setuid ubuntu \
-	nodejs server.js > /home/ubuntu/wistla-api/logs/output.txt
+	mkdir --parents logs
+
+	setuid ubuntu \
+	nodejs server.js \
+		> logs/output.txt
 
 end script

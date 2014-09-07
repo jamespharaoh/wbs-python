@@ -2,12 +2,27 @@
 
 - name: "clone lxc container"
   action: shell
+
+    set -e
+
+    (
+      set +e;
+      lxc-stop
+        --name {{ inventory_hostname }};
+      lxc-destroy
+        --name {{ inventory_hostname }};
+      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
+      rm -rf /var/lib/lxc/{{ inventory_hostname }};
+      true;
+    );
+
     lxc-clone
       --backingstore btrfs
       {{ template }}
       {{ inventory_hostname }}
     &&
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
+
   args:
     creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
   delegate_to: "localhost"

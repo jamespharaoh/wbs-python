@@ -1,0 +1,28 @@
+---
+
+- name: "stop lxc container"
+  action: shell
+
+    state=$(
+      lxc-info
+        --name {{ inventory_hostname }}
+        --state
+        --no-humanize
+      | head --lines 1
+    );
+
+    if test "$state" != "RUNNING"; then
+      echo "UNCHANGED";
+      return;
+    fi;
+
+    lxc-stop
+      --name {{ inventory_hostname }};
+
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+  register: stop_result
+  changed_when: stop_result.stdout != 'UNCHANGED'
+
+# ex: et ts=2 filetype=yaml

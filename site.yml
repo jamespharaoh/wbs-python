@@ -3,6 +3,7 @@
 # configure vagrant box
 
 - hosts: "vagrant"
+  gather_facts: "no"
   roles: [ "vagrant" ]
   tags: "vagrant"
 
@@ -10,42 +11,41 @@
 
 - hosts: "template"
   gather_facts: "no"
-  roles: [ "create" ]
-  tags: "template"
-
-- hosts: "template"
-  roles: [ "template" ]
+  roles: [ "create", "template" ]
   tags: "template"
 
 # create mongo
 
-- hosts: "mongo"
+- hosts: "mongo-template"
   gather_facts: "no"
-  roles: [ "clone" ]
+  roles: [ "clone", "template", "mongo" ]
   tags: "mongo"
 
-- hosts: "mongo"
-  roles: [ "template", "mongo", "start" ]
+- hosts: "mongo-host"
+  gather_facts: "no"
+  roles: [ "stop", "destroy", "clone", "start" ]
   tags: "mongo"
 
 # create api
 
-- hosts: "api"
+- hosts: "api-template"
   gather_facts: "no"
-  roles: [ "clone" ]
+  roles: [ "clone", "template", "api" ]
   tags: "api"
 
-- hosts: "api"
-  roles: [ "template", "api", "start" ]
+- hosts: "api-host"
+  gather_facts: "no"
+  roles: [ "stop", "destroy", "clone", "start" ]
   tags: "api"
 
 # create web
 
-- hosts: "web"
+- hosts: "web-template"
   gather_facts: "no"
-  roles: [ "clone" ]
+  roles: [ "clone", "template", "web" ]
   tags: "web"
 
-- hosts: "web"
-  roles: [ "template", "web", "start" ]
+- hosts: "web-host"
+  gather_facts: "no"
+  roles: [ "stop", "destroy", "clone", "start" ]
   tags: "web"
