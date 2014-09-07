@@ -53,7 +53,7 @@ else
 
 	apt-get install -qqy "${INSTALL_PACKAGES[@]}"
 
-	pip install "${PYTHON_PACKAGES[@]}"
+	#pip install "${PYTHON_PACKAGES[@]}"
 
 	touch /etc/ansible-flag
 
