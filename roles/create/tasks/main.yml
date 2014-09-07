@@ -3,7 +3,7 @@
 - name: "create lxc container"
   action: shell
 
-    set -i
+    set -e
 
     (
       set +e;
@@ -11,6 +11,8 @@
         --name {{ inventory_hostname }};
       lxc-destroy
         --name {{ inventory_hostname }};
+      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
+      rm -r /var/lib/lxc/{{ inventory_hostname }};
     );
 
     lxc-create
