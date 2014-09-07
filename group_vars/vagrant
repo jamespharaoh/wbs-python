@@ -10,6 +10,8 @@ vagrant_install_packages:
   - "ngrep"
   - "parted"
   - "whois"
+  - "nodejs"
+  - "npm"
 
 vagrant_remove_packages:
 
