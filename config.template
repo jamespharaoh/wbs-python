@@ -3,4 +3,5 @@
 name: ""
 email: ""
 
-ubuntu_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_security_url: "http://security.ubuntu.com/ubuntu"

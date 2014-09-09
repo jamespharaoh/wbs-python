@@ -33,17 +33,29 @@ else
 
 	#echo "set grub-pc/install_devices /dev/sda" | debconf-communicate
 
-	mirror=$(
+	ubuntu_main_url=$(
 		gawk -- "
-			BEGIN { mirror = \"http://archive.ubuntu.com/ubuntu\" }
-			match (\$0, /^ubuntu_url: \"([^\"]+)\"$/, ary) { mirror = ary [1] }
-			END { print mirror }
+			BEGIN { url = \"http://archive.ubuntu.com/ubuntu\" }
+			match (\$0, /^ubuntu_main_url: \"([^\"]+)\"$/, ary) { url = ary [1] }
+			END { print url }
 		" < /vagrant/config
 	)
 
-	echo "Using ubuntu mirror: $mirror" >&2
+	ubuntu_security_url=$(
+		gawk -- "
+			BEGIN { url = \"http://security.ubuntu.com/ubuntu\" }
+			match (\$0, /^ubuntu_security_url: \"([^\"]+)\"$/, ary) { url = ary [1] }
+			END { print url }
+		" < /vagrant/config
+	)
 
-	sed "s|{{ ubuntu_url }}|$mirror|" \
+	echo "Using ubuntu main: $ubuntu_main_url" >&2
+	echo "Using ubuntu security: $ubuntu_security_url" >&2
+
+	sed "
+		s|{{ ubuntu_main_url }}|$ubuntu_main_url|
+		s|{{ ubuntu_security_url }}|$ubuntu_security_url|
+	" \
 		</vagrant/roles/vagrant/templates/apt-sources-list \
 		>/etc/apt/sources.list
 

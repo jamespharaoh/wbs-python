@@ -21,7 +21,8 @@
       --name {{ inventory_hostname }}
       --bdev btrfs
       --
-      --mirror {{ ubuntu_url }}
+      --mirror {{ ubuntu_main_url }}
+      --security-mirror {{ ubuntu_security_url }}
       --release trusty
       --arch amd64
     &&
