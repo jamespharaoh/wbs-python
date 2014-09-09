@@ -1,3 +1,7 @@
+require "rbconfig"
+
+include RbConfig
+
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure VAGRANTFILE_API_VERSION do
@@ -16,12 +20,28 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 
 	# network routing
 
-	config.trigger.after :up do
-		run "sudo route add -net 10.210.0.0 netmask 255.255.0.0 gw 172.28.128.3"
-	end
+	case CONFIG["host_os"]
 
-	config.trigger.after :down do
-		run "sudo route del -net 10.210.0.0 netmask 255.255.0.0 gw 172.28.128.3"
+	when "linux-gnu"
+
+		config.trigger.after :up do
+			run "sudo route add -net 10.210.0.0 netmask 255.255.0.0 gw 172.28.128.3"
+		end
+
+		config.trigger.after :down do
+			run "sudo route del -net 10.210.0.0 netmask 255.255.0.0 gw 172.28.128.3"
+		end
+
+	when "darwin"
+
+		config.trigger.after :up do
+			run "sudo route add -net 10.210.0.0/16 172.28.128.3"
+		end
+
+		config.trigger.after :down do
+			run "sudo route del -net 10.210.0.0/16 172.28.128.3"
+		end
+
 	end
 
 	# setup ansible
