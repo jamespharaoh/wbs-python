@@ -18,6 +18,18 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 
 	config.ssh.forward_agent = true
 
+	# allow console access
+
+	config.vm.provider "virtualbox" do
+		|vbox|
+
+		vbox.customize [
+			"modifyvm", :id,
+			"--vram", "16",
+		]
+
+	end
+
 	# network routing
 
 	case CONFIG["host_os"]
