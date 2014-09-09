@@ -3,8 +3,9 @@
 # always run from vagrant machine
 
 if ! test "$HOSTNAME" = "wistla-dev"; then
-	vagrant up
-	exec vagrant ssh --command "./run-ansible"
+	echo "This command must be run from inside vagrant" >&2
+	echo "Please run 'vagrant ssh' and try again" >&2
+	exit 1
 fi
 
 # always run as root
