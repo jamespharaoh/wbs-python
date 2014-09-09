@@ -1,12 +1,12 @@
 # ---------- vagrant
 
 [vagrant]
-vagrant        adr=1.1 hw=00:16:c3:82:a7:4f
+vagrant        adr=1.1   hw=00:16:c3:82:a7:4f
 
 # ---------- template
 
 [template]
-template       adr=2.0 hw=00:16:5b:f4:8e:33
+template       adr=1.255 hw=00:16:5b:f4:8e:33
 
 # ---------- mongo
 
@@ -15,10 +15,10 @@ mongo-template
 mongo-host
 
 [mongo-template]
-mongo-template adr=3.0 hw=00:16:29:e7:51:30
+mongo-template adr=2.255 hw=00:16:29:e7:51:30
 
 [mongo-host]
-mongo          adr=3.1 hw=00:16:b7:4c:6d:4e
+mongo-0        adr=2.0   hw=00:16:b7:4c:6d:4e
 
 # ---------- api
 
@@ -27,10 +27,10 @@ api-template
 api-host
 
 [api-template]
-api-template   adr=4.0 hw=00:16:a0:9d:4d:b2
+api-template   adr=3.255 hw=00:16:a0:9d:4d:b2
 
 [api-host]
-api            adr=4.1 hw=00:16:0d:66:78:8b
+api-0          adr=3.0   hw=00:16:0d:66:78:8b
 
 # ---------- web
 
@@ -39,7 +39,7 @@ web-template
 web-host
 
 [web-template]
-web-template   adr=5.0 hw=00:16:01:d0:5d:2a
+web-template   adr=4.255 hw=00:16:01:d0:5d:2a
 
 [web-host]
-web            adr=5.1 hw=00:16:1d:15:60:ab
+web-0          adr=4.0   hw=00:16:1d:15:60:ab
