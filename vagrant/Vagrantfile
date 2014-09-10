@@ -68,8 +68,12 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 	# setup ansible
 
 	config.vm.provision "shell",
-		path: "ansible-setup",
+		path: "ansible-setup-root",
 		privileged: true
+
+	config.vm.provision "shell",
+		path: "ansible-setup-user",
+		privileged: false
 
 	# run ansible
 
