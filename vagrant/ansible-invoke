@@ -1,0 +1,25 @@
+cd /home/vagrant
+
+if ! test -d "wistla-devops"; then
+
+	echo "=== checking out wistla-devops" >&2
+
+	git clone "ssh://git@github.com/wistla/wistla-devops"
+
+fi
+
+cd wistla-devops
+
+if ! test -f config; then
+
+	echo "=== copying config from host" >&2
+
+	cp /vagrant/config config
+
+fi
+
+echo "=== running ansible" >&2
+
+exec ./run-ansible
+
+# ex: noet ts=4 filetype=sh

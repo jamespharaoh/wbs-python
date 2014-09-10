@@ -1,8 +1,17 @@
+require "fileutils"
 require "rbconfig"
 
 include RbConfig
 
 VAGRANTFILE_API_VERSION = "2"
+
+unless File.exist? "../config"
+	puts "Please create config, using config.template as a base"
+	exit 1
+end
+
+FileUtils.cp "../config", "config"
+FileUtils.cp "../roles/vagrant/templates/apt-sources-list", "apt-sources-list"
 
 Vagrant.configure VAGRANTFILE_API_VERSION do
 	|config|
@@ -59,13 +68,13 @@ Vagrant.configure VAGRANTFILE_API_VERSION do
 	# setup ansible
 
 	config.vm.provision "shell",
-		path: "etc/ansible-setup",
+		path: "ansible-setup",
 		privileged: true
 
 	# run ansible
 
 	config.vm.provision "shell",
-		path: "etc/ansible-invoke",
+		path: "ansible-invoke",
 		privileged: true
 
 end
