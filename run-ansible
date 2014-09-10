@@ -16,7 +16,7 @@ fi
 
 # load ansible environment
 
-cd /vagrant
+cd /home/vagrant/wistla-devops
 
 source ansible/hacking/env-setup >/dev/null
 

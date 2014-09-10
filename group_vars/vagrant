@@ -10,10 +10,11 @@ vagrant_install_packages:
   - "mongodb-clients"
   - "nfs-kernel-server"
   - "ngrep"
-  - "parted"
-  - "whois"
   - "nodejs"
   - "npm"
+  - "parted"
+  - "samba"
+  - "whois"
 
 vagrant_remove_packages:
 

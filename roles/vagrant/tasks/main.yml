@@ -3,6 +3,7 @@
 - include: "btrfs.yml"
 - include: "network.yml"
 - include: "nfs.yml"
+- include: "samba.yml"
 - include: "user.yml"
 - include: "wistla.yml"
 

@@ -1,0 +1,38 @@
+[global]
+
+	netbios name = "WISTLA-DEV"
+	workgroup = WISTLA
+	server string = Wistla dev
+
+	dns proxy = no
+
+	log file = /var/log/samba/log.%m
+	max log size = 16384
+	syslog = 0
+
+	panic action = /usr/share/samba/panic-action %d
+
+	server role = standalone server
+
+	passdb backend = tdbsam
+	unix password sync = no
+	map to guest = bad user
+
+	usershare allow guests = no
+
+	load printers = no
+	printing = bsd
+	printcap name = /dev/null
+	disable spoolss = yes
+
+[homes]
+
+	comment = Home directories
+
+	browseable = no
+	read only = no
+
+	create mask = 0666
+	directory mask = 0777
+
+	valid users = %S

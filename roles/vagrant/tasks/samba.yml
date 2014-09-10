@@ -1,0 +1,19 @@
+---
+
+- name: "create samba config"
+  action:
+    module: "template"
+    src: "samba-config"
+    dest: "/etc/samba/smb.conf"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "reload samba"
+
+- name: "set samba password"
+  action: shell
+    echo vagrant | smbpaswd -a vagrant -s;
+    touch /etc/samba/vagrant-password-flag;
+  args:
+    creates: "/etc/samba/vagrant-password-flag"
+  sudo: "yes"
+  sudo_user: "root"

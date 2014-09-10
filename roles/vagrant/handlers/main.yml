@@ -7,3 +7,11 @@
     state: "reloaded"
   sudo: "yes"
   sudo_user: "root"
+
+- name: "reload samba"
+  action:
+    module: "service"
+    name: "smbd"
+    state: "reloaded"
+  sudo: "yes"
+  sudo_user: "root"
