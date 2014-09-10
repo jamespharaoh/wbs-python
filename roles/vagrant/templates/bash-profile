@@ -1,6 +1,6 @@
-# default to vagrant directory
+# change to wistla-devops directory
 
-cd /vagrant
+cd "$HOME/wistla-devops"
 
 # run rc as well
 

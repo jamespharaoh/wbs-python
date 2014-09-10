@@ -1,0 +1,10 @@
+---
+
+- name: "create exports"
+  action:
+    module: "template"
+    src: "nfs-exports"
+    dest: "/etc/exports"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "reload nfs server"

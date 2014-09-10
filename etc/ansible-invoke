@@ -1,5 +1,5 @@
 echo "=== running ansible" >&2
 
-exec /vagrant/run-ansible
+exec "/home/vagrant/wistla-devops/run-ansible"
 
 # ex: noet ts=4 filetype=sh

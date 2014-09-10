@@ -1,0 +1,9 @@
+---
+
+- name: "reload nfs server"
+  action:
+    module: "service"
+    name: "nfs-kernel-server"
+    state: "reloaded"
+  sudo: "yes"
+  sudo_user: "root"

@@ -8,6 +8,7 @@ vagrant_install_packages:
   - "git"
   - "lxc"
   - "mongodb-clients"
+  - "nfs-kernel-server"
   - "ngrep"
   - "parted"
   - "whois"

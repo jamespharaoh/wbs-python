@@ -17,7 +17,7 @@
       --delete
       --checksum
       --itemize-changes
-      /vagrant/{{ item }}/
+      /home/vagrant/{{ item }}/
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
 
   sudo: "yes"

@@ -1,22 +1,18 @@
 ---
 
-- name: "link to bash profile"
+- name: "create bash profile"
   action:
-    module: "file"
-    state: "link"
-    path: "/home/vagrant/.bash_profile"
-    src: "/vagrant/etc/bash-profile"
-    force: "yes"
+    module: "template"
+    src: "bash-profile"
+    dest: "/home/vagrant/.bash_profile"
   sudo: "yes"
   sudo_user: "vagrant"
 
-- name: "link to bash rc"
+- name: "create bash rc"
   action:
-    module: "file"
-    state: "link"
-    path: "/home/vagrant/.bashrc"
-    src: "/vagrant/etc/bash-rc"
-    force: "yes"
+    module: "template"
+    src: "bash-rc"
+    dest: "/home/vagrant/.bashrc"
   sudo: "yes"
   sudo_user: "vagrant"
 

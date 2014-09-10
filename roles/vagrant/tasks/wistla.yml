@@ -2,12 +2,12 @@
 
 - name: "checkout projects from git"
   action: shell
-    cd /vagrant;
+    cd /home/vagrant;
     git clone
       git@github.com:/wistla/{{ item.name }}
       --branch {{ item.branch }}
   args:
-    creates: "/vagrant/{{ item.name }}"
+    creates: "/home/vagrant/{{ item.name }}"
   sudo: "yes"
   sudo_user: "vagrant"
   with_items: "vagrant_checkouts"

@@ -69,6 +69,10 @@ else
 
 	#pip install "${PYTHON_PACKAGES[@]}"
 
+	rsync --archive \
+		/vagrant/ \
+		/home/vagrant/wistla-devops/
+
 	touch /etc/ansible-flag
 
 fi

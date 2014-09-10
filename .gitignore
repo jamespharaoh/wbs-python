@@ -1,4 +1,5 @@
-/wistla-api
-/wistla-web
 /.vagrant
 /config
+/vagrant
+/wistla-api
+/wistla-web

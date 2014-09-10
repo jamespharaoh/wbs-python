@@ -56,6 +56,6 @@ fi
 
 # enable ansible
 
-source /vagrant/ansible/hacking/env-setup
+source "$HOME/wistla-devops/ansible/hacking/env-setup"
 
 # ex: noet ts=4 filetype=sh
