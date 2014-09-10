@@ -2,5 +2,6 @@
 /vagrant/.vagrant
 /vagrant/apt-sources-list
 /vagrant/config
+/vagrant/id_rsa
 /wistla-api
 /wistla-web
