@@ -43,4 +43,13 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "make node command work"
+  action:
+    module: "alternatives"
+    link: "/usr/bin/node"
+    name: "node"
+    path: "/usr/bin/nodejs"
+  sudo: "yes"
+  sudo_user: "root"
+
 # ex: et ts=2 filetype=yaml
