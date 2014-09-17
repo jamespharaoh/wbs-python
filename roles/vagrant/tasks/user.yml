@@ -16,4 +16,12 @@
   sudo: "yes"
   sudo_user: "vagrant"
 
+- name: "create git config"
+  action:
+    module: "template"
+    src: "git-config"
+    dest: "/home/vagrant/.gitconfig"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
 # ex: et ts=2 filetype=yaml

@@ -12,4 +12,12 @@
   sudo_user: "vagrant"
   with_items: "vagrant_checkouts"
 
+- name: "create wistla-devops config"
+  action:
+    module: "template"
+    src: "devops-config"
+    dest: "/home/vagrant/wistla-devops/config"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
 # ex: et ts=2 filetype=yaml

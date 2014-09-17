@@ -1,0 +1,7 @@
+---
+
+developer_name: "{{ developer_name }}"
+developer_email: "{{ developer_email }}"
+
+ubuntu_main_url: "{{ ubuntu_main_url }}"
+ubuntu_security_url: "{{ ubuntu_security_url }}"

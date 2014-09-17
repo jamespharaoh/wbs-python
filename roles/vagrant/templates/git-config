@@ -1,0 +1,14 @@
+[user]
+	name = {{ developer_name }}
+	email = {{ developer_email }}
+
+[color]
+	branch = auto
+	diff = auto
+	status = auto
+
+[push]
+	default = matching
+
+[merge]
+	conflictstyle = diff3
