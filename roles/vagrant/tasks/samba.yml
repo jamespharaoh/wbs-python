@@ -11,7 +11,8 @@
 
 - name: "set samba password"
   action: shell
-    echo vagrant | smbpaswd -a vagrant -s;
+    set -e;
+    printf "vagrant\nvagrant\n" | smbpasswd -a vagrant -s;
     touch /etc/samba/vagrant-password-flag;
   args:
     creates: "/etc/samba/vagrant-password-flag"
