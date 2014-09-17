@@ -8,10 +8,10 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "reload samba"
+- name: "restart samba"
   action:
     module: "service"
     name: "smbd"
-    state: "reloaded"
+    state: "restarted"
   sudo: "yes"
   sudo_user: "root"

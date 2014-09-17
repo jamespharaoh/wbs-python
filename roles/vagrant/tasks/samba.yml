@@ -7,7 +7,7 @@
     dest: "/etc/samba/smb.conf"
   sudo: "yes"
   sudo_user: "root"
-  notify: "reload samba"
+  notify: "restart samba"
 
 - name: "set samba password"
   action: shell
