@@ -14,6 +14,7 @@
     module: "apt"
     state: "absent"
     name: "{{ item }}"
+    purge: "yes"
   sudo: "yes"
   sudo_user: "root"
   with_items: "vagrant_remove_packages"
