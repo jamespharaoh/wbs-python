@@ -4,6 +4,7 @@
 - include: "network.yml"
 - include: "nfs.yml"
 - include: "samba.yml"
+- include: "dns.yml"
 - include: "user.yml"
 - include: "wistla.yml"
 
