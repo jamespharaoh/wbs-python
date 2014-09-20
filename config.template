@@ -1,0 +1,9 @@
+---
+
+developer_name: "{{ developer_name | default ('') }}"
+developer_email: "{{ developer_email | default ('') }}"
+
+ubuntu_main_url: "{{ ubuntu_main_url }}"
+ubuntu_security_url: "{{ ubuntu_security_url }}"
+
+domain: "{{ domain | default ('dev.wistla.com') }}"

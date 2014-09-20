@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # always run from vagrant machine
 
 if ! test "$HOSTNAME" = "wistla-dev"; then
@@ -19,6 +21,14 @@ fi
 cd /home/vagrant/wistla-devops
 
 source ansible/hacking/env-setup >/dev/null
+
+# fix config
+
+ansible-playbook \
+	--inventory-file inventory \
+	--extra-vars @config \
+	--limit vagrant \
+	fix-config.yml
 
 # run ansible-playbook
 

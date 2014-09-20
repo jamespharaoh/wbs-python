@@ -1,6 +1,6 @@
 [user]
-	name = {{ developer_name | default ('') }}
-	email = {{ developer_email | default ('') }}
+	name = {{ developer_name }}
+	email = {{ developer_email }}
 
 [color]
 	branch = auto
