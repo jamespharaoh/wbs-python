@@ -5,14 +5,12 @@
 - hosts: "vagrant"
   gather_facts: "no"
   roles: [ "vagrant" ]
-  tags: "vagrant"
 
 # create template
 
 - hosts: "template"
   gather_facts: "no"
   roles: [ "create", "template" ]
-  tags: "template"
 
 # create mongo
 
@@ -23,31 +21,69 @@
 
 - hosts: "mongo-host"
   gather_facts: "no"
-  roles: [ "stop", "destroy", "clone", "start" ]
-  tags: "mongo"
+  roles: [ "stop" ]
+
+- hosts: "mongo-host"
+  gather_facts: "no"
+  roles: [ "destroy" ]
+  serial: 1
+
+- hosts: "mongo-host"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  serial: 1
+
+- hosts: "mongo-host"
+  gather_facts: "no"
+  roles: [ "start" ]
 
 # create api
 
 - hosts: "api-template"
   gather_facts: "no"
   roles: [ "clone", "template", "api" ]
-  tags: "api"
 
 - hosts: "api-host"
   gather_facts: "no"
-  roles: [ "stop", "destroy", "clone", "start" ]
-  tags: "api"
+  roles: [ "stop" ]
+
+- hosts: "api-host"
+  gather_facts: "no"
+  roles: [ "destroy" ]
+  serial: 1
+
+- hosts: "api-host"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  serial: 1
+
+- hosts: "api-host"
+  gather_facts: "no"
+  roles: [ "start" ]
 
 # create web
 
 - hosts: "web-template"
   gather_facts: "no"
   roles: [ "clone", "template", "web" ]
-  tags: "web"
 
 - hosts: "web-host"
   gather_facts: "no"
-  roles: [ "stop", "destroy", "clone", "start" ]
+  roles: [ "stop" ]
+
+- hosts: "web-host"
+  gather_facts: "no"
+  roles: [ "destroy" ]
+  serial: 1
+
+- hosts: "web-host"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  serial: 1
+
+- hosts: "web-host"
+  gather_facts: "no"
+  roles: [ "start" ]
   tags: "web"
 
 # create load
@@ -55,9 +91,21 @@
 - hosts: "load-template"
   gather_facts: "no"
   roles: [ "clone", "template", "load" ]
-  tags: "load"
 
 - hosts: "load-host"
   gather_facts: "no"
-  roles: [ "stop", "destroy", "clone", "start" ]
-  tags: "load"
+  roles: [ "stop" ]
+
+- hosts: "load-host"
+  gather_facts: "no"
+  roles: [ "destroy" ]
+  serial: 1
+
+- hosts: "load-host"
+  gather_facts: "no"
+  roles: [ "clone" ]
+  serial: 1
+
+- hosts: "load-host"
+  gather_facts: "no"
+  roles: [ "start" ]
