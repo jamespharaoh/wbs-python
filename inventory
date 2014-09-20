@@ -11,8 +11,8 @@ concrete-template
 
 [concrete-template:children]
 api-template
+load-template
 mongo-template
-api-template
 web-template
 
 [generic-template]
