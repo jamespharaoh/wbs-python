@@ -30,10 +30,30 @@ ansible-playbook \
 	--limit vagrant \
 	fix-config.yml
 
+if ! test -f accounts; then
+	cat >accounts <<-END
+		---
+		amazon_accounts:
+		  production:
+		    access_key: ""
+		    secret_key: ""
+		  staging:
+		    access_key: ""
+		    secret_key: ""
+		  test:
+		    access_key: ""
+		    secret_key: ""
+		  operations:
+		    access_key: ""
+		    secret_key: ""
+	END
+	chown vagrant:vagrant accounts
+fi
+
 # run ansible-playbook
 
 exec ansible-playbook \
 	--inventory-file inventory \
 	--extra-vars @config \
-	site.yml \
+	--extra-vars @accounts \
 	"${@}"

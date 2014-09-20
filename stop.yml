@@ -1,0 +1,10 @@
+---
+
+- hosts: [ "api-host", "load-host", "mongo-host", "web-host" ]
+  gather_facts: "no"
+  roles: [ "lxc-stop" ]
+
+- hosts: [ "api-host", "load-host", "mongo-host", "web-host" ]
+  gather_facts: "no"
+  roles: [ "lxc-destroy" ]
+

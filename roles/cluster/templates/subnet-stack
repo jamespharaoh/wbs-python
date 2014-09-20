@@ -1,0 +1,60 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Wistla {{ subnet }} subnet"
+
+Resources:
+
+  # set up a route table
+
+  RouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: "{{ cluster_vpc }}"
+      Tags:
+      - { Key: "Cluster", Value: "{{ cluster }}" }
+      - { Key: "Class", Value: "{{ subnet }}" }
+
+  #RoutePublic:
+  #  Type: "AWS::EC2::Route"
+  #  Properties:
+  #    RouteTableId: { Ref: "RouteTable" }
+  #    DestinationCidrBlock: "0.0.0.0/0"
+  #    GatewayId: { Ref: "{{ cluster_gateway }}" }
+
+  # create a subnet in each zone
+
+{% for zone in [ 'a', 'b', 'c' ] %}
+
+  Subnet{{ zone | capitalize }}:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: "{{ amazon_zones[zone] }}"
+      CidrBlock: "{{ cluster_net }}.{{ cluster_subnets[subnet][zone] }}.0/24"
+      VpcId: "{{ cluster_vpc }}"
+      Tags:
+      - { Key: "Cluster", Value: "{{ cluster }}" }
+      - { Key: "Class", Value: "{{ subnet }}" }
+      - { Key: "Zone", Value: "{{ zone }}" }
+
+{% endfor %}
+
+  # associate subnets with the route table
+
+{% for zone in [ 'a', 'b', 'c'] %}
+
+  SubnetRouteTable{{ zone | capitalize }}:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: { Ref: RouteTable }
+      SubnetId: { Ref: Subnet{{ zone | capitalize }} }
+
+{% endfor %}
+
+Outputs:
+
+{% for zone in [ 'a', 'b', 'c' ] %}
+
+  Subnet{{ zone | capitalize }}:
+    Value: { Ref: Subnet{{ zone | capitalize }} }
+
+{% endfor %}

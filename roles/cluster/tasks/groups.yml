@@ -1,0 +1,40 @@
+---
+
+# first create all the groups
+
+- name: "create admin security group"
+  action:
+    module: "ec2_group"
+    name: "{{ cluster }}-admin"
+    description: "Admin {{ cluster }}"
+    vpc_id: "{{ cluster_vpc }}"
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+  register: "create_admin_group"
+
+# save data
+
+- set_fact:
+    cluster_group_admin: "{{ create_admin_group.group_id }}"
+
+- include: "save.yml"
+
+# then set the rules
+
+- name: "update admin security group"
+  action:
+    module: "ec2_group"
+    name: "{{ cluster }}-admin"
+    description: "Admin {{ cluster }}"
+    vpc_id: "{{ cluster_vpc }}"
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    rules:
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "0.0.0.0/0"
+
+# ex: et ts=2 filetype=yaml

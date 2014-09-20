@@ -1,0 +1,9 @@
+---
+
+- name: "write cluster data"
+  action:
+    module: "template"
+    src: "cluster-data"
+    dest: "/home/vagrant/work/{{ cluster }}/cluster-data"
+  sudo: "yes"
+  sudo_user: "vagrant"

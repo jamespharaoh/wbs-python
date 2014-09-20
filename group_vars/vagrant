@@ -13,6 +13,7 @@ vagrant_install_packages:
   - "nodejs"
   - "npm"
   - "parted"
+  - "python-boto"
   - "samba"
   - "whois"
 

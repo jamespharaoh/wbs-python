@@ -1,0 +1,27 @@
+---
+
+- name: "create work dirs"
+  action:
+    module: "file"
+    path: "{{ item }}"
+    state: "directory"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_items:
+    - "/home/vagrant/work"
+    - "/home/vagrant/work/{{ cluster }}"
+
+- name: "make sure cluster data exists"
+  shell:
+    if test -f /home/vagrant/work/{{ cluster }}/cluster-data; then
+      echo 'UNCHANGED';
+    else
+      touch -f /home/vagrant/work/{{ cluster }}/cluster-data;
+      echo 'CHANGED';
+    fi;
+  sudo: "yes"
+  sudo_user: "vagrant"
+  register: "touch_result"
+  changed_when: "touch_result.stdout != 'UNCHANGED'"
+
+- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"

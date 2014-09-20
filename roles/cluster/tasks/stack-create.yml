@@ -1,0 +1,51 @@
+---
+
+- name: "write stack yaml {{ stack }}"
+  action:
+    module: "template"
+    src: "{{ template }}"
+    dest: "/home/vagrant/work/{{ cluster }}/{{ stack }}.yaml"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
+- name: "write stack json {{ stack }}"
+  action: shell
+
+    set -e;
+
+    sum_before=$(
+      md5sum /home/vagrant/work/{{ cluster }}/{{ stack }}.json 2>/dev/null
+      || echo none
+    );
+
+    misc/yaml-to-json.py
+      < /home/vagrant/work/{{ cluster }}/{{ stack }}.yaml
+      > /home/vagrant/work/{{ cluster }}/{{ stack }}.json;
+
+    sum_after=$(
+      md5sum /home/vagrant/work/{{ cluster }}/{{ stack }}.json 2>/dev/null
+    );
+
+    if test "$sum_before" = "$sum_after"; then
+      echo "UNCHANGED";
+    else
+      echo "CHANGED";
+    fi;
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  register: "json_result"
+  changed_when: "json_result.stdout != 'UNCHANGED'"
+
+- name: "create stack {{ stack }}"
+  local_action:
+    module: "cloudformation"
+    stack_name: "{{ stack }}"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster }}/{{ stack }}.json"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+  register: "stack_result"
+
+# ex: et ts=2 filetype=yaml

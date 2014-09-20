@@ -1,0 +1,33 @@
+---
+
+- hosts: "template"
+  gather_facts: "no"
+  roles: [ "lxc-create" ]
+
+- hosts: "template"
+  gather_facts: "no"
+  roles: [ "node-template" ]
+
+- hosts: [ "api-template", "load-template", "mongo-template", web-template" ]
+  gather_facts: "no"
+  roles: [ "lxc-clone" ]
+
+- hosts: [ "api-template", "load-template", "mongo-template", web-template" ]
+  gather_facts: "no"
+  roles: [ "node-template" ]
+
+- hosts: "api-template"
+  gather_facts: "no"
+  roles: [ "node-api" ]
+
+- hosts: "load-template"
+  gather_facts: "no"
+  roles: [ "node-load" ]
+
+- hosts: "mongo-template"
+  gather_facts: "no"
+  roles: [ "node-mongo" ]
+
+- hosts: "web-template"
+  gather_facts: "no"
+  roles: [ "node-web" ]

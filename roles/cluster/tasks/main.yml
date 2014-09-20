@@ -1,0 +1,24 @@
+---
+
+- include: "setup.yml"
+  tags:
+    - "cluster-vpc"
+    - "cluster-subnet-admin"
+    - "cluster-subnet-data"
+    - "cluster-subnet-app"
+    - "cluster-groups"
+
+- include: "vpc.yml"
+  tags: "cluster-vpc"
+
+- include: "subnet-admin.yml"
+  tags: "cluster-subnet-admin"
+
+- include: "subnet-data.yml"
+  tags: "cluster-subnet-data"
+
+- include: "subnet-app.yml"
+  tags: "cluster-subnet-app"
+
+- include: "groups.yml"
+  tags: "cluster-groups"

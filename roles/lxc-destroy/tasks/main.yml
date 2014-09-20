@@ -12,9 +12,14 @@
       return;
     fi;
 
+    source $HOME/wistla-devops/misc/locking lxc-destroy;
+    exlock;
+
     lxc-destroy
       --name {{ inventory_hostname }};
 
+  args:
+    executable: "/bin/bash"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"

@@ -1,0 +1,12 @@
+---
+
+cluster_net: "10.140"
+
+amazon_account: "production"
+
+amazon_region: "eu-west-1"
+
+amazon_zones:
+  a: "eu-west-1a"
+  b: "eu-west-1b"
+  c: "eu-west-1c"

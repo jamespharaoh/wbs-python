@@ -7,3 +7,5 @@ ubuntu_main_url: "{{ ubuntu_main_url }}"
 ubuntu_security_url: "{{ ubuntu_security_url }}"
 
 domain: "{{ domain | default ('dev.wistla.com') }}"
+cluster: "{{ cluster | default ('dev') }}"
+net: "{{ net | default ('10.210') }}"

@@ -22,3 +22,20 @@ global_install_packages:
 
 net: "10.210"
 ip: "{{ net }}.{{ grp }}.{{ idx }}"
+
+cluster_subnets:
+
+  admin:
+    a: "1"
+    b: "2"
+    c: "3"
+
+  data:
+    a: "4"
+    b: "5"
+    c: "6"
+
+  app:
+    a: "7"
+    b: "8"
+    c: "9"

@@ -1,4 +1,5 @@
 /.Trash-*
+/accounts
 /config
 /vagrant/.vagrant
 /vagrant/apt-sources-list
