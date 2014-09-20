@@ -5,7 +5,7 @@
 
     set -e;
 
-    source $HOME/wistla-devops/misc/locking ansible;
+    source /home/vagrant/wistla-devops/misc/locking ansible;
     exlock;
 
     lxc-info
