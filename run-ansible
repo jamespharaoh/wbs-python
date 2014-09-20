@@ -22,6 +22,8 @@ cd /home/vagrant/wistla-devops
 
 source ansible/hacking/env-setup >/dev/null
 
+export PYTHONUNBUFFERED=1
+
 # fix config
 
 ansible-playbook \
