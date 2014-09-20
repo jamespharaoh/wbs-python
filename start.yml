@@ -1,9 +1,9 @@
 ---
 
-- hosts: [ "api-host", "load-host", "mongo-host", "web-host" ]
+- hosts: "node"
   gather_facts: "no"
   roles: [ "lxc-clone" ]
 
-- hosts: [ "api-host", "load-host", "mongo-host", "web-host" ]
+- hosts: "node"
   gather_facts: "no"
   roles: [ "lxc-start" ]

@@ -1,6 +1,6 @@
 ---
 
-- hosts: "template"
+- hosts: "generic-template"
   gather_facts: "no"
   roles: [ "lxc-create" ]
 
@@ -8,11 +8,11 @@
   gather_facts: "no"
   roles: [ "node-template" ]
 
-- hosts: [ "concrete-template" ]
+- hosts: "concrete-template"
   gather_facts: "no"
   roles: [ "lxc-clone" ]
 
-- hosts: [ "concrete-template" ]
+- hosts: "concrete-template"
   gather_facts: "no"
   roles: [ "node-template" ]
 

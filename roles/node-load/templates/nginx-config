@@ -32,7 +32,7 @@ http {
 	# load balancer
 
 	upstream api {
-{% for api in groups['api-host'] %}
+{% for api in groups['api-node'] %}
 		server {{ api }}:7000;
 {% endfor %}
 	}
