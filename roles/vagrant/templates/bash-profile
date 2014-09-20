@@ -6,4 +6,8 @@ cd "$HOME/wistla-devops"
 
 source "$HOME/.bashrc"
 
+# set language
+
+export LANG=C
+
 # ex: noet ts=4 filetype=sh
