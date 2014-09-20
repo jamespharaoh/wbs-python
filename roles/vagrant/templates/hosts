@@ -1,5 +1,5 @@
 127.0.0.1 localhost
-{% for host_name in groups.all %}
+{% for host_name in groups.all if not host_name in groups.template %}
 {% set host = hostvars [host_name] %}
 {{ net }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}
 {% endfor %}
