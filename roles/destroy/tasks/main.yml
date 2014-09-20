@@ -6,7 +6,7 @@
     lxc-info
       --name {{ inventory_hostname }}
       >/dev/null
-    
+
     if test $? != 0; then
       echo "UNCHANGED";
       return;

@@ -11,7 +11,7 @@
 - name: "create bridge network interface"
   action:
     module: "template"
-    src: "bridge-interface"
+    src: "interface-bridge"
     dest: "/etc/network/interfaces.d/brprv0.cfg"
   sudo: "yes"
   sudo_user: "root"

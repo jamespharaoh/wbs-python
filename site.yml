@@ -49,3 +49,15 @@
   gather_facts: "no"
   roles: [ "stop", "destroy", "clone", "start" ]
   tags: "web"
+
+# create load
+
+- hosts: "load-template"
+  gather_facts: "no"
+  roles: [ "clone", "template", "load" ]
+  tags: "load"
+
+- hosts: "load-host"
+  gather_facts: "no"
+  roles: [ "stop", "destroy", "clone", "start" ]
+  tags: "load"

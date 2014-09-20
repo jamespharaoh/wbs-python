@@ -1,3 +1,5 @@
+{% set vagrant = hostvars.vagrant %}
+
 lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
 lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
@@ -10,6 +12,6 @@ lxc.network.flags = up
 lxc.network.link = brprv0
 lxc.network.hwaddr = {{ hw }}
 lxc.network.ipv4 = {{ ip }}/16
-lxc.network.ipv4.gateway = {{ net }}.{{ hostvars.vagrant.adr }}
+lxc.network.ipv4.gateway = {{ net }}.{{ vagrant.grp }}.{{ vagrant.idx }}
 
 lxc.start.auto = {{ 1 if autostart == "yes" else 0 }}

@@ -21,4 +21,4 @@ global_install_packages:
   - "whois"
 
 net: "10.210"
-ip: "{{ net }}.{{ adr }}"
+ip: "{{ net }}.{{ grp }}.{{ idx }}"

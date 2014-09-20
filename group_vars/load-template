@@ -1,8 +1,7 @@
 ---
 
-prv: "2"
-
 ansible_connection: "chroot"
 ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
+template: "template"
 autostart: "no"

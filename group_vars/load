@@ -1,0 +1,8 @@
+---
+
+prv: "5"
+pub: "6"
+
+load_install_packages:
+
+  - "nginx"
