@@ -3,6 +3,11 @@
 - name: "destroy lxc container"
   action: shell
 
+    set -e;
+
+    source $HOME/wistla-devops/misc/locking ansible;
+    exlock;
+
     lxc-info
       --name {{ inventory_hostname }}
       >/dev/null
@@ -11,9 +16,6 @@
       echo "UNCHANGED";
       return;
     fi;
-
-    source $HOME/wistla-devops/misc/locking lxc-destroy;
-    exlock;
 
     lxc-destroy
       --name {{ inventory_hostname }};

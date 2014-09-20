@@ -4,15 +4,15 @@
   gather_facts: "no"
   roles: [ "lxc-create" ]
 
-- hosts: "template"
+- hosts: "generic-template"
   gather_facts: "no"
   roles: [ "node-template" ]
 
-- hosts: [ "api-template", "load-template", "mongo-template", web-template" ]
+- hosts: [ "concrete-template" ]
   gather_facts: "no"
   roles: [ "lxc-clone" ]
 
-- hosts: [ "api-template", "load-template", "mongo-template", web-template" ]
+- hosts: [ "concrete-template" ]
   gather_facts: "no"
   roles: [ "node-template" ]
 

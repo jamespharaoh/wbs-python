@@ -5,16 +5,19 @@
 
     set -e
 
-    (
+    source $HOME/wistla-devops/misc/locking ansible;
+    exlock;
+
+    if test -f /var/lib/lxc/{{ inventory_hostname }}; then
       set +e;
       lxc-stop
         --name {{ inventory_hostname }};
       lxc-destroy
         --name {{ inventory_hostname }};
-      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
       rm -rf /var/lib/lxc/{{ inventory_hostname }};
-      true;
-    );
+      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
+      set -e;
+    fi;
 
     lxc-create
       --template ubuntu
@@ -38,6 +41,7 @@
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
 
   args:
+    executable: "/bin/bash"
     creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
   delegate_to: "localhost"
   sudo: "yes"
