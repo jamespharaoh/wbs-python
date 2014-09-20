@@ -8,13 +8,9 @@
     source /home/vagrant/wistla-devops/misc/locking ansible;
     exlock;
 
-    lxc-info
-      --name {{ inventory_hostname }}
-      >/dev/null
-
-    if test $? != 0; then
+    if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
       echo "UNCHANGED";
-      return;
+      exit;
     fi;
 
     lxc-destroy

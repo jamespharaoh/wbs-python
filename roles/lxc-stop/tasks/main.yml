@@ -3,6 +3,11 @@
 - name: "stop lxc container"
   action: shell
 
+    if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
+      echo "UNCHANGED";
+      return;
+    fi;
+
     state=$(
       lxc-info
         --name {{ inventory_hostname }}

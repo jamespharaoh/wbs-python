@@ -22,9 +22,9 @@
     lxc-clone
       --backingstore btrfs
       {{ template }}
-      {{ inventory_hostname }}
-    &&
-    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
+      {{ inventory_hostname }};
+
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
   args:
     executable: "/bin/bash"
