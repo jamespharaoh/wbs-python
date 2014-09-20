@@ -16,3 +16,4 @@
     dest: "/etc/dnsmasq.conf"
   sudo: "yes"
   sudo_user: "root"
+  notify: "restart dnsmasq"

@@ -7,6 +7,7 @@
     dest: "/etc/hosts"
   sudo: "yes"
   sudo_user: "root"
+  notify: "restart dnsmasq"
 
 - name: "create bridge network interface"
   action:

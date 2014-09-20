@@ -3,3 +3,7 @@
 {% set host = hostvars [host_name] %}
 {{ net }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}
 {% endfor %}
+{% for host_name in groups['api-node'] %}
+{% set host = hostvars [host_name] %}
+{{ net }}.{{ host.grp }}.{{ host.idx }} api.{{ domain }}
+{% endfor %}
