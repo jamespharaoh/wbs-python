@@ -1,0 +1,48 @@
+---
+
+- name: "create admin instance"
+  local_action:
+    module: "ec2"
+
+    instance_tags:
+      "Class": "cluster-admin"
+      "Zone": "{{ zon }}"
+    count_tag:
+      "Class": "cluster-admin"
+      "Zone": "{{ zon }}"
+    exact_count: 1
+
+    image: "{{ amazon_images [amazon_region].base }}"
+    instance_type: "{{ amazon_type_admin }}"
+    key_name: "wistla-production"
+
+    group_id: "{{ cluster_group_admin }}"
+    vpc_subnet_id: "{{ hostvars [inventory_hostname] ['cluster_subnet_admin_' + zon] }}"
+    private_ip: "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
+    assign_public_ip: "yes"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"    
+
+    wait: "yes"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  register: "create_result"
+
+- set_fact:
+    instance_id: "{{ create_result.tagged_instances.0.id }}"
+
+- name: "assign elastic ip"
+  local_action:
+    module: "ec2_eip"
+
+    instance_id: "{{ instance_id }}"
+    public_ip: "{{ amazon_admin_ips [zon] }}"
+
+    region: "{{ amazon_region }}"    
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"    
+
+# ex: et ts=2 filetype=yaml

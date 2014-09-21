@@ -1,0 +1,31 @@
+# server
+
+tls-server
+proto udp
+port 1194
+keepalive 5 20
+mode server
+persist-key
+persist-tun
+status wistla-{{ cluster }}-vpn.log
+
+# protocol
+
+comp-lzo adaptive
+push "comp-lzo adaptive"
+
+# network
+
+dev tun
+topology subnet
+push "topology subnet"
+push "route-gateway {{ cluster_net }}.255.2"
+
+# security
+
+dh wistla-dh.pem
+client-to-client
+ca wistla-ca.cert
+cert wistla-{{ cluster }}-vpn.cert
+key wistla-{{ cluster }}-vpn.key
+#crl-verify wistla-ca.crl

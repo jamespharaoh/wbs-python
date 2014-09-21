@@ -1,0 +1,13 @@
+---
+
+ansible_ssh_host: "{{ zon }}.admin.{{ domain }}"
+
+cluster_admin_install_packages:
+
+  - "git"
+  - "lxc"
+  - "ngrep"
+  - "openvpn"
+  - "whois"
+
+cluster_admin_remove_packages: []

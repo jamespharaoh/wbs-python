@@ -1,6 +1,7 @@
 /.Trash-*
 /accounts
 /config
+/security/secrets-plain
 /vagrant/.vagrant
 /vagrant/apt-sources-list
 /vagrant/config

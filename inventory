@@ -1,5 +1,5 @@
-# ---------- vagrant
 
+# ---------- vagrant
 [vagrant]
 vagrant        grp=1 idx=1   hw=00:16:c3:82:a7:4f
 
@@ -81,3 +81,13 @@ load-2         grp=5 idx=2   hw=00:16:e4:d8:d4:bc
 
 [load-template]
 load-template  grp=5 idx=255 hw=00:16:45:0a:dc:eb
+
+# ---------- cluster
+
+[cluster:children]
+cluster-admin
+
+[cluster-admin]
+cluster-admin-a zon=a
+#cluster-admin-b zon=b
+#cluster-admin-c zon=c

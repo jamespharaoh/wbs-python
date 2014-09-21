@@ -5,6 +5,7 @@ ansible_connection: "local"
 vagrant_install_packages:
 
   - "btrfs-tools"
+  - "encfs"
   - "git"
   - "lxc"
   - "mongodb-clients"

@@ -5,12 +5,17 @@
 - name: "create admin security group"
   action:
     module: "ec2_group"
+
     name: "{{ cluster }}-admin"
     description: "Admin {{ cluster }}"
     vpc_id: "{{ cluster_vpc }}"
+
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+    #purge_rules: "no"
+
   register: "create_admin_group"
 
 # save data
@@ -25,16 +30,30 @@
 - name: "update admin security group"
   action:
     module: "ec2_group"
+
     name: "{{ cluster }}-admin"
     description: "Admin {{ cluster }}"
     vpc_id: "{{ cluster_vpc }}"
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
     rules:
+
+      - proto: "icmp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "-1"
+        to_port: "-1"
+
       - proto: "tcp"
         from_port: "22"
         to_port: "22"
         cidr_ip: "0.0.0.0/0"
+
+      - proto: "udp"
+        from_port: "1194"
+        to_port: "1194"
+        cidr_ip: "0.0.0.0/0"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
 # ex: et ts=2 filetype=yaml

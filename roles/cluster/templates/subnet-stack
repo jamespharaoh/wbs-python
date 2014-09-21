@@ -14,12 +14,16 @@ Resources:
       - { Key: "Cluster", Value: "{{ cluster }}" }
       - { Key: "Class", Value: "{{ subnet }}" }
 
-  #RoutePublic:
-  #  Type: "AWS::EC2::Route"
-  #  Properties:
-  #    RouteTableId: { Ref: "RouteTable" }
-  #    DestinationCidrBlock: "0.0.0.0/0"
-  #    GatewayId: { Ref: "{{ cluster_gateway }}" }
+{% if subnet == 'admin' %}
+
+  RoutePublic:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: { Ref: "RouteTable" }
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: "{{ cluster_gateway }}"
+
+{% endif %}
 
   # create a subnet in each zone
 
@@ -40,7 +44,7 @@ Resources:
 
   # associate subnets with the route table
 
-{% for zone in [ 'a', 'b', 'c'] %}
+{% for zone in [ 'a', 'b', 'c' ] %}
 
   SubnetRouteTable{{ zone | capitalize }}:
     Type: "AWS::EC2::SubnetRouteTableAssociation"

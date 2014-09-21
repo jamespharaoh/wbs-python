@@ -5,6 +5,7 @@
 - include: "nfs.yml"
 - include: "samba.yml"
 - include: "dns.yml"
+- include: "fuse.yml"
 - include: "user.yml"
 - include: "wistla.yml"
 

@@ -3,8 +3,12 @@
 cluster_vpc: "{{ cluster_vpc | default ('') }}"
 cluster_gateway: "{{ cluster_gateway | default ('') }}"
 
-cluster_subnet_admin_a: "{{ cluster_subnet_admin_a | default ('') }}"
-cluster_subnet_admin_b: "{{ cluster_subnet_admin_b | default ('') }}"
-cluster_subnet_admin_c: "{{ cluster_subnet_admin_c | default ('') }}"
+{% set allvars = hostvars[inventory_hostname] %}
+{% for subnet in [ 'admin' ] %}
+{% for zone in [ 'a', 'b', 'c' ] %}
+{% set name = 'cluster_subnet_' + subnet + '_' + zone %}
+{{ name }}: "{{ allvars [name] | default ('') }}"
+{% endfor %}
+{% endfor %}
 
 cluster_group_admin: "{{ cluster_group_admin | default ('') }}"
