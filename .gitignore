@@ -2,6 +2,7 @@
 /accounts
 /config
 /security/secrets-plain
+/security/vpn
 /vagrant/.vagrant
 /vagrant/apt-sources-list
 /vagrant/config
