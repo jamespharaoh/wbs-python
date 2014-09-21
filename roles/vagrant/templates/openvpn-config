@@ -1,0 +1,15 @@
+client
+resolv-retry infinite
+nobind
+ns-cert-type server
+pull
+remote {{ vpn_endpoints [item] }} 1194
+proto udp
+dev tun
+ca wistla-ca.cert
+cert wistla-{{ item }}-vpn.cert
+key wistla-{{ item }}-vpn.key
+#crl-verify wistla-ca.crl
+persist-key
+persist-tun
+status wistla-{{ item }}-vpn.log

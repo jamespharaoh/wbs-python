@@ -6,6 +6,7 @@
   subnet: "app"
 
 - set_fact:
+    cluster_routes_app: "{{ stack_result.stack_outputs.RouteTable }}"
     cluster_subnet_app_a: "{{ stack_result.stack_outputs.SubnetA }}"
     cluster_subnet_app_b: "{{ stack_result.stack_outputs.SubnetB }}"
     cluster_subnet_app_c: "{{ stack_result.stack_outputs.SubnetC }}"

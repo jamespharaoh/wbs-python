@@ -1,3 +1,5 @@
+{% set vpn_net = cluster_vpn + '.' + vpn_groups [zon] %}
+
 # server
 
 tls-server
@@ -9,23 +11,26 @@ persist-key
 persist-tun
 status wistla-{{ cluster }}-vpn.log
 
-# protocol
-
-comp-lzo adaptive
-push "comp-lzo adaptive"
-
 # network
 
 dev tun
 topology subnet
+
+ifconfig {{ vpn_net }}.1 255.255.255.0
+ifconfig-pool {{ vpn_net }}.2 {{ vpn_net }}.254 255.255.255.0
+
 push "topology subnet"
-push "route-gateway {{ cluster_net }}.255.2"
+push "route-gateway {{ vpn_net }}.1"
+push "route {{ cluster_net }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+
+client-to-client
 
 # security
 
 dh wistla-dh.pem
-client-to-client
+
 ca wistla-ca.cert
+#crl-verify wistla-ca.crl
+
 cert wistla-{{ cluster }}-vpn.cert
 key wistla-{{ cluster }}-vpn.key
-#crl-verify wistla-ca.crl

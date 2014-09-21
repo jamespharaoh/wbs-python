@@ -5,6 +5,7 @@
     module: "ec2"
 
     instance_tags:
+      "Name": "admin-{{ zon }}"
       "Class": "cluster-admin"
       "Zone": "{{ zon }}"
     count_tag:
@@ -20,6 +21,7 @@
     vpc_subnet_id: "{{ hostvars [inventory_hostname] ['cluster_subnet_admin_' + zon] }}"
     private_ip: "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
     assign_public_ip: "yes"
+    source_dest_check: "no"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
@@ -44,5 +46,26 @@
     region: "{{ amazon_region }}"    
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"    
+
+- name: "create vpn route"
+  delegate_to: "localhost"
+  command:
+
+    aws ec2 create-route
+      --route-table-id {{ item }}
+      --destination-cidr-block {{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24
+      --instance-id {{ instance_id }}
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_items:
+    - "{{ cluster_routes_admin }}"
+    - "{{ cluster_routes_app }}"
+    - "{{ cluster_routes_data }}"
 
 # ex: et ts=2 filetype=yaml

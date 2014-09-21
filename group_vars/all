@@ -20,7 +20,6 @@ global_install_packages:
   - "super"
   - "whois"
 
-net: "10.210"
 ip: "{{ net }}.{{ grp }}.{{ idx }}"
 
 cluster_subnets:
@@ -39,3 +38,11 @@ cluster_subnets:
     a: "7"
     b: "8"
     c: "9"
+
+vpn_endpoints:
+  production: "vpn.wistla.com"
+
+vpn_groups:
+  a: "1"
+  b: "2"
+  c: "3"

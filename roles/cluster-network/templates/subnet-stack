@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Wistla {{ subnet }} subnet"
+Description: "Wistla subnet {{ subnet }}"
 
 Resources:
 
@@ -55,6 +55,9 @@ Resources:
 {% endfor %}
 
 Outputs:
+
+  RouteTable:
+    Value: { Ref: RouteTable }
 
 {% for zone in [ 'a', 'b', 'c' ] %}
 

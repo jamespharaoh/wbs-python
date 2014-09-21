@@ -23,3 +23,11 @@
     state: "restarted"
   sudo: "yes"
   sudo_user: "root"
+
+- name: "restart openvpn"
+  action:
+    module: "service"
+    name: "openvpn"
+    state: "restarted"
+  sudo: "yes"
+  sudo_user: "root"

@@ -85,9 +85,16 @@ load-template  grp=5 idx=255 hw=00:16:45:0a:dc:eb
 # ---------- cluster
 
 [cluster:children]
+cluster-network
+cluster-host
+
+[cluster-network]
+cluster-network
+
+[cluster-host:children]
 cluster-admin
 
 [cluster-admin]
 cluster-admin-a zon=a
-#cluster-admin-b zon=b
-#cluster-admin-c zon=c
+cluster-admin-b zon=b
+cluster-admin-c zon=c

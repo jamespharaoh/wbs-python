@@ -1,9 +1,9 @@
 ---
 
-- hosts: "vagrant"
+- hosts: "cluster-network"
   gather_facts: "no"
   vars_files: [ "clusters/{{ cluster }}" ]
-  roles: [ "cluster" ]
+  roles: [ "cluster-network" ]
 
 - hosts: "cluster-admin"
   gather_facts: "no"

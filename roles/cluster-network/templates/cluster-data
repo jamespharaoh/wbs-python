@@ -11,4 +11,8 @@ cluster_gateway: "{{ cluster_gateway | default ('') }}"
 {% endfor %}
 {% endfor %}
 
+cluster_routes_admin: "{{ cluster_routes_admin | default ('') }}"
+cluster_routes_app: "{{ cluster_routes_app | default ('') }}"
+cluster_routes_data: "{{ cluster_routes_data | default ('') }}"
+
 cluster_group_admin: "{{ cluster_group_admin | default ('') }}"

@@ -1,9 +1,11 @@
 ---
 
 cluster_net: "10.140"
+cluster_vpn: "10.141"
+
+cluster_domain: "wistla.com"
 
 amazon_account: "production"
-
 amazon_region: "eu-west-1"
 
 amazon_zones:

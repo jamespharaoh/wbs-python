@@ -6,6 +6,7 @@
 - include: "samba.yml"
 - include: "dns.yml"
 - include: "fuse.yml"
+- include: "openvpn.yml"
 - include: "user.yml"
 - include: "wistla.yml"
 

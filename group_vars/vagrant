@@ -4,6 +4,7 @@ ansible_connection: "local"
 
 vagrant_install_packages:
 
+  - "awscli"
   - "btrfs-tools"
   - "encfs"
   - "git"
@@ -13,6 +14,7 @@ vagrant_install_packages:
   - "ngrep"
   - "nodejs"
   - "npm"
+  - "openvpn"
   - "parted"
   - "python-boto"
   - "samba"
