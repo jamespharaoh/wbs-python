@@ -58,5 +58,4 @@ exec ansible-playbook \
 	--inventory-file inventory \
 	--extra-vars @config \
 	--extra-vars @accounts \
-	--vault-password-file vault-password \
 	"${@}"
