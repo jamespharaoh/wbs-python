@@ -55,4 +55,12 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "install python packages"
+  action:
+    module: "pip"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "vagrant_install_python"
+
 # ex: et ts=2 filetype=yaml

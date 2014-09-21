@@ -1,0 +1,34 @@
+---
+
+- name: "create directory"
+  delegate_to: "vagrant"
+  action:
+    module: "file"
+    path: "/home/vagrant/work/build"
+    state: "directory"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
+- name: "create package"
+  delegate_to: "vagrant"
+  shell:
+
+    cd /home/vagrant/work/build;
+
+    tar
+      --create
+      --gzip
+      --file {{ node }}-{{ build }}.tar.gz.temp
+      --directory /var/lib/lxc/{{ inventory_hostname }}
+      rootfs;
+
+    chown vagrant:vagrant {{ node }}-{{ build }}.tar.gz.temp;
+
+    mv {{ node }}-{{ build }}.tar.gz.temp {{ node }}-{{ build }}.tar.gz;
+
+  args:
+    creates: "/home/vagrant/work/build/{{ node }}-{{ build }}.tar.gz"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=4 filetype=yaml

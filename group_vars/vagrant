@@ -4,7 +4,6 @@ ansible_connection: "local"
 
 vagrant_install_packages:
 
-  - "awscli"
   - "btrfs-tools"
   - "encfs"
   - "git"
@@ -27,6 +26,10 @@ vagrant_remove_packages:
   - "cloud-init"
   - "puppet"
   - "puppet-common"
+
+vagrant_install_python:
+
+  - "awscli"
 
 vagrant_checkouts:
 

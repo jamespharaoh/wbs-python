@@ -46,3 +46,6 @@ vpn_groups:
   a: "1"
   b: "2"
   c: "3"
+
+devops_region: "eu-west-1"
+devops_bucket: "wistla-builds"

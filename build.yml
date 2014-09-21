@@ -1,0 +1,7 @@
+---
+
+- include: "vagrant.yml"
+- include: "templates.yml"
+
+- hosts: "concrete-template"
+  roles: [ "build-pack", "build-upload" ]

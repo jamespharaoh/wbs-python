@@ -1,0 +1,20 @@
+---
+
+- name: "upload package"
+  delegate_to: "vagrant"
+  action:
+    module: "s3"
+    mode: "put"
+
+    bucket: "{{ devops_bucket }}"
+    object: "/builds/{{ build }}/{{ node }}-{{ build }}.tar.gz"
+    src: "/home/vagrant/work/build/{{ node }}-{{ build }}.tar.gz"
+
+    region: "{{ devops_region }}"
+    aws_access_key: "{{ amazon_accounts.ops.access_key }}"
+    aws_secret_key: "{{ amazon_accounts.ops.secret_key }}"    
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+
+# ex: et ts=4 filetype=yaml
