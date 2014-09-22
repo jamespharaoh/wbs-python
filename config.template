@@ -9,7 +9,7 @@ ubuntu_security_url: "{{ ubuntu_security_url }}"
 domain: "{{ domain | default ('dev.wistla.com') }}"
 net: "{{ net | default ('10.210') }}"
 
-{% if vpns %}
+{% if vpns | default ([]) %}
 vpns:
 {% for vpn in vpns | default ([]) %}
   - "{{ vpn }}"
