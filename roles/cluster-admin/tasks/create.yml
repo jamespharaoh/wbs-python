@@ -15,7 +15,7 @@
 
     image: "{{ amazon_images [amazon_region].base }}"
     instance_type: "{{ amazon_type_admin }}"
-    key_name: "wistla-production"
+    key_name: "{{ amazon_key_name }}"
 
     group_id: "{{ cluster_group_admin }}"
     vpc_subnet_id: "{{ hostvars [inventory_hostname] ['cluster_subnet_admin_' + zon] }}"
@@ -49,12 +49,16 @@
 
 - name: "create vpn route"
   delegate_to: "localhost"
-  command:
+  shell:
 
-    aws ec2 create-route
-      --route-table-id {{ item }}
-      --destination-cidr-block {{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24
-      --instance-id {{ instance_id }}
+    if test "{{ item }}"; then
+
+      aws ec2 create-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24"
+        --instance-id "{{ instance_id }}";
+
+    fi;
 
   environment:
     AWS_DEFAULT_REGION: "{{ amazon_region }}"

@@ -1,0 +1,40 @@
+---
+
+- name: "create admin dns"
+  action:
+    module: "route53"
+    command: "create"
+
+    zone: "{{ cluster_domain }}"
+    record: "{{ item }}.{{ cluster_domain }}"
+    ttl: "60"
+    type: "A"
+    value: "{{ amazon_admin_ips.values () | join (',') }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  with_items:
+    - "admin"
+    - "vpn"
+
+- name: "create admin zone dns"
+  action:
+    module: "route53"
+    command: "create"
+
+    zone: "{{ cluster_domain }}"
+    record: "{{ item }}.admin.{{ cluster_domain }}"
+    ttl: "60"
+    type: "A"
+    value: "{{ amazon_admin_ips [item] }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  with_items:
+    - "a"
+    - "b"
+    - "c"
+
+# ex: et ts=2 filetype=yaml

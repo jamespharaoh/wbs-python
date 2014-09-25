@@ -9,3 +9,8 @@
   gather_facts: "no"
   vars_files: [ "clusters/{{ cluster }}" ]
   roles: [ "cluster-admin" ]
+
+- hosts: "cluster-jenkins"
+  gather_facts: "no"
+  vars_files: [ "clusters/{{ cluster }}" ]
+  roles: [ "cluster-jenkins" ]

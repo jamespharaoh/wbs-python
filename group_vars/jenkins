@@ -1,0 +1,13 @@
+---
+
+ansible_ssh_host: "jenkins.ops.wistla.com"
+
+jenkins_install_packages:
+
+  - "git"
+  - "lxc"
+  - "ngrep"
+  - "openvpn"
+  - "whois"
+
+jenkins_remove_packages: []

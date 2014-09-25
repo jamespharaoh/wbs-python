@@ -1,7 +1,0 @@
----
-
-ansible_ssh_user: "ubuntu"
-
-amazon_images:
-  eu-west-1:
-    base: "ami-b8c41ccf"

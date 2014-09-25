@@ -18,4 +18,13 @@ amazon_admin_ips:
   b: "54.77.196.68"
   c: "54.77.222.234"
 
-amazon_type_admin: "c3.large"
+amazon_type_admin: "t2.small"
+
+amazon_images:
+
+  eu-west-1:
+    base: "ami-0cfb5a7b"
+
+amazon_key_name: "wistla-production"
+
+# ex: et ts=2 filetype=yaml

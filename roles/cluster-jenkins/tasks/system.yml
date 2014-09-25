@@ -1,0 +1,31 @@
+---
+
+- name: "update system packages"
+  action:
+    module: "apt"
+    upgrade: "dist"
+    update_cache: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  tags: "update"
+
+- name: "remove system packages"
+  action:
+    module: "apt"
+    state: "absent"
+    name: "{{ item }}"
+    purge: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "jenkins_remove_packages"
+  tags: "update"
+
+- name: "install system packages"
+  action:
+    module: "apt"
+    state: "present"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "jenkins_install_packages"
+  tags: "update"

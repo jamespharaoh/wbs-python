@@ -2,11 +2,15 @@
 
 - include: "setup.yml"
   tags:
+    - "cluster-dns"
     - "cluster-vpc"
     - "cluster-subnet-admin"
     - "cluster-subnet-data"
     - "cluster-subnet-app"
     - "cluster-groups"
+
+- include: "dns.yml"
+  tags: "cluster-dns"
 
 - include: "vpc.yml"
   tags: "cluster-vpc"
@@ -16,9 +20,11 @@
 
 - include: "subnet-data.yml"
   tags: "cluster-subnet-data"
+  when: "cluster != 'ops'"
 
 - include: "subnet-app.yml"
   tags: "cluster-subnet-app"
+  when: "cluster != 'ops'"
 
 - include: "groups.yml"
   tags: "cluster-groups"
