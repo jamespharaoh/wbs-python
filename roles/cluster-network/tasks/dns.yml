@@ -18,7 +18,7 @@
     - "admin"
     - "vpn"
 
-- name: "create admin zone dns"
+- name: "create admin per-zone dns"
   action:
     module: "route53"
     command: "create"

@@ -2,12 +2,12 @@
 
 # first create all the groups
 
-- name: "create admin security group"
+- name: "create security groups"
   action:
     module: "ec2_group"
 
-    name: "{{ cluster }}-admin"
-    description: "Admin {{ cluster }}"
+    name: "{{ cluster }}-{{ item.name }}"
+    description: "Security group {{ cluster }}-{{ item.name }}"
     vpc_id: "{{ cluster_vpc }}"
 
     region: "{{ amazon_region }}"
@@ -16,44 +16,38 @@
 
     #purge_rules: "no"
 
-  register: "create_admin_group"
+  register: "create_group"
+  with_items: "amazon_security_groups"
+
+- action:
+    module: "debug"
+    var: "create_group"
 
 # save data
 
 - set_fact:
-    cluster_group_admin: "{{ create_admin_group.group_id }}"
+    cluster_group_admin: "{{ create_group.results.0.group_id }}"
+    cluster_group_balancer: "{{ create_group.results.1.group_id }}"
+    cluster_group_jenkins: "{{ create_group.results.2.group_id }}"
 
 - include: "save.yml"
 
 # then set the rules
 
-- name: "update admin security group"
+- name: "update security group"
   action:
     module: "ec2_group"
 
-    name: "{{ cluster }}-admin"
-    description: "Admin {{ cluster }}"
+    description: "Security group {{ item.name }"
+    name: "{{ cluster }}-{{ item.name }}"
+    rules: "{{ item.rules }}"
+
     vpc_id: "{{ cluster_vpc }}"
-
-    rules:
-
-      - proto: "icmp"
-        cidr_ip: "0.0.0.0/0"
-        from_port: "-1"
-        to_port: "-1"
-
-      - proto: "tcp"
-        from_port: "22"
-        to_port: "22"
-        cidr_ip: "0.0.0.0/0"
-
-      - proto: "udp"
-        from_port: "1194"
-        to_port: "1194"
-        cidr_ip: "0.0.0.0/0"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  with_items: "amazon_security_groups"
 
 # ex: et ts=2 filetype=yaml

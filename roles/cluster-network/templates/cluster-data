@@ -4,7 +4,7 @@ cluster_vpc: "{{ cluster_vpc | default ('') }}"
 cluster_gateway: "{{ cluster_gateway | default ('') }}"
 
 {% set allvars = hostvars[inventory_hostname] %}
-{% for subnet in [ 'admin' ] %}
+{% for subnet in [ 'admin', 'jenkins' ] %}
 {% for zone in [ 'a', 'b', 'c' ] %}
 {% set name = 'cluster_subnet_' + subnet + '_' + zone %}
 {{ name }}: "{{ allvars [name] | default ('') }}"
@@ -16,3 +16,5 @@ cluster_routes_app: "{{ cluster_routes_app | default ('') }}"
 cluster_routes_data: "{{ cluster_routes_data | default ('') }}"
 
 cluster_group_admin: "{{ cluster_group_admin | default ('') }}"
+cluster_group_jenkins: "{{ cluster_group_jenkins | default ('') }}"
+cluster_group_balancer: "{{ cluster_group_balancer | default ('') }}"

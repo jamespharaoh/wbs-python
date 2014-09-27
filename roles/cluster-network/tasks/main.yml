@@ -26,5 +26,9 @@
   tags: "cluster-subnet-app"
   when: "cluster != 'ops'"
 
+- include: "subnet-jenkins.yml"
+  tags: "cluster-subnet-jenkins"
+  when: "cluster == 'ops'"
+
 - include: "groups.yml"
   tags: "cluster-groups"

@@ -1,0 +1,15 @@
+---
+
+- name: "create jenkins balancer"
+  action:
+    module: "ec2_elb_lb"
+
+    name: "{{ cluster }}-jenkins"
+    state: "create"
+
+	security_group_ids: "{{ }}"
+	subnets: "{{ hostvars [inventory_hostname] ['cluster_subnet_admin_' + zon] }}"
+    
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"

@@ -93,23 +93,12 @@ cluster-network
 
 [cluster-host:children]
 cluster-admin
+cluster-jenkins
 
 [cluster-admin]
 cluster-admin-a zon=a
 cluster-admin-b zon=b
 cluster-admin-c zon=c
 
-# ---------- ops
-
-[ops:children]
-ops-network
-ops-host
-
-[ops-network]
-ops-network
-
-[ops-host:children]
-ops-jenkins
-
-[ops-jenkins]
-jenkins
+[cluster-jenkins]
+jenkins-a       zon=a

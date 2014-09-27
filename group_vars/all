@@ -39,7 +39,13 @@ cluster_subnets:
     b: "8"
     c: "9"
 
+  jenkins:
+    a: "10"
+    b: "11"
+    c: "12"
+
 vpn_endpoints:
+  ops: "vpn.ops.wistla.com"
   production: "vpn.wistla.com"
 
 vpn_groups:
@@ -49,3 +55,57 @@ vpn_groups:
 
 devops_region: "eu-west-1"
 devops_bucket: "wistla-builds"
+
+amazon_security_groups:
+
+  - name: "admin"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "0.0.0.0/0"
+
+      - proto: "udp"
+        from_port: "1194"
+        to_port: "1194"
+        cidr_ip: "0.0.0.0/0"
+
+  - name: "balancer"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "0.0.0.0/0"
+
+  - name: "jenkins"
+    rules:
+
+      - proto: "icmp"
+        group_id: "{{ cluster_group_admin }}"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_admin }}"
+        from_port: "80"
+        to_port: "80"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_balancer }}"
+        from_port: "80"
+        to_port: "80"
+
+
+# ex: et ts=2 filetype=yaml

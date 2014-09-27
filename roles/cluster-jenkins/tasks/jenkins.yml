@@ -1,0 +1,22 @@
+---
+
+- name: "install jenkins apt key"
+  action:
+    module: "apt_key"
+    url: "https://jenkins-ci.org/debian/jenkins-ci.org.key"
+  sudo: "yes"
+
+- name: "install jenkins apt repository"
+  action:
+    module: "apt_repository"
+    repo: "deb http://pkg.jenkins-ci.org/debian binary/"
+    update_cache: "yes"
+  sudo: "yes"
+
+- name: "install jenkins packages"
+  action:
+    module: "apt"
+    package: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "jenkins"

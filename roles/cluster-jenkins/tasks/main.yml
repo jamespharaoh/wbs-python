@@ -1,3 +1,7 @@
 ---
+
+- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
+
 - include: "create.yml"
 - include: "system.yml"
+- include: "jenkins.yml"
