@@ -42,4 +42,13 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "create shared dir"
+  action:
+    module: "file"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/shared"
+    state: "directory"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
 # ex: et ts=2 filetype=yaml
