@@ -5,11 +5,28 @@
     module: "ec2_elb_lb"
 
     name: "{{ cluster }}-jenkins"
-    state: "create"
+    state: "present"
 
-	security_group_ids: "{{ }}"
-	subnets: "{{ hostvars [inventory_hostname] ['cluster_subnet_admin_' + zon] }}"
-    
+    listeners:
+
+      - protocol: "http"
+        load_balancer_port: "80"
+        instance_port: "80"
+
+      - protocol: "https"
+        load_balancer_port: "443"
+        instance_protocol: "http"
+        instance_port: "80"
+        ssl_certificate_id: "??"
+
+    security_group_ids: "{{ }}"
+    subnets:
+      - "{{ cluster_subnet_admin_a }}"
+      - "{{ cluster_subnet_admin_b }}"
+      - "{{ cluster_subnet_admin_c }}"
+
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+# ex: et ts=2 filetype=yaml

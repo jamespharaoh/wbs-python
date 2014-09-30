@@ -32,3 +32,6 @@
 
 - include: "groups.yml"
   tags: "cluster-groups"
+
+- include: "balancer-jenkins.yml"
+  tags: "cluster-balancer-jenkins"
