@@ -17,9 +17,9 @@
         load_balancer_port: "443"
         instance_protocol: "http"
         instance_port: "80"
-        ssl_certificate_id: "??"
+        ssl_certificate_id: "arn:aws:iam::382254491475:server-certificate/jenkins.ops.wistla.com"
 
-    security_group_ids: "{{ }}"
+    security_group_ids: "{{ cluster_group_jenkins }}"
     subnets:
       - "{{ cluster_subnet_admin_a }}"
       - "{{ cluster_subnet_admin_b }}"
