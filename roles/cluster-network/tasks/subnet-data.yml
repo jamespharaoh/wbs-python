@@ -6,7 +6,9 @@
   subnet: "data"
 
 - set_fact:
-    cluster_routes_data: "{{ stack_result.stack_outputs.RouteTable }}"
+    cluster_routes_data_a: "{{ stack_result.stack_outputs.RouteTableA }}"
+    cluster_routes_data_b: "{{ stack_result.stack_outputs.RouteTableB }}"
+    cluster_routes_data_c: "{{ stack_result.stack_outputs.RouteTableC }}"
     cluster_subnet_data_a: "{{ stack_result.stack_outputs.SubnetA }}"
     cluster_subnet_data_b: "{{ stack_result.stack_outputs.SubnetB }}"
     cluster_subnet_data_c: "{{ stack_result.stack_outputs.SubnetC }}"

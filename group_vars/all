@@ -76,6 +76,9 @@ amazon_security_groups:
         to_port: "1194"
         cidr_ip: "0.0.0.0/0"
 
+      - proto: "-1"
+        group_id: "{{ cluster_group_jenkins }}"
+
   - name: "balancer"
     rules:
 
@@ -98,6 +101,11 @@ amazon_security_groups:
         to_port: "-1"
 
       - proto: "tcp"
+        cidr_ip: "10.0.0.0/8"
+        from_port: "22"
+        to_port: "22"
+
+      - proto: "tcp"
         group_id: "{{ cluster_group_admin }}"
         from_port: "80"
         to_port: "80"
@@ -106,6 +114,5 @@ amazon_security_groups:
         group_id: "{{ cluster_group_balancer }}"
         from_port: "80"
         to_port: "80"
-
 
 # ex: et ts=2 filetype=yaml

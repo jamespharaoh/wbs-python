@@ -6,24 +6,29 @@ Resources:
 
   # set up a route table
 
-  RouteTable:
+{% for zone in [ 'a', 'b', 'c' ] %}
+
+  RouteTable{{ zone | capitalize }}:
     Type: "AWS::EC2::RouteTable"
     Properties:
       VpcId: "{{ cluster_vpc }}"
       Tags:
-      - { Key: "Cluster", Value: "{{ cluster }}" }
-      - { Key: "Class", Value: "{{ subnet }}" }
+        - { Key: "Name", Value: "{{ cluster }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Class", Value: "{{ subnet }}" }
 
 {% if subnet == 'admin' %}
 
-  RoutePublic:
+  RoutePublic{{ zone | capitalize }}:
     Type: "AWS::EC2::Route"
     Properties:
-      RouteTableId: { Ref: "RouteTable" }
+      RouteTableId: { Ref: "RouteTable{{ zone | capitalize }}" }
       DestinationCidrBlock: "0.0.0.0/0"
       GatewayId: "{{ cluster_gateway }}"
 
 {% endif %}
+
+{% endfor %}
 
   # create a subnet in each zone
 
@@ -36,9 +41,10 @@ Resources:
       CidrBlock: "{{ cluster_net }}.{{ cluster_subnets[subnet][zone] }}.0/24"
       VpcId: "{{ cluster_vpc }}"
       Tags:
-      - { Key: "Cluster", Value: "{{ cluster }}" }
-      - { Key: "Class", Value: "{{ subnet }}" }
-      - { Key: "Zone", Value: "{{ zone }}" }
+        - { Key: "Name", Value: "{{ cluster }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Class", Value: "{{ subnet }}" }
+        - { Key: "Zone", Value: "{{ zone }}" }
 
 {% endfor %}
 
@@ -49,17 +55,17 @@ Resources:
   SubnetRouteTable{{ zone | capitalize }}:
     Type: "AWS::EC2::SubnetRouteTableAssociation"
     Properties:
-      RouteTableId: { Ref: RouteTable }
+      RouteTableId: { Ref: RouteTable{{ zone | capitalize }} }
       SubnetId: { Ref: Subnet{{ zone | capitalize }} }
 
 {% endfor %}
 
 Outputs:
 
-  RouteTable:
-    Value: { Ref: RouteTable }
-
 {% for zone in [ 'a', 'b', 'c' ] %}
+
+  RouteTable{{ zone | capitalize }}:
+    Value: { Ref: RouteTable{{ zone | capitalize }} }
 
   Subnet{{ zone | capitalize }}:
     Value: { Ref: Subnet{{ zone | capitalize }} }

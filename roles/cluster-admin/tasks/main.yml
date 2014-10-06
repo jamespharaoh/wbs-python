@@ -3,5 +3,8 @@
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
 
 - include: "create.yml"
+- include: "assign-ip.yml"
 - include: "system.yml"
 - include: "openvpn.yml"
+- include: "firewall.yml"
+- include: "route.yml"

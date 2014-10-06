@@ -5,3 +5,4 @@
 - include: "create.yml"
 - include: "system.yml"
 - include: "jenkins.yml"
+- include: "activate.yml"

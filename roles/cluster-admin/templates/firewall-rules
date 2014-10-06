@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# flush all tables
+
+iptables \
+	--table nat \
+	--flush PREROUTING
+
+iptables \
+	--table nat \
+	--flush POSTROUTING
+
+# source-nat outbound traffic from private instances
+
+iptables \
+	--table nat \
+	--append POSTROUTING \
+	--out-interface eth0 \
+	--source {{ cluster_net }}.0.0/16 \
+	! --destination 10.0.0.0/8 \
+	--jump MASQUERADE
+
+# ex: noet ts=4 filetype=bash

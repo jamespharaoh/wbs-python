@@ -1,0 +1,12 @@
+---
+
+- name: "create firewall rules"
+  action:
+    module: "template"
+    src: "firewall-rules"
+    dest: "/etc/network/firewall-rules"
+    mode: "0755"
+  sudo: "yes"
+  notify: "reload firewall rules"
+
+# ex: et ts=2 filetype=yaml

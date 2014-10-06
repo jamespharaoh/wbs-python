@@ -19,10 +19,6 @@
   register: "create_group"
   with_items: "amazon_security_groups"
 
-- action:
-    module: "debug"
-    var: "create_group"
-
 # save data
 
 - set_fact:

@@ -40,3 +40,5 @@
     dest: "/etc/openvpn/wistla-{{ cluster }}-vpn.conf"
   sudo: "yes"
   notify: "restart openvpn"
+
+# ex: et ts=2 filetype=yaml
