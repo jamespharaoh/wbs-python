@@ -6,6 +6,7 @@ jenkins_install_packages:
 
   - "git"
   - "lxc"
+  - "nginx"
   - "ngrep"
   - "whois"
 

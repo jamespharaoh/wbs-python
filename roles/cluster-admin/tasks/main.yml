@@ -8,3 +8,5 @@
 - include: "openvpn.yml"
 - include: "firewall.yml"
 - include: "route.yml"
+- include: "nginx.yml"
+- include: "activate.yml"

@@ -1,10 +1,10 @@
 ---
 
-- name: "create jenkins balancer"
+- name: "create dev balancer"
   action:
     module: "ec2_elb_lb"
 
-    name: "{{ cluster }}-jenkins"
+    name: "{{ cluster }}-dev"
     state: "present"
 
     listeners:
@@ -12,12 +12,6 @@
       - protocol: "http"
         load_balancer_port: "80"
         instance_port: "80"
-
-      - protocol: "https"
-        load_balancer_port: "443"
-        instance_protocol: "http"
-        instance_port: "80"
-        ssl_certificate_id: "arn:aws:iam::382254491475:server-certificate/jenkins.ops.wistla.com"
 
     security_group_ids: "{{ cluster_group_balancer }}"
 

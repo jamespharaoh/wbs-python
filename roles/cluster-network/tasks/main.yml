@@ -8,6 +8,8 @@
     - "cluster-subnet-data"
     - "cluster-subnet-app"
     - "cluster-groups"
+    - "cluster-balancer-jenkins"
+    - "cluster-balancer-dev"
 
 - include: "dns.yml"
   tags: "cluster-dns"
@@ -35,3 +37,6 @@
 
 - include: "balancer-jenkins.yml"
   tags: "cluster-balancer-jenkins"
+
+- include: "balancer-dev.yml"
+  tags: "cluster-balancer-dev"

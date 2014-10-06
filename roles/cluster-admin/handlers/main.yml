@@ -11,3 +11,10 @@
   action: command
     /etc/network/firewall-rules
   sudo: "yes"
+
+- name: "restart nginx"
+  action:
+    module: "service"
+    name: "nginx"
+    state: "restarted"
+  sudo: "yes"

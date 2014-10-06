@@ -6,6 +6,7 @@ cluster_admin_install_packages:
 
   - "git"
   - "lxc"
+  - "nginx"
   - "ngrep"
   - "openvpn"
   - "whois"

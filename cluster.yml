@@ -2,15 +2,12 @@
 
 - hosts: "cluster-network"
   gather_facts: "no"
-  vars_files: [ "clusters/{{ cluster }}" ]
   roles: [ "cluster-network" ]
 
 - hosts: "cluster-admin"
   gather_facts: "no"
-  vars_files: [ "clusters/{{ cluster }}" ]
   roles: [ "cluster-admin" ]
 
 - hosts: "cluster-jenkins"
   gather_facts: "no"
-  vars_files: [ "clusters/{{ cluster }}" ]
   roles: [ "cluster-jenkins" ]
