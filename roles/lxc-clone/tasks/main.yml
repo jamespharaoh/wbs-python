@@ -5,7 +5,8 @@
 
     set -e;
 
-    source /home/vagrant/wistla-devops/misc/locking ansible;
+    source {{ vagrant_home }}/wistla-devops/misc/locking ansible;
+
     exlock;
 
     if test -f /var/lib/lxc/{{ inventory_hostname }}; then

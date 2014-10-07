@@ -328,4 +328,7 @@ vagrant_templates:
 
   - "template"
 
+vagrant_user: "vagrant"
+vagrant_home: "/home/vagrant"
+
 # ex: et ts=2 filetype=yaml

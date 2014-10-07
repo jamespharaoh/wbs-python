@@ -4,7 +4,7 @@ lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
 lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
 
-lxc.mount.entry = /home/vagrant/shared shared none bind 0 0
+lxc.mount.entry = {{ vagrant_home }}/shared shared none bind 0 0
 
 lxc.utsname = {{ inventory_hostname }}
 lxc.arch = amd64

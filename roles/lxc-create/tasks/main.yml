@@ -3,9 +3,9 @@
 - name: "create lxc container"
   action: shell
 
-    set -e
+    set -e;
 
-    source /home/vagrant/wistla-devops/misc/locking ansible;
+    source {{ vagrant_home}}/wistla-devops/misc/locking ansible;
     exlock;
 
     if test -f /var/lib/lxc/{{ inventory_hostname }}; then
@@ -27,18 +27,18 @@
       --mirror {{ ubuntu_main_url }}
       --security-mirror {{ ubuntu_security_url }}
       --release trusty
-      --arch amd64
-    &&
+      --arch amd64;
+
     chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get update -qqy
-    &&
+    apt-get update -qqy;
+
     chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get dist-upgrade -qqy
-    &&
+    apt-get dist-upgrade -qqy;
+
     chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get install -qqy python
-    &&
-    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag
+    apt-get install -qqy python;
+
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
   args:
     executable: "/bin/bash"
