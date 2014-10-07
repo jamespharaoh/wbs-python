@@ -292,7 +292,12 @@ vagrant_install_packages:
   - "openvpn"
   - "parted"
   - "python-boto"
+  - "python-dev"
+  - "python-httplib2"
+  - "python-jinja2"
+  - "python-paramiko"
   - "python-pip"
+  - "python-yaml"
   - "samba"
   - "whois"
 

@@ -10,4 +10,4 @@
       src: "config.template"
       dest: "/home/vagrant/wistla-devops/config"
     sudo: "yes"
-    sudo_user: "vagrant"
+    sudo_user: "{{ vagrant_user }}"
