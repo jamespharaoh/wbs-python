@@ -2,22 +2,27 @@
 
 - name: "checkout projects from git"
   action: shell
-    cd /home/vagrant;
+
+    set -e;
+
+    cd {{ vagrant_home }};
+
     git clone
       git@github.com:/wistla/{{ item.name }}
-      --branch {{ item.branch }}
+      --branch {{ item.branch }};
+
   args:
-    creates: "/home/vagrant/{{ item.name }}"
+    creates: "{{ vagrant_home }}/{{ item.name }}"
   sudo: "yes"
-  sudo_user: "vagrant"
+  sudo_user: "{{ vagrant_user }}"
   with_items: "vagrant_checkouts"
 
 - name: "create shared directory"
   action:
     module: "file"
-    path: "/home/vagrant/shared"
+    path: "{{ vagrant_home }}/shared"
     state: "directory"
   sudo: "yes"
-  sudo_user: "vagrant"
+  sudo_user: "{{ vagrant_user }}"
 
 # ex: et ts=2 filetype=yaml

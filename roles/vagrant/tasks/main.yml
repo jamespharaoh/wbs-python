@@ -1,13 +1,26 @@
 ---
+
 - include: "system.yml"
+
 - include: "btrfs.yml"
+
 - include: "network.yml"
+
 - include: "nfs.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "samba.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "dns.yml"
+
 - include: "fuse.yml"
+
 - include: "openvpn.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "user.yml"
+
 - include: "wistla.yml"
 
 # ex: et ts=2 filetype=yaml

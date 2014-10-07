@@ -12,7 +12,7 @@
 - name: "set samba password"
   action: shell
     set -e;
-    printf "vagrant\nvagrant\n" | smbpasswd -a vagrant -s;
+    printf "vagrant\nvagrant\n" | smbpasswd -a {{ vagrant_user }} -s;
     touch /etc/samba/vagrant-password-flag;
   args:
     creates: "/etc/samba/vagrant-password-flag"

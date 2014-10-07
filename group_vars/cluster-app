@@ -1,0 +1,17 @@
+---
+
+ansible_ssh_host: "{{ cluster_net }}.{{ cluster_subnets.app [zon] }}.{{ idx }}"
+
+cluster_app_install_packages:
+
+  - "git"
+  - "lxc"
+  - "nginx"
+  - "ngrep"
+  - "openvpn"
+  - "whois"
+
+cluster_app_remove_packages: []
+
+vagrant_user: "ubuntu"
+vagrant_home: "/home/ubuntu"

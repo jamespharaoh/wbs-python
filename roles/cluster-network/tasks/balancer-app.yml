@@ -1,0 +1,27 @@
+---
+
+- name: "create app balancer"
+  action:
+    module: "ec2_elb_lb"
+
+    name: "{{ cluster }}-app"
+    state: "present"
+
+    listeners:
+
+      - protocol: "http"
+        load_balancer_port: "80"
+        instance_port: "80"
+
+    security_group_ids: "{{ cluster_group_balancer }}"
+
+    subnets:
+      - "{{ cluster_subnet_admin_a }}"
+      - "{{ cluster_subnet_admin_b }}"
+      - "{{ cluster_subnet_admin_c }}"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+# ex: et ts=2 filetype=yaml

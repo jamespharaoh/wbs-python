@@ -1,0 +1,4 @@
+ifconfig-push {{ cluster_vpn }}.{{ vpn_groups [zon] }}.{{ item.vpn_ip }} 255.255.255.0
+{% for iroute in item.iroutes %}
+iroute {{ iroute.network }} {{ iroute.netmask }}
+{% endfor %}

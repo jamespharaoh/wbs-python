@@ -8,10 +8,10 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "add vagrant to fuse group"
+- name: "add {{ vagrant_user }} to fuse group"
   action:
     module: "user"
-    name: "vagrant"
+    name: "{{ vagrant_user }}"
     groups: "fuse"
     append: "yes"
   sudo: "yes"

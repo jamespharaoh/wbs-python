@@ -1,0 +1,15 @@
+---
+
+- name: "add app instance to app load balancer"
+  local_action:
+    module: "ec2_elb"
+
+    ec2_elbs: "{{ cluster }}-app"
+    instance_id: "{{ instance_id }}"
+    state: "present"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+# ex: et ts=2 filetype=yaml

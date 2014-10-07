@@ -26,25 +26,4 @@ http {
 	include /etc/nginx/conf.d/*.conf;
 	include /etc/nginx/sites-enabled/*;
 
-{% for cluster_name in dev_cluster_names %}
-{% set cluster = clusters [cluster_name] %}
-
-	upstream {{ cluster_name }} {
-		server {{ cluster.cluster_net }}.5.0;
-		server {{ cluster.cluster_net }}.5.1;
-		server {{ cluster.cluster_net }}.5.2;
-	}
-
-	server {
-
-		server_name api.{{ cluster.cluster_domain }};
-
-		location / {
-			proxy_pass http://{{ cluster_name }}/;
-		}
-
-	}
-
-{% endfor %}
-
 }

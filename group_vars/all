@@ -77,12 +77,33 @@ amazon_security_groups:
         cidr_ip: "0.0.0.0/0"
 
       - proto: "-1"
+        group_id: "{{ cluster_group_app }}"
+
+      - proto: "-1"
         group_id: "{{ cluster_group_jenkins }}"
 
       - proto: "tcp"
         group_id: "{{ cluster_group_balancer }}"
         from_port: "80"
         to_port: "80"
+
+  - name: "app"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "10.0.0.0/8"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "10.0.0.0/8"
+
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "10.0.0.0/8"
 
   - name: "balancer"
     rules:
@@ -173,6 +194,7 @@ clusters:
       c: "54.77.222.234"
 
     amazon_type_admin: "t2.small"
+    amazon_type_app: "c3.large"
 
     amazon_images:
 
@@ -208,6 +230,14 @@ dev_cluster_names:
   - "james"
   - "simon"
 
+deployments:
+
+  production-a:
+    deployment_net: "10.148"
+
+  production-b:
+    deployment_net: "10.149"
+
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
@@ -221,10 +251,76 @@ amazon_zones: "{{ clusters [cluster].amazon_zones }}"
 amazon_admin_ips: "{{ clusters [cluster].amazon_admin_ips }}"
 
 amazon_type_admin: "{{ clusters [cluster].amazon_type_admin }}"
+amazon_type_app: "{{ clusters [cluster].amazon_type_app }}"
 amazon_type_jenkins: "{{ clusters [cluster].amazon_type_jenkins }}"
 
 amazon_images: "{{ clusters [cluster].amazon_images }}"
 
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
+
+vpn_clients:
+
+  - name: "ben.vpn.wistla.com"
+
+    vpn_ip: "3"
+
+    iroutes:
+
+      - network: "10.145.0.0"
+        netmask: "255.255.0.0"
+
+  - name: "james.vpn.wistla.com"
+
+    vpn_ip: "2"
+
+    iroutes:
+
+      - network: "10.144.0.0"
+        netmask: "255.255.0.0"
+
+vagrant_install_packages:
+
+  - "btrfs-tools"
+  - "encfs"
+  - "git"
+  - "lxc"
+  - "mongodb-clients"
+  - "nfs-kernel-server"
+  - "ngrep"
+  - "nodejs"
+  - "npm"
+  - "openvpn"
+  - "parted"
+  - "python-boto"
+  - "python-pip"
+  - "samba"
+  - "whois"
+
+vagrant_remove_packages:
+
+  - "chef"
+  - "chef-zero"
+  - "cloud-init"
+  - "puppet"
+  - "puppet-common"
+
+vagrant_install_python:
+
+  - "awscli"
+
+vagrant_checkouts:
+
+  - name: "wistla-api"
+    branch: "master"
+
+  - name: "wistla-devops"
+    branch: "master"
+
+  - name: "wistla-web"
+    branch: "master"
+
+vagrant_templates:
+
+  - "template"
 
 # ex: et ts=2 filetype=yaml

@@ -9,4 +9,12 @@
   sudo: "yes"
   notify: "reload firewall rules"
 
+- name: "run firewall rules on if-up"
+  action:
+    module: "file"
+    state: "link"
+    path: "/etc/network/if-up.d/firewall-rules"
+    src: "/etc/network/firewall-rules"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml

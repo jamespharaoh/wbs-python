@@ -2,7 +2,7 @@
 
 ansible_ssh_host: "{{ cluster_net }}.{{ cluster_subnets [zon] }}.4"
 
-jenkins_install_packages:
+system_install_packages:
 
   - "git"
   - "lxc"
@@ -10,4 +10,4 @@ jenkins_install_packages:
   - "openvpn"
   - "whois"
 
-jenkins_remove_packages: []
+system_remove_packages: []

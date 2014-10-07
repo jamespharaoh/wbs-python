@@ -11,3 +11,7 @@
 - hosts: "cluster-jenkins"
   gather_facts: "no"
   roles: [ "cluster-jenkins" ]
+
+- hosts: "cluster-app"
+  gather_facts: "no"
+  roles: [ "cluster-app", "vagrant" ]

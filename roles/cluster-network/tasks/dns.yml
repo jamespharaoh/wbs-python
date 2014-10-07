@@ -4,6 +4,7 @@
   action:
     module: "route53"
     command: "create"
+    overwrite: "yes"
 
     zone: "{{ cluster_domain }}"
     record: "{{ item }}.{{ cluster_domain }}"
@@ -22,6 +23,7 @@
   action:
     module: "route53"
     command: "create"
+    overwrite: "yes"
 
     zone: "{{ cluster_domain }}"
     record: "{{ item }}.admin.{{ cluster_domain }}"

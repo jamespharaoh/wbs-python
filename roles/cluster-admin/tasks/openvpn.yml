@@ -41,4 +41,27 @@
   sudo: "yes"
   notify: "restart openvpn"
 
+- name: "create openvpn client config dir"
+  action:
+    module: "file"
+    name: "/etc/openvpn/clients"
+    state: "directory"
+  sudo: "yes"
+
+- name: "create openvpn client configs"
+  action:
+    module: "template"
+    src: "openvpn-client-config"
+    dest: "/etc/openvpn/clients/{{ item.name }}"
+  sudo: "yes"
+  with_items: "vpn_clients"
+
+- name: "create openvpn client connect script"
+  action:
+    module: "template"
+    src: "openvpn-client-connect-script"
+    dest: "/etc/openvpn/client-connect-script"
+    mode: "0755"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml

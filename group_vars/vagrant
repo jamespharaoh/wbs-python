@@ -2,45 +2,7 @@
 
 ansible_connection: "local"
 
-vagrant_install_packages:
-
-  - "btrfs-tools"
-  - "encfs"
-  - "git"
-  - "lxc"
-  - "mongodb-clients"
-  - "nfs-kernel-server"
-  - "ngrep"
-  - "nodejs"
-  - "npm"
-  - "openvpn"
-  - "parted"
-  - "python-boto"
-  - "samba"
-  - "whois"
-
-vagrant_remove_packages:
-
-  - "chef"
-  - "chef-zero"
-  - "cloud-init"
-  - "puppet"
-  - "puppet-common"
-
-vagrant_install_python:
-
-  - "awscli"
-
-vagrant_checkouts:
-
-  - name: "wistla-api"
-    branch: "master"
-
-  - name: "wistla-web"
-    branch: "master"
-
-vagrant_templates:
-
-  - "template"
+vagrant_user: "vagrant"
+vagrant_home: "/home/vagrant"
 
 # ex: et ts=2 filetype=yaml

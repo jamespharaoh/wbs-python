@@ -4,24 +4,24 @@
   action:
     module: "template"
     src: "bash-profile"
-    dest: "/home/vagrant/.bash_profile"
+    dest: "{{ vagrant_home }}/.bash_profile"
   sudo: "yes"
-  sudo_user: "vagrant"
+  sudo_user: "{{ vagrant_user }}"
 
 - name: "create bash rc"
   action:
     module: "template"
     src: "bash-rc"
-    dest: "/home/vagrant/.bashrc"
+    dest: "{{ vagrant_home }}/.bashrc"
   sudo: "yes"
-  sudo_user: "vagrant"
+  sudo_user: "{{ vagrant_user }}"
 
 - name: "create git config"
   action:
     module: "template"
     src: "git-config"
-    dest: "/home/vagrant/.gitconfig"
+    dest: "{{ vagrant_home }}/.gitconfig"
   sudo: "yes"
-  sudo_user: "vagrant"
+  sudo_user: "{{ vagrant_user }}"
 
 # ex: et ts=2 filetype=yaml

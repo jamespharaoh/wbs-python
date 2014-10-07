@@ -11,13 +11,15 @@ persist-key
 persist-tun
 status wistla-{{ cluster }}-vpn.log
 
+client-config-dir clients
+client-connect client-connect-script
+
 # network
 
 dev tun
 topology subnet
 
 ifconfig {{ vpn_net }}.1 255.255.255.0
-ifconfig-pool {{ vpn_net }}.2 {{ vpn_net }}.254 255.255.255.0
 
 push "topology subnet"
 push "route-gateway {{ vpn_net }}.1"

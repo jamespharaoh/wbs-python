@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+case "$common_name" in
+
+{% for vpn_client in vpn_clients %}
+
+({{ vpn_client.name }})
+
+{% for iroute in vpn_client.iroutes %}
+	# TODO
+{% endfor %}
+
+	;;
+
+{% endfor %}
+
+(*)
+
+	echo "Common name not recognised: $common_name" >&2
+
+	exit 1
+
+	;;
+
+esac

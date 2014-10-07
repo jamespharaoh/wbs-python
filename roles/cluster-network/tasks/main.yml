@@ -35,8 +35,14 @@
 - include: "groups.yml"
   tags: "cluster-groups"
 
-- include: "balancer-jenkins.yml"
-  tags: "cluster-balancer-jenkins"
+- include: "balancer-app.yml"
+  tags: "cluster-balancer-app"
+  when: "cluster != 'ops'"
 
 - include: "balancer-dev.yml"
   tags: "cluster-balancer-dev"
+  when: "cluster == 'ops'"
+
+- include: "balancer-jenkins.yml"
+  tags: "cluster-balancer-jenkins"
+  when: "cluster == 'ops'"
