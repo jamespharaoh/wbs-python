@@ -26,21 +26,21 @@ http {
 	include /etc/nginx/conf.d/*.conf;
 	include /etc/nginx/sites-enabled/*;
 
-{% for cluster_name in dev_cluster_names %}
-{% set cluster = clusters [cluster_name] %}
+{% for dev_deployment_name in dev_deployment_names %}
+{% set dev_deployment = deployments [dev_deployment_name] %}
 
-	upstream {{ cluster_name }} {
-		server {{ cluster.cluster_net }}.5.0;
-		server {{ cluster.cluster_net }}.5.1;
-		server {{ cluster.cluster_net }}.5.2;
+	upstream {{ dev_deployment_name }} {
+		server {{ dev_deployment.bridge_network }}.5.0;
+		server {{ dev_deployment.bridge_network }}.5.1;
+		server {{ dev_deployment.bridge_network }}.5.2;
 	}
 
 	server {
 
-		server_name api.{{ cluster.cluster_domain }};
+		server_name api.{{ dev_deployment.private_domain }};
 
 		location / {
-			proxy_pass http://{{ cluster_name }}/;
+			proxy_pass http://{{ dev_deployment_name }}/;
 		}
 
 	}

@@ -23,7 +23,16 @@ http {
 	gzip on;
 	gzip_disable "msie6";
 
-	include /etc/nginx/conf.d/*.conf;
-	include /etc/nginx/sites-enabled/*;
+	upstream temp {
+		server 10.148.5.0;
+		server 10.148.5.1;
+		server 10.148.5.2;
+	}
+
+	server {
+		location / {
+			proxy_pass http://temp;
+		}
+	}
 
 }

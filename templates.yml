@@ -31,3 +31,5 @@
 - hosts: "web-template"
   gather_facts: "no"
   roles: [ "node-web" ]
+
+# ex: et ts=2 filetype=yaml

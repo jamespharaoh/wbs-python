@@ -6,4 +6,6 @@ ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 template: "{{ node }}-template"
 autostart: "yes"
 
+node_ip: "{{ deployment_bridge_network }}.{{ grp }}.{{ idx }}"
+
 # ex: et ts=2 filetype=yaml

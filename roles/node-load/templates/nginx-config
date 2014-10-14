@@ -39,9 +39,8 @@ http {
 
 	server {
 
-		listen 80;
-
-		server_name api.{{ domain }};
+		server_name api.{{ deployment_private_domain }};
+		server_name api.{{ deployment_public_domain }};
 
 		location / {
 			proxy_pass http://api;

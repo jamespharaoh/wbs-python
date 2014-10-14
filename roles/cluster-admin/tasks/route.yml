@@ -8,6 +8,11 @@
 
     if test "{{ item }}"; then
 
+      aws ec2 delete-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "0.0.0.0/0"
+      || true;
+
       aws ec2 create-route
         --route-table-id "{{ item }}"
         --destination-cidr-block "0.0.0.0/0"
@@ -34,6 +39,11 @@
     set -e
 
     if test "{{ item }}"; then
+
+      aws ec2 delete-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24"
+      || true;
 
       aws ec2 create-route
         --route-table-id "{{ item }}"

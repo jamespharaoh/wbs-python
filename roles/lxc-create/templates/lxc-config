@@ -7,8 +7,8 @@ lxc.arch = amd64
 
 lxc.network.type = veth
 lxc.network.flags = up
-lxc.network.link = brprv0
+lxc.network.link = {{ deployments [deployment].bridge_name }}
 lxc.network.hwaddr = {{ hw }}
-lxc.network.ipv4 = {{ ip }}/16
+lxc.network.ipv4 = {{ node_ip }}/16
 
 lxc.start.auto = {{ 1 if autostart == "yes" else 0 }}

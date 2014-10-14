@@ -83,7 +83,7 @@ export PYTHONUNBUFFERED=1
 
 # fix config
 
-if test "$deployment_mode" = "vagrant"; then
+if test "$config_deployment_mode" = "vagrant"; then
 
 	ansible-playbook \
 		--inventory-file inventory \

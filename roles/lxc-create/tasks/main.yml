@@ -1,7 +1,7 @@
 ---
 
 - name: "create lxc container"
-  action: shell
+  shell:
 
     set -e;
 

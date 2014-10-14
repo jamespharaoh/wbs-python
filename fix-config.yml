@@ -11,3 +11,5 @@
       dest: "/home/vagrant/wistla-devops/config"
     sudo: "yes"
     sudo_user: "vagrant"
+
+# ex: et ts=2 filetype=yaml

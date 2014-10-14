@@ -4,6 +4,7 @@ nobind
 ns-cert-type server
 pull
 remote {{ vpn_endpoints [item] }} 1194
+remote-random
 proto udp
 dev tun
 ca wistla-ca.cert

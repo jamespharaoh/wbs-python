@@ -14,4 +14,12 @@
 
 - hosts: "cluster-app"
   gather_facts: "no"
-  roles: [ "cluster-app", "vagrant" ]
+  roles:
+
+    - role: "cluster-app"
+      when: "cluster != 'ops'"
+
+    - role: "vagrant"
+      when: "cluster != 'ops'"
+
+# ex: et ts=2 filetype=yaml

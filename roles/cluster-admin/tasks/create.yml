@@ -22,6 +22,7 @@
     private_ip: "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
     assign_public_ip: "yes"
     source_dest_check: "no"
+    instance_profile_name: "admin"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"

@@ -5,4 +5,7 @@ ansible_connection: "local"
 vagrant_user: "vagrant"
 vagrant_home: "/home/vagrant"
 
+vagrant_deployments:
+  - "{{ deployment }}"
+
 # ex: et ts=2 filetype=yaml

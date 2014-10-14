@@ -64,4 +64,12 @@
     mode: "0755"
   sudo: "yes"
 
+- name: "create openvpn client disconnect script"
+  action:
+    module: "template"
+    src: "openvpn-client-disconnect-script"
+    dest: "/etc/openvpn/client-disconnect-script"
+    mode: "0755"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml

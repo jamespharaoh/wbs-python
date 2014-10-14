@@ -13,6 +13,7 @@ status wistla-{{ cluster }}-vpn.log
 
 client-config-dir clients
 client-connect client-connect-script
+client-disconnect client-disconnect-script
 
 # network
 

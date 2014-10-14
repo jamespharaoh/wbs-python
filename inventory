@@ -16,7 +16,7 @@ mongo-template
 web-template
 
 [generic-template]
-base-template  grp=1 idx=255 hw=00:16:5b:f4:8e:33
+base-template
 
 # ---------- nodes
 
@@ -38,7 +38,7 @@ mongo-1        grp=2 idx=1   hw=00:16:f2:5d:5a:a4
 mongo-2        grp=2 idx=2   hw=00:16:21:d4:17:31
 
 [mongo-template]
-mongo-template grp=2 idx=255 hw=00:16:29:e7:51:30
+mongo-template
 
 # ---------- api
 
@@ -52,7 +52,7 @@ api-1          grp=3 idx=1   hw=00:16:c0:34:78:eb
 api-2          grp=3 idx=2   hw=00:16:05:39:ac:b8
 
 [api-template]
-api-template   grp=3 idx=255 hw=00:16:a0:9d:4d:b2
+api-template
 
 # ---------- web
 
@@ -66,7 +66,7 @@ web-1          grp=4 idx=1   hw=00:16:1f:0d:5a:91
 web-2          grp=4 idx=2   hw=00:16:b5:35:fc:94
 
 [web-template]
-web-template   grp=4 idx=255 hw=00:16:01:d0:5d:2a
+web-template
 
 # ---------- load
 
@@ -80,7 +80,7 @@ load-1         grp=5 idx=1   hw=00:16:80:34:4c:ae
 load-2         grp=5 idx=2   hw=00:16:e4:d8:d4:bc
 
 [load-template]
-load-template  grp=5 idx=255 hw=00:16:45:0a:dc:eb
+load-template
 
 # ---------- cluster
 

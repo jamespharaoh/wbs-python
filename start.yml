@@ -7,3 +7,5 @@
 - hosts: "node"
   gather_facts: "no"
   roles: [ "lxc-start" ]
+
+# ex: et ts=2 filetype=yaml

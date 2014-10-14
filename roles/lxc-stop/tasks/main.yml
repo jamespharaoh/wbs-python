@@ -1,7 +1,8 @@
 ---
 
 - name: "stop lxc container"
-  action: shell
+  delegate_to: "localhost"
+  shell:
 
     if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
       echo "UNCHANGED";

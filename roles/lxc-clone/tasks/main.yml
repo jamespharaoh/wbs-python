@@ -1,7 +1,7 @@
 ---
 
 - name: "clone lxc container"
-  action: shell
+  shell:
 
     set -e;
 

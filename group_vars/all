@@ -20,8 +20,6 @@ global_install_packages:
   - "super"
   - "whois"
 
-ip: "{{ net }}.{{ grp }}.{{ idx }}"
-
 cluster_subnets:
 
   admin:
@@ -75,6 +73,9 @@ amazon_security_groups:
         from_port: "1194"
         to_port: "1194"
         cidr_ip: "0.0.0.0/0"
+
+      - proto: "-1"
+        group_id: "{{ cluster_group_admin }}"
 
       - proto: "-1"
         group_id: "{{ cluster_group_app }}"
@@ -206,41 +207,6 @@ clusters:
 
     amazon_key_name: "wistla-production"
 
-  james:
-
-    cluster_net: "10.144"
-    cluster_domain: "james.wistla.com"
-
-  ben:
-
-    cluster_net: "10.145"
-    cluster_domain: "ben.wistla.com"
-
-  simon:
-
-    cluster_net: "10.146"
-    cluster_domain: "simon.wistla.com"
-
-  dawid:
-
-    cluster_net: "10.147"
-    cluster_domain: "dawid.wistla.com"
-
-dev_cluster_names:
-
-  - "ben"
-  - "dawid"
-  - "james"
-  - "simon"
-
-deployments:
-
-  production-a:
-    deployment_net: "10.148"
-
-  production-b:
-    deployment_net: "10.149"
-
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
@@ -261,6 +227,70 @@ amazon_images: "{{ clusters [cluster].amazon_images }}"
 
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
+deployments:
+
+  production-a:
+
+    public_domain: "wistla.com"
+    private_domain: "a.wistla.com"
+    bridge_name: "br148"
+    bridge_network: "10.148"
+
+  production-b:
+
+    public_domain: "wistla.com"
+    private_domain: "b.wistla.com"
+    bridge_name: "br149"
+    bridge_network: "10.149"
+
+  dev:
+
+    public_domain: "dev.wistla.com"
+    private_domain: "dev.wistla.com"
+    bridge_name: "br152"
+    bridge_network: "10.152"
+
+  james:
+
+    public_domain: "james.wistla.com"
+    private_domain: "james.wistla.com"
+    bridge_name: "br150"
+    bridge_network: "10.150"
+
+  ben:
+
+    public_domain: "ben.wistla.com"
+    private_domain: "ben.wistla.com"
+    bridge_name: "br151"
+    bridge_network: "10.151"
+
+  simon:
+
+    public_domain: "simon.wistla.com"
+    private_domain: "simon.wistla.com"
+    bridge_name: "br153"
+    bridge_network: "10.153"
+
+  dawid:
+
+    public_domain: "dawid.wistla.com"
+    private_domain: "dawid.wistla.com"
+    bridge_name: "br154"
+    bridge_network: "10.154"
+
+deployment_public_domain: "{{ deployments [deployment].public_domain }}"
+deployment_private_domain: "{{ deployments [deployment].public_domain }}"
+
+deployment_bridge_name: "{{ deployments [deployment].bridge_name }}"
+deployment_bridge_network: "{{ deployments [deployment].bridge_network }}"
+
+dev_deployment_names:
+
+  - "james"
+  - "ben"
+  - "simon"
+  - "dawid"
+
 vpn_clients:
 
   - name: "ben.vpn.wistla.com"
@@ -269,7 +299,8 @@ vpn_clients:
 
     iroutes:
 
-      - network: "10.145.0.0"
+      - network: "10.151.0.0"
+        netbits: "16"
         netmask: "255.255.0.0"
 
   - name: "james.vpn.wistla.com"
@@ -278,7 +309,8 @@ vpn_clients:
 
     iroutes:
 
-      - network: "10.144.0.0"
+      - network: "10.150.0.0"
+        netbits: "16"
         netmask: "255.255.0.0"
 
 vagrant_install_packages:
@@ -334,10 +366,12 @@ vagrant_templates:
 deployment_modes:
 
   vagrant:
+
     deployment_home: "/home/vagrant"
     deployment_user: "vagrant"
 
   direct:
+
     deployment_home: "/home/ubuntu"
     deployment_user: "ubuntu"
 

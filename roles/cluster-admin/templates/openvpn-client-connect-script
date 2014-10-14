@@ -2,6 +2,28 @@
 
 set -e
 
+mkdir -p /var/log/openvpn
+exec &> /var/log/openvpn/$common_name.connect.log
+
+route_tables=(
+	"{{ cluster_routes_admin_a }}"
+	"{{ cluster_routes_admin_b }}"
+	"{{ cluster_routes_admin_c }}"
+{% if cluster != 'ops' %}
+	"{{ cluster_routes_app_a }}"
+	"{{ cluster_routes_app_b }}"
+	"{{ cluster_routes_app_c }}"
+	"{{ cluster_routes_data_a }}"
+	"{{ cluster_routes_data_b }}"
+	"{{ cluster_routes_data_c }}"
+{% endif %}
+{% if cluster == 'ops' %}
+	"{{ cluster_routes_jenkins_a }}"
+	"{{ cluster_routes_jenkins_b }}"
+	"{{ cluster_routes_jenkins_c }}"
+{% endif %}
+)
+
 case "$common_name" in
 
 {% for vpn_client in vpn_clients %}
@@ -9,7 +31,27 @@ case "$common_name" in
 ({{ vpn_client.name }})
 
 {% for iroute in vpn_client.iroutes %}
-	# TODO
+
+	ip route replace \
+		{{ iroute.network }}/{{ iroute.netbits }} \
+		via {{ cluster_vpn }}.{{ vpn_groups [zon] }}.{{ vpn_client.vpn_ip }}
+
+	for route_table in "${route_tables[@]}"; do
+
+		aws ec2 delete-route \
+			--region "eu-west-1" \
+			--route-table-id "$route_table" \
+			--destination-cidr-block {{ iroute.network }}/{{ iroute.netbits }} \
+		|| true
+
+		aws ec2 create-route \
+			--region "eu-west-1" \
+			--route-table-id "$route_table" \
+			--destination-cidr-block {{ iroute.network }}/{{ iroute.netbits }} \
+			--instance-id {{ instance_id }}
+
+	done
+
 {% endfor %}
 
 	;;

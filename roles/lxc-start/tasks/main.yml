@@ -1,7 +1,7 @@
 ---
 
 - name: "start lxc container"
-  action: shell
+  shell:
 
     state=$(
       lxc-info

@@ -9,7 +9,7 @@
   sudo_user: "vagrant"
 
 - name: "write stack json {{ stack }}"
-  action: shell
+  shell:
 
     set -e;
 

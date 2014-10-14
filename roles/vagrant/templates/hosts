@@ -1,11 +1,30 @@
 127.0.0.1 localhost
 
+{% if deployment_mode == 'vagrant' %}
+
+# ---------- shortcut hosts for dev only
+
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ net }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.node.{{ domain }}
+{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}
 {% endfor %}
 
-{% for host_name in groups['api-node'] %}
+{% endif %}
+
+{% for other_deployment_name, other_deployment in deployments.items () %}
+
+# ---------- deployment {{ other_deployment_name }}
+
+{% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ net }}.{{ host.grp }}.{{ host.idx }} api.{{ domain }}
+{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}.{{ other_deployment.private_domain }}
+{% endfor %}
+
+{% for subdomain in [ 'api' ] %}
+{% for host_name in groups ['load-node'] %}
+{% set host = hostvars [host_name] %}
+{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ subdomain }}.{{ other_deployment.private_domain }}
+{% endfor %}
+{% endfor %}
+
 {% endfor %}
