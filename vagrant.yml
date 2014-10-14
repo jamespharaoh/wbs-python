@@ -2,4 +2,6 @@
 
 - hosts: "vagrant"
   gather_facts: "no"
-  roles: [ "vagrant" ]
+  roles:
+    - role: "vagrant"
+      when: "deployment_mode == 'vagrant'"
