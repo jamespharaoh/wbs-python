@@ -2,13 +2,7 @@
 
 set -e
 
-# always run from vagrant machine
-
-if ! test "$HOSTNAME" = "wistla-dev"; then
-	echo "This command must be run from inside vagrant" >&2
-	echo "Please run 'vagrant ssh' and try again" >&2
-	exit 1
-fi
+cd "$(dirname "$0")"
 
 # always run as root
 
@@ -16,9 +10,72 @@ if test "$UID" != "0"; then
 	exec sudo "$0" "$@"
 fi
 
-# load ansible environment
+# load config
 
-cd /home/vagrant/wistla-devops
+function parse_yaml {
+
+	local filename="$1"
+	local prefix="$2"
+
+	local s='[[:space:]]*'
+	local w='[a-zA-Z0-9_]*'
+	local fs=$(echo @ | tr @ '\034')
+
+	sed -ne "s|^\($s\):|\1|" \
+		-e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+		-e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$filename" |
+	awk -F$fs '{
+		indent = length ($1) / 2;
+		vname [indent] = $2;
+		for (i in vname) { if (i > indent) { delete vname [i] } }
+		if (length ($3) > 0) {
+			vn=""; for (i = 0; i < indent; i ++) { vn = (vn) (vname [i]) ("_") }
+			printf ("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
+		}
+	}'
+
+}
+
+eval "$(parse_yaml config config_)"
+
+# check deployment mode
+
+case "$config_deployment_mode" in
+
+	(""|vagrant)
+
+		if test "$HOSTNAME" != "wistla-dev"; then
+			echo "This command must be run from inside vagrant" >&2
+			echo "Please run 'vagrant ssh' and try again" >&2
+			exit 1
+		fi
+
+		echo "Running in VAGRANT deployment mode"
+
+		deployment_home="/home/vagrant"
+		deployment_user="vagrant"
+
+		;;
+
+	(direct)
+
+		echo "Running in DIRECT deployment mode"
+
+		deployment_home="/home/ubuntu"
+		deployment_user="ubuntu"
+
+		;;
+
+	(*)
+
+		echo "Unrecognised deployment mode: $config_deployment_mode"
+		exit 1
+
+		;;
+
+esac
+
+# load ansible environment
 
 source ansible/hacking/env-setup >/dev/null
 
@@ -26,30 +83,34 @@ export PYTHONUNBUFFERED=1
 
 # fix config
 
-ansible-playbook \
-	--inventory-file inventory \
-	--extra-vars @config \
-	--limit vagrant \
-	fix-config.yml
+if test "$deployment_mode" = "vagrant"; then
 
-if ! test -f accounts; then
-	cat >accounts <<-END
-		---
-		amazon_accounts:
-		  production:
-		    access_key: ""
-		    secret_key: ""
-		  staging:
-		    access_key: ""
-		    secret_key: ""
-		  test:
-		    access_key: ""
-		    secret_key: ""
-		  operations:
-		    access_key: ""
-		    secret_key: ""
-	END
-	chown vagrant:vagrant accounts
+	ansible-playbook \
+		--inventory-file inventory \
+		--extra-vars @config \
+		--limit vagrant \
+		fix-config.yml
+
+	if ! test -f accounts; then
+		cat >accounts <<-END
+			---
+			amazon_accounts:
+			  production:
+				access_key: ""
+				secret_key: ""
+			  staging:
+				access_key: ""
+				secret_key: ""
+			  test:
+				access_key: ""
+				secret_key: ""
+			  operations:
+				access_key: ""
+				secret_key: ""
+		END
+		chown $deployment_user:$deployment_user accounts
+	fi
+
 fi
 
 # run ansible-playbook
