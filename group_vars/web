@@ -2,3 +2,5 @@
 
 node: "web"
 prv: "4"
+
+# ex: et ts=2 filetype=yaml

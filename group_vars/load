@@ -6,3 +6,5 @@ prv: "5"
 load_install_packages:
 
   - "nginx"
+
+# ex: et ts=2 filetype=yaml

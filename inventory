@@ -1,4 +1,4 @@
-# ---------- vagrant
+# ---------- local box
 
 [vagrant]
 vagrant        grp=1 idx=1   hw=00:16:c3:82:a7:4f

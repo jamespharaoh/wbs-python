@@ -1,3 +1,5 @@
 ---
 
 ansible_connection: "local"
+
+# ex: et ts=2 filetype=yaml

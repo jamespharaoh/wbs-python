@@ -1,5 +1,7 @@
 ---
 
+deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
+
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"
 

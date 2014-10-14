@@ -15,3 +15,5 @@ cluster_app_remove_packages: []
 
 vagrant_user: "ubuntu"
 vagrant_home: "/home/ubuntu"
+
+# ex: et ts=2 filetype=yaml

@@ -5,3 +5,5 @@ prv: "3"
 
 api_install_packages:
   - "npm"
+
+# ex: et ts=2 filetype=yaml

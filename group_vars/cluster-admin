@@ -12,3 +12,5 @@ cluster_admin_install_packages:
   - "whois"
 
 cluster_admin_remove_packages: []
+
+# ex: et ts=2 filetype=yaml

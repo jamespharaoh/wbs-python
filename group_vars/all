@@ -82,6 +82,9 @@ amazon_security_groups:
       - proto: "-1"
         group_id: "{{ cluster_group_jenkins }}"
 
+      - proto: "-1"
+        cidr_ip: "10.0.0.0/8"
+
       - proto: "tcp"
         group_id: "{{ cluster_group_balancer }}"
         from_port: "80"
@@ -328,7 +331,17 @@ vagrant_templates:
 
   - "template"
 
-vagrant_user: "vagrant"
-vagrant_home: "/home/vagrant"
+deployment_modes:
+
+  vagrant:
+    deployment_home: "/home/vagrant"
+    deployment_user: "vagrant"
+
+  direct:
+    deployment_home: "/home/ubuntu"
+    deployment_user: "ubuntu"
+
+deployment_home: "{{ deployment_modes [deployment_mode].deployment_home }}"
+deployment_user: "{{ deployment_modes [deployment_mode].deployment_user }}"
 
 # ex: et ts=2 filetype=yaml

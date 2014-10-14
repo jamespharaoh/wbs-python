@@ -5,3 +5,5 @@ prv: "2"
 
 mongo_install_packages:
   - "mongodb"
+
+# ex: et ts=2 filetype=yaml

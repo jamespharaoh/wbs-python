@@ -5,3 +5,5 @@ ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
 template: "{{ node }}-template"
 autostart: "yes"
+
+# ex: et ts=2 filetype=yaml

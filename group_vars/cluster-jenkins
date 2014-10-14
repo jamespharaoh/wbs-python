@@ -11,3 +11,5 @@ jenkins_install_packages:
   - "whois"
 
 jenkins_remove_packages: []
+
+# ex: et ts=2 filetype=yaml
