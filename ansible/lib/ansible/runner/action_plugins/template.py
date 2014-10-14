@@ -113,7 +113,7 @@ class ActionModule(object):
             xfered = self.runner._transfer_str(conn, tmp, 'source', resultant)
 
             # fix file permissions when the copy is done as a different user
-            if self.runner.sudo and self.runner.sudo_user != 'root':
+            if self.runner.sudo and self.runner.sudo_user != 'root' or self.runner.su and self.runner.su_user != 'root':
                 self.runner._remote_chmod(conn, 'a+r', xfered, tmp)
 
             # run the copy module
@@ -132,5 +132,12 @@ class ActionModule(object):
                     res.diff = dict(before=dest_contents, after=resultant)
                 return res
         else:
+            # if we're running in check mode, we still want the file module
+            # to execute, since we can't know if anything would be changed here,
+            # so we inject the check mode param into the module args and rely on
+            # the file module to report its changed status
+            if self.runner.noop_on_check(inject):
+                new_module_args = dict(CHECKMODE=True)
+                module_args = utils.merge_module_args(module_args, new_module_args)
             return self.runner._execute_module(conn, tmp, 'file', module_args, inject=inject, complex_args=complex_args)
 
