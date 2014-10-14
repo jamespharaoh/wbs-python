@@ -20,3 +20,5 @@
   sudo: "yes"
   with_items:
     - "jenkins"
+
+# ex: et ts=2 filetype=yaml

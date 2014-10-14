@@ -29,3 +29,5 @@
   sudo_user: "root"
   with_items: "jenkins_install_packages"
   tags: "update"
+
+# ex: et ts=2 filetype=yaml

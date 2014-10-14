@@ -11,5 +11,10 @@
 - include: "jenkins.yml"
   when: "cluster == 'ops'"
 
+- include: "nginx.yml"
+  when: "cluster == 'ops'"
+
 - include: "activate.yml"
   when: "cluster == 'ops'"
+
+# ex: et ts=2 filetype=yaml
