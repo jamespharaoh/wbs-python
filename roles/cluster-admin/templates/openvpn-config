@@ -19,13 +19,14 @@ client-disconnect client-disconnect-script
 
 dev tun
 topology subnet
+tun-mtu 1500
 
 ifconfig {{ vpn_net }}.1 255.255.255.0
 
-push "topology subnet"
 push "route-gateway {{ vpn_net }}.1"
 
 push "route {{ cluster_net }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+push "route {{ cluster_vpn }}.0.0 255.255.0.0 {{ vpn_net }}.1"
 
 {% for cluster_deployment_name in cluster_deployment_names %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}

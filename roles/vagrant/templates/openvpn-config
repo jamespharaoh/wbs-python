@@ -1,3 +1,5 @@
+# client
+
 client
 resolv-retry infinite
 nobind
@@ -6,11 +8,19 @@ pull
 remote {{ vpn_endpoints [item] }} 1194
 remote-random
 proto udp
+status wistla-{{ item }}-vpn.log
+
+# network
+
 dev tun
+topology subnet
+tun-mtu 1500
+persist-tun
+
+# security
+
 ca wistla-ca.cert
 cert wistla-{{ item }}-vpn.cert
 key wistla-{{ item }}-vpn.key
 #crl-verify wistla-ca.crl
 persist-key
-persist-tun
-status wistla-{{ item }}-vpn.log
