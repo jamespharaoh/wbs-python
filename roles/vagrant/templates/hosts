@@ -6,7 +6,14 @@
 
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}
+{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.dev.wistla.com
+{% endfor %}
+
+{% for subdomain in [ 'api' ] %}
+{% for host_name in groups ['load-node'] %}
+{% set host = hostvars [host_name] %}
+{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ subdomain }}.dev.wistla.com
+{% endfor %}
 {% endfor %}
 
 {% endif %}
