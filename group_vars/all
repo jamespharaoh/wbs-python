@@ -189,6 +189,11 @@ clusters:
 
     cluster_domain: "wistla.com"
 
+    cluster_deployment_names:
+
+      - "production-a"
+      - "production-b"
+
     amazon_account: "production"
     amazon_region: "eu-west-1"
 
@@ -216,6 +221,8 @@ cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
 cluster_domain: "{{ clusters [cluster].cluster_domain }}"
+
+cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
 
 amazon_account: "{{ clusters [cluster].amazon_account }}"
 amazon_region: "{{ clusters [cluster].amazon_region }}"
@@ -308,6 +315,16 @@ vpn_clients:
         netbits: "16"
         netmask: "255.255.0.0"
 
+  - name: "dawid.vpn.wistla.com"
+
+    vpn_ip: "4"
+
+    iroutes:
+
+      - network: "10.154.0.0"
+        netbits: "16"
+        netmask: "255.255.0.0"
+
   - name: "james.vpn.wistla.com"
 
     vpn_ip: "2"
@@ -315,6 +332,16 @@ vpn_clients:
     iroutes:
 
       - network: "10.150.0.0"
+        netbits: "16"
+        netmask: "255.255.0.0"
+
+  - name: "simon.vpn.wistla.com"
+
+    vpn_ip: "3"
+
+    iroutes:
+
+      - network: "10.153.0.0"
         netbits: "16"
         netmask: "255.255.0.0"
 

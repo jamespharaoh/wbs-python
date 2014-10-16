@@ -24,7 +24,20 @@ ifconfig {{ vpn_net }}.1 255.255.255.0
 
 push "topology subnet"
 push "route-gateway {{ vpn_net }}.1"
+
 push "route {{ cluster_net }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+
+{% for cluster_deployment_name in cluster_deployment_names %}
+{% set cluster_deployment = deployments [cluster_deployment_name] %}
+push "route {{ cluster_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+{% endfor %}
+
+{% if cluster == 'ops' %}
+{% for dev_deployment_name in dev_deployment_names %}
+{% set dev_deployment = deployments [dev_deployment_name] %}
+push "route {{ dev_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+{% endfor %}
+{% endif %}
 
 client-to-client
 
