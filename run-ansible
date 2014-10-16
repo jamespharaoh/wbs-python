@@ -40,9 +40,13 @@ eval "$(parse_yaml config config_)"
 
 # check deployment mode
 
+if ! test "$config_deployment_mode"; then
+	config_deployment_mode="vagrant"
+fi
+
 case "$config_deployment_mode" in
 
-	(""|vagrant)
+	(vagrant)
 
 		if test "$HOSTNAME" != "wistla-dev"; then
 			echo "This command must be run from inside vagrant" >&2
