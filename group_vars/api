@@ -4,6 +4,9 @@ node: "api"
 prv: "3"
 
 api_install_packages:
+
+  - "graphicsmagick"
+  - "imagemagick"
   - "npm"
 
 # ex: et ts=2 filetype=yaml
