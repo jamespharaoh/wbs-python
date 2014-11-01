@@ -17,6 +17,16 @@
   sudo_user: "{{ vagrant_user }}"
   with_items: "vagrant_checkouts"
 
+- name: "create git pre-commit hooks"
+  action:
+    module: "template"
+    src: "git-hook-pre-commit"
+    dest: "{{ vagrant_home }}/{{ item.name }}/.git/hooks/pre-commit"
+    mode: "0755"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items: "vagrant_checkouts"
+
 - name: "create shared directory"
   action:
     module: "file"
