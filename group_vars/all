@@ -350,6 +350,8 @@ vagrant_install_packages:
   - "btrfs-tools"
   - "encfs"
   - "git"
+  - "graphicsmagick"
+  - "imagemagick"
   - "lxc"
   - "mongodb-clients"
   - "nfs-kernel-server"
