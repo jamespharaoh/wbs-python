@@ -19,6 +19,9 @@
 - include: "openvpn.yml"
   when: "inventory_hostname == 'vagrant'"
 
+- include: "tools.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "user.yml"
 
 - include: "wistla.yml"

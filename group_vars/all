@@ -348,6 +348,7 @@ vpn_clients:
 vagrant_install_packages:
 
   - "btrfs-tools"
+  - "colordiff"
   - "encfs"
   - "git"
   - "graphicsmagick"

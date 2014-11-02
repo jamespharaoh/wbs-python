@@ -1,0 +1,23 @@
+#!/bin/bash
+
+SCRIPT='
+	s/[ \t\r][ \t\r]*$//;
+'
+
+temp=`tempfile`
+
+filenames=$(
+	grep -l -P '[ \t\r]+$' "$@"
+)
+
+for file in $filenames; do
+
+	echo $file
+
+	sed "$SCRIPT" "$file" >$temp || exit 1
+
+	colordiff -U3 "$file" "$temp"
+
+	mv "$temp" "$file"
+
+done
