@@ -9,6 +9,8 @@ developer_email: "{{ developer_email | default ('') }}"
 ubuntu_main_url: "{{ ubuntu_main_url }}"
 ubuntu_security_url: "{{ ubuntu_security_url }}"
 
+debug: "{{ debug | default ('yes') }}"
+
 {% if vpns | default ([]) %}
 vpns:
 {% for vpn in vpns | default ([]) %}

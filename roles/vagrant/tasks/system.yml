@@ -62,5 +62,16 @@
   sudo: "yes"
   sudo_user: "root"
   with_items: "vagrant_install_python"
+  tags: "update"
+
+- name: "install node packages"
+  action:
+    module: "npm"
+    name: "{{ item }}"
+    global: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "vagrant_install_node"
+  tags: "update"
 
 # ex: et ts=2 filetype=yaml

@@ -383,6 +383,10 @@ vagrant_install_python:
 
   - "awscli"
 
+vagrant_install_node:
+
+  - "node-inspector"
+
 vagrant_checkouts:
 
   - name: "wistla-api"

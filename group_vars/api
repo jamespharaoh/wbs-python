@@ -9,4 +9,8 @@ api_install_packages:
   - "imagemagick"
   - "npm"
 
+api_install_node:
+
+  - "node-inspector"
+
 # ex: et ts=2 filetype=yaml

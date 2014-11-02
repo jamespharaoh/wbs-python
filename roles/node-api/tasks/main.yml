@@ -9,6 +9,16 @@
   sudo_user: "root"
   with_items: "api_install_packages"
 
+- name: "install node packages"
+  action:
+    module: "npm"
+    name: "{{ item }}"
+    global: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "api_install_node"
+  tags: "update"
+
 - name: "deploy projects"
   delegate_to: "localhost"
   shell:
