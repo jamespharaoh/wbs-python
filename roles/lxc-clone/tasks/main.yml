@@ -25,6 +25,8 @@
       {{ template }}
       {{ inventory_hostname }};
 
+    chgrp {{ deployment_user }} /var/lib/lxc/{{ inventory_hostname }};
+
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
   args:
