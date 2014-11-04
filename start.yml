@@ -2,10 +2,14 @@
 
 - hosts: "node"
   gather_facts: "no"
-  roles: [ "lxc-clone" ]
+  roles:
+    - role: "lxc-clone"
+      when: "idx | int < node_count [node] | int"
 
 - hosts: "node"
   gather_facts: "no"
-  roles: [ "lxc-start" ]
+  roles:
+    - role: "lxc-start"
+      when: "idx | int < node_count [node] | int"
 
 # ex: et ts=2 filetype=yaml

@@ -32,8 +32,13 @@ http {
 	# load balancer
 
 	upstream api {
-{% for api in groups['api-node'] %}
-		server {{ api }}:7000;
+{% for api_name in groups ['api-node'] %}
+{% set api_host = hostvars [api_name] %}
+{% if api_host.idx | int < node_count.api | int %}
+		server {{ api_name }}:7000;
+{% else %}
+		# server {{ api_name }}:7000;
+{% endif %}
 {% endfor %}
 	}
 

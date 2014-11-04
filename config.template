@@ -20,4 +20,10 @@ vpns:
 vpns: []
 {% endif %}
 
+node_count:
+  api: "{{ (node_count | default ({})).api | default ('3') }}"
+  load: "{{ (node_count | default ({})).load | default ('3') }}"
+  mongo: "{{ (node_count | default ({})).mongo | default ('3') }}"
+  web: "{{ (node_count | default ({})).web | default ('3') }}"
+
 # ex: et ts=2 filetype=yaml
