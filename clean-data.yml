@@ -11,4 +11,12 @@
       sudo: "yes"
       sudo_user: "root"
 
+    - name: "create shared directory"
+      action:
+        module: "file"
+        path: "{{ deployment_home }}/shared"
+        state: "directory"
+      sudo: "yes"
+      sudo_user: "{{ vagrant_user }}"
+
 # ex: et ts=2 filetype=yaml
