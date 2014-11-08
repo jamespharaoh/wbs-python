@@ -6,4 +6,12 @@ prv: "2"
 mongo_install_packages:
   - "mongodb"
 
+data_dirs:
+
+  - name: "mongo-data"
+    path: "var/lib/mongodb"
+    owner: "mongodb"
+    group: "mongodb"
+    mode: "0755"
+
 # ex: et ts=2 filetype=yaml

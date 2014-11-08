@@ -1,0 +1,14 @@
+---
+
+- include: "stop.yml"
+
+- hosts: "vagrant"
+  tasks:
+
+    - name: "remove shared directory"
+      shell:
+        rm -rf {{ deployment_home }}/shared
+      sudo: "yes"
+      sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

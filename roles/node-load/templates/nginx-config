@@ -37,20 +37,25 @@ http {
 {% if api_host.idx | int < node_count.api | int %}
 		server {{ api_name }}:7000;
 {% else %}
-		# server {{ api_name }}:7000;
+		server {{ api_name }}:7000 down;
 {% endif %}
 {% endfor %}
+		keepalive 4;
 	}
 
 	server {
 
 		server_name api.{{ deployment_private_domain }};
+{% if deployment_private_domain != deployment_public_domain %}
 		server_name api.{{ deployment_public_domain }};
+{% endif %}
 
 		client_max_body_size 16m;
 
 		location / {
 			proxy_pass http://api;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 		}
 
 	}

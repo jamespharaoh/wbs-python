@@ -54,4 +54,36 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "create host data dir"
+  action:
+    module: "file"
+    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}"
+    state: "directory"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create host data dirs"
+  action:
+    module: "file"
+    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}/{{ item.name }}"
+    state: "directory"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "data_dirs"
+
+- name: "create container data dirs"
+  action:
+    module: "file"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
+    state: "directory"
+  delegate_to: "localhost"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "data_dirs"
+
 # ex: et ts=2 filetype=yaml

@@ -417,4 +417,14 @@ deployment_modes:
 deployment_home: "{{ deployment_modes [deployment_mode].deployment_home }}"
 deployment_user: "{{ deployment_modes [deployment_mode].deployment_user }}"
 
+data_dirs: []
+
+common_users:
+
+  - name: "mongodb"
+    uid: "200"
+    gid: "200"
+    home: "/home/mongodb"
+    shell: "/bin/false"
+
 # ex: et ts=2 filetype=yaml

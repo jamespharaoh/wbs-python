@@ -6,6 +6,10 @@ lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
 
 lxc.mount.entry = {{ deployment_home }}/shared shared none bind 0 0
 
+{% for data_dir in data_dirs %}
+lxc.mount.entry = {{ deployment_home }}/shared/{{ inventory_hostname }}/{{ data_dir.name }} {{ data_dir.path }} none bind 0 0
+{% endfor %}
+
 lxc.utsname = {{ inventory_hostname }}
 lxc.arch = amd64
 
