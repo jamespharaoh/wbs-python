@@ -62,20 +62,6 @@ if [ "$allownonascii" != "true" ] && check_non_ascii; then
 
 fi
 
-# generate documentation
-
-pwd
-
-if test -f package.json -a -d node_modules/apidoc; then
-
-	npm run-script apidoc
-
-	sed --in-place 's/[ \t\r][ \t\r]*$//;' $(find doc -type f)
-
-	git add -A doc
-
-fi
-
 # check whitespace
 
 git diff-index --check --cached $against --

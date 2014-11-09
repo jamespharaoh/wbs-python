@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+exec 1>&2
+
+# generate documentation
+
+if test -f package.json -a -d node_modules/apidoc; then
+
+	npm run-script apidoc >/dev/null 2>/dev/null || true
+
+	sed --in-place 's/[ \t\r][ \t\r]*$//;' $(find doc -type f)
+
+fi
+
+# done
+
+exit 0
