@@ -7,7 +7,7 @@
 
     - name: "remove shared directory"
       shell:
-        rm -rf {{ deployment_home }}/shared
+        rm -rf {{ deployment_home }}/shared/*
       sudo: "yes"
       sudo_user: "root"
 
