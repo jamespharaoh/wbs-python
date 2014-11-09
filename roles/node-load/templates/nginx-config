@@ -40,7 +40,7 @@ http {
 		server {{ api_name }}:7000 down;
 {% endif %}
 {% endfor %}
-		keepalive 4;
+		#keepalive 1;
 	}
 
 	server {
