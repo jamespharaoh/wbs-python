@@ -13,7 +13,7 @@ script
 	mkdir --parents logs
 
 	setuid ubuntu \
-	{{ 'node-debug' if debug == 'yes' else 'nodejs' }} server.js \
+	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} server.js \
 		> logs/output.txt 2> logs/output.txt
 
 end script
