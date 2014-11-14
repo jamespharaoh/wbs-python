@@ -20,6 +20,8 @@ vpns:
 vpns: []
 {% endif %}
 
+vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
+
 node_count:
   api: "{{ (node_count | default ({})).api | default ('3') }}"
   load: "{{ (node_count | default ({})).load | default ('3') }}"

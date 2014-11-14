@@ -14,7 +14,7 @@ status wistla-{{ item }}-vpn.log
 
 dev tun
 topology subnet
-tun-mtu 1500
+tun-mtu {{ vpn_mtu }}
 persist-tun
 
 # security
