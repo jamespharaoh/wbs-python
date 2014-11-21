@@ -35,3 +35,14 @@
 {% endfor %}
 
 {% endfor %}
+
+{% for cluster_name, cluster in clusters.items () %}
+
+# ---------- cluster {{ cluster_name }}
+
+{% for cluster_host_name in groups ['cluster-host'] %}
+{% set cluster_host = hostvars [cluster_host_name] %}
+{{ cluster.cluster_net }}.{{ cluster_subnets [cluster_host.cluster_type] [cluster_host.zon] }}.{{ cluster_host.idx }} {{ cluster_host_name }}.{{ cluster.cluster_domain }}
+{% endfor %}
+
+{% endfor %}

@@ -97,14 +97,14 @@ cluster-app
 cluster-jenkins
 
 [cluster-admin]
-cluster-admin-a zon=a
-cluster-admin-b zon=b
-cluster-admin-c zon=c
+cluster-admin-a zon=a idx=4
+cluster-admin-b zon=b idx=4
+cluster-admin-c zon=c idx=4
 
 [cluster-app]
-cluster-app-a-4 zon=a grp=1 idx=4 hw=00:16:6e:4b:2c:44
-#cluster-app-b-4 zon=b grp=1 idx=4 hw=00:16:cf:18:46:42
-#cluster-app-c-4 zon=c grp=1 idx=4 hw=00:16:a1:90:57:3d
+cluster-app-a-4 zon=a idx=4 hw=00:16:6e:4b:2c:44
+#cluster-app-b-4 zon=b idx=4 hw=00:16:cf:18:46:42
+#cluster-app-c-4 zon=c idx=4 hw=00:16:a1:90:57:3d
 
 [cluster-jenkins]
-jenkins-a       zon=a
+jenkins-a       zon=a idx=4

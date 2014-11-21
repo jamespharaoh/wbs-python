@@ -2,6 +2,8 @@
 
 ansible_ssh_host: "{{ cluster_net }}.{{ cluster_subnets.jenkins [zon] }}.4"
 
+cluster_type: "jenkins"
+
 jenkins_install_packages:
 
   - "git"

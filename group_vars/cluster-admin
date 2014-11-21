@@ -2,6 +2,8 @@
 
 ansible_ssh_host: "{{ zon }}.admin.{{ cluster_domain }}"
 
+cluster_type: "admin"
+
 cluster_admin_install_packages:
 
   - "awscli"

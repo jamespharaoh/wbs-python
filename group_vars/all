@@ -43,8 +43,9 @@ cluster_subnets:
     c: "12"
 
 vpn_endpoints:
-  ops: "vpn.ops.wistla.com"
   production: "vpn.wistla.com"
+  staging: "vpn.staging.wistla.com"
+  ops: "vpn.ops.wistla.com"
 
 vpn_groups:
   a: "1"
@@ -217,6 +218,41 @@ clusters:
 
     amazon_key_name: "wistla-production"
 
+  staging:
+
+    cluster_net: "10.144"
+    cluster_vpn: "10.145"
+
+    cluster_domain: "staging.wistla.com"
+
+    cluster_deployment_names:
+
+      - "staging-a"
+      - "staging-b"
+
+    amazon_account: "staging"
+    amazon_region: "eu-west-1"
+
+    amazon_zones:
+      a: "eu-west-1a"
+      b: "eu-west-1b"
+      c: "eu-west-1c"
+
+    amazon_admin_ips:
+      a: "54.229.28.28"
+      b: "54.229.32.96"
+      c: "54.229.32.240"
+
+    amazon_type_admin: "t2.small"
+    amazon_type_app: "t2.medium"
+
+    amazon_images:
+
+      eu-west-1:
+        base: "ami-0cfb5a7b"
+
+    amazon_key_name: "wistla-staging"
+
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
@@ -254,6 +290,20 @@ deployments:
     private_domain: "b.wistla.com"
     bridge_name: "br149"
     bridge_network: "10.149"
+
+  staging-a:
+
+    public_domain: "staging.wistla.com"
+    private_domain: "a.staging.wistla.com"
+    bridge_name: "br155"
+    bridge_network: "10.155"
+
+  staging-b:
+
+    public_domain: "staging.wistla.com"
+    private_domain: "b.staging.wistla.com"
+    bridge_name: "br156"
+    bridge_network: "10.156"
 
   dev:
 
