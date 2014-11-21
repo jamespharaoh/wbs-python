@@ -191,7 +191,6 @@ clusters:
     cluster_domain: "wistla.com"
 
     cluster_deployment_names:
-
       - "production-a"
       - "production-b"
 
@@ -226,7 +225,6 @@ clusters:
     cluster_domain: "staging.wistla.com"
 
     cluster_deployment_names:
-
       - "staging-a"
       - "staging-b"
 

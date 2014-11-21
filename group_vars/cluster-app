@@ -1,7 +1,5 @@
 ---
 
-ansible_ssh_host: "{{ cluster_net }}.{{ cluster_subnets.app [zon] }}.{{ idx }}"
-
 cluster_type: "app"
 
 cluster_app_install_packages:
@@ -18,6 +16,6 @@ cluster_app_remove_packages: []
 vagrant_user: "ubuntu"
 vagrant_home: "/home/ubuntu"
 
-vagrant_deployments: "{{ deployments [cluster_deployment_names] }}"
+vagrant_deployments: "{{ cluster_deployment_names }}"
 
 # ex: et ts=2 filetype=yaml
