@@ -24,4 +24,12 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
 
+- name: "create ssh config"
+  action:
+    module: "template"
+    src: "ssh-config"
+    dest: "{{ vagrant_home }}/.ssh/config"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
 # ex: et ts=2 filetype=yaml

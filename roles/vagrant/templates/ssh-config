@@ -1,0 +1,16 @@
+{% for cluster_name, cluster in clusters.items () %}
+
+Host *.{{ cluster.cluster_domain }}
+ForwardAgent yes
+IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster_name }}
+User ubuntu
+
+{% endfor %}
+
+# global config
+
+Host *
+ControlPath ~/.ssh/control_%h_%p_%r
+ForwardAgent no
+ServerAliveInterval 10
+ServerAliveCountMax 6
