@@ -1,3 +1,5 @@
+{% set cluster_active_deployment = deployments [cluster_active_deployment_name] %}
+
 user www-data;
 worker_processes 4;
 pid /run/nginx.pid;
@@ -24,9 +26,9 @@ http {
 	gzip_disable "msie6";
 
 	upstream temp {
-		server 10.148.5.0;
-		server 10.148.5.1;
-		server 10.148.5.2;
+		server {{ cluster_active_deployment.bridge_network }}.5.0;
+		server {{ cluster_active_deployment.bridge_network }}.5.1;
+		server {{ cluster_active_deployment.bridge_network }}.5.2;
 	}
 
 	server {

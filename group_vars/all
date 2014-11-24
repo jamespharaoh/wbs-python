@@ -194,6 +194,8 @@ clusters:
       - "production-a"
       - "production-b"
 
+    cluster_active_deployment_name: "production-a"
+
     amazon_account: "production"
     amazon_region: "eu-west-1"
 
@@ -228,6 +230,8 @@ clusters:
       - "staging-a"
       - "staging-b"
 
+    cluster_active_deployment_name: "staging-a"
+
     amazon_account: "staging"
     amazon_region: "eu-west-1"
 
@@ -257,6 +261,8 @@ cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 cluster_domain: "{{ clusters [cluster].cluster_domain }}"
 
 cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
+
+cluster_active_deployment_name: "{{ clusters [cluster].cluster_active_deployment_name }}"
 
 amazon_account: "{{ clusters [cluster].amazon_account }}"
 amazon_region: "{{ clusters [cluster].amazon_region }}"
