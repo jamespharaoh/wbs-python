@@ -452,6 +452,9 @@ vagrant_checkouts:
   - name: "wistla-web"
     branch: "master"
 
+  - name: "wistla-test-images"
+    branch: "master"
+
 vagrant_templates:
 
   - "template"
