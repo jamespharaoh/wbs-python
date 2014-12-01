@@ -196,6 +196,8 @@ clusters:
 
     cluster_active_deployment_name: "production-a"
 
+    cluster_cron_email: "cron.production@wistla.com"
+
     amazon_account: "production"
     amazon_region: "eu-west-1"
 
@@ -232,6 +234,8 @@ clusters:
 
     cluster_active_deployment_name: "staging-a"
 
+    cluster_cron_email: "cron.staging@wistla.com"
+
     amazon_account: "staging"
     amazon_region: "eu-west-1"
 
@@ -263,6 +267,8 @@ cluster_domain: "{{ clusters [cluster].cluster_domain }}"
 cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
 
 cluster_active_deployment_name: "{{ clusters [cluster].cluster_active_deployment_name }}"
+
+cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
 
 amazon_account: "{{ clusters [cluster].amazon_account }}"
 amazon_region: "{{ clusters [cluster].amazon_region }}"

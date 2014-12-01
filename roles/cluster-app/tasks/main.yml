@@ -3,13 +3,10 @@
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
 
 - include: "create.yml"
-  when: "cluster != 'ops'"
 
 - include: "system.yml"
-  when: "cluster != 'ops'"
-
 - include: "nginx.yml"
-  when: "cluster != 'ops'"
-
 - include: "activate.yml"
-  when: "cluster != 'ops'"
+- include: "cron.yml"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,10 @@
+SHELL="/bin/bash"
+MAILTO="{{ cluster_cron_email }}"
+HOME="/home/ubuntu"
+NODE_ENV="vagrant"
+
+0 5 * * * ubuntu cd "$HOME/wistla-api"; ./node_modules/.bin/mocha -R spec --timeout 120000 app/resources/wistles.load.js
+1 5 * * * ubuntu cd "$HOME/wistla-api"; ./node_modules/.bin/mocha -R spec --timeout 120000 app/resources/wistles.load.js
+2 5 * * * ubuntu cd "$HOME/wistla-api"; ./node_modules/.bin/mocha -R spec --timeout 120000 app/resources/wistles.load.js
+
+# ex: noet ts=4 filetype=crontab
