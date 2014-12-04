@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import traceback
 import unittest
 import os
 import os.path
@@ -27,9 +28,18 @@ sys.setdefaultencoding("utf8")
 
 class TestUtils(unittest.TestCase):
 
+    def _is_fips(self):
+        try:
+            data = open('/proc/sys/crypto/fips_enabled').read().strip()
+        except:
+            return False
+        if data != '1':
+            return False
+        return True
+
     def test_before_comment(self):
         ''' see if we can detect the part of a string before a comment.  Used by INI parser in inventory '''
- 
+
         input    = "before # comment"
         expected = "before "
         actual   = ansible.utils.before_comment(input)
@@ -217,36 +227,23 @@ class TestUtils(unittest.TestCase):
         # leading junk
         self.assertEqual(ansible.utils.parse_json('ansible\n{"foo": "bar"}'), dict(foo="bar"))
 
-        # "baby" json
-        self.assertEqual(ansible.utils.parse_json('foo=bar baz=qux'), dict(foo='bar', baz='qux'))
-
         # No closing quotation
         try:
-            ansible.utils.parse_json('foo=bar "')
+            rc = ansible.utils.parse_json('foo=bar "')
+            print rc
         except ValueError:
             pass
         else:
+            traceback.print_exc()
             raise AssertionError('Incorrect exception, expected ValueError')
 
         # Failed to parse
         try:
             ansible.utils.parse_json('{')
-        except ansible.errors.AnsibleError:
+        except ValueError:
             pass
         else:
-            raise AssertionError('Incorrect exception, expected ansible.errors.AnsibleError')
-
-        # boolean changed/failed
-        self.assertEqual(ansible.utils.parse_json('changed=true'), dict(changed=True))
-        self.assertEqual(ansible.utils.parse_json('changed=false'), dict(changed=False))
-        self.assertEqual(ansible.utils.parse_json('failed=true'), dict(failed=True))
-        self.assertEqual(ansible.utils.parse_json('failed=false'), dict(failed=False))
-
-        # rc
-        self.assertEqual(ansible.utils.parse_json('rc=0'), dict(rc=0))
-
-        # Just a string
-        self.assertEqual(ansible.utils.parse_json('foo'), dict(failed=True, parsed=False, msg='foo'))
+            raise AssertionError('Incorrect exception, expected ValueError')
 
     def test_parse_yaml(self):
         #json
@@ -369,13 +366,27 @@ class TestUtils(unittest.TestCase):
                dict(foo=dict(bar='qux')))
 
     def test_md5s(self):
+        if self._is_fips():
+            raise SkipTest('MD5 unavailable on FIPs enabled systems')
         self.assertEqual(ansible.utils.md5s('ansible'), '640c8a5376aa12fa15cf02130ce239a6')
         # Need a test that causes UnicodeEncodeError See 4221
 
     def test_md5(self):
+        if self._is_fips():
+            raise SkipTest('MD5 unavailable on FIPs enabled systems')
         self.assertEqual(ansible.utils.md5(os.path.join(os.path.dirname(__file__), 'ansible.cfg')),
                          'fb7b5b90ea63f04bde33e804b6fad42c')
         self.assertEqual(ansible.utils.md5(os.path.join(os.path.dirname(__file__), 'ansible.cf')),
+                         None)
+
+    def test_checksum_s(self):
+        self.assertEqual(ansible.utils.checksum_s('ansible'), 'bef45157a43c9e5f469d188810814a4a8ab9f2ed')
+        # Need a test that causes UnicodeEncodeError See 4221
+
+    def test_checksum(self):
+        self.assertEqual(ansible.utils.checksum(os.path.join(os.path.dirname(__file__), 'ansible.cfg')),
+                         '658b67c8ac7595adde7048425ff1f9aba270721a')
+        self.assertEqual(ansible.utils.checksum(os.path.join(os.path.dirname(__file__), 'ansible.cf')),
                          None)
 
     def test_default(self):
@@ -445,16 +456,18 @@ class TestUtils(unittest.TestCase):
         hash = ansible.utils.do_encrypt('ansible', 'sha256_crypt')
         self.assertTrue(passlib.hash.sha256_crypt.verify('ansible', hash))
 
-        hash = ansible.utils.do_encrypt('ansible', 'md5_crypt', salt_size=4)
-        self.assertTrue(passlib.hash.md5_crypt.verify('ansible', hash))
-
-
         try:
             ansible.utils.do_encrypt('ansible', 'ansible')
         except ansible.errors.AnsibleError:
             pass
         else:
             raise AssertionError('Incorrect exception, expected AnsibleError')
+
+    def test_do_encrypt_md5(self):
+        if self._is_fips():
+            raise SkipTest('MD5 unavailable on FIPS systems')
+        hash = ansible.utils.do_encrypt('ansible', 'md5_crypt', salt_size=4)
+        self.assertTrue(passlib.hash.md5_crypt.verify('ansible', hash))
 
     def test_last_non_blank_line(self):
         self.assertEqual(ansible.utils.last_non_blank_line('a\n\nb\n\nc'), 'c')
@@ -465,8 +478,6 @@ class TestUtils(unittest.TestCase):
                          '{"foo": "bar"}\n')
         self.assertEqual(ansible.utils.filter_leading_non_json_lines('a\nb\nansible!\n["foo", "bar"]'),
                          '["foo", "bar"]\n')
-        self.assertEqual(ansible.utils.filter_leading_non_json_lines('a\nb\nansible!\nfoo=bar'),
-                         'foo=bar\n')
 
     def test_boolean(self):
         self.assertEqual(ansible.utils.boolean("true"), True)
@@ -484,21 +495,20 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(ansible.utils.boolean(0), False)
         self.assertEqual(ansible.utils.boolean("foo"), False)
 
-    #def test_make_sudo_cmd(self):
-    #    cmd = ansible.utils.make_sudo_cmd('root', '/bin/sh', '/bin/ls')
-    #    self.assertTrue(isinstance(cmd, tuple))
-    #    self.assertEqual(len(cmd), 3)
-    #    self.assertTrue('-u root' in cmd[0])
-    #    self.assertTrue('-p "[sudo via ansible, key=' in cmd[0] and cmd[1].startswith('[sudo via ansible, key'))
-    #    self.assertTrue('echo SUDO-SUCCESS-' in cmd[0] and cmd[2].startswith('SUDO-SUCCESS-'))
-    #    self.assertTrue('sudo -k' in cmd[0])
+    def test_make_sudo_cmd(self):
+        cmd = ansible.utils.make_sudo_cmd(C.DEFAULT_SUDO_EXE, 'root', '/bin/sh', '/bin/ls')
+        self.assertTrue(isinstance(cmd, tuple))
+        self.assertEqual(len(cmd), 3)
+        self.assertTrue('-u root' in cmd[0])
+        self.assertTrue('-p "[sudo via ansible, key=' in cmd[0] and cmd[1].startswith('[sudo via ansible, key'))
+        self.assertTrue('echo SUDO-SUCCESS-' in cmd[0] and cmd[2].startswith('SUDO-SUCCESS-'))
+        self.assertTrue('sudo -k' in cmd[0])
 
     def test_make_su_cmd(self):
         cmd = ansible.utils.make_su_cmd('root', '/bin/sh', '/bin/ls')
         self.assertTrue(isinstance(cmd, tuple))
         self.assertEqual(len(cmd), 3)
         self.assertTrue('root -c "/bin/sh' in cmd[0] or ' root -c /bin/sh' in cmd[0])
-        self.assertTrue(re.compile(cmd[1]))
         self.assertTrue('echo SUDO-SUCCESS-' in cmd[0] and cmd[2].startswith('SUDO-SUCCESS-'))
 
     def test_to_unicode(self):
@@ -518,6 +528,11 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(ansible.utils.is_list_of_strings(['foo', 'bar', u'baz']), True)
         self.assertEqual(ansible.utils.is_list_of_strings(['foo', 'bar', True]), False)
         self.assertEqual(ansible.utils.is_list_of_strings(['one', 2, 'three']), False)
+
+    def test_contains_vars(self):
+        self.assertTrue(ansible.utils.contains_vars('{{foo}}'))
+        self.assertTrue(ansible.utils.contains_vars('$foo'))
+        self.assertFalse(ansible.utils.contains_vars('foo'))
 
     def test_safe_eval(self):
         # Not basestring
@@ -551,10 +566,17 @@ class TestUtils(unittest.TestCase):
 
     def test_listify_lookup_plugin_terms(self):
         basedir = os.path.dirname(__file__)
-        self.assertEqual(ansible.utils.listify_lookup_plugin_terms('things', basedir, dict()),
-                         ['things'])
-        self.assertEqual(ansible.utils.listify_lookup_plugin_terms('things', basedir, dict(things=['one', 'two'])),
-                         ['one', 'two'])
+
+        # Straight lookups
+        self.assertEqual(ansible.utils.listify_lookup_plugin_terms('things', basedir, dict(things=[])), [])
+        self.assertEqual(ansible.utils.listify_lookup_plugin_terms('things', basedir, dict(things=['one', 'two'])), ['one', 'two'])
+
+        # Variable interpolation
+        self.assertEqual(ansible.utils.listify_lookup_plugin_terms('things', basedir, dict(things=['{{ foo }}', '{{ bar }}'], foo="hello", bar="world")),
+                         ['hello', 'world'])
+        with self.assertRaises(ansible.errors.AnsibleError) as ex:
+            ansible.utils.listify_lookup_plugin_terms('things', basedir, dict(things=['{{ foo }}', '{{ bar_typo }}'], foo="hello", bar="world"))
+        self.assertTrue("undefined variable in items: 'bar_typo'" in ex.exception.msg)
 
     def test_deprecated(self):
         sys_stderr = sys.stderr
@@ -697,10 +719,8 @@ class TestUtils(unittest.TestCase):
         )
 
         # invalid quote detection
-        with self.assertRaises(Exception):
-            split_args('hey I started a quote"')
-        with self.assertRaises(Exception):
-            split_args('hey I started a\' quote')
+        self.assertRaises(Exception, split_args, 'hey I started a quote"')
+        self.assertRaises(Exception, split_args, 'hey I started a\' quote')
 
         # jinja2 loop blocks with lots of complexity
         _test_combo(
@@ -754,4 +774,157 @@ class TestUtils(unittest.TestCase):
             'this string contains unicode: ¢ £ ¤ ¥'
         )
 
+
+    def test_censor_unlogged_data(self):
+        ''' used by the no_log attribute '''
+        input = dict(
+             password='sekrit',
+             rc=12,
+             failed=True,
+             changed=False,
+             skipped=True,
+             msg='moo',
+        )
+        data = ansible.utils.censor_unlogged_data(input)
+        assert 'password' not in data
+        assert 'rc' in data
+        assert 'failed' in data
+        assert 'changed' in data
+        assert 'skipped' in data
+        assert 'msg' not in data
+        assert data['censored'] == 'results hidden due to no_log parameter'
+
+    def test_repo_url_to_role_name(self):
+        tests = [("http://git.example.com/repos/repo.git", "repo"),
+                 ("ssh://git@git.example.com:repos/role-name", "role-name"),
+                 ("ssh://git@git.example.com:repos/role-name,v0.1", "role-name"),
+                 ("directory/role/is/installed/in", "directory/role/is/installed/in")]
+        for (url, result) in tests:
+            self.assertEqual(ansible.utils.repo_url_to_role_name(url), result)
+
+    def test_role_spec_parse(self):
+        tests = [
+            (
+                "git+http://git.example.com/repos/repo.git,v1.0", 
+                {
+                    'scm': 'git', 
+                    'src': 'http://git.example.com/repos/repo.git', 
+                    'version': 'v1.0', 
+                    'name': 'repo'
+                }
+            ),
+            (
+                "http://repo.example.com/download/tarfile.tar.gz", 
+                {
+                    'scm': None, 
+                    'src': 'http://repo.example.com/download/tarfile.tar.gz', 
+                    'version': '', 
+                    'name': 'tarfile'
+                }
+            ),
+            (
+                "http://repo.example.com/download/tarfile.tar.gz,,nicename", 
+                {
+                    'scm': None, 
+                    'src': 'http://repo.example.com/download/tarfile.tar.gz', 
+                    'version': '', 
+                    'name': 'nicename'
+                }
+            ),
+            (
+                "git+http://git.example.com/repos/repo.git,v1.0,awesome", 
+                {
+                    'scm': 'git', 
+                    'src': 'http://git.example.com/repos/repo.git', 
+                    'version': 'v1.0', 
+                    'name': 'awesome'
+                }
+            ),
+            (
+                # test that http://github URLs are assumed git+http:// unless they end in .tar.gz
+                "http://github.com/ansible/fakerole/fake",
+                {
+                    'scm' : 'git',
+                    'src' : 'http://github.com/ansible/fakerole/fake',
+                    'version' : 'master', 
+                    'name' : 'fake'
+                }
+            ),
+            (
+                # test that http://github URLs are assumed git+http:// unless they end in .tar.gz
+                "http://github.com/ansible/fakerole/fake/archive/master.tar.gz",
+                {
+                    'scm' : None,
+                    'src' : 'http://github.com/ansible/fakerole/fake/archive/master.tar.gz',
+                    'version' : '', 
+                    'name' : 'master'
+                }
+            )
+            ]
+        for (spec, result) in tests:
+            self.assertEqual(ansible.utils.role_spec_parse(spec), result)
+
+    def test_role_yaml_parse(self):
+        tests = (
+                (
+                    # Old style
+                    {
+                        'role': 'debops.elasticsearch',
+                        'name': 'elks'
+                    },
+                    {
+                        'role': 'debops.elasticsearch',
+                        'name': 'elks',
+                        'scm': None,
+                        'src': 'debops.elasticsearch',
+                        'version': '',
+                    }
+                ),
+                (
+                    {
+                        'role': 'debops.elasticsearch,1.0,elks',
+                        'my_param': 'foo'
+                    },
+                    {
+                        'role': 'debops.elasticsearch,1.0,elks',
+                        'name': 'elks',
+                        'scm': None,
+                        'src': 'debops.elasticsearch',
+                        'version': '1.0',
+                        'my_param': 'foo',
+                    }
+                ),
+                (
+                    {
+                        'role': 'debops.elasticsearch,1.0',
+                        'my_param': 'foo'
+                    },
+                    {
+                        'role': 'debops.elasticsearch,1.0',
+                        'name': 'debops.elasticsearch',
+                        'scm': None,
+                        'src': 'debops.elasticsearch',
+                        'version': '1.0',
+                        'my_param': 'foo',
+                    }
+                ),
+                # New style
+                (
+                    {
+                        'src': 'debops.elasticsearch',
+                        'name': 'elks',
+                        'my_param': 'foo'
+                    },
+                    {
+                        'name': 'elks',
+                        'scm': None,
+                        'src': 'debops.elasticsearch',
+                        'version': '',
+                        'my_param': 'foo'
+                    }
+                ),
+            )
+
+        for (role, result) in tests:
+            self.assertEqual(ansible.utils.role_yaml_parse(role), result)
 

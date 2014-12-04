@@ -1,3 +1,15 @@
+ansible (1.8.1) unstable; urgency=low
+
+  * 1.8.1
+
+ -- Michael DeHaan <michael@ansible.com>  Wed, 26 Nov 2014 23:00:00 -0500
+
+ansible (1.8.0) unstable; urgency=low
+
+  * 1.8.0
+
+ -- Michael DeHaan <michael@ansible.com>  Tue, 25 Nov 2014 17:00:00 -0500
+
 ansible (1.7.2) unstable; urgency=low
 
   * 1.7.2 release
@@ -8,13 +20,13 @@ ansible (1.7.1) unstable; urgency=low
 
   * 1.7.1 release
 
- -- Michael DeHaan <michael@ansible.com>  Thu, 14 Aug 2014 17:00:00 -0500
+ -- Michael DeHaan <michael@ansible.com>  Thu, 14 Oct 2014 17:00:00 -0500
 
 ansible (1.7) unstable; urgency=low
 
-  * 1.7 release
+  * 1.7.0 release
 
- -- Michael DeHaan <michael@ansible.com>  Web, 06 Aug 2014 13:00:00 -0500
+ -- Michael DeHaan <michael@ansible.com>  Wed, 06 Aug 2014 15:00:00 -0500
 
 ansible (1.6.10) unstable; urgency=low
 

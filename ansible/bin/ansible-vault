@@ -15,10 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ansible-pull is a script that runs ansible in local mode
-# after checking out a playbooks directory from source repo.  There is an
-# example playbook to bootstrap this script in the examples/ dir which
-# installs ansible and sets it up to run on cron.
+# ansible-vault is a script that encrypts/decrypts YAML files. See
+# http://docs.ansible.com/playbooks_vault.html for more details.
 
 #__requires__ = ['ansible']
 #import pkg_resources
@@ -39,7 +37,7 @@ from optparse import OptionParser
 # Utility functions for parsing actions/options
 #-------------------------------------------------------------------------------------
 
-VALID_ACTIONS = ("create", "decrypt", "edit", "encrypt", "rekey")
+VALID_ACTIONS = ("create", "decrypt", "edit", "encrypt", "rekey", "view")
 
 def build_option_parser(action):
     """
@@ -69,6 +67,8 @@ def build_option_parser(action):
         parser.set_usage("usage: %prog decrypt [options] file_name")
     elif action == "edit":
         parser.set_usage("usage: %prog edit [options] file_name")
+    elif action == "view":
+        parser.set_usage("usage: %prog view [options] file_name")
     elif action == "encrypt":
         parser.set_usage("usage: %prog encrypt [options] file_name")
     elif action == "rekey":
@@ -142,7 +142,7 @@ def execute_decrypt(args, options, parser):
 def execute_edit(args, options, parser):
 
     if len(args) > 1:
-        raise errors.AnsibleError("create does not accept more than one filename")        
+        raise errors.AnsibleError("edit does not accept more than one filename")        
 
     if not options.password_file:
         password, new_password = utils.ask_vault_passwords(ask_vault_pass=True)
@@ -154,6 +154,22 @@ def execute_edit(args, options, parser):
     for f in args:
         this_editor = VaultEditor(cipher, password, f)
         this_editor.edit_file()
+
+def execute_view(args, options, parser):
+
+    if len(args) > 1:
+        raise errors.AnsibleError("view does not accept more than one filename")        
+
+    if not options.password_file:        
+        password, new_password = utils.ask_vault_passwords(ask_vault_pass=True)
+    else:
+        password = utils.read_vault_file(options.password_file)
+
+    cipher = None
+
+    for f in args:
+        this_editor = VaultEditor(cipher, password, f)
+        this_editor.view_file()
 
 def execute_encrypt(args, options, parser):
 

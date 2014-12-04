@@ -86,7 +86,7 @@ class Inventory(object):
                 else:
                     if ":" in x:
                         tokens = x.rsplit(":", 1)
-                        # if there is ':' in the address, then this is a ipv6
+                        # if there is ':' in the address, then this is an ipv6
                         if ':' in tokens[0]:
                             all.add_host(Host(x))
                         else:
@@ -146,7 +146,7 @@ class Inventory(object):
 
         # get host vars from host_vars/ files and vars plugins
         for host in self.get_hosts():
-            host.vars = utils.combine_vars(host.vars, self.get_variables(host.name, vault_password=self._vault_password))
+            host.vars = utils.combine_vars(host.vars, self.get_host_variables(host.name, vault_password=self._vault_password))
 
 
     def _match(self, str, pattern_str):
@@ -244,7 +244,7 @@ class Inventory(object):
 
     def __get_hosts(self, pattern):
         """ 
-        finds hosts that postively match a particular pattern.  Does not
+        finds hosts that positively match a particular pattern.  Does not
         take into account negative matches.
         """
 
@@ -324,6 +324,7 @@ class Inventory(object):
         if ungrouped is None:
             self.add_group(Group('ungrouped'))
             ungrouped = self.get_group('ungrouped')
+            self.get_group('all').add_child_group(ungrouped)
         ungrouped.add_host(new_host)
         return new_host
 
@@ -429,30 +430,31 @@ class Inventory(object):
             if updated is not None:
                 vars = utils.combine_vars(vars, updated)
 
-        # get group variables set by Inventory Parsers
-        vars = utils.combine_vars(vars, group.get_variables())
-
         # Read group_vars/ files
         vars = utils.combine_vars(vars, self.get_group_vars(group))
 
         return vars
 
     def get_variables(self, hostname, update_cached=False, vault_password=None):
+
+        host = self.get_host(hostname)
+        if not host:
+            raise Exception("host not found: %s" % hostname)
+        return host.get_variables()
+
+    def get_host_variables(self, hostname, update_cached=False, vault_password=None):
+
         if hostname not in self._vars_per_host or update_cached:
-            self._vars_per_host[hostname] = self._get_variables(hostname, vault_password=vault_password)
+            self._vars_per_host[hostname] = self._get_host_variables(hostname, vault_password=vault_password)
         return self._vars_per_host[hostname]
 
-    def _get_variables(self, hostname, vault_password=None):
+    def _get_host_variables(self, hostname, vault_password=None):
 
         host = self.get_host(hostname)
         if host is None:
             raise errors.AnsibleError("host not found: %s" % hostname)
 
         vars = {}
-
-        # special case for ungrouped hosts, make sure group_vars/all is loaded
-        if len(host.groups) == 1 and host.groups[0].name == 'ungrouped':
-            vars = self.get_group_variables('all', vault_password=self._vault_password)
 
         # plugin.run retrieves all vars (also from groups) for host
         vars_results = [ plugin.run(host, vault_password=vault_password) for plugin in self._vars_plugins if hasattr(plugin, 'run')]
@@ -465,9 +467,6 @@ class Inventory(object):
         for updated in vars_results:
             if updated is not None:
                 vars = utils.combine_vars(vars, updated)
-
-        # get host variables set by Inventory Parsers
-        vars = utils.combine_vars(vars, host.get_variables())
 
         # still need to check InventoryParser per host vars
         # which actually means InventoryScript per host,
