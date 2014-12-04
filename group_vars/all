@@ -397,7 +397,7 @@ vpn_clients:
 
   - name: "simon.vpn.wistla.com"
 
-    vpn_ip: "3"
+    vpn_ip: "5"
 
     iroutes:
 
