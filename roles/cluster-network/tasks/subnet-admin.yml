@@ -14,3 +14,5 @@
     cluster_subnet_admin_c: "{{ stack_result.stack_outputs.SubnetC }}"
 
 - include: "save.yml"
+
+# ex: et ts=2 filetype=yaml

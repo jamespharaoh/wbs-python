@@ -17,7 +17,7 @@
         load_balancer_port: "443"
         instance_protocol: "http"
         instance_port: "80"
-        ssl_certificate_id: "arn:aws:iam::382254491475:server-certificate/icinga.wistla.com"
+        ssl_certificate_id: "arn:aws:iam::382254491475:server-certificate/icinga.ops.wistla.com"
 
     security_group_ids: "{{ cluster_group_balancer }}"
 
@@ -28,6 +28,28 @@
       - "{{ cluster_subnet_admin_c }}"
 
     region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  register: "icinga_balancer_result"
+
+- set_fact:
+    cluster_balancer_icinga: "{{ icinga_balancer_result.elb.dns_name }}"
+
+- include: "save.yml"
+
+- name: "create icinga dns"
+  action:
+    module: "route53"
+    command: "create"
+    overwrite: "yes"
+
+    zone: "{{ cluster_domain }}"
+    record: "icinga.{{ cluster_domain }}"
+    ttl: "60"
+    type: "CNAME"
+    value: "{{ cluster_balancer_icinga }}"
+
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 

@@ -47,4 +47,40 @@ http {
 
 {% endfor %}
 
+{% if cluster == 'ops' %}
+
+	server {
+
+		server_name icinga.ops.wistla.com;
+
+		location /cgi-bin/icinga2-classicui {
+
+			root /usr/lib;
+
+			auth_basic "Restricted";
+			auth_basic_user_file /etc/icinga2-classicui/htpasswd.users;
+
+			fastcgi_pass unix:/var/run/fcgiwrap.socket;
+			include /etc/nginx/fastcgi_params;
+			fastcgi_param SCRIPT_FILENAME /usr/lib/$fastcgi_script_name;
+			fastcgi_param ICINGA_CGI_CONFIG /etc/icinga2-classicui/cgi.cfg;
+			fastcgi_param AUTH_USER $remote_user;
+			fastcgi_param REMOTE_USER $remote_user;
+
+		}
+
+		location /icinga2-classicui/stylesheets {
+			alias /etc/icinga2-classicui/stylesheets;
+		}
+
+		location /icinga2-classicui {
+			alias /usr/share/icinga2/classicui;
+			auth_basic "Restricted";
+			auth_basic_user_file /etc/icinga2-classicui/htpasswd.users;
+		}
+
+	}
+
+{% endif %}
+
 }

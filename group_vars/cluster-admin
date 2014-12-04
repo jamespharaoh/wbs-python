@@ -7,6 +7,7 @@ cluster_type: "admin"
 cluster_admin_install_packages:
 
   - "awscli"
+  - "fcgiwrap"
   - "git"
   - "lxc"
   - "nginx"

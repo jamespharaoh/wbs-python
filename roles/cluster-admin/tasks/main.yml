@@ -1,19 +1,37 @@
 ---
 
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
+  tags:
+    - "cluster-admin-activate"
 
 - include: "create.yml"
+  tags:
+    - "cluster-admin-create"
+    - "cluster-admin-activate"
+
 - include: "assign-ip.yml"
+  tags: "cluster-admin-assign-ip"
 
 - include: "system.yml"
+  tags: "cluster-admin-system"
+
 - include: "openvpn.yml"
+  tags: "cluster-admin-openvpn"
+
 - include: "firewall.yml"
+  tags: "cluster-admin-firewall"
+
 - include: "nginx.yml"
+  tags: "cluster-admin-nginx"
 
 - include: "icinga.yml"
   when: "cluster == 'ops'"
+  tags: "cluster-admin-icinga"
 
 - include: "route.yml"
+  tags: "cluster-admin-route"
+
 - include: "activate.yml"
+  tags: "cluster-admin-activate"
 
 # ex: et ts=2 filetype=yaml

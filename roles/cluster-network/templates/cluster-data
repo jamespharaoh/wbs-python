@@ -23,3 +23,6 @@ cluster_group_app: "{{ cluster_group_app | default ('') }}"
 cluster_group_balancer: "{{ cluster_group_balancer | default ('') }}"
 cluster_group_jenkins: "{{ cluster_group_jenkins | default ('') }}"
 
+cluster_balancer_icinga: "{{ cluster_balancer_icinga | default ('') }}"
+
+# ex: et ts=2 filetype=yaml
