@@ -14,7 +14,7 @@
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
-    #purge_rules: "no"
+    purge_rules: "no"
 
   register: "create_group"
   with_items: "amazon_security_groups"
@@ -35,7 +35,7 @@
   action:
     module: "ec2_group"
 
-    description: "Security group {{ item.name }"
+    description: "Security group {{ item.name }}"
     name: "{{ cluster }}-{{ item.name }}"
     rules: "{{ item.rules }}"
 

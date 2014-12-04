@@ -1,0 +1,19 @@
+---
+
+- name: "add icinga ppa"
+  action:
+    module: "apt_repository"
+    repo: "ppa:formorer/icinga"
+    update_cache: "yes"
+  sudo: "yes"
+
+- name: "install icinga packages"
+  action:
+    module: "apt"
+    package: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "icinga2"
+    - "icinga2-classicui"
+
+# ex: et ts=2 filetype=yaml

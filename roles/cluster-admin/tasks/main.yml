@@ -4,9 +4,16 @@
 
 - include: "create.yml"
 - include: "assign-ip.yml"
+
 - include: "system.yml"
 - include: "openvpn.yml"
 - include: "firewall.yml"
-- include: "route.yml"
 - include: "nginx.yml"
+
+- include: "icinga.yml"
+  when: "cluster == 'ops'"
+
+- include: "route.yml"
 - include: "activate.yml"
+
+# ex: et ts=2 filetype=yaml

@@ -46,3 +46,9 @@
 - include: "balancer-jenkins.yml"
   tags: "cluster-balancer-jenkins"
   when: "cluster == 'ops'"
+
+- include: "balancer-icinga.yml"
+  tags: "cluster-balancer-icinga"
+  when: "cluster == 'ops'"
+
+# ex: et ts=2 filetype=yaml
