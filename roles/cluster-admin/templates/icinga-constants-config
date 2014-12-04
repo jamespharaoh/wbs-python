@@ -1,0 +1,5 @@
+const PluginDir = "/usr/lib/nagios/plugins"
+const ManubulonPluginDir = "/usr/lib/nagios/plugins"
+const NodeName = "wistla-ops-admin-{{ zon }}"
+//const ZoneName = NodeName
+const TicketSalt = "abc"

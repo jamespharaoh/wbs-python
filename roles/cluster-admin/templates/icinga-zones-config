@@ -1,0 +1,13 @@
+object Zone "wistla-ops" {
+	endpoints = [
+{% for zon in [ 'a', 'b', 'c' ] %}
+		"wistla-ops-admin-{{ zon }}",
+{% endfor %}
+	]
+}
+
+{% for zon in [ 'a', 'b', 'c' ] %}
+object Endpoint "wistla-ops-admin-{{ zon }}" {
+	host = "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
+}
+{% endfor %}

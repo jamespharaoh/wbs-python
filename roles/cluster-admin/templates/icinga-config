@@ -1,0 +1,22 @@
+include "constants.conf"
+include "zones.conf"
+
+include <itl>
+include <plugins>
+
+include "features-enabled/*.conf"
+
+object FileLogger "notice-file" {
+	severity = "notice"
+	path = "/var/log/icinga2/notice.log"
+}
+
+object ApiListener "api" {
+
+	ca_path = "/etc/icinga2/pki/wistla-icinga-ca.cert"
+	cert_path = "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.cert"
+	key_path = "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.key"
+
+	accept_config = false
+
+}

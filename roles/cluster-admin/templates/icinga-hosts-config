@@ -1,0 +1,14 @@
+template Host "generic-host" {
+  max_check_attempts = 10
+  check_interval = 30s
+  retry_interval = 10s
+  check_command = "hostalive"
+}
+
+{% for zon in [ 'a', 'b', 'c' ] %}
+object Host "wistla-ops-admin-{{ zon }}" {
+	import "generic-host"
+	address = "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
+	vars.os = "Linux"
+}
+{% endfor %}
