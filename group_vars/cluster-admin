@@ -12,6 +12,7 @@ cluster_admin_install_packages:
   - "lxc"
   - "nginx"
   - "ngrep"
+  - "ntp"
   - "openvpn"
   - "whois"
 

@@ -8,6 +8,7 @@ cluster_app_install_packages:
   - "lxc"
   - "nginx"
   - "ngrep"
+  - "ntp"
   - "openvpn"
   - "whois"
 

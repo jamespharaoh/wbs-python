@@ -6,6 +6,9 @@
 
 - include: "network.yml"
 
+- include: "ssh.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "nfs.yml"
   when: "inventory_hostname == 'vagrant'"
 

@@ -4,34 +4,55 @@
   tags:
     - "cluster-admin-activate"
 
+# pre setup
+
 - include: "create.yml"
   tags:
     - "cluster-admin-create"
     - "cluster-admin-activate"
 
 - include: "assign-ip.yml"
-  tags: "cluster-admin-assign-ip"
+  tags:
+    - "cluster-admin-assign-ip"
+
+- include: "wait-for-ssh.yml"
+  tags:
+    - "cluster-admin-system"
+    - "cluster-admin-openvpn"
+    - "cluster-admin-firewall"
+    - "cluster-admin-nginx"
+    - "cluster-admin-icinga"
+
+# system setup
 
 - include: "system.yml"
-  tags: "cluster-admin-system"
+  tags:
+    - "cluster-admin-system"
 
 - include: "openvpn.yml"
-  tags: "cluster-admin-openvpn"
+  tags:
+    - "cluster-admin-openvpn"
 
 - include: "firewall.yml"
-  tags: "cluster-admin-firewall"
+  tags:
+    - "cluster-admin-firewall"
 
 - include: "nginx.yml"
-  tags: "cluster-admin-nginx"
+  tags:
+    - "cluster-admin-nginx"
 
 - include: "icinga.yml"
-  when: "cluster == 'ops'"
-  tags: "cluster-admin-icinga"
+  tags:
+    - "cluster-admin-icinga"
+
+# post setup
 
 - include: "route.yml"
-  tags: "cluster-admin-route"
+  tags:
+    - "cluster-admin-route"
 
 - include: "activate.yml"
-  tags: "cluster-admin-activate"
+  tags:
+    - "cluster-admin-activate"
 
 # ex: et ts=2 filetype=yaml

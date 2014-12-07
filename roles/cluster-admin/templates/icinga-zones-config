@@ -1,13 +1,28 @@
-object Zone "wistla-ops" {
+object Zone "global-templates" {
+	global = true
+}
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+
+object Zone "wistla-{{ other_cluster_name }}" {
 	endpoints = [
 {% for zon in [ 'a', 'b', 'c' ] %}
-		"wistla-ops-admin-{{ zon }}",
+		"wistla-{{ other_cluster_name }}-admin-{{ zon }}",
 {% endfor %}
 	]
+{% if other_cluster_name != 'ops' %}
+	parent = "wistla-ops"
+{% endif %}
 }
 
 {% for zon in [ 'a', 'b', 'c' ] %}
-object Endpoint "wistla-ops-admin-{{ zon }}" {
+object Endpoint "wistla-{{ other_cluster_name }}-admin-{{ zon }}" {
+{% if other_cluster_name == cluster %}
 	host = "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
+{% else %}
+	host = "{{ other_cluster.amazon_admin_ips [zon] }}"
+{% endif %}
 }
+{% endfor %}
+
 {% endfor %}

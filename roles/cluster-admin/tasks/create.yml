@@ -1,7 +1,8 @@
 ---
 
 - name: "create admin instance"
-  local_action:
+  delegate_to: "localhost"
+  action:
     module: "ec2"
 
     instance_tags:

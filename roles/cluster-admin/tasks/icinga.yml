@@ -1,5 +1,7 @@
 ---
 
+- include_vars: "security/icinga/icinga-secrets"
+
 - name: "add icinga ppa"
   action:
     module: "apt_repository"
@@ -43,15 +45,6 @@
     mode: "0750"
   sudo: "yes"
 
-- name: "create icinga zone directories"
-  action:
-    module: "file"
-    path: "/etc/icinga2/zones.d/{{ item }}"
-    state: "directory"
-  sudo: "yes"
-  with_items:
-    - "wistla-ops"
-
 - name: "create icinga configs"
   action:
     module: "template"
@@ -72,45 +65,80 @@
   sudo: "yes"
   notify: "restart icinga"
 
+- name: "create icinga zone directories"
+  action:
+    module: "file"
+    path: "/etc/icinga2/zones.d/{{ item }}"
+    state: "directory"
+  sudo: "yes"
+  when: "cluster == 'ops' and zon == 'a'"
+  with_items:
+    - "global-templates"
+    - "wistla-ops"
+    - "wistla-production"
+    - "wistla-staging"
+
 - name: "create icinga zone configs"
   action:
     module: "template"
+    src: "{{ item [1].src }}"
+    dest: "/etc/icinga2/zones.d/wistla-{{ item [0] }}/{{ item [1].dest }}"
+  sudo: "yes"
+  when: "cluster == 'ops' and zon == 'a'"
+  with_nested:
+
+    - "clusters"
+
+    - - src: "icinga-hosts-config"
+        dest: "hosts.conf"
+
+  sudo: "yes"
+  notify: "restart icinga"
+
+- name: "create icinga template configs"
+  action:
+    module: "template"
     src: "{{ item.src }}"
-    dest: "/etc/icinga2/{{ item.dest }}"
+    dest: "/etc/icinga2/zones.d/global-templates/{{ item.dest }}"
+  sudo: "yes"
+  when: "cluster == 'ops' and zon == 'a'"
+  with_items:
+
+    - src: "icinga-templates-config"
+      dest: "templates.conf"
+
+  sudo: "yes"
+  notify: "restart icinga"
+
+- name: "create icinga credentials"
+  action:
+    module: "copy"
+    src: "security/icinga/{{ item.src }}"
+    dest: "/etc/icinga2/pki/{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
   sudo: "yes"
   with_items:
 
-    - src: "icinga-hosts-config"
-      dest: "zones.d/wistla-ops/hosts.conf"
+    - src: "wistla-icinga-ca.cert"
+      dest: "wistla-icinga-ca.cert"
+      owner: "root"
+      group: "root"
+      mode: "0644"
 
-  sudo: "yes"
-  notify: "restart icinga"
+    - src: "wistla-{{ cluster }}-admin-{{ zon }}.cert"
+      dest: "wistla-{{ cluster }}-admin-{{ zon }}.cert"
+      owner: "root"
+      group: "root"
+      mode: "0644"
 
-- name: "create icinga ca cert"
-  action:
-    module: "copy"
-    src: "security/icinga/wistla-icinga-ca.cert"
-    dest: "/etc/icinga2/pki/wistla-icinga-ca.cert"
-  sudo: "yes"
-  notify: "restart icinga"
+    - src: "wistla-{{ cluster }}-admin-{{ zon }}.key"
+      dest: "wistla-{{ cluster }}-admin-{{ zon }}.key"
+      owner: "root"
+      group: "nagios"
+      mode: "0640"
 
-- name: "create icinga node cert"
-  action:
-    module: "copy"
-    src: "security/icinga/wistla-ops-admin-{{ zon }}.cert"
-    dest: "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.cert"
-  sudo: "yes"
-  notify: "restart icinga"
-
-- name: "create icinga node key"
-  action:
-    module: "copy"
-    src: "security/icinga/wistla-ops-admin-{{ zon }}.key"
-    dest: "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.key"
-    owner: "root"
-    group: "nagios"
-    mode: "0640"
-  sudo: "yes"
   notify: "restart icinga"
 
 - name: "create icinga defaults"

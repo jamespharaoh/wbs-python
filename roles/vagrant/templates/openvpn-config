@@ -5,7 +5,9 @@ resolv-retry infinite
 nobind
 ns-cert-type server
 pull
-remote {{ vpn_endpoints [item] }} 1194
+remote a.vpn.{{ clusters [item].cluster_domain }} 1194
+remote b.vpn.{{ clusters [item].cluster_domain }} 1194
+remote c.vpn.{{ clusters [item].cluster_domain }} 1194
 remote-random
 proto udp
 status wistla-{{ item }}-vpn.log

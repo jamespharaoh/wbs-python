@@ -6,17 +6,30 @@ include <plugins>
 
 include "features-enabled/*.conf"
 
+{% if false %}
 object FileLogger "notice-file" {
 	severity = "notice"
 	path = "/var/log/icinga2/notice.log"
 }
+{% endif %}
+
+{% if true %}
+object FileLogger "debug-file" {
+	severity = "debug"
+	path = "/var/log/icinga2/debug.log"
+}
+{% endif %}
 
 object ApiListener "api" {
 
 	ca_path = "/etc/icinga2/pki/wistla-icinga-ca.cert"
-	cert_path = "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.cert"
-	key_path = "/etc/icinga2/pki/wistla-ops-admin-{{ zon }}.key"
+	cert_path = "/etc/icinga2/pki/wistla-{{ cluster }}-admin-{{ zon }}.cert"
+	key_path = "/etc/icinga2/pki/wistla-{{ cluster }}-admin-{{ zon }}.key"
 
+{% if cluster == 'ops' and zon == 'a' %}
 	accept_config = false
+{% else %}
+	accept_config = true
+{% endif %}
 
 }

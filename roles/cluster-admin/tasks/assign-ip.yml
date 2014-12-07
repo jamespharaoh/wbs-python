@@ -1,7 +1,8 @@
 ---
 
 - name: "assign elastic ip"
-  local_action:
+  delegate_to: "localhost"
+  action:
     module: "ec2_eip"
 
     instance_id: "{{ instance_id }}"

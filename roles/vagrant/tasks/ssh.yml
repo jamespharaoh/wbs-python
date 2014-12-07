@@ -1,0 +1,13 @@
+---
+
+- include_vars: "data/ssh-host-keys"
+
+- name: "create ssh known hosts"
+  action:
+    module: "template"
+    src: "ssh-known-hosts"
+    dest: "/etc/ssh/ssh_known_hosts"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

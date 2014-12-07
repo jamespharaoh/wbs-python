@@ -1,0 +1,79 @@
+---
+
+ssh_host_keys:
+
+  general:
+
+    github:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYP"
+      - "CPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJ"
+      - "izHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+"
+      - "Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3Rc"
+      - "T0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+w"
+      - "C604ydGXA8VJiS5ap43JXiUFFAaQ=="
+
+  ops:
+
+    admin:
+
+      a:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBBZqRA9KK5Izf28EmdgJ+HHtWQ+2K8BLZZNMCymniiA20yVMvqFo/k6L0UUYVMou"
+        - "IdUwrwzk/iCkThzwCw51DU4="
+
+      b:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBDflJHSwkya9iEC7UAK8u6s33+/CqyOnv4MjWC2VJsLTlRHc2qJRO6biPIKaJJXl"
+        - "hMoyzZ3tuCr6ywAcm+0HAvc="
+
+      c:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBN+7LzCQpSI3/8rgp99SNtPUWmnHFtWysT37yyFeBL4l/Ec5dEMSRaMKib5bbwY0"
+        - "y1xkQtmcW+sqaNPLpTnOwUs="
+
+    jenkins:
+
+      a:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBNtJikVfyJsnCpfL676x4SXTGG77P5d5iVZhxnLpY+QXdEIKr7UpU9Ty4Al3hDYO"
+        - "lzrHRnDyUu49ANRYftgpWbo="
+
+  production:
+
+    admin:
+
+      a:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBPHT/KQKwXOd5EuN0Cy/2u0ivQ71cxsigoKc6how9U0EmXj1sqRN3CPbEYjKTwgz"
+        - "hCJaB07wqhP4qmrl5AuMxII="
+
+      b:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBHVdsvSsLZ8nO9IV9yNt08cdZ4FejShGrpt67y2Ds+aPqQ4wFAB5ijTRYRjP+OPP"
+        - "c7rsNHZyu+1uPqmgznvXcns="
+
+      c:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBI2jzozu9QaIDVlaEkyytwjhwSNvSsR0t5uZ26rySc5UNjXhrEfrrUUsqryfLQkA"
+        - "g5V2+YuPrTsF0j3nHML4Jz0="
+
+  staging:
+
+    admin:
+
+      a:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBONyg4CxdeOyDRJ4yQPCUNK7IC4h5Kqd82gZmeErVJ/XSKum9MiNfvmi8X8lRs2f"
+        - "b0mEAFnti8fdk5lMWga/Bvo="
+
+      b:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBN9f8zV7lTXXhlTa+Z3Tb+gjHXb29Ms7xZmltjWh0u87MFcqFIUNcs0MZues2Qo2"
+        - "KOr1kxaEw4p0euKG9uFXvkE="
+
+      c:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBC7zY9uk7Nt4SgXT/AMNH4cOme5ymSLsuWrc8kYlAhqSNNkoha2LZsHGl9UTY0QH"
+        - "kmgmvFFlJFZZQ34dOqug3xA="
+
+# ex: et ts=2 filetype=yaml

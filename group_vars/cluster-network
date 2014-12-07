@@ -2,4 +2,145 @@
 
 ansible_connection: "local"
 
+amazon_security_groups:
+
+  - name: "admin"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "0.0.0.0/0"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.ops.amazon_admin_ips.a }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.ops.amazon_admin_ips.b }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.ops.amazon_admin_ips.c }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.production.amazon_admin_ips.a }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.production.amazon_admin_ips.b }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.production.amazon_admin_ips.c }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.staging.amazon_admin_ips.a }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.staging.amazon_admin_ips.b }}/32"
+
+      - proto: "tcp"
+        from_port: "5665"
+        to_port: "5665"
+        cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
+
+      - proto: "udp"
+        from_port: "1194"
+        to_port: "1194"
+        cidr_ip: "0.0.0.0/0"
+
+      - proto: "-1"
+        group_id: "{{ cluster_group_admin }}"
+
+      - proto: "-1"
+        group_id: "{{ cluster_group_app }}"
+
+      - proto: "-1"
+        group_id: "{{ cluster_group_jenkins }}"
+
+      - proto: "-1"
+        cidr_ip: "10.0.0.0/8"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_balancer }}"
+        from_port: "80"
+        to_port: "80"
+
+  - name: "app"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "10.0.0.0/8"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "10.0.0.0/8"
+
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "10.0.0.0/8"
+
+  - name: "balancer"
+    rules:
+
+      - proto: "icmp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "0.0.0.0/0"
+
+      - proto: "tcp"
+        from_port: "443"
+        to_port: "443"
+        cidr_ip: "0.0.0.0/0"
+
+  - name: "jenkins"
+    rules:
+
+      - proto: "icmp"
+        group_id: "{{ cluster_group_admin }}"
+        from_port: "-1"
+        to_port: "-1"
+
+      - proto: "tcp"
+        cidr_ip: "10.0.0.0/8"
+        from_port: "22"
+        to_port: "22"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_admin }}"
+        from_port: "80"
+        to_port: "80"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_balancer }}"
+        from_port: "80"
+        to_port: "80"
+
 # ex: et ts=2 filetype=yaml
