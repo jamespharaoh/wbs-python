@@ -323,6 +323,8 @@ class ElbManager(object):
             info = {
                 'name': check_elb.name,
                 'dns_name': check_elb.dns_name,
+                'canonical_hosted_zone_name': check_elb.canonical_hosted_zone_name,
+                'canonical_hosted_zone_name_id': check_elb.canonical_hosted_zone_name_id,
                 'zones': check_elb.availability_zones,
                 'security_group_ids': check_elb.security_groups,
                 'status': self.status,
