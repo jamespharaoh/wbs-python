@@ -112,6 +112,7 @@ tasks:
 '''
 
 import json
+import yaml
 import time
 
 try:
@@ -197,7 +198,8 @@ def main():
             state=dict(default='present', choices=['present', 'absent']),
             template=dict(default=None, required=True),
             disable_rollback=dict(default=False, type='bool'),
-            tags=dict(default=None)
+            tags=dict(default=None),
+            template_format=dict(required=False, default='json', choices=['json', 'yaml'])
         )
     )
 
@@ -211,6 +213,11 @@ def main():
     disable_rollback = module.params['disable_rollback']
     template_parameters = module.params['template_parameters']
     tags = module.params['tags']
+    template_format=module.params['template_format']
+
+    if template_format == 'yaml':
+        template_yaml = yaml.load(template_body)
+        template_body = json.dumps(template_yaml)
 
     ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
 
