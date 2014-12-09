@@ -1,1 +1,60 @@
 ---
+
+- name: "install system packages"
+  action:
+    module: "apt"
+    state: "present"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "web_install_packages"
+
+- name: "make node command work"
+  action:
+    module: "alternatives"
+    link: "/usr/bin/node"
+    name: "node"
+    path: "/usr/bin/nodejs"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "install node packages"
+  action:
+    module: "npm"
+    name: "{{ item }}"
+    global: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "web_install_node"
+  tags: "update"
+
+- name: "deploy projects"
+  delegate_to: "localhost"
+  shell:
+
+    rsync
+      --archive
+      --delete
+      --checksum
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      --exclude /.git
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-web"
+
+- name: "create web init config"
+  action:
+    module: "template"
+    src: "wistla-web-init-conf"
+    dest: "/etc/init/wistla-web.conf"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "reload upstart config"
+
+# ex: et ts=2 filetype=yaml

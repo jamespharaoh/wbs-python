@@ -3,4 +3,12 @@
 node: "web"
 prv: "4"
 
+web_install_packages:
+
+  - "npm"
+
+web_install_node:
+
+  - "node-inspector"
+
 # ex: et ts=2 filetype=yaml

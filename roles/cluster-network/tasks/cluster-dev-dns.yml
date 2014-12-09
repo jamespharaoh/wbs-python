@@ -13,7 +13,7 @@
 - name: "create dev dns stack"
   action:
     module: "cloudformation"
-    stack_name: "dev-dns-{{ item }}"
+    stack_name: "{{ cluster }}-dev-dns-{{ item }}"
     state: "present"
     template: "/home/vagrant/work/{{ cluster }}/dev-dns-{{ item }}-stack"
     template_format: "yaml"
@@ -23,8 +23,7 @@
   sudo: "yes"
   sudo_user: "vagrant"
   when: "cluster == 'ops'"
-  #with_items: "dev_deployment_names"
-  with_items: [ "brandon", "dawid" ]
+  with_items: "dev_deployment_names"
   register: "dev_dns_stack_result"
 
 - name: "write dev dns nameservers"
@@ -61,7 +60,6 @@
   sudo_user: "vagrant"
   when: "cluster == 'ops'"
   with_indexed_items: "dev_deployment_names"
-  #with_indexed_items: [ "brandon", "dawid" ]
 
 - name: "create dev dns delegations"
   action:
@@ -77,7 +75,6 @@
   sudo: "yes"
   sudo_user: "vagrant"
   when: "cluster == 'production'"
-  #with_items: "dev_deployment_names"
-  with_items: [ "brandon", "dawid" ]
+  with_items: "dev_deployment_names"
 
 # ex: et ts=2 filetype=yaml

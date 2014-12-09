@@ -1,5 +1,7 @@
 ---
 
+- include_vars: "data/ssh-host-keys"
+
 - name: "create apt sources.list"
   action:
     module: "template"

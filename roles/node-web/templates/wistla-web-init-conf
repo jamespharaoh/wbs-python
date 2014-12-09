@@ -1,4 +1,4 @@
-description "wistla api"
+description "wistla webs"
 
 start on runlevel [2345]
 stop on runlevel [!2345]
@@ -6,17 +6,15 @@ stop on runlevel [!2345]
 respawn
 respawn limit 1 5
 
-env NODE_ENV=vagrant
-
 script
 
-	cd /home/ubuntu/wistla-api
+	cd /home/ubuntu/wistla-web
 
 	setuid ubuntu \
 	mkdir --parents logs
 
 	setuid ubuntu \
-	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} server.js \
+	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} keystone.js \
 		> logs/output.txt 2> logs/output.txt
 
 end script

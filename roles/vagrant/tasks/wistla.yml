@@ -17,6 +17,22 @@
   sudo_user: "{{ vagrant_user }}"
   with_items: "vagrant_checkouts"
 
+- name: "install node modules"
+  shell:
+
+    set -e;
+
+    cd {{ vagrant_home }}/{{ item }};
+
+    npm install;
+
+  args:
+    creates: "{{ vagrant_home }}/{{ item }}/node_modules"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items:
+    - "wistla-web"
+
 - name: "create git pre-commit hooks"
   action:
     module: "template"

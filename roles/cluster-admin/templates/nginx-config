@@ -37,10 +37,16 @@ http {
 
 	server {
 
+		server_name {{ dev_deployment.private_domain }};
 		server_name api.{{ dev_deployment.private_domain }};
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
 
 		location / {
 			proxy_pass http://{{ dev_deployment_name }}/;
+			proxy_set_header Host $host;
 		}
 
 	}

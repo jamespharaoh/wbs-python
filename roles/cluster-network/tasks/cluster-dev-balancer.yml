@@ -26,9 +26,6 @@
 
   register: "dev_balancer_result"
 
-- debug:
-    var: "dev_balancer_result"
-
 - set_fact:
     cluster_balancer_dev: "{{ dev_balancer_result.elb.dns_name }}"
     cluster_dev_balancer_hosted_zone_name: "{{ dev_balancer_result.elb.canonical_hosted_zone_name }}"

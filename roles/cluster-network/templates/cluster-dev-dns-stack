@@ -13,6 +13,16 @@ Resources:
     Properties:
       Name: "{{ deployment_name }}.wistla.com."
 
+  WebRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "{{ deployment_name }}.wistla.com."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_dev_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dev_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
   ApiRecordSet:
     Type: "AWS::Route53::RecordSet"
     Properties:

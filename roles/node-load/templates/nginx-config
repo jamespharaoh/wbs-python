@@ -29,7 +29,7 @@ http {
 	gzip on;
 	gzip_disable "msie6";
 
-	# load balancer
+	# api
 
 	upstream api {
 {% for api_name in groups ['api-node'] %}
@@ -54,6 +54,37 @@ http {
 
 		location / {
 			proxy_pass http://api;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
+	# web
+
+	upstream web {
+{% for web_name in groups ['web-node'] %}
+{% set web_host = hostvars [web_name] %}
+{% if web_host.idx | int < node_count.web | int %}
+		server {{ web_name }}:3000;
+{% else %}
+		server {{ web_name }}:3000 down;
+{% endif %}
+{% endfor %}
+		#keepalive 1;
+	}
+
+	server {
+
+		server_name {{ deployment_private_domain }};
+{% if deployment_private_domain != deployment_public_domain %}
+		server_name {{ deployment_public_domain }};
+{% endif %}
+
+		client_max_body_size 16m;
+
+		location / {
+			proxy_pass http://web;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
