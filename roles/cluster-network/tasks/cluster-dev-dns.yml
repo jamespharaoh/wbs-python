@@ -1,0 +1,83 @@
+---
+
+- name: "write dev dns stack yaml"
+  action:
+    module: "template"
+    src: "cluster-dev-dns-stack"
+    dest: "/home/vagrant/work/{{ cluster }}/dev-dns-{{ item }}-stack"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster == 'ops'"
+  with_items: "dev_deployment_names"
+
+- name: "create dev dns stack"
+  action:
+    module: "cloudformation"
+    stack_name: "dev-dns-{{ item }}"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster }}/dev-dns-{{ item }}-stack"
+    template_format: "yaml"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster == 'ops'"
+  #with_items: "dev_deployment_names"
+  with_items: [ "brandon", "dawid" ]
+  register: "dev_dns_stack_result"
+
+- name: "write dev dns nameservers"
+  shell:
+
+    set -e;
+
+    name="{{ deployment_home }}/work/ops/dev-dns-{{ item.1 }}-nameservers";
+    touch $name;
+    sum_before=$(sha1sum $name);
+
+    aws route53 get-hosted-zone
+      --query "DelegationSet.NameServers"
+      --output text
+      --id {{ dev_dns_stack_result.results [item.0].stack_outputs ["HostedZone"] }}
+      | sed 's/\t/,/g'
+      > $name;
+
+    sum_after=$(sha1sum $name);
+    if test "$sum_before" = "$sum_after"; then
+      echo "UNCHANGED";
+    else
+      echo "CHANGED";
+    fi;
+
+    return 0;
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster == 'ops'"
+  with_indexed_items: "dev_deployment_names"
+  #with_indexed_items: [ "brandon", "dawid" ]
+
+- name: "create dev dns delegations"
+  action:
+    module: "route53"
+    zone: "wistla.com"
+    record: "{{ item }}.wistla.com"
+    type: "NS"
+    command: "create"
+    overwrite: "yes"
+    value: "{{ lookup ('file', '/home/vagrant/work/ops/dev-dns-' + item + '-nameservers') }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster == 'production'"
+  #with_items: "dev_deployment_names"
+  with_items: [ "brandon", "dawid" ]
+
+# ex: et ts=2 filetype=yaml

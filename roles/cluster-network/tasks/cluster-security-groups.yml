@@ -27,7 +27,7 @@
     cluster_group_balancer: "{{ create_group.results.2.group_id }}"
     cluster_group_jenkins: "{{ create_group.results.3.group_id }}"
 
-- include: "save.yml"
+- include: "cluster-save-data.yml"
 
 # then set the rules
 

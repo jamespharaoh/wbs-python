@@ -1,0 +1,31 @@
+---
+
+- name: "write vpc stack yaml"
+  action:
+    module: "template"
+    src: "cluster-vpc-stack"
+    dest: "/home/vagrant/work/{{ cluster }}/vpc-stack.yaml"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
+- name: "create vpc stack"
+  action:
+    module: "cloudformation"
+    stack_name: "{{ cluster }}-vpc"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster }}/vpc-stack.yaml"
+    template_format: "yaml"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  register: "vpc_stack_result"
+
+- set_fact:
+    cluster_vpc: "{{ vpc_stack_result.stack_outputs.Vpc }}"
+    cluster_gateway: "{{ vpc_stack_result.stack_outputs.InternetGateway }}"
+
+- include: "cluster-save-data.yml"
+
+# ex: et ts=2 filetype=yaml

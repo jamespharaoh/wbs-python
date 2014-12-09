@@ -24,5 +24,15 @@ cluster_group_balancer: "{{ cluster_group_balancer | default ('') }}"
 cluster_group_jenkins: "{{ cluster_group_jenkins | default ('') }}"
 
 cluster_balancer_icinga: "{{ cluster_balancer_icinga | default ('') }}"
+cluster_balancer_dev: "{{ cluster_balancer_dev | default ('') }}"
+
+{% if cluster == 'ops' %}
+{% for var in [
+  'cluster_dev_balancer_hosted_zone_name',
+  'cluster_dev_balancer_hosted_zone_name_id',
+] %}
+{{ var }}: "{{ hostvars [inventory_hostname] [var] | default ('') }}"
+{% endfor %}
+{% endif %}
 
 # ex: et ts=2 filetype=yaml

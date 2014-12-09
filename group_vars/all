@@ -223,10 +223,10 @@ deployments:
     bridge_name: "br151"
     bridge_network: "10.151"
 
-  simon:
+  brandon:
 
-    public_domain: "simon.wistla.com"
-    private_domain: "simon.wistla.com"
+    public_domain: "brandon.wistla.com"
+    private_domain: "brandon.wistla.com"
     bridge_name: "br153"
     bridge_network: "10.153"
 
@@ -247,7 +247,7 @@ dev_deployment_names:
 
   - "james"
   - "ben"
-  - "simon"
+  - "brandon"
   - "dawid"
 
 vpn_clients:
@@ -282,7 +282,7 @@ vpn_clients:
         netbits: "16"
         netmask: "255.255.0.0"
 
-  - name: "simon.vpn.wistla.com"
+  - name: "brandon.vpn.wistla.com"
 
     vpn_ip: "5"
 

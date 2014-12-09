@@ -36,7 +36,7 @@
 - set_fact:
     cluster_balancer_icinga: "{{ icinga_balancer_result.elb.dns_name }}"
 
-- include: "save.yml"
+- include: "cluster-save-data.yml"
 
 - name: "create icinga dns"
   action:

@@ -24,4 +24,17 @@
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
+  register: "dev_balancer_result"
+
+- debug:
+    var: "dev_balancer_result"
+
+- set_fact:
+    cluster_balancer_dev: "{{ dev_balancer_result.elb.dns_name }}"
+    cluster_dev_balancer_hosted_zone_name: "{{ dev_balancer_result.elb.canonical_hosted_zone_name }}"
+    cluster_dev_balancer_hosted_zone_name_id: "{{ dev_balancer_result.elb.canonical_hosted_zone_name_id }}"
+    balancer_dev: "{{ dev_balancer_result.elb.dns_name }}"
+
+- include: "cluster-save-data.yml"
+
 # ex: et ts=2 filetype=yaml

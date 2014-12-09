@@ -1,0 +1,31 @@
+---
+
+{% set deployment_name = item %}
+{% set deploement = deployments [deployment_name] %}
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Wistla dev dns {{ deployment_name }}"
+
+Resources:
+
+  HostedZone:
+    Type: "AWS::Route53::HostedZone"
+    Properties:
+      Name: "{{ deployment_name }}.wistla.com."
+
+  ApiRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "api.{{ deployment_name }}.wistla.com."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_dev_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dev_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
+Outputs:
+
+  HostedZone:
+    Value: { Ref: "HostedZone" }
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,38 @@
+---
+
+- set_fact:
+    subnet: "admin"
+
+- name: "write admin subnet stack yaml"
+  action:
+    module: "template"
+    src: "cluster-subnet-stack"
+    dest: "/home/vagrant/work/{{ cluster }}/admin-subnet-stack.yaml"
+  sudo: "yes"
+  sudo_user: "vagrant"
+
+- name: "create admin subnet stack"
+  action:
+    module: "cloudformation"
+    stack_name: "{{ cluster }}-subnet-admin"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster }}/admin-subnet-stack.yaml"
+    template_format: "yaml"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  register: "admin_subnet_stack_result"
+
+- set_fact:
+    cluster_routes_admin_a: "{{ admin_subnet_stack_result.stack_outputs.RouteTableA }}"
+    cluster_routes_admin_b: "{{ admin_subnet_stack_result.stack_outputs.RouteTableB }}"
+    cluster_routes_admin_c: "{{ admin_subnet_stack_result.stack_outputs.RouteTableC }}"
+    cluster_subnet_admin_a: "{{ admin_subnet_stack_result.stack_outputs.SubnetA }}"
+    cluster_subnet_admin_b: "{{ admin_subnet_stack_result.stack_outputs.SubnetB }}"
+    cluster_subnet_admin_c: "{{ admin_subnet_stack_result.stack_outputs.SubnetC }}"
+
+- include: "cluster-save-data.yml"
+
+# ex: et ts=2 filetype=yaml

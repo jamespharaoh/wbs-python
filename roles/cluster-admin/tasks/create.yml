@@ -27,7 +27,7 @@
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"    
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
     wait: "yes"
 

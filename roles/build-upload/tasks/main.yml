@@ -12,7 +12,7 @@
 
     region: "{{ devops_region }}"
     aws_access_key: "{{ amazon_accounts.ops.access_key }}"
-    aws_secret_key: "{{ amazon_accounts.ops.secret_key }}"    
+    aws_secret_key: "{{ amazon_accounts.ops.secret_key }}"
 
   sudo: "yes"
   sudo_user: "vagrant"
