@@ -100,17 +100,17 @@ if test "$config_deployment_mode" = "vagrant"; then
 			---
 			amazon_accounts:
 			  production:
-				access_key: ""
-				secret_key: ""
+			    access_key: ""
+			    secret_key: ""
 			  staging:
-				access_key: ""
-				secret_key: ""
+			    access_key: ""
+			    secret_key: ""
 			  test:
-				access_key: ""
-				secret_key: ""
+			    access_key: ""
+			    secret_key: ""
 			  operations:
-				access_key: ""
-				secret_key: ""
+			    access_key: ""
+			    secret_key: ""
 		END
 		chown $deployment_user:$deployment_user accounts
 	fi
