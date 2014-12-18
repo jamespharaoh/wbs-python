@@ -9,6 +9,15 @@
   sudo_user: "root"
   with_items: "api_install_packages"
 
+- name: "make node command work"
+  action:
+    module: "alternatives"
+    link: "/usr/bin/node"
+    name: "node"
+    path: "/usr/bin/nodejs"
+  sudo: "yes"
+  sudo_user: "root"
+
 - name: "install node packages"
   action:
     module: "npm"
@@ -47,14 +56,5 @@
   sudo: "yes"
   sudo_user: "root"
   notify: "reload upstart config"
-
-- name: "make node command work"
-  action:
-    module: "alternatives"
-    link: "/usr/bin/node"
-    name: "node"
-    path: "/usr/bin/nodejs"
-  sudo: "yes"
-  sudo_user: "root"
 
 # ex: et ts=2 filetype=yaml
