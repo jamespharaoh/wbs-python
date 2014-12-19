@@ -19,11 +19,4 @@
     state: "restarted"
   sudo: "yes"
 
-- name: "restart icinga"
-  action:
-    module: "service"
-    name: "icinga2"
-    state: "restarted"
-  sudo: "yes"
-
 # ex: et ts=2 filetype=yaml

@@ -4,7 +4,10 @@
   local_action:
     module: "ec2_elb"
 
-    ec2_elbs: "{{ cluster }}-app"
+    ec2_elbs:
+      - "{{ cluster }}-api"
+      - "{{ cluster }}-app"
+      - "{{ cluster }}-web"
     instance_id: "{{ instance_id }}"
     state: "present"
 

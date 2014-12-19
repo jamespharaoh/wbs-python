@@ -2,9 +2,19 @@ github.com {{ ssh_host_keys.general.github | join }}
 
 {% for cluster_name, cluster in clusters.items () %}
 
-{% for zon in [ 'a', 'b', 'c' ] %}
-{{ zon }}.admin.{{ cluster.cluster_domain }},cluster-admin-{{ zon }}.{{ cluster.cluster_domain }} {{ ssh_host_keys [cluster_name].admin [zon] | join }}
-{% endfor %}
+{%- for zon in [ 'a', 'b', 'c' ] %}
+	{%- print
+		[
+			zon + '.admin.' + cluster.cluster_domain,
+			'cluster-admin-' + zon + '.' + cluster.cluster_domain,
+			cluster.amazon_admin_ips [zon],
+			cluster.cluster_net + '.' + cluster_subnets.admin [zon] + '.4',
+		] | join (','),
+		' ',
+		ssh_host_keys [cluster_name].admin [zon] | join,
+		'\n'
+	-%}
+{%- endfor %}
 
 {% if cluster_name == 'ops' %}
 jenkins-a.{{ cluster.cluster_domain }} {{ ssh_host_keys [cluster_name].jenkins.a | join }}

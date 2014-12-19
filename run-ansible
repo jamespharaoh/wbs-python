@@ -98,6 +98,7 @@ if test "$config_deployment_mode" = "vagrant"; then
 	if ! test -f accounts; then
 		cat >accounts <<-END
 			---
+
 			amazon_accounts:
 			  production:
 			    access_key: ""
@@ -108,14 +109,20 @@ if test "$config_deployment_mode" = "vagrant"; then
 			  test:
 			    access_key: ""
 			    secret_key: ""
-			  operations:
+			  ops:
 			    access_key: ""
 			    secret_key: ""
+
+			# ex: et ts=2 filetype=yaml
 		END
 		chown $deployment_user:$deployment_user accounts
 	fi
 
 fi
+
+# fix permissions of secret files
+
+chmod -R u=rwX,go= security/secrets-plain
 
 # run ansible-playbook
 

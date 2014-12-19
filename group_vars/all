@@ -108,6 +108,10 @@ clusters:
 
     amazon_key_name: "wistla-production"
 
+    amazon_certs:
+      api: "arn:aws:iam::670055293867:server-certificate/api.wistla.com"
+      web: "arn:aws:iam::670055293867:server-certificate/wistla.com"
+
   staging:
 
     cluster_net: "10.144"
@@ -146,6 +150,10 @@ clusters:
 
     amazon_key_name: "wistla-staging"
 
+    amazon_certs:
+      api: "arn:aws:iam::155823734687:server-certificate/api.staging.wistla.com"
+      web: "arn:aws:iam::155823734687:server-certificate/staging.wistla.com"
+
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
@@ -171,6 +179,8 @@ amazon_type_jenkins: "{{ clusters [cluster].amazon_type_jenkins }}"
 amazon_images: "{{ clusters [cluster].amazon_images }}"
 
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
+
+amazon_certs: "{{ clusters [cluster].amazon_certs }}"
 
 deployments:
 

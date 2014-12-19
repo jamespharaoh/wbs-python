@@ -1,5 +1,0 @@
-const PluginDir = "/usr/lib/nagios/plugins"
-const ManubulonPluginDir = "/usr/lib/nagios/plugins"
-const NodeName = "wistla-{{ cluster }}-admin-{{ zon }}"
-const ZoneName = "wistla-{{ cluster }}"
-const TicketSalt = "{{ icinga_ticket_salt [cluster] [zon] }}"

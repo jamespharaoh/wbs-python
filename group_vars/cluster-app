@@ -19,4 +19,6 @@ vagrant_home: "/home/ubuntu"
 
 vagrant_deployments: "{{ cluster_deployment_names }}"
 
+icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}-{{ idx }}"
+
 # ex: et ts=2 filetype=yaml

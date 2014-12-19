@@ -9,3 +9,13 @@ object Host "wistla-{{ other_cluster_name }}-admin-{{ zon }}" {
 	vars.os = "Linux"
 }
 {% endfor %}
+
+{% if false %}
+{% if other_cluster_name in [ 'production', 'staging' ] %}
+object Host "wistla-{{ other_cluster_name }}-app-a-4" {
+	import "generic-host"
+	address = "{{ other_cluster_net }}.{{ cluster_subnets.app.a }}.4"
+	vars.os = "Linux"
+}
+{% endif %}
+{% endif %}

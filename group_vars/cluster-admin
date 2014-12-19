@@ -18,4 +18,6 @@ cluster_admin_install_packages:
 
 cluster_admin_remove_packages: []
 
+icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}"
+
 # ex: et ts=2 filetype=yaml

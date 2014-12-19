@@ -1,6 +1,0 @@
-template Host "generic-host" {
-	max_check_attempts = 10
-	check_interval = 30s
-	retry_interval = 10s
-	check_command = "hostalive"
-}

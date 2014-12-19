@@ -21,7 +21,6 @@
     - "cluster-admin-openvpn"
     - "cluster-admin-firewall"
     - "cluster-admin-nginx"
-    - "cluster-admin-icinga"
 
 # system setup
 
@@ -40,10 +39,6 @@
 - include: "nginx.yml"
   tags:
     - "cluster-admin-nginx"
-
-- include: "icinga.yml"
-  tags:
-    - "cluster-admin-icinga"
 
 # post setup
 

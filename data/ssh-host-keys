@@ -44,18 +44,18 @@ ssh_host_keys:
 
       a:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBPHT/KQKwXOd5EuN0Cy/2u0ivQ71cxsigoKc6how9U0EmXj1sqRN3CPbEYjKTwgz"
-        - "hCJaB07wqhP4qmrl5AuMxII="
+        - "AABBBCogv7d0GKrp4OCFOWrfIO+oQUfghvmLaIIb7HWcwWmqouh0k+VDuqIhv4f4pCzw"
+        - "TfvUENGZ6ZwSbDMEuHJNW3U="
 
       b:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBHVdsvSsLZ8nO9IV9yNt08cdZ4FejShGrpt67y2Ds+aPqQ4wFAB5ijTRYRjP+OPP"
-        - "c7rsNHZyu+1uPqmgznvXcns="
+        - "AABBBH5wEKCa+CG3Vd3MtnX6FAxWGblLamhHNTkBzNWavzIyE4TE0m/I2NisAX5PrDTE"
+        - "kpiL+hAo74FDJqipFyTC3T4="
 
       c:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBI2jzozu9QaIDVlaEkyytwjhwSNvSsR0t5uZ26rySc5UNjXhrEfrrUUsqryfLQkA"
-        - "g5V2+YuPrTsF0j3nHML4Jz0="
+        - "AABBBKly3dt0m8ITJ/kMXGTe0MGUVNdZTdC8t3AF0nflpextOmWFCAZn5w8eJ10cl7C0"
+        - "8qQm1HPBeBABrij2dIVwRGw="
 
   staging:
 

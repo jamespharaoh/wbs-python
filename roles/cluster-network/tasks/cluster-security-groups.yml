@@ -1,5 +1,7 @@
 ---
 
+- include_vars: "data/security-groups"
+
 # first create all the groups
 
 - name: "create security groups"

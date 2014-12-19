@@ -1,0 +1,38 @@
+---
+
+- name: "install icinga web packages"
+  action:
+    module: "apt"
+    package: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "icinga2-classicui"
+
+- name: "install icinga htpasswd"
+  action:
+    module: "template"
+    src: "icinga-htpasswd"
+    dest: "/etc/icinga2-classicui/htpasswd.users"
+    owner: "root"
+    group: "www-data"
+    mode: "0640"
+  sudo: "yes"
+
+- name: "install icinga cgi config"
+  action:
+    module: "template"
+    src: "icinga-classicui-cgi"
+    dest: "/etc/icinga2-classicui/cgi.cfg"
+  sudo: "yes"
+
+- name: "create icinga gui log dir"
+  action:
+    module: "file"
+    path: "/var/log/icinga2/gui"
+    state: "directory"
+    owner: "www-data"
+    group: "adm"
+    mode: "0750"
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

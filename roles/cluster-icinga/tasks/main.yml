@@ -1,0 +1,19 @@
+---
+
+- include_vars: "security/icinga/icinga-secrets"
+
+- include: "cluster-icinga-install.yml"
+
+- include: "cluster-icinga-config-local.yml"
+
+- include: "cluster-icinga-config-central.yml"
+  when: "
+    cluster == 'ops' and
+    cluster_type == 'admin' and
+    zon == 'a'
+  "
+
+- include: "cluster-icinga-web.yml"
+  when: "cluster_type == 'admin'"
+
+# ex: et ts=2 filetype=yaml

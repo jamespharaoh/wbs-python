@@ -19,10 +19,22 @@ object Zone "wistla-{{ other_cluster_name }}" {
 object Endpoint "wistla-{{ other_cluster_name }}-admin-{{ zon }}" {
 {% if other_cluster_name == cluster %}
 	host = "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
-{% else %}
+{% elif other_cluster_name == 'ops' %}
 	host = "{{ other_cluster.amazon_admin_ips [zon] }}"
 {% endif %}
 }
 {% endfor %}
+
+{% if false %}
+{% if other_cluster_name in [ 'production', 'staging' ] %}
+object Zone "wistla-{{ other_cluster_name }}-app-a-4" {
+	endpoints = [ "wistla-{{ other_cluster_name }}-app-a-4" ]
+	parent = "wistla-{{ other_cluster_name }}"
+}
+object Endpoint "wistla-{{ other_cluster_name }}-app-a-4" {
+	host = "{{ cluster_net }}.{{ cluster_subnets.app.a }}.4"
+}
+{% endif %}
+{% endif %}
 
 {% endfor %}

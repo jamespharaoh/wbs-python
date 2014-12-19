@@ -13,7 +13,7 @@ object FileLogger "notice-file" {
 }
 {% endif %}
 
-{% if true %}
+{% if false %}
 object FileLogger "debug-file" {
 	severity = "debug"
 	path = "/var/log/icinga2/debug.log"
@@ -31,5 +31,7 @@ object ApiListener "api" {
 {% else %}
 	accept_config = true
 {% endif %}
+
+	accept_commands = true
 
 }

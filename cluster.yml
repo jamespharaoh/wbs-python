@@ -1,22 +1,18 @@
 ---
 
 - hosts: "cluster-network"
-  gather_facts: "no"
   roles: [ "cluster-network" ]
   tags: "cluster-network"
 
 - hosts: "cluster-admin"
-  gather_facts: "no"
   roles: [ "cluster-admin" ]
   tags: "cluster-admin"
 
 - hosts: "cluster-jenkins"
-  gather_facts: "no"
   roles: [ "cluster-jenkins" ]
   tags: "cluster-jenkins"
 
 - hosts: "cluster-app"
-  gather_facts: "no"
   roles:
 
     - role: "cluster-app"
@@ -27,5 +23,17 @@
 
   tags:
     - "cluster-app"
+
+# ----- icinga
+
+- hosts: "cluster-admin"
+  roles: [ "cluster-icinga" ]
+  tags: "cluster-icinga"
+
+- hosts: "cluster-app"
+  roles:
+    - role: "cluster-icinga"
+      when: "cluster != 'ops'"
+  tags: "cluster-icinga"
 
 # ex: et ts=2 filetype=yaml

@@ -1,24 +1,12 @@
 ---
 
-- name: "add admin instance to dev load balancer"
+- name: "add admin instance to load balancers"
   local_action:
     module: "ec2_elb"
 
-    ec2_elbs: "ops-dev"
-    instance_id: "{{ instance_id }}"
-    state: "present"
-
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-  when: "cluster == 'ops'"
-
-- name: "add admin instance to icinga load balancer"
-  local_action:
-    module: "ec2_elb"
-
-    ec2_elbs: "ops-icinga"
+    ec2_elbs:
+      - "ops-dev"
+      - "ops-icinga"
     instance_id: "{{ instance_id }}"
     state: "present"
 
