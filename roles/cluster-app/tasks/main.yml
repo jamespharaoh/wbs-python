@@ -2,11 +2,11 @@
 
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
 
-- include: "create.yml"
+- include: "cluster-app-create.yml"
 
-- include: "system.yml"
-- include: "nginx.yml"
-- include: "activate.yml"
-- include: "cron.yml"
+- include: "cluster-app-system.yml"
+- include: "cluster-app-nginx.yml"
+- include: "cluster-app-activate.yml"
+- include: "cluster-app-cron.yml"
 
 # ex: et ts=2 filetype=yaml

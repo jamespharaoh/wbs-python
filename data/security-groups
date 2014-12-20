@@ -82,6 +82,11 @@ amazon_security_groups:
         from_port: "80"
         to_port: "80"
 
+      - proto: "tcp"
+        group_id: "{{ cluster_group_balancer }}"
+        from_port: "443"
+        to_port: "443"
+
   - name: "app"
     rules:
 
@@ -99,6 +104,11 @@ amazon_security_groups:
         from_port: "80"
         to_port: "80"
         cidr_ip: "10.0.0.0/8"
+
+      - proto: "tcp"
+        group_id: "{{ cluster_group_balancer }}"
+        from_port: "443"
+        to_port: "443"
 
   - name: "balancer"
     rules:

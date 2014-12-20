@@ -31,10 +31,38 @@ http {
 		server {{ cluster_active_deployment.bridge_network }}.5.2;
 	}
 
+{% for vhost in [
+	cluster_domain,
+	'api.' + cluster_domain,
+] %}
+
 	server {
+
+		listen 80;
+		server_name {{ vhost }};
+
 		location / {
 			proxy_pass http://temp;
+			proxy_set_header Host "{{ vhost }}";
 		}
+
 	}
+
+	server {
+
+		listen 443 ssl;
+		server_name {{ vhost }};
+
+		ssl_certificate /etc/nginx/ssl/{{ vhost }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ vhost }}.key;
+
+		location / {
+			proxy_pass http://temp;
+			proxy_set_header Host "{{ vhost }}";
+		}
+
+	}
+
+{% endfor %}
 
 }

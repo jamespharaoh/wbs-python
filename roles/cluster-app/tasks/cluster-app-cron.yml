@@ -3,7 +3,7 @@
 - name: "install wistla cron"
   action:
     module: "template"
-    src: "wistla-cron"
+    src: "cluster-app-wistla-cron"
     dest: "/etc/cron.d/wistla-cron"
   sudo: "yes"
   sudo_user: "root"

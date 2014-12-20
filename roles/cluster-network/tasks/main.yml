@@ -36,29 +36,14 @@
 - include: "cluster-security-groups.yml"
   tags: "cluster-security-groups"
 
-# ---------- app balancers
+# ---------- balancers
 
-- include: "cluster-api-balancer.yml"
-  tags: "cluster-api-balancer"
+- include: "cluster-app-balancer.yml"
+  tags: "cluster-app-balancer"
   when: "cluster != 'ops'"
 
-- include: "cluster-web-balancer.yml"
-  tags: "cluster-web-balancer"
-  when: "cluster != 'ops'"
-
-# ---------- ops balancers
-
-- include: "cluster-jenkins-balancer.yml"
+- include: "cluster-admin-balancer.yml"
   tags: "cluster-jenkins-balancer"
-  when: "cluster == 'ops'"
-
-- include: "cluster-icinga-balancer.yml"
-  tags: "cluster-icinga-balancer"
-  when: "cluster == 'ops'"
-
-- include: "cluster-dev-balancer.yml"
-  tags: "cluster-dev-balancer"
-  when: "cluster == 'ops'"
 
 # ---------- admin
 

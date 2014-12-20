@@ -1,0 +1,54 @@
+---
+
+- name: "create nginx config"
+  action:
+    module: "template"
+    src: "cluster-app-nginx-config"
+    dest: "/etc/nginx/nginx.conf"
+  sudo: "yes"
+  notify: "restart nginx"
+
+- name: "create nginx ssl directory"
+  action:
+    module: "file"
+    name: "/etc/nginx/ssl"
+    state: "directory"
+  sudo: "yes"
+
+- set_fact:
+    app_certificates:
+
+      - name: "{{ cluster_domain }}"
+        private_key: "security/ssl/{{ cluster_domain }}.key"
+        certificates:
+          - "security/ssl/{{ cluster_domain }}.cert"
+          - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+      - name: "api.{{ cluster_domain }}"
+        private_key: "security/ssl/api.{{ cluster_domain }}.key"
+        certificates:
+          - "security/ssl/api.{{ cluster_domain }}.cert"
+          - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+- name: "write nginx certificates"
+  action:
+    module: "template"
+    src: "cluster-app-ssl-bundle"
+    dest: "/etc/nginx/ssl/{{ item.name }}.cert"
+  sudo: "yes"
+  with_items: "app_certificates"
+  notify: "restart nginx"
+
+- name: "write nginx private keys"
+  action:
+    module: "copy"
+    src: "{{ item.private_key }}"
+    dest: "/etc/nginx/ssl/{{ item.name }}.key"
+    mode: "0600"
+  sudo: "yes"
+  with_items: "app_certificates"
+  notify: "restart nginx"
+
+- meta: flush_handlers
+
+# ex: et ts=2 filetype=yaml

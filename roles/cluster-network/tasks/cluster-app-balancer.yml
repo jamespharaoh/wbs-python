@@ -1,23 +1,21 @@
 ---
 
-- name: "create api balancer"
+- name: "create app balancer"
   action:
     module: "ec2_elb_lb"
 
-    name: "{{ cluster }}-api"
+    name: "{{ cluster }}-app"
     state: "present"
 
     listeners:
 
-      - protocol: "http"
+      - protocol: "tcp"
         load_balancer_port: "80"
         instance_port: "80"
 
-      - protocol: "https"
+      - protocol: "tcp"
         load_balancer_port: "443"
-        instance_port: "80"
-        instance_protocol: "http"
-        ssl_certificate_id: "{{ amazon_certs.api }}"
+        instance_port: "443"
 
     security_group_ids: "{{ cluster_group_balancer }}"
 

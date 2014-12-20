@@ -23,8 +23,8 @@ cluster_group_app: "{{ cluster_group_app | default ('') }}"
 cluster_group_balancer: "{{ cluster_group_balancer | default ('') }}"
 cluster_group_jenkins: "{{ cluster_group_jenkins | default ('') }}"
 
-cluster_balancer_icinga: "{{ cluster_balancer_icinga | default ('') }}"
-cluster_balancer_dev: "{{ cluster_balancer_dev | default ('') }}"
+cluster_balancer_admin: "{{ cluster_balancer_admin | default ('') }}"
+cluster_balancer_app: "{{ cluster_balancer_app | default ('') }}"
 
 {% if cluster == 'ops' %}
 {% for var in [
