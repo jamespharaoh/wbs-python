@@ -122,7 +122,9 @@ fi
 
 # fix permissions of secret files
 
-chmod -R u=rwX,go= security/secrets-plain
+if test -d security/secrets-plain; then
+	chmod -R u=rwX,go= security/secrets-plain
+fi
 
 # run ansible-playbook
 
