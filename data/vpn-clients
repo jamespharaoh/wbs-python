@@ -1,0 +1,43 @@
+---
+
+- name: "ben.vpn.wistla.com"
+
+  vpn_ip: "3"
+
+  iroutes:
+
+    - network: "10.151.0.0"
+      netbits: "16"
+      netmask: "255.255.0.0"
+
+- name: "dawid.vpn.wistla.com"
+
+  vpn_ip: "4"
+
+  iroutes:
+
+    - network: "10.154.0.0"
+      netbits: "16"
+      netmask: "255.255.0.0"
+
+- name: "james.vpn.wistla.com"
+
+  vpn_ip: "2"
+
+  iroutes:
+
+    - network: "10.150.0.0"
+      netbits: "16"
+      netmask: "255.255.0.0"
+
+- name: "brandon.vpn.wistla.com"
+
+  vpn_ip: "5"
+
+  iroutes:
+
+    - network: "10.153.0.0"
+      netbits: "16"
+      netmask: "255.255.0.0"
+
+# ex: et ts=2 filetype=yaml

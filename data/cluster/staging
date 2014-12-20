@@ -1,0 +1,43 @@
+---
+
+cluster_net: "10.144"
+cluster_vpn: "10.145"
+
+cluster_domain: "staging.wistla.com"
+
+cluster_deployment_names:
+  - "staging-a"
+  - "staging-b"
+
+cluster_active_deployment_name: "staging-a"
+
+cluster_cron_email: "cron.staging@wistla.com"
+
+amazon_account: "staging"
+amazon_region: "eu-west-1"
+
+amazon_zones:
+  a: "eu-west-1a"
+  b: "eu-west-1b"
+  c: "eu-west-1c"
+
+amazon_admin_ips:
+  a: "54.229.28.28"
+  b: "54.229.32.96"
+  c: "54.229.32.240"
+
+amazon_type_admin: "t2.small"
+amazon_type_app: "t2.medium"
+
+amazon_images:
+
+  eu-west-1:
+    base: "ami-0cfb5a7b"
+
+amazon_key_name: "wistla-staging"
+
+amazon_certs:
+  api: "arn:aws:iam::155823734687:server-certificate/api.staging.wistla.com"
+  web: "arn:aws:iam::155823734687:server-certificate/staging.wistla.com"
+
+# ex: et ts=2 filetype=yaml

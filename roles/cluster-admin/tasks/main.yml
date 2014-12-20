@@ -6,16 +6,16 @@
 
 # pre setup
 
-- include: "create.yml"
+- include: "cluster-admin-create.yml"
   tags:
     - "cluster-admin-create"
     - "cluster-admin-activate"
 
-- include: "assign-ip.yml"
+- include: "cluster-admin-assign-ip.yml"
   tags:
     - "cluster-admin-assign-ip"
 
-- include: "wait-for-ssh.yml"
+- include: "cluster-admin-wait-for-ssh.yml"
   tags:
     - "cluster-admin-system"
     - "cluster-admin-openvpn"
@@ -24,29 +24,29 @@
 
 # system setup
 
-- include: "system.yml"
+- include: "cluster-admin-system.yml"
   tags:
     - "cluster-admin-system"
 
-- include: "openvpn.yml"
+- include: "cluster-admin-openvpn.yml"
   tags:
     - "cluster-admin-openvpn"
 
-- include: "firewall.yml"
+- include: "cluster-admin-firewall.yml"
   tags:
     - "cluster-admin-firewall"
 
-- include: "nginx.yml"
+- include: "cluster-admin-nginx.yml"
   tags:
     - "cluster-admin-nginx"
 
 # post setup
 
-- include: "route.yml"
+- include: "cluster-admin-route.yml"
   tags:
     - "cluster-admin-route"
 
-- include: "activate.yml"
+- include: "cluster-admin-activate.yml"
   tags:
     - "cluster-admin-activate"
 

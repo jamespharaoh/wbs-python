@@ -1,0 +1,9 @@
+---
+
+- name: "mongodb"
+  uid: "200"
+  gid: "200"
+  home: "/home/mongodb"
+  shell: "/bin/false"
+
+# ex: et ts=2 filetype=yaml

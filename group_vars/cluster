@@ -1,0 +1,31 @@
+---
+
+cluster_net: "{{ clusters [cluster].cluster_net }}"
+cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
+
+cluster_domain: "{{ clusters [cluster].cluster_domain }}"
+
+cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
+
+cluster_active_deployment_name: "{{ clusters [cluster].cluster_active_deployment_name }}"
+
+cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
+
+amazon_account: "{{ clusters [cluster].amazon_account }}"
+amazon_region: "{{ clusters [cluster].amazon_region }}"
+
+amazon_zones: "{{ clusters [cluster].amazon_zones }}"
+
+amazon_admin_ips: "{{ clusters [cluster].amazon_admin_ips }}"
+
+amazon_type_admin: "{{ clusters [cluster].amazon_type_admin }}"
+amazon_type_app: "{{ clusters [cluster].amazon_type_app }}"
+amazon_type_jenkins: "{{ clusters [cluster].amazon_type_jenkins }}"
+
+amazon_images: "{{ clusters [cluster].amazon_images }}"
+
+amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
+
+amazon_certs: "{{ clusters [cluster].amazon_certs }}"
+
+# ex: et ts=2 filetype=yaml

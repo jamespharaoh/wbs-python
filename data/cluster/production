@@ -1,0 +1,43 @@
+---
+
+cluster_net: "10.140"
+cluster_vpn: "10.141"
+
+cluster_domain: "wistla.com"
+
+cluster_deployment_names:
+  - "production-a"
+  - "production-b"
+
+cluster_active_deployment_name: "production-a"
+
+cluster_cron_email: "cron.production@wistla.com"
+
+amazon_account: "production"
+amazon_region: "eu-west-1"
+
+amazon_zones:
+  a: "eu-west-1a"
+  b: "eu-west-1b"
+  c: "eu-west-1c"
+
+amazon_admin_ips:
+  a: "54.72.85.106"
+  b: "54.77.196.68"
+  c: "54.77.222.234"
+
+amazon_type_admin: "t2.small"
+amazon_type_app: "c3.large"
+
+amazon_images:
+
+  eu-west-1:
+    base: "ami-0cfb5a7b"
+
+amazon_key_name: "wistla-production"
+
+amazon_certs:
+  api: "arn:aws:iam::670055293867:server-certificate/api.wistla.com"
+  web: "arn:aws:iam::670055293867:server-certificate/wistla.com"
+
+# ex: et ts=2 filetype=yaml

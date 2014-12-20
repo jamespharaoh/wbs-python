@@ -1,0 +1,66 @@
+---
+
+production-a:
+
+  public_domain: "wistla.com"
+  private_domain: "a.wistla.com"
+  bridge_name: "br148"
+  bridge_network: "10.148"
+
+production-b:
+
+  public_domain: "wistla.com"
+  private_domain: "b.wistla.com"
+  bridge_name: "br149"
+  bridge_network: "10.149"
+
+staging-a:
+
+  public_domain: "staging.wistla.com"
+  private_domain: "a.staging.wistla.com"
+  bridge_name: "br155"
+  bridge_network: "10.155"
+
+staging-b:
+
+  public_domain: "staging.wistla.com"
+  private_domain: "b.staging.wistla.com"
+  bridge_name: "br156"
+  bridge_network: "10.156"
+
+dev:
+
+  public_domain: "dev.wistla.com"
+  private_domain: "dev.wistla.com"
+  bridge_name: "br152"
+  bridge_network: "10.152"
+
+james:
+
+  public_domain: "james.wistla.com"
+  private_domain: "james.wistla.com"
+  bridge_name: "br150"
+  bridge_network: "10.150"
+
+ben:
+
+  public_domain: "ben.wistla.com"
+  private_domain: "ben.wistla.com"
+  bridge_name: "br151"
+  bridge_network: "10.151"
+
+brandon:
+
+  public_domain: "brandon.wistla.com"
+  private_domain: "brandon.wistla.com"
+  bridge_name: "br153"
+  bridge_network: "10.153"
+
+dawid:
+
+  public_domain: "dawid.wistla.com"
+  private_domain: "dawid.wistla.com"
+  bridge_name: "br154"
+  bridge_network: "10.154"
+
+# ex: et ts=2 filetype=yaml
