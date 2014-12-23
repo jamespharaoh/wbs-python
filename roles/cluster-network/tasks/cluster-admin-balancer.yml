@@ -4,7 +4,7 @@
   action:
     module: "ec2_elb_lb"
 
-    name: "{{ cluster }}-icinga"
+    name: "{{ cluster }}-admin"
     state: "present"
 
     listeners:
@@ -32,7 +32,9 @@
   register: "admin_balancer_result"
 
 - set_fact:
-    cluster_balancer_admin: "{{ admin_balancer_result.elb.dns_name }}"
+    cluster_admin_balancer: "{{ admin_balancer_result.elb.dns_name }}"
+    cluster_admin_balancer_hosted_zone_name: "{{ admin_balancer_result.elb.canonical_hosted_zone_name }}"
+    cluster_admin_balancer_hosted_zone_name_id: "{{ admin_balancer_result.elb.canonical_hosted_zone_name_id }}"
 
 - include: "cluster-save-data.yml"
 

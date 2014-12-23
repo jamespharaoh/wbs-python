@@ -1,0 +1,7 @@
+{%- set certificates = [
+	'security/ssl/' + item.1 + deployments [item.0].private_domain + '.cert',
+	'security/ssl/comodo-rsa-domain-validation-chain.cert',
+] -%}
+{%- for certificate in certificates -%}
+{%- print lookup ('file', certificate), '\n' -%}
+{%- endfor -%}

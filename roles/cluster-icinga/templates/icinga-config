@@ -6,7 +6,7 @@ include <plugins>
 
 include "features-enabled/*.conf"
 
-{% if false %}
+{% if true %}
 object FileLogger "notice-file" {
 	severity = "notice"
 	path = "/var/log/icinga2/notice.log"

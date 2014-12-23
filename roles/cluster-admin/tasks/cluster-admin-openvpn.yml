@@ -36,7 +36,7 @@
 - name: "create openvpn config"
   action:
     module: "template"
-    src: "openvpn-config"
+    src: "cluster-admin-openvpn-config"
     dest: "/etc/openvpn/wistla-{{ cluster }}-vpn.conf"
   sudo: "yes"
   notify: "restart openvpn"
@@ -51,7 +51,7 @@
 - name: "create openvpn client configs"
   action:
     module: "template"
-    src: "openvpn-client-config"
+    src: "cluster-admin-openvpn-client-config"
     dest: "/etc/openvpn/clients/{{ item.name }}"
   sudo: "yes"
   with_items: "vpn_clients"
@@ -59,7 +59,7 @@
 - name: "create openvpn client connect script"
   action:
     module: "template"
-    src: "openvpn-client-connect-script"
+    src: "cluster-admin-openvpn-client-connect-script"
     dest: "/etc/openvpn/client-connect-script"
     mode: "0755"
   sudo: "yes"
@@ -67,7 +67,7 @@
 - name: "create openvpn client disconnect script"
   action:
     module: "template"
-    src: "openvpn-client-disconnect-script"
+    src: "cluster-admin-openvpn-client-disconnect-script"
     dest: "/etc/openvpn/client-disconnect-script"
     mode: "0755"
   sudo: "yes"

@@ -1,12 +1,10 @@
 ---
 
-- name: "add admin instance to load balancers"
+- name: "add admin instance to load balancer"
   local_action:
     module: "ec2_elb"
 
-    ec2_elbs:
-      - "ops-dev"
-      - "ops-icinga"
+    ec2_elbs: "ops-admin"
     instance_id: "{{ instance_id }}"
     state: "present"
 

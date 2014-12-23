@@ -35,32 +35,25 @@ dev:
   bridge_name: "br152"
   bridge_network: "10.152"
 
-james:
+berk:
 
-  public_domain: "james.wistla.com"
-  private_domain: "james.wistla.com"
+  public_domain: "berk.wistla.com"
+  private_domain: "berk.wistla.com"
   bridge_name: "br150"
   bridge_network: "10.150"
 
-ben:
+bruce:
 
-  public_domain: "ben.wistla.com"
-  private_domain: "ben.wistla.com"
-  bridge_name: "br151"
-  bridge_network: "10.151"
-
-brandon:
-
-  public_domain: "brandon.wistla.com"
-  private_domain: "brandon.wistla.com"
-  bridge_name: "br153"
-  bridge_network: "10.153"
-
-dawid:
-
-  public_domain: "dawid.wistla.com"
-  private_domain: "dawid.wistla.com"
+  public_domain: "bruce.wistla.com"
+  private_domain: "bruce.wistla.com"
   bridge_name: "br154"
   bridge_network: "10.154"
+
+mrbenn:
+
+  public_domain: "mrbenn.wistla.com"
+  private_domain: "mrbenn.wistla.com"
+  bridge_name: "br151"
+  bridge_network: "10.151"
 
 # ex: et ts=2 filetype=yaml

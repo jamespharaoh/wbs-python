@@ -1,0 +1,20 @@
+---
+
+- hosts: "cluster-admin"
+  roles:
+    - role: "cluster-update"
+  tags: "cluster-admin"
+
+- hosts: "cluster-app"
+  roles:
+    - role: "cluster-update"
+      when: "cluster != 'ops'"
+  tags: "cluster-app"
+
+- hosts: "cluster-jenkins"
+  roles:
+    - role: "cluster-update"
+      when: "cluster == 'ops'"
+  tags: "cluster-jenkins"
+
+# ex: et ts=2 filetype=yaml

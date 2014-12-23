@@ -28,4 +28,11 @@
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
+  register: "app_balancer_result"
+
+- set_fact:
+    cluster_app_balancer: "{{ app_balancer_result.elb.dns_name }}"
+    cluster_admin_balancer_hosted_zone_name: "{{ app_balancer_result.elb.canonical_hosted_zone_name }}"
+    cluster_admin_balancer_hosted_zone_name_id: "{{ app_balancer_result.elb.canonical_hosted_zone_name_id }}"
+
 # ex: et ts=2 filetype=yaml

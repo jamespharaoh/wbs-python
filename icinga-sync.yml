@@ -18,7 +18,7 @@
         dest: "{{ deployment_home }}/work/{{ cluster }}/icinga-state"
         flat: "yes"
       sudo: "yes"
-      when: "inventory_hostname == 'cluster-admin-a'"
+      when: "cluster == 'ops' and inventory_hostname == 'cluster-admin-a'"
 
     - name: "send state to slaves"
       action:
@@ -29,7 +29,7 @@
         group: "nagios"
         mode: "0644"
       sudo: "yes"
-      when: "inventory_hostname != 'cluster-admin-a'"
+      when: "cluster == 'ops' and inventory_hostname != 'cluster-admin-a'"
 
     - name: "delete zones config dir"
       action:

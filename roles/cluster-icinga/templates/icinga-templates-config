@@ -1,14 +1,14 @@
 template Host "generic-host" {
-	max_check_attempts = 10
-	check_interval = 30s
-	retry_interval = 10s
+	max_check_attempts = 5
+	check_interval = 15s
+	retry_interval = 5s
 	check_command = "hostalive"
 }
 
 template Service "generic-service" {
-	max_check_attempts = 10
-	check_interval = 30s
-	retry_interval = 10s
+	max_check_attempts = 5
+	check_interval = 15s
+	retry_interval = 5s
 }
 
 apply Service "load" {

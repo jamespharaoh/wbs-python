@@ -37,7 +37,33 @@ http {
 
 	server {
 
+		listen 80;
+		listen 443 ssl;
+
+		ssl_certificate /etc/nginx/ssl/{{ dev_deployment.private_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ dev_deployment.private_domain }}.key;
+
 		server_name {{ dev_deployment.private_domain }};
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+		location / {
+			proxy_pass http://{{ dev_deployment_name }}/;
+			proxy_set_header Host $host;
+		}
+
+	}
+
+	server {
+
+		listen 80;
+		listen 443 ssl;
+
+		ssl_certificate /etc/nginx/ssl/api.{{ dev_deployment.private_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/api.{{ dev_deployment.private_domain }}.key;
+
 		server_name api.{{ dev_deployment.private_domain }};
 
 		location /robots.txt {

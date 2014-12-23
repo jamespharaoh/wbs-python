@@ -3,6 +3,7 @@ object Zone "global-templates" {
 }
 
 {% for other_cluster_name, other_cluster in clusters.items () %}
+{% if other_cluster_name == 'ops' %}
 
 object Zone "wistla-{{ other_cluster_name }}" {
 	endpoints = [
@@ -19,7 +20,7 @@ object Zone "wistla-{{ other_cluster_name }}" {
 object Endpoint "wistla-{{ other_cluster_name }}-admin-{{ zon }}" {
 {% if other_cluster_name == cluster %}
 	host = "{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.4"
-{% elif other_cluster_name == 'ops' %}
+{% else %}
 	host = "{{ other_cluster.amazon_admin_ips [zon] }}"
 {% endif %}
 }
@@ -37,4 +38,5 @@ object Endpoint "wistla-{{ other_cluster_name }}-app-a-4" {
 {% endif %}
 {% endif %}
 
+{% endif %}
 {% endfor %}

@@ -26,13 +26,18 @@ cluster_group_jenkins: "{{ cluster_group_jenkins | default ('') }}"
 cluster_balancer_admin: "{{ cluster_balancer_admin | default ('') }}"
 cluster_balancer_app: "{{ cluster_balancer_app | default ('') }}"
 
-{% if cluster == 'ops' %}
 {% for var in [
-  'cluster_dev_balancer_hosted_zone_name',
-  'cluster_dev_balancer_hosted_zone_name_id',
+
+  'cluster_admin_balancer',
+  'cluster_admin_balancer_hosted_zone_name',
+  'cluster_admin_balancer_hosted_zone_name_id',
+
+  'cluster_app_balancer',
+  'cluster_app_balancer_hosted_zone_name',
+  'cluster_app_balancer_hosted_zone_name_id',
+
 ] %}
 {{ var }}: "{{ hostvars [inventory_hostname] [var] | default ('') }}"
 {% endfor %}
-{% endif %}
 
 # ex: et ts=2 filetype=yaml

@@ -3,16 +3,50 @@
 - name: "create dev robots.txt"
   action:
     module: "template"
-    src: "cluster-dev-robots-txt"
+    src: "cluster-admin-dev-robots-txt"
     dest: "/etc/nginx/dev-robots.txt"
   sudo: "yes"
 
 - name: "create nginx config"
   action:
     module: "template"
-    src: "nginx-config"
+    src: "cluster-admin-nginx-config"
     dest: "/etc/nginx/nginx.conf"
   sudo: "yes"
   notify: "restart nginx"
+
+- name: "create nginx ssl directory"
+  action:
+    module: "file"
+    name: "/etc/nginx/ssl"
+    state: "directory"
+  sudo: "yes"
+
+- name: "write nginx certificates"
+  action:
+    module: "template"
+    src: "cluster-admin-ssl-bundle"
+    dest: "/etc/nginx/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.cert"
+  sudo: "yes"
+  with_nested:
+    - "dev_deployment_names"
+    - - "api."
+      - ""
+  notify: "restart nginx"
+
+- name: "write nginx private keys"
+  action:
+    module: "copy"
+    src: "security/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.key"
+    dest: "/etc/nginx/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.key"
+    mode: "0600"
+  sudo: "yes"
+  with_nested:
+    - "dev_deployment_names"
+    - - "api."
+      - ""
+  notify: "restart nginx"
+
+- meta: flush_handlers
 
 # ex: et ts=2 filetype=yaml

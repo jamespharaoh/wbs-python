@@ -1,14 +1,5 @@
 ---
 
-- name: "update system packages"
-  action:
-    module: "apt"
-    upgrade: "dist"
-    update_cache: "yes"
-  sudo: "yes"
-  sudo_user: "root"
-  tags: "update"
-
 - name: "remove system packages"
   action:
     module: "apt"

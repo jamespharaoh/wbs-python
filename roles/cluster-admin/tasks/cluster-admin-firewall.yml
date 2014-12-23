@@ -3,7 +3,7 @@
 - name: "create firewall rules"
   action:
     module: "template"
-    src: "firewall-rules"
+    src: "cluster-admin-firewall-rules"
     dest: "/etc/network/firewall-rules"
     mode: "0755"
   sudo: "yes"
