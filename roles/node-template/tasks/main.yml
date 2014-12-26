@@ -26,15 +26,6 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "update system packages"
-  action:
-    module: "apt"
-    upgrade: "dist"
-    update_cache: "yes"
-  sudo: "yes"
-  sudo_user: "root"
-  tags: "update"
-
 - name: "create common groups"
   action:
     module: "group"

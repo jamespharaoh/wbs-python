@@ -24,4 +24,3 @@ deb-src {{ ubuntu_security_url }} trusty-security universe
 
 # deb {{ ubuntu_security_url }} trusty-security multiverse
 # deb-src {{ ubuntu_security_url }} trusty-security multiverse
-

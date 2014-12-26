@@ -77,8 +77,10 @@ http {
 	server {
 
 		server_name {{ deployment_private_domain }};
+		server_name www.{{ deployment_private_domain }};
 {% if deployment_private_domain != deployment_public_domain %}
 		server_name {{ deployment_public_domain }};
+		server_name www.{{ deployment_public_domain }};
 {% endif %}
 
 		client_max_body_size 16m;

@@ -31,38 +31,69 @@ http {
 		server {{ cluster_active_deployment.bridge_network }}.5.2;
 	}
 
-{% for vhost in [
-	cluster_domain,
-	'api.' + cluster_domain,
-] %}
+	# website redirect www to naked domain
 
 	server {
 
 		listen 80;
-		server_name {{ vhost }};
+		listen 443 ssl;
 
-		location / {
-			proxy_pass http://temp;
-			proxy_set_header Host "{{ vhost }}";
-		}
+		server_name www.{{ cluster_domain }};
+
+		ssl_certificate /etc/nginx/ssl/{{ cluster_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ cluster_domain }}.key;
+
+		return 301 https://{{ cluster_domain }}$request_uri;
 
 	}
+
+	# website redirect http to https
+
+	server {
+
+		listen 80;
+
+		server_name {{ cluster_domain }};
+
+		return 301 https://{{ cluster_domain }}$request_uri;
+
+	}
+
+	# website
 
 	server {
 
 		listen 443 ssl;
-		server_name {{ vhost }};
 
-		ssl_certificate /etc/nginx/ssl/{{ vhost }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ vhost }}.key;
+		server_name {{ cluster_domain }};
+
+		ssl_certificate /etc/nginx/ssl/{{ cluster_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ cluster_domain }}.key;
+
+		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
 		location / {
 			proxy_pass http://temp;
-			proxy_set_header Host "{{ vhost }}";
+			proxy_set_header Host "{{ cluster_domain }}";
 		}
 
 	}
 
-{% endfor %}
+	# api
+
+	server {
+
+		listen 443 ssl;
+		server_name {{ cluster_domain }};
+
+		ssl_certificate /etc/nginx/ssl/api.{{ cluster_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/api.{{ cluster_domain }}.key;
+
+		location / {
+			proxy_pass http://temp;
+			proxy_set_header Host "api.{{ cluster_domain }}";
+		}
+
+	}
 
 }

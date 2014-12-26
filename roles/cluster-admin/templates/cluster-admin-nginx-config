@@ -35,15 +35,46 @@ http {
 		server {{ dev_deployment.bridge_network }}.5.2;
 	}
 
+	# website redirect www to naked domain
+
 	server {
 
 		listen 80;
+		listen 443 ssl;
+
+		server_name www.{{ dev_deployment.private_domain }};
+
+		ssl_certificate /etc/nginx/ssl/{{ dev_deployment.private_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ dev_deployment.private_domain }}.key;
+
+		return 301 https://{{ dev_deployment.private_domain }}$request_uri;
+
+	}
+
+	# website redirect to ssl
+
+	server {
+
+		listen 80;
+
+		server_name {{ dev_deployment.private_domain }};
+
+		return 301 https://{{ dev_deployment.private_domain }}$request_uri;
+
+	}
+
+	# website
+
+	server {
+
 		listen 443 ssl;
 
 		ssl_certificate /etc/nginx/ssl/{{ dev_deployment.private_domain }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/{{ dev_deployment.private_domain }}.key;
 
 		server_name {{ dev_deployment.private_domain }};
+
+		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
 		location /robots.txt {
 			alias /etc/nginx/dev-robots.txt;
@@ -55,6 +86,8 @@ http {
 		}
 
 	}
+
+	# api
 
 	server {
 

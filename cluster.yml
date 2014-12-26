@@ -18,7 +18,7 @@
     - role: "cluster-app"
       when: "cluster != 'ops'"
 
-    - role: "vagrant"
+    - role: "devbox"
       when: "cluster != 'ops'"
 
   tags:

@@ -1,0 +1,10 @@
+---
+
+- hosts: "vagrant"
+  gather_facts: "no"
+  roles:
+
+    - role: "update"
+      when: "deployment_mode == 'vagrant'"
+
+# ex: et ts=2 filetype=yaml
