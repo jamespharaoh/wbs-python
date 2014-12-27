@@ -61,4 +61,12 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
 
+- name: "create api config"
+  action:
+    module: "template"
+    src: "devbox-wistla-api-config"
+    dest: "{{ vagrant_home }}/wistla-api/config/config.vagrant.js"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
 # ex: et ts=2 filetype=yaml

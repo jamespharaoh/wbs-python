@@ -1,0 +1,20 @@
+/******************************************************************************
+ * Development environment configuration.
+ *****************************************************************************/
+
+var config = require('./config.global');
+
+// Environment.
+config.env = 'vagrant';
+
+// The url the api is running at
+config.apiUrl = 'https://api.{{ deployment_private_domain }}';
+config.testUrl = 'http://api.{{ deployment_private_domain }}';
+
+// Database.
+config.dbUrl = 'mongodb://mongo-0:27017/wistla';
+
+// Blobs.
+config.blobMode = 'local';
+
+module.exports = config;

@@ -1,32 +1,32 @@
 ---
 
-- include: "system.yml"
+- include: "devbox-system.yml"
 
-- include: "btrfs.yml"
+- include: "devbox-btrfs.yml"
 
-- include: "network.yml"
+- include: "devbox-network.yml"
 
-- include: "ssh.yml"
+- include: "devbox-ssh.yml"
   when: "inventory_hostname == 'vagrant'"
 
-- include: "nfs.yml"
+- include: "devbox-nfs.yml"
   when: "inventory_hostname == 'vagrant'"
 
-- include: "samba.yml"
+- include: "devbox-samba.yml"
   when: "inventory_hostname == 'vagrant'"
 
-- include: "dns.yml"
+- include: "devbox-dns.yml"
 
-- include: "fuse.yml"
+- include: "devbox-fuse.yml"
 
-- include: "openvpn.yml"
+- include: "devbox-openvpn.yml"
   when: "inventory_hostname == 'vagrant'"
 
-- include: "tools.yml"
+- include: "devbox-tools.yml"
   when: "inventory_hostname == 'vagrant'"
 
-- include: "user.yml"
+- include: "devbox-user.yml"
 
-- include: "wistla.yml"
+- include: "devbox-wistla.yml"
 
 # ex: et ts=2 filetype=yaml
