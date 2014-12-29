@@ -57,4 +57,12 @@
   sudo_user: "root"
   notify: "reload upstart config"
 
+- name: "create wistla api config"
+  action:
+    module: "template"
+    src: "wistla-api-local-config"
+    dest: "/home/ubuntu/wistla-api/config/config.local.js"
+  sudo: "yes"
+  sudo_user: "root"
+
 # ex: et ts=2 filetype=yaml

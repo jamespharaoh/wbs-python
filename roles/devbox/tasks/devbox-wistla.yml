@@ -65,7 +65,7 @@
   action:
     module: "template"
     src: "devbox-wistla-api-config"
-    dest: "{{ vagrant_home }}/wistla-api/config/config.vagrant.js"
+    dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
 
