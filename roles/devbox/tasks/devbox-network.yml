@@ -9,6 +9,16 @@
   sudo_user: "root"
   notify: "restart dnsmasq"
 
+- name: "create firewall rules"
+  action:
+    module: "template"
+    src: "devbox-firewall-rules"
+    dest: "/etc/network/firewall-rules"
+    mode: "0755"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "reload firewall rules"
+
 - name: "create bridge network interface"
   action:
     module: "template"

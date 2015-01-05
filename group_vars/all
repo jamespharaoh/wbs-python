@@ -8,6 +8,10 @@ global_install_packages:
   - "super"
   - "whois"
 
+global_remove_packages:
+
+  - "resolvconf"
+
 cluster_subnets:
 
   admin:

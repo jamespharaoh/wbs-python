@@ -28,4 +28,6 @@ node_count:
   mongo: "{{ (node_count | default ({})).mongo | default ('3') }}"
   web: "{{ (node_count | default ({})).web | default ('3') }}"
 
+use_s3: "{{ use_s3 | default ('no') }}"
+
 # ex: et ts=2 filetype=yaml

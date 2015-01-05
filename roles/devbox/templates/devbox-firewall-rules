@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+# nat postrouting
+
+iptables \
+	--table nat \
+	--flush POSTROUTING
+
+iptables \
+	--table nat \
+	--policy POSTROUTING ACCEPT
+
+iptables \
+	--table nat \
+	--append POSTROUTING \
+	--source {{ deployment_bridge_network }}/16 \
+	! --destination {{ deployment_bridge_network }}/16 \
+	--jump MASQUERADE
+
+# ex: noet ts=4 filetype=bash

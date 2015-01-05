@@ -15,6 +15,6 @@ script
 
 	setuid ubuntu \
 	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} server.js \
-		> logs/output.txt 2> logs/output.txt
+		>> logs/output.txt 2>> logs/output.txt
 
 end script

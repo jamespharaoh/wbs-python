@@ -1,0 +1,1 @@
+nameserver {{ deployment_bridge_network }}.1.1

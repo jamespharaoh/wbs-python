@@ -5,7 +5,7 @@
 - name: "create apt sources.list"
   action:
     module: "template"
-    src: "apt-sources-list"
+    src: "template-apt-sources-list"
     dest: "/etc/apt/sources.list"
   sudo: "yes"
   sudo_user: "root"
@@ -13,15 +13,23 @@
 - name: "create hosts file"
   action:
     module: "template"
-    src: "hosts"
+    src: "template-hosts"
     dest: "/etc/hosts"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create resolv.conf"
+  action:
+    module: "template"
+    src: "template-resolv-conf"
+    dest: "/etc/resolv.conf"
   sudo: "yes"
   sudo_user: "root"
 
 - name: "create network interfaces"
   action:
     module: "template"
-    src: "network-interfaces"
+    src: "template-network-interfaces"
     dest: "/etc/network/interfaces"
   sudo: "yes"
   sudo_user: "root"
@@ -59,10 +67,19 @@
   sudo_user: "root"
   with_items: "global_install_packages"
 
+- name: "remove system packages"
+  action:
+    module: "apt"
+    state: "absent"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "global_remove_packages"
+
 - name: "install ssh known hosts"
   action:
     module: "template"
-    src: "ssh-known-hosts"
+    src: "template-ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
   sudo: "yes"
   sudo_user: "root"
