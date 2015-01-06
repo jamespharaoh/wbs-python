@@ -9,16 +9,18 @@
   tags: "cluster-admin"
 
 - hosts: "cluster-jenkins"
-  roles: [ "cluster-jenkins" ]
-  tags: "cluster-jenkins"
+  roles:
+
+    - role: "cluster-jenkins"
+      when: "cluster == 'ops'"
+
+  tags:
+    - "cluster-jenkins"
 
 - hosts: "cluster-app"
   roles:
 
     - role: "cluster-app"
-      when: "cluster != 'ops'"
-
-    - role: "devbox"
       when: "cluster != 'ops'"
 
   tags:
