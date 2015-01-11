@@ -48,6 +48,7 @@
   sudo_user: "root"
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
+  tags: "quick"
   with_items:
     - "wistla-api"
 

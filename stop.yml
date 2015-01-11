@@ -1,11 +1,13 @@
 ---
 
-- hosts: [ "node" ]
+- hosts: "node"
   gather_facts: "no"
-  roles: [ "lxc-stop" ]
+  roles:
 
-- hosts: [ "node" ]
-  gather_facts: "no"
-  roles: [ "lxc-destroy" ]
+    - role: "lxc-stop"
+      tags: "quick"
+
+    - role: "lxc-destroy"
+      tags: "quick"
 
 # ex: et ts=2 filetype=yaml

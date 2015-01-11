@@ -3,13 +3,13 @@
 - hosts: "node"
   gather_facts: "no"
   roles:
+
     - role: "lxc-clone"
       when: "idx | int < node_count [node] | int"
+      tags: "quick"
 
-- hosts: "node"
-  gather_facts: "no"
-  roles:
     - role: "lxc-start"
       when: "idx | int < node_count [node] | int"
+      tags: "quick"
 
 # ex: et ts=2 filetype=yaml
