@@ -25,3 +25,5 @@
   changed_when: "touch_result.stdout != 'UNCHANGED'"
 
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
+
+# ex: et ts=2 filetype=yaml

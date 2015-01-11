@@ -10,6 +10,7 @@ cluster_admin_install_packages:
   - "fcgiwrap"
   - "git"
   - "lxc"
+  - "mailutils"
   - "nginx"
   - "ngrep"
   - "ntp"

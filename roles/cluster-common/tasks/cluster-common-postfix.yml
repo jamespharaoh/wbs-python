@@ -1,0 +1,32 @@
+---
+
+- include_vars: "security/amazon/{{ cluster }}.yml"
+
+- name: "install postfix"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "postfix"
+
+- name: "create postfix main config"
+  action:
+    module: "template"
+    src: "cluster-common-postfix-main"
+    dest: "/etc/postfix/main.cf"
+  sudo: "yes"
+  notify: "restart postfix"
+
+- name: "create postfix sasl passwords"
+  action:
+    module: "template"
+    src: "cluster-common-postfix-sasl-passwd"
+    dest: "/etc/postfix/sasl_passwd"
+    mode: "0600"
+  sudo: "yes"
+  notify: "rehash sasl passwords"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

@@ -19,6 +19,7 @@
   tags:
     - "cluster-admin-system"
     - "cluster-admin-openvpn"
+    - "cluster-admin-postfix"
     - "cluster-admin-firewall"
     - "cluster-admin-nginx"
 
@@ -27,6 +28,10 @@
 - include: "cluster-admin-system.yml"
   tags:
     - "cluster-admin-system"
+
+- include: "cluster-common-postfix.yml"
+  tags:
+    - "cluster-admin-postfix"
 
 - include: "cluster-admin-openvpn.yml"
   tags:

@@ -72,6 +72,7 @@ vagrant_install_packages:
   - "graphicsmagick"
   - "imagemagick"
   - "lxc"
+  - "mailutils"
   - "mongodb-clients"
   - "nfs-kernel-server"
   - "ngrep"

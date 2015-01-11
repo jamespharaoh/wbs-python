@@ -1,5 +1,22 @@
 ---
 
+- name: "set hostname"
+  action:
+    module: "copy"
+    dest: "/etc/hostname"
+    content: "{{ inventory_hostname }}{{ '\n' }}"
+  sudo: "yes"
+  notify: "set hostname"
+
+- meta: "flush_handlers"
+
+- name: "write hosts"
+  action:
+    module: "template"
+    src: "cluster-admin-hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+
 - name: "remove system packages"
   action:
     module: "apt"

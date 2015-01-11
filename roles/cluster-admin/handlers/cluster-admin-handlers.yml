@@ -1,0 +1,22 @@
+---
+
+- name: "restart openvpn"
+  action:
+    module: "service"
+    name: "openvpn"
+    state: "restarted"
+  sudo: "yes"
+
+- name: "reload firewall rules"
+  action: command
+    /etc/network/firewall-rules
+  sudo: "yes"
+
+- name: "restart nginx"
+  action:
+    module: "service"
+    name: "nginx"
+    state: "restarted"
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

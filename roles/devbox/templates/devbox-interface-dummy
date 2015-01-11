@@ -1,0 +1,4 @@
+auto dummy0
+iface dummy0 inet static
+	pre-up modprobe dummy
+	address 10.255.255.10

@@ -26,6 +26,6 @@ amazon_images: "{{ clusters [cluster].amazon_images }}"
 
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
-amazon_certs: "{{ clusters [cluster].amazon_certs }}"
+smtp_server: "{{ clusters [cluster].smtp_server }}"
 
 # ex: et ts=2 filetype=yaml

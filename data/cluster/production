@@ -36,8 +36,6 @@ amazon_images:
 
 amazon_key_name: "wistla-production"
 
-amazon_certs:
-  api: "arn:aws:iam::670055293867:server-certificate/api.wistla.com"
-  web: "arn:aws:iam::670055293867:server-certificate/wistla.com"
+smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 # ex: et ts=2 filetype=yaml

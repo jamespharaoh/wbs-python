@@ -22,7 +22,7 @@
 - name: "create bridge network interface"
   action:
     module: "template"
-    src: "interface-bridge"
+    src: "devbox-interface-bridge"
     dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
   sudo: "yes"
   sudo_user: "root"
@@ -45,5 +45,30 @@
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
   with_items: "vagrant_deployments"
+
+- name: "create dummy network interface"
+  action:
+    module: "template"
+    src: "devbox-interface-dummy"
+    dest: "/etc/network/interfaces.d/dummy0.cfg"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "start network dummy"
+  shell:
+
+    set -e
+
+    if ifquery --state dummy0 >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifup dummy0;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
 
 # ex: et ts=2 filetype=yaml

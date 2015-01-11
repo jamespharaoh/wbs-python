@@ -1,0 +1,1 @@
+{{ smtp_server }}:25 {{ smtp_username }}:{{ smtp_password }}

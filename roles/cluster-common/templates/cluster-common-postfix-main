@@ -1,0 +1,41 @@
+# general
+
+smtpd_banner = $myhostname ESMTP $mail_name
+biff = no
+readme_directory = no
+mynetworks = 127.0.0.0/8 [::1]/128 10.0.0.0/8
+myhostname = {{ inventory_hostname }}.{{ cluster_domain }}
+
+# addresses
+
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mydestination = localdomain, localhost, localhost.localdomain, localhost
+recipient_delimiter = +
+
+# tls
+
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+
+# inbound mail
+
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
+inet_interfaces = all
+
+# outbound mail
+
+relayhost = {{ smtp_server }}:25
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+smtp_tls_note_starttls_offer = yes
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# local mail
+
+mailbox_size_limit = 0

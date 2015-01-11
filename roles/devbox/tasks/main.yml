@@ -6,6 +6,9 @@
 
 - include: "devbox-network.yml"
 
+- include: "devbox-postfix.yml"
+  when: "inventory_hostname == 'vagrant'"
+
 - include: "devbox-ssh.yml"
   when: "inventory_hostname == 'vagrant'"
 
