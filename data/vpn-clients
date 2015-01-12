@@ -30,7 +30,7 @@
       netbits: "16"
       netmask: "255.255.0.0"
 
-- name: "brandon.vpn.wistla.com"
+- name: "nick.vpn.wistla.com"
 
   vpn_ip: "5"
 
