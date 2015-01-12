@@ -60,6 +60,7 @@ dev_deployment_names:
   - "berk"
   - "bruce"
   - "mrbenn"
+  - "7-zark-7"
 
 vpn_clients: "{{ lookup ('file', 'data/vpn-clients') | from_yaml }}"
 

@@ -56,4 +56,11 @@ mrbenn:
   bridge_name: "br151"
   bridge_network: "10.151"
 
+7-zark-7:
+
+  public_domain: "7-zark-7.wistla.com"
+  private_domain: "7-zark-7.wistla.com"
+  bridge_name: "br153"
+  bridge_network: "10.153"
+
 # ex: et ts=2 filetype=yaml

@@ -1,6 +1,6 @@
 ---
 
-- include: "vagrant.yml"
+- include: "devbox.yml"
 - include: "templates.yml"
 
 - hosts: "concrete-template"
