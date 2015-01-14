@@ -17,3 +17,7 @@
   sudo: "yes"
   sudo_user: "root"
   notify: "restart dnsmasq"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

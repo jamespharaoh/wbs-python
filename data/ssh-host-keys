@@ -57,6 +57,13 @@ ssh_host_keys:
         - "AABBBKly3dt0m8ITJ/kMXGTe0MGUVNdZTdC8t3AF0nflpextOmWFCAZn5w8eJ10cl7C0"
         - "8qQm1HPBeBABrij2dIVwRGw="
 
+    app:
+
+      a-4:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBB4So0C9Wssz7jgJVsDJIgxwPTLfbjMcpWsoT06AQCD7nzDaEhUODyJQuDA4j3Yy"
+        - "IVjqQ8C8zGjtBuNyLJsBP5s="
+
   staging:
 
     admin:
@@ -75,5 +82,12 @@ ssh_host_keys:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
         - "AABBBC7zY9uk7Nt4SgXT/AMNH4cOme5ymSLsuWrc8kYlAhqSNNkoha2LZsHGl9UTY0QH"
         - "kmgmvFFlJFZZQ34dOqug3xA="
+
+    app:
+
+      a-4:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBIwa32ySrZDlBh92kcOcG45sMTfv/WESz4UybgrYai2Z+TLnuEiK0FDryrdf9iiQ"
+        - "JMKbvJYzP7u8q7XdCuaWTas="
 
 # ex: et ts=2 filetype=yaml

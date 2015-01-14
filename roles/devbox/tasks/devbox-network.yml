@@ -7,7 +7,6 @@
     dest: "/etc/hosts"
   sudo: "yes"
   sudo_user: "root"
-  notify: "restart dnsmasq"
 
 - name: "create firewall rules"
   action:
