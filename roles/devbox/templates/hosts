@@ -27,7 +27,12 @@
 {{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}.{{ other_deployment.private_domain }}
 {% endfor %}
 
-{% for subdomain in [ 'api' ] %}
+{% for host_name in groups ['load-node'] %}
+{% set host = hostvars [host_name] %}
+{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ other_deployment.private_domain }}
+{% endfor %}
+
+{% for subdomain in [ 'api', 'www' ] %}
 {% for host_name in groups ['load-node'] %}
 {% set host = hostvars [host_name] %}
 {{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ subdomain }}.{{ other_deployment.private_domain }}

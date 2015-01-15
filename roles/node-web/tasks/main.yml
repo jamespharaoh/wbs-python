@@ -47,6 +47,7 @@
   changed_when: "deploy_output.stdout != ''"
   with_items:
     - "wistla-web"
+  tags: "quick"
 
 - name: "create web init config"
   action:

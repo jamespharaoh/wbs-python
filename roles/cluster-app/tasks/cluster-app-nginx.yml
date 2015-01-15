@@ -49,6 +49,15 @@
   with_items: "app_certificates"
   notify: "restart nginx"
 
-- meta: flush_handlers
+- name: "write nginx htpasswd"
+  action:
+    module: "copy"
+    src: "security/htpasswd"
+    dest: "/etc/nginx/htpasswd"
+    mode: "0640"
+    group: "www-data"
+  sudo: "yes"
+
+- meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml

@@ -72,4 +72,6 @@
     mode: "0755"
   sudo: "yes"
 
+- meta: "flush_handlers"
+
 # ex: et ts=2 filetype=yaml

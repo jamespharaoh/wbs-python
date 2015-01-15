@@ -17,4 +17,6 @@
     src: "/etc/network/firewall-rules"
   sudo: "yes"
 
+- meta: "flush_handlers"
+
 # ex: et ts=2 filetype=yaml
