@@ -17,11 +17,27 @@ github.com {{ ssh_host_keys.general.github | join }}
 {%- endfor %}
 
 {% if cluster_name != 'ops' %}
-cluster-app-a-4.{{ cluster.cluster_domain }} {{ ssh_host_keys [cluster_name].app ['a-4'] | join }}
+	{%- print
+		[
+			'cluster-app-a-4.' + cluster.cluster_domain,
+			cluster.cluster_net + '.' + cluster_subnets.app.a + '.4',
+		] | join (','),
+		' ',
+		ssh_host_keys [cluster_name].app ['a-4'] | join,
+		'\n'
+	-%}
 {% endif %}
 
 {% if cluster_name == 'ops' %}
-jenkins-a.{{ cluster.cluster_domain }} {{ ssh_host_keys [cluster_name].jenkins.a | join }}
+	{%- print
+		[
+			'jenkins-a.' + cluster.cluster_domain,
+			cluster.cluster_net + '.' + cluster_subnets.jenkins.a + '.4',
+		] | join (','),
+		' ',
+		ssh_host_keys [cluster_name].jenkins.a | join,
+		'\n'
+	-%}
 {% endif %}
 
 {% endfor %}

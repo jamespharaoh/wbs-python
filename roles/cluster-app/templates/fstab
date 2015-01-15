@@ -1,0 +1,2 @@
+/dev/xvda1    /             ext4    errors=remount-ro    0 0
+/btrfs-image  /var/lib/lxc  btrfs   defaults             0 1

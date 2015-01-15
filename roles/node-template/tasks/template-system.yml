@@ -19,6 +19,15 @@
 
 - include_vars: "data/ssh-host-keys"
 
+- name: "remove system packages"
+  action:
+    module: "apt"
+    state: "absent"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "global_remove_packages"
+
 - name: "create apt sources.list"
   action:
     module: "template"
@@ -83,15 +92,6 @@
   sudo: "yes"
   sudo_user: "root"
   with_items: "global_install_packages"
-
-- name: "remove system packages"
-  action:
-    module: "apt"
-    state: "absent"
-    name: "{{ item }}"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "global_remove_packages"
 
 - name: "install ssh known hosts"
   action:

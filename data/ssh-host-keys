@@ -87,7 +87,7 @@ ssh_host_keys:
 
       a-4:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBIwa32ySrZDlBh92kcOcG45sMTfv/WESz4UybgrYai2Z+TLnuEiK0FDryrdf9iiQ"
-        - "JMKbvJYzP7u8q7XdCuaWTas="
+        - "AABBBJAmFj5GlJUXnr5EnXsoCuwIUvHjynO9zHSmo6r1MXWCF4W1QaWHbfT4JTl9LMXK"
+        - "2p7PAes0MBYOEVeGl2GNCb8="
 
 # ex: et ts=2 filetype=yaml

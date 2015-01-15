@@ -1,35 +1,17 @@
 ---
 
 - include: "devbox-system.yml"
-
 - include: "devbox-btrfs.yml"
-
 - include: "devbox-network.yml"
-
 - include: "devbox-postfix.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-ssh.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-nfs.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-samba.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-dns.yml"
-
 - include: "devbox-fuse.yml"
-
 - include: "devbox-openvpn.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-tools.yml"
-  when: "inventory_hostname == 'vagrant'"
-
 - include: "devbox-user.yml"
-
 - include: "devbox-wistla.yml"
 
 # ex: et ts=2 filetype=yaml

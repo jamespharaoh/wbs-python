@@ -4,15 +4,39 @@ cluster_type: "app"
 
 cluster_app_install_packages:
 
+  - "btrfs-tools"
+  - "colordiff"
   - "git"
+  - "graphicsmagick"
+  - "imagemagick"
+  - "libav-tools"
   - "lxc"
+  - "mailutils"
+  - "mongodb-clients"
   - "nginx"
   - "ngrep"
+  - "nodejs"
+  - "npm"
   - "ntp"
   - "openvpn"
+  - "python-boto"
+  - "python-dev"
+  - "python-httplib2"
+  - "python-jinja2"
+  - "python-paramiko"
+  - "python-pip"
+  - "python-yaml"
   - "whois"
 
 cluster_app_remove_packages: []
+
+cluster_app_install_python:
+
+  - "awscli"
+
+cluster_app_install_node:
+
+  - "node-inspector"
 
 vagrant_user: "ubuntu"
 vagrant_home: "/home/ubuntu"

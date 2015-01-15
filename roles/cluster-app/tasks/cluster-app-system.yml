@@ -1,5 +1,48 @@
 ---
 
+- stat:
+    path: "/etc/first-run-flag"
+  sudo: "yes"
+  register: "first_run_flag"
+
+- name: "upgrade system packages"
+  action:
+    module: "apt"
+    update_cache: "yes"
+    upgrade: "dist"
+  sudo: "yes"
+  when: "not first_run_flag.stat.exists"
+
+- file:
+    path: "/etc/first-run-flag"
+    state: "touch"
+  sudo: "yes"
+  when: "not first_run_flag.stat.exists"
+
+- name: "create common groups"
+  action:
+    module: "group"
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+    system: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "common_users"
+
+- name: "create common users"
+  action:
+    module: "user"
+    name: "{{ item.name }}"
+    group: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    home: "{{ item.home }}"
+    createhome: "no"
+    shell: "{{ item.shell }}"
+    system: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "common_users"
+
 - name: "remove system packages"
   action:
     module: "apt"
@@ -9,7 +52,6 @@
   sudo: "yes"
   sudo_user: "root"
   with_items: "cluster_app_remove_packages"
-  tags: "update"
 
 - name: "install system packages"
   action:
@@ -19,4 +61,41 @@
   sudo: "yes"
   sudo_user: "root"
   with_items: "cluster_app_install_packages"
+
+- name: "setup sudo"
+  action:
+    module: "template"
+    src: "sudoers-ssh-agent"
+    dest: "/etc/sudoers.d/ssh-agent"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "make node command work"
+  action:
+    module: "alternatives"
+    link: "/usr/bin/node"
+    name: "node"
+    path: "/usr/bin/nodejs"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "install python packages"
+  action:
+    module: "pip"
+    name: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "cluster_app_install_python"
   tags: "update"
+
+- name: "install node packages"
+  action:
+    module: "npm"
+    name: "{{ item }}"
+    global: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "cluster_app_install_node"
+  tags: "update"
+
+# ex: et ts=2 filetype=yaml

@@ -5,6 +5,8 @@
 - include: "cluster-app-create.yml"
 
 - include: "cluster-app-system.yml"
+- include: "cluster-app-btrfs.yml"
+- include: "cluster-app-network.yml"
 - include: "cluster-common-postfix.yml"
 - include: "cluster-app-nginx.yml"
 - include: "cluster-app-activate.yml"
