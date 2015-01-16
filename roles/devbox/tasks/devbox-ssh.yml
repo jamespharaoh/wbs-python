@@ -7,6 +7,9 @@
     module: "template"
     src: "ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
+    owner: "root"
+    group: "root"
+    mode: "0644"
   sudo: "yes"
   sudo_user: "root"
 
