@@ -1,4 +1,5 @@
-var config = require('./config.global');
+var ROOT = process.env.HOME+ '/wistla-web';
+var config = require(ROOT + '/config/config.global');
 
 // mailchimp
 config.mailchimp = {
