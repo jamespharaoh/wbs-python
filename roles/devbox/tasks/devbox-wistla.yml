@@ -61,6 +61,11 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
 
+- set_fact:
+    mailchimp_accounts:
+      production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
+      test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
+
 - name: "create config directories"
   action:
     module: "file"
