@@ -1,0 +1,39 @@
+var ROOT = process.env.HOME+ '/wistla-api';
+var config = require(ROOT + '/config/config.global');
+
+// public url used for general access and urls returned by api
+config.apiUrl = 'https://api.{{ deployment_public_domain }}';
+
+// test url which works locally
+config.testUrl = 'http://api.{{ deployment_private_domain }}';
+
+// Database.
+config.dbUrl = 'mongodb://mongo-0:27017/wistla';
+
+{% if use_s3 == 'yes' %}
+
+// amazon s3 blob storage
+config.blobMode = 'amazon';
+config.blobAmazon = {
+	accessKey: '{{ amazon_accounts.test.access_key }}',
+	secretKey: '{{ amazon_accounts.test.secret_key }}',
+	bucketName: 'wistla-dev',
+	bucketPrefix: '/{{ deployment }}/blobs'
+};
+
+{% else %}
+
+// local blob storage
+config.blobMode = 'local';
+
+{% endif %}
+
+// mailchimp
+config.mailchimp = {
+	listId: '{{ deployment_mailchimp_account.unique_id }}',
+	apiKey: '{{ deployment_mailchimp_account.api_key }}',
+};
+
+module.exports = config;
+
+// ex: noet ts=4 filetype=javascript

@@ -8,4 +8,8 @@ vagrant_home: "/home/vagrant"
 vagrant_deployments:
   - "{{ deployment }}"
 
+mailchimp_accounts:
+  production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
+  test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
+
 # ex: et ts=2 filetype=yaml
