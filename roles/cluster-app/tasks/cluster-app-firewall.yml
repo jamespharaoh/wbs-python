@@ -1,0 +1,22 @@
+---
+
+- name: "create firewall rules"
+  action:
+    module: "template"
+    src: "cluster-app-firewall-rules"
+    dest: "/etc/network/firewall-rules"
+    mode: "0755"
+  sudo: "yes"
+  notify: "reload firewall rules"
+
+- name: "run firewall rules on if-up"
+  action:
+    module: "file"
+    state: "link"
+    path: "/etc/network/if-up.d/firewall-rules"
+    src: "/etc/network/firewall-rules"
+  sudo: "yes"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

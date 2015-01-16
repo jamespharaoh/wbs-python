@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# nat postrouting
+
+iptables \
+	--table nat \
+	--flush POSTROUTING
+
+iptables \
+	--table nat \
+	--policy POSTROUTING ACCEPT
+
+{% for cluster_deployment_name in cluster_deployment_names %}
+{% set cluster_deployment = deployments [cluster_deployment_name] %}
+
+iptables \
+	--table nat \
+	--append POSTROUTING \
+	--source {{ cluster_deployment.bridge_network }}/16 \
+	! --destination {{ cluster_deployment.bridge_network }}/16 \
+	--jump MASQUERADE
+
+{% endfor %}
+
+# ex: noet ts=4 filetype=bash
