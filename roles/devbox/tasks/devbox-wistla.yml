@@ -83,8 +83,12 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
   with_items:
+
     - src: "devbox-wistla-api-config"
       dest: "{{ vagrant_home }}/config/api/config.local.js"
+
+    - src: "devbox-wistla-web-config"
+      dest: "{{ vagrant_home }}/config/web/config.local.js"
 
 - name: "create links to config files"
   action:
@@ -96,7 +100,11 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
   with_items:
-    - src: "../../config/wistla-api/config.local.js"
+
+    - src: "../../config/api/config.local.js"
       dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
+
+    - src: "../../config/web/config.local.js"
+      dest: "{{ vagrant_home }}/wistla-web/config/config.local.js"
 
 # ex: et ts=2 filetype=yaml

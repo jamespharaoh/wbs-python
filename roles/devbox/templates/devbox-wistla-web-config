@@ -1,0 +1,11 @@
+var config = require('./config.global');
+
+// mailchimp
+config.mailchimp = {
+	listId: '{{ deployment_mailchimp_account.unique_id }}',
+	apiKey: '{{ deployment_mailchimp_account.api_key }}',
+};
+
+module.exports = config;
+
+// ex: noet ts=4 filetype=javascript

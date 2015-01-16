@@ -58,4 +58,12 @@
   sudo_user: "root"
   notify: "reload upstart config"
 
+- name: "create wistla web config"
+  action:
+    module: "file"
+    path: "/home/ubuntu/wistla-web/config/config.local.js"
+    state: "link"
+    src: "/config/config.local.js"
+    force: "yes"
+
 # ex: et ts=2 filetype=yaml
