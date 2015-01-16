@@ -55,6 +55,13 @@ deployment_private_domain: "{{ deployments [deployment].public_domain }}"
 deployment_bridge_name: "{{ deployments [deployment].bridge_name }}"
 deployment_bridge_network: "{{ deployments [deployment].bridge_network }}"
 
+mailchimp_accounts:
+  production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
+  test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
+
+deployment_mailchimp_account_name: "{{ deployments [deployment].mailchimp_account }}"
+deployment_mailchimp_account: "{{ mailchimp_accounts [deployment_mailchimp_account_name] }}"
+
 dev_deployment_names:
 
   - "berk"

@@ -61,12 +61,42 @@
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
 
-- name: "create api config"
+- name: "create config directories"
   action:
-    module: "template"
-    src: "devbox-wistla-api-config"
-    dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
+    module: "file"
+    path: "{{ item }}"
+    state: "directory"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
+  with_items:
+    - "{{ vagrant_home }}/config"
+    - "{{ vagrant_home }}/config/api"
+    - "{{ vagrant_home }}/config/load"
+    - "{{ vagrant_home }}/config/mongo"
+    - "{{ vagrant_home }}/config/web"
+
+- name: "create config files"
+  action:
+    module: "template"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items:
+    - src: "devbox-wistla-api-config"
+      dest: "{{ vagrant_home }}/config/api/config.local.js"
+
+- name: "create links to config files"
+  action:
+    module: "file"
+    path: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    state: "link"
+    force: "yes"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items:
+    - src: "../../config/wistla-api/config.local.js"
+      dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
 
 # ex: et ts=2 filetype=yaml

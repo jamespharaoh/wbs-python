@@ -1,0 +1,12 @@
+---
+
+- name: "create config dir"
+  action:
+    module: "file"
+    path: "/config"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+# ex: et ts=2 filetype=yaml

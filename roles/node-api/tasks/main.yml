@@ -6,7 +6,6 @@
     state: "present"
     name: "{{ item }}"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "api_install_packages"
 
 - name: "make node command work"
@@ -16,7 +15,6 @@
     name: "node"
     path: "/usr/bin/nodejs"
   sudo: "yes"
-  sudo_user: "root"
 
 - name: "install node packages"
   action:
@@ -24,7 +22,6 @@
     name: "{{ item }}"
     global: "yes"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "api_install_node"
   tags: "update"
 
@@ -58,15 +55,14 @@
     src: "wistla-api-init-conf"
     dest: "/etc/init/wistla-api.conf"
   sudo: "yes"
-  sudo_user: "root"
   notify: "reload upstart config"
 
 - name: "create wistla api config"
   action:
-    module: "template"
-    src: "wistla-api-local-config"
-    dest: "/home/ubuntu/wistla-api/config/config.local.js"
-  sudo: "yes"
-  sudo_user: "root"
+    module: "file"
+    path: "/home/ubuntu/wistla-api/config/config.local.js"
+    state: "link"
+    src: "/config/config.local.js"
+    force: "yes"
 
 # ex: et ts=2 filetype=yaml

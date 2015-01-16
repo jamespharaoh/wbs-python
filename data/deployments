@@ -6,6 +6,7 @@ production-a:
   private_domain: "a.wistla.com"
   bridge_name: "br148"
   bridge_network: "10.148"
+  mailchimp_account: "production"
 
 production-b:
 
@@ -13,6 +14,7 @@ production-b:
   private_domain: "b.wistla.com"
   bridge_name: "br149"
   bridge_network: "10.149"
+  mailchimp_account: "production"
 
 staging-a:
 
@@ -20,6 +22,7 @@ staging-a:
   private_domain: "a.staging.wistla.com"
   bridge_name: "br155"
   bridge_network: "10.155"
+  mailchimp_account: "production"
 
 staging-b:
 
@@ -27,6 +30,7 @@ staging-b:
   private_domain: "b.staging.wistla.com"
   bridge_name: "br156"
   bridge_network: "10.156"
+  mailchimp_account: "production"
 
 dev:
 
@@ -34,6 +38,7 @@ dev:
   private_domain: "dev.wistla.com"
   bridge_name: "br152"
   bridge_network: "10.152"
+  mailchimp_account: "test"
 
 berk:
 
@@ -41,6 +46,7 @@ berk:
   private_domain: "berk.wistla.com"
   bridge_name: "br150"
   bridge_network: "10.150"
+  mailchimp_account: "test"
 
 bruce:
 
@@ -48,6 +54,7 @@ bruce:
   private_domain: "bruce.wistla.com"
   bridge_name: "br154"
   bridge_network: "10.154"
+  mailchimp_account: "test"
 
 mrbenn:
 
@@ -55,6 +62,7 @@ mrbenn:
   private_domain: "mrbenn.wistla.com"
   bridge_name: "br151"
   bridge_network: "10.151"
+  mailchimp_account: "test"
 
 7-zark-7:
 
@@ -62,5 +70,6 @@ mrbenn:
   private_domain: "7-zark-7.wistla.com"
   bridge_name: "br153"
   bridge_network: "10.153"
+  mailchimp_account: "test"
 
 # ex: et ts=2 filetype=yaml
