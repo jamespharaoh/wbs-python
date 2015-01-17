@@ -18,6 +18,15 @@
   sudo_user: "root"
   notify: "reload firewall rules"
 
+- name: "activate firewall rules automatically"
+  action:
+    module: "file"
+    path: "/etc/network/if-up.d/firewall-rules"
+    state: "link"
+    src: "../firewall-rules"
+  sudo: "yes"
+  sudo_user: "root"
+
 - name: "create bridge network interface"
   action:
     module: "template"

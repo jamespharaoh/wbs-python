@@ -16,7 +16,20 @@ iptables \
 	--table nat \
 	--append POSTROUTING \
 	--source {{ deployment_bridge_network }}/16 \
-	! --destination {{ deployment_bridge_network }}/16 \
+	--destination 172.16/12 \
+	--jump ACCEPT
+
+iptables \
+	--table nat \
+	--append POSTROUTING \
+	--source {{ deployment_bridge_network }}/16 \
+	--destination 10/8 \
+	--jump ACCEPT
+
+iptables \
+	--table nat \
+	--append POSTROUTING \
+	--source {{ deployment_bridge_network }}/16 \
 	--jump MASQUERADE
 
 # ex: noet ts=4 filetype=bash
