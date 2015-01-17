@@ -25,7 +25,6 @@
     state: "absent"
     name: "{{ item }}"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "global_remove_packages"
 
 - name: "create apt sources.list"
@@ -34,7 +33,6 @@
     src: "template-apt-sources-list"
     dest: "/etc/apt/sources.list"
   sudo: "yes"
-  sudo_user: "root"
 
 - name: "create hosts file"
   action:
@@ -42,7 +40,6 @@
     src: "template-hosts"
     dest: "/etc/hosts"
   sudo: "yes"
-  sudo_user: "root"
 
 - name: "create resolv.conf"
   action:
@@ -50,7 +47,6 @@
     src: "template-resolv-conf"
     dest: "/etc/resolv.conf"
   sudo: "yes"
-  sudo_user: "root"
 
 - name: "create network interfaces"
   action:
@@ -58,7 +54,6 @@
     src: "template-network-interfaces"
     dest: "/etc/network/interfaces"
   sudo: "yes"
-  sudo_user: "root"
 
 - name: "create common groups"
   action:
@@ -67,7 +62,6 @@
     gid: "{{ item.gid }}"
     system: "yes"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "common_users"
 
 - name: "create common users"
@@ -81,7 +75,6 @@
     shell: "{{ item.shell }}"
     system: "yes"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "common_users"
 
 - name: "install system packages"
@@ -90,7 +83,6 @@
     state: "present"
     name: "{{ item }}"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "global_install_packages"
 
 - name: "install ssh known hosts"
@@ -99,6 +91,12 @@
     src: "template-ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
   sudo: "yes"
-  sudo_user: "root"
+
+- name: "configure sysctl"
+  action:
+    module: "template"
+    src: "template-sysctl-conf"
+    dest: "/etc/sysctl.conf"
+  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml

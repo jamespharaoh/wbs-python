@@ -66,4 +66,20 @@
     src: "/config/config.local.js"
     force: "yes"
 
+- name: "install firewall rules"
+  action:
+    module: "template"
+    src: "wistla-web-firewall-rules"
+    dest: "/etc/network/firewall-rules"
+    mode: "0755"
+  sudo: "yes"
+
+- name: "run firewall rules automatically"
+  action:
+    module: "file"
+    path: "/etc/network/if-up.d/firewall-rules"
+    state: "link"
+    src: "../firewall-rules"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml
