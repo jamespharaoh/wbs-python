@@ -27,7 +27,6 @@ inet_interfaces = all
 
 # outbound mail
 
-relayhost = {{ smtp_server }}:25
 smtp_sasl_auth_enable = yes
 smtp_sasl_security_options = noanonymous
 smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
@@ -35,6 +34,8 @@ smtp_use_tls = yes
 smtp_tls_security_level = encrypt
 smtp_tls_note_starttls_offer = yes
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtp_sender_dependent_authentication = yes
+sender_dependent_relayhost_maps = hash:/etc/postfix/relayhost_map
 
 # local mail
 

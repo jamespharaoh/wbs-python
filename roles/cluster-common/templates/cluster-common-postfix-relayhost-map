@@ -1,0 +1,1 @@
+@{{ cluster_domain }} {{ smtp_server }}:25

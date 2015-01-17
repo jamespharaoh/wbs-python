@@ -27,6 +27,24 @@
   sudo: "yes"
   notify: "rehash sasl passwords"
 
+- name: "create postfix relayhost map"
+  action:
+    module: "template"
+    src: "cluster-common-postfix-relayhost-map"
+    dest: "/etc/postfix/relayhost_map"
+    mode: "0644"
+  sudo: "yes"
+  notify: "rehash relayhost map"
+
+- name: "create postfix aliases"
+  action:
+    module: "template"
+    src: "cluster-common-postfix-aliases"
+    dest: "/etc/aliases"
+    mode: "0644"
+  sudo: "yes"
+  notify: "rehash aliases"
+
 - meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml
