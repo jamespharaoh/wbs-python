@@ -32,6 +32,8 @@
   delegate_to: "localhost"
   shell:
 
+    set -e;
+
     rsync
       --archive
       --delete
@@ -40,6 +42,7 @@
       {{ deployment_home }}/{{ item }}/
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
+      --exclude /config/config.local.js;
 
   sudo: "yes"
   sudo_user: "root"
