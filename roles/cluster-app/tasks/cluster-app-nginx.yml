@@ -1,5 +1,12 @@
 ---
 
+- name: "create dev robots.txt"
+  action:
+    module: "template"
+    src: "cluster-app-dev-robots-txt"
+    dest: "/etc/nginx/dev-robots.txt"
+  sudo: "yes"
+
 - name: "create nginx config"
   action:
     module: "template"

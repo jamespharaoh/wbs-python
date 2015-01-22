@@ -84,6 +84,12 @@ http {
 			proxy_set_header Host "{{ cluster_domain }}";
 		}
 
+{% if cluster != 'production' %}
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+{% endif %}
+
 	}
 
 	# api
@@ -101,6 +107,10 @@ http {
 		location / {
 			proxy_pass http://temp;
 			proxy_set_header Host "api.{{ cluster_domain }}";
+		}
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
 		}
 
 	}
