@@ -4,7 +4,7 @@
   action:
     module: "template"
     src: "{{ item.src }}"
-    dest: "/etc/icinga2/{{ item.dest }}"
+    dest: "/opt/icinga2/etc/icinga2/{{ item.dest }}"
   sudo: "yes"
   with_items:
 
@@ -24,7 +24,7 @@
   action:
     module: "copy"
     src: "security/icinga/{{ item.src }}"
-    dest: "/etc/icinga2/pki/{{ item.dest }}"
+    dest: "/opt/icinga2/etc/icinga2/pki/{{ item.dest }}"
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
@@ -46,17 +46,19 @@
     - src: "{{ icinga_name }}.key"
       dest: "{{ icinga_name }}.key"
       owner: "root"
-      group: "nagios"
+      group: "icinga"
       mode: "0640"
 
   notify: "restart icinga"
 
-- name: "create icinga defaults"
+- name: "create icinga upstart config"
   action:
     module: "template"
-    src: "icinga-default"
-    dest: "/etc/default/icinga2"
+    src: "icinga-upstart"
+    dest: "/etc/init/icinga2.conf"
   sudo: "yes"
-  notify: "restart icinga"
+  notify: [ "reload initctl", "restart icinga" ]
+
+- meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml

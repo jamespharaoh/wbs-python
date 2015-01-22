@@ -3,7 +3,7 @@
 - name: "create icinga zone directories"
   action:
     module: "file"
-    path: "/etc/icinga2/zones.d/{{ item }}"
+    path: "/opt/icinga2/etc/icinga2/zones.d/{{ item }}"
     state: "directory"
   sudo: "yes"
   with_items:
@@ -16,7 +16,7 @@
   action:
     module: "template"
     src: "{{ item [1].src }}"
-    dest: "/etc/icinga2/zones.d/wistla-{{ item [0] }}/{{ item [1].dest }}"
+    dest: "/opt/icinga2/etc/icinga2/zones.d/wistla-{{ item [0] }}/{{ item [1].dest }}"
   sudo: "yes"
   with_nested:
 
@@ -32,7 +32,7 @@
   action:
     module: "template"
     src: "{{ item.src }}"
-    dest: "/etc/icinga2/zones.d/global-templates/{{ item.dest }}"
+    dest: "/opt/icinga2/etc/icinga2/zones.d/global-templates/{{ item.dest }}"
   sudo: "yes"
   with_items:
 

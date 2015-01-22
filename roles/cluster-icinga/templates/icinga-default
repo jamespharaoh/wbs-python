@@ -1,5 +1,0 @@
-DAEMON_CONFIG="/etc/icinga2/icinga2.conf"
-DAEMON_USER="nagios"
-DAEMON_GROUP="nagios"
-DAEMON_CMDGROUP="www-data"
-DAEMON_ARGS="-e /var/log/icinga2/icinga2.err"

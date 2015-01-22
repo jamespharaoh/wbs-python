@@ -1,0 +1,14 @@
+description "icinga2 monitoring daemon"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+script
+
+	exec >> /opt/icinga2/var/log/icinga2/startup.log
+	exec 2>&1
+
+	exec /opt/icinga2/sbin/icinga2 daemon \
+		-e /opt/icinga2/var/log/icinga2/icinga2.err;
+
+end script

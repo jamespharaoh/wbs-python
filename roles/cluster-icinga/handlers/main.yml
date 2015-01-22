@@ -1,8 +1,11 @@
 ---
 
+- name: "reload initctl"
+  shell: "initctl reload-configuration"
+  sudo: "yes"
+
 - name: "restart icinga"
-  action:
-    module: "service"
+  service:
     name: "icinga2"
     state: "restarted"
   sudo: "yes"

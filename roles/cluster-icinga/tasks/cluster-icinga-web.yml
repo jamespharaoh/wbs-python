@@ -1,38 +1,49 @@
 ---
 
-- name: "install icinga web packages"
+#- name: "install icinga web packages"
+#  action:
+#    module: "apt"
+#    package: "{{ item }}"
+#  sudo: "yes"
+#  with_items:
+#    - "icinga2-classicui"
+
+- name: "create icinga cgi dirs"
   action:
-    module: "apt"
-    package: "{{ item }}"
+    module: "file"
+    path: "{{ item.path }}"
+    state: "directory"
+    owner: "{{ item.owner | default ('root') }}"
+    group: "{{ item.group | default ('root') }}"
+    mode: "{{ item.mode | default ('0755') }}"
   sudo: "yes"
   with_items:
-    - "icinga2-classicui"
 
-- name: "install icinga htpasswd"
-  action:
-    module: "template"
-    src: "icinga-htpasswd"
-    dest: "/etc/icinga2-classicui/htpasswd.users"
-    owner: "root"
-    group: "www-data"
-    mode: "0640"
-  sudo: "yes"
+    - path: "/opt/icinga/var/log"
+      owner: "www-data"
+      group: "adm"
+      mode: "0750"
+
+    - path: "/opt/icinga2/etc/icinga2-classicui"
 
 - name: "install icinga cgi config"
   action:
     module: "template"
-    src: "icinga-classicui-cgi"
-    dest: "/etc/icinga2-classicui/cgi.cfg"
+    src: "{{ item.template }}"
+    dest: "{{ item.target }}"
+    owner: "{{ item.owner | default ('root') }}"
+    group: "{{ item.group | default ('root') }}"
+    mode: "{{ item.mode | default ('0644') }}"
   sudo: "yes"
+  with_items:
 
-- name: "create icinga gui log dir"
-  action:
-    module: "file"
-    path: "/var/log/icinga2/gui"
-    state: "directory"
-    owner: "www-data"
-    group: "adm"
-    mode: "0750"
-  sudo: "yes"
+    - template: "icinga-classicui-cgi"
+      target: "/opt/icinga2/etc/icinga2-classicui/cgi.cfg"
+
+    - template: "icinga-htpasswd"
+      target: "/opt/icinga2/etc/icinga2-classicui/htpasswd.users"
+      owner: "root"
+      group: "www-data"
+      mode: "0640"
 
 # ex: et ts=2 filetype=yaml

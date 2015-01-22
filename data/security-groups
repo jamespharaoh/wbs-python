@@ -87,6 +87,16 @@ amazon_security_groups:
         from_port: "443"
         to_port: "443"
 
+      - proto: "tcp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "80"
+        to_port: "80"
+
+      - proto: "tcp"
+        cidr_ip: "0.0.0.0/0"
+        from_port: "443"
+        to_port: "443"
+
   - name: "app"
     rules:
 

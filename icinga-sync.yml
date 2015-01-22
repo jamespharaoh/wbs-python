@@ -14,7 +14,7 @@
     - name: "fetch state from master"
       action:
         module: "fetch"
-        src: "/var/lib/icinga2/icinga2.state"
+        src: "/opt/icinga2/var/lib/icinga2/icinga2.state"
         dest: "{{ deployment_home }}/work/{{ cluster }}/icinga-state"
         flat: "yes"
       sudo: "yes"
@@ -24,9 +24,9 @@
       action:
         module: "copy"
         src: "{{ deployment_home }}/work/{{ cluster }}/icinga-state"
-        dest: "/var/lib/icinga2/icinga2.state"
-        owner: "nagios"
-        group: "nagios"
+        dest: "/opt/icinga2/var/lib/icinga2/icinga2.state"
+        owner: "icinga"
+        group: "icinga"
         mode: "0644"
       sudo: "yes"
       when: "cluster == 'ops' and inventory_hostname != 'cluster-admin-a'"
@@ -34,7 +34,7 @@
     - name: "delete zones config dir"
       action:
         module: "file"
-        path: "/etc/icinga2/zones.d"
+        path: "/opt/icinga2/etc/icinga2/zones.d"
         state: "absent"
       sudo: "yes"
       when: "cluster != 'ops' or zon != 'a'"
@@ -42,7 +42,7 @@
     - name: "recreate zones config dir"
       action:
         module: "file"
-        path: "/etc/icinga2/zones.d"
+        path: "/opt/icinga2/etc/icinga2/zones.d"
         state: "directory"
       sudo: "yes"
       when: "cluster != 'ops' or zon != 'a'"
@@ -50,7 +50,7 @@
     - name: "delete lib dirs"
       action:
         module: "file"
-        path: "/var/lib/icinga2/api/{{ item }}"
+        path: "/opt/icinga2/var/lib/icinga2/api/{{ item }}"
         state: "absent"
       sudo: "yes"
       with_items:
@@ -61,10 +61,10 @@
     - name: "recreate lib dirs"
       action:
         module: "file"
-        path: "/var/lib/icinga2/api/{{ item }}"
+        path: "/opt/icinga2/var/lib/icinga2/api/{{ item }}"
         state: "directory"
-        owner: "nagios"
-        group: "nagios"
+        owner: "icinga"
+        group: "icinga"
         mode: "0750"
       sudo: "yes"
       with_items:
@@ -75,7 +75,7 @@
     - name: "delete logs"
       action:
         module: "file"
-        path: "/var/log/icinga2/{{ item }}"
+        path: "/opt/icinga2/var/log/icinga2/{{ item }}"
         state: "absent"
       sudo: "yes"
       with_items:
@@ -88,7 +88,7 @@
     - name: "delete cache"
       action:
         module: "file"
-        path: "/var/cache/icinga2/{{ item }}"
+        path: "/opt/icinga2/var/cache/icinga2/{{ item }}"
         state: "absent"
       sudo: "yes"
       with_items:

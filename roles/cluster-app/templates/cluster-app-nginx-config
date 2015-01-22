@@ -31,19 +31,19 @@ http {
 		server {{ cluster_active_deployment.bridge_network }}.5.2;
 	}
 
-	# website redirect www to naked domain
+	# website redirect naked domain to www
 
 	server {
 
 		listen 80;
 		listen 443 ssl;
 
-		server_name www.{{ cluster_domain }};
+		server_name {{ cluster_domain }};
 
 		ssl_certificate /etc/nginx/ssl/{{ cluster_domain }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/{{ cluster_domain }}.key;
 
-		return 301 https://{{ cluster_domain }}$request_uri;
+		return 301 https://www.{{ cluster_domain }}$request_uri;
 
 	}
 
@@ -53,9 +53,9 @@ http {
 
 		listen 80;
 
-		server_name {{ cluster_domain }};
+		server_name www.{{ cluster_domain }};
 
-		return 301 https://{{ cluster_domain }}$request_uri;
+		return 301 https://www.{{ cluster_domain }}$request_uri;
 
 	}
 
@@ -65,7 +65,7 @@ http {
 
 		listen 443 ssl;
 
-		server_name {{ cluster_domain }};
+		server_name www.{{ cluster_domain }};
 
 		ssl_certificate /etc/nginx/ssl/{{ cluster_domain }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/{{ cluster_domain }}.key;

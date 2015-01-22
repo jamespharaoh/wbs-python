@@ -28,4 +28,7 @@ amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
 smtp_server: "{{ clusters [cluster].smtp_server }}"
 
+cluster_mailchimp_account_name: "{{ deployments [cluster_active_deployment_name].mailchimp_account }}"
+cluster_mailchimp_account: "{{ mailchimp_accounts [cluster_mailchimp_account_name] }}"
+
 # ex: et ts=2 filetype=yaml
