@@ -29,7 +29,11 @@ http {
 {% for dev_deployment_name in dev_deployment_names %}
 {% set dev_deployment = deployments [dev_deployment_name] %}
 
-	upstream {{ dev_deployment_name }} {
+	upstream {{ dev_deployment_name }}-host {
+		server {{ dev_deployment.bridge_network }}.1.1;
+	}
+
+	upstream {{ dev_deployment_name }}-load {
 		server {{ dev_deployment.bridge_network }}.5.0;
 		server {{ dev_deployment.bridge_network }}.5.1;
 		server {{ dev_deployment.bridge_network }}.5.2;
@@ -81,14 +85,14 @@ http {
 		}
 
 		location / {
-			proxy_pass http://{{ dev_deployment_name }}/;
+			proxy_pass http://{{ dev_deployment_name }}-load/;
 			proxy_set_header Host $host;
 		}
 
 		location /keystone {
 			auth_basic "Restricted";
 			auth_basic_user_file /etc/nginx/htpasswd;
-			proxy_pass http://{{ dev_deployment_name }}/keystone;
+			proxy_pass http://{{ dev_deployment_name }}-load/keystone;
 			proxy_set_header Host $host;
 		}
 
@@ -111,7 +115,26 @@ http {
 		}
 
 		location / {
-			proxy_pass http://{{ dev_deployment_name }}/;
+			proxy_pass http://{{ dev_deployment_name }}-load/;
+			proxy_set_header Host $host;
+		}
+
+	}
+
+	# test
+
+	server {
+
+		listen 80;
+
+		server_name test.{{ dev_deployment.private_domain }};
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+		location / {
+			proxy_pass http://{{ dev_deployment_name }}-host/;
 			proxy_set_header Host $host;
 		}
 
