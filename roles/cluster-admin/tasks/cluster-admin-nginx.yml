@@ -30,8 +30,9 @@
   sudo: "yes"
   with_nested:
     - "dev_deployment_names"
-    - - "api."
-      - ""
+    - - ""
+      - "api."
+      - "test."
   notify: "restart nginx"
 
 - name: "write nginx private keys"
@@ -43,8 +44,9 @@
   sudo: "yes"
   with_nested:
     - "dev_deployment_names"
-    - - "api."
-      - ""
+    - - ""
+      - "api."
+      - "test."
   notify: "restart nginx"
 
 - name: "write nginx htpasswd"

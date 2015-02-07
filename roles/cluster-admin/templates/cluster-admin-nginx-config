@@ -26,6 +26,8 @@ http {
 	include /etc/nginx/conf.d/*.conf;
 	include /etc/nginx/sites-enabled/*;
 
+{% if cluster == 'ops' %}
+
 {% for dev_deployment_name in dev_deployment_names %}
 {% set dev_deployment = deployments [dev_deployment_name] %}
 
@@ -126,6 +128,10 @@ http {
 	server {
 
 		listen 80;
+		listen 443 ssl;
+
+		ssl_certificate /etc/nginx/ssl/test.{{ dev_deployment.private_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/test.{{ dev_deployment.private_domain }}.key;
 
 		server_name test.{{ dev_deployment.private_domain }};
 
@@ -141,8 +147,6 @@ http {
 	}
 
 {% endfor %}
-
-{% if cluster == 'ops' %}
 
 	server {
 
