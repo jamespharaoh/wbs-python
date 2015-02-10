@@ -37,12 +37,12 @@
     rsync
       --archive
       --delete
-      --checksum
       --itemize-changes
       {{ deployment_home }}/{{ item }}/
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
-      --exclude /config/config.local.js;
+      --exclude /config/config.local.js
+      --exclude /node_modules;
 
   sudo: "yes"
   sudo_user: "root"
@@ -51,6 +51,26 @@
   with_items:
     - "wistla-web"
   tags: "quick"
+
+- name: "deploy projects node modules"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/node_modules/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-web"
 
 - name: "create web init config"
   action:
