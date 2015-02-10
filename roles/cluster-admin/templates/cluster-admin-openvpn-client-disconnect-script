@@ -1,9 +1,11 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 mkdir -p /var/log/openvpn
-exec &> /var/log/openvpn/$common_name.disconnect.log
+exec &>> /var/log/openvpn/$common_name.disconnect.log
+
+echo "----- $(date)"
 
 case "$common_name" in
 
@@ -12,6 +14,8 @@ case "$common_name" in
 ({{ vpn_client.name }})
 
 {% for iroute in vpn_client.iroutes %}
+
+	echo "flush route {{ iroute.network }}/{{ iroute.netbits }}"
 
 	ip route flush \
 		{{ iroute.network }}/{{ iroute.netbits }} \

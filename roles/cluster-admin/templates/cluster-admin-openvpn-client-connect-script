@@ -1,9 +1,11 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 mkdir -p /var/log/openvpn
-exec &> /var/log/openvpn/$common_name.connect.log
+exec &>> /var/log/openvpn/$common_name.connect.log
+
+echo "----- $(date)"
 
 route_tables=(
 	"{{ cluster_routes_admin_a }}"
