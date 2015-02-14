@@ -1,0 +1,23 @@
+---
+
+{% set deployment_name = item.0 %}
+
+deployment_mode: "direct"
+deployment: "{{ deployment_name }}"
+
+debug: "no"
+
+ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
+
+vpns: []
+
+node_count:
+  api: "3"
+  load: "3"
+  mongo: "3"
+  web: "3"
+
+use_s3: "no"
+
+# ex: et ts=2 filetype=yaml

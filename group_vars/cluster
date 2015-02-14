@@ -31,4 +31,18 @@ smtp_server: "{{ clusters [cluster].smtp_server }}"
 cluster_mailchimp_account_name: "{{ deployments [cluster_active_deployment_name].mailchimp_account }}"
 cluster_mailchimp_account: "{{ mailchimp_accounts [cluster_mailchimp_account_name] }}"
 
+cluster_checkouts:
+
+  - name: "wistla-api"
+    branch: "master"
+
+  - name: "wistla-devops"
+    branch: "master"
+
+  - name: "wistla-web"
+    branch: "master"
+
+  - name: "wistla-test-images"
+    branch: "master"
+
 # ex: et ts=2 filetype=yaml

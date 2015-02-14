@@ -5,50 +5,89 @@
       production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
       test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
 
+- name: "create deployment directories"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ item }}"
+    state: "directory"
+  with_items: "cluster_deployment_names"
+
+- name: "checkout projects from git"
+  shell:
+
+    set -e;
+
+    cd {{ vagrant_home }}/{{ item.0 }};
+
+    git clone
+      git@github.com:/wistla/{{ item.1.name }}
+      --branch {{ item.1.branch }};
+
+  args:
+    creates: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.name }}"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_nested:
+    - "cluster_deployment_names"
+    - "cluster_checkouts"
+
 - name: "create config directories"
   action:
     module: "file"
-    path: "{{ item }}"
+    path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
     state: "directory"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
-  with_items:
-    - "{{ vagrant_home }}/config"
-    - "{{ vagrant_home }}/config/api"
-    - "{{ vagrant_home }}/config/load"
-    - "{{ vagrant_home }}/config/mongo"
-    - "{{ vagrant_home }}/config/web"
+  with_nested:
+
+    - "cluster_deployment_names"
+
+    - - "config"
+      - "config/api"
+      - "config/load"
+      - "config/mongo"
+      - "config/web"
 
 - name: "create config files"
   action:
     module: "template"
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ item.1.src }}"
+    dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.dest }}"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
-  with_items:
+  with_nested:
 
-    - src: "cluster-app-wistla-api-config"
-      dest: "{{ vagrant_home }}/config/api/config.local.js"
+    - "cluster_deployment_names"
 
-    - src: "cluster-app-wistla-web-config"
-      dest: "{{ vagrant_home }}/config/web/config.local.js"
+    - - src: "cluster-app-wistla-devops-config"
+        dest: "wistla-devops/config"
+
+      - src: "cluster-app-wistla-devops-accounts"
+        dest: "wistla-devops/accounts"
+
+      - src: "cluster-app-wistla-api-config"
+        dest: "config/api/config.local.js"
+
+      - src: "cluster-app-wistla-web-config"
+        dest: "config/web/config.local.js"
 
 - name: "create links to config files"
   action:
     module: "file"
-    path: "{{ item.dest }}"
-    src: "{{ item.src }}"
+    path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.dest }}"
+    src: "{{ item.1.src }}"
     state: "link"
     force: "yes"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
-  with_items:
+  with_nested:
 
-    - src: "../../config/api/config.local.js"
-      dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
+    - "cluster_deployment_names"
 
-    - src: "../../config/web/config.local.js"
-      dest: "{{ vagrant_home }}/wistla-web/config/config.local.js"
+    - - src: "../../config/api/config.local.js"
+        dest: "wistla-api/config/config.local.js"
+
+      - src: "../../config/web/config.local.js"
+        dest: "wistla-web/config/config.local.js"
 
 # ex: et ts=2 filetype=yaml

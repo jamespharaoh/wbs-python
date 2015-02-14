@@ -3,16 +3,36 @@
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
 
 - include: "cluster-app-create.yml"
+  tags: "cluster-app-create"
 
 - include: "cluster-app-system.yml"
+  tags: "cluster-app-system"
+
 - include: "cluster-app-btrfs.yml"
+  tags: "cluster-app-btrfs"
+
 - include: "cluster-app-network.yml"
+  tags: "cluster-app-network"
+
 - include: "cluster-app-firewall.yml"
+  tags: "cluster-app-firewall"
+
 - include: "cluster-app-dns.yml"
+  tags: "cluster-app-dns"
+
 - include: "cluster-common-postfix.yml"
+  tags: "cluster-common-postfix"
+
 - include: "cluster-app-nginx.yml"
+  tags: "cluster-app-nginx"
+
 - include: "cluster-app-activate.yml"
+  tags: "cluster-app-activate"
+
 - include: "cluster-app-wistla.yml"
+  tags: "cluster-app-wistla"
+
 - include: "cluster-app-cron.yml"
+  tags: "cluster-app-cron"
 
 # ex: et ts=2 filetype=yaml

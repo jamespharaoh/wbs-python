@@ -112,4 +112,13 @@
     - src: "../../config/web/config.local.js"
       dest: "{{ vagrant_home }}/wistla-web/config/config.local.js"
 
+- name: "create deployment name link"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ deployment }}"
+    state: "link"
+    src: "."
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
 # ex: et ts=2 filetype=yaml
