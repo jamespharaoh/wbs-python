@@ -2,7 +2,7 @@
 
 lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
-lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
+lxc.rootfs = /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs
 
 lxc.mount.entry = {{ deployment_home }}/shared shared none bind 0 0
 lxc.mount.entry = {{ deployment_home }}/config/{{ node }} config none bind,ro,remount 0 0

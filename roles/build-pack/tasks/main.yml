@@ -19,7 +19,7 @@
       --create
       --gzip
       --file {{ node }}-{{ build }}.tar.gz.temp
-      --directory /var/lib/lxc/{{ inventory_hostname }}
+      --directory /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}
       rootfs;
 
     chown vagrant:vagrant {{ node }}-{{ build }}.tar.gz.temp;
