@@ -31,7 +31,7 @@
     - "cluster_deployment_names"
     - "cluster_checkouts"
 
-- name: "create config directories"
+- name: "create directories"
   action:
     module: "file"
     path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
@@ -47,6 +47,7 @@
       - "config/load"
       - "config/mongo"
       - "config/web"
+      - "shared"
 
 - name: "create config files"
   action:

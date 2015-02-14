@@ -57,7 +57,7 @@
 - name: "create host data dir"
   action:
     module: "file"
-    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}"
+    path: "{{ deployment_home }}/{{ deployment }}/shared/{{ inventory_hostname }}"
     state: "directory"
   delegate_to: "localhost"
   sudo: "yes"
@@ -66,7 +66,7 @@
 - name: "create host data dirs"
   action:
     module: "file"
-    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}/{{ item.name }}"
+    path: "{{ deployment_home }}/{{ deployment }}/shared/{{ inventory_hostname }}/{{ item.name }}"
     state: "directory"
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
