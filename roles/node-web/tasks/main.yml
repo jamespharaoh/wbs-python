@@ -38,7 +38,7 @@
       --archive
       --delete
       --itemize-changes
-      {{ deployment_home }}/{{ item }}/
+      {{ deployment_home }}/{{ deployment }}/{{ item }}/
       /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
       --exclude /config/config.local.js
@@ -62,7 +62,7 @@
       --archive
       --delete
       --itemize-changes
-      {{ deployment_home }}/{{ item }}/node_modules/
+      {{ deployment_home }}/{{ deployment }}/{{ item }}/node_modules/
       /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
 
   sudo: "yes"

@@ -31,6 +31,15 @@ http {
 		server {{ cluster_active_deployment.bridge_network }}.5.2;
 	}
 
+{% for deployment_name in cluster_deployment_names %}
+{% set deployment = deployments [deployment_name] %}
+	upstream deployment-{{ deployment_name }} {
+		server {{ deployment.bridge_network }}.5.0;
+		server {{ deployment.bridge_network }}.5.1;
+		server {{ deployment.bridge_network }}.5.2;
+	}
+{% endfor %}
+
 	# website redirect naked domain to www
 
 	server {
@@ -73,14 +82,14 @@ http {
 		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
 		location / {
-			proxy_pass http://temp;
+			proxy_pass http://deployment-{{ cluster_active_deployment_name }};
 			proxy_set_header Host "{{ cluster_domain }}";
 		}
 
 		location /keystone {
 			auth_basic "Restricted";
 			auth_basic_user_file /etc/nginx/htpasswd;
-			proxy_pass http://temp/keystone;
+			proxy_pass http://deployment-{{ cluster_active_deployment_name }}/keystone;
 			proxy_set_header Host "{{ cluster_domain }}";
 		}
 
@@ -105,7 +114,7 @@ http {
 		ssl_certificate_key /etc/nginx/ssl/api.{{ cluster_domain }}.key;
 
 		location / {
-			proxy_pass http://temp;
+			proxy_pass http://deployment-{{ cluster_active_deployment_name }};
 			proxy_set_header Host "api.{{ cluster_domain }}";
 		}
 
