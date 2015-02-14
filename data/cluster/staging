@@ -3,7 +3,10 @@
 cluster_net: "10.144"
 cluster_vpn: "10.145"
 
+cluster_short: "stage"
 cluster_domain: "staging.wistla.com"
+
+cluster_colour: "221"
 
 cluster_deployment_names:
   - "staging-a"

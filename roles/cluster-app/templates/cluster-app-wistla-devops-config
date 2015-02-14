@@ -20,4 +20,6 @@ node_count:
 
 use_s3: "no"
 
+instance_idx: "{{ idx }}"
+
 # ex: et ts=2 filetype=yaml

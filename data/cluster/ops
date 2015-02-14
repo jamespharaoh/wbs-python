@@ -3,7 +3,10 @@
 cluster_net: "10.142"
 cluster_vpn: "10.143"
 
+cluster_short: "ops"
 cluster_domain: "ops.wistla.com"
+
+cluster_colour: "207"
 
 amazon_account: "ops"
 amazon_region: "eu-west-1"

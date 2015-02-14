@@ -5,11 +5,11 @@
   roles:
 
     - role: "lxc-clone"
-      when: "idx | int < node_count [node] | int"
+      when: "active == 'yes'"
       tags: "quick"
 
     - role: "lxc-start"
-      when: "idx | int < node_count [node] | int"
+      when: "active == 'yes'"
       tags: "quick"
 
 # ex: et ts=2 filetype=yaml

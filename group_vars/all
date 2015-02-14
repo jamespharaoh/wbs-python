@@ -149,4 +149,11 @@ data_dirs: []
 
 common_users: "{{ lookup ('file', 'data/common-users') | from_yaml }}"
 
+zone_colours:
+  a: "93"
+  b: "99"
+  c: "105"
+
+zone_colour: "{{ zone_colours [zon] }}"
+
 # ex: et ts=2 filetype=yaml

@@ -29,6 +29,9 @@
 - include: "cluster-app-activate.yml"
   tags: "cluster-app-activate"
 
+- include: "cluster-common-user.yml"
+  tags: "cluster-common-user"
+
 - include: "cluster-app-wistla.yml"
   tags: "cluster-app-wistla"
 

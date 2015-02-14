@@ -1,0 +1,19 @@
+---
+
+- name: "create bash profile"
+  action:
+    module: "template"
+    src: "cluster-common-bash-profile"
+    dest: "{{ vagrant_home }}/.bash_profile"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+- name: "create bash rc"
+  action:
+    module: "template"
+    src: "cluster-common-bash-rc"
+    dest: "{{ vagrant_home }}/.bashrc"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+# ex: et ts=2 filetype=yaml

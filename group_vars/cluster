@@ -3,7 +3,10 @@
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
 
+cluster_short: "{{ clusters [cluster].cluster_short }}"
 cluster_domain: "{{ clusters [cluster].cluster_domain }}"
+
+cluster_colour: "{{ clusters [cluster].cluster_colour }}"
 
 cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
 

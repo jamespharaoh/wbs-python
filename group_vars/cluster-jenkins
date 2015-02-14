@@ -1,6 +1,7 @@
 ---
 
 cluster_type: "jenkins"
+cluster_type_colour: "197"
 
 jenkins_install_packages:
 

@@ -1,6 +1,7 @@
 ---
 
 cluster_type: "app"
+cluster_type_colour: "202"
 
 cluster_app_install_packages:
 
@@ -43,6 +44,7 @@ vagrant_home: "/home/ubuntu"
 
 vagrant_deployments: "{{ cluster_deployment_names }}"
 
-icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}-{{ idx }}"
+icinga_name: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
+hostname: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
 
 # ex: et ts=2 filetype=yaml

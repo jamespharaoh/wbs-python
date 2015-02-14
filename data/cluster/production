@@ -3,13 +3,16 @@
 cluster_net: "10.140"
 cluster_vpn: "10.141"
 
+cluster_short: "prod"
 cluster_domain: "wistla.com"
+
+cluster_colour: "27"
 
 cluster_deployment_names:
   - "production-a"
   - "production-b"
 
-cluster_active_deployment_name: "production-a"
+cluster_active_deployment_name: "production-b"
 
 cluster_cron_email: "cron.production@wistla.com"
 

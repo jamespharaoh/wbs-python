@@ -36,6 +36,8 @@ mongo-node
 mongo-0        grp=2 idx=0   hw=00:16:b7:4c:6d:4e
 mongo-1        grp=2 idx=1   hw=00:16:f2:5d:5a:a4
 mongo-2        grp=2 idx=2   hw=00:16:21:d4:17:31
+mongo-3        grp=2 idx=3   hw=00:16:92:46:fe:31
+mongo-4        grp=2 idx=4   hw=00:16:8f:b7:75:3e
 
 [mongo-template]
 mongo-template
@@ -50,6 +52,8 @@ api-node
 api-0          grp=3 idx=0   hw=00:16:0d:66:78:8b
 api-1          grp=3 idx=1   hw=00:16:c0:34:78:eb
 api-2          grp=3 idx=2   hw=00:16:05:39:ac:b8
+api-3          grp=3 idx=3   hw=00:16:4d:e5:62:12
+api-4          grp=3 idx=4   hw=00:16:53:e9:6b:42
 
 [api-template]
 api-template
@@ -64,6 +68,8 @@ web-node
 web-0          grp=4 idx=0   hw=00:16:50:9f:4d:1c
 web-1          grp=4 idx=1   hw=00:16:1f:0d:5a:91
 web-2          grp=4 idx=2   hw=00:16:b5:35:fc:94
+web-3          grp=4 idx=3   hw=00:16:c4:b4:89:d5
+web-4          grp=4 idx=4   hw=00:16:0d:b3:d0:43
 
 [web-template]
 web-template
@@ -78,6 +84,8 @@ load-node
 load-0         grp=5 idx=0   hw=00:16:d7:77:47:c8
 load-1         grp=5 idx=1   hw=00:16:80:34:4c:ae
 load-2         grp=5 idx=2   hw=00:16:e4:d8:d4:bc
+load-3         grp=5 idx=3   hw=00:16:b2:02:9d:c8
+load-4         grp=5 idx=4   hw=00:16:d9:65:fa:be
 
 [load-template]
 load-template

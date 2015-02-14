@@ -98,4 +98,17 @@
   with_items: "cluster_app_install_node"
   tags: "update"
 
+- name: "set hostname"
+  action:
+    module: "copy"
+    dest: "/etc/hostname"
+    content: "{{ hostname + '\n' }}"
+  sudo: "yes"
+  register: "hostname_result"
+
+- name: "update hostname"
+  shell: "hostname {{ hostname }}"
+  sudo: "yes"
+  when: "hostname_result.changed"
+
 # ex: et ts=2 filetype=yaml

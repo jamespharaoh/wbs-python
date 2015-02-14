@@ -8,4 +8,9 @@ autostart: "yes"
 
 node_ip: "{{ deployment_bridge_network }}.{{ grp }}.{{ idx }}"
 
+active: "{{ 'yes' if (
+  (idx | int < node_count [node] | int) if deployment_mode == 'vagrant' else
+  (idx == instance_idx)
+) else 'no' }}"
+
 # ex: et ts=2 filetype=yaml
