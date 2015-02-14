@@ -1,6 +1,9 @@
 var ROOT = process.env.HOME+ '/wistla-web';
 var config = require(ROOT + '/config/config.global');
 
+// Database.
+config.dbUrl = 'mongodb://mongo-0:27017/wistla-web';
+
 // mailchimp
 config.mailchimp = {
 	listId: '{{ cluster_mailchimp_account.unique_id }}',

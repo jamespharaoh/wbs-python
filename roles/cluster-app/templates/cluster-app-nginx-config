@@ -34,9 +34,7 @@ http {
 {% for deployment_name in cluster_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
 	upstream deployment-{{ deployment_name }} {
-		server {{ deployment.bridge_network }}.5.0;
-		server {{ deployment.bridge_network }}.5.1;
-		server {{ deployment.bridge_network }}.5.2;
+		server {{ deployment.bridge_network }}.5.{{ idx }};
 	}
 {% endfor %}
 
