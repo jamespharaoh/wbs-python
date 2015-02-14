@@ -31,6 +31,18 @@
     - "cluster_deployment_names"
     - "cluster_checkouts"
 
+- name: "install npm dependencies"
+  shell:
+    set -e;
+    cd "{{ vagrant_home }}/{{ item }}";
+    for project_name in *; do
+      test -f "$project_name/package.json" || continue;
+      ( cd "$project_name"; npm install; );
+    done;
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items: "cluster_deployment_names"
+
 - name: "create directories"
   action:
     module: "file"

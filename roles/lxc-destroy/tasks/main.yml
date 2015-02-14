@@ -6,7 +6,7 @@
 
     set -e;
 
-    source {{ deployment_home }}/wistla-devops/misc/locking ansible;
+    source {{ deployment_home }}/{{ deployment }}/wistla-devops/misc/locking ansible;
     exlock;
 
     if ! test -d /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}; then
