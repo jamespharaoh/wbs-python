@@ -1,0 +1,50 @@
+---
+
+{% set deployment_alias = item %}
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Wistla deployment alias dns {{ deployment_alias.name }}"
+
+Resources:
+
+  HostedZone:
+    Type: "AWS::Route53::HostedZone"
+    Properties:
+      Name: "{{ deployment_alias.domain }}."
+
+  WebRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "{{ deployment_alias.domain }}."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_app_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_app_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
+  WwwWebRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "www.{{ deployment_alias.domain }}."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_app_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_app_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
+  ApiRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "api.{{ deployment_alias.domain }}."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_app_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_app_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
+Outputs:
+
+  HostedZone:
+    Value: { Ref: "HostedZone" }
+
+# ex: et ts=2 filetype=yaml

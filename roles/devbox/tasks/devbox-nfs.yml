@@ -3,8 +3,10 @@
 - name: "create exports"
   action:
     module: "template"
-    src: "nfs-exports"
+    src: "devbox-nfs-exports"
     dest: "/etc/exports"
   sudo: "yes"
   sudo_user: "root"
   notify: "reload nfs server"
+
+# ex: et ts=2 filetype=yaml

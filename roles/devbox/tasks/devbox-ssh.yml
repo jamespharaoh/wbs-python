@@ -5,7 +5,7 @@
 - name: "create ssh known hosts"
   action:
     module: "template"
-    src: "ssh-known-hosts"
+    src: "devbox-ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
     owner: "root"
     group: "root"

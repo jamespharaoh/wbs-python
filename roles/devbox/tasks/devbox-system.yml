@@ -48,7 +48,7 @@
 - name: "setup sudo"
   action:
     module: "template"
-    src: "sudoers-ssh-agent"
+    src: "devbox-sudoers-ssh-agent"
     dest: "/etc/sudoers.d/ssh-agent"
   sudo: "yes"
   sudo_user: "root"

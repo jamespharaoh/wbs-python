@@ -3,7 +3,7 @@
 - name: "create hosts file"
   action:
     module: "template"
-    src: "hosts"
+    src: "devbox-hosts"
     dest: "/etc/hosts"
   sudo: "yes"
   sudo_user: "root"

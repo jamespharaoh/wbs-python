@@ -12,7 +12,7 @@
 - name: "create dnsmasq config"
   action:
     module: "template"
-    src: "dnsmasq-config"
+    src: "devbox-dnsmasq-config"
     dest: "/etc/dnsmasq.conf"
   sudo: "yes"
   sudo_user: "root"

@@ -3,7 +3,7 @@
 - name: "create samba config"
   action:
     module: "template"
-    src: "samba-config"
+    src: "devbox-samba-config"
     dest: "/etc/samba/smb.conf"
   sudo: "yes"
   sudo_user: "root"
@@ -18,3 +18,5 @@
     creates: "/etc/samba/vagrant-password-flag"
   sudo: "yes"
   sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

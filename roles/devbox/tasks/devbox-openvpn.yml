@@ -33,9 +33,11 @@
 - name: "create openvpn config"
   action:
     module: "template"
-    src: "openvpn-config"
+    src: "devbox-openvpn-config"
     dest: "/etc/openvpn/wistla-{{ item }}-vpn.conf"
   sudo: "yes"
   sudo_user: "root"
   with_items: "vpns"
   notify: "restart openvpn"
+
+# ex: et ts=2 filetype=yaml

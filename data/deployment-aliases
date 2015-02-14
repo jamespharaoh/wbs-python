@@ -1,0 +1,13 @@
+---
+
+- name: "production"
+  domain: "wistla.com"
+  cluster: "production"
+  target: "production-b"
+
+- name: "staging"
+  domain: "staging.wistla.com"
+  cluster: "staging"
+  target: "staging-a"
+
+# ex: et ts=2 filetype=yaml

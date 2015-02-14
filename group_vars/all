@@ -48,6 +48,7 @@ clusters:
   staging: "{{ lookup ('file', 'data/cluster/staging') | from_yaml }}"
 
 deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
+deployment_aliases: "{{ lookup ('file', 'data/deployment-aliases') | from_yaml }}"
 
 deployment_public_domain: "{{ deployments [deployment].public_domain }}"
 deployment_private_domain: "{{ deployments [deployment].public_domain }}"

@@ -20,7 +20,7 @@
 - name: "create fstab"
   action:
     module: "template"
-    src: "fstab"
+    src: "devbox-fstab"
     dest: "/etc/fstab"
   sudo: "yes"
   sudo_user: "root"

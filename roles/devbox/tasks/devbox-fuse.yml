@@ -3,7 +3,7 @@
 - name: "create fuse config"
   action:
     module: "template"
-    src: "fuse-config"
+    src: "devbox-fuse-config"
     dest: "/etc/fuse.conf"
   sudo: "yes"
   sudo_user: "root"

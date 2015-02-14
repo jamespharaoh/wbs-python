@@ -3,7 +3,7 @@
 - name: "create bash profile"
   action:
     module: "template"
-    src: "bash-profile"
+    src: "devbox-bash-profile"
     dest: "{{ vagrant_home }}/.bash_profile"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
@@ -11,7 +11,7 @@
 - name: "create bash rc"
   action:
     module: "template"
-    src: "bash-rc"
+    src: "devbox-bash-rc"
     dest: "{{ vagrant_home }}/.bashrc"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
@@ -19,7 +19,7 @@
 - name: "create git config"
   action:
     module: "template"
-    src: "git-config"
+    src: "devbox-git-config"
     dest: "{{ vagrant_home }}/.gitconfig"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
@@ -27,7 +27,7 @@
 - name: "create ssh config"
   action:
     module: "template"
-    src: "ssh-config"
+    src: "devbox-ssh-config"
     dest: "{{ vagrant_home }}/.ssh/config"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"

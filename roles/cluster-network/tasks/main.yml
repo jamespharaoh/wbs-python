@@ -10,7 +10,7 @@
     - "cluster-security-groups"
     - "cluster-jenkins-balancer"
     - "cluster-icinga-balancer"
-    - "cluster-dev-balancer"
+    - "cluster-deployment-dns"
     - "cluster-dev-dns"
 
 # ---------- vpc
@@ -49,6 +49,11 @@
 
 - include: "cluster-admin-dns.yml"
   tags: "cluster-admin-dns"
+
+# ---------- deployments
+
+- include: "cluster-deployment-dns.yml"
+  tags: "cluster-deployment-dns"
 
 # ---------- dev
 

@@ -2,74 +2,108 @@
 
 production-a:
 
+  cluster: "production"
   public_domain: "wistla.com"
   private_domain: "a.wistla.com"
+
+  parent_cluster: "production"
+  parent_domain: "wistla.com"
+
   bridge_name: "br148"
   bridge_network: "10.148"
+
   mailchimp_account: "production"
 
 production-b:
 
+  cluster: "production"
   public_domain: "wistla.com"
   private_domain: "b.wistla.com"
+
+  parent_cluster: "production"
+  parent_domain: "wistla.com"
+
   bridge_name: "br149"
   bridge_network: "10.149"
+
   mailchimp_account: "production"
 
 staging-a:
 
+  cluster: "staging"
   public_domain: "staging.wistla.com"
   private_domain: "a.staging.wistla.com"
+
+  parent_cluster: "staging"
+  parent_domain: "staging.wistla.com"
+
   bridge_name: "br155"
   bridge_network: "10.155"
+
   mailchimp_account: "production"
 
 staging-b:
 
+  cluster: "staging"
   public_domain: "staging.wistla.com"
   private_domain: "b.staging.wistla.com"
+
+  parent_cluster: "staging"
+  parent_domain: "staging.wistla.com"
+
   bridge_name: "br156"
   bridge_network: "10.156"
+
   mailchimp_account: "production"
 
 dev:
 
   public_domain: "dev.wistla.com"
   private_domain: "dev.wistla.com"
+
   bridge_name: "br152"
   bridge_network: "10.152"
+
   mailchimp_account: "test"
 
 berk:
 
   public_domain: "berk.wistla.com"
   private_domain: "berk.wistla.com"
+
   bridge_name: "br150"
   bridge_network: "10.150"
+
   mailchimp_account: "test"
 
 bruce:
 
   public_domain: "bruce.wistla.com"
   private_domain: "bruce.wistla.com"
+
   bridge_name: "br154"
   bridge_network: "10.154"
+
   mailchimp_account: "test"
 
 mrbenn:
 
   public_domain: "mrbenn.wistla.com"
   private_domain: "mrbenn.wistla.com"
+
   bridge_name: "br151"
   bridge_network: "10.151"
+
   mailchimp_account: "test"
 
 7-zark-7:
 
   public_domain: "7-zark-7.wistla.com"
   private_domain: "7-zark-7.wistla.com"
+
   bridge_name: "br153"
   bridge_network: "10.153"
+
   mailchimp_account: "test"
 
 # ex: et ts=2 filetype=yaml

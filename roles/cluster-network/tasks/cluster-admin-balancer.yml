@@ -40,6 +40,7 @@
   register: "admin_balancer_result"
 
 - set_fact:
+
     cluster_admin_balancer: "{{ admin_balancer_result.elb.dns_name }}"
     cluster_admin_balancer_hosted_zone_name: "{{ admin_balancer_result.elb.canonical_hosted_zone_name }}"
     cluster_admin_balancer_hosted_zone_name_id: "{{ admin_balancer_result.elb.canonical_hosted_zone_name_id }}"

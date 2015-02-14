@@ -36,7 +36,7 @@
 - name: "create git pre-commit hooks"
   action:
     module: "template"
-    src: "git-hook-pre-commit"
+    src: "devbox-git-hook-pre-commit"
     dest: "{{ vagrant_home }}/{{ item.name }}/.git/hooks/pre-commit"
     mode: "0755"
   sudo: "yes"
@@ -46,7 +46,7 @@
 - name: "create git post-checkout hooks"
   action:
     module: "template"
-    src: "git-hook-post-checkout"
+    src: "devbox-git-hook-post-checkout"
     dest: "{{ vagrant_home }}/{{ item.name }}/.git/hooks/post-checkout"
     mode: "0755"
   sudo: "yes"

@@ -1,0 +1,80 @@
+---
+
+- name: "write deployment dns stack yaml"
+  action:
+    module: "template"
+    src: "cluster-deployment-dns-stack"
+    dest: "/home/vagrant/work/{{ cluster }}/deployment-dns-{{ item }}-stack"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster != 'ops'"
+  with_items: "cluster_deployment_names"
+
+- name: "create deployment dns stack"
+  action:
+    module: "cloudformation"
+    stack_name: "{{ cluster }}-deployment-dns-{{ item }}"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster }}/deployment-dns-{{ item }}-stack"
+    template_format: "yaml"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster != 'ops'"
+  with_items: "cluster_deployment_names"
+  register: "deployment_dns_stack_result"
+
+- name: "write deployment dns nameservers"
+  shell:
+
+    set -e;
+
+    name="{{ deployment_home }}/work/{{ cluster }}/deployment-dns-{{ item.1 }}-nameservers";
+    touch $name;
+    sum_before=$(sha1sum $name);
+
+    aws route53 get-hosted-zone
+      --query "DelegationSet.NameServers"
+      --output text
+      --id {{ deployment_dns_stack_result.results [item.0].stack_outputs ["HostedZone"] }}
+      | sed 's/\t/,/g'
+      > $name;
+
+    sum_after=$(sha1sum $name);
+    if test "$sum_before" = "$sum_after"; then
+      echo "UNCHANGED";
+    else
+      echo "CHANGED";
+    fi;
+
+    return 0;
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster != 'ops'"
+  with_indexed_items: "cluster_deployment_names"
+
+- name: "create deployment dns delegations"
+  action:
+    module: "route53"
+    zone: "{{ item.value.parent_domain }}"
+    record: "{{ item.value.private_domain }}"
+    type: "NS"
+    command: "create"
+    overwrite: "yes"
+    value: "{{ lookup ('file', '/home/vagrant/work/' + item.value.cluster + '/deployment-dns-' + item.key + '-nameservers') }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_dict: "deployments"
+  when: "(item.value.parent_cluster | default ('none')) == cluster"
+
+# ex: et ts=2 filetype=yaml
