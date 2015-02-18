@@ -40,7 +40,7 @@ http {
 {% for api_name in groups ['api-node'] %}
 {% set api_host = hostvars [api_name] %}
 {% if api_host.idx | int < node_count.api | int %}
-		server {{ api_name }}:7000;
+		server {{ api_name }}:7000 fail_timeout=30s max_fails=1;
 {% else %}
 		server {{ api_name }}:7000 down;
 {% endif %}
