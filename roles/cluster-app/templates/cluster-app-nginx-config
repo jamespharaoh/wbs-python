@@ -1,5 +1,3 @@
-{% set cluster_active_deployment = deployments [cluster_active_deployment_name] %}
-
 user www-data;
 worker_processes 4;
 pid /run/nginx.pid;

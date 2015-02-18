@@ -8,7 +8,7 @@ config.apiUrl = 'https://api.{{ deployment_public_domain }}';
 config.testUrl = 'http://api.{{ deployment_private_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://mongo-0:27017/wistla';
+config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla';
 
 {% if use_s3 == 'yes' %}
 
@@ -30,8 +30,8 @@ config.blobMode = 'local';
 
 // mailchimp
 config.mailchimp = {
-	listId: '{{ deployment_mailchimp_account.unique_id }}',
-	apiKey: '{{ deployment_mailchimp_account.api_key }}',
+	listId: '{{ devbox_mailchimp_account.unique_id }}',
+	apiKey: '{{ devbox_mailchimp_account.api_key }}',
 };
 
 module.exports = config;

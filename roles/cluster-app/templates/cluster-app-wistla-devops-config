@@ -1,6 +1,7 @@
 ---
 
 {% set deployment_name = item.0 %}
+{% set deployment = deployments [deployment_name] %}
 
 deployment_mode: "direct"
 deployment: "{{ deployment_name }}"

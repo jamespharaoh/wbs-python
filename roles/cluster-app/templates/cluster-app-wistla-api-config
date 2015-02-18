@@ -1,14 +1,17 @@
+{% set deployment_name = item.0 %}
+{% set deployment = deployments [deployment_name] %}
+
 var ROOT = process.env.HOME+ '/wistla-api';
 var config = require(ROOT + '/config/config.global');
 
 // public url used for general access and urls returned by api
-config.apiUrl = 'https://api.{{ deployment_public_domain }}';
+config.apiUrl = 'https://api.{{ deployment.public_domain }}';
 
 // test url which works locally
-config.testUrl = 'http://api.{{ deployment_private_domain }}';
+config.testUrl = 'http://api.{{ deployment.private_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://mongo-0:27017/wistla';
+config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';
 
 {% if use_s3 == 'yes' %}
 
@@ -18,7 +21,7 @@ config.blobAmazon = {
 	accessKey: '{{ amazon_accounts.test.access_key }}',
 	secretKey: '{{ amazon_accounts.test.secret_key }}',
 	bucketName: 'wistla-dev',
-	bucketPrefix: '/{{ deployment }}/blobs'
+	bucketPrefix: '/{{ deployment_name }}/blobs'
 };
 
 {% else %}

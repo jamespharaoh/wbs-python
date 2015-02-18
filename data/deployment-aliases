@@ -7,7 +7,7 @@
 
 - name: "staging"
   domain: "staging.wistla.com"
-  cluster: "staging"
+  cluster: "production"
   target: "staging-a"
 
 # ex: et ts=2 filetype=yaml

@@ -8,9 +8,8 @@ cluster_domain: "{{ clusters [cluster].cluster_domain }}"
 
 cluster_colour: "{{ clusters [cluster].cluster_colour }}"
 
+cluster_deployment_alias_names: "{{ clusters [cluster].cluster_deployment_alias_names | default ([]) }}"
 cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
-
-cluster_active_deployment_name: "{{ clusters [cluster].cluster_active_deployment_name }}"
 
 cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
 
@@ -29,9 +28,8 @@ amazon_images: "{{ clusters [cluster].amazon_images }}"
 
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
-smtp_server: "{{ clusters [cluster].smtp_server }}"
-
-cluster_mailchimp_account_name: "{{ deployments [cluster_active_deployment_name].mailchimp_account }}"
+cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
+cluster_mailchimp_account_name: "{{ clusters [cluster].cluster_mailchimp_account }}"
 cluster_mailchimp_account: "{{ mailchimp_accounts [cluster_mailchimp_account_name] }}"
 
 cluster_checkouts:
@@ -47,5 +45,7 @@ cluster_checkouts:
 
   - name: "wistla-test-images"
     branch: "master"
+
+cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
 
 # ex: et ts=2 filetype=yaml

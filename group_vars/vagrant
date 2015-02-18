@@ -8,4 +8,6 @@ vagrant_home: "/home/vagrant"
 vagrant_deployments:
   - "{{ deployment }}"
 
+devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
+
 # ex: et ts=2 filetype=yaml

@@ -6,13 +6,31 @@
 
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.dev.wistla.com
+{% set host_address = [
+	deployment_bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	deployment_bridge_network + '.' + (host.grp | string) + '.' + (host.idx | string),
+	deployment + '-' + host_name,
+	host_name,
+	host_name + '.dev.wistla.com',
+] | join (' ') }}
 {% endfor %}
 
 {% for subdomain in [ 'api' ] %}
 {% for host_name in groups ['load-node'] %}
 {% set host = hostvars [host_name] %}
-{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ subdomain }}.dev.wistla.com
+{% set host_address = [
+	deployment_bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	subdomain + '.dev.wistla.com',
+] | join (' ') }}
 {% endfor %}
 {% endfor %}
 
@@ -24,18 +42,43 @@
 
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}.{{ other_deployment.private_domain }}
+{% set host_address = [
+	other_deployment.bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	other_deployment_name + '-' + host_name,
+	host_name + '.' + other_deployment.private_domain,
+] | join (' ') }}
 {% endfor %}
 
 {% for host_name in groups ['load-node'] %}
 {% set host = hostvars [host_name] %}
-{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ other_deployment.private_domain }}
+{% set host_address = [
+	other_deployment.bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	other_deployment.private_domain,
+] | join (' ') }}
 {% endfor %}
 
 {% for subdomain in [ 'api', 'www' ] %}
 {% for host_name in groups ['load-node'] %}
 {% set host = hostvars [host_name] %}
-{{ other_deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ subdomain }}.{{ other_deployment.private_domain }}
+{% set host_address = [
+	other_deployment.bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	subdomain + '.' + other_deployment.private_domain,
+] | join (' ') }}
 {% endfor %}
 {% endfor %}
 

@@ -1,12 +1,18 @@
 ---
 
+- name: "create hosts file"
+  action:
+    module: "template"
+    src: "cluster-app-hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+
 - name: "create bridge network interface"
   action:
     module: "template"
     src: "cluster-app-interface-bridge"
     dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "cluster_deployment_names"
 
 - name: "start network bridge"
@@ -22,7 +28,6 @@
     ifup {{ deployments [item].bridge_name }};
 
   sudo: "yes"
-  sudo_user: "root"
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
   with_items: "cluster_deployment_names"

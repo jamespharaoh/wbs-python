@@ -10,6 +10,7 @@
     - "cluster-security-groups"
     - "cluster-jenkins-balancer"
     - "cluster-icinga-balancer"
+    - "cluster-deployment-alias-dns"
     - "cluster-deployment-dns"
     - "cluster-dev-dns"
 
@@ -51,6 +52,9 @@
   tags: "cluster-admin-dns"
 
 # ---------- deployments
+
+- include: "cluster-deployment-alias-dns.yml"
+  tags: "cluster-deployment-alias-dns"
 
 - include: "cluster-deployment-dns.yml"
   tags: "cluster-deployment-dns"

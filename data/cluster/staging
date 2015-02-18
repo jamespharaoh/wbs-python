@@ -12,8 +12,6 @@ cluster_deployment_names:
   - "staging-a"
   - "staging-b"
 
-cluster_active_deployment_name: "staging-a"
-
 cluster_cron_email: "cron.staging@wistla.com"
 
 amazon_account: "staging"
@@ -39,6 +37,21 @@ amazon_images:
 
 amazon_key_name: "wistla-staging"
 
-smtp_server: "email-smtp.eu-west-1.amazonaws.com"
+cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
+cluster_mailchimp_account: "production"
+
+cluster_app_certificates:
+
+  - name: "staging.wistla.com"
+    private_key: "security/ssl/staging.wistla.com.key"
+    certificates:
+      - "security/ssl/staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.staging.wistla.com"
+    private_key: "security/ssl/api.staging.wistla.com.key"
+    certificates:
+      - "security/ssl/api.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
 # ex: et ts=2 filetype=yaml

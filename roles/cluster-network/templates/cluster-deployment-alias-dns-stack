@@ -1,6 +1,6 @@
 ---
 
-{% set deployment_alias = item %}
+{% for deployment_alias in deployment_aliases if deployment_alias.name == item %}
 
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Wistla deployment alias dns {{ deployment_alias.name }}"
@@ -46,5 +46,7 @@ Outputs:
 
   HostedZone:
     Value: { Ref: "HostedZone" }
+
+{% endfor %}
 
 # ex: et ts=2 filetype=yaml
