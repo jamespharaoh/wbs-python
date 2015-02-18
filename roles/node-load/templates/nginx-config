@@ -71,7 +71,7 @@ http {
 {% for web_name in groups ['web-node'] %}
 {% set web_host = hostvars [web_name] %}
 {% if web_host.idx | int < node_count.web | int %}
-		server {{ web_name }}:3000;
+		server {{ web_name }}:3000 fail_timeout=30s max_fails=1;
 {% else %}
 		server {{ web_name }}:3000 down;
 {% endif %}
