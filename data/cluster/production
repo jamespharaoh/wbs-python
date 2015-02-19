@@ -17,6 +17,7 @@ cluster_deployment_names:
   - "production-b"
   - "staging-a"
   - "staging-b"
+  - "test-everest"
 
 cluster_cron_email: "cron.production@wistla.com"
 
@@ -70,6 +71,18 @@ cluster_app_certificates:
     private_key: "security/ssl/api.staging.wistla.com.key"
     certificates:
       - "security/ssl/api.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "everest.test.wistla.com"
+    private_key: "security/ssl/everest.test.wistla.com.key"
+    certificates:
+      - "security/ssl/everest.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.everest.test.wistla.com"
+    private_key: "security/ssl/api.everest.test.wistla.com.key"
+    certificates:
+      - "security/ssl/api.everest.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
 # ex: et ts=2 filetype=yaml

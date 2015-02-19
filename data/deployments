@@ -56,6 +56,20 @@ staging-b:
   bridge_name: "br156"
   bridge_network: "10.156"
 
+test-everest:
+
+  name: "test-everest"
+  cluster: "production"
+
+  public_domain: "everest.test.wistla.com"
+  private_domain: "everest.test.wistla.com"
+
+  parent_cluster: "production"
+  parent_domain: "wistla.com"
+
+  bridge_name: "br157"
+  bridge_network: "10.157"
+
 dev:
 
   name: "dev"

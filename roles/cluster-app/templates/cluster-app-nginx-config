@@ -23,6 +23,8 @@ http {
 	gzip on;
 	gzip_disable "msie6";
 
+# ----- upstream servers per deployment -----
+
 {% for deployment_name in cluster_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
 	upstream deployment-{{ deployment_name }} {
