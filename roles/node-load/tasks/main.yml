@@ -16,3 +16,13 @@
     dest: "/etc/nginx/nginx.conf"
   sudo: "yes"
   sudo_user: "root"
+
+- name: "link to upstream config"
+  action:
+    module: "file"
+    path: "/etc/nginx/upstream.conf"
+    state: "link"
+    src: "/config/nginx-upstream.conf"
+    force: "yes"
+
+# ex: et ts=2 filetype=yaml

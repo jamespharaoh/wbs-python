@@ -84,6 +84,9 @@
       - src: "cluster-app-wistla-web-config"
         dest: "config/web/config.local.js"
 
+      - src: "cluster-app-wistla-load-upstream"
+        dest: "config/load/nginx-upstream.conf"
+
 - name: "create links to config files"
   action:
     module: "file"

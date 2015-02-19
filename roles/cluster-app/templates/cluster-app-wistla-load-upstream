@@ -1,0 +1,10 @@
+{% set deployment_name = item.0 %}
+{% set deployment = deployments [deployment_name] %}
+
+upstream api {
+	server {{ deployment_name }}-api-{{ idx }}:7000 fail_timeout=30s max_fails=1;
+}
+
+upstream web {
+	server {{ deployment_name }}-web-{{ idx }}:3000 fail_timeout=30s max_fails=1;
+}

@@ -95,6 +95,9 @@
     - src: "devbox-wistla-web-config"
       dest: "{{ vagrant_home }}/config/web/config.local.js"
 
+    - src: "devbox-wistla-load-upstream"
+      dest: "{{ vagrant_home }}/config/load/nginx-upstream.conf"
+
 - name: "create links to config files"
   action:
     module: "file"
