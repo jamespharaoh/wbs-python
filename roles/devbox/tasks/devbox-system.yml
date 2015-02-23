@@ -74,7 +74,8 @@
 - name: "install node packages"
   action:
     module: "npm"
-    name: "{{ item }}"
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
     global: "yes"
   sudo: "yes"
   sudo_user: "root"

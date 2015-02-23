@@ -10,6 +10,7 @@ web_install_packages:
 
 web_install_node:
 
-  - "node-inspector"
+  - name: "node-inspector"
+    version: "0.8.3"
 
 # ex: et ts=2 filetype=yaml

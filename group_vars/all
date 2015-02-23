@@ -111,7 +111,8 @@ vagrant_install_python:
 
 vagrant_install_node:
 
-  - "node-inspector"
+  - name: "node-inspector"
+    version: "0.8.3"
 
 vagrant_checkouts:
 

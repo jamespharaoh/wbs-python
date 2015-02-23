@@ -19,7 +19,8 @@
 - name: "install node packages"
   action:
     module: "npm"
-    name: "{{ item }}"
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
     global: "yes"
   sudo: "yes"
   with_items: "api_install_node"
