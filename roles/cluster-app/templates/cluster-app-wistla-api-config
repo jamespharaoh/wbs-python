@@ -1,7 +1,7 @@
 {% set deployment_name = item.0 %}
 {% set deployment = deployments [deployment_name] %}
 
-var ROOT = process.env.HOME+ '/wistla-api';
+var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // public url used for general access and urls returned by api

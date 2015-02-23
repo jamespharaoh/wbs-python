@@ -19,32 +19,4 @@
 ] | join (' ') }}
 {% endfor %}
 
-{% for host_name in groups ['load-node'] %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	other_deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	other_deployment.private_domain,
-] | join (' ') }}
-{% endfor %}
-
-{% for subdomain in [ 'api', 'www' ] %}
-{% for host_name in groups ['load-node'] %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	other_deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	subdomain + '.' + other_deployment.private_domain,
-] | join (' ') }}
-{% endfor %}
-{% endfor %}
-
 {% endfor %}
