@@ -107,6 +107,8 @@ http {
 		ssl_certificate /etc/nginx/ssl/api.{{ certificate }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/api.{{ certificate }}.key;
 
+		client_max_body_size 16m;
+
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "api.{{ domain }}";
