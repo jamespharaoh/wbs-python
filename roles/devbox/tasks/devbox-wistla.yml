@@ -78,6 +78,7 @@
     - "{{ vagrant_home }}/config/api"
     - "{{ vagrant_home }}/config/load"
     - "{{ vagrant_home }}/config/mongo"
+    - "{{ vagrant_home }}/config/rabbit"
     - "{{ vagrant_home }}/config/web"
 
 - name: "create config files"

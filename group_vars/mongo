@@ -4,6 +4,7 @@ node: "mongo"
 prv: "2"
 
 mongo_install_packages:
+
   - "mongodb"
 
 data_dirs:

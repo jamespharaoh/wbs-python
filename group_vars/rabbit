@@ -1,0 +1,18 @@
+---
+
+node: "rabbit"
+prv: "6"
+
+rabbit_install_packages:
+
+  - "rabbitmq-server"
+
+data_dirs:
+
+  - name: "rabbit-data"
+    path: "var/lib/rabbitmq"
+    owner: "rabbitmq"
+    group: "rabbitmq"
+    mode: "0755"
+
+# ex: et ts=2 filetype=yaml

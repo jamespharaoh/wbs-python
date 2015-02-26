@@ -13,6 +13,7 @@ concrete-template
 api-template
 load-template
 mongo-template
+rabbit-template
 web-template
 
 [generic-template]
@@ -24,6 +25,7 @@ base-template
 api-node
 load-node
 mongo-node
+rabbit-node
 web-node
 
 # ---------- mongo
@@ -89,6 +91,22 @@ load-4         grp=5 idx=4   hw=00:16:d9:65:fa:be
 
 [load-template]
 load-template
+
+# ---------- rabbit
+
+[rabbit:children]
+rabbit-template
+rabbit-node
+
+[rabbit-node]
+rabbit-0       grp=6 idx=0   hw=00:16:d2:9a:89:f0
+rabbit-1       grp=6 idx=1   hw=00:16:09:fc:90:83
+rabbit-2       grp=6 idx=2   hw=00:16:8c:f2:05:4e
+rabbit-3       grp=6 idx=3   hw=00:16:e2:fd:41:b9
+rabbit-4       grp=6 idx=4   hw=00:16:5d:4e:6b:4c
+
+[rabbit-template]
+rabbit-template
 
 # ---------- cluster
 
