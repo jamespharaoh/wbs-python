@@ -1,13 +1,5 @@
 ---
 
-- name: "create hosts file"
-  action:
-    module: "template"
-    src: "devbox-hosts"
-    dest: "/etc/hosts"
-  sudo: "yes"
-  sudo_user: "root"
-
 - name: "create firewall rules"
   action:
     module: "template"
