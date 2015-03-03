@@ -25,9 +25,8 @@
 
   args:
     creates: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.name }}"
-  sudo: "yes"
-  sudo_user: "{{ vagrant_user }}"
   with_nested:
+
     - "cluster_deployment_names"
     - "cluster_checkouts"
 
@@ -39,8 +38,6 @@
       test -f "$project_name/package.json" || continue;
       ( cd "$project_name"; npm install; );
     done;
-  sudo: "yes"
-  sudo_user: "{{ vagrant_user }}"
   with_items: "cluster_deployment_names"
 
 - name: "create directories"
@@ -48,8 +45,6 @@
     module: "file"
     path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
     state: "directory"
-  sudo: "yes"
-  sudo_user: "{{ vagrant_user }}"
   with_nested:
 
     - "cluster_deployment_names"
@@ -64,46 +59,56 @@
 - name: "create config files"
   action:
     module: "template"
-    src: "{{ item.1.src }}"
-    dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.dest }}"
-  sudo: "yes"
-  sudo_user: "{{ vagrant_user }}"
+    src: "{{ item.1.source }}"
+    dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.target }}"
   with_nested:
 
     - "cluster_deployment_names"
 
-    - - src: "cluster-app-wistla-devops-config"
-        dest: "wistla-devops/config"
+    - - source: "cluster-app-wistla-devops-config"
+        target: "wistla-devops/config"
 
-      - src: "cluster-app-wistla-devops-accounts"
-        dest: "wistla-devops/accounts"
+      - source: "cluster-app-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
 
-      - src: "cluster-app-wistla-api-config"
-        dest: "config/api/config.local.js"
+      - source: "cluster-app-wistla-api-config"
+        target: "config/api/config.local.js"
 
-      - src: "cluster-app-wistla-web-config"
-        dest: "config/web/config.local.js"
+      - source: "cluster-app-wistla-web-config"
+        target: "config/web/config.local.js"
 
-      - src: "cluster-app-wistla-load-upstream"
-        dest: "config/load/nginx-upstream.conf"
+      - source: "cluster-app-wistla-load-upstream"
+        target: "config/load/nginx-upstream.conf"
+
+- name: "copy config files"
+  action:
+    module: "copy"
+    src: "{{ item.1.source }}"
+    dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.target }}"
+    mode: "{{ item.1.mode }}"
+  with_nested:
+
+    - "cluster_deployment_names"
+
+    - - source: "security/test/google-service-account.key"
+        target: "config/api/google-service-account.key"
+        mode: "0600"
 
 - name: "create links to config files"
   action:
     module: "file"
-    path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.dest }}"
-    src: "{{ item.1.src }}"
+    path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.target }}"
+    src: "{{ item.1.source }}"
     state: "link"
     force: "yes"
-  sudo: "yes"
-  sudo_user: "{{ vagrant_user }}"
   with_nested:
 
     - "cluster_deployment_names"
 
-    - - src: "../../config/api/config.local.js"
-        dest: "wistla-api/config/config.local.js"
+    - - source: "../../config/api/config.local.js"
+        target: "wistla-api/config/config.local.js"
 
-      - src: "../../config/web/config.local.js"
-        dest: "wistla-web/config/config.local.js"
+      - source: "../../config/web/config.local.js"
+        target: "wistla-web/config/config.local.js"
 
 # ex: et ts=2 filetype=yaml

@@ -42,6 +42,12 @@ config.mailchimp = {
 	apiKey: '{{ cluster_mailchimp_account.api_key }}',
 };
 
+// test data loader
+config.loadingData = {
+	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
+	keyFile: '/config/google-service-account.key',
+};
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript
