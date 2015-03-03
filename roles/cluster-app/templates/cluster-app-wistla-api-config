@@ -13,6 +13,11 @@ config.testUrl = 'http://api.{{ deployment.private_domain }}';
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';
 
+// message exchange
+config.amqpOptions = {
+	url: 'amqp://{{ deployment_name }}-rabbit-{{ idx }}',
+};
+
 {% if use_s3 == 'yes' %}
 
 // amazon s3 blob storage
