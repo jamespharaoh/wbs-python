@@ -4,7 +4,7 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 
 respawn
-respawn limit 1 5
+respawn limit unlimited
 
 env HOME=/home/ubuntu
 
@@ -15,8 +15,13 @@ script
 	setuid ubuntu \
 	mkdir --parents logs
 
-	setuid ubuntu \
-	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} server.js \
-		>> logs/output.txt 2>> logs/output.txt
+	exec >> logs/output.txt
+	exec 2>> logs/output.txt
+
+	exec setuid ubuntu \
+	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} \
+	server.js
 
 end script
+
+post-stop exec sleep 2
