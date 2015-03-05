@@ -40,6 +40,7 @@
       /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
       --exclude /config/config.local.js
+      --exclude /config/google-service-account.key
       --exclude /node_modules;
 
   sudo: "yes"
@@ -81,10 +82,13 @@
 - name: "create wistla api config"
   action:
     module: "file"
-    path: "/home/ubuntu/wistla-api/config/config.local.js"
+    path: "/home/ubuntu/wistla-api/config/{{ item }}"
     state: "link"
-    src: "/config/config.local.js"
+    src: "/config/{{ item }}"
     force: "yes"
+  with_items:
+    - "config.local.js"
+    - "google-service-account.key"
 
 - name: "install firewall rules"
   action:

@@ -84,20 +84,38 @@
 - name: "create config files"
   action:
     module: "template"
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ item.template }}"
+    dest: "{{ vagrant_home }}/config/{{ item.type }}/{{ item.target }}"
   sudo: "yes"
   sudo_user: "{{ vagrant_user }}"
   with_items:
 
-    - src: "devbox-wistla-api-config"
-      dest: "{{ vagrant_home }}/config/api/config.local.js"
+    - template: "devbox-wistla-api-config"
+      type: "api"
+      target: "config.local.js"
 
-    - src: "devbox-wistla-web-config"
-      dest: "{{ vagrant_home }}/config/web/config.local.js"
+    - template: "devbox-wistla-web-config"
+      type: "web"
+      target: "config.local.js"
 
-    - src: "devbox-wistla-load-upstream"
-      dest: "{{ vagrant_home }}/config/load/nginx-upstream.conf"
+    - template: "devbox-wistla-load-upstream"
+      type: "load"
+      target: "nginx-upstream.conf"
+
+- name: "copy config files"
+  action:
+    module: "copy"
+    src: "{{ item.source }}"
+    dest: "{{ vagrant_home }}/config/{{ item.type }}/{{ item.target }}"
+    mode: "{{ item.mode }}"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+  with_items:
+
+    - source: "security/test/google-service-account.key"
+      type: "api"
+      target: "google-service-account.key"
+      mode: "0600"
 
 - name: "create links to config files"
   action:
@@ -112,6 +130,9 @@
 
     - src: "../../config/api/config.local.js"
       dest: "{{ vagrant_home }}/wistla-api/config/config.local.js"
+
+    - src: "../../config/api/google-service-account.key"
+      dest: "{{ vagrant_home }}/wistla-api/config/google-service-account.key"
 
     - src: "../../config/web/config.local.js"
       dest: "{{ vagrant_home }}/wistla-web/config/config.local.js"

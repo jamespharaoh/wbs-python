@@ -42,7 +42,7 @@ config.mailchimp = {
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
-	keyFile: '{{ vagrant_home }}/wistla-devops/security/test/google-service-account.key',
+	keyFile: ROOT + '/config/google-service-account.key',
 };
 
 module.exports = config;
