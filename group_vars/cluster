@@ -47,5 +47,6 @@ cluster_checkouts:
     branch: "master"
 
 cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
+cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
 
 # ex: et ts=2 filetype=yaml

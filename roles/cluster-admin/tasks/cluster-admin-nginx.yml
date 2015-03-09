@@ -26,27 +26,19 @@
   action:
     module: "template"
     src: "cluster-admin-ssl-bundle"
-    dest: "/etc/nginx/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.cert"
+    dest: "/etc/nginx/ssl/{{ item.name }}.cert"
   sudo: "yes"
-  with_nested:
-    - "dev_deployment_names"
-    - - ""
-      - "api."
-      - "test."
+  with_items: "cluster_admin_certificates"
   notify: "restart nginx"
 
 - name: "write nginx private keys"
   action:
     module: "copy"
-    src: "security/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.key"
-    dest: "/etc/nginx/ssl/{{ item.1 }}{{ deployments [item.0].private_domain }}.key"
+    src: "{{ item.private_key }}"
+    dest: "/etc/nginx/ssl/{{ item.name }}.key"
     mode: "0600"
   sudo: "yes"
-  with_nested:
-    - "dev_deployment_names"
-    - - ""
-      - "api."
-      - "test."
+  with_items: "cluster_admin_certificates"
   notify: "restart nginx"
 
 - name: "write nginx htpasswd"

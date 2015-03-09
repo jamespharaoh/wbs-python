@@ -33,4 +33,102 @@ amazon_key_name: "wistla-ops"
 
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
+cluster_admin_certificates:
+
+  # --- berk
+
+  - name: "berk.wistla.com"
+    private_key: "security/ssl/berk.wistla.com.key"
+    certificates:
+      - "security/ssl/berk.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.berk.wistla.com"
+    private_key: "security/ssl/api.berk.wistla.com.key"
+    certificates:
+      - "security/ssl/api.berk.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "test.berk.wistla.com"
+    private_key: "security/ssl/test.berk.wistla.com.key"
+    certificates:
+      - "security/ssl/test.berk.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # --- bruce
+
+  - name: "bruce.wistla.com"
+    private_key: "security/ssl/bruce.wistla.com.key"
+    certificates:
+      - "security/ssl/bruce.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.bruce.wistla.com"
+    private_key: "security/ssl/api.bruce.wistla.com.key"
+    certificates:
+      - "security/ssl/api.bruce.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "test.bruce.wistla.com"
+    private_key: "security/ssl/test.bruce.wistla.com.key"
+    certificates:
+      - "security/ssl/test.bruce.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # --- mrbenn
+
+  - name: "mrbenn.wistla.com"
+    private_key: "security/ssl/mrbenn.wistla.com.key"
+    certificates:
+      - "security/ssl/mrbenn.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.mrbenn.wistla.com"
+    private_key: "security/ssl/api.mrbenn.wistla.com.key"
+    certificates:
+      - "security/ssl/api.mrbenn.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "test.mrbenn.wistla.com"
+    private_key: "security/ssl/test.mrbenn.wistla.com.key"
+    certificates:
+      - "security/ssl/test.mrbenn.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # --- 7-zark-7
+
+  - name: "7-zark-7.wistla.com"
+    private_key: "security/ssl/7-zark-7.wistla.com.key"
+    certificates:
+      - "security/ssl/7-zark-7.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.7-zark-7.wistla.com"
+    private_key: "security/ssl/api.7-zark-7.wistla.com.key"
+    certificates:
+      - "security/ssl/api.7-zark-7.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "test.7-zark-7.wistla.com"
+    private_key: "security/ssl/test.7-zark-7.wistla.com.key"
+    certificates:
+      - "security/ssl/test.7-zark-7.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # --- icinga
+
+  - name: "icinga.ops.wistla.com"
+    private_key: "security/ssl/icinga.ops.wistla.com.key"
+    certificates:
+      - "security/ssl/icinga.ops.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # --- jenkins
+
+  - name: "jenkins.ops.wistla.com"
+    private_key: "security/ssl/jenkins.ops.wistla.com.key"
+    certificates:
+      - "security/ssl/jenkins.ops.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
 # ex: et ts=2 filetype=yaml

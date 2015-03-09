@@ -153,4 +153,15 @@ mrbenn:
   bridge_name: "br153"
   bridge_network: "10.153"
 
+jenkins-latest:
+
+  name: "jenkins-latest"
+  cluster: "dev"
+
+  public_domain: "latest.jenkins.wistla.com"
+  private_domain: "latest.jenkins.wistla.com"
+
+  bridge_name: "br160"
+  bridge_network: "10.160"
+
 # ex: et ts=2 filetype=yaml
