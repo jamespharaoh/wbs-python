@@ -5,6 +5,8 @@
 
 deployment_mode: "direct"
 deployment: "{{ deployment_name }}"
+deployment_user: "ubuntu"
+deployment_home: "/home/ubuntu/{{ deployment_name }}"
 
 debug: "no"
 

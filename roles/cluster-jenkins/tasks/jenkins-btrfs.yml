@@ -1,0 +1,37 @@
+---
+
+- name: "install btrfs packages"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "btrfs-tools"
+
+- name: "create btrfs disk"
+  action: shell
+    truncate --size 32GiB /btrfs-image
+  args:
+    creates: "/btrfs-image"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create btrfs file system"
+  action: shell
+    mkfs.btrfs /btrfs-image
+    && touch /etc/btrfs-flag
+  args:
+    creates: "/etc/btrfs-flag"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "mount btrfs"
+  action:
+    module: "mount"
+    name: "/var/lib/lxc"
+    fstype: "btrfs"
+    src: "/btrfs-image"
+    state: "mounted"
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

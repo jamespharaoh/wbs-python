@@ -12,6 +12,14 @@ jenkins_install_packages:
   - "ntp"
   - "whois"
 
+  - "python-dev"
+  - "python-pip"
+
+  - "python-httplib2"
+  - "python-jinja2"
+  - "python-paramiko"
+  - "python-yaml"
+
 jenkins_remove_packages: []
 
 # ex: et ts=2 filetype=yaml

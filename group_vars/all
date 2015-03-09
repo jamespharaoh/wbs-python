@@ -132,21 +132,6 @@ vagrant_templates:
 
   - "template"
 
-deployment_modes:
-
-  vagrant:
-
-    deployment_home: "/home/vagrant"
-    deployment_user: "vagrant"
-
-  direct:
-
-    deployment_home: "/home/ubuntu"
-    deployment_user: "ubuntu"
-
-deployment_home: "{{ deployment_modes [deployment_mode].deployment_home }}"
-deployment_user: "{{ deployment_modes [deployment_mode].deployment_user }}"
-
 data_dirs: []
 
 common_users: "{{ lookup ('file', 'data/common-users') | from_yaml }}"

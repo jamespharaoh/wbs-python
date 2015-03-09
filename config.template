@@ -2,6 +2,8 @@
 
 deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
 deployment: "{{ deployment | default ('dev') }}"
+deployment_user: "{{ deployment_path | default ('vagrant') }}"
+deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
 
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"

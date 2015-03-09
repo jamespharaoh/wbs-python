@@ -8,6 +8,9 @@
 - include: "jenkins-system.yml"
   when: "cluster == 'ops'"
 
+- include: "jenkins-btrfs.yml"
+  when: "cluster == 'ops'"
+
 - include: "jenkins-install.yml"
   when: "cluster == 'ops'"
 
