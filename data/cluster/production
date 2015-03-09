@@ -87,4 +87,28 @@ cluster_app_certificates:
       - "security/ssl/api.everest.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "k2.test.wistla.com"
+    private_key: "security/ssl/k2.test.wistla.com.key"
+    certificates:
+      - "security/ssl/k2.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.k2.test.wistla.com"
+    private_key: "security/ssl/api.k2.test.wistla.com.key"
+    certificates:
+      - "security/ssl/api.k2.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "montblanc.test.wistla.com"
+    private_key: "security/ssl/montblanc.test.wistla.com.key"
+    certificates:
+      - "security/ssl/montblanc.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.montblanc.test.wistla.com"
+    private_key: "security/ssl/api.montblanc.test.wistla.com.key"
+    certificates:
+      - "security/ssl/api.montblanc.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
 # ex: et ts=2 filetype=yaml
