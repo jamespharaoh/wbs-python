@@ -18,6 +18,8 @@ cluster_deployment_names:
   - "staging-a"
   - "staging-b"
   - "test-everest"
+  - "test-k2"
+  - "test-montblanc"
 
 cluster_cron_email: "cron.production@wistla.com"
 

@@ -70,6 +70,34 @@ test-everest:
   bridge_name: "br157"
   bridge_network: "10.157"
 
+test-k2:
+
+  name: "test-k2"
+  cluster: "production"
+
+  public_domain: "k2.test.wistla.com"
+  private_domain: "k2.test.wistla.com"
+
+  parent_cluster: "production"
+  parent_domain: "wistla.com"
+
+  bridge_name: "br158"
+  bridge_network: "10.158"
+
+test-montblanc:
+
+  name: "test-montblanc"
+  cluster: "production"
+
+  public_domain: "montblanc.test.wistla.com"
+  private_domain: "montblanc.test.wistla.com"
+
+  parent_cluster: "production"
+  parent_domain: "wistla.com"
+
+  bridge_name: "br159"
+  bridge_network: "10.159"
+
 dev:
 
   name: "dev"

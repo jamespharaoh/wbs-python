@@ -53,6 +53,7 @@
       - "config/api"
       - "config/load"
       - "config/mongo"
+      - "config/rabbit"
       - "config/web"
       - "shared"
 

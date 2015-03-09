@@ -1,12 +1,5 @@
 ---
 
-- name: "create hosts file"
-  action:
-    module: "template"
-    src: "cluster-app-hosts"
-    dest: "/etc/hosts"
-  sudo: "yes"
-
 - name: "create bridge network interface"
   action:
     module: "template"

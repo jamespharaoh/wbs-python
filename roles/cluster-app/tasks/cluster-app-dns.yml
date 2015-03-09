@@ -18,6 +18,14 @@
   sudo_user: "root"
   notify: "restart dnsmasq"
 
+- name: "create hosts file"
+  action:
+    module: "template"
+    src: "cluster-app-hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+  notify: "restart dnsmasq"
+
 - meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml
