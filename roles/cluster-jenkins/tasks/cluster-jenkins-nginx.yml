@@ -3,7 +3,7 @@
 - name: "create nginx config"
   action:
     module: "template"
-    src: "nginx-config"
+    src: "cluster-jenkins-nginx-config"
     dest: "/etc/nginx/nginx.conf"
   sudo: "yes"
   notify: "restart nginx"

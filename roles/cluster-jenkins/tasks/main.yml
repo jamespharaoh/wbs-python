@@ -2,19 +2,22 @@
 
 - include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
 
-- include: "jenkins-create.yml"
+- include: "cluster-jenkins-create.yml"
   when: "cluster == 'ops'"
 
-- include: "jenkins-system.yml"
+- include: "cluster-jenkins-system.yml"
   when: "cluster == 'ops'"
 
-- include: "jenkins-btrfs.yml"
+- include: "cluster-jenkins-btrfs.yml"
   when: "cluster == 'ops'"
 
-- include: "jenkins-install.yml"
+- include: "cluster-jenkins-dns.yml"
   when: "cluster == 'ops'"
 
-- include: "jenkins-nginx.yml"
+- include: "cluster-jenkins-install.yml"
+  when: "cluster == 'ops'"
+
+- include: "cluster-jenkins-nginx.yml"
   when: "cluster == 'ops'"
 
 # ex: et ts=2 filetype=yaml

@@ -1,0 +1,31 @@
+---
+
+- name: "install dnsmasq packages"
+  action:
+    module: "apt"
+    package: "{{ item }}"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items:
+    - "dnsmasq"
+
+- name: "create dnsmasq config"
+  action:
+    module: "template"
+    src: "cluster-jenkins-dnsmasq-conf"
+    dest: "/etc/dnsmasq.conf"
+  sudo: "yes"
+  sudo_user: "root"
+  notify: "restart dnsmasq"
+
+- name: "create hosts file"
+  action:
+    module: "template"
+    src: "cluster-jenkins-hosts"
+    dest: "/etc/hosts"
+  sudo: "yes"
+  notify: "restart dnsmasq"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml
