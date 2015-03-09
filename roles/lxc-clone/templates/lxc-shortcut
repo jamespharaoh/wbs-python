@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if test $# -eq 0; then
+
+	exec sudo lxc-attach --name {{ deployment }}-{{ inventory_hostname }} -- \
+	sudo --set-home --user ubuntu bash -
+
+elif test $# -eq 1; then
+
+	exec sudo lxc-attach --name {{ deployment }}-{{ inventory_hostname }} -- \
+	sudo --set-home --user ubuntu bash -c "$1"
+
+else
+
+	exec sudo lxc-attach --name {{ deployment }}-{{ inventory_hostname }} -- \
+	sudo --set-home --user ubuntu "$@"
+
+fi
