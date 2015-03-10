@@ -21,4 +21,11 @@
   with_items:
     - "jenkins"
 
+- name: "enable jenkins sudo"
+  action:
+    module: "copy"
+    dest: "/etc/sudoers.d/jenkins"
+    content: "jenkins ALL=(ALL) NOPASSWD: ALL{{ '\n' }}"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml

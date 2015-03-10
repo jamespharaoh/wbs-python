@@ -22,4 +22,8 @@ jenkins_install_packages:
 
 jenkins_remove_packages: []
 
+jenkins_deployment_names:
+
+  - "jenkins-latest"
+
 # ex: et ts=2 filetype=yaml

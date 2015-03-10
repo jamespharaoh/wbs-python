@@ -1,5 +1,29 @@
 ---
 
+- name: "create common groups"
+  action:
+    module: "group"
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+    system: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "common_users"
+
+- name: "create common users"
+  action:
+    module: "user"
+    name: "{{ item.name }}"
+    group: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    home: "{{ item.home }}"
+    createhome: "no"
+    shell: "{{ item.shell }}"
+    system: "yes"
+  sudo: "yes"
+  sudo_user: "root"
+  with_items: "common_users"
+
 - name: "remove system packages"
   action:
     module: "apt"
@@ -20,12 +44,5 @@
   sudo_user: "root"
   with_items: "jenkins_install_packages"
   tags: "update"
-
-- name: "enable jenkins sudo"
-  action:
-    module: "copy"
-    dest: "/etc/sudoers.d/jenkins"
-    content: "jenkins ALL=(ALL) NOPASSWD: ALL{{ '\n' }}"
-  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml

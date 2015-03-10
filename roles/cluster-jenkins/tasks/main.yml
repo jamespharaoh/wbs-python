@@ -8,16 +8,25 @@
 - include: "cluster-jenkins-system.yml"
   when: "cluster == 'ops'"
 
+- include: "cluster-jenkins-network.yml"
+  when: "cluster == 'ops'"
+
 - include: "cluster-jenkins-btrfs.yml"
   when: "cluster == 'ops'"
 
 - include: "cluster-jenkins-dns.yml"
   when: "cluster == 'ops'"
 
+- include: "cluster-common-postfix.yml"
+  tags: "cluster-common-postfix"
+
 - include: "cluster-jenkins-install.yml"
   when: "cluster == 'ops'"
 
 - include: "cluster-jenkins-nginx.yml"
   when: "cluster == 'ops'"
+
+- include: "cluster-common-user.yml"
+  tags: "cluster-common-user"
 
 # ex: et ts=2 filetype=yaml
