@@ -1,6 +1,6 @@
 127.0.0.1 localhost
 
-{% for other_deployment_name in cluster_deployment_names %}
+{% for other_deployment_name in jenkins_deployment_names %}
 {% set other_deployment = deployments [other_deployment_name] %}
 
 # ---------- deployment {{ other_deployment_name }}
@@ -17,6 +17,34 @@
 	other_deployment_name + '-' + host_name,
 	host_name + '.' + other_deployment.private_domain,
 ] | join (' ') }}
+{% endfor %}
+
+{% for host_name in groups ['load-node'] %}
+{% set host = hostvars [host_name] %}
+{% set host_address = [
+	other_deployment.bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	other_deployment.private_domain,
+] | join (' ') }}
+{% endfor %}
+
+{% for subdomain in [ 'api', 'www' ] %}
+{% for host_name in groups ['load-node'] %}
+{% set host = hostvars [host_name] %}
+{% set host_address = [
+	other_deployment.bridge_network,
+	host.grp,
+	host.idx,
+] | join ('.') %}
+{{ [
+	host_address,
+	subdomain + '.' + other_deployment.private_domain,
+] | join (' ') }}
+{% endfor %}
 {% endfor %}
 
 {% endfor %}

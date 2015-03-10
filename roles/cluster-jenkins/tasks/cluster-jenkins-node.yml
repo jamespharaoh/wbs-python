@@ -1,0 +1,21 @@
+---
+
+- name: "install node system packages"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "nodejs"
+    - "npm"
+
+- name: "make node command work"
+  action:
+    module: "alternatives"
+    link: "/usr/bin/node"
+    name: "node"
+    path: "/usr/bin/nodejs"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

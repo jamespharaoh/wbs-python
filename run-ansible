@@ -70,6 +70,15 @@ case "$config_deployment_mode" in
 
 		;;
 
+	(jenkins)
+
+		echo "Running in JENKINS deployment mode"
+
+		deployment_home="$WORKSPACE"
+		deployment_user="jenkins"
+
+		;;
+
 	(*)
 
 		echo "Unrecognised deployment mode: $config_deployment_mode"

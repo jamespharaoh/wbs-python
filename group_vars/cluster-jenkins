@@ -5,6 +5,8 @@ cluster_type_colour: "197"
 
 jenkins_install_packages:
 
+  # misc
+
   - "git"
   - "lxc"
   - "nginx"
@@ -12,9 +14,10 @@ jenkins_install_packages:
   - "ntp"
   - "whois"
 
+  # ansible
+
   - "python-dev"
   - "python-pip"
-
   - "python-httplib2"
   - "python-jinja2"
   - "python-paramiko"
