@@ -1,5 +1,13 @@
 ---
 
+- name: "create jenkins service config"
+  action:
+    module: "template"
+    src: "cluster-jenkins-default"
+    dest: "/etc/default/jenkins"
+  sudo: "yes"
+  notify: "restart jenkins"
+
 - name: "install jenkins apt key"
   action:
     module: "apt_key"
@@ -27,5 +35,7 @@
     dest: "/etc/sudoers.d/jenkins"
     content: "jenkins ALL=(ALL) NOPASSWD: ALL{{ '\n' }}"
   sudo: "yes"
+
+- meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml
