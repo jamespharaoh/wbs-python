@@ -1,7 +1,9 @@
 NAME="jenkins"
 
 JAVA="/usr/bin/java"
-JAVA_ARGS="-Djava.awt.headless=true"
+JAVA_ARGS=""
+JAVA_ARGS="$JAVA_ARGS -Djava.awt.headless=true"
+JAVA_ARGS="$JAVA_ARGS -Dfile.encoding=UTF8"
 
 PIDFILE="/var/run/jenkins/jenkins.pid"
 JENKINS_LOG="/var/log/jenkins/$NAME.log"
