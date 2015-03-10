@@ -1,0 +1,160 @@
+---
+
+- name: "checkout projects from git"
+  shell:
+
+    set -e;
+
+    cd {{ deployment_home }};
+
+    git clone
+      git@github.com:/wistla/{{ item.name }}
+      --branch {{ item.branch }};
+
+  args:
+    creates: "{{ deployment_home }}/{{ item.name }}"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items: "devenv_checkouts"
+  when: "deployment_mode == 'vagrant'"
+
+- name: "install node modules"
+  shell:
+
+    set -e;
+
+    cd {{ deployment_home }}/{{ item }};
+
+    npm install;
+
+  args:
+    creates: "{{ deployment_home }}/{{ item }}/node_modules"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items:
+    - "wistla-web"
+
+- name: "create git pre-commit hooks"
+  action:
+    module: "template"
+    src: "devenv-git-hook-pre-commit"
+    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/pre-commit"
+    mode: "0755"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items: "devenv_checkouts"
+  when: "deployment_mode == 'vagrant'"
+
+- name: "create git post-checkout hooks"
+  action:
+    module: "template"
+    src: "devenv-git-hook-post-checkout"
+    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/post-checkout"
+    mode: "0755"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items: "devenv_checkouts"
+  when: "deployment_mode == 'vagrant'"
+
+- name: "create shared directory"
+  action:
+    module: "file"
+    path: "{{ deployment_home }}/shared"
+    state: "directory"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+
+- set_fact:
+    mailchimp_accounts:
+      production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
+      test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
+  when: "deployment_mode == 'vagrant'"
+
+- set_fact:
+    mailchimp_accounts:
+      production: "TODO"
+      test: "TODO"
+  when: "deployment_mode == 'jenkins'"
+
+- name: "create config directories"
+  action:
+    module: "file"
+    path: "{{ item }}"
+    state: "directory"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items:
+    - "{{ deployment_home }}/config"
+    - "{{ deployment_home }}/config/api"
+    - "{{ deployment_home }}/config/load"
+    - "{{ deployment_home }}/config/mongo"
+    - "{{ deployment_home }}/config/rabbit"
+    - "{{ deployment_home }}/config/web"
+
+- name: "create config files"
+  action:
+    module: "template"
+    src: "{{ item.template }}"
+    dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items:
+
+    - template: "devenv-wistla-api-config"
+      type: "api"
+      target: "config.local.js"
+
+    - template: "devenv-wistla-web-config"
+      type: "web"
+      target: "config.local.js"
+
+    - template: "devenv-wistla-load-upstream"
+      type: "load"
+      target: "nginx-upstream.conf"
+
+- name: "copy config files"
+  action:
+    module: "copy"
+    src: "{{ item.source }}"
+    dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
+    mode: "{{ item.mode }}"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items:
+
+    - source: "security/test/google-service-account.key"
+      type: "api"
+      target: "google-service-account.key"
+      mode: "0600"
+
+- name: "create links to config files"
+  action:
+    module: "file"
+    path: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    state: "link"
+    force: "yes"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  with_items:
+
+    - src: "../../config/api/config.local.js"
+      dest: "{{ deployment_home }}/wistla-api/config/config.local.js"
+
+    - src: "../../config/api/google-service-account.key"
+      dest: "{{ deployment_home }}/wistla-api/config/google-service-account.key"
+
+    - src: "../../config/web/config.local.js"
+      dest: "{{ deployment_home }}/wistla-web/config/config.local.js"
+
+- name: "create deployment name link"
+  action:
+    module: "file"
+    path: "{{ deployment_home }}/{{ deployment }}"
+    state: "link"
+    src: "."
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  when: "deployment_mode == 'vagrant'"
+
+# ex: et ts=2 filetype=yaml

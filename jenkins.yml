@@ -1,0 +1,10 @@
+---
+
+- hosts: "jenkins"
+  gather_facts: "no"
+  roles:
+
+    - role: "devenv"
+      when: "deployment_mode == 'jenkins'"
+
+# ex: et ts=2 filetype=yaml

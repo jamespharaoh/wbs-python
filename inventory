@@ -3,6 +3,9 @@
 [vagrant]
 vagrant        grp=1 idx=1   hw=00:16:c3:82:a7:4f
 
+[jenkins]
+jenkins        grp=1 idx=1   hw=00:16:4d:e1:1c:8f
+
 # ---------- template
 
 [template:children]

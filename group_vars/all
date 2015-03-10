@@ -114,7 +114,7 @@ vagrant_install_node:
   - name: "node-inspector"
     version: "0.8.3"
 
-vagrant_checkouts:
+devenv_checkouts:
 
   - name: "wistla-api"
     branch: "master"
