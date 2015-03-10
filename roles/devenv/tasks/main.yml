@@ -72,8 +72,9 @@
 
 - set_fact:
     mailchimp_accounts:
-      production: "TODO"
-      test: "TODO"
+      test:
+        unique_id: "TODO"
+        api_key: "TODO"
   when: "deployment_mode == 'jenkins'"
 
 - name: "create config directories"
