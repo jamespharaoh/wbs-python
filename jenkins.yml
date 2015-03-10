@@ -7,9 +7,8 @@
     - role: "devenv"
       when: "deployment_mode == 'jenkins'"
 
-- include: "clean-data.yml"
 - include: "templates.yml"
-- include: "stop.yml"
+- include: "clean-data.yml"
 - include: "start.yml"
 
 # ex: et ts=2 filetype=yaml
