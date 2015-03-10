@@ -7,9 +7,13 @@ jenkins_install_packages:
 
   # misc
 
+  - "colordiff"
   - "git"
-  - "lxc"
-  - "nginx"
+  - "graphicsmagick"
+  - "imagemagick"
+  - "libav-tools"
+  - "mailutils"
+  - "mongodb-clients"
   - "ngrep"
   - "ntp"
   - "whois"
