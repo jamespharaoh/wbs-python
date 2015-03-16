@@ -15,11 +15,12 @@ ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
 
 vpns: []
 
-node_count:
-  api: "5"
-  load: "5"
-  mongo: "5"
-  web: "5"
+node_memory:
+  api: "512"
+  load: "512"
+  mongo: "512"
+  rabbit: "512"
+  web: "512"
 
 use_s3: "no"
 

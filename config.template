@@ -31,6 +31,13 @@ node_count:
   rabbit: "{{ (node_count | default ({})).rabbit | default ('3') }}"
   web: "{{ (node_count | default ({})).web | default ('3') }}"
 
+node_memory:
+  api: "{{ (node_memory | default ({})).api | default ('512') }}"
+  load: "{{ (node_memory | default ({})).load | default ('512') }}"
+  mongo: "{{ (node_memory | default ({})).mongo | default ('512') }}"
+  rabbit: "{{ (node_memory | default ({})).rabbit | default ('512') }}"
+  web: "{{ (node_memory | default ({})).web | default ('512') }}"
+
 use_s3: "{{ use_s3 | default ('no') }}"
 
 # ex: et ts=2 filetype=yaml

@@ -2,6 +2,12 @@
 
 lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
+# limits
+
+lxc.cgroup.memory.limit_in_bytes = {{ (node_memory [node] | int) * 1024 * 1024 }}
+
+# file system
+
 lxc.rootfs = /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs
 
 lxc.mount.entry = {{ deployment_home }}/shared shared none bind 0 0
@@ -11,8 +17,12 @@ lxc.mount.entry = {{ deployment_home }}/config/{{ node }} config none bind,ro,re
 lxc.mount.entry = {{ deployment_home }}/shared/{{ inventory_hostname }}/{{ data_dir.name }} {{ data_dir.path }} none bind 0 0
 {% endfor %}
 
+# misc
+
 lxc.utsname = {{ inventory_hostname }}
 lxc.arch = amd64
+
+# network
 
 lxc.network.type = veth
 lxc.network.flags = up
@@ -20,5 +30,7 @@ lxc.network.link = {{ deployments [deployment].bridge_name }}
 lxc.network.hwaddr = {{ hw }}
 lxc.network.ipv4 = {{ node_ip }}/16
 lxc.network.ipv4.gateway = {{ deployment_bridge_network }}.{{ vagrant.grp }}.{{ vagrant.idx }}
+
+# autostart
 
 lxc.start.auto = {{ 1 if autostart == "yes" else 0 }}
