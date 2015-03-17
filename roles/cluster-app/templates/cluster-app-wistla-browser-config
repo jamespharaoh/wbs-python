@@ -1,9 +1,13 @@
 {% set deployment_name = item.0 %}
 {% set deployment = deployments [deployment_name] %}
 
-var ROOT = process.env.HOME+ '/wistla-web';
+var ROOT = process.env.HOME+ '/wistla-browser';
 var config = require(ROOT + '/config/config.global');
 
+// Database.
+config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla-browser';
+
+// API
 config.apiUrl = 'http://{{ deployment_name }}-api-{{ idx }}:7000';
 
 module.exports = config;

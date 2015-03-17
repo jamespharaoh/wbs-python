@@ -1,7 +1,11 @@
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
-config.dbUrl = 'http://{{ deployment }}-api-0:7000';
+// Database.
+config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla-browser';
+
+// API
+config.apiUrl = 'http://{{ deployment }}-api-0:7000';
 
 module.exports = config;
 

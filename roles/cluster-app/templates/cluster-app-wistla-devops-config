@@ -17,10 +17,11 @@ vpns: []
 
 node_memory:
   api: "512"
-  load: "512"
+  browser: "128"
+  load: "128"
   mongo: "512"
-  rabbit: "512"
-  web: "512"
+  rabbit: "128"
+  web: "128"
 
 use_s3: "no"
 
