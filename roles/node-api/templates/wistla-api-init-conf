@@ -19,7 +19,14 @@ script
 	exec 2>> logs/output.txt
 
 	exec setuid ubuntu \
-	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} \
+{% if debug == 'yes' %}
+	node-debug \
+	--debug-brk=0 \
+{% else %}
+	stdbuf -oL -eL \
+	nodejs \
+	--trace_gc \
+{% endif %}
 	server.js
 
 end script
