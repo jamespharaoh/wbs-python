@@ -6,10 +6,15 @@ global_install_packages:
   - "git"
   - "ngrep"
   - "super"
+  - "telnet"
   - "whois"
 
 global_remove_packages:
 
+  - "apport"
+  - "apport-symptoms"
+  - "python-apport"
+  - "python3-apport"
   - "resolvconf"
 
 cluster_subnets:
@@ -99,11 +104,15 @@ vagrant_install_packages:
 
 vagrant_remove_packages:
 
+  - "apport"
+  - "apport-symptoms"
   - "chef"
   - "chef-zero"
   - "cloud-init"
   - "puppet"
   - "puppet-common"
+  - "python-apport"
+  - "python3-apport"
 
 vagrant_install_python:
 

@@ -18,7 +18,12 @@ cluster_admin_install_packages:
   - "openvpn"
   - "whois"
 
-cluster_admin_remove_packages: []
+cluster_admin_remove_packages:
+
+  - "apport"
+  - "apport-symptoms"
+  - "python-apport"
+  - "python3-apport"
 
 icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}"
 

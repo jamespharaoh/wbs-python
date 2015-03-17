@@ -40,6 +40,8 @@ amazon_key_name: "wistla-staging"
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 cluster_mailchimp_account: "production"
 
+cluster_admin_certificates: []
+
 cluster_app_certificates:
 
   - name: "staging.wistla.com"

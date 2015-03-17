@@ -29,7 +29,12 @@ cluster_app_install_packages:
   - "python-yaml"
   - "whois"
 
-cluster_app_remove_packages: []
+cluster_app_remove_packages:
+
+  - "apport"
+  - "apport-symptoms"
+  - "python-apport"
+  - "python3-apport"
 
 cluster_app_install_python:
 

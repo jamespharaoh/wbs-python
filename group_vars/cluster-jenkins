@@ -3,7 +3,7 @@
 cluster_type: "jenkins"
 cluster_type_colour: "197"
 
-jenkins_install_packages:
+cluster_jenkins_install_packages:
 
   # misc
 
@@ -27,7 +27,12 @@ jenkins_install_packages:
   - "python-paramiko"
   - "python-yaml"
 
-jenkins_remove_packages: []
+cluster_jenkins_remove_packages:
+
+  - "apport"
+  - "apport-symptoms"
+  - "python-apport"
+  - "python3-apport"
 
 jenkins_deployment_names:
 

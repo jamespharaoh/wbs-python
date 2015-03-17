@@ -32,7 +32,7 @@
     purge: "yes"
   sudo: "yes"
   sudo_user: "root"
-  with_items: "jenkins_remove_packages"
+  with_items: "cluster_jenkins_remove_packages"
   tags: "update"
 
 - name: "install system packages"
@@ -42,7 +42,7 @@
     name: "{{ item }}"
   sudo: "yes"
   sudo_user: "root"
-  with_items: "jenkins_install_packages"
+  with_items: "cluster_jenkins_install_packages"
   tags: "update"
 
 # ex: et ts=2 filetype=yaml
