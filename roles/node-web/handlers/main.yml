@@ -1,9 +1,0 @@
----
-
-- name: "reload upstart config"
-  action: shell
-    initctl reload-configuration
-  sudo: "yes"
-  sudo_user: "root"
-
-# ex: et ts=2 filetype=yaml

@@ -1,0 +1,11 @@
+{% set deployment_name = item.0 %}
+{% set deployment = deployments [deployment_name] %}
+
+var ROOT = process.env.HOME+ '/wistla-web';
+var config = require(ROOT + '/config/config.global');
+
+config.apiUrl = 'http://{{ deployment_name }}-api-{{ idx }}:7000';
+
+module.exports = config;
+
+// ex: noet ts=4 filetype=javascript

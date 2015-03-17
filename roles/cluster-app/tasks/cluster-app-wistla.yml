@@ -51,6 +51,7 @@
 
     - - "config"
       - "config/api"
+      - "config/browser"
       - "config/load"
       - "config/mongo"
       - "config/rabbit"
@@ -74,6 +75,9 @@
 
       - source: "cluster-app-wistla-api-config"
         target: "config/api/config.local.js"
+
+      - source: "cluster-app-wistla-browser-config"
+        target: "config/browser/config.local.js"
 
       - source: "cluster-app-wistla-web-config"
         target: "config/web/config.local.js"
@@ -108,6 +112,9 @@
 
     - - source: "../../config/api/config.local.js"
         target: "wistla-api/config/config.local.js"
+
+      - source: "../../config/browser/config.local.js"
+        target: "wistla-browser/config/config.local.js"
 
       - source: "../../config/web/config.local.js"
         target: "wistla-web/config/config.local.js"

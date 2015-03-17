@@ -19,3 +19,14 @@ upstream web {
 {% endif %}
 {% endfor %}
 }
+
+upstream browser {
+{% for browser_name in groups ['browser-node'] %}
+{% set browser_host = hostvars [browser_name] %}
+{% if browser_host.idx | int < node_count.browser | int %}
+	server {{ browser_name }}:3000 fail_timeout=30s max_fails=1;
+{% else %}
+	server {{ browser_name }}:3000 down;
+{% endif %}
+{% endfor %}
+}

@@ -87,6 +87,7 @@
   with_items:
     - "{{ deployment_home }}/config"
     - "{{ deployment_home }}/config/api"
+    - "{{ deployment_home }}/config/browser"
     - "{{ deployment_home }}/config/load"
     - "{{ deployment_home }}/config/mongo"
     - "{{ deployment_home }}/config/rabbit"
@@ -103,6 +104,10 @@
 
     - template: "devenv-wistla-api-config"
       type: "api"
+      target: "config.local.js"
+
+    - template: "devenv-wistla-browser-config"
+      type: "browser"
       target: "config.local.js"
 
     - template: "devenv-wistla-web-config"
@@ -144,6 +149,9 @@
 
     - src: "../../config/api/google-service-account.key"
       dest: "{{ deployment_home }}/wistla-api/config/google-service-account.key"
+
+    - src: "../../config/browser/config.local.js"
+      dest: "{{ deployment_home }}/wistla-browser/config/config.local.js"
 
     - src: "../../config/web/config.local.js"
       dest: "{{ deployment_home }}/wistla-web/config/config.local.js"

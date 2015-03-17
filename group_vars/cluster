@@ -37,6 +37,9 @@ cluster_checkouts:
   - name: "wistla-api"
     branch: "master"
 
+  - name: "wistla-browser"
+    branch: "master"
+
   - name: "wistla-devops"
     branch: "master"
 

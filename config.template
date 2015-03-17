@@ -26,6 +26,7 @@ vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
 node_count:
   api: "{{ (node_count | default ({})).api | default ('3') }}"
+  browser: "{{ (node_count | default ({})).browser | default ('3') }}"
   load: "{{ (node_count | default ({})).load | default ('3') }}"
   mongo: "{{ (node_count | default ({})).mongo | default ('3') }}"
   rabbit: "{{ (node_count | default ({})).rabbit | default ('3') }}"
@@ -33,6 +34,7 @@ node_count:
 
 node_memory:
   api: "{{ (node_memory | default ({})).api | default ('512') }}"
+  browser: "{{ (node_memory | default ({})).browser | default ('512') }}"
   load: "{{ (node_memory | default ({})).load | default ('512') }}"
   mongo: "{{ (node_memory | default ({})).mongo | default ('512') }}"
   rabbit: "{{ (node_memory | default ({})).rabbit | default ('512') }}"

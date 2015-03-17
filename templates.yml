@@ -36,4 +36,8 @@
   gather_facts: "no"
   roles: [ "node-rabbit" ]
 
+- hosts: "browser-template"
+  gather_facts: "no"
+  roles: [ "node-browser" ]
+
 # ex: et ts=2 filetype=yaml

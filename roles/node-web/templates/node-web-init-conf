@@ -15,8 +15,18 @@ script
 	setuid ubuntu \
 	mkdir --parents logs
 
-	setuid ubuntu \
-	{{ 'node-debug --debug-brk=0' if debug == 'yes' else 'nodejs' }} keystone.js \
-		> logs/output.txt 2> logs/output.txt
+	exec >> logs/output.txt
+	exec 2>> logs/output.txt
+
+	exec setuid ubuntu \
+{% if debug == 'yes' %}
+	node-debug \
+	--debug-brk=0 \
+{% else %}
+	stdbuf -oL -eL \
+	nodejs \
+	--trace_gc \
+{% endif %}
+	keystone.js
 
 end script

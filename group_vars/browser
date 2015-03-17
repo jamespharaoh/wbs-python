@@ -1,0 +1,16 @@
+---
+
+node: "browser"
+prv: "7"
+
+browser_install_packages:
+
+  - "iptables"
+  - "npm"
+
+browser_install_node:
+
+  - name: "node-inspector"
+    version: "0.8.3"
+
+# ex: et ts=2 filetype=yaml

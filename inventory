@@ -14,6 +14,7 @@ concrete-template
 
 [concrete-template:children]
 api-template
+browser-template
 load-template
 mongo-template
 rabbit-template
@@ -26,6 +27,7 @@ base-template
 
 [node:children]
 api-node
+browser-node
 load-node
 mongo-node
 rabbit-node
@@ -110,6 +112,22 @@ rabbit-4       grp=6 idx=4   hw=00:16:5d:4e:6b:4c
 
 [rabbit-template]
 rabbit-template
+
+# ---------- browser
+
+[browser:children]
+browser-template
+browser-node
+
+[browser-node]
+browser-0      grp=7 idx=0   hw=00:16:98:26:d5:9f
+browser-1      grp=7 idx=1   hw=00:16:ca:a2:d3:1e
+browser-2      grp=7 idx=2   hw=00:16:da:90:8c:19
+browser-3      grp=7 idx=3   hw=00:16:01:ed:bc:a2
+browser-4      grp=7 idx=4   hw=00:16:05:b2:be:74
+
+[browser-template]
+browser-template
 
 # ---------- cluster
 
