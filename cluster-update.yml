@@ -2,18 +2,18 @@
 
 - hosts: "cluster-admin"
   roles:
-    - role: "update"
+    - role: "cluster-update"
   tags: "cluster-admin"
 
 - hosts: "cluster-app"
   roles:
-    - role: "update"
+    - role: "cluster-update"
       when: "cluster != 'ops'"
   tags: "cluster-app"
 
 - hosts: "cluster-jenkins"
   roles:
-    - role: "update"
+    - role: "cluster-update"
       when: "cluster == 'ops'"
   tags: "cluster-jenkins"
 
