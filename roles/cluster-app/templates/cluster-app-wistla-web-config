@@ -9,8 +9,8 @@ config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla-web
 
 // mailchimp
 config.mailchimp = {
-	listId: '{{ cluster_mailchimp_account.unique_id }}',
-	apiKey: '{{ cluster_mailchimp_account.api_key }}',
+	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
+	apiKey: '{{ third_parties [cluster].mailchimp_api_key }}',
 };
 
 module.exports = config;

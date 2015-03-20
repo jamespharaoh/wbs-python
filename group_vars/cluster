@@ -29,8 +29,6 @@ amazon_images: "{{ clusters [cluster].amazon_images }}"
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
 cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
-cluster_mailchimp_account_name: "{{ clusters [cluster].cluster_mailchimp_account }}"
-cluster_mailchimp_account: "{{ mailchimp_accounts [cluster_mailchimp_account_name] }}"
 
 cluster_checkouts:
 

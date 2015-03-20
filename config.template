@@ -13,6 +13,29 @@ ubuntu_security_url: "{{ ubuntu_security_url }}"
 
 debug: "{{ debug | default ('yes') }}"
 
+{% if secrets | default ([ 'dev' ]) %}
+secrets:
+{% for secret in secrets | default ([ 'dev' ]) %}
+  - "{{ secret }}"
+{% endfor %}
+{% else %}
+secrets: []
+{% endif %}
+
+{% if secrets | default ([ 'dev' ]) %}
+third_parties:
+{% if 'production' in secrets | default ([ 'dev' ]) %}
+  production: "{{ '{{' }} lookup ('file', 'security/third-parties/production') | from_yaml {{ '}}' }}"
+  staging: "{{ '{{' }} lookup ('file', 'security/third-parties/staging') | from_yaml {{ '}}' }}"
+  test: "{{ '{{' }} lookup ('file', 'security/third-parties/test') | from_yaml {{ '}}' }}"
+{% endif %}
+{% if 'dev' in secrets | default ([ 'dev' ]) %}
+  dev: "{{ '{{' }} lookup ('file', 'security/third-parties/dev') | from_yaml {{ '}}' }}"
+{% endif %}
+{% else %}
+third_parties: {}
+{% endif %}
+
 {% if vpns | default ([]) %}
 vpns:
 {% for vpn in vpns | default ([]) %}

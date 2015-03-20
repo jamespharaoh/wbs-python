@@ -1,10 +1,5 @@
 ---
 
-- set_fact:
-    mailchimp_accounts:
-      production: "{{ lookup ('file', 'security/mailchimp/production') | from_yaml }}"
-      test: "{{ lookup ('file', 'security/mailchimp/test') | from_yaml }}"
-
 - name: "create deployment directories"
   action:
     module: "file"

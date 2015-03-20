@@ -5,10 +5,17 @@ var config = require(ROOT + '/config/config.global');
 config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla-web';
 
 // mailchimp
+{% if 'dev' in third_parties %}
 config.mailchimp = {
-	listId: '{{ devbox_mailchimp_account.unique_id }}',
-	apiKey: '{{ devbox_mailchimp_account.api_key }}',
+	listId: '{{ third_parties.dev.mailchimp_unique_id }}',
+	apiKey: '{{ third_parties.dev.mailchimp_api_key }}',
 };
+{% else %}
+config.mailchimp = {
+	listId: '',
+	apiKey: '',
+};
+{% endif %}
 
 module.exports = config;
 

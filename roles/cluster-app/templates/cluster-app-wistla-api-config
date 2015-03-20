@@ -38,8 +38,8 @@ config.blobMode = 'local';
 
 // mailchimp
 config.mailchimp = {
-	listId: '{{ cluster_mailchimp_account.unique_id }}',
-	apiKey: '{{ cluster_mailchimp_account.api_key }}',
+	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
+	apiKey: '{{ third_parties [cluster].mailchimp_api_key }}',
 };
 
 // test data loader
