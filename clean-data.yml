@@ -5,17 +5,27 @@
 - hosts: "vagrant"
   tasks:
 
-    - name: "remove shared directory"
-      shell:
-        rm -rf {{ deployment_home }}/shared/*
-      sudo: "yes"
-
-    - name: "create shared directory"
+    - name: "remove shared directories"
       action:
         module: "file"
-        path: "{{ deployment_home }}/shared"
-        state: "directory"
+        path: "{{ deployment_home }}/shared/{{ item }}"
+        state: "absent"
       sudo: "yes"
-      sudo_user: "{{ deployment_user }}"
+      with_items:
+        - "audio"
+        - "image"
+        - "userUpload"
+        - "video"
+
+- hosts: [ "node", "template" ]
+  tasks:
+
+    - name: "remove per-container directories"
+      delegate_to: "vagrant"
+      action:
+        module: "file"
+        path: "{{ deployment_home }}/shared/{{ inventory_hostname }}"
+        state: "absent"
+      sudo: "yes"
 
 # ex: et ts=2 filetype=yaml
