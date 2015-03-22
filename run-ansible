@@ -28,6 +28,8 @@ for secret in "${config_secrets[@]}"; do
 		-- \
 		-o allow_root
 
+	chmod -R u=rwX,go= security/$secret-plain
+
 done
 
 # always run as root
@@ -127,18 +129,28 @@ if test "$config_deployment_mode" = "vagrant"; then
 
 fi
 
-# fix permissions of secret files
-
-if test -d security/secrets-plain; then
-	chmod -R u=rwX,go= security/secrets-plain
-fi
-
 # run ansible-playbook
 
-exec ansible-playbook \
+ansible-playbook \
 	--inventory-file inventory \
 	--extra-vars @config \
 	--extra-vars @accounts \
 	"${@}"
+
+ansible_status="$?"
+
+# output message on success or failure
+
+if test "$ansible_status" = "0"; then
+
+	echo "##### Success #####" >&2
+	echo "" >&2
+
+else
+
+	echo "##### Error $ansible_status #####" >&2
+	echo "" >&2
+
+fi
 
 # ex: noet ts=4 filetype=bash

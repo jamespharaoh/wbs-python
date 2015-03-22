@@ -4,7 +4,7 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 
 respawn
-respawn limit 1 5
+respawn limit unlimited
 
 env HOME=/home/ubuntu
 
@@ -13,10 +13,13 @@ script
 	cd /home/ubuntu/wistla-browser
 
 	setuid ubuntu \
-	mkdir --parents logs
+	mkdir --parents /shared/log
 
-	exec >> logs/output.txt
-	exec 2>> logs/output.txt
+	setuid ubuntu \
+	touch /shared/log/wistla-browser.log
+
+	exec >> /shared/log/wistla-browser.log
+	exec 2>> /shared/log/wistla-browser.log
 
 	exec setuid ubuntu \
 {% if debug == 'yes' %}
@@ -30,3 +33,5 @@ script
 	keystone.js
 
 end script
+
+post-stop exec sleep 2
