@@ -32,7 +32,11 @@ http {
 	# proxy defaults
 
 	proxy_connect_timeout 1s;
+{% if debug == 'yes' %}
+	proxy_read_timeout 10m;
+{% else %}
 	proxy_read_timeout 10s;
+{% endif %}
 
 	# upstream servers
 
