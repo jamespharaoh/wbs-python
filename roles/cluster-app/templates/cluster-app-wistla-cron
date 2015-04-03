@@ -3,6 +3,6 @@ HOME="/home/ubuntu"
 MAILTO="{{ cluster_cron_email }}"
 
 MAILTO="everest.test.notifications@wistla.com"
-0 2 * * * ubuntu cd "$HOME/test-everest/wistla-api"; ./node_modules/.bin/mocha -R spec --timeout {{ 5 * 60 * 1000 }} app/resources/testData.load.js
+#0 2 * * * ubuntu cd "$HOME/test-everest/wistla-api"; ./node_modules/.bin/mocha -R spec --timeout {{ 5 * 60 * 1000 }} app/resources/testData.load.js
 
 # ex: noet ts=4 filetype=crontab
