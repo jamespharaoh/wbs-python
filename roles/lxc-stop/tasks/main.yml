@@ -23,7 +23,8 @@
     fi;
 
     lxc-stop
-      --name {{ deployment }}-{{ inventory_hostname }};
+      --name {{ deployment }}-{{ inventory_hostname }}
+      --timeout 10;
 
   delegate_to: "localhost"
   sudo: "yes"
