@@ -1,7 +1,7 @@
 ---
 
 {% set deployment_name = item %}
-{% set deploement = deployments [deployment_name] %}
+{% set deployment = deployments [deployment_name] %}
 
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Wistla dev dns {{ deployment_name }}"
@@ -11,12 +11,12 @@ Resources:
   HostedZone:
     Type: "AWS::Route53::HostedZone"
     Properties:
-      Name: "{{ deployment_name }}.wistla.com."
+      Name: "{{ deployment.private_domain }}."
 
   WebRecordSet:
     Type: "AWS::Route53::RecordSet"
     Properties:
-      Name: "{{ deployment_name }}.wistla.com."
+      Name: "{{ deployment.private_domain }}."
       Type: "A"
       AliasTarget:
         DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
@@ -26,7 +26,7 @@ Resources:
   WwwWebRecordSet:
     Type: "AWS::Route53::RecordSet"
     Properties:
-      Name: "www.{{ deployment_name }}.wistla.com."
+      Name: "www.{{ deployment.private_domain }}."
       Type: "A"
       AliasTarget:
         DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
@@ -36,7 +36,7 @@ Resources:
   ApiRecordSet:
     Type: "AWS::Route53::RecordSet"
     Properties:
-      Name: "api.{{ deployment_name }}.wistla.com."
+      Name: "api.{{ deployment.private_domain }}."
       Type: "A"
       AliasTarget:
         DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
@@ -46,7 +46,7 @@ Resources:
   TestRecordSet:
     Type: "AWS::Route53::RecordSet"
     Properties:
-      Name: "test.{{ deployment_name }}.wistla.com."
+      Name: "test.{{ deployment.private_domain }}."
       Type: "A"
       AliasTarget:
         DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"

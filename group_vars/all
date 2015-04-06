@@ -63,10 +63,11 @@ deployment_bridge_network: "{{ deployments [deployment].bridge_network }}"
 
 dev_deployment_names:
 
+  - "7-zark-7"
   - "berk"
   - "bruce"
   - "mrbenn"
-  - "7-zark-7"
+  - "optimus"
 
 vpn_clients: "{{ lookup ('file', 'data/vpn-clients') | from_yaml }}"
 

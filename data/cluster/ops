@@ -115,6 +115,26 @@ cluster_admin_certificates:
       - "security/ssl/test.7-zark-7.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  # --- optimus
+
+  - name: "optimus.dev.wistla.com"
+    private_key: "security/ssl/optimus.dev.wistla.com.key"
+    certificates:
+      - "security/ssl/optimus.dev.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "api.optimus.dev.wistla.com"
+    private_key: "security/ssl/api.optimus.dev.wistla.com.key"
+    certificates:
+      - "security/ssl/api.optimus.dev.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "test.optimus.dev.wistla.com"
+    private_key: "security/ssl/test.optimus.dev.wistla.com.key"
+    certificates:
+      - "security/ssl/test.optimus.dev.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # --- icinga
 
   - name: "icinga.ops.wistla.com"

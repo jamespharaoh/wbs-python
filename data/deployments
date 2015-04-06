@@ -153,6 +153,17 @@ mrbenn:
   bridge_name: "br153"
   bridge_network: "10.153"
 
+optimus:
+
+  name: "optimus"
+  cluster: "dev"
+
+  public_domain: "optimus.dev.wistla.com"
+  private_domain: "optimus.dev.wistla.com"
+
+  bridge_name: "br161"
+  bridge_network: "10.161"
+
 jenkins-latest:
 
   name: "jenkins-latest"
