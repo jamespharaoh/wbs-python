@@ -22,6 +22,10 @@
   tags: "cluster-jenkins-dns"
   when: "cluster == 'ops'"
 
+- include: "cluster-common-ssh.yml"
+  tags: "cluster-common-ssh"
+  when: "cluster == 'ops'"
+
 - include: "cluster-common-postfix.yml"
   tags: "cluster-common-postfix"
   when: "cluster == 'ops'"

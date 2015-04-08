@@ -27,7 +27,11 @@
 
 - include: "cluster-admin-system.yml"
   tags:
-    - "cluster-admin-system"
+    - "cluster-common-system"
+
+- include: "cluster-common-ssh.yml"
+  tags:
+    - "cluster-common-ssh"
 
 - include: "cluster-common-postfix.yml"
   tags:
