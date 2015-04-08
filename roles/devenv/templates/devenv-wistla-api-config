@@ -50,6 +50,11 @@ config.mailchimp = {
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
 	keyFile: ROOT + '/config/google-service-account.key',
+{% if 'dev' in third_parties %}
+        cryptoKey: '{{ third_parties.dev.google_maps_key }}'
+{% else %}
+		cryptoKey: ''
+{% endif %}
 };
 
 module.exports = config;
