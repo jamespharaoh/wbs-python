@@ -28,6 +28,12 @@ for secret in "${config_secrets[@]}"; do
 		-- \
 		-o allow_root
 
+done
+
+# fix permissions in secrets
+
+for secret in "${config_secrets[@]}"; do
+
 	chmod -R u=rwX,go= security/$secret-plain
 
 done
