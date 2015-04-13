@@ -40,4 +40,14 @@
       netbits: "16"
       netmask: "255.255.0.0"
 
+- name: "richard.vpn.wistla.com"
+
+  vpn_ip: "6"
+
+  iroutes:
+
+    - network: "10.161.0.0"
+      netbits: "16"
+      netmask: "255.255.0.0"
+
 # ex: et ts=2 filetype=yaml
