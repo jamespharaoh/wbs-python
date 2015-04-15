@@ -4,6 +4,20 @@ set -e
 
 exec 1>&2
 
+# main
+
+main () {
+
+	find_parent
+
+	check_filenames
+	check_whitespace
+	check_jshint
+
+	exit 0
+
+}
+
 # fix whitespace tool
 
 fix_whitespace () {
@@ -34,11 +48,15 @@ fix_whitespace () {
 
 # parent is head, or empty for new repo
 
-if git rev-parse --verify HEAD >/dev/null 2>&1; then
-	against=HEAD
-else
-	against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-fi
+find_parent () {
+
+	if git rev-parse --verify HEAD >/dev/null 2>&1; then
+		against=HEAD
+	else
+		against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+	fi
+
+}
 
 # check filenames
 
@@ -50,22 +68,83 @@ check_non_ascii () {
 	) != 0
 }
 
-allownonascii=$(git config --bool hooks.allownonascii || true)
+check_filenames () {
 
-if [ "$allownonascii" != "true" ] && check_non_ascii; then
+	allownonascii=$(git config --bool hooks.allownonascii || true)
 
-	cat <<-EOF
-		Error: non-ascii filenames detected
-	EOF
+	if [ "$allownonascii" != "true" ] && check_non_ascii; then
 
-	exit 1
+		cat <<-EOF
+			Error: non-ascii filenames detected
+		EOF
 
-fi
+		exit 1
+
+	fi
+
+}
 
 # check whitespace
 
-git diff-index --check --cached $against --
+check_whitespace () {
+	git diff-index --check --cached $against --
+}
+
+# run jshint
+
+check_jshint () {
+
+	local jshint="node_modules/.bin/jshint"
+
+	if ! test -f $jshint; then
+		return
+	fi
+
+	local files=$(
+		git diff --cached --name-only --diff-filter=ACMR -- \
+		*.js app/**.js test/**.js utils/**.js
+	)
+
+	local pass="true"
+
+	local one_file
+	local one_result
+
+	if [ "$files" != "" ]; then
+
+		for one_file in ${files}; do
+
+			one_result=$(
+				(
+					git show :$one_file \
+					| $jshint --filename $one_file --config .jshintrc -
+				) || true
+			)
+
+			if [ "$one_result" != "" ]; then
+
+				echo "$one_result"
+
+				pass="false"
+
+			fi
+
+		done
+
+	fi
+
+	if $pass; then
+		return
+	fi
+
+	echo ""
+	echo "COMMIT FAILED:"
+	echo "Some JavaScript files are invalid. Please fix errors and try committing again."
+
+	exit 1
+
+}
 
 # done
 
-exit 0
+main

@@ -6,8 +6,10 @@
 
     - role: "devbox"
       when: "deployment_mode == 'vagrant'"
+      tags: "devbox"
 
     - role: "devenv"
       when: "deployment_mode == 'vagrant'"
+      tags: "devenv"
 
 # ex: et ts=2 filetype=yaml
