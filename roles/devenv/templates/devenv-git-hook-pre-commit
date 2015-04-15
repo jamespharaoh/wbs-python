@@ -96,13 +96,15 @@ check_jshint () {
 
 	local jshint="node_modules/.bin/jshint"
 
-	if ! test -f $jshint; then
+	if ! [ -f "$jshint" ]; then
 		return
 	fi
 
-	local files=$(
+	local all_files
+
+	all_files=$(
 		git diff --cached --name-only --diff-filter=ACMR -- \
-		*.js app/**.js test/**.js utils/**.js
+		'*.js' 'app/**.js' 'test/**.js' 'utils/**.js'
 	)
 
 	local pass="true"
@@ -110,9 +112,9 @@ check_jshint () {
 	local one_file
 	local one_result
 
-	if [ "$files" != "" ]; then
+	if [ "$all_files" ]; then
 
-		for one_file in ${files}; do
+		for one_file in $all_files; do
 
 			one_result=$(
 				(
