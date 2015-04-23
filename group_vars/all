@@ -123,6 +123,9 @@ vagrant_install_node:
 
 devenv_checkouts:
 
+  - name: "wistla-admin"
+    branch: "master"
+
   - name: "wistla-api"
     branch: "master"
 
