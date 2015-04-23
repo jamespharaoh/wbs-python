@@ -14,29 +14,7 @@ eval $(misc/yaml-to-bash config <config)
 
 # mount secrets
 
-for secret in "${config_secrets[@]}"; do
-
-	if grep -q "^encfs $project_dir/security/$secret-plain " /proc/mounts; then
-		continue
-	fi
-
-	echo "Mounting secrets for $secret"
-
-	encfs \
-		"$project_dir/security/$secret-cipher" \
-		"$project_dir/security/$secret-plain" \
-		-- \
-		-o allow_root
-
-done
-
-# fix permissions in secrets
-
-for secret in "${config_secrets[@]}"; do
-
-	chmod -R u=rwX,go= security/$secret-plain
-
-done
+"$project_dir/mount-secrets"
 
 # always run as root
 
