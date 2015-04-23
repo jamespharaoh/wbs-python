@@ -55,6 +55,12 @@ cluster_admin_certificates:
       - "security/ssl/test.berk.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "admin.berk.wistla.com"
+    private_key: "security/ssl/admin.berk.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.berk.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # --- bruce
 
   - name: "bruce.wistla.com"
@@ -73,6 +79,12 @@ cluster_admin_certificates:
     private_key: "security/ssl/test.bruce.wistla.com.key"
     certificates:
       - "security/ssl/test.bruce.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.bruce.wistla.com"
+    private_key: "security/ssl/admin.bruce.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.bruce.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
   # --- mrbenn
@@ -95,6 +107,12 @@ cluster_admin_certificates:
       - "security/ssl/test.mrbenn.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "admin.mrbenn.wistla.com"
+    private_key: "security/ssl/admin.mrbenn.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.mrbenn.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # --- 7-zark-7
 
   - name: "7-zark-7.wistla.com"
@@ -115,6 +133,12 @@ cluster_admin_certificates:
       - "security/ssl/test.7-zark-7.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "admin.7-zark-7.wistla.com"
+    private_key: "security/ssl/admin.7-zark-7.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.7-zark-7.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # --- optimus
 
   - name: "optimus.dev.wistla.com"
@@ -133,6 +157,12 @@ cluster_admin_certificates:
     private_key: "security/ssl/test.optimus.dev.wistla.com.key"
     certificates:
       - "security/ssl/test.optimus.dev.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.optimus.dev.wistla.com"
+    private_key: "security/ssl/admin.optimus.dev.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.optimus.dev.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
   # --- icinga
