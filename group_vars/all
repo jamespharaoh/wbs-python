@@ -121,6 +121,12 @@ vagrant_install_node:
   - name: "node-inspector"
     version: "0.8.3"
 
+  - name: "gulp"
+    version: "3.8.11"
+
+  - name: "jspm"
+    version: "0.15.3"
+
 devenv_checkouts:
 
   - name: "wistla-admin"
