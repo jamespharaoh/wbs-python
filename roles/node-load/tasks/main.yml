@@ -25,4 +25,32 @@
     src: "/config/nginx-upstream.conf"
     force: "yes"
 
+- name: "deploy projects"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      --exclude /dist/config/config.local.js
+      --include /dist
+      --include /favicon.ico
+      --include /index.html
+      --include /jspm_packages
+      --include /styles
+      --exclude '/*';
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  tags: "quick"
+  with_items:
+    - "wistla-admin"
+
 # ex: et ts=2 filetype=yaml

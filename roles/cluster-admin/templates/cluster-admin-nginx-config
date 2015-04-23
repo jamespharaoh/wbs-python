@@ -123,6 +123,38 @@ http {
 
 	}
 
+	# admin redirect to ssl
+
+	server {
+
+		listen 80;
+
+		server_name admin.{{ dev_deployment.private_domain }};
+
+		return 301 https://admin.{{ dev_deployment.private_domain }}$request_uri;
+
+	}
+
+	server {
+
+		listen 443 ssl;
+
+		server_name admin.{{ dev_deployment.private_domain }};
+
+		ssl_certificate /etc/nginx/ssl/admin.{{ dev_deployment.private_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/admin.{{ dev_deployment.private_domain }}.key;
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+		location / {
+			proxy_pass http://{{ dev_deployment_name }}-load/;
+			proxy_set_header Host $host;
+		}
+
+	}
+
 	# test
 
 	server {

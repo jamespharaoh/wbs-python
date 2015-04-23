@@ -88,4 +88,28 @@ http {
 
 	}
 
+	# admin
+
+	server {
+
+		server_name admin.{{ deployment_private_domain }};
+{% if deployment_private_domain != deployment_public_domain %}
+		server_name admin.{{ deployment_public_domain }};
+{% endif %}
+
+		root /home/ubuntu/wistla-admin;
+
+		location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+			expires max;
+			log_not_found off;
+		}
+
+		location / {
+			try_files $uri /index.html;
+		}
+
+		}
+
+	}
+
 }

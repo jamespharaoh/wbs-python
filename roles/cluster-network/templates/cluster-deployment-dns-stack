@@ -43,6 +43,16 @@ Resources:
         HostedZoneId: "{{ cluster_app_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
+  AdminRecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: "admin.{{ deployment.private_domain }}."
+      Type: "A"
+      AliasTarget:
+        DNSName: "{{ cluster_app_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_app_balancer_hosted_zone_name_id }}"
+      HostedZoneId: { Ref: "HostedZone" }
+
 Outputs:
 
   HostedZone:
