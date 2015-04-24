@@ -32,17 +32,30 @@ cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
 
 cluster_checkouts:
 
+  - name: "wistla-admin"
+    branch: "master"
+    build_steps:
+      - "npm install"
+      - "jspm install -y"
+      - "gulp build"
+
   - name: "wistla-api"
     branch: "master"
+    build_steps:
+      - "npm install"
 
   - name: "wistla-browser"
     branch: "master"
+    build_steps:
+      - "npm install"
 
   - name: "wistla-devops"
     branch: "master"
 
   - name: "wistla-web"
     branch: "master"
+    build_steps:
+      - "npm install"
 
   - name: "wistla-test-images"
     branch: "master"

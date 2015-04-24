@@ -120,6 +120,42 @@ http {
 
 	}
 
+	# admin redirect http to https
+
+	server {
+
+		listen 80;
+
+		server_name admin.{{ domain }};
+
+		return 301 https://admin.{{ domain }}$request_uri;
+
+	}
+
+	# api
+
+	server {
+
+		listen 443 ssl;
+
+		server_name admin.{{ domain }};
+
+		ssl_certificate /etc/nginx/ssl/admin.{{ certificate }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/admin.{{ certificate }}.key;
+
+		client_max_body_size 16m;
+
+		location / {
+			proxy_pass http://deployment-{{ target }};
+			proxy_set_header Host "admin.{{ domain }}";
+		}
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+	}
+
 {% endmacro %}
 
 {% for deployment_alias in deployment_aliases

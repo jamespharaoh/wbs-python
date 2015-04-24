@@ -42,7 +42,14 @@ cluster_app_install_python:
 
 cluster_app_install_node:
 
-  - "node-inspector"
+  - name: "node-inspector"
+    version: "0.8.3"
+
+  - name: "gulp"
+    version: "3.8.11"
+
+  - name: "jspm"
+    version: "0.15.3"
 
 vagrant_user: "ubuntu"
 vagrant_home: "/home/ubuntu"

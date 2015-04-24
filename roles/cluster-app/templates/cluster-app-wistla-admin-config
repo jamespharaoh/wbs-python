@@ -1,0 +1,20 @@
+var configLocal = {
+
+	urls: {
+
+		baseUrl: 'https://admin.{{ deployment_public_domain }}',
+
+		adminUrl: 'https://admin.{{ deployment_public_domain }}',
+		apiUrl: 'https://api.{{ deployment_public_domain }}',
+{% if deployment_public_domain == 'wistla.com' %}
+		shortUrl: 'https://wist.la',
+{% else %}
+		shortUrl: 'https://{{ deployment }}.wist.la',
+{% endif %}
+		webUrl: 'https://www.{{ deployment_public_domain }}'
+
+	}
+
+};
+
+// ex: noet ts=4 filetype=javascript

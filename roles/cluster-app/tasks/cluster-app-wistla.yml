@@ -25,15 +25,13 @@
     - "cluster_deployment_names"
     - "cluster_checkouts"
 
-- name: "install npm dependencies"
-  shell:
-    set -e;
-    cd "{{ vagrant_home }}/{{ item }}";
-    for project_name in *; do
-      test -f "$project_name/package.json" || continue;
-      ( cd "$project_name"; npm install; );
-    done;
-  with_items: "cluster_deployment_names"
+- name: "run project build steps"
+  shell: "{{ item.1.build_steps | default ([ 'true' ]) | join (' && ') }}"
+  args:
+    chdir: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.name }}"
+  with_nested:
+    - "cluster_deployment_names"
+    - "cluster_checkouts"
 
 - name: "create directories"
   action:
@@ -67,6 +65,9 @@
 
       - source: "cluster-app-wistla-devops-accounts"
         target: "wistla-devops/accounts"
+
+      - source: "cluster-app-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
 
       - source: "cluster-app-wistla-api-config"
         target: "config/api/config.local.js"

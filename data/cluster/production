@@ -52,6 +52,8 @@ cluster_admin_certificates: []
 
 cluster_app_certificates:
 
+  # ----- production
+
   - name: "wistla.com"
     private_key: "security/ssl/wistla.com.key"
     certificates:
@@ -63,6 +65,14 @@ cluster_app_certificates:
     certificates:
       - "security/ssl/api.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.wistla.com"
+    private_key: "security/ssl/admin.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # ----- staging
 
   - name: "staging.wistla.com"
     private_key: "security/ssl/staging.wistla.com.key"
@@ -76,6 +86,14 @@ cluster_app_certificates:
       - "security/ssl/api.staging.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "admin.staging.wistla.com"
+    private_key: "security/ssl/admin.staging.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # ----- test everest
+
   - name: "everest.test.wistla.com"
     private_key: "security/ssl/everest.test.wistla.com.key"
     certificates:
@@ -87,6 +105,14 @@ cluster_app_certificates:
     certificates:
       - "security/ssl/api.everest.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.everest.test.wistla.com"
+    private_key: "security/ssl/admin.everest.test.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.everest.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # ----- test k2
 
   - name: "k2.test.wistla.com"
     private_key: "security/ssl/k2.test.wistla.com.key"
@@ -100,6 +126,14 @@ cluster_app_certificates:
       - "security/ssl/api.k2.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "admin.k2.test.wistla.com"
+    private_key: "security/ssl/admin.k2.test.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.k2.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  # ----- test montblanc
+
   - name: "montblanc.test.wistla.com"
     private_key: "security/ssl/montblanc.test.wistla.com.key"
     certificates:
@@ -110,6 +144,12 @@ cluster_app_certificates:
     private_key: "security/ssl/api.montblanc.test.wistla.com.key"
     certificates:
       - "security/ssl/api.montblanc.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.montblanc.test.wistla.com"
+    private_key: "security/ssl/admin.montblanc.test.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.montblanc.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
 # ex: et ts=2 filetype=yaml

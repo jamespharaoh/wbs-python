@@ -70,15 +70,6 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "make node command work"
-  action:
-    module: "alternatives"
-    link: "/usr/bin/node"
-    name: "node"
-    path: "/usr/bin/nodejs"
-  sudo: "yes"
-  sudo_user: "root"
-
 - name: "install python packages"
   action:
     module: "pip"
@@ -86,16 +77,6 @@
   sudo: "yes"
   sudo_user: "root"
   with_items: "cluster_app_install_python"
-  tags: "update"
-
-- name: "install node packages"
-  action:
-    module: "npm"
-    name: "{{ item }}"
-    global: "yes"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "cluster_app_install_node"
   tags: "update"
 
 - name: "set hostname"
