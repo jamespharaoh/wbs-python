@@ -58,4 +58,11 @@ fi
 
 source "$HOME/wistla-devops/ansible/hacking/env-setup"
 
+# useful aliases
+
+alias run-ansible="$HOME/wistla-devops/run-ansible"
+alias run-redeploy="$HOME/wistla-devops/run-ansible redeploy.yml"
+alias run-clean-data="$HOME/wistla-devops/run-ansible clean-data.yml"
+alias run-devbox="$HOME/wistla-devops/run-ansible devbox.yml"
+
 # ex: noet ts=4 filetype=sh
