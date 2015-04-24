@@ -118,14 +118,20 @@ vagrant_install_python:
 
 vagrant_install_node:
 
-  - name: "node-inspector"
-    version: "0.8.3"
+  - name: "bunyan"
+    version: "1.3.4"
 
   - name: "gulp"
     version: "3.8.11"
 
   - name: "jspm"
     version: "0.15.3"
+
+  - name: "mocha"
+    version: "2.2.4"
+
+  - name: "node-inspector"
+    version: "0.8.3"
 
 devenv_checkouts:
 
