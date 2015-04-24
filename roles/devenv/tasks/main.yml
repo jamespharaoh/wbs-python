@@ -89,6 +89,10 @@
   sudo_user: "{{ deployment_user }}"
   with_items:
 
+    - template: "devenv-wistla-admin-config"
+      type: "load"
+      target: "wistla-admin-config.local.js"
+
     - template: "devenv-wistla-api-config"
       type: "api"
       target: "config.local.js"
@@ -130,6 +134,9 @@
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
   with_items:
+
+    - src: "../../config/load/wistla-admin-config.local.js"
+      dest: "{{ deployment_home }}/wistla-admin/config/config.local.js"
 
     - src: "../../config/api/config.local.js"
       dest: "{{ deployment_home }}/wistla-api/config/config.local.js"

@@ -1,0 +1,11 @@
+var configLocal = {
+
+	authentication: {
+
+		redirectUrl: 'https://admin.{{ deployment_public_domain }}/login'
+
+	}
+
+};
+
+// ex: noet ts=4 filetype=javascript

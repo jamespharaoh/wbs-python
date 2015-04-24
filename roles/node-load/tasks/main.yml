@@ -17,14 +17,6 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "link to upstream config"
-  action:
-    module: "file"
-    path: "/etc/nginx/upstream.conf"
-    state: "link"
-    src: "/config/nginx-upstream.conf"
-    force: "yes"
-
 - name: "deploy projects"
   delegate_to: "localhost"
   shell:
@@ -37,7 +29,9 @@
       --itemize-changes
       {{ deployment_home }}/{{ item }}/
       /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
-      --exclude /dist/config/config.local.js
+      --exclude /config/config.local.js
+      --include /config
+      --include /config.js
       --include /dist
       --include /favicon.ico
       --include /index.html
@@ -52,5 +46,20 @@
   tags: "quick"
   with_items:
     - "wistla-admin"
+
+- name: "link to upstream config"
+  action:
+    module: "file"
+    path: "{{ item.link }}"
+    state: "link"
+    src: "{{ item.source }}"
+    force: "yes"
+  with_items:
+
+    - link: "/etc/nginx/upstream.conf"
+      source: "/config/nginx-upstream.conf"
+
+    - link: "/home/ubuntu/wistla-admin/config/config.local.js"
+      source: "/config/wistla-admin-config.local.js"
 
 # ex: et ts=2 filetype=yaml
