@@ -18,21 +18,15 @@
   with_items: "devenv_checkouts"
   when: "deployment_mode == 'vagrant'"
 
-- name: "install node modules"
-  shell:
-
-    set -e;
-
-    cd {{ deployment_home }}/{{ item }};
-
-    npm install;
-
+- name: "run build steps"
+  shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
   args:
+    chdir: "{{ deployment_home }}/{{ item.name }}"
     creates: "{{ deployment_home }}/{{ item }}/node_modules"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items:
-    - "wistla-web"
+  with_items: "devenv_checkouts"
+  tags: "build"
 
 - name: "create git pre-commit hooks"
   action:
