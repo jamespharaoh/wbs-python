@@ -18,4 +18,14 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "install node packages"
+  action:
+    module: "npm"
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    global: "yes"
+  sudo: "yes"
+  with_items: "cluster_jenkins_install_node"
+  tags: "update"
+
 # ex: et ts=2 filetype=yaml

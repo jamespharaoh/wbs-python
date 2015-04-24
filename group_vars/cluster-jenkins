@@ -34,6 +34,14 @@ cluster_jenkins_remove_packages:
   - "python-apport"
   - "python3-apport"
 
+cluster_jenkins_install_node:
+
+  - name: "gulp"
+    version: "3.8.11"
+
+  - name: "jspm"
+    version: "0.15.3"
+
 jenkins_deployment_names:
 
   - "jenkins-latest"
