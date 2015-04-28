@@ -5,6 +5,10 @@ var config = require(ROOT + '/config/config.global');
 config.apiUrl = 'https://api.{{ deployment_public_domain }}';
 config.apiTest = 'http://api.{{ deployment_private_domain }}';
 
+// web url
+config.webUrl = 'https://{{ deployment_public_domain }}';
+config.webTest = 'http://{{ deployment_private_domain }}';
+
 // short url for links sent out
 config.shortUrl = 'https://{{ deployment }}.wist.la';
 config.shortTest = 'http://{{ deployment }}.wist.la';
