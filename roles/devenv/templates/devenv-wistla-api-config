@@ -5,9 +5,9 @@ var config = require(ROOT + '/config/config.global');
 config.apiUrl = 'https://api.{{ deployment_public_domain }}';
 config.apiTest = 'http://api.{{ deployment_private_domain }}';
 
-// share url for links sent out
-config.shareUrl = 'https://{{ deployment }}.wist.la';
-config.shareTest = 'http://{{ deployment }}.wist.la';
+// short url for links sent out
+config.shortUrl = 'https://{{ deployment }}.wist.la';
+config.shortTest = 'http://{{ deployment }}.wist.la';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla';
@@ -61,6 +61,11 @@ config.loadingData = {
 
 // apple push notifications
 config.applePush = {
+{% if 'dev' in third_parties %}
+	enabled: true,
+{% else %}
+	enabled: false,
+{% endif %}
 	caCertFile: ROOT + '/config/apple-ca.cert',
 	certFile: ROOT + '/config/apple-push.cert',
 	keyFile: ROOT + '/config/apple-push.key',
