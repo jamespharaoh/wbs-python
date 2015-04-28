@@ -2,11 +2,13 @@
 
 - name: "production"
   domain: "wistla.com"
+  short_domain: "wist.la"
   cluster: "production"
   target: "production-b"
 
 - name: "staging"
   domain: "staging.wistla.com"
+  short_domain: "stating.wist.la"
   cluster: "production"
   target: "staging-a"
 
