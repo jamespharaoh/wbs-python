@@ -108,25 +108,33 @@
     module: "copy"
     src: "{{ item.source }}"
     dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
-    mode: "{{ item.mode }}"
+    mode: "0644"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
+  with_items:
+
+    - source: "security/apple/apple-ca.cert"
+      type: "api"
+      target: "apple-ca.cert"
+
+    - source: "security/apple/apple-push-dev.cert"
+      type: "api"
+      target: "apple-push.cert"
+
+- name: "copy config secrets"
+  action:
+    module: "copy"
+    src: "{{ item.source }}"
+    dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
+    mode: "0600"
+  sudo: "yes"
+  sudo_user: "{{ deployment_user }}"
+  when: "'dev' in secrets"
   with_items:
 
     - source: "security/test/google-service-account.key"
       type: "api"
       target: "google-service-account.key"
-      mode: "0600"
-
-    - source: "security/apple/apple-ca.cert"
-      type: "api"
-      target: "apple-ca.cert"
-      mode: "0644"
-
-    - source: "security/apple/apple-push-dev.cert"
-      type: "api"
-      target: "apple-push.cert"
-      mode: "0644"
 
     - source: "security/apple/apple-push-dev.key"
       type: "api"
