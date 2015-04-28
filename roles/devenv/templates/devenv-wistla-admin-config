@@ -6,7 +6,7 @@ var configLocal = {
 
 		adminUrl: 'https://admin.{{ deployment_public_domain }}',
 		apiUrl: 'https://api.{{ deployment_public_domain }}',
-		shortUrl: 'https://{{ deployment }}.wist.la',
+		shareUrl: 'https://{{ deployment }}.wist.la',
 		webUrl: 'https://{{ deployment_public_domain }}'
 
 	}

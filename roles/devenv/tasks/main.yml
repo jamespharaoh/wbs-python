@@ -118,6 +118,21 @@
       target: "google-service-account.key"
       mode: "0600"
 
+    - source: "security/apple/apple-ca.cert"
+      type: "api"
+      target: "apple-ca.cert"
+      mode: "0644"
+
+    - source: "security/apple/apple-push-dev.cert"
+      type: "api"
+      target: "apple-push.cert"
+      mode: "0644"
+
+    - source: "security/apple/apple-push-dev.key"
+      type: "api"
+      target: "apple-push.key"
+      mode: "0600"
+
 - name: "create links to config files"
   action:
     module: "file"
@@ -129,8 +144,14 @@
   sudo_user: "{{ deployment_user }}"
   with_items:
 
-    - src: "../../config/load/wistla-admin-config.local.js"
-      dest: "{{ deployment_home }}/wistla-admin/config/config.local.js"
+    - src: "../../config/api/apple-ca.cert"
+      dest: "{{ deployment_home }}/wistla-api/config/apple-ca.cert"
+
+    - src: "../../config/api/apple-push.cert"
+      dest: "{{ deployment_home }}/wistla-api/config/apple-push.cert"
+
+    - src: "../../config/api/apple-push.key"
+      dest: "{{ deployment_home }}/wistla-api/config/apple-push.key"
 
     - src: "../../config/api/config.local.js"
       dest: "{{ deployment_home }}/wistla-api/config/config.local.js"
@@ -140,6 +161,9 @@
 
     - src: "../../config/browser/config.local.js"
       dest: "{{ deployment_home }}/wistla-browser/config/config.local.js"
+
+    - src: "../../config/load/wistla-admin-config.local.js"
+      dest: "{{ deployment_home }}/wistla-admin/config/config.local.js"
 
     - src: "../../config/web/config.local.js"
       dest: "{{ deployment_home }}/wistla-web/config/config.local.js"

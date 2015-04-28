@@ -41,6 +41,9 @@
       --exclude /.git
       --exclude /config/config.local.js
       --exclude /config/google-service-account.key
+      --exclude /config/apple-ca.cert
+      --exclude /config/apple-push.cert
+      --exclude /config/apple-push.key
       --exclude /node_modules;
 
   sudo: "yes"
@@ -86,6 +89,9 @@
     src: "/config/{{ item }}"
     force: "yes"
   with_items:
+    - "apple-ca.cert"
+    - "apple-push.cert"
+    - "apple-push.key"
     - "config.local.js"
     - "google-service-account.key"
 

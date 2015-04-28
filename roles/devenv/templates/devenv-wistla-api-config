@@ -1,11 +1,13 @@
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
-// public url used for general access and urls returned by api
+// api url
 config.apiUrl = 'https://api.{{ deployment_public_domain }}';
+config.apiTest = 'http://api.{{ deployment_private_domain }}';
 
-// test url which works locally
-config.testUrl = 'http://api.{{ deployment_private_domain }}';
+// share url for links sent out
+config.shareUrl = 'https://{{ deployment }}.wist.la';
+config.shareTest = 'http://{{ deployment }}.wist.la';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla';
@@ -55,6 +57,14 @@ config.loadingData = {
 {% else %}
 		cryptoKey: ''
 {% endif %}
+};
+
+// apple push notifications
+config.applePush = {
+	caCertFile: ROOT + '/config/apple-ca.cert',
+	certFile: ROOT + '/config/apple-push.cert',
+	keyFile: ROOT + '/config/apple-push.key',
+	production: false,
 };
 
 module.exports = config;
