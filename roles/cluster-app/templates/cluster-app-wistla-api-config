@@ -4,11 +4,21 @@
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
-// public url used for general access and urls returned by api
+// api url
 config.apiUrl = 'https://api.{{ deployment.public_domain }}';
+config.apiTest = 'http://api.{{ deployment.private_domain }}';
 
-// test url which works locally
-config.testUrl = 'http://api.{{ deployment.private_domain }}';
+// web url
+config.webUrl = 'https://www.{{ deployment_public_domain }}';
+config.webTest = 'http://{{ deployment_private_domain }}';
+
+// short url for links sent out
+{% if deployment_public_domain == 'wistla.com' %}
+config.shortUrl = 'https://wist.la';
+{% else %}
+config.shortUrl = 'https://{{ deployment_name }}.wist.la';
+{% endif %}
+config.shortTest = 'http://{{ deployment_name }}.wist.la';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';
@@ -47,6 +57,15 @@ config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
 	keyFile: '/config/google-service-account.key',
 	cryptoKey: '{{ third_parties [cluster].google_maps_key }}'
+};
+
+// apple push notifications
+config.applePush = {
+	enabled: true,
+	caCertFile: ROOT + '/config/apple-ca.cert',
+	certFile: ROOT + '/config/apple-push.cert',
+	keyFile: ROOT + '/config/apple-push.key',
+	production: false,
 };
 
 module.exports = config;

@@ -38,6 +38,7 @@
     module: "file"
     path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
     state: "directory"
+  tags: "cluster-app-wistla-config"
   with_nested:
 
     - "cluster_deployment_names"
@@ -56,6 +57,7 @@
     module: "template"
     src: "{{ item.1.source }}"
     dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.target }}"
+  tags: "cluster-app-wistla-config"
   with_nested:
 
     - "cluster_deployment_names"
@@ -87,12 +89,25 @@
     src: "{{ item.1.source }}"
     dest: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1.target }}"
     mode: "{{ item.1.mode }}"
+  tags: "cluster-app-wistla-config"
   with_nested:
 
     - "cluster_deployment_names"
 
     - - source: "security/test/google-service-account.key"
         target: "config/api/google-service-account.key"
+        mode: "0600"
+
+      - source: "security/apple/apple-ca.cert"
+        target: "config/api/apple-ca.cert"
+        mode: "0644"
+
+      - source: "security/apple/apple-push-dev.cert"
+        target: "config/api/apple-push.cert"
+        mode: "0644"
+
+      - source: "security/apple/apple-push-dev.key"
+        target: "config/api/apple-push.key"
         mode: "0600"
 
 - name: "create links to config files"
