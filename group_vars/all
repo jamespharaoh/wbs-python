@@ -178,4 +178,13 @@ zone_colours:
 
 zone_colour: "{{ zone_colours [zon] }}"
 
+kernel_mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
+kernel_versions: "{{ lookup ('file', 'data/kernel-versions') | from_yaml }}"
+
+kernel_branch: "{{ kernel_versions [kernel_version].branch }}"
+kernel_version_zero: "{{ kernel_versions [kernel_version].version_zero }}"
+kernel_build: "{{ kernel_versions [kernel_version].build }}"
+kernel_type: "{{ kernel_versions [kernel_version].type }}"
+kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
+
 # ex: et ts=2 filetype=yaml

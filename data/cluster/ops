@@ -31,6 +31,9 @@ amazon_images:
 
 amazon_key_name: "wistla-ops"
 
+kernel_versions:
+  jenkins: "4.0.1"
+
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cluster_admin_certificates:

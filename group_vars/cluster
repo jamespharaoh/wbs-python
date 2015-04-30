@@ -63,4 +63,6 @@ cluster_checkouts:
 cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
 cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
 
+kernel_version: "{{ clusters [cluster].kernel_versions [cluster_type] }}"
+
 # ex: et ts=2 filetype=yaml
