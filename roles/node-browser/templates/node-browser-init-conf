@@ -30,7 +30,7 @@ script
 	nodejs \
 	--trace_gc \
 {% endif %}
-	keystone.js
+	server.js
 
 end script
 
