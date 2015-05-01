@@ -133,6 +133,9 @@ vagrant_install_node:
   - name: "node-inspector"
     version: "0.8.3"
 
+  - name: "prettyjson"
+    version: "1.1.0"
+
 devenv_checkouts:
 
   - name: "wistla-admin"
