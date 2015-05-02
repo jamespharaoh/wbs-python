@@ -2,12 +2,12 @@ var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-config.apiUrl = 'https://api.{{ deployment_public_domain }}';
-config.apiTest = 'http://api.{{ deployment_private_domain }}';
+config.apiUrl = 'https://api.{{ deployment_main_domain }}';
+config.apiTest = 'http://api.{{ deployment_main_domain }}';
 
 // web url
-config.webUrl = 'https://{{ deployment_public_domain }}';
-config.webTest = 'http://{{ deployment_private_domain }}';
+config.webUrl = 'https://{{ deployment_main_domain }}';
+config.webTest = 'http://{{ deployment_main_domain }}';
 
 // short url for links sent out
 config.shortUrl = 'https://{{ deployment }}.wist.la';

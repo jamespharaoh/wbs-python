@@ -2,12 +2,12 @@ var configLocal = {
 
 	urls: {
 
-		baseUrl: 'https://admin.{{ deployment_public_domain }}',
+		baseUrl: 'https://admin.{{ deployment_main_domain }}',
 
-		adminUrl: 'https://admin.{{ deployment_public_domain }}',
-		apiUrl: 'https://api.{{ deployment_public_domain }}',
+		adminUrl: 'https://admin.{{ deployment_main_domain }}',
+		apiUrl: 'https://api.{{ deployment_main_domain }}',
 		shortUrl: 'https://{{ deployment }}.wist.la',
-		webUrl: 'https://{{ deployment_public_domain }}'
+		webUrl: 'https://{{ deployment_main_domain }}'
 
 	}
 

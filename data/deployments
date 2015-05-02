@@ -4,9 +4,9 @@ production-a:
 
   name: "production-a"
   cluster: "production"
+  alias: "production"
 
-  public_domain: "wistla.com"
-  private_domain: "a.wistla.com"
+  main_domain: "a.wistla.com"
   short_domain: "a.wist.la"
 
   parent_cluster: "production"
@@ -19,9 +19,9 @@ production-b:
 
   name: "production-b"
   cluster: "production"
+  alias: "production"
 
-  public_domain: "wistla.com"
-  private_domain: "b.wistla.com"
+  main_domain: "b.wistla.com"
   short_domain: "b.wist.la"
 
   parent_cluster: "production"
@@ -34,9 +34,9 @@ staging-a:
 
   name: "staging-a"
   cluster: "production"
+  alias: "staging"
 
-  public_domain: "staging.wistla.com"
-  private_domain: "a.staging.wistla.com"
+  main_domain: "a.staging.wistla.com"
   short_domain: "a.staging.wist.la"
 
   parent_cluster: "staging"
@@ -49,9 +49,9 @@ staging-b:
 
   name: "staging-b"
   cluster: "production"
+  alias: "staging"
 
-  public_domain: "staging.wistla.com"
-  private_domain: "b.staging.wistla.com"
+  main_domain: "b.staging.wistla.com"
   short_domain: "b.staging.wist.la"
 
   parent_cluster: "staging"
@@ -65,8 +65,7 @@ test-everest:
   name: "test-everest"
   cluster: "production"
 
-  public_domain: "everest.test.wistla.com"
-  private_domain: "everest.test.wistla.com"
+  main_domain: "everest.test.wistla.com"
   short_domain: "everest.test.wist.la"
 
   parent_cluster: "production"
@@ -80,8 +79,7 @@ test-k2:
   name: "test-k2"
   cluster: "production"
 
-  public_domain: "k2.test.wistla.com"
-  private_domain: "k2.test.wistla.com"
+  main_domain: "k2.test.wistla.com"
   short_domain: "k2.test.wist.la"
 
   parent_cluster: "production"
@@ -95,8 +93,7 @@ test-montblanc:
   name: "test-montblanc"
   cluster: "production"
 
-  public_domain: "montblanc.test.wistla.com"
-  private_domain: "montblanc.test.wistla.com"
+  main_domain: "montblanc.test.wistla.com"
   short_domain: "montblanc.test.wist.la"
 
   parent_cluster: "production"
@@ -110,8 +107,7 @@ dev:
   name: "dev"
   cluster: "dev"
 
-  public_domain: "dev.wistla.com"
-  private_domain: "dev.wistla.com"
+  main_domain: "dev.wistla.com"
   short_domain: "dev.wist.la"
 
   bridge_name: "br152"
@@ -122,8 +118,7 @@ berk:
   name: "berk"
   cluster: "dev"
 
-  public_domain: "berk.wistla.com"
-  private_domain: "berk.wistla.com"
+  main_domain: "berk.wistla.com"
   short_domain: "berk.dev.wist.la"
 
   bridge_name: "br150"
@@ -134,8 +129,9 @@ bruce:
   name: "bruce"
   cluster: "dev"
 
-  public_domain: "bruce.wistla.com"
+  main_domain: "bruce.wistla.com"
   private_domain: "bruce.wistla.com"
+
   short_domain: "bruce.dev.wist.la"
 
   bridge_name: "br154"
@@ -146,8 +142,7 @@ mrbenn:
   name: "mrbenn"
   cluster: "dev"
 
-  public_domain: "mrbenn.wistla.com"
-  private_domain: "mrbenn.wistla.com"
+  main_domain: "mrbenn.wistla.com"
   short_domain: "mrbenn.dev.wist.la"
 
   bridge_name: "br151"
@@ -158,8 +153,7 @@ mrbenn:
   name: "7-zark-7"
   cluster: "dev"
 
-  public_domain: "7-zark-7.wistla.com"
-  private_domain: "7-zark-7.wistla.com"
+  main_domain: "7-zark-7.wistla.com"
   short_domain: "7-zark-7.dev.wist.la"
 
   bridge_name: "br153"
@@ -170,8 +164,7 @@ optimus:
   name: "optimus"
   cluster: "dev"
 
-  public_domain: "optimus.dev.wistla.com"
-  private_domain: "optimus.dev.wistla.com"
+  main_domain: "optimus.dev.wistla.com"
   short_domain: "optimus.dev.wist.la"
 
   bridge_name: "br161"
@@ -182,8 +175,7 @@ jenkins-latest:
   name: "jenkins-latest"
   cluster: "dev"
 
-  public_domain: "latest.jenkins.wistla.com"
-  private_domain: "latest.jenkins.wistla.com"
+  main_domain: "latest.jenkins.wistla.com"
   short_domain: "latest.jenkins.wist.la"
 
   bridge_name: "br160"

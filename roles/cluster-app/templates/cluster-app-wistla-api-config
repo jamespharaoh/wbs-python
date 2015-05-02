@@ -5,20 +5,28 @@ var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-config.apiUrl = 'https://api.{{ deployment.public_domain }}';
-config.apiTest = 'http://api.{{ deployment.private_domain }}';
+{% if deployment_alias is defined %}
+config.apiUrl = 'https://api.{{ deployment_alias_main_domain }}';
+{% else %}
+config.apiUrl = 'https://api.{{ deployment_main_domain }}';
+{% endif %}
+config.apiTest = 'http://api.{{ deployment_main_domain }}';
 
 // web url
-config.webUrl = 'https://www.{{ deployment_public_domain }}';
-config.webTest = 'http://{{ deployment_private_domain }}';
+{% if deployment_alias is defined %}
+config.webUrl = 'https://www.{{ deployment_alias_main_domain }}';
+{% else %}
+config.webUrl = 'https://www.{{ deployment_main_domain }}';
+{% endif %}
+config.webTest = 'http://{{ deployment_main_domain }}';
 
 // short url for links sent out
-{% if deployment_public_domain == 'wistla.com' %}
-config.shortUrl = 'https://wist.la';
+{% if deployment_alias is defined %}
+config.shortUrl = 'https://{{ deployment_alias_short_domain }}';
 {% else %}
-config.shortUrl = 'https://{{ deployment_name }}.wist.la';
+config.shortUrl = 'https://{{ deployment_short_domain }}';
 {% endif %}
-config.shortTest = 'http://{{ deployment_name }}.wist.la';
+config.shortTest = 'http://{{ deployment_short_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';

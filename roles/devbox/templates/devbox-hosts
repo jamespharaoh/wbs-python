@@ -50,7 +50,7 @@
 {{ [
 	host_address,
 	other_deployment_name + '-' + host_name,
-	host_name + '.' + other_deployment.private_domain,
+	host_name + '.' + other_deployment.main_domain,
 ] | join (' ') }}
 {% endfor %}
 
@@ -63,7 +63,7 @@
 ] | join ('.') %}
 {{ [
 	host_address,
-	other_deployment.private_domain,
+	other_deployment.main_domain,
 ] | join (' ') }}
 {% endfor %}
 
@@ -77,7 +77,7 @@
 ] | join ('.') %}
 {{ [
 	host_address,
-	subdomain + '.' + other_deployment.private_domain,
+	subdomain + '.' + other_deployment.main_domain,
 ] | join (' ') }}
 {% endfor %}
 {% endfor %}

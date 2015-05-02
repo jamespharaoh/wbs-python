@@ -11,10 +11,10 @@
 
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.{{ deployment_private_domain }}
+{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.{{ deployment_main_domain }}
 {% endfor %}
 
 {% for host_name in groups['api-node'] %}
 {% set host = hostvars [host_name] %}
-{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} api.{{ deployment_private_domain }}
+{{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} api.{{ deployment_main_domain }}
 {% endfor %}

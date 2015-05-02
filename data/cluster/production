@@ -72,6 +72,12 @@ cluster_app_certificates:
       - "security/ssl/admin.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "wist.la"
+    private_key: "security/ssl/wist.la.key"
+    certificates:
+      - "security/ssl/wist.la.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # ----- staging
 
   - name: "staging.wistla.com"
@@ -90,6 +96,12 @@ cluster_app_certificates:
     private_key: "security/ssl/admin.staging.wistla.com.key"
     certificates:
       - "security/ssl/admin.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "staging.wist.la"
+    private_key: "security/ssl/staging.wist.la.key"
+    certificates:
+      - "security/ssl/staging.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
   # ----- test everest
@@ -112,6 +124,12 @@ cluster_app_certificates:
       - "security/ssl/admin.everest.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "everest.test.wist.la"
+    private_key: "security/ssl/everest.test.wist.la.key"
+    certificates:
+      - "security/ssl/everest.test.wist.la.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # ----- test k2
 
   - name: "k2.test.wistla.com"
@@ -132,6 +150,12 @@ cluster_app_certificates:
       - "security/ssl/admin.k2.test.wistla.com.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
+  - name: "k2.test.wist.la"
+    private_key: "security/ssl/k2.test.wist.la.key"
+    certificates:
+      - "security/ssl/k2.test.wist.la.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
   # ----- test montblanc
 
   - name: "montblanc.test.wistla.com"
@@ -150,6 +174,12 @@ cluster_app_certificates:
     private_key: "security/ssl/admin.montblanc.test.wistla.com.key"
     certificates:
       - "security/ssl/admin.montblanc.test.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "montblanc.test.wist.la"
+    private_key: "security/ssl/montblanc.test.wist.la.key"
+    certificates:
+      - "security/ssl/montblanc.test.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
 # ex: et ts=2 filetype=yaml

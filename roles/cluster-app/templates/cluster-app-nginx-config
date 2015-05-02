@@ -32,7 +32,7 @@ http {
 	}
 {% endfor %}
 
-{% macro do_deployment (domain, certificate, target) %}
+{% macro do_deployment (deployment, deployment_alias, target) %}
 
 	# website redirect naked domain to www
 
@@ -41,12 +41,12 @@ http {
 		listen 80;
 		listen 443 ssl;
 
-		server_name {{ domain }};
+		server_name {{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ certificate }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ certificate }}.key;
+		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.main_domain }}.key;
 
-		return 301 https://www.{{ domain }}$request_uri;
+		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
 	}
 
@@ -56,9 +56,9 @@ http {
 
 		listen 80;
 
-		server_name www.{{ domain }};
+		server_name www.{{ deployment.main_domain }};
 
-		return 301 https://www.{{ domain }}$request_uri;
+		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
 	}
 
@@ -68,23 +68,23 @@ http {
 
 		listen 443 ssl;
 
-		server_name www.{{ domain }};
+		server_name www.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ certificate }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ certificate }}.key;
+		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.main_domain }}.key;
 
 		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
-			proxy_set_header Host "{{ domain }}";
+			proxy_set_header Host "{{ deployment.main_domain }}";
 		}
 
 		location /keystone {
 			auth_basic "Restricted";
 			auth_basic_user_file /etc/nginx/htpasswd;
 			proxy_pass http://deployment-{{ target }}/keystone;
-			proxy_set_header Host "{{ domain }}";
+			proxy_set_header Host "{{ deployment.main_domain }}";
 		}
 
 {% if cluster != 'production' %}
@@ -102,16 +102,16 @@ http {
 		listen 80;
 		listen 443 ssl;
 
-		server_name api.{{ domain }};
+		server_name api.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/api.{{ certificate }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/api.{{ certificate }}.key;
+		ssl_certificate /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.key;
 
 		client_max_body_size 16m;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
-			proxy_set_header Host "api.{{ domain }}";
+			proxy_set_header Host "api.{{ deployment.main_domain }}";
 		}
 
 		location /robots.txt {
@@ -126,9 +126,9 @@ http {
 
 		listen 80;
 
-		server_name admin.{{ domain }};
+		server_name admin.{{ deployment.main_domain }};
 
-		return 301 https://admin.{{ domain }}$request_uri;
+		return 301 https://admin.{{ deployment.main_domain }}$request_uri;
 
 	}
 
@@ -138,16 +138,16 @@ http {
 
 		listen 443 ssl;
 
-		server_name admin.{{ domain }};
+		server_name admin.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/admin.{{ certificate }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/admin.{{ certificate }}.key;
+		ssl_certificate /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.key;
 
 		client_max_body_size 16m;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
-			proxy_set_header Host "admin.{{ domain }}";
+			proxy_set_header Host "admin.{{ deployment.main_domain }}";
 		}
 
 		location /robots.txt {
@@ -158,35 +158,58 @@ http {
 
 {% endmacro %}
 
-{% for deployment_alias in deployment_aliases
+{% for deployment_alias_name, deployment_alias in deployment_aliases.items ()
 	if deployment_alias.cluster == cluster %}
 
 # ----- deployment alias {{ deployment_alias.name }} -----
 #
-# domain: {{ deployment_alias.domain }}
+# main domain: {{ deployment_alias.main_domain }}
+# short domain: {{ deployment_alias.short_domain }}
 # target: {{ deployment_alias.target }}
 #
 
 {{ do_deployment (
-	deployment_alias.domain,
-	deployment_alias.domain,
+	deployment_alias,
+	deployment_alias,
 	deployment_alias.target) }}
 
 {% endfor %}
 
-{% for deployment_name, deployment in deployments.items ()
-	if (deployment.cluster | default ('none')) == cluster %}
+{% for other_deployment_name, other_deployment in deployments.items ()
+	if (other_deployment.cluster | default ('none')) == cluster %}
 
-# ----- deployment {{ deployment_name }} -----
+{% if other_deployment.alias is defined %}
+{% set other_deployment_alias = deployment_aliases [other_deployment.alias] %}
+
+# ----- deployment {{ other_deployment_name }} -----
 #
-# private domain: {{ deployment.private_domain }}
-# public domain: {{ deployment.public_domain }}
+# main domain: {{ other_deployment.main_domain }}
+# short domain: {{ other_deployment.short_domain }}
+#
+# alias name: {{ other_deployment.alias }}
+# main domain: {{ other_deployment_alias.main_domain }}
+# short domain: {{ other_deployment_alias.short_domain }}
 #
 
 {{ do_deployment (
-	deployment.private_domain,
-	deployment.public_domain,
-	deployment_name) }}
+	other_deployment,
+	other_deployment_alias,
+	other_deployment_name) }}
+
+{% else %}
+
+# ----- deployment {{ other_deployment_name }} -----
+#
+# main domain: {{ other_deployment.main_domain }}
+# short domain: {{ other_deployment.short_domain }}
+#
+
+{{ do_deployment (
+	other_deployment,
+	other_deployment,
+	other_deployment_name) }}
+
+{% endif %}
 
 {% endfor %}
 

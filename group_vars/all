@@ -55,8 +55,26 @@ clusters:
 deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
 deployment_aliases: "{{ lookup ('file', 'data/deployment-aliases') | from_yaml }}"
 
-deployment_public_domain: "{{ deployments [deployment].public_domain }}"
-deployment_private_domain: "{{ deployments [deployment].public_domain }}"
+deployment_alias: "{{
+  deployments [deployment].alias
+  if 'alias' in deployments [deployment]
+  else False
+}}"
+
+deployment_main_domain: "{{ deployments [deployment].main_domain }}"
+deployment_short_domain: "{{ deployments [deployment].short_domain }}"
+
+deployment_alias_main_domain: "{{
+  deployment_aliases [deployment_alias].main_domain
+  if 'alias' in deployments [deployment]
+  else None
+}}"
+
+deployment_alias_short_domain: "{{
+  deployment_aliases [deployment_alias].short_domain
+  if 'alias' in deployments [deployment]
+  else None
+}}"
 
 deployment_bridge_name: "{{ deployments [deployment].bridge_name }}"
 deployment_bridge_network: "{{ deployments [deployment].bridge_network }}"

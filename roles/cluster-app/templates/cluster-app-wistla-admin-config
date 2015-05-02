@@ -2,16 +2,12 @@ var configLocal = {
 
 	urls: {
 
-		baseUrl: 'https://admin.{{ deployment_public_domain }}',
+		baseUrl: 'https://admin.{{ deployment_alias_main_domain }}',
 
-		adminUrl: 'https://admin.{{ deployment_public_domain }}',
-		apiUrl: 'https://api.{{ deployment_public_domain }}',
-{% if deployment_public_domain == 'wistla.com' %}
-		shortUrl: 'https://wist.la',
-{% else %}
-		shortUrl: 'https://{{ deployment }}.wist.la',
-{% endif %}
-		webUrl: 'https://www.{{ deployment_public_domain }}'
+		adminUrl: 'https://admin.{{ deployment_alias_main_domain }}',
+		apiUrl: 'https://api.{{ deployment_alias_main_domain }}',
+		shortUrl: 'https://{{ deployment_alias_short_domain }}',
+		webUrl: 'https://www.{{ deployment_alias_main_domain }}'
 
 	}
 

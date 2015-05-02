@@ -65,7 +65,7 @@
   action:
     module: "route53"
     zone: "{{ item.value.parent_domain }}"
-    record: "{{ item.value.private_domain }}"
+    record: "{{ item.value.main_domain }}"
     type: "NS"
     command: "create"
     overwrite: "yes"

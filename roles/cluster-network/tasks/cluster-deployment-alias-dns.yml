@@ -76,7 +76,7 @@
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
   sudo: "yes"
   sudo_user: "vagrant"
-  with_items: "deployment_aliases"
+  with_items: "deployment_aliases.values ()"
   when: "cluster == 'production' and item.name != 'production'"
 
 # ex: et ts=2 filetype=yaml

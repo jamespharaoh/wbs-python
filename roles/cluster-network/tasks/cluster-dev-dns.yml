@@ -65,7 +65,7 @@
   action:
     module: "route53"
     zone: "wistla.com"
-    record: "{{ deployments [item].private_domain }}"
+    record: "{{ deployments [item].main_domain }}"
     type: "NS"
     command: "create"
     overwrite: "yes"

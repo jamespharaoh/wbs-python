@@ -10,7 +10,7 @@ Resources:
     Properties:
       Name: "wist.la."
 
-{% for deployment_alias in deployment_aliases %}
+{% for deployment_alias_name, deployment_alias in deployment_aliases.items () %}
 
 {% set other_cluster_data = lookup ('file', [
   '/home/vagrant/work/',

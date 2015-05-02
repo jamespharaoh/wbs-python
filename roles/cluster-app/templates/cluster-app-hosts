@@ -15,7 +15,7 @@
 {{ [
 	host_address,
 	other_deployment_name + '-' + host_name,
-	host_name + '.' + other_deployment.private_domain,
+	host_name + '.' + other_deployment.main_domain,
 ] | join (' ') }}
 {% endfor %}
 
