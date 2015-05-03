@@ -112,7 +112,7 @@ http {
 
 	# short
 
-	short {
+	server {
 
 		server_name {{ deployment_short_domain }};
 {% if 'alias' in deployments [deployment] %}
