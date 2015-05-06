@@ -7,6 +7,9 @@ var config = require(ROOT + '/config/config.global');
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla-web';
 
+// semi-persistent storage
+config.cmsImagePath = '/shared/cms-image';
+
 // mailchimp
 config.mailchimp = {
 	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
