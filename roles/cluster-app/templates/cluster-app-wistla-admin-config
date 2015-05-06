@@ -1,14 +1,19 @@
+{% set deployment_name = item.0 %}
+{% set deployment = deployments [deployment_name] %}
+{% if deployment.alias is defined %}
+{% set deployment_alias = deployment_aliases [deployment.alias] %}
+{% else %}
+{% set deployment_alias = deployment %}
+{% endif %}
+
 var configLocal = {
 
 	urls: {
-
-		baseUrl: 'https://admin.{{ deployment_alias_main_domain }}',
-
-		adminUrl: 'https://admin.{{ deployment_alias_main_domain }}',
-		apiUrl: 'https://api.{{ deployment_alias_main_domain }}',
-		shortUrl: 'https://{{ deployment_alias_short_domain }}',
-		webUrl: 'https://www.{{ deployment_alias_main_domain }}'
-
+		baseUrl: 'https://admin.{{ deployment_alias.main_domain }}',
+		adminUrl: 'https://admin.{{ deployment_alias.main_domain }}',
+		apiUrl: 'https://api.{{ deployment_alias.main_domain }}',
+		shortUrl: 'https://{{ deployment_alias.short_domain }}',
+		webUrl: 'https://www.{{ deployment_alias.main_domain }}'
 	}
 
 };

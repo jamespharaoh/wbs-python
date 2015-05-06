@@ -1,32 +1,25 @@
 {% set deployment_name = item.0 %}
 {% set deployment = deployments [deployment_name] %}
+{% if deployment.alias is defined %}
+{% set deployment_alias = deployment_aliases [deployment.alias] %}
+{% else %}
+{% set deployment_alias = deployment %}
+{% endif %}
 
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-{% if deployment_alias is defined %}
-config.apiUrl = 'https://api.{{ deployment_alias_main_domain }}';
-{% else %}
-config.apiUrl = 'https://api.{{ deployment_main_domain }}';
-{% endif %}
-config.apiTest = 'http://api.{{ deployment_main_domain }}';
+config.apiUrl = 'https://api.{{ deployment_alias.main_domain }}';
+config.apiTest = 'http://api.{{ deployment.main_domain }}';
 
 // web url
-{% if deployment_alias is defined %}
-config.webUrl = 'https://www.{{ deployment_alias_main_domain }}';
-{% else %}
-config.webUrl = 'https://www.{{ deployment_main_domain }}';
-{% endif %}
-config.webTest = 'http://{{ deployment_main_domain }}';
+config.webUrl = 'https://www.{{ deployment_alias.main_domain }}';
+config.webTest = 'http://www.{{ deployment.main_domain }}';
 
 // short url for links sent out
-{% if deployment_alias is defined %}
-config.shortUrl = 'https://{{ deployment_alias_short_domain }}';
-{% else %}
-config.shortUrl = 'https://{{ deployment_short_domain }}';
-{% endif %}
-config.shortTest = 'http://{{ deployment_short_domain }}';
+config.shortUrl = 'https://{{ deployment_alias.short_domain }}';
+config.shortTest = 'http://{{ deployment.short_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';
@@ -73,7 +66,7 @@ config.applePush = {
 	caCertFile: ROOT + '/config/apple-ca.cert',
 	certFile: ROOT + '/config/apple-push.cert',
 	keyFile: ROOT + '/config/apple-push.key',
-	production: false,
+	production: true,
 };
 
 module.exports = config;
