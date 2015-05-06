@@ -50,13 +50,21 @@
   with_items: "devenv_checkouts"
   when: "deployment_mode == 'vagrant'"
 
-- name: "create shared directory"
+- name: "create shared directories"
   action:
     module: "file"
-    path: "{{ deployment_home }}/shared"
+    path: "{{ item }}"
     state: "directory"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
+  with_items:
+    - "{{ deployment_home }}/shared"
+    - "{{ deployment_home }}/shared/audio"
+    - "{{ deployment_home }}/shared/cms-image"
+    - "{{ deployment_home }}/shared/image"
+    - "{{ deployment_home }}/shared/log"
+    - "{{ deployment_home }}/shared/user-upload"
+    - "{{ deployment_home }}/shared/video"
 
 - name: "create config directories"
   action:
