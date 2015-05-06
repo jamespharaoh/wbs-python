@@ -23,6 +23,8 @@ http {
 	gzip on;
 	gzip_disable "msie6";
 
+	client_max_body_size 16m;
+
 # ----- upstream servers per deployment -----
 
 {% for deployment_name in cluster_deployment_names %}
@@ -107,8 +109,6 @@ http {
 		ssl_certificate /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.key;
 
-		client_max_body_size 16m;
-
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "api.{{ deployment.main_domain }}";
@@ -142,8 +142,6 @@ http {
 
 		ssl_certificate /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.cert;
 		ssl_certificate_key /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.key;
-
-		client_max_body_size 16m;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
