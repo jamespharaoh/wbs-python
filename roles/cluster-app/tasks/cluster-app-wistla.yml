@@ -34,7 +34,7 @@
     - "cluster_deployment_names"
     - "cluster_checkouts"
 
-- name: "create directories"
+- name: "create config directories"
   action:
     module: "file"
     path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
@@ -51,7 +51,24 @@
       - "config/mongo"
       - "config/rabbit"
       - "config/web"
-      - "shared"
+
+- name: "create shared directories"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ item.0 }}/{{ item.1 }}"
+    state: "directory"
+  tags: "cluster-app-wistla-config"
+  with_nested:
+
+    - "cluster_deployment_names"
+
+    - - "shared"
+      - "shared/audio"
+      - "shared/cms-image"
+      - "shared/image"
+      - "shared/log"
+      - "shared/user-upload"
+      - "shared/video"
 
 - name: "create config files"
   action:
