@@ -29,6 +29,9 @@
   tags:
     - "cluster-common-system"
 
+- include: "cluster-common-kernel.yml"
+  tags: "cluster-common-kernel"
+
 - include: "cluster-common-ssh.yml"
   tags:
     - "cluster-common-ssh"
