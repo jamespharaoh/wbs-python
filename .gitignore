@@ -1,4 +1,5 @@
 /.Trash-*
+/.state
 /accounts
 /config
 /security/*-plain
