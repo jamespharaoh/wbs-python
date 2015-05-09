@@ -2,13 +2,12 @@
 
 - hosts: "jenkins"
   gather_facts: "no"
-  roles:
+  roles: [ "devenv" ]
 
-    - role: "devenv"
-      when: "deployment_mode == 'jenkins'"
+- include: "clean-templates.yml"
+- include: "clean-data.yml"
 
 - include: "templates.yml"
-- include: "clean-data.yml"
 - include: "start.yml"
 
 # ex: et ts=2 filetype=yaml
