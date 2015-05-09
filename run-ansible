@@ -10,6 +10,15 @@ import yaml
 
 need_newline = True
 
+PROJECTS = [
+	"wistla-admin",
+	"wistla-api",
+	"wistla-browser",
+	"wistla-devops",
+	"wistla-test-images",
+	"wistla-web",
+]
+
 def main ():
 
 	basic_setup ()
@@ -22,8 +31,10 @@ def main ():
 
 	fetch_upstream ()
 	warn_upstream ()
+	warn_redeploy ()
 
 	run_given_playbook ()
+	auto_newline ()
 
 def basic_setup ():
 
@@ -207,7 +218,7 @@ def update_config ():
 
 def fetch_upstream ():
 
-	global STATE
+	global STATE, PROJECTS
 
 	if CONFIG ["deployment_mode"] != "vagrant":
 		return
@@ -222,14 +233,13 @@ def fetch_upstream ():
 
 	try:
 
-		for project in [
-			"wistla-admin",
-			"wistla-api",
-			"wistla-browser",
-			"wistla-devops",
-			"wistla-test-images",
-			"wistla-web",
-		]:
+		for project in PROJECTS:
+
+			write_message ([
+				"It has been over an hour since the last attempt to\n",
+				"synchronize your local git repositories with the server. We\n",
+				"will now automatically attempt to fetch the latest code.\n",
+			])
 
 			auto_newline ()
 
@@ -254,11 +264,111 @@ def fetch_upstream ():
 
 def warn_upstream ():
 
-	# TODO
+	if CONFIG ["deployment_mode"] != "vagrant":
+		return
+
+	# TODO check if there are commits to be merged
+	# this is not as simple as it sounds, hence the "todo"
 
 	pass
 
+def warn_redeploy ():
+
+	global CONFIG, STATE
+
+	if CONFIG ["deployment_mode"] != "vagrant":
+		return
+
+	if sys.argv [1:] == [ "redeploy.yml" ]:
+		return
+
+	if not "last_redeploy" in STATE:
+
+		write_message ([
+			"##### Full redeploy warning #####\n",
+		])
+
+		write_message ([
+			"You have never done a full redeploy\n",
+		])
+
+		write_message ([
+			"It is recommended to run a full redeploy regularly to ensure you\n",
+			"are running the latest code.\n",
+		])
+
+		pause ()
+		return
+
+	if STATE ["last_redeploy"] < time.time () - 3600:
+
+		write_message ([
+			"##### Full redeploy warning #####\n",
+		])
+
+		write_message ([
+			"You have not done a full redeploy in the last hour\n",
+		])
+
+		write_message ([
+			"It is recommended to run a full redeploy regularly to ensure you\n",
+			"are running the latest code.\n",
+		])
+
+		if STATE ["last_redeploy"] < time.time () - 86400:
+
+			pause ()
+			return
+
+	last_commit = max ([
+		os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project)
+		for project in PROJECTS
+	])
+
+	if STATE ["last_redeploy"] < last_commit:
+
+		write_message ([
+			"##### Full redeploy warning #####\n",
+		])
+
+		write_message ([
+			"You have not done a full redeploy since the last git commit\n",
+		])
+
+		write_message ([
+			"Last redeploy: %s\n" % STATE ["last_redeploy"],
+		] + [
+			"Updated %s: %s\n" % (
+				project,
+				os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project),
+			)
+			for project in PROJECTS
+			if os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project) < last_commit
+		])
+
+		write_message ([
+			"It is recommended to run a full redeploy regularly to ensure you\n",
+			"are running the latest code.\n",
+		])
+
+		if STATE ["last_redeploy"] < time.time () - 300:
+
+			pause ()
+			return
+
+def pause ():
+
+	write_message ([
+		"(annoying three second pause)\n",
+	])
+
+	auto_newline ()
+
+	time.sleep (3)
+
 def run_given_playbook ():
+
+	global STATE
 
 	if not sys.argv [1:]:
 		return
@@ -275,8 +385,6 @@ def run_given_playbook ():
 			"##### Success #####\n",
 		])
 
-		my_exit (0)
-
 	except subprocess.CalledProcessError as exception:
 
 		write_message ([
@@ -284,6 +392,11 @@ def run_given_playbook ():
 		])
 
 		my_exit (1)
+
+	if sys.argv [1:] == [ "redeploy.yml" ]:
+
+		STATE ["last_redeploy"] = time.time ()
+		write_state ()
 
 def my_exit (status):
 
