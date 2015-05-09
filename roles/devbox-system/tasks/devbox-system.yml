@@ -1,10 +1,10 @@
 ---
 
-- name: "create mongo.conf"
+- name: "setup sudo"
   action:
     module: "template"
-    src: "mongo-conf"
-    dest: "/etc/mongodb.conf"
+    src: "devbox-sudoers-ssh-agent"
+    dest: "/etc/sudoers.d/ssh-agent"
   sudo: "yes"
   sudo_user: "root"
 

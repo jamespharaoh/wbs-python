@@ -1,43 +1,80 @@
 ---
 
-- hosts: "generic-template"
-  gather_facts: "no"
-  roles: [ "lxc-create" ]
+# First create the generic template. This is the common base for all the other
+# templates, and doing it this way reduces disk space and speeds the process up
+# because the common steps are done once and cloned cheaply.
 
 - hosts: "generic-template"
-  gather_facts: "no"
-  roles: [ "node-template" ]
+  roles:
+
+    - "lxc-create"
+
+- hosts: "generic-template"
+  roles:
+
+    - "install-system-packages"
+    - "setup-common-users"
+    - "node-template"
+
+# Next we create the concrete templates, by which we mean each one of the actual
+# templates which correspond to the container types. We run the common steps
+# again here because the clone operation is a no-op if the container already
+# exists, and so we won't see changes made to the generic template. Ansible is
+# already going to quickly skip any tasks which are already complete, so this is
+# not inefficient.
 
 - hosts: "concrete-template"
-  gather_facts: "no"
-  roles: [ "lxc-clone" ]
+  roles:
+
+    - "lxc-clone"
 
 - hosts: "concrete-template"
-  gather_facts: "no"
-  roles: [ "node-template" ]
+  roles:
+
+    - "install-system-packages"
+    - "setup-common-users"
+    - "node-template"
 
 - hosts: "api-template"
-  gather_facts: "no"
-  roles: [ "node-api" ]
+  roles:
+
+    - "node-api"
+    - "install-nodejs"
+    - "setup-alternatives"
+    - "install-node-packages"
+    - "deploy-api"
 
 - hosts: "load-template"
-  gather_facts: "no"
-  roles: [ "node-load" ]
+  roles:
+
+    - "node-load"
 
 - hosts: "mongo-template"
-  gather_facts: "no"
-  roles: [ "node-mongo" ]
+  roles:
+
+    - "node-mongo"
 
 - hosts: "web-template"
-  gather_facts: "no"
-  roles: [ "node-web" ]
+  roles:
+
+    - "node-web"
+    - "install-nodejs"
+    - "setup-alternatives"
+    - "install-node-packages"
+    - "deploy-web"
 
 - hosts: "rabbit-template"
-  gather_facts: "no"
-  roles: [ "node-rabbit" ]
+  roles:
+
+    - "node-rabbit"
 
 - hosts: "browser-template"
-  gather_facts: "no"
-  roles: [ "node-browser" ]
+  roles:
+
+    - "node-browser"
+    - "install-nodejs"
+    - "setup-alternatives"
+    - "install-node-packages"
+    - "deploy-browser"
 
 # ex: et ts=2 filetype=yaml

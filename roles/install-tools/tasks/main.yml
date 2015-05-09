@@ -7,6 +7,5 @@
     dest: "/usr/local/bin/fix-whitespace"
     mode: "0755"
   sudo: "yes"
-  sudo_user: "root"
 
 # ex: et ts=2 filetype=yaml

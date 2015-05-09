@@ -1,0 +1,72 @@
+---
+
+- name: "deploy projects"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      --exclude /.git
+      --exclude /config/config.local.js
+      --exclude /config/google-service-account.key
+      --exclude /config/apple-ca.cert
+      --exclude /config/apple-push.cert
+      --exclude /config/apple-push.key
+      --exclude /node_modules;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  tags: "quick"
+  with_items:
+    - "wistla-api"
+
+- name: "deploy projects node modules"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/node_modules/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-api"
+
+- name: "create api init config"
+  action:
+    module: "template"
+    src: "node-api-init-conf"
+    dest: "/etc/init/wistla-api.conf"
+  sudo: "yes"
+
+- name: "create wistla api config"
+  action:
+    module: "file"
+    path: "/home/ubuntu/wistla-api/config/{{ item }}"
+    state: "link"
+    src: "/config/{{ item }}"
+    force: "yes"
+  with_items:
+    - "apple-ca.cert"
+    - "apple-push.cert"
+    - "apple-push.key"
+    - "config.local.js"
+    - "google-service-account.key"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,63 @@
+---
+
+- name: "deploy projects"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      --exclude /.git
+      --exclude /config/config.local.js
+      --exclude /node_modules;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-browser"
+  tags: "quick"
+
+- name: "deploy projects node modules"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/node_modules/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-browser"
+
+- name: "create browser init config"
+  action:
+    module: "template"
+    src: "node-browser-init-conf"
+    dest: "/etc/init/wistla-browser.conf"
+  sudo: "yes"
+  sudo_user: "root"
+
+- name: "create wistla browser config"
+  action:
+    module: "file"
+    path: "/home/ubuntu/wistla-browser/config/config.local.js"
+    state: "link"
+    src: "/config/config.local.js"
+    force: "yes"
+
+# ex: et ts=2 filetype=yaml

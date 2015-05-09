@@ -1,0 +1,37 @@
+---
+
+- set_fact:
+    nodejs_name: "node-v{{ nodejs_version }}-linux-x64"
+    nodejs_flag: "/etc/node-{{ nodejs_version }}-flag"
+    nodejs_tmp: "/tmp/nodejs-install"
+
+- set_fact:
+    nodejs_archive: "{{ nodejs_name }}.tar.gz"
+
+- set_fact:
+    nodejs_target: "/opt/{{ nodejs_name }}"
+    nodejs_url: "{{ wistla_dist }}/nodejs/{{ nodejs_archive }}"
+
+- name: "install node.js"
+  args:
+    executable: "/bin/bash"
+    creates: "{{ nodejs_flag }}"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf {{ nodejs_tmp }};
+    mkdir {{ nodejs_tmp }};
+    cd {{ nodejs_tmp }};
+
+    wget {{ nodejs_url }};
+
+    rm -rf {{ nodejs_name }};
+    tar --extract --gzip --file {{ nodejs_archive }};
+
+    rsync --archive --delete {{ nodejs_name }}/ {{ nodejs_target }}/;
+
+    rm -rf {{ nodejs_tmp }};
+    touch {{ nodejs_flag }};
+
+# ex: et ts=2 filetype=yaml

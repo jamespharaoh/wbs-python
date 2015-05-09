@@ -3,9 +3,14 @@
 node: "mongo"
 prv: "2"
 
-mongo_install_packages:
+my_system_packages:
 
-  - "mongodb"
+  - name: "mongodb"
+
+system_packages: "{{ []
+  | union (global_system_packages)
+  | union (my_system_packages)
+}}"
 
 data_dirs:
 

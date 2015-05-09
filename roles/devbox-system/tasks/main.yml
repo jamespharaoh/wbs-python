@@ -10,7 +10,5 @@
 - include: "devbox-dns.yml"
 - include: "devbox-fuse.yml"
 - include: "devbox-openvpn.yml"
-- include: "devbox-tools.yml"
-- include: "devbox-user.yml"
 
 # ex: et ts=2 filetype=yaml

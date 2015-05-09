@@ -1,0 +1,70 @@
+---
+
+- name: "deploy projects"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      --exclude /.git
+      --exclude /config/config.local.js
+      --exclude /node_modules
+      --exclude /public/cms-images;
+
+  sudo: "yes"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-web"
+  tags: "quick"
+
+- name: "deploy projects node modules"
+  delegate_to: "localhost"
+  shell:
+
+    set -e;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/{{ item }}/node_modules/
+      /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
+
+  sudo: "yes"
+  register: "deploy_output"
+  changed_when: "deploy_output.stdout != ''"
+  with_items:
+    - "wistla-web"
+
+- name: "create web init config"
+  action:
+    module: "template"
+    src: "node-web-init-conf"
+    dest: "/etc/init/wistla-web.conf"
+  sudo: "yes"
+
+- name: "link to external config"
+  action:
+    module: "file"
+    path: "{{ item.link }}"
+    state: "link"
+    src: "{{ item.target }}"
+    owner: "ubuntu"
+    group: "ubuntu"
+    force: "yes"
+  with_items:
+
+    - link: "/home/ubuntu/wistla-web/config/config.local.js"
+      target: "/config/config.local.js"
+
+    - link: "/home/ubuntu/wistla-web/public/cms-images"
+      target: "/shared/cms-image"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,37 @@
+---
+
+- set_fact:
+    iojs_name: "iojs-v{{ iojs_version }}-linux-x64"
+    iojs_flag: "/etc/ios-{{ iojs_version }}-flag"
+    iojs_tmp: "/tmp/iojs-install"
+
+- set_fact:
+    iojs_archive: "{{ iojs_name }}.tar.xz"
+
+- set_fact:
+    iojs_target: "/opt/{{ iojs_name }}"
+    iojs_url: "{{ wistla_dist }}/iojs/{{ iojs_archive }}"
+
+- name: "install io.js"
+  args:
+    executable: "/bin/bash"
+    creates: "{{ iojs_flag }}"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf {{ iojs_tmp }};
+    mkdir {{ iojs_tmp }};
+    cd {{ iojs_tmp }};
+
+    wget {{ iojs_url }};
+
+    rm -rf {{ iojs_name }};
+    tar --extract --xz --file {{ iojs_archive }};
+
+    rsync --archive --delete {{ iojs_name }}/ {{ iojs_target }}/;
+
+    rm -rf {{ iojs_tmp }};
+    touch {{ iojs_flag }};
+
+# ex: et ts=2 filetype=yaml

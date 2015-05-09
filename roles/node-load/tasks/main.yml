@@ -1,14 +1,5 @@
 ---
 
-- name: "install system packages"
-  action:
-    module: "apt"
-    state: "present"
-    name: "{{ item }}"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "load_install_packages"
-
 - name: "install nginx config"
   action:
     module: "template"

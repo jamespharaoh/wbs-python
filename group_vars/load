@@ -3,8 +3,13 @@
 node: "load"
 prv: "5"
 
-load_install_packages:
+my_system_packages:
 
-  - "nginx"
+  - name: "nginx"
+
+system_packages: "{{ []
+  | union (global_system_packages)
+  | union (my_system_packages)
+}}"
 
 # ex: et ts=2 filetype=yaml

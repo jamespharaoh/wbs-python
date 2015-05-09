@@ -1,22 +1,5 @@
 ---
 
-global_install_packages:
-
-  - "btrfs-tools"
-  - "git"
-  - "ngrep"
-  - "super"
-  - "telnet"
-  - "whois"
-
-global_remove_packages:
-
-  - "apport"
-  - "apport-symptoms"
-  - "python-apport"
-  - "python3-apport"
-  - "resolvconf"
-
 cluster_subnets:
 
   admin:
@@ -89,71 +72,45 @@ dev_deployment_names:
 
 vpn_clients: "{{ lookup ('file', 'data/vpn-clients') | from_yaml }}"
 
-vagrant_install_packages:
+global_system_packages:
 
-  - "btrfs-tools"
-  - "colordiff"
-  - "encfs"
-  - "git"
-  - "gitk"
-  - "graphicsmagick"
-  - "imagemagick"
-  - "libav-tools"
-  - "lxc"
-  - "mailutils"
-  - "mongodb-clients"
-  - "nfs-kernel-server"
-  - "ngrep"
-  - "nodejs"
-  - "npm"
-  - "openvpn"
-  - "parted"
-  - "python-boto"
-  - "python-dev"
-  - "python-httplib2"
-  - "python-jinja2"
-  - "python-paramiko"
-  - "python-pip"
-  - "python-yaml"
-  - "samba"
-  - "whois"
+  - name: "apport"
+    state: "absent"
 
-vagrant_remove_packages:
+  - name: "apport-symptoms"
+    state: "absent"
 
-  - "apport"
-  - "apport-symptoms"
-  - "chef"
-  - "chef-zero"
-  - "cloud-init"
-  - "puppet"
-  - "puppet-common"
-  - "python-apport"
-  - "python3-apport"
+  - name: "python-apport"
+    state: "absent"
 
-vagrant_install_python:
+  - name: "python3-apport"
+    state: "absent"
 
-  - "awscli"
-  - "GitPython"
+  - name: "resolvconf"
+    state: "absent"
 
-vagrant_install_node:
+  - name: "btrfs-tools"
 
-  - name: "bunyan"
-    version: "1.3.4"
+  - name: "curl"
 
-  - name: "gulp"
-    version: "3.8.11"
+  - name: "git"
 
-  - name: "jspm"
-    version: "0.15.3"
+  - name: "ngrep"
 
-  - name: "mocha"
-    version: "2.2.4"
+  - name: "super"
 
-  - name: "node-inspector"
-    version: "0.8.3"
+  - name: "telnet"
 
-  - name: "prettyjson"
-    version: "1.1.0"
+  - name: "wget"
+
+  - name: "whois"
+
+my_system_packages: []
+
+system_packages: "{{ []
+  | union (global_system_packages)
+  | union (my_system_packages)
+}}"
 
 devenv_checkouts:
 
@@ -208,5 +165,7 @@ kernel_version_zero: "{{ kernel_versions [kernel_version].version_zero }}"
 kernel_build: "{{ kernel_versions [kernel_version].build }}"
 kernel_type: "{{ kernel_versions [kernel_version].type }}"
 kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
+
+wistla_dist: "http://dist.ops.wistla.com"
 
 # ex: et ts=2 filetype=yaml

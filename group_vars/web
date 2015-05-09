@@ -8,9 +8,25 @@ web_install_packages:
   - "iptables"
   - "npm"
 
-web_install_node:
+nodejs_version: "0.12.2"
+
+node_packages:
 
   - name: "node-inspector"
     version: "0.8.3"
+
+alternatives:
+
+  - name: "node"
+    link: "/usr/bin/node"
+    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
+
+  - name: "nodejs"
+    link: "/usr/bin/nodejs"
+    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
+
+  - name: "npm"
+    link: "/usr/bin/npm"
+    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
 
 # ex: et ts=2 filetype=yaml

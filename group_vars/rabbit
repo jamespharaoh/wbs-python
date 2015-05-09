@@ -3,9 +3,14 @@
 node: "rabbit"
 prv: "6"
 
-rabbit_install_packages:
+my_system_packages:
 
-  - "rabbitmq-server"
+  - name: "rabbitmq-server"
+
+system_packages: "{{ []
+  | union (global_system_packages)
+  | union (my_system_packages)
+}}"
 
 data_dirs:
 
