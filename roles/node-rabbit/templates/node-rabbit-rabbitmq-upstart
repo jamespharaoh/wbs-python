@@ -1,0 +1,18 @@
+description "rabbit mq"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit unlimited
+
+env HOME=/var/lib/rabbitmq
+
+script
+
+	setuid rabbitmq \
+	/usr/sbin/rabbitmq-server
+
+end script
+
+post-stop exec sleep 2

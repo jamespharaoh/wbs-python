@@ -6,7 +6,20 @@
     state: "present"
     name: "{{ item }}"
   sudo: "yes"
-  sudo_user: "root"
   with_items: "rabbit_install_packages"
+
+- name: "disable rabbit mq sysv init scripts"
+  action:
+    module: "service"
+    name: "rabbitmq-server"
+    enabled: "no"
+  sudo: "yes"
+
+- name: "install rabbitmq upstart script"
+  action:
+    module: "template"
+    src: "node-rabbit-rabbitmq-upstart"
+    dest: "/etc/init/rabbitmq.conf"
+  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml
