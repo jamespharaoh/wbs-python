@@ -8,6 +8,8 @@ import sys
 
 import yaml
 
+need_newline = True
+
 def main ():
 
 	always_run_as_root ()
@@ -44,45 +46,65 @@ def load_config ():
 	except IOError:
 		CONFIG = dict ({ "deployment_mode": "vagrant" })
 
+def write_message (parts):
+
+	global need_newline
+
+	if need_newline:
+		sys.stderr.write ("\n")
+
+	sys.stderr.write ("".join (parts))
+
+	need_newline = True
+
 def check_deployment_mode ():
 
 	if CONFIG ["deployment_mode"] == "vagrant":
 
 		if socket.gethostname () != "wistla-dev":
 
-			sys.stderr.write ("\n".join ([
-				"This command must be run from inside vagrant",
-				"Please run 'vagrant ssh' and try again, or refer to the documentation",
-			]) + "\n");
+			write_message ([
+				"This command must be run from inside vagrant\n",
+				"Please run 'vagrant ssh' and try again, or refer to the ",
+				"documentation\n",
+			])
 
-			sys.exit (1);
+			my_exit (1);
 
-		print "Running in VAGRANT deployment mode"
+		write_message ([
+			"##### Running in VAGRANT deployment mode #####\n",
+		])
 
 		DEPLOYMENT_HOME = "/home/vagrant"
 		DEPLOYMENT_USER = "vagrant"
 
 	elif CONFIG ["deployment_mode"] == "direct":
 
-		print "Running in DIRECT deployment mode"
+		write_message ([
+			"##### Running in DIRECT deployment mode #####\n",
+		])
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
 	elif CONFIG ["deployment_mode"] == "jenkins":
 
-		print "Running in JENKINS deployment mode"
+		write_message ([
+			"##### Running in JENKINS deployment mode #####\n",
+		])
 
 		DEPLOYMENT_HOME = "$WORKSPACE"
 		DEPLOYMENT_USER = "jenkins"
 
 	else:
 
-		sys.stderr.write (
+		write_message ([
 			"Unrecognised deployment mode: %s\n" % (
-				CONFIG ["deployment_mode"]))
+				CONFIG ["deployment_mode"],
+			),
+		])
 
-		sys.exit (1)
+		my_exit (1)
 
 def mount_secrets ():
 
@@ -90,29 +112,26 @@ def mount_secrets ():
 
 def run_playbook (args):
 
-	ansible_command = " ".join ([
-		pipes.quote (arg) for arg in [
-			"ansible-playbook",
-			"--inventory-file", "inventory",
-			"--extra-vars", "@config",
-			"--extra-vars", "@accounts",
-		] + args
-	])
-
-	print ansible_command
+	global need_newline
 
 	subprocess.check_call (
 		[
-			"/bin/bash",
-			"-c",
-			" && ".join ([
-				"source ansible/hacking/env-setup >/dev/null",
-				ansible_command,
-			]),
-		],
+			"ansible/bin/ansible-playbook",
+			"--inventory-file", "inventory",
+			"--extra-vars", "@config",
+			"--extra-vars", "@accounts",
+		] + args,
 		env = dict ({
 			"PYTHONUNBUFFERED": "1",
+			"PYTHONPATH": "%s/ansible/lib" % HOME,
+			"PATH": ":".join ([
+				"%s/ansible/bin" % HOME,
+				os.environ ["PATH"],
+			]),
+			"ANSIBLE_HOME": "%s/ansible" % HOME,
 		}))
+
+	need_newline = False
 
 def update_config ():
 
@@ -148,6 +167,10 @@ def update_config ():
 
 			os.chown ("accounts", 1000, 1000)
 
+		write_message ([
+			"##### Automatically updating config #####\n",
+		])
+
 		run_playbook ([
 			"--limit", "vagrant",
 			"fix-config.yml",
@@ -160,14 +183,34 @@ def run_given_playbook ():
 
 	try:
 
+		write_message ([
+			"##### Running specified command #####\n",
+		])
+
 		run_playbook (sys.argv [1:])
 
-		sys.stderr.write ("\n##### Success #####\n\n")
+		write_message ([
+			"##### Success #####\n",
+		])
+
+		my_exit (0)
 
 	except subprocess.CalledProcessError as exception:
 
-		sys.stderr.write ("\n##### Error %s #####\n\n" % exception.returncode)
-		sys.exit (1)
+		write_message ([
+			"##### Error %s #####\n" % exception.returncode,
+		])
+
+		my_exit (1)
+
+def my_exit (status):
+
+	global need_newline
+
+	if need_newline:
+		sys.stderr.write ("\n")
+
+	sys.exit (status)
 
 main ()
 
