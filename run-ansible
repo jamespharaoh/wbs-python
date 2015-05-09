@@ -30,10 +30,14 @@ def always_run_as_root ():
 
 def basic_setup ():
 
+	global HOME
+
 	HOME = os.path.abspath (os.path.dirname (__file__))
 	os.chdir (HOME)
 
 def load_config ():
+
+	global CONFIG
 
 	try:
 		CONFIG = yaml.load (file ("config"))
@@ -164,5 +168,7 @@ def run_given_playbook ():
 
 		sys.stderr.write ("\n##### Error %s #####\n\n" % exception.returncode)
 		sys.exit (1)
+
+main ()
 
 # ex: noet ts=4 filetype=python
