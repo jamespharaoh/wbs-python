@@ -8,6 +8,12 @@ import sys
 import time
 import yaml
 
+try:
+	import git
+	HAVE_GIT = True
+except ImportError:
+	HAVE_GIT = False
+
 need_newline = True
 
 PROJECTS = [
@@ -218,9 +224,12 @@ def update_config ():
 
 def fetch_upstream ():
 
-	global STATE, PROJECTS
+	global STATE, PROJECTS, HAVE_GIT
 
 	if CONFIG ["deployment_mode"] != "vagrant":
+		return
+
+	if not HAVE_GIT:
 		return
 
 	if "last_sync_success" in STATE \
@@ -231,23 +240,24 @@ def fetch_upstream ():
 		"##### Syncing upstream changes #####\n",
 	])
 
+	write_message ([
+		"It has been over an hour since the last attempt to\n",
+		"synchronize your local git repositories with the server. We\n",
+		"will now automatically attempt to fetch the latest code.\n",
+	])
+
 	try:
 
 		for project in PROJECTS:
-
-			write_message ([
-				"It has been over an hour since the last attempt to\n",
-				"synchronize your local git repositories with the server. We\n",
-				"will now automatically attempt to fetch the latest code.\n",
-			])
 
 			auto_newline ()
 
 			sys.stderr.write ("Syncing %s\n" % project)
 
-			subprocess.call (
-				[ "git", "fetch", "origin" ],
-				cwd = "/home/vagrant/%s" % project)
+			project_repo = git.Repo (
+				"/home/vagrant/%s" % project)
+
+			project_repo.remotes.origin.fetch ()
 
 	except:
 
@@ -264,13 +274,51 @@ def fetch_upstream ():
 
 def warn_upstream ():
 
+	global CONFIG, PROJECTS, HAVE_GIT
+
 	if CONFIG ["deployment_mode"] != "vagrant":
 		return
 
-	# TODO check if there are commits to be merged
-	# this is not as simple as it sounds, hence the "todo"
+	if not HAVE_GIT:
+		return
 
-	pass
+	diverged_count = 0
+
+	for project in PROJECTS:
+
+		project_repo = git.Repo (
+			"/home/vagrant/%s" % project)
+
+		bases = project_repo.merge_base (
+			project_repo.head,
+			project_repo.remotes.origin.refs.master)
+
+		base = bases [0]
+
+		if base == project_repo.remotes.origin.refs.master.commit:
+			continue
+
+		if diverged_count == 0:
+
+			write_message ([
+				"##### Diverged from upstream #####\n",
+			])
+
+			write_message ([
+				"New changed can be merged from master in at least one\n"
+				"project\n",
+			])
+
+		auto_newline ()
+
+		sys.stderr.write ("%s\n" % project)
+
+		diverged_count += 1
+
+	if diverged_count > 0:
+
+		set_newline ()
+		pause ()
 
 def warn_redeploy ():
 

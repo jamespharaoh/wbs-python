@@ -133,6 +133,7 @@ vagrant_remove_packages:
 vagrant_install_python:
 
   - "awscli"
+  - "GitPython"
 
 vagrant_install_node:
 
