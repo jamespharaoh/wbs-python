@@ -1,140 +1,168 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-set -e
+import os
+import pipes
+import socket
+import subprocess
+import sys
 
-project_dir_relative=$(dirname "$0")
-project_dir=$(readlink -f "$project_dir_relative")
-basename=$(basename "$0")
+import yaml
 
-cd "$project_dir"
+def main ():
 
-# load config
+	always_run_as_root ()
+	basic_setup ()
 
-eval $(misc/yaml-to-bash config <config)
+	load_config ()
+	check_deployment_mode ()
+	mount_secrets ()
+	update_config ()
 
-# mount secrets
+	run_given_playbook ()
 
-"$project_dir/mount-secrets"
+def always_run_as_root ():
 
-# always run as root
+	if os.getuid () != 0:
 
-if test "$UID" != "0"; then
-	exec sudo "$0" "$@"
-fi
+		os.execv (
+			"/usr/bin/sudo",
+			[ __file__ ] + sys.argv)
 
-# check deployment mode
+def basic_setup ():
 
-if ! test "$config_deployment_mode"; then
-	config_deployment_mode="vagrant"
-fi
+	HOME = os.path.abspath (os.path.dirname (__file__))
+	os.chdir (HOME)
 
-case "$config_deployment_mode" in
+def load_config ():
 
-	(vagrant)
+	try:
+		CONFIG = yaml.load (file ("config"))
+	except IOError:
+		CONFIG = dict ({ "deployment_mode": "vagrant" })
 
-		if test "$HOSTNAME" != "wistla-dev"; then
-			echo "This command must be run from inside vagrant" >&2
-			echo "Please run 'vagrant ssh' and try again" >&2
-			exit 1
-		fi
+def check_deployment_mode ():
 
-		echo "Running in VAGRANT deployment mode"
+	if CONFIG ["deployment_mode"] == "vagrant":
 
-		deployment_home="/home/vagrant"
-		deployment_user="vagrant"
+		if socket.gethostname () != "wistla-dev":
 
-		;;
+			sys.stderr.write ("\n".join ([
+				"This command must be run from inside vagrant",
+				"Please run 'vagrant ssh' and try again, or refer to the documentation",
+			]) + "\n");
 
-	(direct)
+			sys.exit (1);
 
-		echo "Running in DIRECT deployment mode"
+		print "Running in VAGRANT deployment mode"
 
-		deployment_home="/home/ubuntu"
-		deployment_user="ubuntu"
+		DEPLOYMENT_HOME = "/home/vagrant"
+		DEPLOYMENT_USER = "vagrant"
 
-		;;
+	elif CONFIG ["deployment_mode"] == "direct":
 
-	(jenkins)
+		print "Running in DIRECT deployment mode"
 
-		echo "Running in JENKINS deployment mode"
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
 
-		deployment_home="$WORKSPACE"
-		deployment_user="jenkins"
+	elif CONFIG ["deployment_mode"] == "jenkins":
 
-		;;
+		print "Running in JENKINS deployment mode"
 
-	(*)
+		DEPLOYMENT_HOME = "$WORKSPACE"
+		DEPLOYMENT_USER = "jenkins"
 
-		echo "Unrecognised deployment mode: $config_deployment_mode"
-		exit 1
+	else:
 
-		;;
+		sys.stderr.write (
+			"Unrecognised deployment mode: %s\n" % (
+				CONFIG ["deployment_mode"]))
 
-esac
+		sys.exit (1)
 
-# load ansible environment
+def mount_secrets ():
 
-source ansible/hacking/env-setup >/dev/null
+	subprocess.check_call ("./mount-secrets")
 
-export PYTHONUNBUFFERED=1
+def run_playbook (args):
 
-# fix config
+	ansible_command = " ".join ([
+		pipes.quote (arg) for arg in [
+			"ansible-playbook",
+			"--inventory-file", "inventory",
+			"--extra-vars", "@config",
+			"--extra-vars", "@accounts",
+		] + args
+	])
 
-if test "$config_deployment_mode" = "vagrant"; then
+	print ansible_command
 
-	ansible-playbook \
-		--inventory-file inventory \
-		--extra-vars @config \
-		--limit vagrant \
-		fix-config.yml
+	subprocess.check_call (
+		[
+			"/bin/bash",
+			"-c",
+			" && ".join ([
+				"source ansible/hacking/env-setup >/dev/null",
+				ansible_command,
+			]),
+		],
+		env = dict ({
+			"PYTHONUNBUFFERED": "1",
+		}))
 
-	if ! test -f accounts; then
-		cat >accounts <<-END
-			---
+def update_config ():
 
-			amazon_accounts:
-			  production:
-			    access_key: ""
-			    secret_key: ""
-			  staging:
-			    access_key: ""
-			    secret_key: ""
-			  test:
-			    access_key: ""
-			    secret_key: ""
-			  ops:
-			    access_key: ""
-			    secret_key: ""
+	if CONFIG ["deployment_mode"] == "vagrant":
 
-			# ex: et ts=2 filetype=yaml
-		END
-		chown $deployment_user:$deployment_user accounts
-	fi
+		if not os.path.isfile ("accounts"):
 
-fi
+			with open ("accounts", "w") as file_handle:
 
-# run ansible-playbook
+				file_handle.write ("\n".join ([
+					"---",
+					"",
+					"amazon_accounts:",
+					"",
+					"  production:",
+					"    access_key: \"\"",
+					"    secret_key: \"\"",
+					"",
+					"  staging:",
+					"    access_key: \"\"",
+					"    secret_key: \"\"",
+					"",
+					"  test:",
+					"    access_key: \"\"",
+					"    secret_key: \"\"",
+					"",
+					"  ops:",
+					"    access_key: \"\"",
+					"    secret_key: \"\"",
+					"",
+					"# ex: et ts=2 filetype=yaml",
+				]) + "\n")
 
-ansible-playbook \
-	--inventory-file inventory \
-	--extra-vars @config \
-	--extra-vars @accounts \
-	"${@}"
+			os.chown ("accounts", 1000, 1000)
 
-ansible_status="$?"
+		run_playbook ([
+			"--limit", "vagrant",
+			"fix-config.yml",
+		])
 
-# output message on success or failure
+def run_given_playbook ():
 
-if test "$ansible_status" = "0"; then
+	if not sys.argv [1:]:
+		return
 
-	echo "##### Success #####" >&2
-	echo "" >&2
+	try:
 
-else
+		run_playbook (sys.argv [1:])
 
-	echo "##### Error $ansible_status #####" >&2
-	echo "" >&2
+		sys.stderr.write ("\n##### Success #####\n\n")
 
-fi
+	except subprocess.CalledProcessError as exception:
 
-# ex: noet ts=4 filetype=bash
+		sys.stderr.write ("\n##### Error %s #####\n\n" % exception.returncode)
+		sys.exit (1)
+
+# ex: noet ts=4 filetype=python
