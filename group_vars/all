@@ -112,6 +112,9 @@ system_packages: "{{ []
   | union (my_system_packages)
 }}"
 
+nodejs_version: "0.12.2"
+iojs_version: "2.0.1"
+
 devenv_checkouts:
 
   - name: "wistla-admin"

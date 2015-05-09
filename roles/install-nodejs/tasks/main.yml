@@ -16,6 +16,7 @@
   args:
     executable: "/bin/bash"
     creates: "{{ nodejs_flag }}"
+  sudo: "yes"
   shell:
 
     set -euf -o pipefail;

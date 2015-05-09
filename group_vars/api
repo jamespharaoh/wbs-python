@@ -18,8 +18,6 @@ system_packages: "{{ []
   | union (my_system_packages)
 }}"
 
-nodejs_version: "0.12.2"
-
 node_packages:
 
   - name: "node-inspector"

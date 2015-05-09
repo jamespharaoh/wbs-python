@@ -8,8 +8,6 @@ web_install_packages:
   - "iptables"
   - "npm"
 
-nodejs_version: "0.12.2"
-
 node_packages:
 
   - name: "node-inspector"

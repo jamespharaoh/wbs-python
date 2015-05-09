@@ -14,6 +14,15 @@
     - role: "cluster-jenkins"
       when: "cluster == 'ops'"
 
+    - role: "install-nodejs"
+      when: "cluster == 'ops'"
+
+    - role: "install-iojs"
+      when: "cluster == 'ops'"
+
+    - role: "setup-alternatives"
+      when: "cluster == 'ops'"
+
   tags:
     - "cluster-jenkins"
 
