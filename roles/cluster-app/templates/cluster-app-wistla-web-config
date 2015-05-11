@@ -10,6 +10,13 @@ config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla-web
 // semi-persistent storage
 config.cmsImagePath = '/shared/cms-image';
 
+// Google Maps API Key for showing office location on a map.
+{% if 'dev' in third_parties %}
+config.googleMapsApiKey = '{{ third_parties [cluster].googleMapsApiKey }}';
+{% else %}
+config.googleMapsApiKey = '';
+{% endif %}
+
 // mailchimp
 config.mailchimp = {
 	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
