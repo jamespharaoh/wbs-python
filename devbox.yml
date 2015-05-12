@@ -32,19 +32,19 @@
 
     - role: "install-tools"
       when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
+      tags: [ "devbox", "devbox-tools" ]
 
     - role: "setup-alternatives"
       when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
+      tags: [ "devbox", "devbox-alternatives" ]
 
     - role: "install-node-packages"
       when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
+      tags: [ "devbox", devbox-node" ]
 
     - role: "devbox-user"
       when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
+      tags: [ "devbox", "devbox-user" ]
 
     - role: "devenv"
       when: "deployment_mode == 'vagrant'"

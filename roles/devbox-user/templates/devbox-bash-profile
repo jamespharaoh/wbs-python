@@ -13,4 +13,10 @@ export LANG=C
 export LC_ALL=C
 export LC_NAME=C
 
+# set paths
+
+NODE="/opt/node-v{{ nodejs_version }}-linux-x64"
+
+export MANPATH="$NODE/man:$(/usr/bin/manpath)"
+
 # ex: noet ts=4 filetype=sh
