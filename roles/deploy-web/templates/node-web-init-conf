@@ -29,6 +29,8 @@ script
 	stdbuf -oL -eL \
 	nodejs \
 	--trace_gc \
+	--expose_gc \
+	--gc_global \
 {% endif %}
 	keystone.js
 
