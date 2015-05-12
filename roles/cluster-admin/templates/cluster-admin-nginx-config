@@ -159,6 +159,15 @@ http {
 	server {
 
 		listen 80;
+
+		server_name {{ dev_deployment.short_domain }};
+
+		return 301 https://{{ dev_deployment.short_domain }}$request_uri;
+
+	}
+
+	server {
+
 		listen 443 ssl;
 
 		ssl_certificate /etc/nginx/ssl/{{ dev_deployment.short_domain }}.cert;
