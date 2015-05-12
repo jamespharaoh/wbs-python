@@ -120,7 +120,13 @@ http {
 {% endif %}
 
 		location / {
-			proxy_pass http://browser/in;
+			proxy_pass http://browser/in/;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /v/ {
+			proxy_pass http://browser/in/registration/verification/;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
