@@ -10,8 +10,8 @@ config.webUrl = 'https://{{ deployment_main_domain }}';
 config.webTest = 'http://{{ deployment_main_domain }}';
 
 // short url for links sent out
-config.shortUrl = 'https://{{ deployment }}.wist.la';
-config.shortTest = 'http://{{ deployment }}.wist.la';
+config.shortUrl = 'https://{{ deployment_short_domain }}';
+config.shortTest = 'http://{{ deployment_short_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla';
