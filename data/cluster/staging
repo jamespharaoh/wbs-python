@@ -38,8 +38,8 @@ amazon_images:
 amazon_key_name: "wistla-staging"
 
 kernel_versions:
-  admin: "4.0.1"
-  app: "4.0.1"
+  admin: "3.19.8"
+  app: "3.19.8"
 
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 

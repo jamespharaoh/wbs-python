@@ -8,19 +8,11 @@
   type: "generic"
   arch: "amd64"
 
-3.19.2:
-  version: "3.19.2"
+3.19.8:
+  version: "3.19.8"
   branch: "vivid"
-  version_zero: "031902"
-  build: "201503181436"
-  type: "generic"
-  arch: "amd64"
-
-4.0.1:
-  version: "4.0.1"
-  branch: "vivid"
-  version_zero: "040001"
-  build: "201504290935"
+  version_zero: "031908"
+  build: "201505110938"
   type: "generic"
   arch: "amd64"
 
