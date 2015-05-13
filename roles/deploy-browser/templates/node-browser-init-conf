@@ -27,8 +27,10 @@ script
 	--debug-brk=0 \
 {% else %}
 	stdbuf -oL -eL \
-	nodejs \
+	node \
 	--trace_gc \
+	--expose_gc \
+	--gc_global \
 {% endif %}
 	server.js
 
