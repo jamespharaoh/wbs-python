@@ -82,7 +82,7 @@ test-everest:
   bridge_name: "br157"
   bridge_network: "10.157"
 
-  apple_push_notifications: "wistla-production"
+  apple_push_notifications: "wistla-enterprise-production"
 
 test-k2:
 
