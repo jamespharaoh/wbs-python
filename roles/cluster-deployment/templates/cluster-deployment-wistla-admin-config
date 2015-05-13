@@ -1,0 +1,13 @@
+var configLocal = {
+
+	urls: {
+		baseUrl: 'https://admin.{{ cluster_deployment_alias.main_domain }}',
+		adminUrl: 'https://admin.{{ cluster_deployment_alias.main_domain }}',
+		apiUrl: 'https://api.{{ cluster_deployment_alias.main_domain }}',
+		shortUrl: 'https://{{ cluster_deployment_alias.short_domain }}',
+		webUrl: 'https://www.{{ cluster_deployment_alias.main_domain }}'
+	}
+
+};
+
+// ex: noet ts=4 filetype=javascript

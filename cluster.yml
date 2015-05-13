@@ -29,11 +29,48 @@
 - hosts: "cluster-app"
   roles:
 
+    # ----- system
+
     - role: "cluster-app"
       when: "cluster != 'ops'"
+      tags: [ "cluster-app" ]
 
-  tags:
-    - "cluster-app"
+    # ----- deployments
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "production-a"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "production-a" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "production-b"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "production-b" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "staging-a"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "staging-a" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "staging-b"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "staging-b" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "test-everest"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "test-everest" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "test-k2"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "test-k2" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "test-montblanc"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment", "test-montblanc" ]
 
 # ----- icinga
 

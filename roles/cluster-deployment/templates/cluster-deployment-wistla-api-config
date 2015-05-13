@@ -1,32 +1,24 @@
-{% set deployment_name = item.0 %}
-{% set deployment = deployments [deployment_name] %}
-{% if deployment.alias is defined %}
-{% set deployment_alias = deployment_aliases [deployment.alias] %}
-{% else %}
-{% set deployment_alias = deployment %}
-{% endif %}
-
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-config.apiUrl = 'https://api.{{ deployment_alias.main_domain }}';
-config.apiTest = 'http://api.{{ deployment.main_domain }}';
+config.apiUrl = 'https://api.{{ cluster_deployment_alias.main_domain }}';
+config.apiTest = 'http://api.{{ cluster_deployment.main_domain }}';
 
 // web url
-config.webUrl = 'https://www.{{ deployment_alias.main_domain }}';
-config.webTest = 'http://www.{{ deployment.main_domain }}';
+config.webUrl = 'https://www.{{ cluster_deployment_alias.main_domain }}';
+config.webTest = 'http://www.{{ cluster_deployment.main_domain }}';
 
 // short url for links sent out
-config.shortUrl = 'https://{{ deployment_alias.short_domain }}';
-config.shortTest = 'http://{{ deployment.short_domain }}';
+config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
+config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-{{ idx }}:27017/wistla';
+config.dbUrl = 'mongodb://{{ cluster_deployment_name }}-mongo-{{ idx }}:27017/wistla';
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ deployment_name }}-rabbit-{{ idx }}',
+	url: 'amqp://{{ cluster_deployment_name }}-rabbit-{{ idx }}',
 };
 
 {% if use_s3 == 'yes' %}

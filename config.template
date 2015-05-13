@@ -11,7 +11,10 @@ developer_email: "{{ developer_email | default ('') }}"
 ubuntu_main_url: "{{ ubuntu_main_url }}"
 ubuntu_security_url: "{{ ubuntu_security_url }}"
 
-debug: "{{ debug | default ('yes') }}"
+dev_debug: "{{ dev_debug | default (debug | default ('yes')) }}"
+
+dev_apple_push_notifications_name: "{{ dev_apple_push_notifications_name | default ('wistla-production') }}"
+dev_apple_push_notifications_production: "{{ dev_apple_push_notifications_production | default ('yes') }}"
 
 {% if secrets | default ([ 'dev' ]) %}
 secrets:

@@ -22,7 +22,7 @@ script
 	exec 2>> /shared/log/wistla-api.log
 
 	exec setuid ubuntu \
-{% if debug == 'yes' %}
+{% if dev_debug | default ('no') == 'yes' %}
 	node-debug \
 	--debug-brk=0 \
 {% else %}

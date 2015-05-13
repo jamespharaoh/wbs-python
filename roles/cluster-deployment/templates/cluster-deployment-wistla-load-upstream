@@ -1,0 +1,11 @@
+upstream api {
+	server {{ cluster_deployment_name }}-api-{{ idx }}:7000 fail_timeout=30s max_fails=1;
+}
+
+upstream browser {
+	server {{ cluster_deployment_name }}-browser-{{ idx }}:3000 fail_timeout=30s max_fails=1;
+}
+
+upstream web {
+	server {{ cluster_deployment_name }}-web-{{ idx }}:3000 fail_timeout=30s max_fails=1;
+}

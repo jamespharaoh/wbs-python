@@ -1,14 +1,9 @@
 ---
 
-{% set deployment_name = item.0 %}
-{% set deployment = deployments [deployment_name] %}
-
 deployment_mode: "direct"
-deployment: "{{ deployment_name }}"
+deployment: "{{ cluster_deployment_name }}"
 deployment_user: "ubuntu"
-deployment_home: "/home/ubuntu/{{ deployment_name }}"
-
-debug: "no"
+deployment_home: "/home/ubuntu/{{ cluster_deployment_name }}"
 
 ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
 ubuntu_security_url: "http://security.ubuntu.com/ubuntu"

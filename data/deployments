@@ -15,6 +15,8 @@ production-a:
   bridge_name: "br148"
   bridge_network: "10.148"
 
+  apple_push_notifications: "wistla-production"
+
 production-b:
 
   name: "production-b"
@@ -29,6 +31,8 @@ production-b:
 
   bridge_name: "br149"
   bridge_network: "10.149"
+
+  apple_push_notifications: "wistla-production"
 
 staging-a:
 
@@ -45,6 +49,8 @@ staging-a:
   bridge_name: "br155"
   bridge_network: "10.155"
 
+  apple_push_notifications: "wistla-production"
+
 staging-b:
 
   name: "staging-b"
@@ -60,6 +66,8 @@ staging-b:
   bridge_name: "br156"
   bridge_network: "10.156"
 
+  apple_push_notifications: "wistla-production"
+
 test-everest:
 
   name: "test-everest"
@@ -73,6 +81,8 @@ test-everest:
 
   bridge_name: "br157"
   bridge_network: "10.157"
+
+  apple_push_notifications: "wistla-production"
 
 test-k2:
 
@@ -88,6 +98,8 @@ test-k2:
   bridge_name: "br158"
   bridge_network: "10.158"
 
+  apple_push_notifications: "wistla-production"
+
 test-montblanc:
 
   name: "test-montblanc"
@@ -101,6 +113,8 @@ test-montblanc:
 
   bridge_name: "br159"
   bridge_network: "10.159"
+
+  apple_push_notifications: "wistla-production"
 
 dev:
 

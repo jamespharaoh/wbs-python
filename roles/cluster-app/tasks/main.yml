@@ -42,9 +42,6 @@
 - include: "cluster-common-user.yml"
   tags: "cluster-common-user"
 
-- include: "cluster-app-wistla.yml"
-  tags: "cluster-app-wistla"
-
 - include: "cluster-app-cron.yml"
   tags: "cluster-app-cron"
 
