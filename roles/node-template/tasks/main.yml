@@ -1,7 +1,7 @@
 ---
 
 - include: "template-system.yml"
-- include: "template-postfix.yml"
+- include: "template-nullmailer.yml"
 - include: "template-config.yml"
 
 # ex: et ts=2 filetype=yaml

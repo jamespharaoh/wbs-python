@@ -1,0 +1,43 @@
+---
+
+- name: "remove postfix"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+    state: "absent"
+    purge: "yes"
+  sudo: "yes"
+  with_items:
+    - "postfix"
+
+- name: "configure nullmailer"
+  action:
+    module: "debconf"
+    name: "nullmailer"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.type }}"
+  sudo: "yes"
+  with_items:
+
+    - question: "nullmailer/relayhost"
+      value: "10.255.255.10"
+      type: "string"
+
+    - question: "nullmailer/defaultdomain"
+      value: "wistla.com"
+      type: "string"
+
+    - question: "nullmailer/adminaddr"
+      value: ""
+      type: "string"
+
+- name: "install nullmailer"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "nullmailer"
+
+# ex: et ts=2 filetype=yaml
