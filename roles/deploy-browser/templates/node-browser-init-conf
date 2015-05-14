@@ -32,7 +32,7 @@ script
 	--expose_gc \
 	--min_semi_space_size={{ 4 }} \
 	--max_semi_space_size={{ 32 }} \
-	--max_old_space_size={{ (node_memory.api | int) - 128 }} \
+	--max_old_space_size={{ (node_memory.browser | int) - 128 }} \
 	--max_executable_size={{ 32 }} \
 {% endif %}
 	server.js
