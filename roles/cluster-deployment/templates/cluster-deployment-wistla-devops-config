@@ -16,7 +16,7 @@ node_memory:
   load: "128"
   mongo: "512"
   rabbit: "256"
-  web: "512"
+  web: "768"
 
 use_s3: "no"
 
