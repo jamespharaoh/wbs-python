@@ -1,9 +1,9 @@
 ---
 
+is_template: "yes"
+
 ansible_connection: "chroot"
 ansible_ssh_host: "/var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs"
-
-autostart: "no"
 
 node_ip: "0.0.0.0"
 hw: "00:00:00:00:00:00"

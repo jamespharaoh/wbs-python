@@ -68,4 +68,8 @@ vagrant_deployments: "{{ cluster_deployment_names }}"
 icinga_name: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
 hostname: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
 
+load_balancer_name: "{{ cluster }}-app"
+
+system_reboot_on_error: "yes"
+
 # ex: et ts=2 filetype=yaml

@@ -12,4 +12,8 @@ system_packages: "{{ []
   | union (my_system_packages)
 }}"
 
+network_route_localnet:
+
+  - "eth0"
+
 # ex: et ts=2 filetype=yaml

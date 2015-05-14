@@ -1,30 +1,41 @@
 ---
 
+# ========== network
+
 - hosts: "cluster-network"
-  roles: [ "cluster-network" ]
-  tags: "cluster-network"
-
-- hosts: "cluster-admin"
-  roles: [ "cluster-admin" ]
-  tags: "cluster-admin"
-
-- hosts: "cluster-jenkins"
   roles:
 
-    - role: "cluster-jenkins"
-      when: "cluster == 'ops'"
+    - role: "cluster-network"
+      tags: [ "cluster-network" ]
 
-    - role: "install-nodejs"
-      when: "cluster == 'ops'"
+# ========== admin
 
-    - role: "install-iojs"
-      when: "cluster == 'ops'"
+- hosts: "cluster-admin"
+  roles:
 
-    - role: "setup-alternatives"
-      when: "cluster == 'ops'"
+    # ----- system
 
-  tags:
-    - "cluster-jenkins"
+    - role: "cluster-admin"
+      tags: [ "cluster-admin" ]
+
+    - role: "install-kernel"
+      tags: [ "install-kernel" ]
+
+    - role: "setup-system"
+      tags: [ "setup-system" ]
+
+    # ----- services
+
+    #- role: "cluster-icinga"
+    #  tags: [ "cluster-icinga" ]
+
+    # ----- final steps
+
+    - role: "cluster-activate"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-activate" ]
+
+# ========== app
 
 - hosts: "cluster-app"
   roles:
@@ -34,6 +45,20 @@
     - role: "cluster-app"
       when: "cluster != 'ops'"
       tags: [ "cluster-app" ]
+
+    - role: "install-kernel"
+      when: "cluster != 'ops'"
+      tags: [ "install-kernel" ]
+
+    - role: "setup-system"
+      when: "cluster != 'ops'"
+      tags: [ "setup-system" ]
+
+    # ----- services
+
+    #- role: "cluster-icinga"
+    #  when: "cluster != 'ops'"
+    #  tags: [ "cluster-icinga" ]
 
     # ----- deployments
 
@@ -72,16 +97,46 @@
       when: "cluster == 'production'"
       tags: [ "cluster-deployment", "test-montblanc" ]
 
-# ----- icinga
+    # ----- final steps
 
-- hosts: "cluster-admin"
-  roles: [ "cluster-icinga" ]
-  tags: "cluster-icinga"
+    - role: "cluster-activate"
+      tags: [ "cluster-activate" ]
 
-- hosts: "cluster-app"
+# ========== jenkins
+
+- hosts: "cluster-jenkins"
   roles:
-    - role: "cluster-icinga"
-      when: "cluster != 'ops'"
-  tags: "cluster-icinga"
+
+    # ----- system
+
+    - role: "cluster-jenkins"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-jenkins" ]
+
+    - role: "install-kernel"
+      when: "cluster == 'ops'"
+      tags: [ "install-kernel" ]
+
+    - role: "setup-system"
+      when: "cluster == 'ops'"
+      tags: [ "setup-system" ]
+
+    - role: "install-nodejs"
+      when: "cluster == 'ops'"
+      tags: [ "install-nodejs" ]
+
+    - role: "install-iojs"
+      when: "cluster == 'ops'"
+      tags: [ "install-iojs" ]
+
+    - role: "setup-alternatives"
+      when: "cluster == 'ops'"
+      tags: [ "setup-alternatives" ]
+
+    # ----- services
+
+    #- role: "cluster-icinga"
+    #  when: "cluster == 'ops'"
+    #  tags: [ "cluster-icinga" ]
 
 # ex: et ts=2 filetype=yaml

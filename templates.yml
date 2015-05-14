@@ -1,5 +1,7 @@
 ---
 
+# ========== generic
+
 # First create the generic template. This is the common base for all the other
 # templates, and doing it this way reduces disk space and speeds the process up
 # because the common steps are done once and cloned cheaply.
@@ -12,9 +14,12 @@
 - hosts: "generic-template"
   roles:
 
+    - "setup-system"
     - "install-system-packages"
     - "setup-common-users"
     - "node-template"
+
+# ========== concrete
 
 # Next we create the concrete templates, by which we mean each one of the actual
 # templates which correspond to the container types. We run the common steps
@@ -31,9 +36,12 @@
 - hosts: "concrete-template"
   roles:
 
+    - "setup-system"
     - "install-system-packages"
     - "setup-common-users"
     - "node-template"
+
+# ========== specific
 
 - hosts: "api-template"
   roles:

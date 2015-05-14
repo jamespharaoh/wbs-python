@@ -1,0 +1,13 @@
+{% if system_reboot_on_error | default ('no') == 'yes' %}
+# automatically reboot if hung
+kernel.panic = 10
+kernel.hung_task_panic = 1
+kernel.hung_task_timeout_secs = 120
+{% endif %}
+
+{% if network_route_localnet | default ([]) %}
+# allow loopback routing
+{% for network in network_route_localnet | default ([]) %}
+net.ipv4.conf.{{ network }}.route_localnet = 1
+{% endfor %}
+{% endif %}

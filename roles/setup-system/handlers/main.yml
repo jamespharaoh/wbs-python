@@ -1,0 +1,8 @@
+---
+
+- name: "reload sysctl"
+  shell: "sysctl --load"
+  sudo: "yes"
+  when: "is_template | default ('no') == 'no'"
+
+# ex: et ts=2 filetype=yaml

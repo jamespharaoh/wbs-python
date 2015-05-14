@@ -9,9 +9,6 @@
 - include: "cluster-app-system.yml"
   tags: "cluster-app-system"
 
-- include: "cluster-common-kernel.yml"
-  tags: "cluster-common-kernel"
-
 - include: "cluster-app-node.yml"
   tags: "cluster-app-node"
 
@@ -35,9 +32,6 @@
 
 - include: "cluster-app-nginx.yml"
   tags: "cluster-app-nginx"
-
-- include: "cluster-app-activate.yml"
-  tags: "cluster-app-activate"
 
 - include: "cluster-common-user.yml"
   tags: "cluster-common-user"

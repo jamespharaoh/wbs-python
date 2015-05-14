@@ -1,0 +1,30 @@
+---
+
+- name: "disable service startup"
+  action:
+    module: "template"
+    src: "template-policy-rcd"
+    dest: "/usr/sbin/policy-rc.d"
+    mode: "0755"
+  sudo: "yes"
+  when: "is_template | default ('no') == 'yes'"
+
+- name: "enable service startup"
+  action:
+    module: "file"
+    path: "/usr/sbin/policy-rc.d"
+    state: "absent"
+  sudo: "yes"
+  when: "is_template | default ('no') == 'no'"
+
+- name: "install sysctl config"
+  action:
+    module: "template"
+    src: "setup-system-sysctl-conf"
+    dest: "/etc/sysctl.conf"
+  sudo: "yes"
+  notify: "reload sysctl"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

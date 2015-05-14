@@ -171,4 +171,6 @@ kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
 
 wistla_dist: "http://dist.ops.wistla.com"
 
+system_reboot_on_error: "yes"
+
 # ex: et ts=2 filetype=yaml

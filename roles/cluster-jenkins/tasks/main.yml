@@ -10,10 +10,6 @@
   tags: "cluster-jenkins-system"
   when: "cluster == 'ops'"
 
-- include: "cluster-common-kernel.yml"
-  tags: "cluster-common-kernel"
-  when: "cluster == 'ops'"
-
 - include: "cluster-jenkins-network.yml"
   tags: "cluster-jenkins-network"
   when: "cluster == 'ops'"

@@ -29,9 +29,6 @@
   tags:
     - "cluster-common-system"
 
-- include: "cluster-common-kernel.yml"
-  tags: "cluster-common-kernel"
-
 - include: "cluster-common-ssh.yml"
   tags:
     - "cluster-common-ssh"
@@ -57,9 +54,5 @@
 - include: "cluster-admin-route.yml"
   tags:
     - "cluster-admin-route"
-
-- include: "cluster-admin-activate.yml"
-  tags:
-    - "cluster-admin-activate"
 
 # ex: et ts=2 filetype=yaml

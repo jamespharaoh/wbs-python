@@ -27,4 +27,8 @@ cluster_admin_remove_packages:
 
 icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}"
 
+load_balancer_name: "{{ cluster }}-admin"
+
+system_reboot_on_error: "yes"
+
 # ex: et ts=2 filetype=yaml
