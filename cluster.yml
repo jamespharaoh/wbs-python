@@ -24,6 +24,18 @@
     - role: "setup-system"
       tags: [ "setup-system" ]
 
+    - role: "cluster-ssh"
+      tags: [ "cluster-user" ]
+
+    - role: "install-postfix"
+      tags: [ "install-postfix" ]
+
+    - role: "setup-common-users"
+      tags: [ "setup-common-users" ]
+
+    - role: "cluster-user"
+      tags: [ "cluster-user" ]
+
     # ----- services
 
     #- role: "cluster-icinga"
@@ -46,6 +58,10 @@
       when: "cluster != 'ops'"
       tags: [ "cluster-app" ]
 
+    - role: "cluster-volumes"
+      when: "cluster != 'ops'"
+      tags: [ "cluster-volumes" ]
+
     - role: "install-kernel"
       when: "cluster != 'ops'"
       tags: [ "install-kernel" ]
@@ -53,6 +69,22 @@
     - role: "setup-system"
       when: "cluster != 'ops'"
       tags: [ "setup-system" ]
+
+    - role: "cluster-ssh"
+      when: "cluster != 'ops'"
+      tags: [ "cluster-user" ]
+
+    - role: "install-postfix"
+      when: "cluster != 'ops'"
+      tags: [ "install-postfix" ]
+
+    - role: "setup-common-users"
+      when: "cluster != 'ops'"
+      tags: [ "setup-common-users" ]
+
+    - role: "cluster-user"
+      when: "cluster != 'ops'"
+      tags: [ "cluster-user" ]
 
     # ----- services
 
@@ -113,6 +145,10 @@
       when: "cluster == 'ops'"
       tags: [ "cluster-jenkins" ]
 
+    - role: "cluster-volumes"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-volumes" ]
+
     - role: "install-kernel"
       when: "cluster == 'ops'"
       tags: [ "install-kernel" ]
@@ -120,6 +156,18 @@
     - role: "setup-system"
       when: "cluster == 'ops'"
       tags: [ "setup-system" ]
+
+    - role: "cluster-ssh"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-user" ]
+
+    - role: "install-postfix"
+      when: "cluster != 'ops'"
+      tags: [ "install-postfix" ]
+
+    - role: "setup-common-users"
+      when: "cluster != 'ops'"
+      tags: [ "setup-common-users" ]
 
     - role: "install-nodejs"
       when: "cluster == 'ops'"
@@ -132,6 +180,10 @@
     - role: "setup-alternatives"
       when: "cluster == 'ops'"
       tags: [ "setup-alternatives" ]
+
+    - role: "cluster-user"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-user" ]
 
     # ----- services
 

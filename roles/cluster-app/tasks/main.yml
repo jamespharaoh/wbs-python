@@ -24,17 +24,8 @@
 - include: "cluster-app-dns.yml"
   tags: "cluster-app-dns"
 
-- include: "cluster-common-ssh.yml"
-  tags: "cluster-common-ssh"
-
-- include: "cluster-common-postfix.yml"
-  tags: "cluster-common-postfix"
-
 - include: "cluster-app-nginx.yml"
   tags: "cluster-app-nginx"
-
-- include: "cluster-common-user.yml"
-  tags: "cluster-common-user"
 
 - include: "cluster-app-cron.yml"
   tags: "cluster-app-cron"

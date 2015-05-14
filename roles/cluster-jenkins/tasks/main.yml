@@ -14,24 +14,8 @@
   tags: "cluster-jenkins-network"
   when: "cluster == 'ops'"
 
-- include: "cluster-jenkins-btrfs.yml"
-  tags: "cluster-jenkins-btrfs"
-  when: "cluster == 'ops'"
-
 - include: "cluster-jenkins-dns.yml"
   tags: "cluster-jenkins-dns"
-  when: "cluster == 'ops'"
-
-- include: "cluster-common-ssh.yml"
-  tags: "cluster-common-ssh"
-  when: "cluster == 'ops'"
-
-- include: "cluster-common-postfix.yml"
-  tags: "cluster-common-postfix"
-  when: "cluster == 'ops'"
-
-- include: "cluster-jenkins-node.yml"
-  tags: "cluster-jenkins-node"
   when: "cluster == 'ops'"
 
 - include: "cluster-jenkins-install.yml"
@@ -40,10 +24,6 @@
 
 - include: "cluster-jenkins-nginx.yml"
   tags: "cluster-jenkins-nginx"
-  when: "cluster == 'ops'"
-
-- include: "cluster-common-user.yml"
-  tags: "cluster-common-user"
   when: "cluster == 'ops'"
 
 # ex: et ts=2 filetype=yaml

@@ -29,14 +29,6 @@
   tags:
     - "cluster-common-system"
 
-- include: "cluster-common-ssh.yml"
-  tags:
-    - "cluster-common-ssh"
-
-- include: "cluster-common-postfix.yml"
-  tags:
-    - "cluster-admin-postfix"
-
 - include: "cluster-admin-openvpn.yml"
   tags:
     - "cluster-admin-openvpn"

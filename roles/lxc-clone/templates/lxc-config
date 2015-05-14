@@ -33,4 +33,4 @@ lxc.network.ipv4.gateway = {{ deployment_bridge_network }}.{{ vagrant.grp }}.{{ 
 
 # autostart
 
-lxc.start.auto = {{ 1 if autostart == "yes" else 0 }}
+lxc.start.auto = {{ 1 if is_template | default ('no') == 'no' else 0 }}

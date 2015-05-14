@@ -3,13 +3,13 @@
 - name: "create bash profile"
   action:
     module: "template"
-    src: "cluster-common-bash-profile"
+    src: "cluster-user-bash-profile"
     dest: "/home/ubuntu/.bash_profile"
 
 - name: "create bash rc"
   action:
     module: "template"
-    src: "cluster-common-bash-rc"
+    src: "cluster-user-bash-rc"
     dest: "/home/ubuntu/.bashrc"
 
 # ex: et ts=2 filetype=yaml

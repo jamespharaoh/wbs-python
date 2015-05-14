@@ -72,4 +72,14 @@ load_balancer_name: "{{ cluster }}-app"
 
 system_reboot_on_error: "yes"
 
+cluster_volumes:
+
+  - type: "btrfs"
+    path: "/var/lib/lxc"
+    device: "/dev/xvdf"
+
+  - type: "ext4"
+    path: "/data"
+    device: "/dev/xvdg"
+
 # ex: et ts=2 filetype=yaml

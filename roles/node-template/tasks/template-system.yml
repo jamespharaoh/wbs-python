@@ -37,11 +37,4 @@
     dest: "/etc/ssh/ssh_known_hosts"
   sudo: "yes"
 
-- name: "configure sysctl"
-  action:
-    module: "template"
-    src: "template-sysctl-conf"
-    dest: "/etc/sysctl.conf"
-  sudo: "yes"
-
 # ex: et ts=2 filetype=yaml

@@ -4,7 +4,6 @@ ansible_connection: "chroot"
 ansible_ssh_host: "/var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}/rootfs"
 
 template: "{{ node }}-template"
-autostart: "yes"
 
 node_ip: "{{ deployment_bridge_network }}.{{ grp }}.{{ idx }}"
 
