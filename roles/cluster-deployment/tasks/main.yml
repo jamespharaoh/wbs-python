@@ -34,11 +34,11 @@
         target: "config/api/apple-ca.cert"
         mode: "0644"
 
-      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications }}.cert"
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.cert"
         target: "config/api/apple-push.cert"
         mode: "0644"
 
-      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications }}.key"
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.key"
         target: "config/api/apple-push.key"
         mode: "0600"
 
