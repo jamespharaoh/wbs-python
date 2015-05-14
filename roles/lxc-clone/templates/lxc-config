@@ -4,7 +4,8 @@ lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
 # limits
 
-lxc.cgroup.memory.limit_in_bytes = {{ (node_memory [node] | int) * 1024 * 1024 }}
+lxc.cgroup.memory.soft_limit_in_bytes = {{ (node_memory [node] | int) * 1024 * 1024 }}
+lxc.cgroup.memory.limit_in_bytes = {{ (node_memory [node] | int) * 1024 * 1024 * 2 }}
 
 # file system
 
