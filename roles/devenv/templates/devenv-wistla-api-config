@@ -65,7 +65,7 @@ config.loadingData = {
 
 // apple push notifications
 config.applePush = {
-{% if dev_apple_push_notifications_name is defined $}
+{% if dev_apple_push_notifications_name is defined %}
 	enabled: true,
 	caCertFile: ROOT + '/config/apple-ca.cert',
 	certFile: ROOT + '/config/apple-push.cert',

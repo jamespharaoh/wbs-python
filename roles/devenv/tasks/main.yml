@@ -2,7 +2,7 @@
 
 - set_fact:
 
-    config_directories:
+    devenv_config_directories:
 
       - "config"
       - "config/api"
@@ -12,7 +12,7 @@
       - "config/rabbit"
       - "config/web"
 
-    config_files:
+    devenv_config_files:
 
       - source: "security/apple/push-notifications/ca.cert"
         type: "api"
@@ -22,7 +22,7 @@
         type: "api"
         target: "apple-push.cert"
 
-    config_secrets:
+    devenv_config_secrets:
 
       - source: "security/test/google-service-account.key"
         type: "api"
@@ -32,7 +32,7 @@
         type: "api"
         target: "apple-push.key"
 
-    config_templates:
+    devenv_config_templates:
 
       - template: "devenv-wistla-admin-config"
         type: "load"
@@ -54,7 +54,7 @@
         type: "load"
         target: "nginx-upstream.conf"
 
-    config_links:
+    devenv_config_links:
 
       - src: "../../config/api/apple-ca.cert"
         dest: "wistla-api/config/apple-ca.cert"
@@ -80,7 +80,7 @@
       - src: "../../config/web/config.local.js"
         dest: "wistla-web/config/config.local.js"
 
-    shared_directories:
+    devenv_shared_directories:
 
       - "shared"
       - "shared/audio"
@@ -147,7 +147,7 @@
     state: "directory"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items: "shared_directories"
+  with_items: "devenv_shared_directories"
 
 - name: "create config directories"
   action:
@@ -156,7 +156,7 @@
     state: "directory"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items: "config_directories"
+  with_items: "devenv_config_directories"
 
 - name: "create config files"
   action:
@@ -165,7 +165,7 @@
     dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items: "config_templates"
+  with_items: "devenv_config_templates"
 
 - name: "copy config files"
   action:
@@ -175,7 +175,7 @@
     mode: "0644"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items: "config_files"
+  with_items: "devenv_config_files"
 
 - name: "copy config secrets"
   action:
@@ -186,7 +186,7 @@
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
   when: "'dev' in secrets"
-  with_items: "config_secrets"
+  with_items: "devenv_config_secrets"
 
 - name: "create links to config files"
   action:
@@ -197,7 +197,7 @@
     force: "yes"
   sudo: "yes"
   sudo_user: "{{ deployment_user }}"
-  with_items: "config_links"
+  with_items: "devenv_config_links"
 
 - name: "create deployment name link"
   action:
