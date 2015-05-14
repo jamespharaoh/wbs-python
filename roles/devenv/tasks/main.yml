@@ -18,7 +18,7 @@
         type: "api"
         target: "apple-ca.cert"
 
-      - source: "security/apple/push-notifications/{{ dev_apple_push_notifications_name }}.cert"
+      - source: "security/apple/push-notifications/{{ dev_apple_push_notifications_name | default ('null') }}.cert"
         type: "api"
         target: "apple-push.cert"
 
@@ -28,7 +28,7 @@
         type: "api"
         target: "google-service-account.key"
 
-      - source: "security/apple/push-notifications/{{ dev_apple_push_notifications_name }}.key"
+      - source: "security/apple/push-notifications/{{ dev_apple_push_notifications_name | default ('null') }}.key"
         type: "api"
         target: "apple-push.key"
 

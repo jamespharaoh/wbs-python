@@ -1,0 +1,9 @@
+---
+
+- hosts: "cluster-network"
+  roles:
+
+    - role: "cluster-network"
+      tags: [ "cluster-network" ]
+
+# ex: et ts=2 filetype=yaml

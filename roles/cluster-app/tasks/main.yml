@@ -9,12 +9,6 @@
 - include: "cluster-app-system.yml"
   tags: "cluster-app-system"
 
-- include: "cluster-app-node.yml"
-  tags: "cluster-app-node"
-
-- include: "cluster-app-btrfs.yml"
-  tags: "cluster-app-btrfs"
-
 - include: "cluster-app-network.yml"
   tags: "cluster-app-network"
 

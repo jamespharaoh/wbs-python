@@ -1,13 +1,5 @@
 ---
 
-# ========== network
-
-- hosts: "cluster-network"
-  roles:
-
-    - role: "cluster-network"
-      tags: [ "cluster-network" ]
-
 # ========== admin
 
 - hosts: "cluster-admin"
@@ -82,6 +74,18 @@
       when: "cluster != 'ops'"
       tags: [ "setup-common-users" ]
 
+    - role: "install-nodejs"
+      when: "cluster != 'ops'"
+      tags: [ "install-nodejs" ]
+
+    - role: "install-iojs"
+      when: "cluster != 'ops'"
+      tags: [ "install-iojs" ]
+
+    - role: "setup-alternatives"
+      when: "cluster != 'ops'"
+      tags: [ "setup-alternatives" ]
+
     - role: "cluster-user"
       when: "cluster != 'ops'"
       tags: [ "cluster-user" ]
@@ -91,43 +95,6 @@
     #- role: "cluster-icinga"
     #  when: "cluster != 'ops'"
     #  tags: [ "cluster-icinga" ]
-
-    # ----- deployments
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "production-a"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "production-a" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "production-b"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "production-b" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "staging-a"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "staging-a" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "staging-b"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "staging-b" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "test-everest"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "test-everest" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "test-k2"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "test-k2" ]
-
-    - role: "cluster-deployment"
-      cluster_deployment_name: "test-montblanc"
-      when: "cluster == 'production'"
-      tags: [ "cluster-deployment", "test-montblanc" ]
 
     # ----- final steps
 
