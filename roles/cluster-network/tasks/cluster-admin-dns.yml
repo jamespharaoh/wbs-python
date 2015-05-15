@@ -3,12 +3,13 @@
 - name: "create admin per-zone dns"
   delegate_to: "localhost"
   action:
+
     module: "route53"
     command: "create"
     overwrite: "yes"
 
-    zone: "{{ cluster_domain }}"
-    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster_domain }}"
+    zone: "{{ cluster_main_domain }}"
+    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster_main_domain }}"
     ttl: "60"
     type: "A"
     value: "{{ amazon_admin_ips [item.1] }}"
@@ -24,25 +25,5 @@
     - - "a"
       - "b"
       - "c"
-
-- name: "create admin dns"
-  delegate_to: "localhost"
-  action:
-    module: "route53"
-    command: "create"
-    overwrite: "yes"
-
-    zone: "{{ cluster_domain }}"
-    record: "{{ item }}.{{ cluster_domain }}"
-    ttl: "60"
-    type: "A"
-    value: "{{ amazon_admin_ips.values () | join (',') }}"
-
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-  with_items:
-    - "admin"
-    - "vpn"
 
 # ex: et ts=2 filetype=yaml

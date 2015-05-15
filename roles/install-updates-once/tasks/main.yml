@@ -1,0 +1,22 @@
+---
+
+- stat:
+    path: "/etc/install-updates-once-flag"
+  sudo: "yes"
+  register: "install_updates_once_flag"
+
+- name: "upgrade system packages"
+  action:
+    module: "apt"
+    update_cache: "yes"
+    upgrade: "dist"
+  sudo: "yes"
+  when: "not install_updates_once_flag.stat.exists"
+
+- file:
+    path: "/etc/install-updates-once-flag"
+    state: "touch"
+  sudo: "yes"
+  when: "not install_updates_once_flag.stat.exists"
+
+# ex: et ts=2 filetype=yaml

@@ -4,19 +4,18 @@ cluster_net: "10.140"
 cluster_vpn: "10.141"
 
 cluster_short: "prod"
-cluster_domain: "wistla.com"
+
+cluster_main_domain: "wistla.com"
+cluster_short_domain: "wist.la"
 
 cluster_colour: "27"
 
 cluster_deployment_alias_names:
   - "production"
-  - "staging"
 
 cluster_deployment_names:
   - "production-a"
   - "production-b"
-  - "staging-a"
-  - "staging-b"
   - "test-everest"
   - "test-k2"
   - "test-montblanc"
@@ -80,32 +79,6 @@ cluster_app_certificates:
     private_key: "security/ssl/wist.la.key"
     certificates:
       - "security/ssl/wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  # ----- staging
-
-  - name: "staging.wistla.com"
-    private_key: "security/ssl/staging.wistla.com.key"
-    certificates:
-      - "security/ssl/staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.staging.wistla.com"
-    private_key: "security/ssl/api.staging.wistla.com.key"
-    certificates:
-      - "security/ssl/api.staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.staging.wistla.com"
-    private_key: "security/ssl/admin.staging.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "staging.wist.la"
-    private_key: "security/ssl/staging.wist.la.key"
-    certificates:
-      - "security/ssl/staging.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
   # ----- test everest

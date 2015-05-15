@@ -1,4 +1,4 @@
-{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}.{{ cluster_domain }}
+{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}.{{ cluster_main_domain }}
 {{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}
 
 127.0.0.1 localhost
@@ -11,7 +11,7 @@
 			cluster_subnets [cluster_host.cluster_type] [cluster_host.zon],
 			cluster_host.idx,
 		] | join ('.'),
-		cluster_host_name + '.' + cluster_domain,
+		cluster_host_name + '.' + cluster_main_domain,
 		cluster_host_name,
 	] | join (' '), '\n' -%}
 {% endfor %}

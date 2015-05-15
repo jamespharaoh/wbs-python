@@ -13,7 +13,7 @@ staging:
   name: "staging"
   main_domain: "staging.wistla.com"
   short_domain: "stating.wist.la"
-  cluster: "production"
+  cluster: "staging"
   target: "staging-a"
 
 # ex: et ts=2 filetype=yaml

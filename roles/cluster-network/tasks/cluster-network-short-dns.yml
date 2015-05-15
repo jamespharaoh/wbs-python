@@ -21,6 +21,5 @@
     region: "{{ amazon_region }}"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster == 'production'"
 
 # ex: et ts=2 filetype=yaml

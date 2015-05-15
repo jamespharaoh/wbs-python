@@ -1,24 +1,5 @@
 ---
 
-- stat:
-    path: "/etc/first-run-flag"
-  sudo: "yes"
-  register: "first_run_flag"
-
-- name: "upgrade system packages"
-  action:
-    module: "apt"
-    update_cache: "yes"
-    upgrade: "dist"
-  sudo: "yes"
-  when: "not first_run_flag.stat.exists"
-
-- file:
-    path: "/etc/first-run-flag"
-    state: "touch"
-  sudo: "yes"
-  when: "not first_run_flag.stat.exists"
-
 - name: "create common groups"
   action:
     module: "group"

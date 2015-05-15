@@ -4,9 +4,14 @@ cluster_net: "10.144"
 cluster_vpn: "10.145"
 
 cluster_short: "stage"
-cluster_domain: "staging.wistla.com"
+
+cluster_main_domain: "staging.wistla.com"
+cluster_short_domain: "staging.wist.la"
 
 cluster_colour: "221"
+
+cluster_deployment_alias_names:
+  - "staging"
 
 cluster_deployment_names:
   - "staging-a"
@@ -47,6 +52,8 @@ cluster_admin_certificates: []
 
 cluster_app_certificates:
 
+  # ----- staging
+
   - name: "staging.wistla.com"
     private_key: "security/ssl/staging.wistla.com.key"
     certificates:
@@ -57,6 +64,18 @@ cluster_app_certificates:
     private_key: "security/ssl/api.staging.wistla.com.key"
     certificates:
       - "security/ssl/api.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "admin.staging.wistla.com"
+    private_key: "security/ssl/admin.staging.wistla.com.key"
+    certificates:
+      - "security/ssl/admin.staging.wistla.com.cert"
+      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+
+  - name: "staging.wist.la"
+    private_key: "security/ssl/staging.wist.la.key"
+    certificates:
+      - "security/ssl/staging.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
 # ex: et ts=2 filetype=yaml

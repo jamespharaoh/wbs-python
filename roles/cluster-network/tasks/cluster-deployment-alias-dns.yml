@@ -67,16 +67,16 @@
   action:
     module: "route53"
     zone: "wistla.com"
-    record: "{{ item.domain }}"
+    record: "{{ item.value.main_domain }}"
     type: "NS"
     command: "create"
     overwrite: "yes"
-    value: "{{ lookup ('file', '/home/vagrant/work/' + item.cluster + '/deployment-alias-dns-' + item.name + '-nameservers') }}"
+    value: "{{ lookup ('file', '/home/vagrant/work/' + item.value.cluster + '/deployment-alias-dns-' + item.key + '-nameservers') }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
   sudo: "yes"
   sudo_user: "vagrant"
-  with_items: "deployment_aliases.values ()"
-  when: "cluster == 'production' and item.name != 'production'"
+  with_dict: "deployment_aliases"
+  when: "cluster == 'production' and item.key != 'production'"
 
 # ex: et ts=2 filetype=yaml

@@ -3,6 +3,8 @@
 - hosts: "cluster-app"
   roles:
 
+    # ----- production
+
     - role: "cluster-deployment"
       cluster_deployment_name: "production-a"
       when: "cluster == 'production'"
@@ -13,15 +15,19 @@
       when: "cluster == 'production'"
       tags: [ "cluster-deployment", "production-b" ]
 
+    # ----- staging
+
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-a"
-      when: "cluster == 'production'"
+      when: "cluster == 'staging'"
       tags: [ "cluster-deployment", "staging-a" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-b"
-      when: "cluster == 'production'"
+      when: "cluster == 'staging'"
       tags: [ "cluster-deployment", "staging-b" ]
+
+    # ----- test
 
     - role: "cluster-deployment"
       cluster_deployment_name: "test-everest"

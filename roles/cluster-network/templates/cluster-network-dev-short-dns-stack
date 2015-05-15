@@ -8,7 +8,7 @@ Resources:
   HostedZone:
     Type: "AWS::Route53::HostedZone"
     Properties:
-      Name: "{{ cluster_short_domain }}."
+      Name: "dev.wist.la."
 
 {% for deployment_alias_name, deployment_alias in deployment_aliases.items ()
 if deployment_alias_name in cluster_deployment_alias_names %}
@@ -32,12 +32,10 @@ if deployment_alias_name in cluster_deployment_alias_names %}
 {% endfor %}
 
 {% for deployment_name, deployment in deployments.items ()
-if deployment.cluster == cluster %}
+if deployment.cluster == 'dev' %}
 
 {% set other_cluster_data = lookup ('file', [
-  '/home/vagrant/work/',
-  deployment.cluster,
-  '/cluster-data',
+  '/home/vagrant/work/ops/cluster-data',
 ] | join ('')) | from_yaml %}
 
   {{ deployment_name | replace ('-', '') | capitalize }}RecordSet:
@@ -46,8 +44,8 @@ if deployment.cluster == cluster %}
       Name: "{{ deployment.short_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ other_cluster_data.cluster_app_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ other_cluster_data.cluster_app_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ other_cluster_data.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ other_cluster_data.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
 {% endfor %}

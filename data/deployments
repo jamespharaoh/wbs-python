@@ -41,7 +41,7 @@ production-b:
 staging-a:
 
   name: "staging-a"
-  cluster: "production"
+  cluster: "staging"
   alias: "staging"
 
   main_domain: "a.staging.wistla.com"
@@ -60,7 +60,7 @@ staging-a:
 staging-b:
 
   name: "staging-b"
-  cluster: "production"
+  cluster: "staging"
   alias: "staging"
 
   main_domain: "b.staging.wistla.com"
@@ -201,7 +201,7 @@ optimus:
 jenkins-latest:
 
   name: "jenkins-latest"
-  cluster: "dev"
+  cluster: "jenkins"
 
   main_domain: "latest.jenkins.wistla.com"
   short_domain: "latest.jenkins.wist.la"

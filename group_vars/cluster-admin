@@ -1,6 +1,6 @@
 ---
 
-ansible_ssh_host: "{{ zon }}.admin.{{ cluster_domain }}"
+ansible_ssh_host: "{{ zon }}.admin.{{ cluster_main_domain }}"
 
 cluster_type: "admin"
 cluster_type_colour: "196"
