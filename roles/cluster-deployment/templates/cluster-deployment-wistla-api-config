@@ -54,11 +54,15 @@ config.loadingData = {
 
 // apple push notifications
 config.applePush = {
+{% if cluster_deployment.apple_push_notifications_enabled == 'yes' %}
 	enabled: true,
 	caCertFile: ROOT + '/config/apple-ca.cert',
 	certFile: ROOT + '/config/apple-push.cert',
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ 'true' if cluster_deployment.apple_push_notifications_production == 'yes' else 'false' }},
+{% else %}
+	enabled: false,
+{% endif %}
 };
 
 module.exports = config;
