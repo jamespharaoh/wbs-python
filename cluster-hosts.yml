@@ -5,6 +5,11 @@
 - hosts: "cluster-admin"
   roles:
 
+    # ----- create
+
+    - role: "cluster-create"
+      tags: [ "cluster-create" ]
+
     # ----- system
 
     - role: "cluster-admin"
@@ -43,6 +48,12 @@
 
 - hosts: "cluster-app"
   roles:
+
+    # ----- create
+
+    - role: "cluster-create"
+      when: "cluster != 'ops'"
+      tags: [ "cluster-create" ]
 
     # ----- system
 
@@ -86,6 +97,10 @@
       when: "cluster != 'ops'"
       tags: [ "setup-alternatives" ]
 
+    - role: "install-node-packages"
+      when: "cluster != 'ops'"
+      tags: [ "install-node-packages" ]
+
     - role: "cluster-user"
       when: "cluster != 'ops'"
       tags: [ "cluster-user" ]
@@ -106,11 +121,12 @@
 - hosts: "cluster-jenkins"
   roles:
 
-    # ----- system
+    # ----- create
 
-    - role: "cluster-jenkins"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-jenkins" ]
+    - role: "cluster-create"
+      tags: [ "cluster-create" ]
+
+    # ----- system
 
     - role: "cluster-volumes"
       when: "cluster == 'ops'"
@@ -129,11 +145,11 @@
       tags: [ "cluster-user" ]
 
     - role: "install-postfix"
-      when: "cluster != 'ops'"
+      when: "cluster == 'ops'"
       tags: [ "install-postfix" ]
 
     - role: "setup-common-users"
-      when: "cluster != 'ops'"
+      when: "cluster == 'ops'"
       tags: [ "setup-common-users" ]
 
     - role: "install-nodejs"
@@ -148,11 +164,19 @@
       when: "cluster == 'ops'"
       tags: [ "setup-alternatives" ]
 
+    - role: "install-node-packages"
+      when: "cluster == 'ops'"
+      tags: [ "install-node-packages" ]
+
+    # ----- services
+
     - role: "cluster-user"
       when: "cluster == 'ops'"
       tags: [ "cluster-user" ]
 
-    # ----- services
+    - role: "cluster-jenkins"
+      when: "cluster == 'ops'"
+      tags: [ "cluster-jenkins" ]
 
     #- role: "cluster-icinga"
     #  when: "cluster == 'ops'"

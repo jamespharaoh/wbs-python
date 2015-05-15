@@ -34,14 +34,6 @@ cluster_jenkins_remove_packages:
   - "python-apport"
   - "python3-apport"
 
-cluster_jenkins_install_node:
-
-  - name: "gulp"
-    version: "3.8.11"
-
-  - name: "jspm"
-    version: "0.15.3"
-
 jenkins_deployment_names:
 
   - "jenkins-latest"
@@ -60,6 +52,29 @@ alternatives:
     link: "/usr/bin/npm"
     target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
 
+node_packages:
+
+  - name: "bunyan"
+    version: "1.3.4"
+
+  - name: "gulp"
+    version: "3.8.11"
+
+  - name: "jspm"
+    version: "0.15.3"
+
+  - name: "mocha"
+    version: "2.2.4"
+
+  - name: "node-inspector"
+    version: "0.8.3"
+
+  - name: "prettyjson"
+    version: "1.1.0"
+
+  - name: "request"
+    version: "2.55.0"
+
 system_reboot_on_error: "yes"
 
 cluster_volumes:
@@ -71,5 +86,29 @@ cluster_volumes:
   - type: "ext4"
     path: "/data"
     device: "/dev/xvdg"
+
+cluster_create_instance_tags:
+
+  "Name": "jenkins"
+  "Class": "jenkins"
+
+cluster_create_count_tag:
+
+  "Name": "jenkins"
+  "Class": "jenkins"
+
+cluster_create_volumes:
+
+  - # system
+    device_name: "/dev/sda1"
+    volume_size: "32"
+
+  - # containers
+    device_name: "/dev/sdf"
+    volume_size: "128"
+
+  - # data
+    device_name: "/dev/sdg"
+    volume_size: "128"
 
 # ex: et ts=2 filetype=yaml

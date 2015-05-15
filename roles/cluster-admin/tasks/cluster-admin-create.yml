@@ -15,7 +15,7 @@
     exact_count: 1
 
     image: "{{ amazon_images [amazon_region].base }}"
-    instance_type: "{{ amazon_type_admin }}"
+    instance_type: "{{ amazon_instance_types.admin }}"
     key_name: "{{ amazon_key_name }}"
 
     group_id: "{{ cluster_group_admin }}"

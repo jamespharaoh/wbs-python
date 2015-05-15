@@ -2,35 +2,24 @@
 
 cluster_net: "{{ clusters [cluster].cluster_net }}"
 cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
-
 cluster_short: "{{ clusters [cluster].cluster_short }}"
-
 cluster_main_domain: "{{ clusters [cluster].cluster_main_domain }}"
 cluster_short_domain: "{{ clusters [cluster].cluster_short_domain }}"
-
 cluster_colour: "{{ clusters [cluster].cluster_colour }}"
-
 cluster_deployment_alias_names: "{{ clusters [cluster].cluster_deployment_alias_names | default ([]) }}"
 cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
-
 cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
+cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
+cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
+cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
 
 amazon_account: "{{ clusters [cluster].amazon_account }}"
 amazon_region: "{{ clusters [cluster].amazon_region }}"
-
 amazon_zones: "{{ clusters [cluster].amazon_zones }}"
-
 amazon_admin_ips: "{{ clusters [cluster].amazon_admin_ips }}"
-
-amazon_type_admin: "{{ clusters [cluster].amazon_type_admin }}"
-amazon_type_app: "{{ clusters [cluster].amazon_type_app }}"
-amazon_type_jenkins: "{{ clusters [cluster].amazon_type_jenkins }}"
-
+amazon_instance_types: "{{ clusters [cluster].amazon_instance_types }}"
 amazon_images: "{{ clusters [cluster].amazon_images }}"
-
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
-
-cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
 
 cluster_checkouts:
 
@@ -61,9 +50,6 @@ cluster_checkouts:
 
   - name: "wistla-test-images"
     branch: "master"
-
-cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
-cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
 
 kernel_version: "{{ clusters [cluster].kernel_versions [cluster_type] }}"
 

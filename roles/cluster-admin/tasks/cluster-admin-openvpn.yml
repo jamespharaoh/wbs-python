@@ -19,7 +19,7 @@
 - name: "install openvpn server cert"
   action:
     module: "copy"
-    src: "security/{{ cluster }}-vpn.cert"
+    src: "security/vpn-server/{{ cluster }}.cert"
     dest: "/etc/openvpn/wistla-{{ cluster }}-vpn.cert"
   sudo: "yes"
   notify: "restart openvpn"
@@ -27,7 +27,7 @@
 - name: "install openvpn server key"
   action:
     module: "copy"
-    src: "security/secrets-plain/{{ cluster }}-vpn.key"
+    src: "security/vpn-server/{{ cluster }}.key"
     dest: "/etc/openvpn/wistla-{{ cluster }}-vpn.key"
     mode: "0600"
   sudo: "yes"

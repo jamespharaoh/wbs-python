@@ -171,15 +171,16 @@ def run_playbook (args):
 			"--extra-vars", "@config",
 			"--extra-vars", "@accounts",
 		] + args,
-		env = dict ({
-			"PYTHONUNBUFFERED": "1",
-			"PYTHONPATH": "%s/ansible/lib" % HOME,
-			"PATH": ":".join ([
+		env = dict (
+			os.environ,
+			ANSIBLE_HOME = "%s/ansible" % HOME,
+			PATH = ":".join ([
 				"%s/ansible/bin" % HOME,
 				os.environ ["PATH"],
 			]),
-			"ANSIBLE_HOME": "%s/ansible" % HOME,
-		}))
+			PYTHONPATH = "%s/ansible/lib" % HOME,
+			PYTHONUNBUFFERED = "1",
+		))
 
 	clear_newline ()
 

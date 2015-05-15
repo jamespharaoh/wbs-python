@@ -16,4 +16,11 @@ staging:
   cluster: "staging"
   target: "staging-a"
 
+test:
+
+  name: "test"
+  main_domain: "test.wistla.com"
+  short_domain: "test.wist.la"
+  cluster: "test"
+
 # ex: et ts=2 filetype=yaml

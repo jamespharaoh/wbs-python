@@ -3,7 +3,8 @@
 - hosts: "vagrant"
   roles:
 
-    - role: "update"
+    - role: "devenv"
       when: "deployment_mode == 'vagrant'"
+      tags: "devenv"
 
 # ex: et ts=2 filetype=yaml

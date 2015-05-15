@@ -42,6 +42,26 @@ ssh_user_keys:
       - "Db48T4rsaKqxDwKBoNdw6QulGOoUtV2nmRm5Ko1iJIW3Z/LjZlRqrFdBdBn+m3WNXdJRT2"
       - "hK0OcO2LOgF4TPUm0fFPNX"
 
+  wistla-test:
+    type: "ssh-rsa"
+    data:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
+      - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
+      - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
+      - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
+      - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
+      - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+
+  wistla-test-old:
+    type: "ssh-rsa"
+    data:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
+      - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
+      - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
+      - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
+      - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
+      - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+
   wistla-ops:
     type: "ssh-rsa"
     data:

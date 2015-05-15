@@ -1,11 +1,5 @@
 ---
 
-- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
-
-- include: "cluster-jenkins-create.yml"
-  tags: "cluster-jenkins-create"
-  when: "cluster == 'ops'"
-
 - include: "cluster-jenkins-system.yml"
   tags: "cluster-jenkins-system"
   when: "cluster == 'ops'"

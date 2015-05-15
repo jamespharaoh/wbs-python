@@ -34,6 +34,7 @@ clusters:
   ops: "{{ lookup ('file', 'data/cluster/ops') | from_yaml }}"
   production: "{{ lookup ('file', 'data/cluster/production') | from_yaml  }}"
   staging: "{{ lookup ('file', 'data/cluster/staging') | from_yaml }}"
+  test: "{{ lookup ('file', 'data/cluster/test') | from_yaml }}"
 
 deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
 deployment_aliases: "{{ lookup ('file', 'data/deployment-aliases') | from_yaml }}"

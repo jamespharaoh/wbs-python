@@ -157,7 +157,8 @@ http {
 {% endmacro %}
 
 {% for deployment_alias_name, deployment_alias in deployment_aliases.items ()
-	if deployment_alias.cluster == cluster %}
+	if deployment_alias.cluster == cluster
+	and deployment_alias.target is defined %}
 
 # ----- deployment alias {{ deployment_alias.name }} -----
 #

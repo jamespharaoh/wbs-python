@@ -79,13 +79,13 @@ staging-b:
 test-everest:
 
   name: "test-everest"
-  cluster: "production"
+  cluster: "test"
 
   main_domain: "everest.test.wistla.com"
   short_domain: "everest.test.wist.la"
 
-  parent_cluster: "production"
-  parent_domain: "wistla.com"
+  parent_cluster: "test"
+  parent_domain: "test.wistla.com"
 
   bridge_name: "br157"
   bridge_network: "10.157"
@@ -97,13 +97,13 @@ test-everest:
 test-k2:
 
   name: "test-k2"
-  cluster: "production"
+  cluster: "test"
 
   main_domain: "k2.test.wistla.com"
   short_domain: "k2.test.wist.la"
 
-  parent_cluster: "production"
-  parent_domain: "wistla.com"
+  parent_cluster: "test"
+  parent_domain: "test.wistla.com"
 
   bridge_name: "br158"
   bridge_network: "10.158"
@@ -115,20 +115,20 @@ test-k2:
 test-montblanc:
 
   name: "test-montblanc"
-  cluster: "production"
+  cluster: "test"
 
   main_domain: "montblanc.test.wistla.com"
   short_domain: "montblanc.test.wist.la"
 
-  parent_cluster: "production"
-  parent_domain: "wistla.com"
+  parent_cluster: "test"
+  parent_domain: "test.wistla.com"
 
   bridge_name: "br159"
   bridge_network: "10.159"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-production"
-  apple_push_notifications_production: "yes"
+  apple_push_notifications_name: "wistla-dev"
+  apple_push_notifications_production: "no"
 
 dev:
 

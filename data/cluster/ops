@@ -23,8 +23,9 @@ amazon_admin_ips:
   b: "54.77.73.153"
   c: "54.77.72.11"
 
-amazon_type_admin: "t2.small"
-amazon_type_jenkins: "c3.xlarge"
+amazon_instance_types:
+  admin: "t2.small"
+  jenkins: "c3.xlarge"
 
 amazon_images:
 

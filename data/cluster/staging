@@ -32,8 +32,9 @@ amazon_admin_ips:
   b: "54.229.32.96"
   c: "54.229.32.240"
 
-amazon_type_admin: "t2.small"
-amazon_type_app: "t2.medium"
+amazon_instance_types:
+  admin: "t2.small"
+  app: "c4.large"
 
 amazon_images:
 

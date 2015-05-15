@@ -90,4 +90,30 @@ ssh_host_keys:
         - "AABBBLmaGGl41B2tPNB6QCl30uofDDAYdvNFvBvJqClmsaTwJNoSC95HArx3V3sAw0Au"
         - "R+DTDs9xzkNFGks4nxanA3U="
 
+  test:
+
+    admin:
+
+      a:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBKEYHFppfHUH+d+vbx2FilxK2HRqSrnW2DDTuYGRw5TKeycmg4/7jrNivTUJlA3x"
+        - "R0McJ5EGEJfMXUuzcTOyI44="
+
+      b:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBHpuz+qWSFywmP7JA/WiqlJQ80vFyr3hB4h4wRE388q8n8OLtuIyh8aJcoFC30am"
+        - "CU4xgeS3g7QqdfDUnAmGsUc="
+
+      c:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBJ1cALjvILngS/nNwq56mw4DgzAJDRXLgpgzkWr8P0J/DAoqRzeOrLfG5AVSukAx"
+        - "sUW/s1pv1fRCizxrF9JGgVc="
+
+    app:
+
+      a-4:
+        - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
+        - "AABBBDU+/fcJ22n5t9466TaY9VshZ1fSmtNIGK6kLTfcW56biTe1N9eqB/4NKiBlGS+F"
+        - "3mEn4dYJTbtI8WiwOOW81MY="
+
 # ex: et ts=2 filetype=yaml

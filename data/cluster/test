@@ -1,29 +1,26 @@
 ---
 
-cluster_net: "10.140"
-cluster_vpn: "10.141"
+cluster_net: "10.146"
+cluster_vpn: "10.147"
 
-cluster_short: "prod"
+cluster_short: "test"
 
-cluster_main_domain: "wistla.com"
-cluster_short_domain: "wist.la"
+cluster_main_domain: "test.wistla.com"
+cluster_short_domain: "test.wist.la"
 
-cluster_colour: "27"
+cluster_colour: "84"
 
 cluster_deployment_alias_names:
-  - "production"
   - "test"
 
 cluster_deployment_names:
-  - "production-a"
-  - "production-b"
   - "test-everest"
   - "test-k2"
   - "test-montblanc"
 
-cluster_cron_email: "cron.production@wistla.com"
+cluster_cron_email: "cron.test@wistla.com"
 
-amazon_account: "production"
+amazon_account: "test"
 amazon_region: "eu-west-1"
 
 amazon_zones:
@@ -32,20 +29,20 @@ amazon_zones:
   c: "eu-west-1c"
 
 amazon_admin_ips:
-  a: "54.72.85.106"
-  b: "54.77.196.68"
-  c: "54.77.222.234"
+  a: "52.17.37.137"
+  b: "52.17.112.67"
+  c: "52.17.197.208"
 
 amazon_instance_types:
   admin: "t2.small"
-  app: "c4.large"
+  app: "r3.large"
 
 amazon_images:
 
   eu-west-1:
     base: "ami-0cfb5a7b"
 
-amazon_key_name: "wistla-production"
+amazon_key_name: "wistla-test"
 
 kernel_versions:
   admin: "3.19.8"
@@ -57,33 +54,7 @@ cluster_admin_certificates: []
 
 cluster_app_certificates:
 
-  # ----- production
-
-  - name: "wistla.com"
-    private_key: "security/ssl/wistla.com.key"
-    certificates:
-      - "security/ssl/wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.wistla.com"
-    private_key: "security/ssl/api.wistla.com.key"
-    certificates:
-      - "security/ssl/api.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.wistla.com"
-    private_key: "security/ssl/admin.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "wist.la"
-    private_key: "security/ssl/wist.la.key"
-    certificates:
-      - "security/ssl/wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  # ----- test everest
+  # ----- everest
 
   - name: "everest.test.wistla.com"
     private_key: "security/ssl/everest.test.wistla.com.key"
@@ -109,7 +80,7 @@ cluster_app_certificates:
       - "security/ssl/everest.test.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
-  # ----- test k2
+  # ----- k2
 
   - name: "k2.test.wistla.com"
     private_key: "security/ssl/k2.test.wistla.com.key"
@@ -135,7 +106,7 @@ cluster_app_certificates:
       - "security/ssl/k2.test.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
-  # ----- test montblanc
+  # ----- k2
 
   - name: "montblanc.test.wistla.com"
     private_key: "security/ssl/montblanc.test.wistla.com.key"

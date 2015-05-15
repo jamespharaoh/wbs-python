@@ -1,15 +1,6 @@
 ---
 
-- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
-  tags:
-    - "cluster-admin-activate"
-
 # pre setup
-
-- include: "cluster-admin-create.yml"
-  tags:
-    - "cluster-admin-create"
-    - "cluster-admin-activate"
 
 - include: "cluster-admin-assign-ip.yml"
   tags:

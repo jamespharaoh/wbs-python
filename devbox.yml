@@ -1,53 +1,6 @@
 ---
 
-- hosts: "vagrant"
-  gather_facts: "no"
-  roles:
-
-    - role: "install-system-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "setup-common-users"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-python-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "devbox-system"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-nodejs"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-      nodejs_version: "0.12.2"
-
-    - role: "install-iojs"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-      iojs_version: "2.0.1"
-
-    - role: "install-tools"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-tools" ]
-
-    - role: "setup-alternatives"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-alternatives" ]
-
-    - role: "install-node-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", devbox-node" ]
-
-    - role: "devbox-user"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-user" ]
-
-    - role: "devenv"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devenv"
+- include: "devbox-host.yml"
+- include: "devbox-deployment.yml"
 
 # ex: et ts=2 filetype=yaml

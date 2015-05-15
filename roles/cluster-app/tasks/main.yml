@@ -1,11 +1,5 @@
 ---
 
-- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
-  tags: "cluster-app-create"
-
-- include: "cluster-app-create.yml"
-  tags: "cluster-app-create"
-
 - include: "cluster-app-system.yml"
   tags: "cluster-app-system"
 
