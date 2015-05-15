@@ -124,6 +124,7 @@
     # ----- create
 
     - role: "cluster-create"
+      when: "cluster == 'ops'"
       tags: [ "cluster-create" ]
 
     # ----- system
