@@ -1,5 +1,7 @@
 ---
 
+# ========== core configuration
+
 cluster_net: "10.142"
 cluster_vpn: "10.143"
 
@@ -10,22 +12,22 @@ cluster_short_domain: "ops.wist.la"
 
 cluster_colour: "207"
 
+# ========== amazon miscellaneous
+
 amazon_account: "ops"
 amazon_region: "eu-west-1"
 
 amazon_zones:
+
   a: "eu-west-1a"
   b: "eu-west-1b"
   c: "eu-west-1c"
 
 amazon_admin_ips:
+
   a: "54.72.3.102"
   b: "54.77.73.153"
   c: "54.77.72.11"
-
-amazon_instance_types:
-  admin: "t2.small"
-  jenkins: "c3.xlarge"
 
 amazon_images:
 
@@ -34,9 +36,19 @@ amazon_images:
 
 amazon_key_name: "wistla-ops"
 
+# ========== resources and versions
+
+amazon_instance_types:
+
+  admin: "t2.small"
+  jenkins: "c3.xlarge"
+
 kernel_versions:
+
   admin: "3.19.8"
   jenkins: "3.19.8"
+
+# ========== accounts and security
 
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 

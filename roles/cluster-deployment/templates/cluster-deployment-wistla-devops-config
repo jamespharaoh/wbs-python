@@ -11,12 +11,10 @@ ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
 vpns: []
 
 node_memory:
-  api: "512"
-  browser: "256"
-  load: "128"
-  mongo: "512"
-  rabbit: "256"
-  web: "768"
+
+{% for key, value in cluster_node_memory.items () %}
+  {{ key }}: "{{ value }}"
+{% endfor %}
 
 use_s3: "no"
 

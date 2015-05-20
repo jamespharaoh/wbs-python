@@ -1,5 +1,7 @@
 ---
 
+# ========== core configuration
+
 cluster_net: "10.146"
 cluster_vpn: "10.147"
 
@@ -11,31 +13,31 @@ cluster_short_domain: "test.wist.la"
 cluster_colour: "221"
 
 cluster_deployment_alias_names:
+
   - "test"
 
 cluster_deployment_names:
+
   - "test-everest"
   - "test-k2"
   - "test-montblanc"
 
-cluster_cron_email: "cron.test@wistla.com"
+# ========== amazon miscellaneous
 
 amazon_account: "test"
 amazon_region: "eu-west-1"
 
 amazon_zones:
+
   a: "eu-west-1a"
   b: "eu-west-1b"
   c: "eu-west-1c"
 
 amazon_admin_ips:
+
   a: "52.17.37.137"
   b: "52.17.112.67"
   c: "52.17.197.208"
-
-amazon_instance_types:
-  admin: "t2.small"
-  app: "r3.large"
 
 amazon_images:
 
@@ -44,11 +46,32 @@ amazon_images:
 
 amazon_key_name: "wistla-test"
 
+# ========== resources and version
+
+node_memory:
+
+  api: "512"
+  browser: "256"
+  load: "128"
+  mongo: "512"
+  rabbit: "256"
+  web: "1024"
+
+amazon_instance_types:
+
+  admin: "t2.small"
+  app: "r3.large"
+
 kernel_versions:
+
   admin: "3.19.8"
   app: "3.19.8"
 
+# ========== accounts and security
+
 cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
+
+cluster_cron_email: "cron.test@wistla.com"
 
 cluster_admin_certificates: []
 
