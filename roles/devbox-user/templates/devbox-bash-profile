@@ -17,6 +17,6 @@ export LC_NAME=C
 
 NODE="/opt/node-v{{ nodejs_version }}-linux-x64"
 
-export MANPATH="$NODE/share/man:$(/usr/bin/manpath)"
+export MANPATH="$NODE/share/man:$(/usr/bin/manpath --quiet)"
 
 # ex: noet ts=4 filetype=sh

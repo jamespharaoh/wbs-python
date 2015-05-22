@@ -54,10 +54,6 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 	source /etc/bash_completion
 fi
 
-# enable ansible
-
-source "$HOME/wistla-devops/ansible/hacking/env-setup"
-
 # useful aliases
 
 alias run-ansible="$HOME/wistla-devops/run-ansible"
