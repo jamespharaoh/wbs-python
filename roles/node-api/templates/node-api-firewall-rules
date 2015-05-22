@@ -16,7 +16,7 @@ set -e
 
 	# external access to node debugger
 
-		{% if debug | default ('no') == 'yes' %}
+		{% if dev_debug | default ('no') == 'yes' %}
 
 		iptables \
 			--table nat \
