@@ -38,7 +38,7 @@ alternatives:
     target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
 
 network_route_localnet: "{{
-  [ 'eth0' ] if dev_debug == 'yes' else []
+  [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []
 }}"
 
 # ex: et ts=2 filetype=yaml
