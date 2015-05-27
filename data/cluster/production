@@ -49,9 +49,9 @@ amazon_key_name: "wistla-production"
 
 node_memory:
 
-  api: "512"
-  browser: "256"
-  load: "128"
+  api: "1024"
+  browser: "512"
+  load: "256"
   mongo: "512"
   rabbit: "256"
   web: "1024"
