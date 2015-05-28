@@ -1,11 +1,27 @@
-upstream api {
-	server {{ cluster_deployment_name }}-api-{{ idx }}:7000 fail_timeout=30s max_fails=1;
-}
+{%- macro upstream (name, port) -%}
 
-upstream browser {
-	server {{ cluster_deployment_name }}-browser-{{ idx }}:3000 fail_timeout=30s max_fails=1;
-}
+	{%- print 'upstream ', name, ' {\n' -%}
 
-upstream web {
-	server {{ cluster_deployment_name }}-web-{{ idx }}:3000 fail_timeout=30s max_fails=1;
-}
+	{%- for node_index in range (0, node_instance_count [name] | int) -%}
+
+		{%- print
+			'\tserver ',
+			cluster_deployment_name,
+			'-',
+			name,
+			'-',
+			idx,
+			':',
+			port + node_index,
+			' fail_timeout=30s max_fails=1;\n'
+		-%}
+
+	{%- endfor -%}
+
+	{%- print '}\n' -%}
+
+{%- endmacro -%}
+
+{{ upstream ('api', 7000) }}
+{{ upstream ('web', 3000) }}
+{{ upstream ('browser', 3000) }}

@@ -56,6 +56,9 @@
       - template: "cluster-deployment-wistla-api-config"
         target: "config/api/config.local.js"
 
+      - template: "cluster-deployment-wistla-api-environment"
+        target: "config/api/environment"
+
       - template: "cluster-deployment-wistla-browser-config"
         target: "config/browser/config.local.js"
 

@@ -1,0 +1,1 @@
+WISTLA_API_COUNT="{{ node_instance_count.api }}"
