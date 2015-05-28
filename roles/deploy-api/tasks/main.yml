@@ -51,9 +51,16 @@
 - name: "create api init config"
   action:
     module: "template"
-    src: "node-api-init-conf"
-    dest: "/etc/init/wistla-api.conf"
+    src: "{{ item.template }}"
+    dest: "{{ item.target }}"
   sudo: "yes"
+  with_items:
+
+    - template: "node-api-upstart"
+      target: "/etc/init/wistla-api.conf"
+
+    - template: "node-api-instance-upstart"
+      target: "/etc/init/wistla-api-instance.conf"
 
 - name: "create wistla api config"
   action:

@@ -42,6 +42,10 @@
         type: "api"
         target: "config.local.js"
 
+      - template: "devenv-wistla-api-environment"
+        type: "api"
+        target: "environment"
+
       - template: "devenv-wistla-browser-config"
         type: "browser"
         target: "config.local.js"

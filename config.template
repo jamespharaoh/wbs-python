@@ -52,6 +52,7 @@ vpns: []
 vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
 node_count:
+
   api: "{{ (node_count | default ({})).api | default ('3') }}"
   browser: "{{ (node_count | default ({})).browser | default ('3') }}"
   load: "{{ (node_count | default ({})).load | default ('3') }}"
@@ -59,7 +60,17 @@ node_count:
   rabbit: "{{ (node_count | default ({})).rabbit | default ('3') }}"
   web: "{{ (node_count | default ({})).web | default ('3') }}"
 
+node_instance_count:
+
+  api: "{{ (node_instance_count | default ({})).api | default ('1') }}"
+  browser: "{{ (node_instance_count | default ({})).browser | default ('1') }}"
+  load: "{{ (node_instance_count | default ({})).load | default ('1') }}"
+  mongo: "{{ (node_instance_count | default ({})).mongo | default ('1') }}"
+  rabbit: "{{ (node_instance_count | default ({})).rabbit | default ('1') }}"
+  web: "{{ (node_instance_count | default ({})).web | default ('1') }}"
+
 node_memory:
+
   api: "{{ (node_memory | default ({})).api | default ('512') }}"
   browser: "{{ (node_memory | default ({})).browser | default ('512') }}"
   load: "{{ (node_memory | default ({})).load | default ('512') }}"

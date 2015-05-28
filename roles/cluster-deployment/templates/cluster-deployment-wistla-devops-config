@@ -10,6 +10,12 @@ ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
 
 vpns: []
 
+node_instance_count:
+
+{% for key, value in cluster_node_instance_count.items () %}
+  {{ key }}: "{{ value }}"
+{% endfor %}
+
 node_memory:
 
 {% for key, value in cluster_node_memory.items () %}

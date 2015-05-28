@@ -12,6 +12,7 @@ cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
 cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
 cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
 cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
+cluster_node_instance_count: "{{ clusters [cluster].node_instance_count }}"
 cluster_node_memory: "{{ clusters [cluster].node_memory }}"
 
 amazon_account: "{{ clusters [cluster].amazon_account }}"
