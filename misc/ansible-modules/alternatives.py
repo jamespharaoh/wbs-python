@@ -144,7 +144,7 @@ def main():
 
                 if need_to_force:
                     module.run_command(
-                        [UPDATE_ALTERNATIVES, '--install', '--force', link, name, path, str(DEFAULT_LINK_PRIORITY)],
+                        [UPDATE_ALTERNATIVES, '--force', '--install', link, name, path, str(DEFAULT_LINK_PRIORITY)],
                         check_rc=True
                     )
 
