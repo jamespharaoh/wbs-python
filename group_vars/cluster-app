@@ -38,20 +38,6 @@ cluster_app_install_python:
 
   - "awscli"
 
-alternatives:
-
-  - name: "node"
-    link: "/usr/bin/node"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "nodejs"
-    link: "/usr/bin/nodejs"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "npm"
-    link: "/usr/bin/npm"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
-
 node_packages:
 
   - name: "bunyan"

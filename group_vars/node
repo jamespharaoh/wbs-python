@@ -16,6 +16,4 @@ active: "{{ 'yes' if (
     (idx | int) == (instance_idx | int))
 ) else 'no' }}"
 
-system_packages: "{{ global_system_packages }}"
-
 # ex: et ts=2 filetype=yaml

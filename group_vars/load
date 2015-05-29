@@ -7,11 +7,6 @@ my_system_packages:
 
   - name: "nginx"
 
-system_packages: "{{ []
-  | union (global_system_packages)
-  | union (my_system_packages)
-}}"
-
 network_route_localnet:
 
   - "eth0"

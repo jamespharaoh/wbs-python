@@ -5,4 +5,9 @@
   sudo: "yes"
   when: "is_template | default ('no') == 'no'"
 
+- name: "reload sysfs"
+  shell: "service sysfs force-reload"
+  sudo: "yes"
+  when: "is_template | default ('no') == 'no'"
+
 # ex: et ts=2 filetype=yaml

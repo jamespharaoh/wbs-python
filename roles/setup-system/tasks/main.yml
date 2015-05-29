@@ -1,5 +1,14 @@
 ---
 
+- name: "install system packages"
+  action:
+    module: "apt"
+    name: "{{ item }}"
+  sudo: "yes"
+  with_items:
+    - "procps"
+    - "sysfsutils"
+
 - name: "disable service startup"
   action:
     module: "copy"
@@ -20,10 +29,18 @@
 - name: "install sysctl config"
   action:
     module: "template"
-    src: "setup-system-sysctl-conf"
+    src: "sysctl-config"
     dest: "/etc/sysctl.conf"
   sudo: "yes"
   notify: "reload sysctl"
+
+- name: "install sysfs config"
+  action:
+    module: "template"
+    src: "sysfs-config"
+    dest: "/etc/sysfs.conf"
+  sudo: "yes"
+  notify: "reload sysfs"
 
 - meta: "flush_handlers"
 

@@ -3,15 +3,6 @@
 node: "mongo"
 prv: "2"
 
-my_system_packages:
-
-  - name: "mongodb"
-
-system_packages: "{{ []
-  | union (global_system_packages)
-  | union (my_system_packages)
-}}"
-
 data_dirs:
 
   - name: "mongo-data"

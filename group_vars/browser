@@ -9,29 +9,10 @@ my_system_packages:
 
   - name: "npm"
 
-system_packages: "{{ []
-  | union (global_system_packages)
-  | union (my_system_packages)
-}}"
-
 node_packages:
 
   - name: "node-inspector"
     version: "0.8.3"
-
-alternatives:
-
-  - name: "node"
-    link: "/usr/bin/node"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "nodejs"
-    link: "/usr/bin/nodejs"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "npm"
-    link: "/usr/bin/npm"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
 
 network_route_localnet: "{{
   [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []

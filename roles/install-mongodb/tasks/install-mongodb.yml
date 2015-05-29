@@ -1,0 +1,43 @@
+---
+
+- name: "install mongodb"
+  args:
+    executable: "/bin/bash"
+    creates: "{{ mongodb_flag }}"
+  sudo: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf {{ mongodb_tmp }};
+    mkdir {{ mongodb_tmp }};
+    cd {{ mongodb_tmp }};
+
+    wget {{ mongodb_url }};
+
+    rm -rf {{ mongodb_name }};
+    tar --extract --gzip --file {{ mongodb_archive }};
+
+    rsync --archive --delete {{ mongodb_name }}/ {{ mongodb_target }}/;
+
+    rm -rf {{ mongodb_tmp }};
+    touch {{ mongodb_flag }};
+
+- name: "setup mongodb alternatives"
+  action:
+    module: "alternatives"
+    name: "{{ item }}"
+    link: "/usr/bin/{{ item }}"
+    path: "{{ mongodb_target }}/bin/{{ item }}"
+    force: "yes"
+  sudo: "yes"
+  with_items: "mongodb_binaries"
+
+- name: "install mongodb upstart"
+  action:
+    module: "template"
+    src: "mongodb-upstart"
+    dest: "/etc/init/mongodb.conf"
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

@@ -12,6 +12,8 @@ devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
 
 system_packages:
 
+  # ---------- remove
+
   - name: "apport"
     state: "absent"
 
@@ -27,6 +29,12 @@ system_packages:
   - name: "cloud-init"
     state: "absent"
 
+  - name: "mongodb-clients"
+    state: "absent"
+
+  - name: "nodejs"
+    state: "absent"
+
   - name: "puppet"
     state: "absent"
 
@@ -38,6 +46,8 @@ system_packages:
 
   - name: "python3-apport"
     state: "absent"
+
+  # ---------- install
 
   - name: "btrfs-tools"
 
@@ -59,13 +69,9 @@ system_packages:
 
   - name: "mailutils"
 
-  - name: "mongodb-clients"
-
   - name: "nfs-kernel-server"
 
   - name: "ngrep"
-
-  - name: "nodejs"
 
   - name: "npm"
 
@@ -125,19 +131,5 @@ python_packages:
 
   - name: "GitPython"
     version: "1.0.1"
-
-alternatives:
-
-  - name: "node"
-    link: "/usr/bin/node"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "nodejs"
-    link: "/usr/bin/nodejs"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/node"
-
-  - name: "npm"
-    link: "/usr/bin/npm"
-    target: "/opt/node-v{{ nodejs_version }}-linux-x64/bin/npm"
 
 # ex: et ts=2 filetype=yaml

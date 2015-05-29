@@ -7,11 +7,6 @@ my_system_packages:
 
   - name: "rabbitmq-server"
 
-system_packages: "{{ []
-  | union (global_system_packages)
-  | union (my_system_packages)
-}}"
-
 data_dirs:
 
   - name: "rabbit-data"

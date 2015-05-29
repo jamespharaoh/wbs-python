@@ -48,7 +48,6 @@
 
     - "node-api"
     - "install-nodejs"
-    - "setup-alternatives"
     - "install-node-packages"
     - "deploy-api"
 
@@ -61,13 +60,13 @@
   roles:
 
     - "node-mongo"
+    - "install-mongodb"
 
 - hosts: "web-template"
   roles:
 
     - "node-web"
     - "install-nodejs"
-    - "setup-alternatives"
     - "install-node-packages"
     - "deploy-web"
 
@@ -81,7 +80,6 @@
 
     - "node-browser"
     - "install-nodejs"
-    - "setup-alternatives"
     - "install-node-packages"
     - "deploy-browser"
 

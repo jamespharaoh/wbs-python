@@ -1,50 +1,6 @@
 ---
 
-- include_vars: "security/amazon/{{ cluster }}.yml"
-
-- name: "install postfix"
-  action:
-    module: "apt"
-    name: "{{ item }}"
-  sudo: "yes"
-  with_items:
-    - "postfix"
-
-- name: "create postfix main config"
-  action:
-    module: "template"
-    src: "install-postfix-main"
-    dest: "/etc/postfix/main.cf"
-  sudo: "yes"
-  notify: "restart postfix"
-
-- name: "create postfix sasl passwords"
-  action:
-    module: "template"
-    src: "install-postfix-sasl-passwd"
-    dest: "/etc/postfix/sasl_passwd"
-    mode: "0600"
-  sudo: "yes"
-  notify: "rehash sasl passwords"
-
-- name: "create postfix relayhost map"
-  action:
-    module: "template"
-    src: "install-postfix-relayhost-map"
-    dest: "/etc/postfix/relayhost_map"
-    mode: "0644"
-  sudo: "yes"
-  notify: "rehash relayhost map"
-
-- name: "create postfix aliases"
-  action:
-    module: "template"
-    src: "install-postfix-aliases"
-    dest: "/etc/aliases"
-    mode: "0644"
-  sudo: "yes"
-  notify: "rehash aliases"
-
-- meta: "flush_handlers"
+- include: "install-postfix.yml"
+  tags: "install-postfix"
 
 # ex: et ts=2 filetype=yaml

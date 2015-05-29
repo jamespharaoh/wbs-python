@@ -1,0 +1,26 @@
+---
+
+- name: "install io.js"
+  args:
+    executable: "/bin/bash"
+    creates: "{{ iojs_flag }}"
+  sudo: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf {{ iojs_tmp }};
+    mkdir {{ iojs_tmp }};
+    cd {{ iojs_tmp }};
+
+    wget {{ iojs_url }};
+
+    rm -rf {{ iojs_name }};
+    tar --extract --xz --file {{ iojs_archive }};
+
+    rsync --archive --delete {{ iojs_name }}/ {{ iojs_target }}/;
+
+    rm -rf {{ iojs_tmp }};
+    touch {{ iojs_flag }};
+
+# ex: et ts=2 filetype=yaml

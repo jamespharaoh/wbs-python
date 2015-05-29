@@ -8,4 +8,25 @@
   sudo: "yes"
   sudo_user: "root"
 
+- name: "create mongodb directories"
+  action:
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  sudo: "yes"
+  with_items:
+
+    - directory: "/var/log/mongodb"
+      owner: "mongodb"
+      group: "adm"
+      mode: "0750"
+
+    - directory: "/var/lib/mongodb"
+      owner: "mongodb"
+      group: "adm"
+      mode: "0750"
+
 # ex: et ts=2 filetype=yaml

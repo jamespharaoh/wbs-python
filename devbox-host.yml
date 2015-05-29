@@ -22,20 +22,18 @@
     - role: "install-nodejs"
       when: "deployment_mode == 'vagrant'"
       tags: "devbox"
-      nodejs_version: "0.12.2"
 
     - role: "install-iojs"
       when: "deployment_mode == 'vagrant'"
       tags: "devbox"
-      iojs_version: "2.0.1"
+
+    - role: "install-mongodb"
+      when: "deployment_mode == 'vagrant'"
+      tags: "devbox"
 
     - role: "install-tools"
       when: "deployment_mode == 'vagrant'"
       tags: [ "devbox", "devbox-tools" ]
-
-    - role: "setup-alternatives"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-alternatives" ]
 
     - role: "install-node-packages"
       when: "deployment_mode == 'vagrant'"
