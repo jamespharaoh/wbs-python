@@ -7,6 +7,10 @@
       when: "deployment_mode == 'vagrant'"
       tags: "devbox"
 
+    - role: "setup-system"
+      when: "deployment_mode == 'vagrant'"
+      tags: "devbox"
+
     - role: "setup-common-users"
       when: "deployment_mode == 'vagrant'"
       tags: "devbox"

@@ -11,4 +11,18 @@ data_dirs:
     group: "mongodb"
     mode: "0755"
 
+my_system_packages:
+
+  - name: "mongodb"
+    state: "absent"
+
+  - name: "mongodb-clients"
+    state: "absent"
+
+  - name: "mongodb-dev"
+    state: "absent"
+
+  - name: "mongodb-server"
+    state: "absent"
+
 # ex: et ts=2 filetype=yaml
