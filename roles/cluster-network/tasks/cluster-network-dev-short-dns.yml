@@ -25,6 +25,7 @@
   when: "cluster == 'ops'"
 
 - name: "write short dev dns nameservers"
+  when: "cluster == 'ops'"
   shell:
 
     set -e;
@@ -36,7 +37,7 @@
     aws route53 get-hosted-zone
       --query "DelegationSet.NameServers"
       --output text
-      --id {{ dev_short_dns_stack_result.stack_outputs ["HostedZone"] }}
+      --id {{ dev_short_dns_result.stack_outputs ["HostedZone"] }}
       | sed 's/\t/,/g'
       > $name;
 
