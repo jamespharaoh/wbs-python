@@ -32,5 +32,6 @@
     force: "yes"
   sudo: "yes"
   with_items: "nodejs_alternatives"
+  when: "nodejs_default == 'yes'"
 
 # ex: et ts=2 filetype=yaml

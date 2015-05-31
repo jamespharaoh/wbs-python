@@ -8,4 +8,24 @@ iojs_target: "/opt/{{ iojs_name }}"
 iojs_flag: "/etc/ios-{{ iojs_version }}-flag"
 iojs_tmp: "/tmp/iojs-install"
 
+iojs_alternatives:
+
+  - name: "iojs"
+    link: "/usr/bin/iojs"
+    target: "{{ iojs_target }}/bin/iojs"
+
+  - name: "node"
+    link: "/usr/bin/node"
+    target: "{{ iojs_target }}/bin/node"
+
+  - name: "nodejs"
+    link: "/usr/bin/nodejs"
+    target: "{{ iojs_target }}/bin/node"
+
+  - name: "npm"
+    link: "/usr/bin/npm"
+    target: "{{ iojs_target }}/bin/npm"
+
+iojs_default: "no"
+
 # ex: et ts=2 filetype=yaml
