@@ -43,6 +43,9 @@
 
 # ========== specific
 
+# Finally we apply specific configuration to each of the concrete templates.
+# This has to run in series, since that's how ansible works.
+
 - hosts: "api-template"
   roles:
 
