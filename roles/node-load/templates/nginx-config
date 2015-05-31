@@ -31,12 +31,13 @@ http {
 
 	# proxy defaults
 
-	proxy_connect_timeout 1s;
+	proxy_connect_timeout 5s;
 {% if dev_debug | default ('no') == 'yes' %}
 	proxy_read_timeout 10m;
 {% else %}
-	proxy_read_timeout 10s;
+	proxy_read_timeout 60s;
 {% endif %}
+	proxy_next_upstream error;
 
 	# upstream servers
 
