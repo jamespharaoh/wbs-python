@@ -24,11 +24,11 @@ script
 
 	exec setuid ubuntu \
 {% if dev_debug | default ('no') == 'yes' %}
-	node-debug \
+	node-debug --nodejs --harmony \
 	--debug-brk=0 \
 {% else %}
 	stdbuf -oL -eL \
-	node \
+	node --harmony \
 	--trace_gc \
 	--expose_gc \
 	--min_semi_space_size={{ 4 }} \
