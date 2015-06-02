@@ -13,6 +13,8 @@ active: "{{ 'yes' if (
   (deployment_mode == 'jenkins' and
     (idx | int) < (node_count [node] | int)) or
   (deployment_mode == 'direct' and
+    (idx | int) == (instance_idx | int)) or
+  (deployment_mode == 'cluster-deployment-alias' and
     (idx | int) == (instance_idx | int))
 ) else 'no' }}"
 
