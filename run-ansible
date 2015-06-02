@@ -146,6 +146,17 @@ def check_deployment_mode ():
 
 		DEPLOYMENT_INVENTORY = "inventory"
 
+	elif CONFIG ["deployment_mode"] == "cluster-deployment":
+
+		write_message ([
+			"##### Running in CLUSTER-DEPLOYMENT deployment mode #####\n",
+		])
+
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
+
+		DEPLOYMENT_INVENTORY = "inventory-cluster-deployment"
+
 	elif CONFIG ["deployment_mode"] == "cluster-deployment-alias":
 
 		write_message ([
@@ -155,7 +166,7 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory-deployment-alias"
+		DEPLOYMENT_INVENTORY = "inventory-cluster-deployment-alias"
 
 	elif CONFIG ["deployment_mode"] == "jenkins":
 

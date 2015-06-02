@@ -1,6 +1,6 @@
 ---
 
-deployment_mode: "cluster-deployment-alias"
+deployment_mode: "cluster-deployment"
 deployment: "{{ cluster_deployment_name }}"
 deployment_user: "ubuntu"
 deployment_home: "/home/ubuntu/{{ cluster_deployment_name }}"
