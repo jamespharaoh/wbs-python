@@ -135,38 +135,38 @@ def check_deployment_mode ():
 
 		DEPLOYMENT_INVENTORY = "inventory"
 
-	elif CONFIG ["deployment_mode"] == "direct":
+	elif CONFIG ["deployment_mode"] == "cluster-shared":
 
 		write_message ([
-			"##### Running in DIRECT deployment mode #####\n",
+			"##### Running in CLUSTER-SHARED deployment mode #####\n",
 		])
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory"
+		DEPLOYMENT_INVENTORY = "inventory-cluster-shared"
 
-	elif CONFIG ["deployment_mode"] == "cluster-deployment":
+	elif CONFIG ["deployment_mode"] == "cluster-alias":
 
 		write_message ([
-			"##### Running in CLUSTER-DEPLOYMENT deployment mode #####\n",
+			"##### Running in CLUSTER-ALIAS deployment mode #####\n",
 		])
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory-cluster-deployment"
+		DEPLOYMENT_INVENTORY = "inventory-cluster-alias"
 
-	elif CONFIG ["deployment_mode"] == "cluster-deployment-alias":
+	elif CONFIG ["deployment_mode"] == "cluster-simple":
 
 		write_message ([
-			"##### Running in CLUSTER-DEPLOYMENT-ALIAS deployment mode #####\n",
+			"##### Running in CLUSTER-SIMPLE deployment mode #####\n",
 		])
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory-cluster-deployment-alias"
+		DEPLOYMENT_INVENTORY = "inventory-cluster-simple"
 
 	elif CONFIG ["deployment_mode"] == "jenkins":
 

@@ -23,41 +23,6 @@ amazon_instance_types: "{{ clusters [cluster].amazon_instance_types }}"
 amazon_images: "{{ clusters [cluster].amazon_images }}"
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
-cluster_deployment_checkouts:
-
-  - name: "wistla-admin"
-    branch: "master"
-    build_steps:
-      - "npm install"
-      - "jspm install -y"
-      - "gulp build"
-
-  - name: "wistla-api"
-    branch: "master"
-    build_steps:
-      - "npm install"
-
-  - name: "wistla-browser"
-    branch: "master"
-    build_steps:
-      - "npm install"
-
-  - name: "wistla-devops"
-    branch: "master"
-
-  - name: "wistla-web"
-    branch: "master"
-    build_steps:
-      - "npm install"
-
-  - name: "wistla-test-images"
-    branch: "master"
-
-cluster_deployment_alias_checkouts:
-
-  - name: "wistla-devops"
-    branch: "master"
-
 kernel_version: "{{ clusters [cluster].kernel_versions [cluster_type] }}"
 
 # ex: et ts=2 filetype=yaml

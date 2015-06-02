@@ -3,88 +3,253 @@
 cluster_deployment: "{{ deployments [cluster_deployment_name] }}"
 
 cluster_deployment_alias: "{{
-  deployment_aliases [cluster_deployment.alias]
-  if cluster_deployment.alias is defined
+  deployments [cluster_deployment.alias]
+  if cluster_deployment.type == 'alias'
   else cluster_deployment
 }}"
 
-cluster_deployment_config_directories:
+cluster_deployment_type: "{{ cluster_deployment_types [cluster_deployment.type] }}"
 
-  - "config"
-  - "config/api"
-  - "config/browser"
-  - "config/load"
-  - "config/mongo"
-  - "config/rabbit"
-  - "config/web"
+cluster_deployment_checkouts: "{{ cluster_deployment_type.checkouts }}"
+cluster_deployment_config_directories: "{{ cluster_deployment_type.config_directories }}"
+cluster_deployment_config_templates: "{{ cluster_deployment_type.config_templates }}"
+cluster_deployment_config_files: "{{ cluster_deployment_type.config_files }}"
+cluster_deployment_config_links: "{{ cluster_deployment_type.config_links }}"
+cluster_deployment_shared_links: "{{ cluster_deployment_type.shared_links }}"
 
-cluster_deployment_config_files:
+cluster_deployment_types:
 
-  - source: "security/test/google-service-account.key"
-    target: "config/api/google-service-account.key"
-    mode: "0600"
+  shared:
 
-  - source: "security/apple/push-notifications/ca.cert"
-    target: "config/api/apple-ca.cert"
-    mode: "0644"
+    checkouts:
 
-  - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.cert"
-    target: "config/api/apple-push.cert"
-    mode: "0644"
+      - name: "wistla-devops"
+        branch: "master"
 
-  - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.key"
-    target: "config/api/apple-push.key"
-    mode: "0600"
+    config_directories:
 
-cluster_deployment_config_templates:
+      - "mongo"
+      - "rabbit"
 
-  - template: "cluster-deployment-wistla-devops-config"
-    target: "wistla-devops/config"
+    config_templates:
 
-  - template: "cluster-deployment-wistla-devops-accounts"
-    target: "wistla-devops/accounts"
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config"
 
-  - template: "cluster-deployment-wistla-admin-config"
-    target: "config/load/wistla-admin-config.local.js"
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
 
-  - template: "cluster-deployment-wistla-api-config"
-    target: "config/api/config.local.js"
+    config_files: []
 
-  - template: "cluster-deployment-wistla-api-environment"
-    target: "config/api/environment"
+    config_links: []
 
-  - template: "cluster-deployment-wistla-browser-config"
-    target: "config/browser/config.local.js"
+    shared_links:
 
-  - template: "cluster-deployment-wistla-web-config"
-    target: "config/web/config.local.js"
+      - link: "userUpload"
+        target: "user-upload"
 
-  - template: "cluster-deployment-wistla-load-upstream"
-    target: "config/load/nginx-upstream.conf"
+  alias:
 
-cluster_deployment_config_links:
+    checkouts:
 
-  - source: "../../config/api/config.local.js"
-    target: "wistla-api/config/config.local.js"
+      - name: "wistla-admin"
+        branch: "master"
+        build_steps:
+          - "npm install"
+          - "jspm install -y"
+          - "gulp build"
 
-  - source: "../../config/browser/config.local.js"
-    target: "wistla-browser/config/config.local.js"
+      - name: "wistla-api"
+        branch: "master"
+        build_steps:
+          - "npm install"
 
-  - source: "../../config/web/config.local.js"
-    target: "wistla-web/config/config.local.js"
+      - name: "wistla-browser"
+        branch: "master"
+        build_steps:
+          - "npm install"
 
-cluster_deployment_shared_directories:
+      - name: "wistla-devops"
+        branch: "master"
 
-  - "audio"
-  - "cms-image"
-  - "image"
-  - "log"
-  - "user-upload"
-  - "video"
+      - name: "wistla-web"
+        branch: "master"
+        build_steps:
+          - "npm install"
 
-cluster_deployment_shared_links:
+      - name: "wistla-test-images"
+        branch: "master"
 
-  - link: "userUpload"
-    target: "user-upload"
+    config_directories:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "web"
+
+    config_files:
+
+      - source: "security/test/google-service-account.key"
+        target: "config/api/google-service-account.key"
+        mode: "0600"
+
+      - source: "security/apple/push-notifications/ca.cert"
+        target: "config/api/apple-ca.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.cert"
+        target: "config/api/apple-push.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.key"
+        target: "config/api/apple-push.key"
+        mode: "0600"
+
+    config_links:
+
+      - source: "../../config/api/config.local.js"
+        target: "wistla-api/config/config.local.js"
+
+      - source: "../../config/browser/config.local.js"
+        target: "wistla-browser/config/config.local.js"
+
+      - source: "../../config/web/config.local.js"
+        target: "wistla-web/config/config.local.js"
+
+    config_templates:
+
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config"
+
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
+
+      - template: "cluster-deployment-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
+
+      - template: "cluster-deployment-wistla-api-config"
+        target: "config/api/config.local.js"
+
+      - template: "cluster-deployment-wistla-api-environment"
+        target: "config/api/environment"
+
+      - template: "cluster-deployment-wistla-browser-config"
+        target: "config/browser/config.local.js"
+
+      - template: "cluster-deployment-wistla-web-config"
+        target: "config/web/config.local.js"
+
+      - template: "cluster-deployment-wistla-load-upstream"
+        target: "config/load/nginx-upstream.conf"
+
+  simple:
+
+    checkouts:
+
+      - name: "wistla-admin"
+        branch: "master"
+        build_steps:
+          - "npm install"
+          - "jspm install -y"
+          - "gulp build"
+
+      - name: "wistla-api"
+        branch: "master"
+        build_steps:
+          - "npm install"
+
+      - name: "wistla-browser"
+        branch: "master"
+        build_steps:
+          - "npm install"
+
+      - name: "wistla-devops"
+        branch: "master"
+
+      - name: "wistla-web"
+        branch: "master"
+        build_steps:
+          - "npm install"
+
+      - name: "wistla-test-images"
+        branch: "master"
+
+    config_directories:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+    config_files:
+
+      - source: "security/test/google-service-account.key"
+        target: "config/api/google-service-account.key"
+        mode: "0600"
+
+      - source: "security/apple/push-notifications/ca.cert"
+        target: "config/api/apple-ca.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.cert"
+        target: "config/api/apple-push.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.key"
+        target: "config/api/apple-push.key"
+        mode: "0600"
+
+    config_templates:
+
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config"
+
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
+
+      - template: "cluster-deployment-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
+
+      - template: "cluster-deployment-wistla-api-config"
+        target: "config/api/config.local.js"
+
+      - template: "cluster-deployment-wistla-api-environment"
+        target: "config/api/environment"
+
+      - template: "cluster-deployment-wistla-browser-config"
+        target: "config/browser/config.local.js"
+
+      - template: "cluster-deployment-wistla-web-config"
+        target: "config/web/config.local.js"
+
+      - template: "cluster-deployment-wistla-load-upstream"
+        target: "config/load/nginx-upstream.conf"
+
+    config_links:
+
+      - source: "../../config/api/config.local.js"
+        target: "wistla-api/config/config.local.js"
+
+      - source: "../../config/browser/config.local.js"
+        target: "wistla-browser/config/config.local.js"
+
+      - source: "../../config/web/config.local.js"
+        target: "wistla-web/config/config.local.js"
+
+    shared_directories:
+
+      - "audio"
+      - "cms-image"
+      - "image"
+      - "log"
+      - "user-upload"
+      - "video"
+
+    shared_links:
+
+      - link: "userUpload"
+        target: "user-upload"
 
 # ex: et ts=2 filetype=yaml

@@ -1,28 +1,13 @@
 ---
 
-deployment_mode: "cluster-deployment"
-deployment: "{{ cluster_deployment_name }}"
+deployment_name: "{{ cluster_deployment.name }}"
+deployment_mode: "cluster-{{ cluster_deployment.type }}"
+
 deployment_user: "ubuntu"
-deployment_home: "/home/ubuntu/{{ cluster_deployment_name }}"
+deployment_home: "/home/ubuntu/{{ cluster_deployment.name }}"
 
 ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
 ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
-
-vpns: []
-
-node_instance_count:
-
-{% for key, value in cluster_node_instance_count.items () %}
-  {{ key }}: "{{ value }}"
-{% endfor %}
-
-node_memory:
-
-{% for key, value in cluster_node_memory.items () %}
-  {{ key }}: "{{ value }}"
-{% endfor %}
-
-use_s3: "no"
 
 instance_idx: "{{ idx }}"
 
