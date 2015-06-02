@@ -138,7 +138,7 @@ cluster_app_certificates:
       - "security/ssl/k2.test.wist.la.cert"
       - "security/ssl/comodo-rsa-domain-validation-chain.cert"
 
-  # ----- k2
+  # ----- montblanc
 
   - name: "montblanc.test.wistla.com"
     private_key: "security/ssl/montblanc.test.wistla.com.key"

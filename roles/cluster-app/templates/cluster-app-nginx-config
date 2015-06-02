@@ -154,6 +154,41 @@ http {
 
 	}
 
+	# short redirect http to https
+
+	server {
+
+		listen 80;
+
+		server_name {{ deployment.short_domain }};
+		server_name www.{{ deployment.short_domain }};
+
+		return 301 https://{{ deployment.short_domain }}$request_uri;
+
+	}
+
+	# short
+
+	server {
+
+		listen 443 ssl;
+
+		server_name {{ deployment.short_domain }};
+
+		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.short_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.short_domain }}.key;
+
+		location / {
+			proxy_pass http://deployment-{{ target }};
+			proxy_set_header Host "admin.{{ deployment.short_domain }}";
+		}
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+	}
+
 {% endmacro %}
 
 {% for deployment_alias_name, deployment_alias in deployment_aliases.items ()

@@ -7,7 +7,7 @@
     dest: "/home/vagrant/work/{{ cluster }}/short-dns-stack"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster == 'production'"
+  when: "cluster != 'ops'"
 
 - name: "create short dns stack"
   action:
@@ -21,5 +21,57 @@
     region: "{{ amazon_region }}"
   sudo: "yes"
   sudo_user: "vagrant"
+  register: "short_dns_stack_result"
+  when: "cluster != 'ops'"
+
+- name: "write short dns nameservers"
+  shell:
+
+    set -e;
+
+    name="{{ deployment_home }}/work/{{ cluster }}/short-dns-nameservers";
+    touch $name;
+    sum_before=$(sha1sum $name);
+
+    aws route53 get-hosted-zone
+      --query "DelegationSet.NameServers"
+      --output text
+      --id {{ short_dns_stack_result.stack_outputs ["HostedZone"] }}
+      | sed 's/\t/,/g'
+      > $name;
+
+    sum_after=$(sha1sum $name);
+    if test "$sum_before" = "$sum_after"; then
+      echo "UNCHANGED";
+    else
+      echo "CHANGED";
+    fi;
+
+    return 0;
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  when: "cluster != 'ops'"
+
+- name: "create short dns delegations"
+  action:
+    module: "route53"
+    zone: "wist.la"
+    record: "{{ item.value.cluster_short_domain }}"
+    type: "NS"
+    command: "create"
+    overwrite: "yes"
+    value: "{{ lookup ('file', '/home/vagrant/work/' + item.key + '/short-dns-nameservers') }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_dict: "clusters"
+  when: "cluster == 'production' and item.key not in [ 'ops', 'production' ]"
 
 # ex: et ts=2 filetype=yaml

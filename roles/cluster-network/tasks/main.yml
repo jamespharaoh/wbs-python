@@ -71,6 +71,5 @@
 
 - include: "cluster-network-short-dns.yml"
   tags: "cluster-network-short-dns"
-  when: "cluster == 'production'"
 
 # ex: et ts=2 filetype=yaml
