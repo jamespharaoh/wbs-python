@@ -1,5 +1,3 @@
-{% set vagrant = hostvars.vagrant %}
-
 lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
 # limits
