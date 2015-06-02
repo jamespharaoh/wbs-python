@@ -14,7 +14,7 @@
 {{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.{{ deployment_main_domain }}
 {% endfor %}
 
-{% for host_name in groups ['api-node'] %}
+{% for host_name in groups ['api-node'] | default ([]) %}
 {% set host = hostvars [host_name] %}
 {{ deployment_bridge_network }}.{{ host.grp }}.{{ host.idx }} api.{{ deployment_main_domain }}
 {% endfor %}
