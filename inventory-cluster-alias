@@ -1,3 +1,15 @@
+# ---------- cluster
+
+[cluster:children]
+cluster-node
+cluster-template
+
+[cluster-template:children]
+template
+
+[cluster-node:children]
+node
+
 # ---------- template
 
 [template:children]

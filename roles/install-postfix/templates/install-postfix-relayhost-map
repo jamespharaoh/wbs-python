@@ -1,1 +1,1 @@
-@{{ cluster_main_domain }} {{ cluster_smtp_server }}:25
+@{{ cluster.main_domain }} {{ cluster.smtp_server }}:25

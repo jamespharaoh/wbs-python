@@ -1,6 +1,0 @@
----
-
-- include: "cluster-deployment-alias.yml"
-  tags: "cluster-deployment-alias"
-
-# ex: et ts=2 filetype=yaml

@@ -1,28 +1,18 @@
 ---
 
-cluster_net: "{{ clusters [cluster].cluster_net }}"
-cluster_vpn: "{{ clusters [cluster].cluster_vpn }}"
-cluster_short: "{{ clusters [cluster].cluster_short }}"
-cluster_main_domain: "{{ clusters [cluster].cluster_main_domain }}"
-cluster_short_domain: "{{ clusters [cluster].cluster_short_domain }}"
-cluster_colour: "{{ clusters [cluster].cluster_colour }}"
-cluster_deployment_alias_names: "{{ clusters [cluster].cluster_deployment_alias_names | default ([]) }}"
-cluster_deployment_names: "{{ clusters [cluster].cluster_deployment_names | default ([]) }}"
-cluster_cron_email: "{{ clusters [cluster].cluster_cron_email }}"
-cluster_smtp_server: "{{ clusters [cluster].cluster_smtp_server }}"
-cluster_app_certificates: "{{ clusters [cluster].cluster_app_certificates }}"
-cluster_admin_certificates: "{{ clusters [cluster].cluster_admin_certificates }}"
-cluster_node_instance_count: "{{ clusters [cluster].node_instance_count }}"
-cluster_node_memory: "{{ clusters [cluster].node_memory }}"
+cluster: "{{ clusters [cluster_name] }}"
 
-amazon_account: "{{ clusters [cluster].amazon_account }}"
-amazon_region: "{{ clusters [cluster].amazon_region }}"
-amazon_zones: "{{ clusters [cluster].amazon_zones }}"
-amazon_admin_ips: "{{ clusters [cluster].amazon_admin_ips }}"
-amazon_instance_types: "{{ clusters [cluster].amazon_instance_types }}"
-amazon_images: "{{ clusters [cluster].amazon_images }}"
-amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
+amazon_account: "{{ cluster.amazon_account }}"
+amazon_region: "{{ cluster.amazon_region }}"
+amazon_zones: "{{ cluster.amazon_zones }}"
+amazon_admin_ips: "{{ cluster.amazon_admin_ips }}"
+amazon_instance_types: "{{ cluster.amazon_instance_types }}"
+amazon_images: "{{ cluster.amazon_images }}"
+amazon_key_name: "{{ cluster.amazon_key_name }}"
 
-kernel_version: "{{ clusters [cluster].kernel_versions [cluster_type] }}"
+kernel_version: "{{ cluster.kernel_versions [cluster.type] }}"
+
+node_memory: "{{ cluster.node_memory }}"
+node_instance_count: "{{ cluster.node_instance_count }}"
 
 # ex: et ts=2 filetype=yaml

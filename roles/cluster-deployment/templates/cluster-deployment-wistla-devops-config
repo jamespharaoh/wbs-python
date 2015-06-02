@@ -1,5 +1,7 @@
 ---
 
+cluster_name: "{{ cluster_name }}"
+
 deployment_name: "{{ cluster_deployment.name }}"
 deployment_mode: "cluster-{{ cluster_deployment.type }}"
 

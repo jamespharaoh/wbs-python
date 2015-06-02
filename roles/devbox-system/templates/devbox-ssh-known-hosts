@@ -5,8 +5,8 @@ github.com {{ ssh_host_keys.general.github | join }}
 {%- for zon in [ 'a', 'b', 'c' ] %}
 	{%- print
 		[
-			zon + '.admin.' + cluster.cluster_main_domain,
-			'cluster-admin-' + zon + '.' + cluster.cluster_main_domain,
+			zon + '.admin.' + cluster.main_domain,
+			'cluster-admin-' + zon + '.' + cluster.main_domain,
 			cluster.amazon_admin_ips [zon],
 			cluster.cluster_net + '.' + cluster_subnets.admin [zon] + '.4',
 		] | join (','),
@@ -19,7 +19,7 @@ github.com {{ ssh_host_keys.general.github | join }}
 {% if cluster_name != 'ops' %}
 	{%- print
 		[
-			'cluster-app-a-4.' + cluster.cluster_main_domain,
+			'cluster-app-a-4.' + cluster.main_domain,
 			cluster.cluster_net + '.' + cluster_subnets.app.a + '.4',
 		] | join (','),
 		' ',
@@ -31,7 +31,7 @@ github.com {{ ssh_host_keys.general.github | join }}
 {% if cluster_name == 'ops' %}
 	{%- print
 		[
-			'jenkins-a.' + cluster.cluster_main_domain,
+			'jenkins-a.' + cluster.main_domain,
 			cluster.cluster_net + '.' + cluster_subnets.jenkins.a + '.4',
 		] | join (','),
 		' ',

@@ -8,12 +8,12 @@ config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ idx }}:27
 config.cmsImagePath = '/shared/cms-image';
 
 // Google Maps API Key for showing office location on a map.
-config.googleMapsApiKey = '{{ third_parties [cluster].googleMapsApiKey }}';
+config.googleMapsApiKey = '{{ third_parties [cluster_name].googleMapsApiKey }}';
 
 // mailchimp
 config.mailchimp = {
-	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
-	apiKey: '{{ third_parties [cluster].mailchimp_api_key }}',
+	listId: '{{ third_parties [cluster_name].mailchimp_unique_id }}',
+	apiKey: '{{ third_parties [cluster_name].mailchimp_api_key }}',
 };
 
 module.exports = config;

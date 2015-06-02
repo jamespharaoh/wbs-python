@@ -1,1 +1,1 @@
-WISTLA_API_COUNT="{{ cluster_node_instance_count.api }}"
+WISTLA_API_COUNT="{{ cluster.node_instance_count.api }}"

@@ -2,21 +2,21 @@
 
 # ========== core configuration
 
-cluster_net: "10.146"
-cluster_vpn: "10.147"
+cluster_network: "10.146"
+vpn_network: "10.147"
 
-cluster_short: "test"
+short_name: "test"
 
-cluster_main_domain: "test.wistla.com"
-cluster_short_domain: "test.wist.la"
+main_domain: "test.wistla.com"
+short_domain: "test.wist.la"
 
 cluster_colour: "221"
 
-cluster_deployment_alias_names:
+deployment_alias_names:
 
   - "test"
 
-cluster_deployment_names:
+deployment_names:
 
   - "test-everest"
   - "test-k2"
@@ -78,13 +78,11 @@ kernel_versions:
 
 # ========== accounts and security
 
-cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
+smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
-cluster_cron_email: "cron.test@wistla.com"
+cron_email: "cron.test@wistla.com"
 
-cluster_admin_certificates: []
-
-cluster_app_certificates:
+app_certificates:
 
   # ----- everest
 

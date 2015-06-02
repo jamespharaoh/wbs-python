@@ -8,8 +8,8 @@
     command: "create"
     overwrite: "yes"
 
-    zone: "{{ cluster_main_domain }}"
-    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster_main_domain }}"
+    zone: "{{ cluster.main_domain }}"
+    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.main_domain }}"
     ttl: "60"
     type: "A"
     value: "{{ amazon_admin_ips [item.1] }}"

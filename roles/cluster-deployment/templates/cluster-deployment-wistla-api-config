@@ -41,15 +41,15 @@ config.blobMode = 'local';
 
 // mailchimp
 config.mailchimp = {
-	listId: '{{ third_parties [cluster].mailchimp_unique_id }}',
-	apiKey: '{{ third_parties [cluster].mailchimp_api_key }}',
+	listId: '{{ third_parties [cluster_name].mailchimp_unique_id }}',
+	apiKey: '{{ third_parties [cluster_name].mailchimp_api_key }}',
 };
 
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
 	keyFile: '/config/google-service-account.key',
-	cryptoKey: '{{ third_parties [cluster].google_maps_key }}'
+	cryptoKey: '{{ third_parties [cluster_name].google_maps_key }}'
 };
 
 // apple push notifications

@@ -2,13 +2,13 @@
 
 # ========== core configuration
 
-cluster_net: "10.142"
-cluster_vpn: "10.143"
+cluster_network: "10.142"
+vpn_network: "10.143"
 
-cluster_short: "ops"
+short_name: "ops"
 
-cluster_main_domain: "ops.wistla.com"
-cluster_short_domain: "ops.wist.la"
+main_domain: "ops.wistla.com"
+short_domain: "ops.wist.la"
 
 cluster_colour: "207"
 
@@ -50,9 +50,9 @@ kernel_versions:
 
 # ========== accounts and security
 
-cluster_smtp_server: "email-smtp.eu-west-1.amazonaws.com"
+smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
-cluster_admin_certificates:
+admin_certificates:
 
   # --- berk
 
