@@ -69,8 +69,8 @@ deployment_alias: "{{
   else False
 }}"
 
-deployment_main_domain: "{{ deployments [deployment].main_domain }}"
-deployment_short_domain: "{{ deployments [deployment].short_domain }}"
+deployment_main_domain: "{{ all_deployments [deployment].main_domain }}"
+deployment_short_domain: "{{ all_deployments [deployment].short_domain }}"
 
 deployment_alias_main_domain: "{{
   deployment_aliases [deployment_alias].main_domain
@@ -84,8 +84,8 @@ deployment_alias_short_domain: "{{
   else None
 }}"
 
-deployment_bridge_name: "{{ deployments [deployment].bridge_name }}"
-deployment_bridge_network: "{{ deployments [deployment].bridge_network }}"
+deployment_bridge_name: "{{ all_deployments [deployment].bridge_name }}"
+deployment_bridge_network: "{{ all_deployments [deployment].bridge_network }}"
 
 dev_deployment_names:
 
