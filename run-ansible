@@ -110,6 +110,10 @@ def write_message (parts):
 
 def check_deployment_mode ():
 
+	global DEPLOYMENT_HOME
+	global DEPLOYMENT_USER
+	global DEPLOYMENT_INVENTORY
+
 	if CONFIG ["deployment_mode"] == "vagrant":
 
 		if socket.gethostname () != "wistla-dev":
