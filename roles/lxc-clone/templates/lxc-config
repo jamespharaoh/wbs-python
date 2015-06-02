@@ -30,7 +30,7 @@ lxc.network.flags = up
 lxc.network.link = {{ deployments [deployment].bridge_name }}
 lxc.network.hwaddr = {{ hw }}
 lxc.network.ipv4 = {{ node_ip }}/16
-lxc.network.ipv4.gateway = {{ deployment_bridge_network }}.{{ vagrant.grp }}.{{ vagrant.idx }}
+lxc.network.ipv4.gateway = {{ deployment_bridge_network }}.1.1
 
 # autostart
 
