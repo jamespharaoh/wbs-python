@@ -9,14 +9,14 @@
   sudo_user: "vagrant"
   with_items:
     - "/home/vagrant/work"
-    - "/home/vagrant/work/{{ cluster }}"
+    - "/home/vagrant/work/{{ cluster_name }}"
 
 - name: "make sure cluster data exists"
   shell:
-    if test -f /home/vagrant/work/{{ cluster }}/cluster-data; then
+    if test -f /home/vagrant/work/{{ cluster_name }}/cluster-data; then
       echo 'UNCHANGED';
     else
-      touch -f /home/vagrant/work/{{ cluster }}/cluster-data;
+      touch -f /home/vagrant/work/{{ cluster_name }}/cluster-data;
       echo 'CHANGED';
     fi;
   sudo: "yes"
@@ -24,6 +24,6 @@
   register: "touch_result"
   changed_when: "touch_result.stdout != 'UNCHANGED'"
 
-- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
+- include_vars: "/home/vagrant/work/{{ cluster_name }}/cluster-data"
 
 # ex: et ts=2 filetype=yaml

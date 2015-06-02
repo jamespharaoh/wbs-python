@@ -27,7 +27,7 @@ http {
 
 # ----- upstream servers per deployment -----
 
-{% for deployment_name in cluster_deployment_names %}
+{% for deployment_name in cluster.deployment_names %}
 {% set deployment = deployments [deployment_name] %}
 	upstream deployment-{{ deployment_name }} {
 		server {{ deployment.bridge_network }}.5.{{ idx }};
@@ -191,60 +191,55 @@ http {
 
 {% endmacro %}
 
-{% for deployment_alias_name, deployment_alias in deployment_aliases.items ()
-	if deployment_alias.cluster == cluster
-	and deployment_alias.target is defined %}
+{% for deployment_name, deployment in deployments.items ()
+if deployment.cluster == cluster %}
 
-# ----- deployment alias {{ deployment_alias.name }} -----
+{% if deployment.type == 'shared' %}
+
+# ----- shared deployment {{ deployment.name }} -----
 #
+# main domain: {{ deployment.main_domain }}
+# short domain: {{ deployment.short_domain }}
+# target: {{ deployment.target }}
+#
+
+{{ do_deployment (
+	deployment,
+	deployment,
+	deployment.target) }}
+
+{% elif deployment.type == 'alias' %}
+{% set deployment_alias = deployments [deployment.alias] %}
+
+# ----- deployment alias {{ deployment_name }} -----
+#
+# main domain: {{ deployment.main_domain }}
+# short domain: {{ deployment.short_domain }}
+#
+# alias name: {{ deployment.alias }}
 # main domain: {{ deployment_alias.main_domain }}
 # short domain: {{ deployment_alias.short_domain }}
-# target: {{ deployment_alias.target }}
 #
 
 {{ do_deployment (
+	deployment,
 	deployment_alias,
-	deployment_alias,
-	deployment_alias.target) }}
+	deployment_name) }}
 
-{% endfor %}
+{% elif deployment.type == 'simple' %}
 
-{% for other_deployment_name, other_deployment in deployments.items ()
-	if (other_deployment.cluster | default ('none')) == cluster %}
-
-{% if other_deployment.alias is defined %}
-{% set other_deployment_alias = deployment_aliases [other_deployment.alias] %}
-
-# ----- deployment {{ other_deployment_name }} -----
+# ----- simple deployment {{ deployment_name }} -----
 #
-# main domain: {{ other_deployment.main_domain }}
-# short domain: {{ other_deployment.short_domain }}
-#
-# alias name: {{ other_deployment.alias }}
-# main domain: {{ other_deployment_alias.main_domain }}
-# short domain: {{ other_deployment_alias.short_domain }}
+# main domain: {{ deployment.main_domain }}
+# short domain: {{ deployment.short_domain }}
 #
 
 {{ do_deployment (
-	other_deployment,
-	other_deployment_alias,
-	other_deployment_name) }}
-
-{% else %}
-
-# ----- deployment {{ other_deployment_name }} -----
-#
-# main domain: {{ other_deployment.main_domain }}
-# short domain: {{ other_deployment.short_domain }}
-#
-
-{{ do_deployment (
-	other_deployment,
-	other_deployment,
-	other_deployment_name) }}
+	deployment,
+	deployment,
+	deployment_name) }}
 
 {% endif %}
-
 {% endfor %}
 
 }

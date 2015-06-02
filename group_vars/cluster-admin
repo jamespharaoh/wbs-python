@@ -25,9 +25,9 @@ cluster_admin_remove_packages:
   - "python-apport"
   - "python3-apport"
 
-icinga_name: "wistla-{{ cluster }}-{{ cluster_type }}-{{ zon }}"
+icinga_name: "wistla-{{ cluster_name }}-{{ cluster_type }}-{{ zon }}"
 
-load_balancer_name: "{{ cluster }}-admin"
+load_balancer_name: "{{ cluster_name }}-admin"
 
 system_reboot_on_error: "yes"
 

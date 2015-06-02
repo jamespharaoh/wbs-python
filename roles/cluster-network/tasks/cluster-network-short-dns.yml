@@ -4,17 +4,17 @@
   action:
     module: "template"
     src: "cluster-network-short-dns-stack"
-    dest: "/home/vagrant/work/{{ cluster }}/short-dns-stack"
+    dest: "/home/vagrant/work/{{ cluster_name }}/short-dns-stack"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - name: "create short dns stack"
   action:
     module: "cloudformation"
-    stack_name: "{{ cluster }}-short-dns"
+    stack_name: "{{ cluster_name }}-short-dns"
     state: "present"
-    template: "/home/vagrant/work/{{ cluster }}/short-dns-stack"
+    template: "/home/vagrant/work/{{ cluster_name }}/short-dns-stack"
     template_format: "yaml"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
@@ -22,14 +22,14 @@
   sudo: "yes"
   sudo_user: "vagrant"
   register: "short_dns_stack_result"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - name: "write short dns nameservers"
   shell:
 
     set -e;
 
-    name="{{ deployment_home }}/work/{{ cluster }}/short-dns-nameservers";
+    name="{{ deployment_home }}/work/{{ cluster_name }}/short-dns-nameservers";
     touch $name;
     sum_before=$(sha1sum $name);
 
@@ -56,7 +56,7 @@
 
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - name: "create short dns delegations"
   action:
@@ -72,6 +72,6 @@
   sudo: "yes"
   sudo_user: "vagrant"
   with_dict: "clusters"
-  when: "cluster == 'production' and item.key not in [ 'ops', 'production' ]"
+  when: "cluster_name == 'production' and item.key not in [ 'ops', 'production' ]"
 
 # ex: et ts=2 filetype=yaml

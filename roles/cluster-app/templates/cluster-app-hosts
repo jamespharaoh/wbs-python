@@ -1,6 +1,6 @@
 127.0.0.1 localhost
 
-{% for other_deployment_name in cluster_deployment_names %}
+{% for other_deployment_name in cluster.deployment_names %}
 {% set other_deployment = deployments [other_deployment_name] %}
 
 # ---------- deployment {{ other_deployment_name }}

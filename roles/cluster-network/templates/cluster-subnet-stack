@@ -13,8 +13,8 @@ Resources:
     Properties:
       VpcId: "{{ cluster_vpc }}"
       Tags:
-        - { Key: "Name", Value: "{{ cluster }}-{{ subnet }}-{{ zone }}" }
-        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Cluster", Value: "{{ cluster_name }}" }
         - { Key: "Class", Value: "{{ subnet }}" }
 
 {% if subnet == 'admin' %}
@@ -37,12 +37,12 @@ Resources:
   Subnet{{ zone | capitalize }}:
     Type: "AWS::EC2::Subnet"
     Properties:
-      AvailabilityZone: "{{ amazon_zones[zone] }}"
-      CidrBlock: "{{ cluster_net }}.{{ cluster_subnets[subnet][zone] }}.0/24"
-      VpcId: "{{ cluster_vpc }}"
+      AvailabilityZone: "{{ amazon_zones [zone] }}"
+      CidrBlock: "{{ cluster.cluster_network }}.{{ cluster_subnets [subnet] [zone] }}.0/24"
+      VpcId: "{{ cluster_dynamic.cluster_vpc }}"
       Tags:
-        - { Key: "Name", Value: "{{ cluster }}-{{ subnet }}-{{ zone }}" }
-        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Cluster", Value: "{{ cluster_name }}" }
         - { Key: "Class", Value: "{{ subnet }}" }
         - { Key: "Zone", Value: "{{ zone }}" }
 

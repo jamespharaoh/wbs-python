@@ -4,7 +4,7 @@
   action:
     module: "template"
     src: "cluster-network-dev-short-dns-stack"
-    dest: "/home/vagrant/work/{{ cluster }}/dev-short-dns-stack"
+    dest: "/home/vagrant/work/{{ cluster_name }}/dev-short-dns-stack"
   sudo: "yes"
   sudo_user: "vagrant"
   when: "cluster == 'ops'"
@@ -12,7 +12,7 @@
 - name: "create dev short dns stack"
   action:
     module: "cloudformation"
-    stack_name: "{{ cluster }}-dev-short-dns"
+    stack_name: "{{ cluster_name }}-dev-short-dns"
     state: "present"
     template: "/home/vagrant/work/{{ cluster }}/dev-short-dns-stack"
     template_format: "yaml"
@@ -22,10 +22,10 @@
   register: "dev_short_dns_result"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster == 'ops'"
+  when: "cluster_name == 'ops'"
 
 - name: "write short dev dns nameservers"
-  when: "cluster == 'ops'"
+  when: "cluster_name == 'ops'"
   shell:
 
     set -e;
@@ -57,7 +57,7 @@
 
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster == 'ops'"
+  when: "cluster_name == 'ops'"
 
 - name: "create dev dns delegations"
   action:
@@ -72,6 +72,6 @@
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster == 'production'"
+  when: "cluster_name == 'production'"
 
 # ex: et ts=2 filetype=yaml

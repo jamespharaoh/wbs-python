@@ -64,12 +64,12 @@ node_packages:
 vagrant_user: "ubuntu"
 vagrant_home: "/home/ubuntu"
 
-vagrant_deployments: "{{ cluster_deployment_names }}"
+vagrant_deployments: "{{ cluster.deployment_names }}"
 
-icinga_name: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
-hostname: "wistla-{{ cluster_short }}-app-{{ zon }}-{{ idx }}"
+icinga_name: "wistla-{{ cluster.short_name }}-app-{{ zon }}-{{ idx }}"
+hostname: "wistla-{{ cluster.short_name }}-app-{{ zon }}-{{ idx }}"
 
-load_balancer_name: "{{ cluster }}-app"
+load_balancer_name: "{{ cluster_name }}-app"
 
 system_reboot_on_error: "yes"
 

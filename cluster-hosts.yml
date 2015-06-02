@@ -1,48 +1,6 @@
 ---
 
-# ========== admin
-
-- hosts: "cluster-admin"
-  roles:
-
-    # ----- create
-
-    - role: "cluster-create"
-      tags: [ "cluster-create" ]
-
-    # ----- system
-
-    - role: "cluster-admin"
-      tags: [ "cluster-admin" ]
-
-    - role: "install-kernel"
-      tags: [ "install-kernel" ]
-
-    - role: "setup-system"
-      tags: [ "setup-system" ]
-
-    - role: "cluster-ssh"
-      tags: [ "cluster-user" ]
-
-    - role: "install-postfix"
-      tags: [ "install-postfix" ]
-
-    - role: "setup-common-users"
-      tags: [ "setup-common-users" ]
-
-    - role: "cluster-user"
-      tags: [ "cluster-user" ]
-
-    # ----- services
-
-    #- role: "cluster-icinga"
-    #  tags: [ "cluster-icinga" ]
-
-    # ----- final steps
-
-    - role: "cluster-activate"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-activate" ]
+- include: "cluster-admin.yml"
 
 # ========== app
 

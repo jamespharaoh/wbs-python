@@ -24,15 +24,15 @@
 
 - include: "cluster-data-subnet.yml"
   tags: "cluster-data-subnet"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - include: "cluster-app-subnet.yml"
   tags: "cluster-app-subnet"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - include: "cluster-jenkins-subnet.yml"
   tags: "cluster-jenkins-subnet"
-  when: "cluster == 'ops'"
+  when: "cluster_name == 'ops'"
 
 - include: "cluster-security-groups.yml"
   tags: "cluster-security-groups"
@@ -41,7 +41,7 @@
 
 - include: "cluster-app-balancer.yml"
   tags: "cluster-app-balancer"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
 
 - include: "cluster-admin-balancer.yml"
   tags: "cluster-jenkins-balancer"

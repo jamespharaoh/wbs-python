@@ -12,11 +12,9 @@ short_domain: "test.wist.la"
 
 cluster_colour: "221"
 
-deployment_alias_names:
+deployment_names:
 
   - "test"
-
-deployment_names:
 
   - "test-everest"
   - "test-k2"

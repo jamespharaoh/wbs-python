@@ -10,9 +10,12 @@ amazon_instance_types: "{{ cluster.amazon_instance_types }}"
 amazon_images: "{{ cluster.amazon_images }}"
 amazon_key_name: "{{ cluster.amazon_key_name }}"
 
-kernel_version: "{{ cluster.kernel_versions [cluster.type] }}"
-
 node_memory: "{{ cluster.node_memory }}"
 node_instance_count: "{{ cluster.node_instance_count }}"
+
+cluster_dynamic: "{{
+  lookup ('file', '/home/vagrant/work/' + cluster_name + '/cluster-data')
+  | from_yaml
+}}"
 
 # ex: et ts=2 filetype=yaml

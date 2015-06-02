@@ -19,7 +19,7 @@ case "$common_name" in
 
 	ip route flush \
 		{{ iroute.network }}/{{ iroute.netbits }} \
-		via {{ cluster_vpn }}.{{ vpn_groups [zon] }}.{{ vpn_client.vpn_ip }}
+		via {{ cluster.vpn_network }}.{{ vpn_groups [zon] }}.{{ vpn_client.vpn_ip }}
 
 {% endfor %}
 

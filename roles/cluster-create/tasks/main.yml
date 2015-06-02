@@ -1,7 +1,5 @@
 ---
 
-- include_vars: "/home/vagrant/work/{{ cluster }}/cluster-data"
-
 - name: "create cluster instance"
   local_action:
     module: "ec2"
@@ -14,9 +12,9 @@
     instance_type: "{{ cluster_type }}"
     key_name: "{{ amazon_key_name }}"
 
-    group_id: "{{ hostvars [inventory_hostname] ['cluster_group_' + cluster_type] }}"
-    vpc_subnet_id: "{{ hostvars [inventory_hostname] ['cluster_subnet_' + cluster_type + '_' + zon] }}"
-    private_ip: "{{ cluster_net }}.{{ cluster_subnets [cluster_type] [zon] }}.{{ idx }}"
+    group_id: "{{ cluster_dynamic ['cluster_group_' + cluster_type] }}"
+    vpc_subnet_id: "{{ cluster_dynamic ['cluster_subnet_' + cluster_type + '_' + zon] }}"
+    private_ip: "{{ cluster.cluster_network }}.{{ cluster_subnets [cluster_type] [zon] }}.{{ idx }}"
     assign_public_ip: "no"
     source_dest_check: "no"
 

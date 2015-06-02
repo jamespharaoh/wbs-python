@@ -28,9 +28,9 @@
   sudo: "yes"
   sudo_user: "vagrant"
   with_items:
-    - "{{ hostvars [inventory_hostname] ['cluster_routes_app_' + zon] }}"
-    - "{{ hostvars [inventory_hostname] ['cluster_routes_data_' + zon] }}"
-    - "{{ hostvars [inventory_hostname] ['cluster_routes_jenkins_' + zon] }}"
+    - "{{ cluster_dynamic ['cluster_routes_app_' + zon] }}"
+    - "{{ cluster_dynamic ['cluster_routes_data_' + zon] }}"
+    - "{{ cluster_dynamic ['cluster_routes_jenkins_' + zon] }}"
 
 - name: "create vpn route"
   delegate_to: "localhost"
@@ -42,12 +42,12 @@
 
       aws ec2 delete-route
         --route-table-id "{{ item }}"
-        --destination-cidr-block "{{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24"
+        --destination-cidr-block "{{ cluster.vpn_network }}.{{ vpn_groups [zon] }}.0/24"
       || true;
 
       aws ec2 create-route
         --route-table-id "{{ item }}"
-        --destination-cidr-block "{{ cluster_vpn }}.{{ vpn_groups [zon] }}.0/24"
+        --destination-cidr-block "{{ cluster.vpn_network }}.{{ vpn_groups [zon] }}.0/24"
         --instance-id "{{ instance_id }}";
 
     fi;
@@ -60,17 +60,17 @@
   sudo: "yes"
   sudo_user: "vagrant"
   with_items:
-    - "{{ cluster_routes_admin_a }}"
-    - "{{ cluster_routes_admin_b }}"
-    - "{{ cluster_routes_admin_c }}"
-    - "{{ cluster_routes_app_a }}"
-    - "{{ cluster_routes_app_b }}"
-    - "{{ cluster_routes_app_c }}"
-    - "{{ cluster_routes_data_a }}"
-    - "{{ cluster_routes_data_b }}"
-    - "{{ cluster_routes_data_c }}"
-    - "{{ cluster_routes_jenkins_a }}"
-    - "{{ cluster_routes_jenkins_b }}"
-    - "{{ cluster_routes_jenkins_c }}"
+    - "{{ cluster_dynamic.cluster_routes_admin_a }}"
+    - "{{ cluster_dynamic.cluster_routes_admin_b }}"
+    - "{{ cluster_dynamic.cluster_routes_admin_c }}"
+    - "{{ cluster_dynamic.cluster_routes_app_a }}"
+    - "{{ cluster_dynamic.cluster_routes_app_b }}"
+    - "{{ cluster_dynamic.cluster_routes_app_c }}"
+    - "{{ cluster_dynamic.cluster_routes_data_a }}"
+    - "{{ cluster_dynamic.cluster_routes_data_b }}"
+    - "{{ cluster_dynamic.cluster_routes_data_c }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_a }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_b }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_c }}"
 
 # ex: et ts=2 filetype=yaml

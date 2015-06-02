@@ -21,7 +21,7 @@ export PAGER=less
 
 # configure window title
 
-{% set colour_cluster = '\[\e[38;5;' + cluster_colour + 'm\]' %}
+{% set colour_cluster = '\[\e[38;5;' + cluster.cluster_colour + 'm\]' %}
 {% set colour_type = '\[\e[38;5;' + cluster_type_colour + 'm\]' %}
 {% set colour_zone = '\[\e[38;5;' + zone_colour + 'm\]' %}
 {% set colour_index = '\[\e[38;5;252m\]' %}
@@ -31,7 +31,7 @@ export PAGER=less
 {% set colour_normal = '\[\e[0m\]' %}
 
 PS1="{{ [
-	colour_cluster, 'wistla-', cluster_short,
+	colour_cluster, 'wistla-', cluster.short_name,
 	colour_misc, '-',
 	colour_type, cluster_type,
 	colour_misc, '-',

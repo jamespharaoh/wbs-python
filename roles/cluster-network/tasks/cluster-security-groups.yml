@@ -8,9 +8,9 @@
   action:
     module: "ec2_group"
 
-    name: "{{ cluster }}-{{ item.name }}"
-    description: "Security group {{ cluster }}-{{ item.name }}"
-    vpc_id: "{{ cluster_vpc }}"
+    name: "{{ cluster_name }}-{{ item.name }}"
+    description: "Security group {{ cluster_name }}-{{ item.name }}"
+    vpc_id: "{{ cluster_dynamic.cluster_vpc }}"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
@@ -38,10 +38,10 @@
     module: "ec2_group"
 
     description: "Security group {{ item.name }}"
-    name: "{{ cluster }}-{{ item.name }}"
+    name: "{{ cluster_name }}-{{ item.name }}"
     rules: "{{ item.rules }}"
 
-    vpc_id: "{{ cluster_vpc }}"
+    vpc_id: "{{ cluster_dynamic.cluster_vpc }}"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"

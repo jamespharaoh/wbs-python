@@ -1,4 +1,4 @@
-{% set vpn_net = cluster_vpn + '.' + vpn_groups [zon] %}
+{% set vpn_net = cluster.vpn_network + '.' + vpn_groups [zon] %}
 
 # server
 
@@ -9,7 +9,7 @@ keepalive 5 20
 mode server
 persist-key
 persist-tun
-status wistla-{{ cluster }}-vpn.log
+status wistla-{{ cluster_name }}-vpn.log
 
 client-config-dir clients
 client-connect client-connect-script
@@ -25,15 +25,15 @@ ifconfig {{ vpn_net }}.1 255.255.255.0
 
 push "route-gateway {{ vpn_net }}.1"
 
-push "route {{ cluster_net }}.0.0 255.255.0.0 {{ vpn_net }}.1"
-push "route {{ cluster_vpn }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+push "route {{ cluster.cluster_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
+push "route {{ cluster.vpn_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
 
-{% for cluster_deployment_name in cluster_deployment_names %}
+{% for cluster_deployment_name in cluster.deployment_names %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}
 push "route {{ cluster_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
 {% endfor %}
 
-{% if cluster == 'ops' %}
+{% if cluster_name == 'ops' %}
 {% for dev_deployment_name in dev_deployment_names %}
 {% set dev_deployment = deployments [dev_deployment_name] %}
 push "route {{ dev_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_net }}.1"
@@ -49,5 +49,5 @@ dh wistla-dh.pem
 ca wistla-ca.cert
 #crl-verify wistla-ca.crl
 
-cert wistla-{{ cluster }}-vpn.cert
-key wistla-{{ cluster }}-vpn.key
+cert wistla-{{ cluster_name }}-vpn.cert
+key wistla-{{ cluster_name }}-vpn.key

@@ -8,7 +8,7 @@ Resources:
   HostedZone:
     Type: "AWS::Route53::HostedZone"
     Properties:
-      Name: "{{ cluster_short_domain }}."
+      Name: "{{ cluster.short_domain }}."
 
 {% for deployment_alias_name, deployment_alias in deployment_aliases.items ()
 if deployment_alias_name in cluster_deployment_alias_names %}

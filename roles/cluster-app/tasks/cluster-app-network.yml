@@ -6,7 +6,7 @@
     src: "cluster-app-interface-bridge"
     dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
   sudo: "yes"
-  with_items: "cluster_deployment_names"
+  with_items: "cluster.deployment_names"
 
 - name: "start deployment network bridge"
   shell:
@@ -23,32 +23,7 @@
   sudo: "yes"
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  with_items: "cluster_deployment_names"
-
-- name: "create deployment alias bridge network interface"
-  action:
-    module: "template"
-    src: "cluster-app-interface-bridge"
-    dest: "/etc/network/interfaces.d/{{ deployment_aliases [item].bridge_name }}.cfg"
-  sudo: "yes"
-  with_items: "cluster_deployment_alias_names"
-
-- name: "start deployment alias network bridge"
-  shell:
-
-    set -e
-
-    if ifquery --state {{ deployment_aliases [item].bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi
-
-    ifup {{ deployment_aliases [item].bridge_name }};
-
-  sudo: "yes"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  with_items: "cluster_deployment_alias_names"
+  with_items: "cluster.deployment_names"
 
 - name: "create dummy network interface"
   action:

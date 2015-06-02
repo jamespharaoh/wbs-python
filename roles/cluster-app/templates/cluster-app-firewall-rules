@@ -10,7 +10,7 @@ iptables \
 	--table nat \
 	--policy POSTROUTING ACCEPT
 
-{% for cluster_deployment_name in cluster_deployment_names %}
+{% for cluster_deployment_name in cluster.deployment_names %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}
 
 iptables \

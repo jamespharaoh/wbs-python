@@ -4,7 +4,7 @@
   action:
     module: "ec2_elb_lb"
 
-    name: "{{ cluster }}-app"
+    name: "{{ cluster_name }}-app"
     state: "present"
 
     listeners:
@@ -17,12 +17,12 @@
         load_balancer_port: "443"
         instance_port: "443"
 
-    security_group_ids: "{{ cluster_group_balancer }}"
+    security_group_ids: "{{ cluster_dynamic.cluster_group_balancer }}"
 
     subnets:
-      - "{{ cluster_subnet_admin_a }}"
-      - "{{ cluster_subnet_admin_b }}"
-      - "{{ cluster_subnet_admin_c }}"
+      - "{{ cluster_dynamic.cluster_subnet_admin_a }}"
+      - "{{ cluster_dynamic.cluster_subnet_admin_b }}"
+      - "{{ cluster_dynamic.cluster_subnet_admin_c }}"
 
     health_check:
       ping_protocol: "tcp"

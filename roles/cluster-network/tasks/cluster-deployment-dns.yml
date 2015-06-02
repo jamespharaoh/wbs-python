@@ -4,25 +4,25 @@
   action:
     module: "template"
     src: "cluster-deployment-dns-stack"
-    dest: "/home/vagrant/work/{{ cluster }}/deployment-dns-{{ item }}-stack"
+    dest: "/home/vagrant/work/{{ cluster_name }}/deployment-dns-{{ item }}-stack"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
   with_items: "cluster_deployment_names"
 
 - name: "create deployment dns stack"
   action:
     module: "cloudformation"
-    stack_name: "{{ cluster }}-deployment-dns-{{ item }}"
+    stack_name: "{{ cluster_name }}-deployment-dns-{{ item }}"
     state: "present"
-    template: "/home/vagrant/work/{{ cluster }}/deployment-dns-{{ item }}-stack"
+    template: "/home/vagrant/work/{{ cluster_name }}/deployment-dns-{{ item }}-stack"
     template_format: "yaml"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
     region: "{{ amazon_region }}"
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
   with_items: "cluster_deployment_names"
   register: "deployment_dns_stack_result"
 
@@ -31,7 +31,7 @@
 
     set -e;
 
-    name="{{ deployment_home }}/work/{{ cluster }}/deployment-dns-{{ item.1 }}-nameservers";
+    name="{{ deployment_home }}/work/{{ cluster_name }}/deployment-dns-{{ item.1 }}-nameservers";
     touch $name;
     sum_before=$(sha1sum $name);
 
@@ -58,7 +58,7 @@
 
   sudo: "yes"
   sudo_user: "vagrant"
-  when: "cluster != 'ops'"
+  when: "cluster_name != 'ops'"
   with_indexed_items: "cluster_deployment_names"
 
 - name: "create deployment dns delegations"
@@ -75,6 +75,6 @@
   sudo: "yes"
   sudo_user: "vagrant"
   with_dict: "deployments"
-  when: "(item.value.parent_cluster | default ('none')) == cluster"
+  when: "(item.value.parent_cluster | default ('none')) == cluster_name"
 
 # ex: et ts=2 filetype=yaml

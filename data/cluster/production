@@ -12,11 +12,9 @@ short_domain: "wist.la"
 
 cluster_colour: "27"
 
-deployment_alias_names:
+deployment_names:
 
   - "production"
-
-deployment_names:
 
   - "production-a"
   - "production-b"

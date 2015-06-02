@@ -7,16 +7,16 @@
   action:
     module: "template"
     src: "cluster-subnet-stack"
-    dest: "/home/vagrant/work/{{ cluster }}/app-subnet-stack.yaml"
+    dest: "/home/vagrant/work/{{ cluster_name }}/app-subnet-stack.yaml"
   sudo: "yes"
   sudo_user: "vagrant"
 
 - name: "create app subnet stack"
   action:
     module: "cloudformation"
-    stack_name: "{{ cluster }}-subnet-app"
+    stack_name: "{{ cluster_name }}-subnet-app"
     state: "present"
-    template: "/home/vagrant/work/{{ cluster }}/app-subnet-stack.yaml"
+    template: "/home/vagrant/work/{{ cluster_name }}/app-subnet-stack.yaml"
     template_format: "yaml"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"

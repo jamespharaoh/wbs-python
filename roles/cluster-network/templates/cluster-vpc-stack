@@ -8,16 +8,16 @@ Resources:
     Type: "AWS::EC2::VPC"
     Properties:
       CidrBlock:
-        "{{ cluster_net }}.0.0/16"
+        "{{ cluster.cluster_network }}.0.0/16"
       Tags:
-        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Cluster", Value: "{{ cluster_name }}" }
         - { Key: "Class", Value: "vpc" }
 
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
     Properties:
       Tags:
-        - { Key: "Cluster", Value: "{{ cluster }}" }
+        - { Key: "Cluster", Value: "{{ cluster_name }}" }
         - { Key: "Class", Value: "internet-gateway" }
 
   InternetGatewayAttachment:

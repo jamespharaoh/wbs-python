@@ -12,11 +12,9 @@ short_domain: "staging.wist.la"
 
 cluster_colour: "84"
 
-deployment_alias_names:
+deployment_names:
 
   - "staging"
-
-deployment_names:
 
   - "staging-a"
   - "staging-b"

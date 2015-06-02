@@ -1,5 +1,5 @@
-{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}.{{ cluster.main_domain }}
-{{ cluster_net }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}
+{{ cluster.cluster_network }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}.{{ cluster.main_domain }}
+{{ cluster.cluster_network }}.{{ cluster_subnets.admin [zon] }}.{{ idx }} {{ inventory_hostname }}
 
 127.0.0.1 localhost
 
@@ -7,7 +7,7 @@
 {% set cluster_host = hostvars [cluster_host_name] -%}
 	{% print [
 		[
-			cluster_net,
+			cluster.cluster_network,
 			cluster_subnets [cluster_host.cluster_type] [cluster_host.zon],
 			cluster_host.idx,
 		] | join ('.'),
