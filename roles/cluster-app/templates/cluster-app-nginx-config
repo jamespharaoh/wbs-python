@@ -29,9 +29,13 @@ http {
 
 {% for deployment_name in cluster.deployment_names %}
 {% set deployment = deployments [deployment_name] %}
+{% if deployment.type != 'virtual' %}
+
 	upstream deployment-{{ deployment_name }} {
 		server {{ deployment.bridge_network }}.5.{{ idx }};
 	}
+
+{% endif %}
 {% endfor %}
 
 {% macro do_deployment (deployment, deployment_alias, target) %}
@@ -192,7 +196,7 @@ http {
 {% endmacro %}
 
 {% for deployment_name, deployment in deployments.items ()
-if deployment.cluster == cluster %}
+if deployment.cluster == cluster_name %}
 
 {% if deployment.type == 'shared' %}
 

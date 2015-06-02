@@ -2,6 +2,7 @@
 
 {% for other_deployment_name in cluster.deployment_names %}
 {% set other_deployment = deployments [other_deployment_name] %}
+{% if other_deployment.type != 'virtual' %}
 
 # ---------- deployment {{ other_deployment_name }}
 
@@ -19,4 +20,5 @@
 ] | join (' ') }}
 {% endfor %}
 
+{% endif %}
 {% endfor %}
