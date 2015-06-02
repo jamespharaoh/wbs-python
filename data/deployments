@@ -1,8 +1,24 @@
 ---
 
+production:
+
+  name: "production"
+  type: "shared"
+
+  main_domain: "wistla.com"
+  short_domain: "wist.la"
+
+  cluster: "production"
+  target: "production-b"
+
+  bridge_name: "br162"
+  bridge_network: "10.162"
+
 production-a:
 
   name: "production-a"
+  type: "alias"
+
   cluster: "production"
   alias: "production"
 
@@ -22,6 +38,8 @@ production-a:
 production-b:
 
   name: "production-b"
+  type: "alias"
+
   cluster: "production"
   alias: "production"
 
@@ -38,9 +56,25 @@ production-b:
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
 
+staging:
+
+  name: "staging"
+  type: "shared"
+
+  main_domain: "staging.wistla.com"
+  short_domain: "staging.wist.la"
+
+  cluster: "staging"
+  target: "staging-a"
+
+  bridge_name: "br163"
+  bridge_network: "10.163"
+
 staging-a:
 
   name: "staging-a"
+  type: "alias"
+
   cluster: "staging"
   alias: "staging"
 
@@ -60,6 +94,8 @@ staging-a:
 staging-b:
 
   name: "staging-b"
+  type: "alias"
+
   cluster: "staging"
   alias: "staging"
 
@@ -76,9 +112,21 @@ staging-b:
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
 
+test:
+
+  name: "test"
+  type: "virtual"
+
+  main_domain: "test.wistla.com"
+  short_domain: "test.wist.la"
+
+  cluster: "test"
+
 test-everest:
 
   name: "test-everest"
+  type: "simple"
+
   cluster: "test"
 
   main_domain: "everest.test.wistla.com"
@@ -97,6 +145,8 @@ test-everest:
 test-k2:
 
   name: "test-k2"
+  type: "simple"
+
   cluster: "test"
 
   main_domain: "k2.test.wistla.com"
@@ -115,6 +165,8 @@ test-k2:
 test-montblanc:
 
   name: "test-montblanc"
+  type: "simple"
+
   cluster: "test"
 
   main_domain: "montblanc.test.wistla.com"
@@ -133,6 +185,8 @@ test-montblanc:
 dev:
 
   name: "dev"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "dev.wistla.com"
@@ -144,6 +198,8 @@ dev:
 berk:
 
   name: "berk"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "berk.wistla.com"
@@ -155,6 +211,8 @@ berk:
 bruce:
 
   name: "bruce"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "bruce.wistla.com"
@@ -168,6 +226,8 @@ bruce:
 mrbenn:
 
   name: "mrbenn"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "mrbenn.wistla.com"
@@ -179,6 +239,8 @@ mrbenn:
 7-zark-7:
 
   name: "7-zark-7"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "7-zark-7.wistla.com"
@@ -190,6 +252,8 @@ mrbenn:
 optimus:
 
   name: "optimus"
+  type: "simple"
+
   cluster: "dev"
 
   main_domain: "optimus.dev.wistla.com"
@@ -201,6 +265,8 @@ optimus:
 jenkins-latest:
 
   name: "jenkins-latest"
+  type: "simple"
+
   cluster: "jenkins"
 
   main_domain: "latest.jenkins.wistla.com"

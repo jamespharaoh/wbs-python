@@ -1,7 +1,8 @@
 ---
 
+deployment_name: "{{ deployment_name | default (deployment) | default ('dev') }}"
 deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
-deployment: "{{ deployment | default ('dev') }}"
+
 deployment_user: "{{ deployment_path | default ('vagrant') }}"
 deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
 

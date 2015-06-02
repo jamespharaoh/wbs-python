@@ -9,13 +9,13 @@
     source {{ deployment_home }}/wistla-devops/misc/locking ansible;
     exlock;
 
-    if ! test -d /var/lib/lxc/{{ deployment }}-{{ inventory_hostname }}; then
+    if ! test -d /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}; then
       echo "UNCHANGED";
       exit;
     fi;
 
     lxc-destroy
-      --name {{ deployment }}-{{ inventory_hostname }};
+      --name {{ deployment_name }}-{{ inventory_hostname }};
 
   args:
     executable: "/bin/bash"

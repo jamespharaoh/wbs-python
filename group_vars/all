@@ -37,55 +37,13 @@ clusters:
   test: "{{ lookup ('file', 'data/cluster/test') | from_yaml }}"
 
 deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
-deployment_aliases: "{{ lookup ('file', 'data/deployment-aliases') | from_yaml }}"
-
-all_deployments:
-
-  production: "{{ deployment_aliases.production }}"
-  produciton-a: "{{ deployments ['production-a'] }}"
-  produciton-b: "{{ deployments ['production-b'] }}"
-
-  staging: "{{ deployment_aliases.staging }}"
-  staging-a: "{{ deployments ['staging-a'] }}"
-  staging-b: "{{ deployments ['staging-b'] }}"
-
-  test: "{{ deployment_aliases.test }}"
-  test-everest: "{{ deployments ['test-everest'] }}"
-  test-k2: "{{ deployments ['test-k2'] }}"
-  test-montblanc: "{{ deployments ['test-montblanc'] }}"
-
-  dev: "{{ deployments.dev }}"
-  berk: "{{ deployments.berk }}"
-  bruce: "{{ deployments.bruce }}"
-  mrbenn: "{{ deployments.mrbenn }}"
-  7-zark-7: "{{ deployments ['7-zark-7'] }}"
-  optimus: "{{ deployments.optimus }}"
-
-  jenkins-latest: "{{ deployments ['jenkins-latest'] }}"
+deployment: "{{ deployments [deployment_name] }}"
 
 deployment_alias: "{{
-  deployments [deployment].alias
-  if 'alias' in deployments [deployment]
-  else False
+  deployments [deployment.alias]
+  if 'alias' in deployment
+  else deployment
 }}"
-
-deployment_main_domain: "{{ all_deployments [deployment].main_domain }}"
-deployment_short_domain: "{{ all_deployments [deployment].short_domain }}"
-
-deployment_alias_main_domain: "{{
-  deployment_aliases [deployment_alias].main_domain
-  if 'alias' in deployments [deployment]
-  else None
-}}"
-
-deployment_alias_short_domain: "{{
-  deployment_aliases [deployment_alias].short_domain
-  if 'alias' in deployments [deployment]
-  else None
-}}"
-
-deployment_bridge_name: "{{ all_deployments [deployment].bridge_name }}"
-deployment_bridge_network: "{{ all_deployments [deployment].bridge_network }}"
 
 dev_deployment_names:
 

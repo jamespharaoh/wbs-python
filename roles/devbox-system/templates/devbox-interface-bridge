@@ -1,5 +1,3 @@
-{% set deployment = deployments [item] %}
-
 auto {{ deployment.bridge_name }}
 iface {{ deployment.bridge_name }} inet static
 

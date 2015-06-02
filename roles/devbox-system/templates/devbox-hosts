@@ -7,13 +7,13 @@
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
 {% set host_address = [
-	deployment_bridge_network,
+	deployment.bridge_network,
 	host.grp,
 	host.idx,
 ] | join ('.') %}
 {{ [
-	deployment_bridge_network + '.' + (host.grp | string) + '.' + (host.idx | string),
-	deployment + '-' + host_name,
+	deployment.bridge_network + '.' + (host.grp | string) + '.' + (host.idx | string),
+	deployment_name + '-' + host_name,
 	host_name,
 	host_name + '.dev.wistla.com',
 ] | join (' ') }}
@@ -23,7 +23,7 @@
 {% for host_name in groups ['load-node'] %}
 {% set host = hostvars [host_name] %}
 {% set host_address = [
-	deployment_bridge_network,
+	deployment.bridge_network,
 	host.grp,
 	host.idx,
 ] | join ('.') %}
@@ -36,7 +36,8 @@
 
 {% endif %}
 
-{% for other_deployment_name, other_deployment in deployments.items () %}
+{% for other_deployment_name, other_deployment in deployments.items ()
+if 'bridge_network' in other_deployment %}
 
 # ---------- deployment {{ other_deployment_name }}
 

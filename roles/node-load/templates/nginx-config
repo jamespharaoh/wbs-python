@@ -47,9 +47,9 @@ http {
 
 	server {
 
-		server_name api.{{ deployment_main_domain }};
-{% if 'alias' in deployments [deployment] %}
-		server_name api.{{ deployment_alias_main_domain }};
+		server_name api.{{ deployment.main_domain }};
+{% if deployment.type == 'alias' %}
+		server_name api.{{ deployment_alias.main_domain }};
 {% endif %}
 
 		client_max_body_size 16m;
@@ -66,11 +66,11 @@ http {
 
 	server {
 
-		server_name {{ deployment_main_domain }};
-		server_name www.{{ deployment_main_domain }};
-{% if 'alias' in deployments [deployment] %}
-		server_name {{ deployment_alias_main_domain }};
-		server_name www.{{ deployment_alias_main_domain }};
+		server_name {{ deployment.main_domain }};
+		server_name www.{{ deployment.main_domain }};
+{% if deployment.type == 'alias' %}
+		server_name {{ deployment_alias.main_domain }};
+		server_name www.{{ deployment_alias.main_domain }};
 {% endif %}
 
 		client_max_body_size 16m;
@@ -93,9 +93,9 @@ http {
 
 	server {
 
-		server_name admin.{{ deployment_main_domain }};
-{% if 'alias' in deployments [deployment] %}
-		server_name admin.{{ deployment_alias_main_domain }};
+		server_name admin.{{ deployment.main_domain }};
+{% if deployment.type == 'alias' %}
+		server_name admin.{{ deployment_alias.main_domain }};
 {% endif %}
 
 		root /home/ubuntu/wistla-admin;
@@ -115,9 +115,9 @@ http {
 
 	server {
 
-		server_name {{ deployment_short_domain }};
-{% if 'alias' in deployments [deployment] %}
-		server_name {{ deployment_alias_short_domain }};
+		server_name {{ deployment.short_domain }};
+{% if deployment.type == 'alias' %}
+		server_name {{ deployment_alias.short_domain }};
 {% endif %}
 
 		location / {

@@ -2,23 +2,23 @@ var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-config.apiUrl = 'https://api.{{ deployment_main_domain }}';
-config.apiTest = 'http://api.{{ deployment_main_domain }}';
+config.apiUrl = 'https://api.{{ deployment.main_domain }}';
+config.apiTest = 'http://api.{{ deployment.main_domain }}';
 
 // web url
-config.webUrl = 'https://{{ deployment_main_domain }}';
-config.webTest = 'http://{{ deployment_main_domain }}';
+config.webUrl = 'https://{{ deployment.main_domain }}';
+config.webTest = 'http://{{ deployment.main_domain }}';
 
 // short url for links sent out
-config.shortUrl = 'https://{{ deployment_short_domain }}';
-config.shortTest = 'http://{{ deployment_short_domain }}';
+config.shortUrl = 'https://{{ deployment.short_domain }}';
+config.shortTest = 'http://{{ deployment.short_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://{{ deployment }}-mongo-0:27017/wistla';
+config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ deployment }}-rabbit-0',
+	url: 'amqp://{{ deployment_name }}-rabbit-0',
 };
 
 {% if use_s3 == 'yes' %}
@@ -29,7 +29,7 @@ config.blobAmazon = {
 	accessKey: '{{ amazon_accounts.test.access_key }}',
 	secretKey: '{{ amazon_accounts.test.secret_key }}',
 	bucketName: 'wistla-dev',
-	bucketPrefix: '/{{ deployment }}/blobs'
+	bucketPrefix: '/{{ deployment_name }}/blobs'
 };
 
 {% else %}
