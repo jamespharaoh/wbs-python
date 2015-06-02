@@ -8,7 +8,7 @@ github.com {{ ssh_host_keys.general.github | join }}
 			zon + '.admin.' + cluster.main_domain,
 			'cluster-admin-' + zon + '.' + cluster.main_domain,
 			cluster.amazon_admin_ips [zon],
-			cluster.cluster_net + '.' + cluster_subnets.admin [zon] + '.4',
+			cluster.cluster_network + '.' + cluster_subnets.admin [zon] + '.4',
 		] | join (','),
 		' ',
 		ssh_host_keys [cluster_name].admin [zon] | join,
@@ -20,7 +20,7 @@ github.com {{ ssh_host_keys.general.github | join }}
 	{%- print
 		[
 			'cluster-app-a-4.' + cluster.main_domain,
-			cluster.cluster_net + '.' + cluster_subnets.app.a + '.4',
+			cluster.cluster_network + '.' + cluster_subnets.app.a + '.4',
 		] | join (','),
 		' ',
 		ssh_host_keys [cluster_name].app ['a-4'] | join,
@@ -32,7 +32,7 @@ github.com {{ ssh_host_keys.general.github | join }}
 	{%- print
 		[
 			'jenkins-a.' + cluster.main_domain,
-			cluster.cluster_net + '.' + cluster_subnets.jenkins.a + '.4',
+			cluster.cluster_network + '.' + cluster_subnets.jenkins.a + '.4',
 		] | join (','),
 		' ',
 		ssh_host_keys [cluster_name].jenkins.a | join,
