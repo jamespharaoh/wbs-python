@@ -180,7 +180,7 @@ http {
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
-			proxy_set_header Host "admin.{{ deployment.short_domain }}";
+			proxy_set_header Host "{{ deployment.short_domain }}";
 		}
 
 		location /robots.txt {
