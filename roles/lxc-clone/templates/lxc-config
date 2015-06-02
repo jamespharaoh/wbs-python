@@ -25,7 +25,7 @@ lxc.arch = amd64
 
 lxc.network.type = veth
 lxc.network.flags = up
-lxc.network.link = {{ deployments [deployment].bridge_name }}
+lxc.network.link = {{ all_deployments [deployment].bridge_name }}
 lxc.network.hwaddr = {{ hw }}
 lxc.network.ipv4 = {{ node_ip }}/16
 lxc.network.ipv4.gateway = {{ deployment_bridge_network }}.1.1
