@@ -1,0 +1,90 @@
+---
+
+cluster_deployment: "{{ deployments [cluster_deployment_name] }}"
+
+cluster_deployment_alias: "{{
+  deployment_aliases [cluster_deployment.alias]
+  if cluster_deployment.alias is defined
+  else cluster_deployment
+}}"
+
+cluster_deployment_config_directories:
+
+  - "config"
+  - "config/api"
+  - "config/browser"
+  - "config/load"
+  - "config/mongo"
+  - "config/rabbit"
+  - "config/web"
+
+cluster_deployment_config_files:
+
+  - source: "security/test/google-service-account.key"
+    target: "config/api/google-service-account.key"
+    mode: "0600"
+
+  - source: "security/apple/push-notifications/ca.cert"
+    target: "config/api/apple-ca.cert"
+    mode: "0644"
+
+  - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.cert"
+    target: "config/api/apple-push.cert"
+    mode: "0644"
+
+  - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name }}.key"
+    target: "config/api/apple-push.key"
+    mode: "0600"
+
+cluster_deployment_config_templates:
+
+  - template: "cluster-deployment-wistla-devops-config"
+    target: "wistla-devops/config"
+
+  - template: "cluster-deployment-wistla-devops-accounts"
+    target: "wistla-devops/accounts"
+
+  - template: "cluster-deployment-wistla-admin-config"
+    target: "config/load/wistla-admin-config.local.js"
+
+  - template: "cluster-deployment-wistla-api-config"
+    target: "config/api/config.local.js"
+
+  - template: "cluster-deployment-wistla-api-environment"
+    target: "config/api/environment"
+
+  - template: "cluster-deployment-wistla-browser-config"
+    target: "config/browser/config.local.js"
+
+  - template: "cluster-deployment-wistla-web-config"
+    target: "config/web/config.local.js"
+
+  - template: "cluster-deployment-wistla-load-upstream"
+    target: "config/load/nginx-upstream.conf"
+
+cluster_deployment_config_links:
+
+  - source: "../../config/api/config.local.js"
+    target: "wistla-api/config/config.local.js"
+
+  - source: "../../config/browser/config.local.js"
+    target: "wistla-browser/config/config.local.js"
+
+  - source: "../../config/web/config.local.js"
+    target: "wistla-web/config/config.local.js"
+
+cluster_deployment_shared_directories:
+
+  - "audio"
+  - "cms-image"
+  - "image"
+  - "log"
+  - "user-upload"
+  - "video"
+
+cluster_deployment_shared_links:
+
+  - link: "userUpload"
+    target: "user-upload"
+
+# ex: et ts=2 filetype=yaml

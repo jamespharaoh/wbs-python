@@ -1,0 +1,37 @@
+---
+
+cluster_deployment_alias: "{{ deployment_aliass [cluster_deployment_alias_name] }}"
+
+cluster_deployment_alias_config_directories:
+
+  - "config"
+  - "config/mongo"
+  - "config/rabbit"
+
+cluster_deployment_alias_config_files: []
+
+cluster_deployment_alias_config_templates:
+
+  - template: "cluster-deployment-alias-wistla-devops-config"
+    target: "wistla-devops/config"
+
+  - template: "cluster-deployment-alias-wistla-devops-accounts"
+    target: "wistla-devops/accounts"
+
+cluster_deployment_alias_config_links: []
+
+cluster_deployment_alias_shared_directories:
+
+  - "audio"
+  - "cms-image"
+  - "image"
+  - "log"
+  - "user-upload"
+  - "video"
+
+cluster_deployment_alias_shared_links:
+
+  - link: "userUpload"
+    target: "user-upload"
+
+# ex: et ts=2 filetype=yaml

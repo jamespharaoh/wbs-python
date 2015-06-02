@@ -8,6 +8,9 @@ production:
   cluster: "production"
   target: "production-b"
 
+  bridge_name: "br162"
+  bridge_network: "10.162"
+
 staging:
 
   name: "staging"
@@ -15,6 +18,9 @@ staging:
   short_domain: "staging.wist.la"
   cluster: "staging"
   target: "staging-a"
+
+  bridge_name: "br163"
+  bridge_network: "10.163"
 
 test:
 

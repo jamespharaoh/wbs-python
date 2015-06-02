@@ -23,7 +23,7 @@ amazon_instance_types: "{{ clusters [cluster].amazon_instance_types }}"
 amazon_images: "{{ clusters [cluster].amazon_images }}"
 amazon_key_name: "{{ clusters [cluster].amazon_key_name }}"
 
-cluster_checkouts:
+cluster_deployment_checkouts:
 
   - name: "wistla-admin"
     branch: "master"
@@ -51,6 +51,11 @@ cluster_checkouts:
       - "npm install"
 
   - name: "wistla-test-images"
+    branch: "master"
+
+cluster_deployment_alias_checkouts:
+
+  - name: "wistla-devops"
     branch: "master"
 
 kernel_version: "{{ clusters [cluster].kernel_versions [cluster_type] }}"

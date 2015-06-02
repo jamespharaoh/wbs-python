@@ -129,6 +129,8 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/vagrant"
 		DEPLOYMENT_USER = "vagrant"
 
+		DEPLOYMENT_INVENTORY = "inventory"
+
 	elif CONFIG ["deployment_mode"] == "direct":
 
 		write_message ([
@@ -138,6 +140,19 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
+		DEPLOYMENT_INVENTORY = "inventory"
+
+	elif CONFIG ["deployment_mode"] == "cluster-deployment-alias":
+
+		write_message ([
+			"##### Running in CLUSTER-DEPLOYMENT-ALIAS deployment mode #####\n",
+		])
+
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
+
+		DEPLOYMENT_INVENTORY = "inventory-deployment-alias"
+
 	elif CONFIG ["deployment_mode"] == "jenkins":
 
 		write_message ([
@@ -146,6 +161,8 @@ def check_deployment_mode ():
 
 		DEPLOYMENT_HOME = "$WORKSPACE"
 		DEPLOYMENT_USER = "jenkins"
+
+		DEPLOYMENT_INVENTORY = "inventory"
 
 	else:
 
@@ -167,7 +184,7 @@ def run_playbook (args):
 		[
 			"/usr/bin/sudo",
 			"ansible/bin/ansible-playbook",
-			"--inventory-file", "inventory",
+			"--inventory-file", DEPLOYMENT_INVENTORY,
 			"--extra-vars", "@config",
 			"--extra-vars", "@accounts",
 		] + args,

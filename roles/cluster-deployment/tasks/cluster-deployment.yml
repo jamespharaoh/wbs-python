@@ -1,0 +1,95 @@
+---
+
+- name: "create deployment directories"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}"
+    state: "directory"
+
+- name: "checkout projects from git"
+  shell:
+
+    set -e;
+
+    cd {{ vagrant_home }}/{{ cluster_deployment_name }};
+
+    git clone
+      git@github.com:/wistla/{{ item.name }}
+      --branch {{ item.branch }};
+
+  args:
+    creates: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item.name }}"
+  with_items: "cluster_deployment_checkouts"
+
+- name: "run project build steps"
+  shell: "{{ item.build_steps | default ([ 'true' ]) | join (' && ') }}"
+  args:
+    chdir: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item.name }}"
+  tags: "build"
+  with_items: "cluster_deployment_checkouts"
+
+- name: "create config directories"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item }}"
+    state: "directory"
+  with_items: "cluster_deployment_config_directories"
+
+- name: "create shared link"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/shared"
+    state: "link"
+    src: "../{{ cluster_deployment.alias }}/shared"
+  when: "cluster_deployment.alias is defined"
+
+- name: "create shared directory"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/shared"
+    state: "directory"
+  with_items: "cluster_deployment_shared_directories"
+  when: "cluster_deployment.alias is not defined"
+
+- name: "create shared directories"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/shared/{{ item }}"
+    state: "directory"
+  with_items: "cluster_deployment_shared_directories"
+  when: "cluster_deployment.alias is not defined"
+
+- name: "create shared links"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/shared/{{ item.link }}"
+    state: "link"
+    src: "{{ item.target }}"
+  with_items: "cluster_deployment_shared_links"
+  when: "cluster_deployment.alias is not defined"
+
+- name: "create config files"
+  action:
+    module: "template"
+    src: "{{ item.template }}"
+    dest: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item.target }}"
+  with_items: "cluster_deployment_config_templates"
+
+- name: "copy config files"
+  action:
+    module: "copy"
+    src: "{{ item.source }}"
+    dest: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item.target }}"
+    mode: "{{ item.mode }}"
+  with_items: "cluster_deployment_config_files"
+
+- name: "create links to config files"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment_name }}/{{ item.target }}"
+    src: "{{ item.source }}"
+    state: "link"
+    force: "yes"
+  with_items: "cluster_deployment_config_links"
+
+# ex: et ts=2 filetype=yaml

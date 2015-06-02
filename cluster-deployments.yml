@@ -5,6 +5,11 @@
 
     # ----- production
 
+    - role: "cluster-deployment-alias"
+      cluster_deployment_alias_name: "production"
+      when: "cluster == 'production'"
+      tags: [ "cluster-deployment-alias", "production" ]
+
     - role: "cluster-deployment"
       cluster_deployment_name: "production-a"
       when: "cluster == 'production'"
@@ -16,6 +21,11 @@
       tags: [ "cluster-deployment", "production-b" ]
 
     # ----- staging
+
+    - role: "cluster-deployment-alias"
+      cluster_deployment_alias_name: "staging"
+      when: "cluster == 'staging'"
+      tags: [ "cluster-deployment-alias", "staging" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-a"

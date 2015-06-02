@@ -1,0 +1,21 @@
+---
+
+amazon_accounts:
+
+  production:
+    access_key: ""
+    secret_key: ""
+
+  staging:
+    access_key: ""
+    secret_key: ""
+
+  test:
+    access_key: ""
+    secret_key: ""
+
+  operations:
+    access_key: ""
+    secret_key: ""
+
+# ex: et ts=2 filetype=yaml
