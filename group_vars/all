@@ -39,6 +39,30 @@ clusters:
 deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
 deployment_aliases: "{{ lookup ('file', 'data/deployment-aliases') | from_yaml }}"
 
+all_deployments:
+
+  production: "{{ deployment_aliases.production }}"
+  produciton-a: "{{ deployments ['production-a'] }}"
+  produciton-b: "{{ deployments ['production-b'] }}"
+
+  staging: "{{ deployment_aliases.staging }}"
+  staging-a: "{{ deployments ['staging-a'] }}"
+  staging-b: "{{ deployments ['staging-b'] }}"
+
+  test: "{{ deployment_aliases.test }}"
+  test-everest: "{{ deployments ['test-everest'] }}"
+  test-k2: "{{ deployments ['test-k2'] }}"
+  test-montblanc: "{{ deployments ['test-montblanc'] }}"
+
+  dev: "{{ deployments.dev }}"
+  berk: "{{ deployments.berk }}"
+  bruce: "{{ deployments.bruce }}"
+  mrbenn: "{{ deployments.mrbenn }}"
+  7-zark-7: "{{ deployments ['7-zark-7'] }}"
+  optimus: "{{ deployments.optimus }}"
+
+  jenkins-latest: "{{ deployments ['jenkins-latest'] }}"
+
 deployment_alias: "{{
   deployments [deployment].alias
   if 'alias' in deployments [deployment]

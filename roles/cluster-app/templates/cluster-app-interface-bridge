@@ -1,4 +1,4 @@
-{% set deployment = deployments [item] %}
+{% set deployment = all_deployments [item] %}
 
 auto {{ deployment.bridge_name }}
 iface {{ deployment.bridge_name }} inet static
