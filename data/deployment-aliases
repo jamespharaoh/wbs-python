@@ -12,7 +12,7 @@ staging:
 
   name: "staging"
   main_domain: "staging.wistla.com"
-  short_domain: "stating.wist.la"
+  short_domain: "staging.wist.la"
   cluster: "staging"
   target: "staging-a"
 
