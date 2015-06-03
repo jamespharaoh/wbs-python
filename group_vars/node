@@ -1,23 +1,21 @@
 ---
 
 ansible_connection: "chroot"
-ansible_ssh_host: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs"
+ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
 template: "{{ node }}-template"
 
-node_ip: "{{ deployment.bridge_network }}.{{ grp }}.{{ idx }}"
-
-active: "{{ 'yes' if (
+node_active: "{{ 'yes' if (
   (deployment_mode == 'vagrant' and
-    (idx | int) < (node_count [node] | int)) or
+    (node_index | int) < (node_count [node_type] | int)) or
   (deployment_mode == 'jenkins' and
-    (idx | int) < (node_count [node] | int)) or
+    (node_index | int) < (node_count [node_type] | int)) or
   (deployment_mode == 'cluster-shared' and
-    (idx | int) == (instance_idx | int)) or
+    (node_index | int) == (instance_index | int)) or
   (deployment_mode == 'cluster-alias' and
-    (idx | int) == (instance_idx | int)) or
+    (node_index | int) == (instance_index | int)) or
   (deployment_mode == 'cluster-simple' and
-    (idx | int) == (instance_idx | int))
+    (node_index | int) == (instance_index | int))
 ) else 'no' }}"
 
 # ex: et ts=2 filetype=yaml

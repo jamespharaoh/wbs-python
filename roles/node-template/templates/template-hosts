@@ -2,21 +2,14 @@
 
 127.0.0.1 localhost
 
-# ---------- shortcut hosts TODO remove this
-
-{% for host_name in groups.all if host_name in groups.node %}
-{% set host = hostvars [host_name] %}
-{{ deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }}
-{% endfor %}
-
 # ---------- hosts in our deployment
 
 {% for host_name in groups.all if host_name in groups.node %}
 {% set host = hostvars [host_name] %}
-{{ deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} {{ host_name }} {{ host_name }}.{{ deployment.main_domain }}
+{{ host.private_address }} {{ host_name }} {{ host_name }}.{{ deployment.main_domain }}
 {% endfor %}
 
 {% for host_name in groups ['api-node'] | default ([]) %}
 {% set host = hostvars [host_name] %}
-{{ deployment.bridge_network }}.{{ host.grp }}.{{ host.idx }} api.{{ deployment.main_domain }}
+{{ host.private_address }} api.{{ deployment.main_domain }}
 {% endfor %}

@@ -1,0 +1,62 @@
+---
+
+devops_inventory_deployment_mode: "{{
+  devops_inventory_deployment_modes [deployment_mode]
+}}"
+
+devops_inventory_node_types: "{{
+  devops_inventory_deployment_mode.node_types
+}}"
+
+devops_inventory_deployment_modes:
+
+  vagrant:
+
+    node_types:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+  jenkins:
+
+    node_types:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+  cluster-shared:
+
+    node_types:
+
+      - "mongo"
+      - "rabbit"
+
+  cluster-alias:
+
+    node_types:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "web"
+
+  cluster-simple:
+
+    node_types:
+
+      - "api"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+# ex: et ts=2 filetype=yaml

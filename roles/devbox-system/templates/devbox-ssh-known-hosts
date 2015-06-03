@@ -2,44 +2,38 @@
 
 github.com {{ ssh_host_keys.general.github | join }}
 
-{% for cluster_name, cluster in clusters.items () %}
+{% for host_name in groups ['cluster-host'] -%}
 
-{%- for zon in [ 'a', 'b', 'c' ] %}
-	{%- print
-		[
-			zon + '.admin.' + cluster.main_domain,
-			'cluster-admin-' + zon + '.' + cluster.main_domain,
-			cluster.amazon_admin_ips [zon],
-			cluster.cluster_network + '.' + cluster_subnets.admin [zon] + '.4',
-		] | join (','),
-		' ',
-		ssh_host_keys [cluster_name].admin [zon] | join,
-		'\n'
-	-%}
+	{%- set host = hostvars [host_name] -%}
+	{%- set instance_cluster = host.instance_cluster -%}
+	{%- set instance_type = host.instance_type -%}
+	{%- set instance_zone = host.instance_zone -%}
+	{%- set instance_index = host.instance_index | string -%}
+
+	{%- if instance_cluster in ssh_host_keys -%}
+	{%- if instance_type in ssh_host_keys [instance_cluster] -%}
+
+		{%- if instance_zone + '-' + instance_index in ssh_host_keys [instance_cluster] [instance_type] -%}
+
+			{%- print [
+				host_name,
+				ssh_host_keys [instance_cluster] [instance_type] [instance_zone + '-' + instance_index] | join (''),
+			] | join (' ') + '\n' -%}
+
+		{%- elif instance_zone in ssh_host_keys [instance_cluster] [instance_type] -%}
+
+			{%- print [
+				host_name,
+				ssh_host_keys [instance_cluster] [instance_type] [instance_zone] | join (''),
+			] | join (' ') + '\n' -%}
+
+		{%- else -%}
+
+			{%- print '# ' + host_name + ' (no host key)\n' -%}
+
+		{%- endif -%}
+
+	{%- endif -%}
+	{%- endif -%}
+
 {%- endfor %}
-
-{% if cluster_name != 'ops' %}
-	{%- print
-		[
-			'cluster-app-a-4.' + cluster.main_domain,
-			cluster.cluster_network + '.' + cluster_subnets.app.a + '.4',
-		] | join (','),
-		' ',
-		ssh_host_keys [cluster_name].app ['a-4'] | join,
-		'\n'
-	-%}
-{% endif %}
-
-{% if cluster_name == 'ops' %}
-	{%- print
-		[
-			'jenkins-a.' + cluster.main_domain,
-			cluster.cluster_network + '.' + cluster_subnets.jenkins.a + '.4',
-		] | join (','),
-		' ',
-		ssh_host_keys [cluster_name].jenkins.a | join,
-		'\n'
-	-%}
-{% endif %}
-
-{% endfor %}

@@ -1,99 +1,99 @@
-{{ ansible_warning ['#'] }}
+{%- print ansible_warning ['#'] + '\n\n' -%}
 
-127.0.0.1 localhost
+{%- print '127.0.0.1 localhost\n' -%}
 
-{% if deployment_mode == 'vagrant' %}
+{%- if deployment_mode == 'vagrant' -%}
 
-# ---------- shortcut hosts for dev only
+	{%- print '\n# ---------- shortcut hosts for dev only\n\n' -%}
 
-{% for host_name in groups.all if host_name in groups.node %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	deployment.bridge_network + '.' + (host.grp | string) + '.' + (host.idx | string),
-	deployment_name + '-' + host_name,
-	host_name,
-	host_name + '.dev.wistla.com',
-] | join (' ') }}
-{% endfor %}
+	{%- for host_name in groups.all if host_name in groups.node -%}
 
-{% for subdomain in [ 'api' ] %}
-{% for host_name in groups ['load-node'] %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	subdomain + '.dev.wistla.com',
-] | join (' ') }}
-{% endfor %}
-{% endfor %}
+		{%- set host = hostvars [host_name] -%}
 
-{% endif %}
+		{%- if 'private_address' in host -%}
 
-{% for other_deployment_name, other_deployment in deployments.items ()
-if 'bridge_network' in other_deployment %}
+			{%- print [
+				host.private_address,
+				host.node_type + '-' + host.node_index | string,
+			] | join (' ') + '\n' -%}
 
-# ---------- deployment {{ other_deployment_name }}
+		{%- endif -%}
 
-{% for host_name in groups.all if host_name in groups.node %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	other_deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	other_deployment_name + '-' + host_name,
-	host_name + '.' + other_deployment.main_domain,
-] | join (' ') }}
-{% endfor %}
+	{%- endfor -%}
 
-{% for host_name in groups ['load-node'] %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	other_deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	other_deployment.main_domain,
-] | join (' ') }}
-{% endfor %}
+{%- endif -%}
 
-{% for subdomain in [ 'api', 'www' ] %}
-{% for host_name in groups ['load-node'] %}
-{% set host = hostvars [host_name] %}
-{% set host_address = [
-	other_deployment.bridge_network,
-	host.grp,
-	host.idx,
-] | join ('.') %}
-{{ [
-	host_address,
-	subdomain + '.' + other_deployment.main_domain,
-] | join (' ') }}
-{% endfor %}
-{% endfor %}
+{%- for other_deployment_name, other_deployment in deployments.items ()
+if 'bridge_network' in other_deployment -%}
 
-{% endfor %}
+	{%- print '\n# ---------- deployment ', other_deployment_name, '\n\n' -%}
 
-{% for cluster_name, cluster in clusters.items () %}
+	{%- for host_name in groups.all if host_name in groups.node -%}
 
-# ---------- cluster {{ cluster_name }}
+		{%- set host = hostvars [host_name] -%}
 
-{% for cluster_host_name in groups ['cluster-host'] %}
-{% set cluster_host = hostvars [cluster_host_name] %}
-{{ cluster.cluster_network }}.{{ cluster_subnets [cluster_host.cluster_type] [cluster_host.zon] }}.{{ cluster_host.idx }} {{ cluster_host_name }}.{{ cluster.main_domain }}
-{% endfor %}
+		{%- print [
+			[
+				other_deployment.bridge_network,
+				node_type_indices [host.node_type],
+				host.node_index,
+			] | join ('.'),
+			[
+				other_deployment_name,
+				host.node_type,
+				host.node_index | string,
+			] | join ('-'),
+			[
+				host.node_type + '-' + host.node_index | string,
+				other_deployment.main_domain,
+			] | join ('.'),
+		] | join (' ') + '\n' -%}
+
+	{%- endfor -%}
+
+	{%- if other_deployment_name == deployment_name -%}
+
+		{%- print '\n' -%}
+
+		{%- for host_name in groups ['load-node'] -%}
+
+			{%- set host = hostvars [host_name] -%}
+
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_type_indices [host.node_type],
+					host.node_index,
+				] | join ('.'),
+				other_deployment.main_domain,
+				'api.' + other_deployment.main_domain,
+				'www.' + other_deployment.main_domain,
+			] | join (' ') + '\n' -%}
+
+		{%- endfor -%}
+
+	{%- endif -%}
+
+{%- endfor -%}
+
+{%- for cluster_name, cluster in clusters.items () -%}
+
+	{%- print '\n# ---------- cluster ', cluster_name, '\n\n' -%}
+
+	{%- for cluster_host_name in groups ['cluster-' + cluster_name] -%}
+
+		{%- set cluster_host = hostvars [cluster_host_name] -%}
+
+		{%- if 'private_address' in cluster_host -%}
+
+			{%- print [
+				cluster_host.private_address,
+				cluster_host_name,
+				cluster_host_name + '.' + cluster.main_domain,
+			] | join (' ') + '\n' -%}
+
+		{%- endif -%}
+
+	{%- endfor -%}
 
 {% endfor %}

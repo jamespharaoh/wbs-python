@@ -24,32 +24,29 @@ ansible_warning:
   "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
   "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
 
-cluster_subnets:
+cluster_instance_type_indices:
 
-  admin:
-    a: "1"
-    b: "2"
-    c: "3"
+  admin: 1
+  data: 2
+  app: 3
+  jenkins: 4
 
-  data:
-    a: "4"
-    b: "5"
-    c: "6"
+node_type_indices:
 
-  app:
-    a: "7"
-    b: "8"
-    c: "9"
+  api: 1
+  browser: 2
+  load: 3
+  web: 4
 
-  jenkins:
-    a: "10"
-    b: "11"
-    c: "12"
+  mongo: 17
+  rabbit: 18
 
-vpn_groups:
-  a: "1"
-  b: "2"
-  c: "3"
+cluster_zone_indices:
+
+  a: 0
+  b: 1
+  c: 2
+  d: 3
 
 devops_region: "eu-west-1"
 devops_bucket: "wistla-builds"

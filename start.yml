@@ -5,11 +5,11 @@
   roles:
 
     - role: "lxc-clone"
-      when: "active == 'yes'"
+      when: "node_active == 'yes'"
       tags: "quick"
 
     - role: "lxc-start"
-      when: "active == 'yes'"
+      when: "node_active == 'yes'"
       tags: "quick"
 
 # ex: et ts=2 filetype=yaml

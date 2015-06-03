@@ -112,7 +112,6 @@ def check_deployment_mode ():
 
 	global DEPLOYMENT_HOME
 	global DEPLOYMENT_USER
-	global DEPLOYMENT_INVENTORY
 
 	if CONFIG ["deployment_mode"] == "vagrant":
 
@@ -133,8 +132,6 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/vagrant"
 		DEPLOYMENT_USER = "vagrant"
 
-		DEPLOYMENT_INVENTORY = "inventory"
-
 	elif CONFIG ["deployment_mode"] == "cluster-shared":
 
 		write_message ([
@@ -143,8 +140,6 @@ def check_deployment_mode ():
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
-
-		DEPLOYMENT_INVENTORY = "inventory-cluster-shared"
 
 	elif CONFIG ["deployment_mode"] == "cluster-alias":
 
@@ -155,8 +150,6 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory-cluster-alias"
-
 	elif CONFIG ["deployment_mode"] == "cluster-simple":
 
 		write_message ([
@@ -166,8 +159,6 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
-		DEPLOYMENT_INVENTORY = "inventory-cluster-simple"
-
 	elif CONFIG ["deployment_mode"] == "jenkins":
 
 		write_message ([
@@ -176,8 +167,6 @@ def check_deployment_mode ():
 
 		DEPLOYMENT_HOME = "$WORKSPACE"
 		DEPLOYMENT_USER = "jenkins"
-
-		DEPLOYMENT_INVENTORY = "inventory"
 
 	else:
 
@@ -199,7 +188,7 @@ def run_playbook (args):
 		[
 			"/usr/bin/sudo",
 			"ansible/bin/ansible-playbook",
-			"--inventory-file", DEPLOYMENT_INVENTORY,
+			"--inventory-file", "inventory",
 			"--extra-vars", "@config",
 			"--extra-vars", "@accounts",
 		] + args,
@@ -217,6 +206,14 @@ def run_playbook (args):
 	clear_newline ()
 
 def update_config ():
+
+	write_message ([
+		"##### Automatically updating config #####\n",
+	])
+
+	run_playbook ([
+		"devops.yml",
+	])
 
 	if CONFIG ["deployment_mode"] != "vagrant":
 		return
@@ -248,15 +245,6 @@ def update_config ():
 				"",
 				"# ex: et ts=2 filetype=yaml",
 			]) + "\n")
-
-	write_message ([
-		"##### Automatically updating config #####\n",
-	])
-
-	run_playbook ([
-		"--limit", "vagrant",
-		"fix-config.yml",
-	])
 
 def fetch_upstream ():
 

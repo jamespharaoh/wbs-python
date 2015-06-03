@@ -2,6 +2,7 @@
 /.state
 /accounts
 /config
+/inventory
 /security/*-plain
 /security/vpn
 /vagrant/.vagrant

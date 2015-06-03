@@ -1,0 +1,6 @@
+---
+
+- include: "devops.yml"
+  tags: "devops"
+
+# ex: et ts=2 filetype=yaml

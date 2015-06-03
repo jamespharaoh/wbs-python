@@ -4,14 +4,14 @@
   delegate_to: "localhost"
   shell:
 
-    if ! test -d /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}; then
+    if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
       echo "UNCHANGED";
       return;
     fi;
 
     state=$(
       lxc-info
-        --name {{ deployment_name }}-{{ inventory_hostname }}
+        --name {{ inventory_hostname }}
         --state
         --no-humanize
       | head --lines 1
@@ -23,7 +23,7 @@
     fi;
 
     lxc-stop
-      --name {{ deployment_name }}-{{ inventory_hostname }}
+      --name {{ inventory_hostname }}
       --timeout 10;
 
   delegate_to: "localhost"

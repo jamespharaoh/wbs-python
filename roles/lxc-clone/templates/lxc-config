@@ -9,7 +9,7 @@ lxc.cgroup.memory.limit_in_bytes = {{ (node_memory [node] | int) * 1024 * 1024 *
 
 # file system
 
-lxc.rootfs = /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs
+lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
 
 lxc.mount.entry = {{ deployment_home }}/shared shared none bind 0 0
 lxc.mount.entry = {{ deployment_home }}/config/{{ node }} config none bind,ro,remount 0 0
@@ -28,9 +28,9 @@ lxc.arch = amd64
 lxc.network.type = veth
 lxc.network.flags = up
 lxc.network.link = {{ deployment.bridge_name }}
-lxc.network.hwaddr = {{ hw }}
-lxc.network.ipv4 = {{ node_ip }}/16
-lxc.network.ipv4.gateway = {{ deployment.bridge_network }}.1.1
+lxc.network.hwaddr = {{ private_mac }}
+lxc.network.ipv4 = {{ private_address }}/16
+lxc.network.ipv4.gateway = {{ deployment.bridge_network }}.0.1
 
 # autostart
 

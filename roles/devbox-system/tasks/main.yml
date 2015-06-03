@@ -1,14 +1,33 @@
 ---
 
 - include: "devbox-system.yml"
+  tags: "devbox-system"
+
 - include: "devbox-btrfs.yml"
+  tags: "devbox-btrfs"
+
 - include: "devbox-network.yml"
+  tags: "devbox-network"
+
 - include: "devbox-postfix.yml"
+  tags: "devbox-postfix"
+
 - include: "devbox-ssh.yml"
+  tags: "devbox-ssh"
+
 - include: "devbox-nfs.yml"
+  tags: "devbox-nfs"
+
 - include: "devbox-samba.yml"
+  tags: "devbox-samba"
+
 - include: "devbox-dns.yml"
+  tags: "devbox-dns"
+
 - include: "devbox-fuse.yml"
+  tags: "devbox-fuse"
+
 - include: "devbox-openvpn.yml"
+  tags: "devbox-openvpn"
 
 # ex: et ts=2 filetype=yaml

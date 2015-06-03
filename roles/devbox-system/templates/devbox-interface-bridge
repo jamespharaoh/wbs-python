@@ -3,7 +3,7 @@
 auto {{ deployment.bridge_name }}
 iface {{ deployment.bridge_name }} inet static
 
-	address {{ deployment.bridge_network }}.1.1
+	address {{ deployment.bridge_network }}.0.1
 	netmask 255.255.0.0
 	broadcast {{ deployment.bridge_network }}.255.255
 

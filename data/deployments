@@ -13,6 +13,7 @@ production:
 
   bridge_name: "br162"
   bridge_network: "10.162"
+  bridge_mac: "aa:bb:0a:a2"
 
   node_memory:
 
@@ -40,6 +41,7 @@ production-a:
 
   bridge_name: "br148"
   bridge_network: "10.148"
+  bridge_mac: "aa:bb:0a:94"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
@@ -77,6 +79,7 @@ production-b:
 
   bridge_name: "br149"
   bridge_network: "10.149"
+  bridge_mac: "aa:bb:0a:95"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
@@ -111,6 +114,7 @@ staging:
 
   bridge_name: "br163"
   bridge_network: "10.163"
+  bridge_mac: "aa:bb:0a:a3"
 
   node_memory:
 
@@ -138,6 +142,7 @@ staging-a:
 
   bridge_name: "br155"
   bridge_network: "10.155"
+  bridge_mac: "aa:bb:0a:9b"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
@@ -175,6 +180,7 @@ staging-b:
 
   bridge_name: "br156"
   bridge_network: "10.156"
+  bridge_mac: "aa:bb:0a:9c"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
@@ -221,6 +227,7 @@ test-everest:
 
   bridge_name: "br157"
   bridge_network: "10.157"
+  bridge_mac: "aa:bb:0a:9d"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-enterprise-production"
@@ -261,6 +268,7 @@ test-k2:
 
   bridge_name: "br158"
   bridge_network: "10.158"
+  bridge_mac: "aa:bb:0a:9e"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
@@ -301,6 +309,7 @@ test-montblanc:
 
   bridge_name: "br159"
   bridge_network: "10.159"
+  bridge_mac: "aa:bb:0a:9f"
 
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-dev"
@@ -338,6 +347,7 @@ dev:
 
   bridge_name: "br152"
   bridge_network: "10.152"
+  bridge_mac: "aa:bb:0a:98"
 
 berk:
 
@@ -351,6 +361,7 @@ berk:
 
   bridge_name: "br150"
   bridge_network: "10.150"
+  bridge_mac: "aa:bb:0a:96"
 
 bruce:
 
@@ -366,6 +377,7 @@ bruce:
 
   bridge_name: "br154"
   bridge_network: "10.154"
+  bridge_mac: "aa:bb:0a:9a"
 
 mrbenn:
 
@@ -379,6 +391,7 @@ mrbenn:
 
   bridge_name: "br151"
   bridge_network: "10.151"
+  bridge_mac: "aa:bb:0a:97"
 
 7-zark-7:
 
@@ -392,6 +405,7 @@ mrbenn:
 
   bridge_name: "br153"
   bridge_network: "10.153"
+  bridge_mac: "aa:bb:0a:99"
 
 optimus:
 
@@ -405,6 +419,7 @@ optimus:
 
   bridge_name: "br161"
   bridge_network: "10.161"
+  bridge_mac: "aa:bb:0a:a1"
 
 jenkins-latest:
 
@@ -418,5 +433,6 @@ jenkins-latest:
 
   bridge_name: "br160"
   bridge_network: "10.160"
+  bridge_mac: "aa:bb:0a:a0"
 
 # ex: et ts=2 filetype=yaml

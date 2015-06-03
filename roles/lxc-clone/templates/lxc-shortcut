@@ -4,17 +4,17 @@
 
 if test $# -eq 0; then
 
-	exec sudo lxc-attach --name {{ deployment_name }}-{{ inventory_hostname }} -- \
+	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
 	sudo --set-home --user ubuntu bash -
 
 elif test $# -eq 1; then
 
-	exec sudo lxc-attach --name {{ deployment_name }}-{{ inventory_hostname }} -- \
+	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
 	sudo --set-home --user ubuntu bash -c "$1"
 
 else
 
-	exec sudo lxc-attach --name {{ deployment_name }}-{{ inventory_hostname }} -- \
+	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
 	sudo --set-home --user ubuntu "$@"
 
 fi

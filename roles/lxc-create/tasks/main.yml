@@ -8,20 +8,20 @@
     source {{ deployment_home }}/wistla-devops/misc/locking ansible;
     exlock;
 
-    if test -f /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}; then
+    if test -f /var/lib/lxc/{{ inventory_hostname }}; then
       set +e;
       lxc-stop
-        --name {{ deployment_name }}-{{ inventory_hostname }};
+        --name {{ inventory_hostname }};
       lxc-destroy
-        --name {{ deployment_name }}-{{ inventory_hostname }};
-      rm -rf /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }};
-      btrfs subvolume delete /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs;
+        --name {{ inventory_hostname }};
+      rm -rf /var/lib/lxc/{{ inventory_hostname }};
+      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
       set -e;
     fi;
 
     lxc-create
       --template ubuntu
-      --name {{ deployment_name }}-{{ inventory_hostname }}
+      --name {{ inventory_hostname }}
       --bdev btrfs
       --
       --mirror {{ ubuntu_main_url }}
@@ -29,20 +29,20 @@
       --release trusty
       --arch amd64;
 
-    chroot /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
     apt-get update -qqy;
 
-    chroot /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
     apt-get dist-upgrade -qqy;
 
-    chroot /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs
+    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
     apt-get install -qqy python;
 
-    touch /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/create-flag;
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
   args:
     executable: "/bin/bash"
-    creates: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/create-flag"
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"
@@ -51,7 +51,7 @@
   action:
     module: "template"
     src: "lxc-config"
-    dest: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/config"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"

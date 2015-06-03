@@ -5,7 +5,7 @@
 
     state=$(
       lxc-info
-        --name {{ deployment_name }}-{{ inventory_hostname }}
+        --name {{ inventory_hostname }}
         --state
         --no-humanize
       | head --lines 1
@@ -17,7 +17,7 @@
     fi;
 
     lxc-start
-      --name {{ deployment_name }}-{{ inventory_hostname }}
+      --name {{ inventory_hostname }}
       --daemon;
 
   delegate_to: "localhost"

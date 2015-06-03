@@ -11,7 +11,7 @@
       --delete
       --itemize-changes
       {{ deployment_home }}/{{ item }}/
-      /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
       --exclude /config/config.local.js
       --exclude /config/google-service-account.key
@@ -39,7 +39,7 @@
       --delete
       --itemize-changes
       {{ deployment_home }}/{{ item }}/node_modules/
-      /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/node_modules/;
 
   sudo: "yes"
   sudo_user: "root"

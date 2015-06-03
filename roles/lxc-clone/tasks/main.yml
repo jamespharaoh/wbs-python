@@ -9,29 +9,29 @@
 
     exlock;
 
-    if test -f /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}; then
+    if test -f /var/lib/lxc/{{ inventory_hostname }}; then
       set +e;
       lxc-stop
-        --name {{ deployment_name }}-{{ inventory_hostname }};
+        --name {{ inventory_hostname }};
       lxc-destroy
-        --name {{ deployment_name }}-{{ inventory_hostname }};
-      rm -rf /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }};
-      btrfs subvolume delete /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs;
+        --name {{ inventory_hostname }};
+      rm -rf /var/lib/lxc/{{ inventory_hostname }};
+      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
       set -e;
     fi;
 
     lxc-clone
       --backingstore btrfs
       {{ deployment_name }}-{{ template }}
-      {{ deployment_name }}-{{ inventory_hostname }};
+      {{ inventory_hostname }};
 
-    chgrp {{ deployment_user }} /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }};
+    chgrp {{ deployment_user }} /var/lib/lxc/{{ inventory_hostname }};
 
-    touch /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/create-flag;
+    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
   args:
     executable: "/bin/bash"
-    creates: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/create-flag"
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"
@@ -40,7 +40,7 @@
   action:
     module: "template"
     src: "lxc-config"
-    dest: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/config"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
   delegate_to: "localhost"
   sudo: "yes"
   sudo_user: "root"
@@ -48,7 +48,7 @@
 - name: "create shared dir"
   action:
     module: "file"
-    path: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs/shared"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/shared"
     state: "directory"
   delegate_to: "localhost"
   sudo: "yes"
@@ -79,7 +79,7 @@
 - name: "create container data dirs"
   action:
     module: "file"
-    path: "/var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs/{{ item.path }}"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
     state: "directory"
   delegate_to: "localhost"
   sudo: "yes"
@@ -90,7 +90,7 @@
   action:
     module: "template"
     src: "lxc-shortcut"
-    dest: "/usr/local/bin/{{ deployment_name }}-{{ inventory_hostname }}"
+    dest: "/usr/local/bin/{{ inventory_hostname }}"
     mode: "0755"
   delegate_to: "localhost"
   sudo: "yes"

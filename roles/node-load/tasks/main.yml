@@ -19,7 +19,7 @@
       --delete
       --itemize-changes
       {{ deployment_home }}/{{ item }}/
-      /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /config/config.local.js
       --include /config
       --include /config.js
