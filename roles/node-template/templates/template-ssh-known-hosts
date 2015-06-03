@@ -1,1 +1,3 @@
+{{ ansible_warning ['#'] }}
+
 github.com {{ ssh_host_keys.general.github | join }}

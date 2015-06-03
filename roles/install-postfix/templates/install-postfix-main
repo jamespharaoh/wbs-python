@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 # general
 
 smtpd_banner = $myhostname ESMTP $mail_name

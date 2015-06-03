@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 github.com {{ ssh_host_keys.general.github | join }}
 
 {% for cluster_name, cluster in clusters.items () %}

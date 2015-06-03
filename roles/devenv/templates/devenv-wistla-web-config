@@ -1,3 +1,5 @@
+{{ ansible_warning ['//'] }}
+
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 

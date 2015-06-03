@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 description "wistla api instance"
 
 instance $WISTLA_API_INDEX

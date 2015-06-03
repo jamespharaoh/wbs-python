@@ -1,5 +1,7 @@
 ---
 
+{{ ansible_warning ['#'] }}
+
 cluster_name: "{{ cluster_name }}"
 
 deployment_name: "{{ cluster_deployment.name }}"

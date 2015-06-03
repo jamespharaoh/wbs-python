@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 auto dummy0
 iface dummy0 inet static
 	pre-up modprobe dummy

@@ -1,4 +1,7 @@
 ---
+
+{{ ansible_warning ['#'] }}
+
 {% set allvars = hostvars[inventory_hostname] %}
 
 cluster_vpc: "{{ cluster_vpc | default ('') }}"

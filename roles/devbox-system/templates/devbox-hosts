@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 127.0.0.1 localhost
 
 {% if deployment_mode == 'vagrant' %}

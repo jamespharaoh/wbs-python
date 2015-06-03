@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 # run rc as well
 
 source "$HOME/.bashrc"

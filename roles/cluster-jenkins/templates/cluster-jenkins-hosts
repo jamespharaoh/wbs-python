@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 127.0.0.1 localhost
 
 {% for other_deployment_name in jenkins_deployment_names %}

@@ -1,3 +1,5 @@
+{{ ansible_warning ['//'] }}
+
 var ROOT = process.env.HOME+ '/wistla-web';
 var config = require(ROOT + '/config/config.global');
 

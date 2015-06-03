@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 {% if system_reboot_on_error | default ('no') == 'yes' %}
 # automatically reboot if hung
 kernel.panic = 10

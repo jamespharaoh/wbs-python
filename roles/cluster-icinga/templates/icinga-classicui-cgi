@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 standalone_installation=1
 physical_html_path=/opt/icinga/share
 url_html_path=/icinga

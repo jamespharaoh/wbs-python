@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 lxc.include = /usr/share/lxc/config/ubuntu.common.conf
 
 lxc.rootfs = /var/lib/lxc/{{ deployment_name }}-{{ inventory_hostname }}/rootfs

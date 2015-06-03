@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 deb {{ ubuntu_main_url }} trusty main
 deb-src {{ ubuntu_main_url }} trusty main
 

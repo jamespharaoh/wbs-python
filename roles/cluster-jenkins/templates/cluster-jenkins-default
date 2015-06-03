@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 NAME="jenkins"
 
 JAVA="/usr/bin/java"

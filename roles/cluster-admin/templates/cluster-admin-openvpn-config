@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 {% set vpn_net = cluster.vpn_network + '.' + vpn_groups [zon] %}
 
 # server

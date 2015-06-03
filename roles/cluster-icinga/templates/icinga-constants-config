@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 const PluginDir = "/usr/lib/nagios/plugins"
 const ManubulonPluginDir = "/usr/lib/nagios/plugins"
 

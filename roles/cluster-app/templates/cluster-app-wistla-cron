@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 SHELL="/bin/bash"
 HOME="/home/ubuntu"
 MAILTO="{{ cluster.cron_email }}"

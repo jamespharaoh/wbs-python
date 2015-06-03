@@ -1,5 +1,29 @@
 ---
 
+ansible_warning_lines:
+
+  - "######################################################################"
+  - "################### THIS FILE IS MANAGED BY ANSIBLE ##################"
+  - "######################################################################"
+  - "#                                                                    #"
+  - "#  Please do not make changes to this file, since they will be       #"
+  - "#  automatically overwritten. If you need to change any values in    #"
+  - "#  this file, this should be done by modifying the inputs to         #"
+  - "#  ansible, or by overriding them in another manner.                 #"
+  - "#                                                                    #"
+  - "######################################################################"
+
+ansible_warning_generic: "{{
+  'SEP ' + ansible_warning_lines | join ('\nSEP ')
+}}"
+
+ansible_warning:
+
+  "#": "{{ ansible_warning_generic | replace ('SEP ', '') }}"
+  ";": "{{ ansible_warning_generic | replace ('SEP', ';') }}"
+  "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
+  "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
+
 cluster_subnets:
 
   admin:

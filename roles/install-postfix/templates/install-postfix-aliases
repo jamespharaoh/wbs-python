@@ -1,2 +1,4 @@
+{{ ansible_warning ['#'] }}
+
 root: ops.root@wistla.com
 postmaster: root

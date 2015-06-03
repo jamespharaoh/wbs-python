@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 {% set other_cluster_name = item [0] %}
 {% set other_cluster = clusters [other_cluster_name] %}
 {% set other_cluster_net = other_cluster.cluster_net %}

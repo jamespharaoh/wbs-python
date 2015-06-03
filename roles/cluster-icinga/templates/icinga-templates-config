@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 template Host "generic-host" {
 	max_check_attempts = 5
 	check_interval = 15s

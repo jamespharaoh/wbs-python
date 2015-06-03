@@ -1,5 +1,7 @@
 #!/bin/sh
 
+{{ ansible_warning ['#'] }}
+
 set -e
 
 exec 1>&2

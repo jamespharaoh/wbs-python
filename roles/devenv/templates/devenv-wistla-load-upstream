@@ -36,6 +36,8 @@
 
 {%- endmacro -%}
 
+{{ ansible_warning ['#'] }}
+
 {{ upstream ('api', 7000) }}
 {{ upstream ('web', 3000) }}
 {{ upstream ('browser', 3000) }}

@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 # disable hugepages
 kernel/mm/transparent_hugepage/enabled = never
 kernel/mm/transparent_hugepage/defrag = never

@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 [user]
 	name = {{ developer_name }}
 	email = {{ developer_email }}

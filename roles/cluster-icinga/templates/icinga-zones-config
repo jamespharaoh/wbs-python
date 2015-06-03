@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 object Zone "global-templates" {
 	global = true
 }

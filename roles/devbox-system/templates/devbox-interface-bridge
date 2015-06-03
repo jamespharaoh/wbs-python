@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 auto {{ deployment.bridge_name }}
 iface {{ deployment.bridge_name }} inet static
 

@@ -1,3 +1,4 @@
+{{ ansible_warning ['#'] }}
 {%- for certificate in item.certificates -%}
 {%- print lookup ('file', certificate), '\n' -%}
 {%- endfor -%}
