@@ -2,6 +2,9 @@
 
 cluster: "{{ clusters [cluster_name] }}"
 
+cluster_deployment_name: "{{ deployment_name }}"
+cluster_deployment: "{{ deployment }}"
+
 amazon_account: "{{ cluster.amazon_account }}"
 amazon_region: "{{ cluster.amazon_region }}"
 amazon_zones: "{{ cluster.amazon_zones }}"
