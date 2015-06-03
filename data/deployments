@@ -35,6 +35,8 @@ production-a:
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
 
+  emails_enabled: "yes"
+
 production-b:
 
   name: "production-b"
@@ -55,6 +57,8 @@ production-b:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
+
+  emails_enabled: "yes"
 
 staging:
 
@@ -91,6 +95,8 @@ staging-a:
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
 
+  emails_enabled: "no"
+
 staging-b:
 
   name: "staging-b"
@@ -111,6 +117,8 @@ staging-b:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
+
+  emails_enabled: "no"
 
 test:
 
@@ -142,6 +150,8 @@ test-everest:
   apple_push_notifications_name: "wistla-enterprise-production"
   apple_push_notifications_production: "yes"
 
+  emails_enabled: "no"
+
 test-k2:
 
   name: "test-k2"
@@ -162,6 +172,8 @@ test-k2:
   apple_push_notifications_name: "wistla-production"
   apple_push_notifications_production: "yes"
 
+  emails_enabled: "no"
+
 test-montblanc:
 
   name: "test-montblanc"
@@ -181,6 +193,8 @@ test-montblanc:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "wistla-dev"
   apple_push_notifications_production: "no"
+
+  emails_enabled: "no"
 
 dev:
 

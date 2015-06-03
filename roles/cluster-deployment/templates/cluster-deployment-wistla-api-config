@@ -65,6 +65,11 @@ config.applePush = {
 {% endif %}
 };
 
+{% if cluster_deployment.emails_enabled == 'yes' %}
+// Enable email sends.
+config.sendEmails = true;
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

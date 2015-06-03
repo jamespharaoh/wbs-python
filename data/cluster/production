@@ -3,7 +3,7 @@
 # ========== core configuration
 
 cluster_network: "10.140"
-vpn_netwok: "10.141"
+vpn_network: "10.141"
 
 short_name: "prod"
 

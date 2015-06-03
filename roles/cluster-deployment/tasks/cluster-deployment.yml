@@ -28,10 +28,17 @@
   tags: "build"
   with_items: "cluster_deployment_checkouts"
 
+- name: "create config directory"
+  action:
+    module: "file"
+    path: "{{ vagrant_home }}/{{ cluster_deployment.name }}/config"
+    state: "directory"
+  with_items: "cluster_deployment_shared_directories"
+
 - name: "create config directories"
   action:
     module: "file"
-    path: "{{ vagrant_home }}/{{ cluster_deployment.name }}/{{ item }}"
+    path: "{{ vagrant_home }}/{{ cluster_deployment.name }}/config/{{ item }}"
     state: "directory"
   with_items: "cluster_deployment_config_directories"
 
