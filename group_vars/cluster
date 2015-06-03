@@ -10,8 +10,8 @@ amazon_instance_types: "{{ cluster.amazon_instance_types }}"
 amazon_images: "{{ cluster.amazon_images }}"
 amazon_key_name: "{{ cluster.amazon_key_name }}"
 
-node_memory: "{{ cluster.node_memory }}"
-node_instance_count: "{{ cluster.node_instance_count }}"
+node_memory: "{{ cluster_deployment.node_memory }}"
+node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
 cluster_dynamic: "{{
   lookup ('file', '/home/vagrant/work/' + cluster_name + '/cluster-data')

@@ -2,7 +2,7 @@
 
 	{%- print 'upstream ', name, ' {\n' -%}
 
-	{%- for node_index in range (0, node_instance_count [name] | int) -%}
+	{%- for node_index in range (0, cluster_deployment.node_instance_count [name] | int) -%}
 
 		{%- print
 			'\tserver ',

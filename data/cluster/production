@@ -45,24 +45,6 @@ amazon_key_name: "wistla-production"
 
 # ========== resources and versions
 
-node_memory:
-
-  api: "1024"
-  browser: "512"
-  load: "256"
-  mongo: "512"
-  rabbit: "256"
-  web: "1024"
-
-node_instance_count:
-
-  api: "2"
-  browser: "1"
-  load: "1"
-  mongo: "1"
-  rabbit: "1"
-  web: "1"
-
 amazon_instance_types:
 
   admin: "t2.small"

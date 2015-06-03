@@ -14,6 +14,16 @@ production:
   bridge_name: "br162"
   bridge_network: "10.162"
 
+  node_memory:
+
+    mongo: "512"
+    rabbit: "256"
+
+  node_instance_count:
+
+    mongo: "1"
+    rabbit: "1"
+
 production-a:
 
   name: "production-a"
@@ -36,6 +46,20 @@ production-a:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+
+  node_memory:
+
+    api: "1024"
+    browser: "512"
+    load: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "2"
+    browser: "1"
+    load: "1"
+    web: "1"
 
 production-b:
 
@@ -60,6 +84,20 @@ production-b:
 
   emails_enabled: "yes"
 
+  node_memory:
+
+    api: "1024"
+    browser: "512"
+    load: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    web: "1"
+
 staging:
 
   name: "staging"
@@ -73,6 +111,16 @@ staging:
 
   bridge_name: "br163"
   bridge_network: "10.163"
+
+  node_memory:
+
+    mongo: "512"
+    rabbit: "256"
+
+  node_instance_count:
+
+    mongo: "1"
+    rabbit: "1"
 
 staging-a:
 
@@ -97,6 +145,20 @@ staging-a:
 
   emails_enabled: "no"
 
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "2"
+    browser: "1"
+    load: "1"
+    web: "1"
+
 staging-b:
 
   name: "staging-b"
@@ -119,6 +181,20 @@ staging-b:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "no"
+
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "2"
+    browser: "1"
+    load: "1"
+    web: "1"
 
 test:
 
@@ -152,6 +228,24 @@ test-everest:
 
   emails_enabled: "no"
 
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    mongo: "512"
+    rabbit: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    mongo: "1"
+    rabbit: "1"
+    web: "1"
+
 test-k2:
 
   name: "test-k2"
@@ -174,6 +268,24 @@ test-k2:
 
   emails_enabled: "no"
 
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    mongo: "512"
+    rabbit: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    mongo: "1"
+    rabbit: "1"
+    web: "1"
+
 test-montblanc:
 
   name: "test-montblanc"
@@ -195,6 +307,24 @@ test-montblanc:
   apple_push_notifications_production: "no"
 
   emails_enabled: "no"
+
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    mongo: "512"
+    rabbit: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    mongo: "1"
+    rabbit: "1"
+    web: "1"
 
 dev:
 
