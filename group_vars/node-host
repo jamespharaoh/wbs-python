@@ -7,9 +7,9 @@ node_template: "{{ node_type }}-template"
 
 node_active: "{{ 'yes' if (
   (deployment_mode == 'vagrant' and
-    (node_index | int) < (node_count [node_type] | int)) or
+    (node_index | int) < (dev_node_count [node_type] | int)) or
   (deployment_mode == 'jenkins' and
-    (node_index | int) < (node_count [node_type] | int)) or
+    (node_index | int) < (dev_node_count [node_type] | int)) or
   (deployment_mode == 'cluster-shared' and
     (node_index | int) == (instance_index | int)) or
   (deployment_mode == 'cluster-alias' and

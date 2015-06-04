@@ -23,4 +23,23 @@ private_bits: "{{
   ] else 16
 }}"
 
+node_instance_count: "{{
+  deployment.node_instance_count if deployment_mode in [
+    'cluster-shared',
+    'cluster-alias',
+    'cluster-simple',
+  ] else dev_node_instance_count
+}}"
+
+node_memory: "{{
+  deployment.node_memory if deployment_mode in [
+    'cluster-shared',
+    'cluster-alias',
+    'cluster-simple',
+  ] else dev_node_memory
+}}"
+
+lxc_memory_soft: "{{ node_memory [node_type] }}"
+lxc_memory_hard: "{{ node_memory [node_type] | int * 2 }}"
+
 # ex: et ts=2 filetype=yaml

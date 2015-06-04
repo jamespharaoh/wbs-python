@@ -52,32 +52,32 @@ vpns: []
 
 vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
-node_count:
+dev_node_count:
 
-  api: "{{ (node_count | default ({})).api | default ('3') }}"
-  browser: "{{ (node_count | default ({})).browser | default ('3') }}"
-  load: "{{ (node_count | default ({})).load | default ('3') }}"
-  mongo: "{{ (node_count | default ({})).mongo | default ('3') }}"
-  rabbit: "{{ (node_count | default ({})).rabbit | default ('3') }}"
-  web: "{{ (node_count | default ({})).web | default ('3') }}"
+  api: "{{ (dev_node_count | default ({})).api | default ('1') }}"
+  browser: "{{ (dev_node_count | default ({})).browser | default ('1') }}"
+  load: "{{ (dev_node_count | default ({})).load | default ('1') }}"
+  mongo: "{{ (dev_node_count | default ({})).mongo | default ('1') }}"
+  rabbit: "{{ (dev_node_count | default ({})).rabbit | default ('1') }}"
+  web: "{{ (dev_node_count | default ({})).web | default ('1') }}"
 
-node_instance_count:
+dev_node_instance_count:
 
-  api: "{{ (node_instance_count | default ({})).api | default ('1') }}"
-  browser: "{{ (node_instance_count | default ({})).browser | default ('1') }}"
-  load: "{{ (node_instance_count | default ({})).load | default ('1') }}"
-  mongo: "{{ (node_instance_count | default ({})).mongo | default ('1') }}"
-  rabbit: "{{ (node_instance_count | default ({})).rabbit | default ('1') }}"
-  web: "{{ (node_instance_count | default ({})).web | default ('1') }}"
+  api: "{{ (dev_node_instance_count | default ({})).api | default ('1') }}"
+  browser: "{{ (dev_node_instance_count | default ({})).browser | default ('1') }}"
+  load: "{{ (dev_node_instance_count | default ({})).load | default ('1') }}"
+  mongo: "{{ (dev_node_instance_count | default ({})).mongo | default ('1') }}"
+  rabbit: "{{ (dev_node_instance_count | default ({})).rabbit | default ('1') }}"
+  web: "{{ (dev_node_instance_count | default ({})).web | default ('1') }}"
 
-node_memory:
+dev_node_memory:
 
-  api: "{{ (node_memory | default ({})).api | default ('512') }}"
-  browser: "{{ (node_memory | default ({})).browser | default ('512') }}"
-  load: "{{ (node_memory | default ({})).load | default ('512') }}"
-  mongo: "{{ (node_memory | default ({})).mongo | default ('512') }}"
-  rabbit: "{{ (node_memory | default ({})).rabbit | default ('512') }}"
-  web: "{{ (node_memory | default ({})).web | default ('512') }}"
+  api: "{{ (dev_node_memory | default ({})).api | default ('512') }}"
+  browser: "{{ (dev_node_memory | default ({})).browser | default ('512') }}"
+  load: "{{ (dev_node_memory | default ({})).load | default ('512') }}"
+  mongo: "{{ (dev_node_memory | default ({})).mongo | default ('512') }}"
+  rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('512') }}"
+  web: "{{ (dev_node_memory | default ({})).web | default ('512') }}"
 
 use_s3: "{{ use_s3 | default ('no') }}"
 

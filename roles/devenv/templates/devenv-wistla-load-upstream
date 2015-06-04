@@ -5,9 +5,9 @@
 	{%- for node_name in groups ['node-' + name + '-host'] -%}
 
 		{%- set node_host = hostvars [node_name] -%}
-		{%- for node_instance in range (0, node_instance_count [name] | int) -%}
+		{%- for node_instance in range (0, dev_node_instance_count [name] | int) -%}
 
-			{%- if node_host.node_index < node_count [name] | int -%}
+			{%- if node_host.node_index < dev_node_count [name] | int -%}
 
 				{%- print
 					'\tserver ',
