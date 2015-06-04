@@ -1,6 +1,8 @@
-{{ ansible_warning ['#'] }}
+{%- print ansible_warning ['#'], '\n' -%}
 
 {%- macro upstream (name, port) -%}
+
+	{%- print '\n' -%}
 
 	{%- print 'upstream ', name, ' {\n' -%}
 

@@ -30,42 +30,155 @@ and (inventory_hostname == 'vagrant'
 
 	{%- print '\n# ---------- deployment ', other_deployment_name, '\n\n' -%}
 
-	{%- for host_name in groups.all if host_name in groups ['node-host'] -%}
+	{%- if other_deployment.type == 'shared' -%}
 
-		{%- set host = hostvars [host_name] -%}
+		{%- for node_type in [
+			'mongo',
+			'rabbit',
+		] -%}
+		{%- for node_zone in [ 'a', 'b', 'c', 'd' ] -%}
+		{%- for node_index in range (256) -%}
 
-		{%- print [
-			[
-				other_deployment.bridge_network,
-				node_type_indices [host.node_type],
-				host.node_index,
-			] | join ('.'),
-			[
-				other_deployment_name,
-				host.node_type,
-				host.node_index | string,
-			] | join ('-'),
-			[
-				host.node_type + '-' + host.node_index | string,
-				other_deployment.main_domain,
-			] | join ('.'),
-		] | join (' ') + '\n' -%}
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_index | string,
+					(cluster_zone_indices [node_zone] * 64
+						+ node_type_indices [node_type]) | string,
+				] | join ('.'),
+				[
+					other_deployment_name,
+					node_type,
+					node_zone,
+					node_index | string,
+				] | join ('-'),
+				[
+					node_type + '-' + node_zone + '-' + node_index | string,
+					other_deployment.main_domain,
+				] | join ('.'),
+			] | join (' ') + '\n' -%}
 
-	{%- endfor -%}
+		{%- endfor -%}
+		{%- endfor -%}
+		{%- endfor -%}
+
+	{%- elif other_deployment.type == 'alias' -%}
+
+		{%- for node_type in [
+			'api',
+			'browser',
+			'load',
+			'web',
+		] -%}
+		{%- for node_zone in [ 'a', 'b', 'c', 'd' ] -%}
+		{%- for node_index in range (256) -%}
+
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_index | string,
+					(cluster_zone_indices [node_zone] * 64
+						+ node_type_indices [node_type]) | string,
+				] | join ('.'),
+				[
+					other_deployment_name,
+					node_type,
+					node_zone,
+					node_index | string,
+				] | join ('-'),
+				[
+					node_type + '-' + node_zone + '-' + node_index | string,
+					other_deployment.main_domain,
+				] | join ('.'),
+			] | join (' ') + '\n' -%}
+
+		{%- endfor -%}
+		{%- endfor -%}
+		{%- endfor -%}
+
+	{%- elif other_deployment.type == 'simple' -%}
+
+		{%- for node_type in [
+			'api',
+			'browser',
+			'load',
+			'mongo',
+			'rabbit',
+			'web',
+		] -%}
+		{%- for node_zone in [ 'a', 'b', 'c', 'd' ] -%}
+		{%- for node_index in range (256) -%}
+
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_index | string,
+					(cluster_zone_indices [node_zone] * 64
+						+ node_type_indices [node_type]) | string,
+				] | join ('.'),
+				[
+					other_deployment_name,
+					node_type,
+					node_zone,
+					node_index | string,
+				] | join ('-'),
+				[
+					node_type + '-' + node_zone + '-' + node_index | string,
+					other_deployment.main_domain,
+				] | join ('.'),
+			] | join (' ') + '\n' -%}
+
+		{%- endfor -%}
+		{%- endfor -%}
+		{%- endfor -%}
+
+	{%- else -%}
+
+		{%- for node_type in [
+			'api',
+			'browser',
+			'load',
+			'mongo',
+			'rabbit',
+			'web',
+		] -%}
+		{%- for node_index in range (4) -%}
+
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_index | string,
+					node_type_indices [node_type] | string,
+				] | join ('.'),
+				[
+					other_deployment_name,
+					node_index | string,
+					node_type,
+				] | join ('-'),
+				[
+					node_type + '-' + node_index | string,
+					other_deployment.main_domain,
+				] | join ('.'),
+			] | join (' ') + '\n' -%}
+
+		{%- endfor -%}
+		{%- endfor -%}
+
+	{%- endif -%}
 
 	{%- if other_deployment_name == deployment_name -%}
 
 		{%- print '\n' -%}
 
-		{%- for host_name in groups ['node-load-host'] -%}
+		{%- for node_index in range (256) -%}
 
 			{%- set host = hostvars [host_name] -%}
 
 			{%- print [
 				[
 					other_deployment.bridge_network,
-					node_type_indices [host.node_type],
-					host.node_index,
+					node_type_indices [node_type],
+					node_index,
 				] | join ('.'),
 				other_deployment.main_domain,
 				'api.' + other_deployment.main_domain,

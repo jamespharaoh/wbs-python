@@ -1,30 +1,5 @@
 ---
 
-ansible_warning_lines:
-
-  - "######################################################################"
-  - "################### THIS FILE IS MANAGED BY ANSIBLE ##################"
-  - "######################################################################"
-  - "#                                                                    #"
-  - "#  Please do not make changes to this file, since they will be       #"
-  - "#  automatically overwritten. If you need to change any values in    #"
-  - "#  this file, this should be done by modifying the inputs to         #"
-  - "#  ansible, by modifying the ansible scripts themselves, or by       #"
-  - "#  overriding them in an unmanaged file.                             #"
-  - "#                                                                    #"
-  - "######################################################################"
-
-ansible_warning_generic: "{{
-  'SEP ' + ansible_warning_lines | join ('\nSEP ')
-}}"
-
-ansible_warning:
-
-  "#": "{{ ansible_warning_generic | replace ('SEP ', '') }}"
-  ";": "{{ ansible_warning_generic | replace ('SEP', ';') }}"
-  "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
-  "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
-
 cluster_instance_type_indices:
 
   admin: 0
@@ -34,11 +9,15 @@ cluster_instance_type_indices:
 
 node_type_indices:
 
+  # 0
+  # 1
   api: 2
   browser: 3
   load: 4
   web: 5
 
+  # 16
+  # 17
   mongo: 18
   rabbit: 19
 
@@ -161,5 +140,30 @@ kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
 wistla_dist: "http://dist.ops.wistla.com"
 
 system_reboot_on_error: "yes"
+
+ansible_warning_lines:
+
+  - "######################################################################"
+  - "################### THIS FILE IS MANAGED BY ANSIBLE ##################"
+  - "######################################################################"
+  - "#                                                                    #"
+  - "#  Please do not make changes to this file, since they will be       #"
+  - "#  automatically overwritten. If you need to change any values in    #"
+  - "#  this file, this should be done by modifying the inputs to         #"
+  - "#  ansible, by modifying the ansible scripts themselves, or by       #"
+  - "#  overriding them in an unmanaged file.                             #"
+  - "#                                                                    #"
+  - "######################################################################"
+
+ansible_warning_generic: "{{
+  'SEP ' + ansible_warning_lines | join ('\nSEP ')
+}}"
+
+ansible_warning:
+
+  "#": "{{ ansible_warning_generic | replace ('SEP ', '') }}"
+  ";": "{{ ansible_warning_generic | replace ('SEP', ';') }}"
+  "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
+  "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
 
 # ex: et ts=2 filetype=yaml

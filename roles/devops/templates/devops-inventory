@@ -73,6 +73,7 @@ node-{{ node_type }}-host
 	{% print [
 		[
 			deployment_name,
+			instance_zone,
 			node_type,
 			instance_index | string,
 		] | join ('-'),
