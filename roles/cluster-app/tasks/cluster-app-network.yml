@@ -1,32 +1,5 @@
 ---
 
-- name: "create deployment bridge network interface"
-  action:
-    module: "template"
-    src: "cluster-app-interface-bridge"
-    dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
-  sudo: "yes"
-  when: "deployments [item].type != 'virtual'"
-  with_items: "cluster.deployment_names"
-
-- name: "start deployment network bridge"
-  shell:
-
-    set -e
-
-    if ifquery --state {{ deployments [item].bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi
-
-    ifup {{ deployments [item].bridge_name }};
-
-  sudo: "yes"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  when: "deployments [item].type != 'virtual'"
-  with_items: "cluster.deployment_names"
-
 - name: "create dummy network interface"
   action:
     module: "template"

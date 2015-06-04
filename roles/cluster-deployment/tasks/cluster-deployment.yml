@@ -110,4 +110,27 @@
     force: "yes"
   with_items: "cluster_deployment_config_links"
 
+- name: "create deployment bridge network interface"
+  action:
+    module: "template"
+    src: "cluster-deployment-bridge-interface"
+    dest: "/etc/network/interfaces.d/{{ cluster_deployment.bridge_name }}.cfg"
+  sudo: "yes"
+
+- name: "start deployment network bridge"
+  shell:
+
+    set -e
+
+    if ifquery --state {{ cluster_deployment.bridge_name }} >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifup {{ cluster_deployment.bridge_name }};
+
+  sudo: "yes"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+
 # ex: et ts=2 filetype=yaml

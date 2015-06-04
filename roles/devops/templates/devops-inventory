@@ -103,7 +103,7 @@ cluster-host
 
 [cluster-network]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname == 'vagrant'
+if deployment_mode in [ 'vagrant', 'jenkins' ]
 or other_cluster_name == cluster_name -%}
 	{%- print [
 		'cluster-' + other_cluster_name + '-network',
@@ -118,7 +118,7 @@ cluster-jenkins
 
 [cluster-admin:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname == 'vagrant'
+if deployment_mode in [ 'vagrant', 'jenkins' ]
 or other_cluster_name == cluster_name -%}
 
 	{%- print 'cluster-', other_cluster_name, '-admin\n' -%}
@@ -127,7 +127,7 @@ or other_cluster_name == cluster_name -%}
 
 [cluster-app:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname == 'vagrant'
+if deployment_mode in [ 'vagrant', 'jenkins' ]
 or other_cluster_name == cluster_name -%}
 
 	{%- if other_cluster_name != 'ops' -%}
@@ -138,7 +138,7 @@ or other_cluster_name == cluster_name -%}
 
 [cluster-jenkins:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname == 'vagrant'
+if deployment_mode in [ 'vagrant', 'jenkins' ]
 or other_cluster_name == cluster_name -%}
 
 	{%- if other_cluster_name == 'ops' %}
@@ -148,14 +148,14 @@ or other_cluster_name == cluster_name -%}
 {%- endfor %}
 
 {% for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname == 'vagrant'
+if deployment_mode in [ 'vagrant', 'jenkins' ]
 or other_cluster_name == cluster_name %}
 
 # ---------- cluster {{ other_cluster_name }}
 
 [cluster-{{ other_cluster_name }}:children]
 cluster-{{ other_cluster_name }}-admin
-{% if cluster_name != 'ops' %}
+{% if other_cluster_name != 'ops' %}
 cluster-{{ other_cluster_name }}-app
 {% endif %}
 {% if other_cluster_name == 'ops' %}
@@ -225,7 +225,7 @@ cluster-{{ other_cluster_name }}-jenkins
 	{%- print [
 		[
 			'wistla',
-			cluster.short_name,
+			other_cluster.short_name,
 			'jenkins',
 		] | join ('-'),
 		'cluster_name=' + other_cluster_name,
