@@ -3,8 +3,8 @@
 private_gateway: "{{
   [
     deployment.bridge_network,
-    node_index,
-    cluster_zone_indices [node_zone] * 64 + 1,
+    instance_index,
+    cluster_zone_indices [instance_zone] * 64 + 1,
   ] | join ('.') if deployment_mode in [
     'cluster-shared',
     'cluster-alias',
