@@ -1,0 +1,19 @@
+---
+
+{% set globals = lookup ('file', 'data/globals') | from_yaml %}
+{% for key, value in globals.items () %}
+{{ key }}: {{ value | to_json }}
+{% endfor %}
+
+clusters:
+  ops: {{ lookup ('file', 'data/cluster/ops') | from_yaml | to_json }}
+  production: {{ lookup ('file', 'data/cluster/production') | from_yaml | to_json }}
+  staging: {{ lookup ('file', 'data/cluster/staging') | from_yaml | to_json }}
+  test: {{ lookup ('file', 'data/cluster/test') | from_yaml | to_json }}
+
+deployments: {{ lookup ('file', 'data/deployments') | from_yaml | to_json }}
+vpn_clients: {{ lookup ('file', 'data/vpn-clients') | from_yaml | to_json }}
+common_users: {{ lookup ('file', 'data/common-users') | from_yaml | to_json }}
+kernel_versions: {{ lookup ('file', 'data/kernel-versions') | from_yaml | to_json }}
+
+# ex: et ts=2 filetype=yaml

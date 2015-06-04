@@ -11,3 +11,4 @@
 /vagrant/id_rsa
 /wistla-api
 /wistla-web
+/group_vars/all

@@ -1,5 +1,11 @@
 ---
 
+- name: "create group_vars/all"
+  action:
+    module: "template"
+    dest: "{{ deployment_home }}/wistla-devops/group_vars/all"
+    src: "devops-group-all"
+
 - name: "create inventory"
   action:
     module: "template"

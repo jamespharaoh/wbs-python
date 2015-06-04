@@ -52,13 +52,6 @@ cluster_zone_indices:
 devops_region: "eu-west-1"
 devops_bucket: "wistla-builds"
 
-clusters:
-  ops: "{{ lookup ('file', 'data/cluster/ops') | from_yaml }}"
-  production: "{{ lookup ('file', 'data/cluster/production') | from_yaml  }}"
-  staging: "{{ lookup ('file', 'data/cluster/staging') | from_yaml }}"
-  test: "{{ lookup ('file', 'data/cluster/test') | from_yaml }}"
-
-deployments: "{{ lookup ('file', 'data/deployments') | from_yaml }}"
 deployment: "{{ deployments [deployment_name] }}"
 
 deployment_alias: "{{
@@ -74,8 +67,6 @@ dev_deployment_names:
   - "bruce"
   - "mrbenn"
   - "optimus"
-
-vpn_clients: "{{ lookup ('file', 'data/vpn-clients') | from_yaml }}"
 
 global_system_packages:
 
@@ -154,15 +145,12 @@ vagrant_templates:
 
 data_dirs: []
 
-common_users: "{{ lookup ('file', 'data/common-users') | from_yaml }}"
-
 zone_colours:
   a: "93"
   b: "99"
   c: "105"
 
 kernel_mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
-kernel_versions: "{{ lookup ('file', 'data/kernel-versions') | from_yaml }}"
 
 kernel_branch: "{{ kernel_versions [kernel_version].branch }}"
 kernel_version_zero: "{{ kernel_versions [kernel_version].version_zero }}"
