@@ -83,7 +83,7 @@ concrete-template
 		] | join ('.'),
 		'private_mac=' + [
 			deployment.bridge_mac,
-			"%0.2X" % instance_index,
+			"%0.2X" % instance_index | int,
 			"%0.2X" % node_type_indices [node_type],
 		] | join (':'),
 	] | join (' ') + '\n' -%}
