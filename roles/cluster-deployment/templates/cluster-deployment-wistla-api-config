@@ -16,11 +16,11 @@ config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_index }}:27017/wistla';
+config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla';
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ instance_index }}',
+	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ instance_zone }}-{{ instance_index }}',
 };
 
 {% if use_s3 == 'yes' %}

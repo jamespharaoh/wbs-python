@@ -56,8 +56,8 @@ node-{{ node_type }}-host
 			'node_index=' + node_index | string,
 			'private_address=' + [
 				deployment.bridge_network,
-				node_type_indices [node_type],
 				node_index | string,
+				node_type_indices [node_type],
 			] | join ('.'),
 			'private_mac=' + [
 				deployment.bridge_mac,

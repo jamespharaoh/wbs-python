@@ -134,4 +134,46 @@
   sudo_user: "{{ deployment_user }}"
   when: "deployment_mode == 'vagrant'"
 
+- name: "create bridge network interface"
+  action:
+    module: "template"
+    src: "devenv-bridge-interface"
+    dest: "/etc/network/interfaces.d/{{ deployment.bridge_name }}.cfg"
+  sudo: "yes"
+  register: "devenv_bridge_create_result"
+
+- name: "stop network bridge"
+  shell:
+
+    set -e
+
+    if ! ifquery --state {{ deployment.bridge_name }} >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifdown {{ deployment.bridge_name }};
+
+  sudo: "yes"
+  when: "devenv_bridge_create_result | changed"
+  register: "devenv_bridge_stop_result"
+  changed_when: "devenv_bridge_stop_result.stdout != 'UNCHANGED'"
+
+- name: "start network bridge"
+  shell:
+
+    set -e
+
+    if ifquery --state {{ deployment.bridge_name }} >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifup {{ deployment.bridge_name }};
+
+  sudo: "yes"
+  sudo_user: "root"
+  register: "devenv_bridge_start_result"
+  changed_when: "devenv_bridge_start_result.stdout != 'UNCHANGED'"
+
 # ex: et ts=2 filetype=yaml

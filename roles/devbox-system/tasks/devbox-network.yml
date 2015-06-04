@@ -19,31 +19,6 @@
   sudo: "yes"
   sudo_user: "root"
 
-- name: "create bridge network interface"
-  action:
-    module: "template"
-    src: "devbox-interface-bridge"
-    dest: "/etc/network/interfaces.d/{{ deployment.bridge_name }}.cfg"
-  sudo: "yes"
-  sudo_user: "root"
-
-- name: "start network bridge"
-  shell:
-
-    set -e
-
-    if ifquery --state {{ deployment.bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi
-
-    ifup {{ deployment.bridge_name }};
-
-  sudo: "yes"
-  sudo_user: "root"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
-
 - name: "create dummy network interface"
   action:
     module: "template"
