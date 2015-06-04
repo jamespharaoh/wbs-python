@@ -133,36 +133,38 @@ cluster-jenkins
 	{%- endif -%}
 {%- endfor %}
 
-{% for cluster_name, cluster in clusters.items () %}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name %}
 
-# ---------- cluster {{ cluster_name }}
+# ---------- cluster {{ other_cluster_name }}
 
-[cluster-{{ cluster_name }}:children]
-cluster-{{ cluster_name }}-admin
+[cluster-{{ other_cluster_name }}:children]
+cluster-{{ other_cluster_name }}-admin
 {% if cluster_name != 'ops' %}
-cluster-{{ cluster_name }}-app
+cluster-{{ other_cluster_name }}-app
 {% endif %}
-{% if cluster_name == 'ops' %}
-cluster-{{ cluster_name }}-jenkins
+{% if other_cluster_name == 'ops' %}
+cluster-{{ other_cluster_name }}-jenkins
 {% endif %}
 
-[cluster-{{ cluster_name }}-admin]
+[cluster-{{ other_cluster_name }}-admin]
 {% for instance_zone in [ 'a', 'b', 'c' ] -%}
 {%- for instance_index in [ '4' ] -%}
 
 	{%- print [
 		[
 			'wistla',
-			cluster.short_name,
+			other_cluster.short_name,
 			'admin',
 			instance_zone,
 		] | join ('-'),
-		'cluster_name=' + cluster_name,
+		'cluster_name=' + other_cluster_name,
 		'instance_type=admin',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,
 		'private_address=' + [
-			cluster.cluster_network,
+			other_cluster.cluster_network,
 			(cluster_zone_indices [instance_zone] | int * 64
 				+ cluster_instance_type_indices.admin | int) | string,
 			instance_index,
@@ -172,25 +174,25 @@ cluster-{{ cluster_name }}-jenkins
 {%- endfor -%}
 {%- endfor %}
 
-{% if cluster_name != 'ops' %}
-[cluster-{{ cluster_name }}-app]
+{% if other_cluster_name != 'ops' %}
+[cluster-{{ other_cluster_name }}-app]
 {% for instance_zone in [ 'a' ] -%}
 {%- for instance_index in [ '4' ] -%}
 
 	{%- print [
 		[
 			'wistla',
-			cluster.short_name,
+			other_cluster.short_name,
 			'app',
 			instance_zone,
 			instance_index,
 		] | join ('-'),
-		'cluster_name=' + cluster_name,
+		'cluster_name=' + other_cluster_name,
 		'instance_type=app',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,
 		'private_address=' + [
-			cluster.cluster_network,
+			other_cluster.cluster_network,
 			(cluster_zone_indices [instance_zone] | int * 64
 				+ cluster_instance_type_indices.app | int) | string,
 			instance_index,
@@ -201,8 +203,8 @@ cluster-{{ cluster_name }}-jenkins
 {%- endfor -%}
 {%- endif %}
 
-{% if cluster_name == 'ops' %}
-[cluster-{{ cluster_name }}-jenkins]
+{% if other_cluster_name == 'ops' %}
+[cluster-{{ other_cluster_name }}-jenkins]
 {% for instance_zone in [ 'a' ] -%}
 {%- for instance_index in [ '4' ] -%}
 
@@ -212,12 +214,12 @@ cluster-{{ cluster_name }}-jenkins
 			cluster.short_name,
 			'jenkins',
 		] | join ('-'),
-		'cluster_name=' + cluster_name,
+		'cluster_name=' + other_cluster_name,
 		'instance_type=jenkins',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,
 		'private_address=' + [
-			cluster.cluster_network,
+			other_cluster.cluster_network,
 			(cluster_zone_indices [instance_zone] | int * 64
 				+ cluster_instance_type_indices.jenkins | int) | string,
 			instance_index,
