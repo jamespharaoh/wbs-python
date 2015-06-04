@@ -1,57 +1,50 @@
 ---
 
-- hosts: "cluster-app"
-  roles:
+# TODO generate this file
 
-    # ----- production
+- hosts: "cluster-production-app"
+  roles:
 
     - role: "cluster-deployment"
       cluster_deployment_name: "production"
-      when: "cluster_name == 'production'"
       tags: [ "cluster-deployment", "production" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "production-a"
-      when: "cluster_name == 'production'"
       tags: [ "cluster-deployment", "production-a" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "production-b"
-      when: "cluster_name == 'production'"
       tags: [ "cluster-deployment", "production-b" ]
 
-    # ----- staging
+- hosts: "cluster-staging-app"
+  roles:
 
     - role: "cluster-deployment"
       cluster_deployment_name: "staging"
-      when: "cluster_name == 'staging'"
       tags: [ "cluster-deployment", "staging" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-a"
-      when: "cluster_name == 'staging'"
       tags: [ "cluster-deployment", "staging-a" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-b"
-      when: "cluster_name == 'staging'"
       tags: [ "cluster-deployment", "staging-b" ]
 
-    # ----- test
+- hosts: "cluster-test-app"
+  roles:
 
     - role: "cluster-deployment"
       cluster_deployment_name: "test-everest"
-      when: "cluster_name == 'test'"
       tags: [ "cluster-deployment", "test-everest" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "test-k2"
-      when: "cluster_name == 'test'"
       tags: [ "cluster-deployment", "test-k2" ]
 
     - role: "cluster-deployment"
       cluster_deployment_name: "test-montblanc"
-      when: "cluster_name == 'test'"
       tags: [ "cluster-deployment", "test-montblanc" ]
 
 # ex: et ts=2 filetype=yaml

@@ -9,7 +9,8 @@ ansible_warning_lines:
   - "#  Please do not make changes to this file, since they will be       #"
   - "#  automatically overwritten. If you need to change any values in    #"
   - "#  this file, this should be done by modifying the inputs to         #"
-  - "#  ansible, or by overriding them in another manner.                 #"
+  - "#  ansible, by modifying the ansible scripts themselves, or by       #"
+  - "#  overriding them in an unmanaged file.                             #"
   - "#                                                                    #"
   - "######################################################################"
 
@@ -26,20 +27,20 @@ ansible_warning:
 
 cluster_instance_type_indices:
 
-  admin: 1
-  data: 2
-  app: 3
-  jenkins: 4
+  admin: 0
+  data: 1
+  app: 2
+  jenkins: 3
 
 node_type_indices:
 
-  api: 1
-  browser: 2
-  load: 3
-  web: 4
+  api: 2
+  browser: 3
+  load: 4
+  web: 5
 
-  mongo: 17
-  rabbit: 18
+  mongo: 18
+  rabbit: 19
 
 cluster_zone_indices:
 
@@ -159,8 +160,6 @@ zone_colours:
   a: "93"
   b: "99"
   c: "105"
-
-zone_colour: "{{ zone_colours [zon] }}"
 
 kernel_mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
 kernel_versions: "{{ lookup ('file', 'data/kernel-versions') | from_yaml }}"

@@ -1,0 +1,6 @@
+---
+
+- include: "setup-hostname.yml"
+  tags: "setup-hostname"
+
+# ex: et ts=2 filetype=yaml

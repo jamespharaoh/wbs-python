@@ -3,7 +3,13 @@
 # ========== core configuration
 
 cluster_network: "10.144"
-vpn_network: "10.145"
+
+vpn_networks:
+
+  a: "10.164.4"
+  b: "10.164.5"
+  c: "10.164.6"
+  d: "10.164.7"
 
 short_name: "stage"
 

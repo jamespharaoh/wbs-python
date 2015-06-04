@@ -40,9 +40,18 @@ Resources:
   Subnet{{ zone | capitalize }}:
     Type: "AWS::EC2::Subnet"
     Properties:
+
       AvailabilityZone: "{{ amazon_zones [zone] }}"
-      CidrBlock: "{{ cluster.cluster_network }}.{{ cluster_subnets [subnet] [zone] }}.0/24"
+
+      CidrBlock: "{{ [
+        cluster.cluster_network,
+        (cluster_zone_indices [zone] | int * 64
+          + cluster_instance_type_indices [subnet] | int) | string,
+        '0',
+      ] | join ('.') }}/24"
+
       VpcId: "{{ cluster_dynamic.cluster_vpc }}"
+
       Tags:
         - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
         - { Key: "Cluster", Value: "{{ cluster_name }}" }
@@ -74,3 +83,5 @@ Outputs:
     Value: { Ref: Subnet{{ zone | capitalize }} }
 
 {% endfor %}
+
+# ex: et ts=2 filetype=yaml

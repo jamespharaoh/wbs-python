@@ -186,7 +186,7 @@ def run_playbook (args):
 
 	subprocess.check_call (
 		[
-			"/usr/bin/sudo",
+			#"/usr/bin/sudo",
 			"ansible/bin/ansible-playbook",
 			"--inventory-file", "inventory",
 			"--extra-vars", "@config",

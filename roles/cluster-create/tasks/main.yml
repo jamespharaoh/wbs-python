@@ -1,36 +1,6 @@
 ---
 
-- name: "create cluster instance"
-  local_action:
-    module: "ec2"
-
-    instance_tags: "{{ cluster_create_instance_tags }}"
-    count_tag: "{{ cluster_create_count_tag }}"
-    exact_count: 1
-
-    image: "{{ amazon_images [amazon_region].base }}"
-    instance_type: "{{ cluster_type }}"
-    key_name: "{{ amazon_key_name }}"
-
-    group_id: "{{ cluster_dynamic ['cluster_group_' + cluster_type] }}"
-    vpc_subnet_id: "{{ cluster_dynamic ['cluster_subnet_' + cluster_type + '_' + zon] }}"
-    private_ip: "{{ cluster.cluster_network }}.{{ cluster_subnets [cluster_type] [zon] }}.{{ idx }}"
-    assign_public_ip: "no"
-    source_dest_check: "no"
-
-    volumes: "{{ cluster_create_volumes }}"
-
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-    wait: "yes"
-
-  sudo: "yes"
-  sudo_user: "vagrant"
-  register: "create_result"
-
-- set_fact:
-    instance_id: "{{ create_result.tagged_instances.0.id }}"
+- include: "cluster-create.yml"
+  tags: "cluster-create"
 
 # ex: et ts=2 filetype=yaml

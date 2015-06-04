@@ -2,7 +2,7 @@
 
 {% for cluster_name, cluster in clusters.items () %}
 
-Host *.{{ cluster.main_domain }}
+Host wistla-{{ cluster.short_name }}-*
 ForwardAgent yes
 IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster_name }}
 User ubuntu

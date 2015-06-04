@@ -1,0 +1,6 @@
+---
+
+- include: "cluster-admin-firewall.yml"
+  tags: "cluster-admin-firewall"
+
+# ex: et ts=2 filetype=yaml

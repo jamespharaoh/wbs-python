@@ -1,0 +1,6 @@
+---
+
+- include: "cluster-admin-routes.yml"
+  tags: "cluster-admin-routes"
+
+# ex: et ts=2 filetype=yaml

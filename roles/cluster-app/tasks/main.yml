@@ -1,16 +1,10 @@
 ---
 
-- include: "cluster-app-system.yml"
-  tags: "cluster-app-system"
-
 - include: "cluster-app-network.yml"
   tags: "cluster-app-network"
 
 - include: "cluster-app-firewall.yml"
   tags: "cluster-app-firewall"
-
-- include: "cluster-app-dns.yml"
-  tags: "cluster-app-dns"
 
 - include: "cluster-app-nginx.yml"
   tags: "cluster-app-nginx"

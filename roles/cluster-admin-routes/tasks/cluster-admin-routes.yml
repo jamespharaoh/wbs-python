@@ -1,0 +1,77 @@
+---
+
+- name: "create public route"
+  delegate_to: "localhost"
+  shell:
+
+    set -e
+
+    if test "{{ item }}"; then
+
+      aws ec2 delete-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "0.0.0.0/0"
+      || true;
+
+      aws ec2 create-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "0.0.0.0/0"
+        --instance-id "{{ instance_id }}";
+
+    fi;
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_items:
+
+    - "{{ cluster_dynamic ['cluster_routes_app_' + instance_zone] }}"
+    - "{{ cluster_dynamic ['cluster_routes_data_' + instance_zone] }}"
+    - "{{ cluster_dynamic ['cluster_routes_jenkins_' + instance_zone] }}"
+
+- name: "create vpn route"
+  delegate_to: "localhost"
+  shell:
+
+    set -e
+
+    if test "{{ item }}"; then
+
+      aws ec2 delete-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ vpn_network }}.0/24"
+      || true;
+
+      aws ec2 create-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ vpn_network }}.0/24"
+        --instance-id "{{ instance_id }}";
+
+    fi;
+
+  environment:
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  sudo: "yes"
+  sudo_user: "vagrant"
+  with_items:
+    - "{{ cluster_dynamic.cluster_routes_admin_a }}"
+    - "{{ cluster_dynamic.cluster_routes_admin_b }}"
+    - "{{ cluster_dynamic.cluster_routes_admin_c }}"
+    - "{{ cluster_dynamic.cluster_routes_app_a }}"
+    - "{{ cluster_dynamic.cluster_routes_app_b }}"
+    - "{{ cluster_dynamic.cluster_routes_app_c }}"
+    - "{{ cluster_dynamic.cluster_routes_data_a }}"
+    - "{{ cluster_dynamic.cluster_routes_data_b }}"
+    - "{{ cluster_dynamic.cluster_routes_data_c }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_a }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_b }}"
+    - "{{ cluster_dynamic.cluster_routes_jenkins_c }}"
+
+# ex: et ts=2 filetype=yaml

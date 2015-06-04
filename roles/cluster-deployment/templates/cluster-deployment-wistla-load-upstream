@@ -12,7 +12,7 @@
 			'-',
 			name,
 			'-',
-			idx,
+			instance_index,
 			':',
 			port + node_index,
 			' fail_timeout=30s max_fails=1;\n'

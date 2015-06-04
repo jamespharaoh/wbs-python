@@ -1,11 +1,10 @@
 {{ ansible_warning ['#'] }}
 
-# client
+# ---------- client
 
 client
 resolv-retry infinite
 nobind
-ns-cert-type server
 pull
 remote a.vpn.{{ clusters [item].main_domain }} 1194
 remote b.vpn.{{ clusters [item].main_domain }} 1194
@@ -14,15 +13,16 @@ remote-random
 proto udp
 status wistla-{{ item }}-vpn.log
 
-# network
+# ---------- network
 
 dev tun
 topology subnet
 tun-mtu {{ vpn_mtu }}
 persist-tun
 
-# security
+# ---------- security
 
+tls-client
 ca wistla-ca.cert
 cert wistla-{{ item }}-vpn.cert
 key wistla-{{ item }}-vpn.key

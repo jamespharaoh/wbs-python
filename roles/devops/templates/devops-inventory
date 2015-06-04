@@ -78,13 +78,13 @@ concrete-template
 		'node_index=' + instance_index | string,
 		'private_address=' + [
 			deployment.bridge_network,
-			node_type_indices [node_type],
 			instance_index | string,
+			node_type_indices [node_type],
 		] | join ('.'),
 		'private_mac=' + [
 			deployment.bridge_mac,
-			"%0.2X" % node_type_indices [node_type],
 			"%0.2X" % instance_index,
+			"%0.2X" % node_type_indices [node_type],
 		] | join (':'),
 	] | join (' ') + '\n' -%}
 
@@ -103,7 +103,10 @@ cluster-host
 
 [cluster-network]
 {% for cluster_name, cluster in clusters.items () -%}
-	{%- print 'cluster-', cluster_name, '-network\n' -%}
+	{%- print [
+		'cluster-' + cluster_name + '-network',
+		'cluster_name=' + cluster_name,
+	] | join (' ') + '\n' -%}
 {%- endfor %}
 
 [cluster-host:children]
@@ -154,7 +157,7 @@ cluster-{{ cluster_name }}-jenkins
 			'admin',
 			instance_zone,
 		] | join ('-'),
-		'instance_cluster=' + cluster_name,
+		'cluster_name=' + cluster_name,
 		'instance_type=admin',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,
@@ -182,7 +185,7 @@ cluster-{{ cluster_name }}-jenkins
 			instance_zone,
 			instance_index,
 		] | join ('-'),
-		'instance_cluster=' + cluster_name,
+		'cluster_name=' + cluster_name,
 		'instance_type=app',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,
@@ -209,7 +212,7 @@ cluster-{{ cluster_name }}-jenkins
 			cluster.short_name,
 			'jenkins',
 		] | join ('-'),
-		'instance_cluster=' + cluster_name,
+		'cluster_name=' + cluster_name,
 		'instance_type=jenkins',
 		'instance_zone=' + instance_zone,
 		'instance_index=' + instance_index,

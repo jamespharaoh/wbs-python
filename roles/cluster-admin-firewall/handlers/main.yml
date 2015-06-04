@@ -1,0 +1,8 @@
+---
+
+- name: "reload firewall rules"
+  action: command
+    /etc/network/firewall-rules
+  sudo: "yes"
+
+# ex: et ts=2 filetype=yaml

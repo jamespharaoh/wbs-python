@@ -1,0 +1,103 @@
+{%- print ansible_warning ['#'] + '\n\n' -%}
+
+{%- print '127.0.0.1 localhost\n' -%}
+
+{%- if inventory_hostname == 'vagrant' -%}
+
+	{%- print '\n# ---------- shortcut hosts for dev only\n\n' -%}
+
+	{%- for host_name in groups.all if host_name in groups.node -%}
+
+		{%- set host = hostvars [host_name] -%}
+
+		{%- if 'private_address' in host -%}
+
+			{%- print [
+				host.private_address,
+				host.node_type + '-' + host.node_index | string,
+			] | join (' ') + '\n' -%}
+
+		{%- endif -%}
+
+	{%- endfor -%}
+
+{%- endif -%}
+
+{%- for other_deployment_name, other_deployment in deployments.items ()
+if 'bridge_network' in other_deployment
+and (inventory_hostname == 'vagrant'
+	or other_deployment.cluster == cluster_name) -%}
+
+	{%- print '\n# ---------- deployment ', other_deployment_name, '\n\n' -%}
+
+	{%- for host_name in groups.all if host_name in groups.node -%}
+
+		{%- set host = hostvars [host_name] -%}
+
+		{%- print [
+			[
+				other_deployment.bridge_network,
+				node_type_indices [host.node_type],
+				host.node_index,
+			] | join ('.'),
+			[
+				other_deployment_name,
+				host.node_type,
+				host.node_index | string,
+			] | join ('-'),
+			[
+				host.node_type + '-' + host.node_index | string,
+				other_deployment.main_domain,
+			] | join ('.'),
+		] | join (' ') + '\n' -%}
+
+	{%- endfor -%}
+
+	{%- if other_deployment_name == deployment_name -%}
+
+		{%- print '\n' -%}
+
+		{%- for host_name in groups ['load-node'] -%}
+
+			{%- set host = hostvars [host_name] -%}
+
+			{%- print [
+				[
+					other_deployment.bridge_network,
+					node_type_indices [host.node_type],
+					host.node_index,
+				] | join ('.'),
+				other_deployment.main_domain,
+				'api.' + other_deployment.main_domain,
+				'www.' + other_deployment.main_domain,
+			] | join (' ') + '\n' -%}
+
+		{%- endfor -%}
+
+	{%- endif -%}
+
+{%- endfor -%}
+
+{%- for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name -%}
+
+	{%- print '\n# ---------- cluster ', other_cluster_name, '\n\n' -%}
+
+	{%- for cluster_host_name in groups ['cluster-' + other_cluster_name] -%}
+
+		{%- set cluster_host = hostvars [cluster_host_name] -%}
+
+		{%- if 'private_address' in cluster_host -%}
+
+			{%- print [
+				cluster_host.private_address,
+				cluster_host_name,
+				cluster_host_name + '.' + other_cluster.main_domain,
+			] | join (' ') + '\n' -%}
+
+		{%- endif -%}
+
+	{%- endfor -%}
+
+{% endfor %}

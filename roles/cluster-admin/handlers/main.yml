@@ -1,6 +1,0 @@
----
-
-- include: "cluster-admin-handlers.yml"
-- include: "cluster-common-handlers.yml"
-
-# ex: et ts=2 filetype=yaml

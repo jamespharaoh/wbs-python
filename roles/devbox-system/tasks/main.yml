@@ -21,9 +21,6 @@
 - include: "devbox-samba.yml"
   tags: "devbox-samba"
 
-- include: "devbox-dns.yml"
-  tags: "devbox-dns"
-
 - include: "devbox-fuse.yml"
   tags: "devbox-fuse"
 

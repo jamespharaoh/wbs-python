@@ -1,0 +1,7 @@
+---
+
+- include: "cluster-network.yml"
+- include: "cluster-hosts.yml"
+- include: "cluster-deployments.yml"
+
+# ex: et ts=2 filetype=yaml

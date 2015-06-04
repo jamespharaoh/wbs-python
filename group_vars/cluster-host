@@ -4,6 +4,39 @@ ansible_ssh_host: "{{ inventory_hostname }}.{{ cluster.main_domain }}"
 ansible_ssh_user: "ubuntu"
 ansible_ssh_private_key_file: "{{ inventory_dir }}/security/ssh/{{ amazon_key_name }}"
 
-kernel_version: "{{ cluster.kernel_versions [cluster_type] }}"
+kernel_version: "{{ cluster.kernel_versions [instance_type] }}"
+
+zone_colour: "{{ zone_colours [instance_zone] }}"
+
+amazon_image: "{{
+  cluster.amazon_images [amazon_region].base
+}}"
+
+amazon_instance_type: "{{
+  cluster.amazon_instance_types [instance_type]
+}}"
+
+amazon_vpc_subnet_id: "{{
+  cluster_dynamic ['cluster_subnet_' + instance_type + '_' + instance_zone]
+}}"
+
+amazon_security_group_id: "{{
+  cluster_dynamic ['cluster_group_' + instance_type]
+}}"
+
+amazon_instance_profile_name: "{{ instance_type }}"
+
+amazon_instance_tags:
+
+  "Name": "{{ inventory_hostname }}"
+  "Class": "{{ instance_type }}"
+  "Zone": "{{ instance_zone }}"
+  "Index": "{{ instance_index }}"
+
+amazon_instance_create_count_tag:
+
+  "Class": "{{ instance_type }}"
+  "Zone": "{{ instance_zone }}"
+  "Index": "{{ instance_index }}"
 
 # ex: et ts=2 filetype=yaml

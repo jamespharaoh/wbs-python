@@ -1,0 +1,35 @@
+---
+
+- name: "create bash profile"
+  action:
+    module: "template"
+    src: "devbox-bash-profile"
+    dest: "{{ vagrant_home }}/.bash_profile"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+- name: "create bash rc"
+  action:
+    module: "template"
+    src: "devbox-bash-rc"
+    dest: "{{ vagrant_home }}/.bashrc"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+- name: "create git config"
+  action:
+    module: "template"
+    src: "devbox-git-config"
+    dest: "{{ vagrant_home }}/.gitconfig"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+- name: "create ssh config"
+  action:
+    module: "template"
+    src: "devbox-ssh-config"
+    dest: "{{ vagrant_home }}/.ssh/config"
+  sudo: "yes"
+  sudo_user: "{{ vagrant_user }}"
+
+# ex: et ts=2 filetype=yaml

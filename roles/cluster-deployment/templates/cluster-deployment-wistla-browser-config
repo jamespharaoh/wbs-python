@@ -4,10 +4,10 @@ var ROOT = process.env.HOME+ '/wistla-browser';
 var config = require(ROOT + '/config/config.global');
 
 // Database.
-config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ idx }}:27017/wistla-browser';
+config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_index }}:27017/wistla-browser';
 
 // API
-config.apiUrl = 'http://{{ cluster_deployment_name }}-api-{{ idx }}:7000';
+config.apiUrl = 'http://{{ cluster_deployment_name }}-api-{{ instance_index }}:7000';
 
 module.exports = config;
 

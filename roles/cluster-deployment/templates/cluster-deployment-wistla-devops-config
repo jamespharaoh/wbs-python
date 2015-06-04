@@ -13,6 +13,6 @@ deployment_home: "/home/ubuntu/{{ cluster_deployment.name }}"
 ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
 ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
 
-instance_idx: "{{ idx }}"
+instance_index: "{{ instance_index }}"
 
 # ex: et ts=2 filetype=yaml

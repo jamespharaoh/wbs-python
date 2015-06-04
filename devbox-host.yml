@@ -3,48 +3,17 @@
 - hosts: "vagrant"
   roles:
 
-    - role: "install-system-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "setup-system"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "setup-common-users"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-python-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "devbox-system"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-nodejs"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-iojs"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-mongodb"
-      when: "deployment_mode == 'vagrant'"
-      tags: "devbox"
-
-    - role: "install-tools"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-tools" ]
-
-    - role: "install-node-packages"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", devbox-node" ]
-
-    - role: "devbox-user"
-      when: "deployment_mode == 'vagrant'"
-      tags: [ "devbox", "devbox-user" ]
+    - "install-system-packages"
+    - "setup-system"
+    - "setup-common-users"
+    - "setup-dns"
+    - "install-python-packages"
+    - "devbox-system"
+    - "install-nodejs"
+    - "install-iojs"
+    - "install-mongodb"
+    - "install-tools"
+    - "install-node-packages"
+    - "devbox-user"
 
 # ex: et ts=2 filetype=yaml

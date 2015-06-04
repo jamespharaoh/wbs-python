@@ -3,7 +3,13 @@
 # ========== core configuration
 
 cluster_network: "10.146"
-vpn_network: "10.147"
+
+vpn_networks:
+
+  a: "10.164.8"
+  b: "10.164.9"
+  c: "10.164.10"
+  d: "10.164.11"
 
 short_name: "test"
 

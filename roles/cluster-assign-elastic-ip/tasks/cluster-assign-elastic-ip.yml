@@ -1,0 +1,15 @@
+---
+
+- name: "assign elastic ip"
+  delegate_to: "localhost"
+  action:
+    module: "ec2_eip"
+
+    instance_id: "{{ instance_id }}"
+    public_ip: "{{ amazon_elastic_ip }}"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+# ex: et ts=2 filetype=yaml

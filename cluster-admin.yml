@@ -5,43 +5,26 @@
 - hosts: "cluster-admin"
   roles:
 
-    # ----- create
+    - "cluster-create"
+    - "cluster-assign-elastic-ip"
+    - "wait-for-ssh"
 
-    - role: "cluster-create"
-      tags: [ "cluster-create" ]
+    - "setup-common-users"
+    - "setup-hostname"
+    - "setup-system"
+    - "setup-dns"
+    - "cluster-ssh"
+    - "install-system-packages"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-user"
 
-    # ----- system
+    - "cluster-admin-firewall"
+    - "cluster-admin-nginx"
+    - "setup-openvpn-server"
+    #- "cluster-icinga"
 
-    - role: "cluster-admin"
-      tags: [ "cluster-admin" ]
-
-    - role: "install-kernel"
-      tags: [ "install-kernel" ]
-
-    - role: "setup-system"
-      tags: [ "setup-system" ]
-
-    - role: "cluster-ssh"
-      tags: [ "cluster-user" ]
-
-    - role: "install-postfix"
-      tags: [ "install-postfix" ]
-
-    - role: "setup-common-users"
-      tags: [ "setup-common-users" ]
-
-    - role: "cluster-user"
-      tags: [ "cluster-user" ]
-
-    # ----- services
-
-    #- role: "cluster-icinga"
-    #  tags: [ "cluster-icinga" ]
-
-    # ----- final steps
-
-    - role: "cluster-activate"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-activate" ]
+    - "cluster-admin-routes"
+    - "cluster-activate"
 
 # ex: et ts=2 filetype=yaml

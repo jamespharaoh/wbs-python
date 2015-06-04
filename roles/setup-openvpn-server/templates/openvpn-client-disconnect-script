@@ -1,0 +1,40 @@
+#!/bin/bash
+
+{{ ansible_warning ['#'] }}
+
+#set -e
+
+mkdir -p /var/log/openvpn
+exec &>> /var/log/openvpn/$common_name.disconnect.log
+
+echo "----- $(date)"
+
+case "$common_name" in
+
+{% for vpn_client in vpn_clients %}
+
+({{ vpn_client.name }})
+
+{% for iroute in vpn_client.iroutes %}
+
+	echo "flush route {{ iroute.network }}/{{ iroute.netbits }}"
+
+	ip route flush \
+		{{ iroute.network }}/{{ iroute.netbits }} \
+		via {{ vpn_network }}.{{ vpn_client.vpn_ip }}
+
+{% endfor %}
+
+	;;
+
+{% endfor %}
+
+(*)
+
+	echo "Common name not recognised: $common_name" >&2
+
+	exit 1
+
+	;;
+
+esac

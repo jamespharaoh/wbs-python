@@ -1,0 +1,58 @@
+{{ ansible_warning ['#'] }}
+
+# ---------- server
+
+mode server
+proto udp
+port 1194
+keepalive 5 20
+status wistla-{{ cluster_name }}-vpn.log
+
+client-config-dir clients
+client-connect client-connect-script
+client-disconnect client-disconnect-script
+
+# ---------- network
+
+dev tun
+topology subnet
+tun-mtu 1500
+persist-tun
+
+ifconfig {{ vpn_network }}.1 255.255.255.0
+
+push "route-gateway {{ vpn_network }}.1"
+
+push "route {{ cluster.cluster_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"
+{% for other_vpn_network in cluster.vpn_networks.values () %}
+push "route {{ other_vpn_network }}.0 255.255.255.0 {{ vpn_network }}.1"
+{% endfor %}
+
+{% for cluster_deployment_name in cluster.deployment_names %}
+{% set cluster_deployment = deployments [cluster_deployment_name] %}
+{% if cluster_deployment.type != 'virtual' %}
+push "route {{ cluster_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"
+{% endif %}
+{% endfor %}
+
+{% if cluster_name == 'ops' %}
+{% for dev_deployment_name in dev_deployment_names %}
+{% set dev_deployment = deployments [dev_deployment_name] %}
+push "route {{ dev_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"
+{% endfor %}
+{% endif %}
+
+client-to-client
+
+# ---------- security
+
+tls-server
+persist-key
+
+dh wistla-dh.pem
+
+ca wistla-ca.cert
+#crl-verify wistla-ca.crl
+
+cert wistla-{{ cluster_name }}-vpn.cert
+key wistla-{{ cluster_name }}-vpn.key

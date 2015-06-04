@@ -1,0 +1,6 @@
+{{ ansible_warning ['#'] }}
+
+{% if inventory_hostname != 'vagrant' %}
+server = 8.8.8.8
+server = 8.8.4.4
+{% endif %}

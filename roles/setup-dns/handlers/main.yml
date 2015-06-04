@@ -1,0 +1,11 @@
+---
+
+- name: "restart dnsmasq"
+  action:
+    module: "service"
+    name: "dnsmasq"
+    state: "restarted"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

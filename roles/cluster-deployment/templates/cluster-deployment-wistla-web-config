@@ -4,7 +4,7 @@ var ROOT = process.env.HOME+ '/wistla-web';
 var config = require(ROOT + '/config/config.global');
 
 // Database.
-config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ idx }}:27017/wistla-web';
+config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_index }}:27017/wistla-web';
 
 // semi-persistent storage
 config.cmsImagePath = '/shared/cms-image';

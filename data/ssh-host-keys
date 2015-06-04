@@ -70,25 +70,25 @@ ssh_host_keys:
 
       a:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBCp0BZ+0u4NY4Sr27lYPs+9o/78iQl/Q2aQHUX4M3AWHCHjA+kl5TfJ/MlZ7521a"
-        - "0OG7+NpPLS1xuyURaw39yvU="
+        - "AABBBKib31QEve7hmGq6xr40htcV4nM0KjzWa0Ip3Wge/lDQaV0LbvjC3SVjoaFk9R0s"
+        - "216BN5HITaM813sPF6xd9+Q="
 
       b:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBOIE9UyDoYxrHE3lFAnKkxok5jZaYD65iINBD+MyfTRnHJt3I34cP5NRocwWNEY5"
-        - "1KOHs2p2ivJetKaLB1AJ9fI="
+        - "AABBBPjzCRpJtIDUQB7hrZy0tbgncBF13cvps96zXkhxWg5x/pJUZcrBkEMuKGu7OuPO"
+        - "wgbUyB9EeuXq9Lqz7YRJy/Q="
 
       c:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBFAIqjTd6CVquT4TMLZnHB0P55ZNFKLTpOOJMkgQ78DMOE4aqWzIUPwPuzh1zYwz"
-        - "vKHAfjU7NPlyyA47QiOAulY="
+        - "AABBBO2k2rQhU3izrmsYrDS2vyBdriOYCJFG2qwraLYENiE8b7+xBk/gZyyT6zUiuRzH"
+        - "xeNDLgN5X6+KPY+vziMwAwE="
 
     app:
 
       a-4:
         - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-        - "AABBBLmaGGl41B2tPNB6QCl30uofDDAYdvNFvBvJqClmsaTwJNoSC95HArx3V3sAw0Au"
-        - "R+DTDs9xzkNFGks4nxanA3U="
+        - "AABBBDQNC/7Je/NsvIro1NKcxrQTj+heC7kkgcmxErPQRtnTPtxbbvt+/flXrPfDLQyw"
+        - "LHepIMI07potMfF3pe7OcW0="
 
   test:
 

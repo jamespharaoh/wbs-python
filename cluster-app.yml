@@ -5,71 +5,26 @@
 - hosts: "cluster-app"
   roles:
 
-    # ----- create
+    - "cluster-create"
+    - "wait-for-ssh"
 
-    - role: "cluster-create"
-      when: "cluster != 'ops'"
-      tags: [ "cluster-create" ]
+    - "setup-common-users"
+    - "setup-hostname"
+    - "setup-system"
+    - "setup-dns"
+    - "cluster-ssh"
+    - "install-system-packages"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-volumes"
+    - "cluster-user"
 
-    # ----- system
+    - "install-nodejs"
+    - "install-iojs"
+    - "install-node-packages"
+    - "cluster-app"
+    #- "cluster-icinga"
 
-    - role: "cluster-app"
-      when: "cluster != 'ops'"
-      tags: [ "cluster-app" ]
-
-    - role: "cluster-volumes"
-      when: "cluster != 'ops'"
-      tags: [ "cluster-volumes" ]
-
-    - role: "install-kernel"
-      when: "cluster != 'ops'"
-      tags: [ "install-kernel" ]
-
-    - role: "setup-system"
-      when: "cluster != 'ops'"
-      tags: [ "setup-system" ]
-
-    - role: "cluster-ssh"
-      when: "cluster != 'ops'"
-      tags: [ "cluster-user" ]
-
-    - role: "install-postfix"
-      when: "cluster != 'ops'"
-      tags: [ "install-postfix" ]
-
-    - role: "setup-common-users"
-      when: "cluster != 'ops'"
-      tags: [ "setup-common-users" ]
-
-    - role: "install-nodejs"
-      when: "cluster != 'ops'"
-      tags: [ "install-nodejs" ]
-
-    - role: "install-iojs"
-      when: "cluster != 'ops'"
-      tags: [ "install-iojs" ]
-
-    - role: "setup-alternatives"
-      when: "cluster != 'ops'"
-      tags: [ "setup-alternatives" ]
-
-    - role: "install-node-packages"
-      when: "cluster != 'ops'"
-      tags: [ "install-node-packages" ]
-
-    - role: "cluster-user"
-      when: "cluster != 'ops'"
-      tags: [ "cluster-user" ]
-
-    # ----- services
-
-    #- role: "cluster-icinga"
-    #  when: "cluster != 'ops'"
-    #  tags: [ "cluster-icinga" ]
-
-    # ----- final steps
-
-    - role: "cluster-activate"
-      tags: [ "cluster-activate" ]
+    - "cluster-activate"
 
 # ex: et ts=2 filetype=yaml
