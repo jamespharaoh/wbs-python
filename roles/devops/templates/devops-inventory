@@ -131,7 +131,7 @@ if inventory_hostname == 'vagrant'
 or other_cluster_name == cluster_name -%}
 
 	{%- if other_cluster_name != 'ops' -%}
-		{%- print 'cluster-', oether_cluster_name, '-app\n' -%}
+		{%- print 'cluster-', other_cluster_name, '-app\n' -%}
 	{%- endif -%}
 
 {%- endfor %}
