@@ -211,6 +211,11 @@ def update_config ():
 		"##### Automatically updating config #####\n",
 	])
 
+	if not os.path.isfile ("inventory"):
+
+		with open ("inventory", "w") as file_handle:
+			file_handle.write ("localhost ansible_connection=local\n")
+
 	run_playbook ([
 		"devops.yml",
 	])
