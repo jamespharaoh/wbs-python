@@ -102,10 +102,12 @@ cluster-network
 cluster-host
 
 [cluster-network]
-{% for cluster_name, cluster in clusters.items () -%}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name -%}
 	{%- print [
-		'cluster-' + cluster_name + '-network',
-		'cluster_name=' + cluster_name,
+		'cluster-' + other_cluster_name + '-network',
+		'cluster_name=' + other_cluster_name,
 	] | join (' ') + '\n' -%}
 {%- endfor %}
 
@@ -115,22 +117,34 @@ cluster-app
 cluster-jenkins
 
 [cluster-admin:children]
-{% for cluster_name, cluster in clusters.items () -%}
-	{%- print 'cluster-', cluster_name, '-admin\n' -%}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name -%}
+
+	{%- print 'cluster-', other_cluster_name, '-admin\n' -%}
+
 {%- endfor %}
 
 [cluster-app:children]
-{% for cluster_name, cluster in clusters.items () -%}
-	{%- if cluster_name != 'ops' -%}
-		{%- print 'cluster-', cluster_name, '-app\n' -%}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name -%}
+
+	{%- if other_cluster_name != 'ops' -%}
+		{%- print 'cluster-', oether_cluster_name, '-app\n' -%}
 	{%- endif -%}
+
 {%- endfor %}
 
 [cluster-jenkins:children]
-{% for cluster_name, cluster in clusters.items () -%}
-	{%- if cluster_name == 'ops' %}
-		{%- print 'cluster-', cluster_name, '-jenkins\n' -%}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if inventory_hostname == 'vagrant'
+or other_cluster_name == cluster_name -%}
+
+	{%- if other_cluster_name == 'ops' %}
+		{%- print 'cluster-', other_cluster_name, '-jenkins\n' -%}
 	{%- endif -%}
+
 {%- endfor %}
 
 {% for other_cluster_name, other_cluster in clusters.items ()
