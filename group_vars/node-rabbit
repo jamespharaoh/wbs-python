@@ -1,8 +1,5 @@
 ---
 
-node: "rabbit"
-prv: "6"
-
 my_system_packages:
 
   - name: "rabbitmq-server"

@@ -9,13 +9,6 @@
     dest: "/etc/apt/sources.list"
   sudo: "yes"
 
-- name: "create hosts file"
-  action:
-    module: "template"
-    src: "template-hosts"
-    dest: "/etc/hosts"
-  sudo: "yes"
-
 - name: "create resolv.conf"
   action:
     module: "template"

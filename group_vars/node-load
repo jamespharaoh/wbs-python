@@ -1,8 +1,5 @@
 ---
 
-node: "load"
-prv: "5"
-
 my_system_packages:
 
   - name: "nginx"

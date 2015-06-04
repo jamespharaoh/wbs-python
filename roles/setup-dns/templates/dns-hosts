@@ -6,7 +6,7 @@
 
 	{%- print '\n# ---------- shortcut hosts for dev only\n\n' -%}
 
-	{%- for host_name in groups.all if host_name in groups.node -%}
+	{%- for host_name in groups.all if host_name in groups ['node-host'] -%}
 
 		{%- set host = hostvars [host_name] -%}
 
@@ -30,7 +30,7 @@ and (inventory_hostname == 'vagrant'
 
 	{%- print '\n# ---------- deployment ', other_deployment_name, '\n\n' -%}
 
-	{%- for host_name in groups.all if host_name in groups.node -%}
+	{%- for host_name in groups.all if host_name in groups ['node-host'] -%}
 
 		{%- set host = hostvars [host_name] -%}
 
@@ -57,7 +57,7 @@ and (inventory_hostname == 'vagrant'
 
 		{%- print '\n' -%}
 
-		{%- for host_name in groups ['load-node'] -%}
+		{%- for host_name in groups ['node-load-host'] -%}
 
 			{%- set host = hostvars [host_name] -%}
 

@@ -6,13 +6,10 @@
 # templates, and doing it this way reduces disk space and speeds the process up
 # because the common steps are done once and cloned cheaply.
 
-- hosts: "generic-template"
+- hosts: "node-template-generic"
   roles:
 
     - "lxc-create"
-
-- hosts: "generic-template"
-  roles:
 
     - "setup-system"
     - "install-system-packages"
@@ -28,13 +25,10 @@
 # already going to quickly skip any tasks which are already complete, so this is
 # not inefficient.
 
-- hosts: "concrete-template"
+- hosts: "node-template-concrete"
   roles:
 
     - "lxc-clone"
-
-- hosts: "concrete-template"
-  roles:
 
     - "setup-system"
     - "install-system-packages"
@@ -46,7 +40,7 @@
 # Finally we apply specific configuration to each of the concrete templates.
 # This has to run in series, since that's how ansible works.
 
-- hosts: "api-template"
+- hosts: "node-api-template"
   roles:
 
     - "node-api"
@@ -54,18 +48,18 @@
     - "install-node-packages"
     - "deploy-api"
 
-- hosts: "load-template"
+- hosts: "node-load-template"
   roles:
 
     - "node-load"
 
-- hosts: "mongo-template"
+- hosts: "node-mongo-template"
   roles:
 
     - "node-mongo"
     - "install-mongodb"
 
-- hosts: "web-template"
+- hosts: "node-web-template"
   roles:
 
     - "node-web"
@@ -73,12 +67,12 @@
     - "install-node-packages"
     - "deploy-web"
 
-- hosts: "rabbit-template"
+- hosts: "node-rabbit-template"
   roles:
 
     - "node-rabbit"
 
-- hosts: "browser-template"
+- hosts: "node-browser-template"
   roles:
 
     - "node-browser"

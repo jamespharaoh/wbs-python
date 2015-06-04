@@ -1,6 +1,6 @@
 ---
 
-- hosts: [ "template" ]
+- hosts: "node-template"
   gather_facts: "no"
   roles: [ "lxc-destroy" ]
 

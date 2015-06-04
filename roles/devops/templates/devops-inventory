@@ -10,36 +10,38 @@ vagrant
 jenkins
 {% endif %}
 
-# ---------- template
-
-[template:children]
-generic-template
-concrete-template
-
-[concrete-template:children]
-{% for node_type in devops_inventory_node_types %}
-{{ node_type }}-template
-{% endfor %}
-
-[generic-template]
-{{ deployment_name }}-base-template
-
 # ---------- nodes
 
 [node:children]
+node-template
+node-host
+
+[node-host:children]
 {% for node_type in devops_inventory_node_types %}
-{{ node_type }}-node
+node-{{ node_type }}-host
 {% endfor %}
 
+[node-template:children]
+node-template-generic
+node-template-concrete
+
+[node-template-concrete:children]
+{% for node_type in devops_inventory_node_types %}
+node-{{ node_type }}-template
+{% endfor %}
+
+[node-template-generic]
+{{ deployment_name }}-base-template
+
 {% for node_type in devops_inventory_node_types %}
 
-# ---------- {{ node_type }}
+# ---------- node {{ node_type }}
 
-[{{ node_type }}:children]
-{{ node_type }}-template
-{{ node_type }}-node
+[node-{{ node_type }}:children]
+node-{{ node_type }}-template
+node-{{ node_type }}-host
 
-[{{ node_type }}-node]
+[node-{{ node_type }}-host]
 {% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
 
 	{%- for node_index in range (4) -%}
@@ -90,7 +92,7 @@ concrete-template
 
 {%- endif %}
 
-[{{ node_type }}-template]
+[node-{{ node_type }}-template]
 {{ deployment_name }}-{{ node_type }}-template node_type={{ node_type }}
 
 {% endfor %}

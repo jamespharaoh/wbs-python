@@ -1,21 +1,26 @@
 ---
 
-ansible_connection: "sudo_chroot"
-ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
+private_gateway: "{{
+  [
+    cluster_deployment.bridge_network,
+    instance_index,
+    cluster_zone_indices [instance_zone] * 64 + 1,
+  ] | join ('.') if deployment_mode in [
+    'cluster-shared',
+    'cluster-alias',
+    'cluster-simple',
+  ] else [
+    deployment.bridge_network,
+    '0.1',
+  ] | join ('.')
+}}"
 
-template: "{{ node }}-template"
-
-node_active: "{{ 'yes' if (
-  (deployment_mode == 'vagrant' and
-    (node_index | int) < (node_count [node_type] | int)) or
-  (deployment_mode == 'jenkins' and
-    (node_index | int) < (node_count [node_type] | int)) or
-  (deployment_mode == 'cluster-shared' and
-    (node_index | int) == (instance_index | int)) or
-  (deployment_mode == 'cluster-alias' and
-    (node_index | int) == (instance_index | int)) or
-  (deployment_mode == 'cluster-simple' and
-    (node_index | int) == (instance_index | int))
-) else 'no' }}"
+private_bits: "{{
+  26 if deployment_mode in [
+    'cluster-shared',
+    'cluster-alias',
+    'cluster-simple',
+  ] else 16
+}}"
 
 # ex: et ts=2 filetype=yaml

@@ -1,8 +1,5 @@
 ---
 
-node: "mongo"
-prv: "2"
-
 data_dirs:
 
   - name: "mongo-data"

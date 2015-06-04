@@ -1,8 +1,5 @@
 ---
 
-node: "api"
-prv: "3"
-
 my_system_packages:
 
   - name: "graphicsmagick"

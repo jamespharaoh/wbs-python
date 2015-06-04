@@ -1,13 +1,9 @@
 ---
 
-node: "browser"
-prv: "7"
+web_install_packages:
 
-my_system_packages:
-
-  - name: "iptables"
-
-  - name: "npm"
+  - "iptables"
+  - "npm"
 
 node_packages:
 

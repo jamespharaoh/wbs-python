@@ -1,12 +1,10 @@
 ---
 
-node: "web"
-prv: "4"
+my_system_packages:
 
-web_install_packages:
+  - name: "iptables"
 
-  - "iptables"
-  - "npm"
+  - name: "npm"
 
 node_packages:
 
