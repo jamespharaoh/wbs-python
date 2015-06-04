@@ -94,7 +94,22 @@ node-{{ node_type }}-host
 {%- endif %}
 
 [node-{{ node_type }}-template]
-{{ deployment_name }}-{{ node_type }}-template node_type={{ node_type }}
+{% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
+
+	{%- print [
+		deployment_name + '-' + node_type + '-template',
+		'node_type=' + node_type,
+	] | join (' '), '\n' -%}
+
+{%- else -%}
+
+	{%- print [
+		deployment_name + '-' + node_type + '-template',
+		'node_type=' + node_type,
+		'node_zone=' + instance_zone,
+	] | join (' '), '\n' -%}
+
+{%- endif %}
 
 {% endfor %}
 
