@@ -2,7 +2,7 @@
 
 	{%- print 'upstream ', name, ' {\n' -%}
 
-	{%- for node_name in groups [name + '-node'] -%}
+	{%- for node_name in groups ['node-' + name + '-host'] -%}
 
 		{%- set node_host = hostvars [node_name] -%}
 		{%- for node_instance in range (0, node_instance_count [name] | int) -%}
