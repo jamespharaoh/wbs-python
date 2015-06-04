@@ -78,6 +78,7 @@ node-{{ node_type }}-host
 		] | join ('-'),
 		'node_type=' + node_type,
 		'node_index=' + instance_index | string,
+		'node_zone=' + instance_zone,
 		'private_address=' + [
 			deployment.bridge_network,
 			instance_index | string,
