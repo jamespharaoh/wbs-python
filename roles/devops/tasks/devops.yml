@@ -1,5 +1,12 @@
 ---
 
+- name: "create config"
+  action:
+    module: "template"
+    dest: "{{ deployment_home }}/wistla-devops/config"
+    src: "devops-vagrant-config"
+  when: "deployment_mode == 'vagrant'"
+
 - name: "create group_vars/all"
   action:
     module: "template"
@@ -11,12 +18,5 @@
     module: "template"
     dest: "{{ deployment_home }}/wistla-devops/inventory"
     src: "devops-inventory"
-
-- name: "create config"
-  action:
-    module: "template"
-    dest: "{{ deployment_home }}/wistla-devops/config"
-    src: "devops-vagrant-config"
-  when: "deployment_mode == 'vagrant'"
 
 # ex: et ts=2 filetype=yaml
