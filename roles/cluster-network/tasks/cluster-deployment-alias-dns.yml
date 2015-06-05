@@ -5,10 +5,8 @@
     module: "template"
     src: "cluster-deployment-alias-dns-stack"
     dest: "/home/vagrant/work/{{ cluster_name }}/deployment-alias-dns-{{ item }}-stack"
-  sudo: "yes"
-  sudo_user: "vagrant"
   when: "cluster_name != 'ops'"
-  with_items: "cluster.deploy_alias_names | difference ([ 'production' ]) }}"
+  with_items: "cluster_deployments"
 
 - name: "create deployment alias dns stack"
   action:
@@ -20,8 +18,6 @@
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
     region: "{{ amazon_region }}"
-  sudo: "yes"
-  sudo_user: "vagrant"
   when: "cluster_name != 'ops'"
   with_items: "{{ cluster_deployment_alias_names | difference ([ 'production' ]) }}"
   register: "deployment_alias_dns_stack_result"
@@ -56,8 +52,6 @@
     AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
     AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
 
-  sudo: "yes"
-  sudo_user: "vagrant"
   when: "cluster_name != 'ops'"
   with_indexed_items: "{{ cluster_deployment_alias_names | difference ([ 'production' ]) }}"
   register: "deployment_alias_dns_nameservers_result"
@@ -74,8 +68,6 @@
     value: "{{ lookup ('file', '/home/vagrant/work/' + item.value.cluster + '/deployment-alias-dns-' + item.key + '-nameservers') }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-  sudo: "yes"
-  sudo_user: "vagrant"
   with_dict: "deployment_aliases"
   when: "cluster_name == 'production' and item.key != 'production'"
 

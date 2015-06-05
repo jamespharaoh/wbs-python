@@ -1,8 +1,15 @@
 ---
 
+- hosts: "localhost"
+  tasks:
+
+    - fail:
+        msg: "not available in this deployment mode"
+      when: "deployment_mode == 'alias'"
+
 - include: "stop.yml"
 
-- hosts: "vagrant"
+- hosts: "localhost"
   tasks:
 
     - name: "remove shared directory"

@@ -5,8 +5,6 @@
     module: "file"
     path: "{{ item }}"
     state: "directory"
-  sudo: "yes"
-  sudo_user: "vagrant"
   with_items:
     - "/home/vagrant/work"
     - "/home/vagrant/work/{{ cluster_name }}"
@@ -19,8 +17,6 @@
       touch -f /home/vagrant/work/{{ cluster_name }}/cluster-data;
       echo 'CHANGED';
     fi;
-  sudo: "yes"
-  sudo_user: "vagrant"
   register: "touch_result"
   changed_when: "touch_result.stdout != 'UNCHANGED'"
 
