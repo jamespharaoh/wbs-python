@@ -54,7 +54,7 @@ amazon_key_name: "wistla-test"
 
 amazon_instance_types:
 
-  admin: "t2.small"
+  admin: "t2.micro"
   app: "r3.large"
 
 kernel_versions:

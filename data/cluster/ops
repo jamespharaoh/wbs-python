@@ -46,8 +46,8 @@ amazon_key_name: "wistla-ops"
 
 amazon_instance_types:
 
-  admin: "t2.small"
-  jenkins: "c3.xlarge"
+  admin: "t2.micro"
+  jenkins: "c4.large"
 
 kernel_versions:
 

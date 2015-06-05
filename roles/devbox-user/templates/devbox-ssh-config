@@ -2,7 +2,11 @@
 
 {% for cluster_name, cluster in clusters.items () %}
 
-Host wistla-{{ cluster.short_name }}-*
+Host {{ [
+	'wistla-' + cluster_name + '-*',
+	'wistla-' + cluster.short_name + '-*',
+	'*.admin.' + cluster.main_domain,
+] | join (' ') }}
 ForwardAgent yes
 IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster_name }}
 User ubuntu

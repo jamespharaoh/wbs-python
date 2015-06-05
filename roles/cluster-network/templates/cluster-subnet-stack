@@ -41,7 +41,7 @@ Resources:
     Type: "AWS::EC2::Subnet"
     Properties:
 
-      AvailabilityZone: "{{ amazon_zones [zone] }}"
+      AvailabilityZone: "{{ cluster.amazon_zones [zone] }}"
 
       CidrBlock: "{{ [
         cluster.cluster_network,

@@ -23,6 +23,7 @@ persist-tun
 # ---------- security
 
 tls-client
+remote-cert-tls server
 ca wistla-ca.cert
 cert wistla-{{ item }}-vpn.cert
 key wistla-{{ item }}-vpn.key

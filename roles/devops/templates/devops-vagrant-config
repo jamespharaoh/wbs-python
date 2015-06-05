@@ -33,6 +33,7 @@ third_parties:
   production: "{{ '{{' }} lookup ('file', 'security/third-parties/production') | from_yaml {{ '}}' }}"
   staging: "{{ '{{' }} lookup ('file', 'security/third-parties/staging') | from_yaml {{ '}}' }}"
   test: "{{ '{{' }} lookup ('file', 'security/third-parties/test') | from_yaml {{ '}}' }}"
+  ops: "{{ '{{' }} lookup ('file', 'security/third-parties/ops') | from_yaml {{ '}}' }}"
 {% endif %}
 {% if 'dev' in secrets | default ([ 'dev' ]) %}
   dev: "{{ '{{' }} lookup ('file', 'security/third-parties/dev') | from_yaml {{ '}}' }}"

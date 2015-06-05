@@ -28,7 +28,7 @@ push "route {{ cluster.cluster_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"
 push "route {{ other_vpn_network }}.0 255.255.255.0 {{ vpn_network }}.1"
 {% endfor %}
 
-{% for cluster_deployment_name in cluster.deployment_names %}
+{% for cluster_deployment_name in cluster.deployment_names | default ([]) %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}
 {% if cluster_deployment.type != 'virtual' %}
 push "route {{ cluster_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"

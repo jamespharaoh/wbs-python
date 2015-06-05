@@ -67,6 +67,8 @@ cluster_create_volumes:
 
   - device_name: "/dev/sda1"
     volume_size: "32"
+    device_type: "gp2"
+    delete_on_termination: "yes"
 
 amazon_elastic_ip: "{{ cluster.amazon_admin_ips [instance_zone] }}"
 

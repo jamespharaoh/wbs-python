@@ -27,30 +27,32 @@ http {
 
 	client_max_body_size 16m;
 
+	# default site
+
 	server {
 
 		listen 80;
-		listen 443;
 
 		server_name {{ inventory_hostname }};
 
-		root /usr/share/nginx/html/;
+		root /usr/share/nginx/html;
 
 	}
 
-{% if cluster == 'ops' %}
+{% if cluster_name == 'ops' %}
 
 {% for dev_deployment_name in dev_deployment_names %}
 {% set dev_deployment = deployments [dev_deployment_name] %}
 
 	upstream {{ dev_deployment_name }}-host {
-		server {{ dev_deployment.bridge_network }}.1.1;
+		server {{ dev_deployment.bridge_network }}.0.1;
 	}
 
 	upstream {{ dev_deployment_name }}-load {
-		server {{ dev_deployment.bridge_network }}.5.0;
-		server {{ dev_deployment.bridge_network }}.5.1;
-		server {{ dev_deployment.bridge_network }}.5.2;
+		server {{ dev_deployment.bridge_network }}.0.4;
+		server {{ dev_deployment.bridge_network }}.1.4;
+		server {{ dev_deployment.bridge_network }}.2.4;
+		server {{ dev_deployment.bridge_network }}.3.4;
 	}
 
 	# website redirect www to naked domain
@@ -280,7 +282,7 @@ http {
 		ssl_certificate_key /etc/nginx/ssl/jenkins.ops.wistla.com.key;
 
 		location / {
-			proxy_pass http://{{ cluster_net }}.{{ cluster_subnets.jenkins.a }}.4;
+			proxy_pass http://wistla-ops-jenkins;
 			proxy_set_header Host $host;
 			proxy_set_header X-Real-IP $http_x_real_ip;
 			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

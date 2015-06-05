@@ -21,8 +21,8 @@ Resources:
       Name: "{{ deployment.main_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ cluster_admin_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
   WwwWebRecordSet:
@@ -31,8 +31,8 @@ Resources:
       Name: "www.{{ deployment.main_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ cluster_admin_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
   ApiRecordSet:
@@ -41,8 +41,8 @@ Resources:
       Name: "api.{{ deployment.main_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ cluster_admin_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
   TestRecordSet:
@@ -51,8 +51,8 @@ Resources:
       Name: "test.{{ deployment.main_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ cluster_admin_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
   AdminRecordSet:
@@ -61,8 +61,8 @@ Resources:
       Name: "admin.{{ deployment.main_domain }}."
       Type: "A"
       AliasTarget:
-        DNSName: "{{ cluster_admin_balancer_hosted_zone_name }}"
-        HostedZoneId: "{{ cluster_admin_balancer_hosted_zone_name_id }}"
+        DNSName: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name }}"
+        HostedZoneId: "{{ cluster_dynamic.cluster_admin_balancer_hosted_zone_name_id }}"
       HostedZoneId: { Ref: "HostedZone" }
 
 Outputs:

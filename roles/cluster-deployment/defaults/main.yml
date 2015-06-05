@@ -17,6 +17,7 @@ cluster_deployment_config_directories: "{{ cluster_deployment_type.config_direct
 cluster_deployment_config_templates: "{{ cluster_deployment_type.config_templates }}"
 cluster_deployment_config_files: "{{ cluster_deployment_type.config_files }}"
 cluster_deployment_config_links: "{{ cluster_deployment_type.config_links }}"
+cluster_deployment_shared_directories: "{{ cluster_deployment_type.shared_directories }}"
 cluster_deployment_shared_links: "{{ cluster_deployment_type.shared_links }}"
 
 cluster_deployment_types:
@@ -44,6 +45,8 @@ cluster_deployment_types:
     config_files: []
 
     config_links: []
+
+    shared_directories: []
 
     shared_links:
 
@@ -143,6 +146,8 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-load-upstream"
         target: "config/load/nginx-upstream.conf"
+
+    shared_directories: []
 
   simple:
 

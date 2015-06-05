@@ -1,5 +1,7 @@
 ---
 
+{{ (ansible_warning | default ({ '#': '' })) ['#'] }}
+
 {% set globals = lookup ('file', 'data/globals') | from_yaml %}
 {% for key, value in globals.items () %}
 {{ key }}: {{ value | to_json }}

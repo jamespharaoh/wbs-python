@@ -53,8 +53,8 @@ amazon_key_name: "wistla-staging"
 
 amazon_instance_types:
 
-  admin: "t2.small"
-  app: "c4.large"
+  admin: "t2.micro"
+  app: "m3.medium"
 
 kernel_versions:
 
