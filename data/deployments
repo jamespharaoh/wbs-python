@@ -9,7 +9,7 @@ production:
   short_domain: "wist.la"
 
   cluster: "production"
-  target: "production-b"
+  target: "production-a"
 
   bridge_name: "br162"
   bridge_network: "10.162"
