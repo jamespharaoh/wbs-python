@@ -70,17 +70,26 @@ devenv_config_links:
   - src: "../../config/api/config.local.js"
     dest: "wistla-api/config/config.local.js"
 
+  - src: "../../config/api/config.overrides.js"
+    dest: "wistla-api/config/config.overrides.js"
+
   - src: "../../config/api/google-service-account.key"
     dest: "wistla-api/config/google-service-account.key"
 
   - src: "../../config/browser/config.local.js"
     dest: "wistla-browser/config/config.local.js"
 
+  - src: "../../config/browser/config.overrides.js"
+    dest: "wistla-browser/config/config.overrides.js"
+
   - src: "../../config/load/wistla-admin-config.local.js"
     dest: "wistla-admin/config/config.local.js"
 
   - src: "../../config/web/config.local.js"
     dest: "wistla-web/config/config.local.js"
+
+  - src: "../../config/web/config.overrides.js"
+    dest: "wistla-web/config/config.overrides.js"
 
 devenv_shared_directories:
 
@@ -95,12 +104,12 @@ devenv_shared_directories:
 devenv_override_templates:
 
   - template: "devenv-wistla-api-overrides"
-    target: "wistla-api/config/config.overrides.js"
+    target: "config/api/config.overrides.js"
 
   - template: "devenv-wistla-browser-overrides"
-    target: "wistla-browser/config/config.overrides.js"
+    target: "config/browser/config.overrides.js"
 
   - template: "devenv-wistla-web-overrides"
-    target: "wistla-web/config/config.overrides.js"
+    target: "config/web/config.overrides.js"
 
 # ex: et ts=2 filetype=yaml

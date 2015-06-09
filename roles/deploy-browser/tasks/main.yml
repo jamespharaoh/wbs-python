@@ -14,6 +14,7 @@
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
       --exclude /.git
       --exclude /config/config.local.js
+      --exclude /config/config.overrides.js
       --exclude /node_modules;
 
   sudo: "yes"
@@ -55,9 +56,12 @@
 - name: "create wistla browser config"
   action:
     module: "file"
-    path: "/home/ubuntu/wistla-browser/config/config.local.js"
+    path: "/home/ubuntu/wistla-browser/config/{{ item }}"
     state: "link"
-    src: "/config/config.local.js"
+    src: "/config/{{ item }}"
     force: "yes"
+  with_items:
+    - "config.local.js"
+    - "config.overrides.js"
 
 # ex: et ts=2 filetype=yaml

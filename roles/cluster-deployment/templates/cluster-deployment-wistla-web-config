@@ -18,6 +18,11 @@ config.mailchimp = {
 	apiKey: '{{ third_parties [cluster_name].mailchimp_api_key }}',
 };
 
+{% if cluster_deployment.emails_enabled == 'yes' %}
+// Enable email sends.
+config.sendEmails = true;
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

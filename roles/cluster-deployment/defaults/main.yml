@@ -19,6 +19,7 @@ cluster_deployment_config_files: "{{ cluster_deployment_type.config_files }}"
 cluster_deployment_config_links: "{{ cluster_deployment_type.config_links }}"
 cluster_deployment_shared_directories: "{{ cluster_deployment_type.shared_directories }}"
 cluster_deployment_shared_links: "{{ cluster_deployment_type.shared_links }}"
+cluster_deployment_override_templates: "{{ cluster_deployment_type.override_templates }}"
 
 cluster_deployment_types:
 
@@ -52,6 +53,8 @@ cluster_deployment_types:
 
       - link: "userUpload"
         target: "user-upload"
+
+    override_templates: []
 
   alias:
 
@@ -115,11 +118,20 @@ cluster_deployment_types:
       - source: "../../config/api/config.local.js"
         target: "wistla-api/config/config.local.js"
 
+      - source: "../../config/api/config.overrides.js"
+        target: "wistla-api/config/config.overrides.js"
+
       - source: "../../config/browser/config.local.js"
         target: "wistla-browser/config/config.local.js"
 
+      - source: "../../config/browser/config.overrides.js"
+        target: "wistla-browser/config/config.overrides.js"
+
       - source: "../../config/web/config.local.js"
         target: "wistla-web/config/config.local.js"
+
+      - source: "../../config/web/config.overrides.js"
+        target: "wistla-web/config/config.overrides.js"
 
     config_templates:
 
@@ -148,6 +160,17 @@ cluster_deployment_types:
         target: "config/load/nginx-upstream.conf"
 
     shared_directories: []
+
+    override_templates:
+
+      - template: "cluster-deployment-wistla-api-overrides"
+        target: "config/api/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-browser-overrides"
+        target: "config/browser/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-web-overrides"
+        target: "config/web/config.overrides.js"
 
   simple:
 
@@ -239,11 +262,20 @@ cluster_deployment_types:
       - source: "../../config/api/config.local.js"
         target: "wistla-api/config/config.local.js"
 
+      - source: "../../config/api/config.overrides.js"
+        target: "wistla-api/config/config.overrides.js"
+
       - source: "../../config/browser/config.local.js"
         target: "wistla-browser/config/config.local.js"
 
+      - source: "../../config/browser/config.overrides.js"
+        target: "wistla-browser/config/config.overrides.js"
+
       - source: "../../config/web/config.local.js"
         target: "wistla-web/config/config.local.js"
+
+      - source: "../../config/web/config.overrides.js"
+        target: "wistla-web/config/config.overrides.js"
 
     shared_directories:
 
@@ -258,5 +290,16 @@ cluster_deployment_types:
 
       - link: "userUpload"
         target: "user-upload"
+
+    override_templates:
+
+      - template: "cluster-deployment-wistla-api-overrides"
+        target: "config/api/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-browser-overrides"
+        target: "config/browser/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-web-overrides"
+        target: "config/web/config.overrides.js"
 
 # ex: et ts=2 filetype=yaml

@@ -17,6 +17,14 @@
     state: "link"
     src: "{{ cluster_deployment_home }}"
 
+- name: "create active deployment link"
+  action:
+    module: "file"
+    path: "/home/ubuntu/{{ cluster_deployment_name }}-active"
+    state: "link"
+    src: "{{ cluster_deployment.target }}"
+  when: "cluster_deployment.type == 'shared'"
+
 - name: "checkout projects from git"
   shell:
 
@@ -109,6 +117,21 @@
     state: "link"
     force: "yes"
   with_items: "cluster_deployment_config_links"
+
+- name: "stat override config files"
+  action:
+    module: "stat"
+    path: "{{ cluster_deployment_home }}/{{ item.target }}"
+  with_items: "cluster_deployment_override_templates"
+  register: "cluster_deployment_stat_override_templates_result"
+
+- name: "create override config templates"
+  action:
+    module: "template"
+    dest: "{{ cluster_deployment_home }}/{{ item.1.target }}"
+    src: "{{ item.1.template }}"
+  with_indexed_items: "cluster_deployment_override_templates"
+  when: "not cluster_deployment_stat_override_templates_result.results [item.0].stat.exists"
 
 - name: "create deployment bridge network interface"
   action:
