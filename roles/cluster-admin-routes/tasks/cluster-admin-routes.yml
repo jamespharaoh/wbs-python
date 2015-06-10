@@ -25,8 +25,6 @@
     AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
     AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
 
-  sudo: "yes"
-  sudo_user: "vagrant"
   with_items:
 
     - "{{ cluster_dynamic ['cluster_routes_app_' + instance_zone] }}"
@@ -58,8 +56,6 @@
     AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
     AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
 
-  sudo: "yes"
-  sudo_user: "vagrant"
   with_items:
     - "{{ cluster_dynamic.cluster_routes_admin_a }}"
     - "{{ cluster_dynamic.cluster_routes_admin_b }}"

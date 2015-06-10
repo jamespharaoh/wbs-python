@@ -1,0 +1,6 @@
+---
+
+- include: "cluster-dns.yml"
+  tags: "cluster-dns"
+
+# ex: et ts=2 filetype=yaml

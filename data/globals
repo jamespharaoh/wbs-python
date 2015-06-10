@@ -9,15 +9,15 @@ cluster_instance_type_indices:
 
 node_type_indices:
 
-  # 0
-  # 1
+  # network: 0
+  # instance: 1
   api: 2
   browser: 3
   load: 4
   web: 5
 
-  # 16
-  # 17
+  # data_network: 16
+  # data_instance: 17
   mongo: 18
   rabbit: 19
 

@@ -61,6 +61,39 @@ kernel_versions:
   admin: "3.19.8"
   app: "3.19.8"
 
+route53_main_domain:
+
+  hosted_zone_id: "Z2CHL5W53KG311"
+
+  nameservers:
+
+    - "ns-625.awsdns-14.net."
+    - "ns-1913.awsdns-47.co.uk."
+    - "ns-146.awsdns-18.com."
+    - "ns-1497.awsdns-59.org."
+
+  misc_records:
+
+    - name: "_amazonses"
+      type: "TXT"
+      ttl: "300"
+      value: "\"Nt8qjJVGC+XvALFtT8b84dM66SHY+oHD1Ky411OBttk=\""
+
+    - name: "6hjs7krh6k3erzhunpvct6p5slvadneb._domainkey"
+      type: "CNAME"
+      ttl: "300"
+      value: "6hjs7krh6k3erzhunpvct6p5slvadneb.dkim.amazonses.com."
+
+    - name: "6wclgibso2q2nw6zg67yi43y2v7b5idd._domainkey"
+      type: "CNAME"
+      ttl: "300"
+      value: "6wclgibso2q2nw6zg67yi43y2v7b5idd.dkim.amazonses.com."
+
+    - name: "7hqrrbc76hcusu7amyf4xve3ufz5bfe3._domainkey"
+      type: "CNAME"
+      ttl: "300"
+      value: "7hqrrbc76hcusu7amyf4xve3ufz5bfe3.dkim.amazonses.com."
+
 # ========== accounts and security
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"

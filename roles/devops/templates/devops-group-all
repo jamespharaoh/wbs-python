@@ -17,5 +17,6 @@ deployments: {{ lookup ('file', 'data/deployments') | from_yaml | to_json }}
 vpn_clients: {{ lookup ('file', 'data/vpn-clients') | from_yaml | to_json }}
 common_users: {{ lookup ('file', 'data/common-users') | from_yaml | to_json }}
 kernel_versions: {{ lookup ('file', 'data/kernel-versions') | from_yaml | to_json }}
+amazon_security_groups: {{ lookup ('file', 'data/security-groups') | from_yaml | to_json }}
 
 # ex: et ts=2 filetype=yaml

@@ -1,0 +1,80 @@
+---
+
+- name: "create main misc records"
+  action:
+
+    module: "route53"
+    record: "{{ item.name }}.{{ cluster.main_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.main_domain }}"
+
+    type: "{{ item.type }}"
+    ttl: "{{ item.ttl }}"
+    value: "{{ item.value }}"
+
+    region: "{{ amazon_region }}"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  with_items: "cluster.route53_main_domain.misc_records"
+
+- name: "create main deployment records"
+  action:
+
+    module: "route53"
+    record: "{{ item.1 }}{{ item.0.main_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.main_domain }}"
+    overwrite: "yes"
+
+    type: "A"
+    ttl: "30"
+    value: "{{ app_balancer_hosted_zone_name }}"
+    alias: "yes"
+    alias_hosted_zone_id: "{{ app_balancer_hosted_zone_name_id }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  when: "item.0.main_domain is defined"
+  with_nested:
+
+    - "{{ cluster.deployment_names | dict_map (deployments) }}"
+
+    - - ""
+      - "admin."
+      - "api."
+      - "www."
+
+- name: "create short deployment records"
+  action:
+
+    module: "route53"
+    record: "{{ item.1 }}{{ item.0.short_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.short_domain }}"
+    overwrite: "yes"
+
+    type: "A"
+    ttl: "30"
+    value: "{{ app_balancer_hosted_zone_name }}"
+    alias: "yes"
+    alias_hosted_zone_id: "{{ app_balancer_hosted_zone_name_id }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  when: "item.0.short_domain is defined"
+  with_nested:
+
+    - "{{ cluster.deployment_names | dict_map (deployments) }}"
+
+    - - ""
+
+# TODO admin hosts
+# TODO vpn hosts
+
+# ex: et ts=2 filetype=yaml

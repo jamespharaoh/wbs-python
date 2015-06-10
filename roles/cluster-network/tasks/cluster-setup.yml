@@ -20,6 +20,4 @@
   register: "touch_result"
   changed_when: "touch_result.stdout != 'UNCHANGED'"
 
-- include_vars: "/home/vagrant/work/{{ cluster_name }}/cluster-data"
-
 # ex: et ts=2 filetype=yaml

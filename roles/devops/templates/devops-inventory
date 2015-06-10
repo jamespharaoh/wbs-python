@@ -181,6 +181,9 @@ cluster-{{ other_cluster_name }}-app
 cluster-{{ other_cluster_name }}-jenkins
 {% endif %}
 
+[cluster-{{ other_cluster_name }}]
+cluster-{{ other_cluster_name }}-network
+
 [cluster-{{ other_cluster_name }}-admin]
 {% for instance_zone in [ 'a', 'b', 'c' ] -%}
 {%- for instance_index in [ '4' ] -%}

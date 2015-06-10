@@ -17,13 +17,13 @@
         load_balancer_port: "443"
         instance_port: "443"
 
-    security_group_ids: "{{ cluster_dynamic.cluster_group_balancer }}"
+    security_group_ids: "{{ security_group_id_balancer }}"
 
     subnets:
 
-      - "{{ cluster_dynamic.cluster_subnet_admin_a }}"
-      - "{{ cluster_dynamic.cluster_subnet_admin_b }}"
-      - "{{ cluster_dynamic.cluster_subnet_admin_c }}"
+      - "{{ subnet_admin_a }}"
+      - "{{ subnet_admin_b }}"
+      - "{{ subnet_admin_c }}"
 
     health_check:
       ping_protocol: "tcp"
@@ -39,12 +39,9 @@
 
   register: "admin_balancer_result"
 
-- set_fact:
+- store_runtime:
 
-    cluster_admin_balancer: "{{ admin_balancer_result.elb.dns_name }}"
-    cluster_admin_balancer_hosted_zone_name: "{{ admin_balancer_result.elb.canonical_hosted_zone_name }}"
-    cluster_admin_balancer_hosted_zone_name_id: "{{ admin_balancer_result.elb.canonical_hosted_zone_name_id }}"
-
-- include: "cluster-save-data.yml"
+    admin_balancer_hosted_zone_name: "{{ admin_balancer_result.elb.canonical_hosted_zone_name }}"
+    admin_balancer_hosted_zone_name_id: "{{ admin_balancer_result.elb.canonical_hosted_zone_name_id }}"
 
 # ex: et ts=2 filetype=yaml

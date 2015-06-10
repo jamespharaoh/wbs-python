@@ -22,10 +22,8 @@
   sudo_user: "vagrant"
   register: "vpc_stack_result"
 
-- set_fact:
-    cluster_vpc: "{{ vpc_stack_result.stack_outputs.Vpc }}"
-    cluster_gateway: "{{ vpc_stack_result.stack_outputs.InternetGateway }}"
-
-- include: "cluster-save-data.yml"
+- store_runtime:
+    vpc_id: "{{ vpc_stack_result.stack_outputs.Vpc }}"
+    internet_gateway_id: "{{ vpc_stack_result.stack_outputs.InternetGateway }}"
 
 # ex: et ts=2 filetype=yaml

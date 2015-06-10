@@ -1,16 +1,12 @@
 ---
 
-- include_vars: "data/security-groups"
-
-# first create all the groups
-
 - name: "create security groups"
   action:
     module: "ec2_group"
 
     name: "{{ cluster_name }}-{{ item.name }}"
     description: "Security group {{ cluster_name }}-{{ item.name }}"
-    vpc_id: "{{ cluster_dynamic.cluster_vpc }}"
+    vpc_id: "{{ vpc_id }}"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
@@ -21,27 +17,22 @@
   register: "create_group"
   with_items: "amazon_security_groups"
 
-# save data
+- store_runtime:
 
-- set_fact:
-    cluster_group_admin: "{{ create_group.results.0.group_id }}"
-    cluster_group_app: "{{ create_group.results.1.group_id }}"
-    cluster_group_balancer: "{{ create_group.results.2.group_id }}"
-    cluster_group_jenkins: "{{ create_group.results.3.group_id }}"
-
-- include: "cluster-save-data.yml"
-
-# then set the rules
+    security_group_id_admin: "{{ create_group.results.0.group_id }}"
+    security_group_id_app: "{{ create_group.results.1.group_id }}"
+    security_group_id_balancer: "{{ create_group.results.2.group_id }}"
+    security_group_id_jenkins: "{{ create_group.results.3.group_id }}"
 
 - name: "update security group"
   action:
     module: "ec2_group"
 
-    description: "Security group {{ item.name }}"
     name: "{{ cluster_name }}-{{ item.name }}"
+    description: "Security group {{ cluster_name }}-{{ item.name }}"
     rules: "{{ item.rules }}"
 
-    vpc_id: "{{ cluster_dynamic.cluster_vpc }}"
+    vpc_id: "{{ vpc_id }}"
 
     region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"

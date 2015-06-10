@@ -14,7 +14,7 @@ Resources:
   RouteTable{{ zone | capitalize }}:
     Type: "AWS::EC2::RouteTable"
     Properties:
-      VpcId: "{{ cluster_vpc }}"
+      VpcId: "{{ vpc_id }}"
       Tags:
         - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
         - { Key: "Cluster", Value: "{{ cluster_name }}" }
@@ -27,7 +27,7 @@ Resources:
     Properties:
       RouteTableId: { Ref: "RouteTable{{ zone | capitalize }}" }
       DestinationCidrBlock: "0.0.0.0/0"
-      GatewayId: "{{ cluster_gateway }}"
+      GatewayId: "{{ internet_gateway_id }}"
 
 {% endif %}
 
@@ -50,7 +50,7 @@ Resources:
         '0',
       ] | join ('.') }}/24"
 
-      VpcId: "{{ cluster_dynamic.cluster_vpc }}"
+      VpcId: "{{ vpc_id }}"
 
       Tags:
         - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
