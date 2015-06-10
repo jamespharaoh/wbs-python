@@ -1,0 +1,17 @@
+---
+
+- name: "install mysql config"
+  sudo: "yes"
+  notify: "set mysql.needs_restart to 'yes'"
+  action:
+
+    module: "template"
+    src: "{{ item.template }}"
+    dest: "{{ item.target }}"
+
+  with_items:
+
+    - template: "mysql-global-config"
+      target: "/etc/mysql/my.cnf"
+
+# ex: et ts=2 filetype=yaml

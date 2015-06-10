@@ -1,0 +1,18 @@
+---
+
+- name: "set nginx.state to 'installing'"
+  set_fact_dynamic:
+    nginx.state: "installing"
+  when: "nginx_state is not defined"
+  tags: [ "nginx", "install-nginx" ]
+
+- include: "install-nginx.yml"
+  tags: [ "nginx", "install-nginx" ]
+
+- name: "set nginx.state to 'unconfigured'"
+  set_fact_dynamic:
+    nginx.state: "unconfigured"
+  when: "nginx_state == 'installing'"
+  tags: [ "nginx", "install-nginx" ]
+
+# ex: et ts=2 filetype=yaml
