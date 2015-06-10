@@ -14,6 +14,9 @@ my_system_packages:
   - name: "apport-symptoms"
     state: "absent"
 
+  - name: "mongodb-clients"
+    state: "absent"
+
   - name: "python-apport"
     state: "absent"
 
@@ -44,9 +47,6 @@ my_system_packages:
     state: "present"
 
   - name: "mailutils"
-    state: "present"
-
-  - name: "mongodb-clients"
     state: "present"
 
   - name: "nginx"

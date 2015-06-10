@@ -13,7 +13,6 @@ cluster_jenkins_install_packages:
   - "imagemagick"
   - "libav-tools"
   - "mailutils"
-  - "mongodb-clients"
   - "ngrep"
   - "ntp"
   - "whois"
@@ -31,6 +30,7 @@ cluster_jenkins_remove_packages:
 
   - "apport"
   - "apport-symptoms"
+  - "mongodb-clients"
   - "python-apport"
   - "python3-apport"
 
