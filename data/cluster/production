@@ -61,6 +61,24 @@ kernel_versions:
   admin: "3.19.8"
   app: "3.19.8"
 
+route53_main_domain:
+
+  hosted_zone_id: "Z1XOX4GL0QBEJA"
+
+  nameservers:
+
+    - "ns-1474.awsdns-56.org."
+    - "ns-246.awsdns-30.com."
+    - "ns-888.awsdns-47.net."
+    - "ns-1562.awsdns-03.co.uk."
+
+  misc_records:
+
+    - name: "_amazonses"
+      type: "TXT"
+      ttl: "300"
+      value: "\"oT8DqUnzbfbursWrUdOEnhk3ZFccYjKEhb7p++E3F0g=\""
+
 # ========== accounts and security
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
