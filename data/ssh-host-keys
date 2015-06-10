@@ -4,13 +4,18 @@ ssh_host_keys:
 
   general:
 
-    github:
+    github.com:
       - "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYP"
       - "CPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJ"
       - "izHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+"
       - "Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3Rc"
       - "T0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+w"
       - "C604ydGXA8VJiS5ap43JXiUFFAaQ=="
+
+    gitlab.wellbehavedsoftware.com:
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBMEiWKmsoIvUoXuGiQNF7N/bCiq1MkXJmQ4MJEJILqxBFqW35r4DeaPoFDzt5R0SuVqe"
+      - "K0E1RtpINYqeYx1EQfU="
 
   ops:
 

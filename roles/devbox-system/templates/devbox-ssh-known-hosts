@@ -1,6 +1,8 @@
 {{ ansible_warning ['#'] }}
 
-github.com {{ ssh_host_keys.general.github | join }}
+{% for name, lines in ssh_host_keys.general.items () %}
+{{ name }} {{ lines | join }}
+{% endfor %}
 
 {% for host_name in groups ['cluster-host'] -%}
 
