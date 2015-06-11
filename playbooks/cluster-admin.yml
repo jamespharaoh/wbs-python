@@ -1,0 +1,35 @@
+---
+
+# ========== admin
+
+- hosts: "cluster-admin"
+  roles:
+
+    - "cluster-create"
+    - "cluster-assign-elastic-ip"
+    - "wait-for-ssh"
+
+    - "setup-common-users"
+    - "setup-hostname"
+    - "setup-system"
+    - "setup-dns"
+    - "cluster-ssh"
+    - "install-system-packages"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-user"
+
+    - "cluster-admin-firewall"
+
+    - "install-etcd"
+    - "setup-etcd"
+    - "start-etcd"
+
+    - "cluster-admin-nginx"
+    - "setup-openvpn-server"
+    #- "cluster-icinga"
+
+    - "cluster-admin-routes"
+    - "cluster-activate"
+
+# ex: et ts=2 filetype=yaml

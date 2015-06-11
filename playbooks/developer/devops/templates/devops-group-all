@@ -1,0 +1,38 @@
+---
+
+{{ (ansible_warning | default ({ '#': '' })) ['#'] }}
+
+{% set globals = lookup ('file', DATA + '/globals') | from_yaml %}
+{% for key, value in globals.items () %}
+{{ key }}: {{ value | to_json }}
+{% endfor %}
+
+clusters:
+  ops: {{ lookup ('file', DATA + '/cluster/ops') | from_yaml | to_json }}
+  production: {{ lookup ('file', DATA + '/cluster/production') | from_yaml | to_json }}
+  staging: {{ lookup ('file', DATA + '/cluster/staging') | from_yaml | to_json }}
+  test: {{ lookup ('file', DATA + '/cluster/test') | from_yaml | to_json }}
+
+deployments: {{ lookup ('file', DATA + '/deployments') | from_yaml | to_json }}
+vpn_clients: {{ lookup ('file', DATA + '/vpn-clients') | from_yaml | to_json }}
+common_users: {{ lookup ('file', DATA + '/common-users') | from_yaml | to_json }}
+kernel_versions: {{ lookup ('file', DATA + '/kernel-versions') | from_yaml | to_json }}
+amazon_security_groups: {{ lookup ('file', DATA + '/security-groups') | from_yaml | to_json }}
+ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys') | from_yaml | to_json }}
+ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys') | from_yaml | to_json }}
+
+{% if not secrets %}
+third_parties: {}
+{% else %}
+third_parties:
+{% if 'dev' in secrets %}
+  dev: {{ lookup ('file', HOME + '/security/third-parties/dev') | from_yaml | to_json }}
+{% endif %}
+{% if 'production' in secrets %}
+  production: {{ lookup ('file', HOME + '/security/third-parties/production') | from_yaml | to_json }}
+  staging: {{ lookup ('file', HOME + '/security/third-parties/staging') | from_yaml | to_json }}
+  ops: {{ lookup ('file', HOME + '/security/third-parties/ops') | from_yaml | to_json }}
+{% endif %}
+{% endif %}
+
+# ex: et ts=2 filetype=yaml

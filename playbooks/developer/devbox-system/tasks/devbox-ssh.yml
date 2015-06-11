@@ -1,0 +1,14 @@
+---
+
+- name: "create ssh known hosts"
+  action:
+    module: "template"
+    src: "devbox-ssh-known-hosts"
+    dest: "/etc/ssh/ssh_known_hosts"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  sudo: "yes"
+  sudo_user: "root"
+
+# ex: et ts=2 filetype=yaml

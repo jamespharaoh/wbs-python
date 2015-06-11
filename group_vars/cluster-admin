@@ -74,4 +74,15 @@ amazon_elastic_ip: "{{ cluster.amazon_admin_ips [instance_zone] }}"
 
 vpn_network: "{{ cluster.vpn_networks [instance_zone] }}"
 
+etcd_clustered: "yes"
+etcd_secured: "yes"
+
+etcd_peer_ca_certificate: "{{ cluster.etcd_credentials.peer_ca_certificate }}"
+etcd_peer_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].peer_certificate }}"
+etcd_peer_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].peer_private_key }}"
+
+etcd_client_ca_certificate: "{{ cluster.etcd_credentials.client_ca_certificate }}"
+etcd_client_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].client_certificate }}"
+etcd_client_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].client_private_key }}"
+
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

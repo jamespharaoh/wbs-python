@@ -3,6 +3,12 @@
 /.state
 /accounts
 /config
+/data/runtime/*
+!/data/runtime/wistla-ops-*
+!/data/runtime/wistla-production-*
+!/data/runtime/wistla-staging-*
+!/data/runtime/wistla-test-*
+!/data/runtime/cluster-*
 /inventory
 /security/*-plain
 /security/vpn
@@ -13,3 +19,4 @@
 /wistla-api
 /wistla-web
 /group_vars/all
+/work

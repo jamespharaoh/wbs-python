@@ -75,7 +75,7 @@ def load_config ():
 	global CONFIG
 
 	try:
-		CONFIG = yaml.load (file ("config"))
+		CONFIG = yaml.load (file ("config/overrides.yml"))
 	except IOError:
 		CONFIG = dict ({ "deployment_mode": "vagrant" })
 
@@ -115,7 +115,10 @@ def check_deployment_mode ():
 
 	if CONFIG ["deployment_mode"] == "vagrant":
 
-		if socket.gethostname () != "wistla-dev":
+		if not socket.gethostname () in [
+			"wistla-" + CONFIG ["deployment_name"] + "-dev",
+			"wistla-dev",
+		]:
 
 			write_message ([
 				"This command must be run from inside vagrant\n",
@@ -184,13 +187,20 @@ def mount_secrets ():
 
 def run_playbook (args):
 
+	playbook_path = "playbooks/%s" % args [0]
+	if not os.path.exists (args [0]) and os.path.exists (playbook_path):
+		args [0] = playbook_path
+
 	subprocess.check_call (
 		[
 			#"/usr/bin/sudo",
-			"third-party/ansible/bin/ansible-playbook",
+			"./wistla-devops",
+			"ansible", "playbook", "--",
 			"--inventory-file", "inventory",
-			"--extra-vars", "@config",
-			"--extra-vars", "@accounts",
+			"--extra-vars", "@config/overrides.yml",
+			"--extra-vars", "@config/accounts.yml",
+			"--extra-vars", "HOME=%s" % HOME,
+			"--extra-vars", "DATA=%s/data" % HOME,
 		] + args,
 		env = dict (
 			os.environ,
@@ -215,7 +225,7 @@ def update_config ():
 		file_handle.write ("localhost ansible_connection=local\n")
 
 	run_playbook ([
-		"devops.yml",
+		"playbooks/devops.yml",
 	])
 
 	if CONFIG ["deployment_mode"] != "vagrant":

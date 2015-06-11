@@ -32,6 +32,9 @@ system_packages:
   - name: "nodejs"
     state: "absent"
 
+  - name: "npm"
+    state: "absent"
+
   - name: "puppet"
     state: "absent"
 
@@ -69,8 +72,6 @@ system_packages:
   - name: "nfs-kernel-server"
 
   - name: "ngrep"
-
-  - name: "npm"
 
   - name: "openvpn"
 

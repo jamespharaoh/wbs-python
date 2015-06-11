@@ -1,85 +1,87 @@
 ---
 
-ssh_user_keys:
+wistla-production:
 
-  wistla-production:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDJn8SfOcqgZZrGYw9hn0rfD7lsQEQARw1QSJljAI"
-      - "5b38Mu7E6nh/HskTGxNf/cgen3mBMUwPJg1tLabKwdcIqbMzlb+D7yP7XEoTud4R52pTCH"
-      - "1C3dlmYPYCXrTSOU443ugbLSpDKINFow8USqZFp3KmbwG+ngvgKIylbg6+BbQ+01jy3kVW"
-      - "l1rv+NuNwlJEQHnmW/c8sp3Wz+Ar/N23S3qOGLbs1LVK1xfW6EyJSRGeciUpS1E7vUvKy4"
-      - "fkCMpaoXS7PueBo6CNRBL62ZRJaKWQ0xCLwqTM4p1V6btLaaLbectL+7DqAE6Kueu46klZ"
-      - "koXgkHSvutKjNIxLLRHSE1"
+  type: "ssh-rsa"
+  data:
 
-  wistla-production-old:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDT098sPzTLlDM9OhwreFVl68RoJyB5pmcw9T5Sm6"
-      - "tWHuU37/5igVipVu4d2Ybfg/FHomO1MN2CZNoGr7MqBX1+vFp/ryBXpxXdX0sOZo5mULxh"
-      - "eW8iHTZGz+ovfMvgNMxO7ZU1nWNSzLACuiFlD59GeYqGbUFAZLAGrWlHPdtGtMHgnb7Wmu"
-      - "/LLLR5jMXRcnMGbbDk8O2RuFQ4e9+x2gCehf/AyQ9WUam6l6SBO7eqxdeFDMpWABFmokjq"
-      - "EITZN8aJobmrOiLPdL+mvCpKGjp8j8PHj+izvbVP+xShf2vMSuXd7PdL6Cr0YVKqiCyE5i"
-      - "/LbcU1LrkTYvdos4XQba2b"
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDJn8SfOcqgZZrGYw9hn0rfD7lsQEQARw1QSJljAI5b"
+    - "38Mu7E6nh/HskTGxNf/cgen3mBMUwPJg1tLabKwdcIqbMzlb+D7yP7XEoTud4R52pTCH1C3d"
+    - "lmYPYCXrTSOU443ugbLSpDKINFow8USqZFp3KmbwG+ngvgKIylbg6+BbQ+01jy3kVWl1rv+N"
+    - "uNwlJEQHnmW/c8sp3Wz+Ar/N23S3qOGLbs1LVK1xfW6EyJSRGeciUpS1E7vUvKy4fkCMpaoX"
+    - "S7PueBo6CNRBL62ZRJaKWQ0xCLwqTM4p1V6btLaaLbectL+7DqAE6Kueu46klZkoXgkHSvut"
+    - "KjNIxLLRHSE1"
 
-  wistla-staging:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQCUf3se/d/x88QSpPZD+vWml99dHMEOkuJaOgEZD6"
-      - "DBAnTkKaWAVs+327mYDMglndQr9gG0GygjIh/j+6NddJxHbWAA7pOIFrx6OCR8L3YNWSnj"
-      - "uftVPg3dYJaHI4U2H5XZQZP7vool05WyzcrHftm4hYKNpbwDVuhk3pNsckEoqLKznsOoah"
-      - "DD6yxOdxlD8II/QOF8vGq9IHmiL1cBXJ9dyzsnTdKmPc84FdD+cRhSpD9dYMizOJ7bYrAh"
-      - "RMi2hkJ3QmXZqcgawotwUkCL6CfSVcsYz39pGHkrXZwJOa3edkVaF+IF3k1mZNK/kg5WSl"
-      - "e5QM7zeqTFeaobbPMok/lF"
+wistla-production-old:
 
-  wistla-staging-old:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDCfwmCCIaakJxfonVCqEPV5nD6nIHTjkYYA4WUyM"
-      - "l6Q8TT2k3UExKmog4s66yZXkr7PTwZitTyMf5tIgz42YBWx0+WL7mDgVhaNfYd47YTPvLP"
-      - "0NOUyMzIU+EnXiocfaUUzufY7o/ykDJvn8jry3CKdxo+HdvMA5FsXID4z4WcOeqb4P/bva"
-      - "CDk3VC3NZVUYKmHmuf/mBgnH7xIqLuEMVUt81vST/v2RUvkpjEaYFMK0J8jX7cHdLEBTc2"
-      - "Db48T4rsaKqxDwKBoNdw6QulGOoUtV2nmRm5Ko1iJIW3Z/LjZlRqrFdBdBn+m3WNXdJRT2"
-      - "hK0OcO2LOgF4TPUm0fFPNX"
+  type: "ssh-rsa"
+  data:
 
-  wistla-test:
-    type: "ssh-rsa"
-    data:
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
-      - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
-      - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
-      - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
-      - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
-      - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDT098sPzTLlDM9OhwreFVl68RoJyB5pmcw9T5Sm6tW"
+    - "HuU37/5igVipVu4d2Ybfg/FHomO1MN2CZNoGr7MqBX1+vFp/ryBXpxXdX0sOZo5mULxheW8i"
+    - "HTZGz+ovfMvgNMxO7ZU1nWNSzLACuiFlD59GeYqGbUFAZLAGrWlHPdtGtMHgnb7Wmu/LLLR5"
+    - "jMXRcnMGbbDk8O2RuFQ4e9+x2gCehf/AyQ9WUam6l6SBO7eqxdeFDMpWABFmokjqEITZN8aJ"
+    - "obmrOiLPdL+mvCpKGjp8j8PHj+izvbVP+xShf2vMSuXd7PdL6Cr0YVKqiCyE5i/LbcU1LrkT"
+    - "Yvdos4XQba2b"
 
-  wistla-test-old:
-    type: "ssh-rsa"
-    data:
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
-      - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
-      - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
-      - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
-      - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
-      - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+wistla-staging:
+  type: "ssh-rsa"
+  data:
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQCUf3se/d/x88QSpPZD+vWml99dHMEOkuJaOgEZD6"
+    - "DBAnTkKaWAVs+327mYDMglndQr9gG0GygjIh/j+6NddJxHbWAA7pOIFrx6OCR8L3YNWSnj"
+    - "uftVPg3dYJaHI4U2H5XZQZP7vool05WyzcrHftm4hYKNpbwDVuhk3pNsckEoqLKznsOoah"
+    - "DD6yxOdxlD8II/QOF8vGq9IHmiL1cBXJ9dyzsnTdKmPc84FdD+cRhSpD9dYMizOJ7bYrAh"
+    - "RMi2hkJ3QmXZqcgawotwUkCL6CfSVcsYz39pGHkrXZwJOa3edkVaF+IF3k1mZNK/kg5WSl"
+    - "e5QM7zeqTFeaobbPMok/lF"
 
-  wistla-ops:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQC6y8qHtdJu8HALZepx7Pqc1M35IUB9qz0mpsU92T"
-      - "z14TLCbrdDhH3D28WqjsBWSx+V2tKwz7/EsoVhft2dlCCwSobPFCXlh3WBVkFq5XJDqGXB"
-      - "aXqraQ297bYhQWBRJG6kWedxAsbmT6sPLAPiKfDk0osF6wYl1O89TUsAh03NQwcctYVyYh"
-      - "dRBYAU0f1zWQxkg+0D7zXznoQF5y2AMNzSv/A92ipqTP406VF9jLxibTtJYUjnLu02pd8G"
-      - "fCBQwTp5HaCX2GakHUHeZQS5WoSMtV+JImWCxqluWud2IZqc8dQH4wpVRrdocyOHrXFAL2"
-      - "mFwkrzXNl2nsZ7TbottJXx"
+wistla-staging-old:
+  type: "ssh-rsa"
+  data:
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDCfwmCCIaakJxfonVCqEPV5nD6nIHTjkYYA4WUyM"
+    - "l6Q8TT2k3UExKmog4s66yZXkr7PTwZitTyMf5tIgz42YBWx0+WL7mDgVhaNfYd47YTPvLP"
+    - "0NOUyMzIU+EnXiocfaUUzufY7o/ykDJvn8jry3CKdxo+HdvMA5FsXID4z4WcOeqb4P/bva"
+    - "CDk3VC3NZVUYKmHmuf/mBgnH7xIqLuEMVUt81vST/v2RUvkpjEaYFMK0J8jX7cHdLEBTc2"
+    - "Db48T4rsaKqxDwKBoNdw6QulGOoUtV2nmRm5Ko1iJIW3Z/LjZlRqrFdBdBn+m3WNXdJRT2"
+    - "hK0OcO2LOgF4TPUm0fFPNX"
 
-  wistla-ops-old:
-    type: "ssh-rsa"
-    data:
-      - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDr2TtXxJcbIs2BSz+UrsVzlJrUmy8jZAOtjE4R3E"
-      - "VzFjv4Verz8LNZ/JrHtHfmQlagDr4tQGFA5yqdiccLWbKinTSySF5MDMb/pi8QTj+53i0a"
-      - "VdTJQAY3J5Njw9AJJuIBnn5C4LTA1QWLjNt+ty4Za6qLG/vByooMvPguUcbwYdeykPrLeW"
-      - "JuT1aRJnlYVxddy4IRti8RxMBEPdT94AEcmAN35xirRqdxLeA0VC4IINsa6VBXSOdGcA/Y"
-      - "KZ4+YQlgJBa7Wro8pN/WW1nd5jMKSPi+FREsYEhm9Z9gDMlTrR0IJdhUYqxJoTsrslnIT/"
-      - "bQdlzkYUdQR2pgRxf1eqeX"
+wistla-test:
+  type: "ssh-rsa"
+  data:
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
+    - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
+    - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
+    - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
+    - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
+    - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+
+wistla-test-old:
+  type: "ssh-rsa"
+  data:
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyyZLCSQOGvjnHvdH7KDFS+65he8hdQ6"
+    - "pJmUbyicqVRxoTKadYMLzvc4Qq3uu8nzieSik/LjLY97jYJ7/F81ufyuXzRSImp7CTu4rC"
+    - "yWaeQADd3SchY+kQLIz0o14JcjdIza71yYPd9LO6eqr0djifvM4O0HOjQaVYbgfyaxuBVG"
+    - "CBW3hVIQ0XXGLOR9FGcaRqedlGRPXgNkUJYW2nfoOotkE0cdcX3Wf2ii9tcxO+c4k13Jfa"
+    - "bk+G+jmd8mFxH8DVmphv8JDTlJh8A08tUdSPApl9DnVQog0QI8sMCq7KXt9VAjJ13Z1PaD"
+    - "wXpjGPM0AKQDgqWnxJdKNp6ySiyl7B"
+
+wistla-ops:
+  type: "ssh-rsa"
+  data:
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQC6y8qHtdJu8HALZepx7Pqc1M35IUB9qz0mpsU92T"
+    - "z14TLCbrdDhH3D28WqjsBWSx+V2tKwz7/EsoVhft2dlCCwSobPFCXlh3WBVkFq5XJDqGXB"
+    - "aXqraQ297bYhQWBRJG6kWedxAsbmT6sPLAPiKfDk0osF6wYl1O89TUsAh03NQwcctYVyYh"
+    - "dRBYAU0f1zWQxkg+0D7zXznoQF5y2AMNzSv/A92ipqTP406VF9jLxibTtJYUjnLu02pd8G"
+    - "fCBQwTp5HaCX2GakHUHeZQS5WoSMtV+JImWCxqluWud2IZqc8dQH4wpVRrdocyOHrXFAL2"
+    - "mFwkrzXNl2nsZ7TbottJXx"
+
+wistla-ops-old:
+  type: "ssh-rsa"
+  data:
+    - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDr2TtXxJcbIs2BSz+UrsVzlJrUmy8jZAOtjE4R3E"
+    - "VzFjv4Verz8LNZ/JrHtHfmQlagDr4tQGFA5yqdiccLWbKinTSySF5MDMb/pi8QTj+53i0a"
+    - "VdTJQAY3J5Njw9AJJuIBnn5C4LTA1QWLjNt+ty4Za6qLG/vByooMvPguUcbwYdeykPrLeW"
+    - "JuT1aRJnlYVxddy4IRti8RxMBEPdT94AEcmAN35xirRqdxLeA0VC4IINsa6VBXSOdGcA/Y"
+    - "KZ4+YQlgJBa7Wro8pN/WW1nd5jMKSPi+FREsYEhm9Z9gDMlTrR0IJdhUYqxJoTsrslnIT/"
+    - "bQdlzkYUdQR2pgRxf1eqeX"
 
 # ex: et ts=2 filetype=yaml

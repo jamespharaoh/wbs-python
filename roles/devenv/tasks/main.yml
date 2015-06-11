@@ -1,6 +1,0 @@
----
-
-- include: "devenv.yml"
-  tags: "devenv"
-
-# ex: et ts=2 filetype=yaml

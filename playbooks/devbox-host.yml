@@ -1,0 +1,35 @@
+---
+
+- hosts: "vagrant"
+  roles:
+
+    - "setup-common-users"
+    - "setup-system"
+    - "setup-hostname"
+    - "setup-dns"
+
+    - "install-system-packages"
+
+    - "build-python"
+    - "setup-python-alternatives"
+
+    - "install-python-pip"
+    - "setup-python-pip-alternatives"
+
+    - "install-python-packages"
+
+    - "devbox-system"
+
+    - "install-nodejs"
+    - "install-iojs"
+    - "install-mongodb"
+    - "install-tools"
+    - "install-node-packages"
+
+    - "install-etcd"
+    - "setup-etcd"
+    - "start-etcd"
+
+    - "devbox-user"
+
+# ex: et ts=2 filetype=yaml

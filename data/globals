@@ -166,4 +166,11 @@ ansible_warning:
   "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
   "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
 
+python_version: "2.7.10"
+python_url: "{{ wistla_dist }}/python/{{ python_archive }}"
+
+python_pip_version: "7.0.3"
+python_pip_archive: "get-pip-{{ python_pip_version }}.py"
+python_pip_url: "{{ wistla_dist }}/python/{{ python_pip_archive }}"
+
 # ex: et ts=2 filetype=yaml

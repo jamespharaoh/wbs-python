@@ -1,0 +1,28 @@
+---
+
+project:
+
+  name: "wistla-devops"
+
+environment:
+
+  devops_home_path: "WISTLA_DEVOPS_HOME"
+  devops_script: "WISTLA_DEVOPS_SCRIPT"
+  devops_connection_name: "WISTLA_DEVOPS_CONNECTION"
+
+ansible:
+
+  dynamic_inventory: "no"
+  write_ssh_data: "no"
+
+etcd:
+
+  default_prefix: "/wistla-devops"
+
+certificate_data:
+
+  country: "GB"
+  locality: "London"
+  organization: "Wistla Limited"
+
+# ex: et ts=2 filetype=yaml

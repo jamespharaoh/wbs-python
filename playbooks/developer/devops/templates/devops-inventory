@@ -1,0 +1,269 @@
+{{ (ansible_warning | default ({ '#': '' })) ['#'] }}
+
+# ---------- local box
+
+{% if deployment_mode == 'vagrant' %}
+[vagrant]
+wistla-{{ deployment_name }}-dev
+{% elif deployment_mode == 'jenkins' %}
+[jenkins]
+wistla-jenkins
+{% endif %}
+
+# ---------- nodes
+
+[node:children]
+node-template
+node-host
+
+[node-host:children]
+{% for node_type in devops_inventory_node_types %}
+node-{{ node_type }}-host
+{% endfor %}
+
+[node-template:children]
+node-template-generic
+node-template-concrete
+
+[node-template-concrete:children]
+{% for node_type in devops_inventory_node_types %}
+node-{{ node_type }}-template
+{% endfor %}
+
+[node-template-generic]
+{{ deployment_name }}-base-template
+
+{% for node_type in devops_inventory_node_types %}
+
+# ---------- node {{ node_type }}
+
+[node-{{ node_type }}:children]
+node-{{ node_type }}-template
+node-{{ node_type }}-host
+
+[node-{{ node_type }}-host]
+{% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
+
+	{%- for node_index in range (4) -%}
+
+		{%- print [
+			[
+				deployment_name,
+				node_type,
+				node_index | string,
+			] | join ('-'),
+			'node_type=' + node_type,
+			'node_index=' + node_index | string,
+			'private_address=' + [
+				deployment.bridge_network,
+				node_index | string,
+				node_type_indices [node_type],
+			] | join ('.'),
+			'private_mac=' + [
+				deployment.bridge_mac,
+				"%0.2X" % node_type_indices [node_type],
+				"%0.2X" % node_index,
+			] | join (':'),
+		] | join (' ') + '\n' -%}
+
+	{%- endfor -%}
+
+{%- else -%}
+
+	{% print [
+		[
+			deployment_name,
+			node_type,
+			instance_zone,
+			instance_index | string,
+		] | join ('-'),
+		'node_type=' + node_type,
+		'node_index=' + instance_index | string,
+		'node_zone=' + instance_zone,
+		'private_address=' + [
+			deployment.bridge_network,
+			instance_index | string,
+			node_type_indices [node_type],
+		] | join ('.'),
+		'private_mac=' + [
+			deployment.bridge_mac,
+			"%0.2X" % instance_index | int,
+			"%0.2X" % node_type_indices [node_type],
+		] | join (':'),
+	] | join (' ') + '\n' -%}
+
+{%- endif %}
+
+[node-{{ node_type }}-template]
+{% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
+
+	{%- print [
+		deployment_name + '-' + node_type + '-template',
+		'node_type=' + node_type,
+	] | join (' '), '\n' -%}
+
+{%- else -%}
+
+	{%- print [
+		deployment_name + '-' + node_type + '-template',
+		'node_type=' + node_type,
+		'node_zone=' + instance_zone,
+	] | join (' '), '\n' -%}
+
+{%- endif %}
+
+{% endfor %}
+
+# ---------- cluster
+
+[cluster:children]
+cluster-network
+cluster-host
+
+[cluster-network]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name -%}
+	{%- print [
+		'cluster-' + other_cluster_name + '-network',
+		'cluster_name=' + other_cluster_name,
+	] | join (' ') + '\n' -%}
+{%- endfor %}
+
+[cluster-host:children]
+cluster-admin
+cluster-app
+cluster-jenkins
+
+[cluster-admin:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name -%}
+
+	{%- print 'cluster-', other_cluster_name, '-admin\n' -%}
+
+{%- endfor %}
+
+[cluster-app:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name -%}
+
+	{%- if other_cluster_name != 'ops' -%}
+		{%- print 'cluster-', other_cluster_name, '-app\n' -%}
+	{%- endif -%}
+
+{%- endfor %}
+
+[cluster-jenkins:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name -%}
+
+	{%- if other_cluster_name == 'ops' %}
+		{%- print 'cluster-', other_cluster_name, '-jenkins\n' -%}
+	{%- endif -%}
+
+{%- endfor %}
+
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name %}
+
+# ---------- cluster {{ other_cluster_name }}
+
+[cluster-{{ other_cluster_name }}:children]
+cluster-{{ other_cluster_name }}-admin
+{% if other_cluster_name != 'ops' %}
+cluster-{{ other_cluster_name }}-app
+{% endif %}
+{% if other_cluster_name == 'ops' %}
+cluster-{{ other_cluster_name }}-jenkins
+{% endif %}
+
+[cluster-{{ other_cluster_name }}]
+cluster-{{ other_cluster_name }}-network
+
+[cluster-{{ other_cluster_name }}-admin]
+{% for instance_zone in [ 'a', 'b', 'c' ] -%}
+{%- for instance_index in [ '4' ] -%}
+
+	{%- print [
+		[
+			'wistla',
+			other_cluster.short_name,
+			'admin',
+			instance_zone,
+		] | join ('-'),
+		'cluster_name=' + other_cluster_name,
+		'instance_type=admin',
+		'instance_zone=' + instance_zone,
+		'instance_index=' + instance_index,
+		'private_address=' + [
+			other_cluster.cluster_network,
+			(cluster_zone_indices [instance_zone] | int * 64
+				+ cluster_instance_type_indices.admin | int) | string,
+			instance_index,
+		] | join ('.'),
+	] | join (' ') + '\n' -%}
+
+{%- endfor -%}
+{%- endfor %}
+
+{% if other_cluster_name != 'ops' %}
+[cluster-{{ other_cluster_name }}-app]
+{% for instance_zone in [ 'a' ] -%}
+{%- for instance_index in [ '4' ] -%}
+
+	{%- print [
+		[
+			'wistla',
+			other_cluster.short_name,
+			'app',
+			instance_zone,
+			instance_index,
+		] | join ('-'),
+		'cluster_name=' + other_cluster_name,
+		'instance_type=app',
+		'instance_zone=' + instance_zone,
+		'instance_index=' + instance_index,
+		'private_address=' + [
+			other_cluster.cluster_network,
+			(cluster_zone_indices [instance_zone] | int * 64
+				+ cluster_instance_type_indices.app | int) | string,
+			instance_index,
+		] | join ('.'),
+	] | join (' ') + '\n' -%}
+
+{%- endfor -%}
+{%- endfor -%}
+{%- endif %}
+
+{% if other_cluster_name == 'ops' %}
+[cluster-{{ other_cluster_name }}-jenkins]
+{% for instance_zone in [ 'a' ] -%}
+{%- for instance_index in [ '4' ] -%}
+
+	{%- print [
+		[
+			'wistla',
+			other_cluster.short_name,
+			'jenkins',
+		] | join ('-'),
+		'cluster_name=' + other_cluster_name,
+		'instance_type=jenkins',
+		'instance_zone=' + instance_zone,
+		'instance_index=' + instance_index,
+		'private_address=' + [
+			other_cluster.cluster_network,
+			(cluster_zone_indices [instance_zone] | int * 64
+				+ cluster_instance_type_indices.jenkins | int) | string,
+			instance_index,
+		] | join ('.'),
+	] | join (' ') + '\n' -%}
+
+{%- endfor -%}
+{%- endfor -%}
+{%- endif %}
+
+{% endfor %}

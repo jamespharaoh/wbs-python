@@ -58,6 +58,37 @@ kernel_versions:
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
+etcd_credentials:
+
+  peer_ca_certificate: "/authority/ops-etcd-peer/certificate"
+  client_ca_certificate: "/authority/ops-etcd-client/certificate"
+
+  admin:
+
+    a:
+
+      peer_certificate: "/authority/ops-etcd-peer/issue/0/certificate"
+      peer_private_key: "/authority/ops-etcd-peer/issue/0/key"
+
+      client_certificate: "/authority/ops-etcd-client/issue/0/certificate"
+      client_private_key: "/authority/ops-etcd-client/issue/0/key"
+
+    b:
+
+      peer_certificate: "/authority/ops-etcd-peer/issue/1/certificate"
+      peer_private_key: "/authority/ops-etcd-peer/issue/1/key"
+
+      client_certificate: "/authority/ops-etcd-client/issue/1/certificate"
+      client_private_key: "/authority/ops-etcd-client/issue/1/key"
+
+    c:
+
+      peer_certificate: "/authority/ops-etcd-peer/issue/2/certificate"
+      peer_private_key: "/authority/ops-etcd-peer/issue/2/key"
+
+      client_certificate: "/authority/ops-etcd-client/issue/2/certificate"
+      client_private_key: "/authority/ops-etcd-client/issue/2/key"
+
 admin_certificates:
 
   # --- berk
