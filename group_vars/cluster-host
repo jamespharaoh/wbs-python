@@ -17,11 +17,11 @@ amazon_instance_type: "{{
 }}"
 
 amazon_vpc_subnet_id: "{{
-  cluster_dynamic ['cluster_subnet_' + instance_type + '_' + instance_zone]
+  cluster_network ['subnet_' + instance_type + '_' + instance_zone]
 }}"
 
 amazon_security_group_id: "{{
-  cluster_dynamic ['cluster_group_' + instance_type]
+  cluster_network ['security_group_id_' + instance_type]
 }}"
 
 amazon_instance_profile_name: "{{ instance_type }}"
@@ -35,6 +35,7 @@ amazon_instance_tags:
 
 amazon_instance_create_count_tag:
 
+  "Name": "{{ inventory_hostname }}"
   "Class": "{{ instance_type }}"
   "Zone": "{{ instance_zone }}"
   "Index": "{{ instance_index }}"

@@ -22,7 +22,8 @@
   sudo_user: "vagrant"
   register: "vpc_stack_result"
 
-- store_runtime:
+- update_resource:
+
     vpc_id: "{{ vpc_stack_result.stack_outputs.Vpc }}"
     internet_gateway_id: "{{ vpc_stack_result.stack_outputs.InternetGateway }}"
 

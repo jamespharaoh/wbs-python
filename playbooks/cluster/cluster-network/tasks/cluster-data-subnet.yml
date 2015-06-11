@@ -25,7 +25,7 @@
   sudo_user: "vagrant"
   register: "data_subnet_stack_result"
 
-- store_runtime:
+- update_resource:
 
     routes_data_a: "{{ data_subnet_stack_result.stack_outputs.RouteTableA }}"
     routes_data_b: "{{ data_subnet_stack_result.stack_outputs.RouteTableB }}"

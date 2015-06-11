@@ -6,9 +6,6 @@
 - include: "cluster-app-firewall.yml"
   tags: "cluster-app-firewall"
 
-- include: "cluster-app-nginx.yml"
-  tags: "cluster-app-nginx"
-
 - include: "cluster-app-cron.yml"
   tags: "cluster-app-cron"
 

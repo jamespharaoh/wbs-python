@@ -104,7 +104,7 @@
 - name: "copy config files"
   action:
     module: "copy"
-    src: "{{ item.source }}"
+    src: "{{ HOME }}/{{ item.source }}"
     dest: "{{ cluster_deployment_home }}/{{ item.target }}"
     mode: "{{ item.mode }}"
   with_items: "cluster_deployment_config_files"

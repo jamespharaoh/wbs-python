@@ -24,6 +24,8 @@
     - "install-nodejs"
     - "install-iojs"
     - "install-node-packages"
+
+    - "cluster-app-nginx"
     - "cluster-app"
     #- "cluster-icinga"
 

@@ -38,7 +38,10 @@ ops:
 
   jenkins:
 
-    a: [ "TODO" ]
+    a:
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBKq2xHvh99CssSn3KkUzmSV02PwCNR90BqGH+iUnAJwUQFDgUKwE4PcUIEv8YzncXeTx"
+      - "A1jL5IzXIWGT56vw6pE="
 
 production:
 

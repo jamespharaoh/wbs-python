@@ -38,7 +38,7 @@
 
   register: "app_balancer_result"
 
-- store_runtime:
+- update_resource:
 
     app_balancer_hosted_zone_name: "{{ app_balancer_result.elb.canonical_hosted_zone_name }}"
     app_balancer_hosted_zone_name_id: "{{ app_balancer_result.elb.canonical_hosted_zone_name_id }}"

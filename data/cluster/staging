@@ -100,32 +100,42 @@ smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.staging@wistla.com"
 
+etcd_credentials:
+
+  peer_ca_certificate: "/authority/staging-etcd-peer/certificate"
+  client_ca_certificate: "/authority/staging-etcd-client/certificate"
+
+  admin:
+
+    a:
+
+      peer_certificate: "/authority/staging-etcd-peer/issue/0/certificate"
+      peer_private_key: "/authority/staging-etcd-peer/issue/0/key"
+
+      client_certificate: "/authority/staging-etcd-client/issue/0/certificate"
+      client_private_key: "/authority/staging-etcd-client/issue/0/key"
+
+    b:
+
+      peer_certificate: "/authority/staging-etcd-peer/issue/1/certificate"
+      peer_private_key: "/authority/staging-etcd-peer/issue/1/key"
+
+      client_certificate: "/authority/staging-etcd-client/issue/1/certificate"
+      client_private_key: "/authority/staging-etcd-client/issue/1/key"
+
+    c:
+
+      peer_certificate: "/authority/staging-etcd-peer/issue/2/certificate"
+      peer_private_key: "/authority/staging-etcd-peer/issue/2/key"
+
+      client_certificate: "/authority/staging-etcd-client/issue/2/certificate"
+      client_private_key: "/authority/staging-etcd-client/issue/2/key"
+
 app_certificates:
 
-  # ----- staging
-
-  - name: "staging.wistla.com"
-    private_key: "security/ssl/staging.wistla.com.key"
-    certificates:
-      - "security/ssl/staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.staging.wistla.com"
-    private_key: "security/ssl/api.staging.wistla.com.key"
-    certificates:
-      - "security/ssl/api.staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.staging.wistla.com"
-    private_key: "security/ssl/admin.staging.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.staging.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "staging.wist.la"
-    private_key: "security/ssl/staging.wist.la.key"
-    certificates:
-      - "security/ssl/staging.wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "staging.wistla.com"
+  - "api.staging.wistla.com"
+  - "admin.staging.wistla.com"
+  - "staging.wist.la"
 
 # ex: et ts=2 filetype=yaml

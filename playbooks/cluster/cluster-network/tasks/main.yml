@@ -35,11 +35,6 @@
 - include: "cluster-admin-balancer.yml"
   tags: "cluster-admin-balancer"
 
-# ---------- admin
-
-#- include: "cluster-admin-dns.yml"
-#  tags: "cluster-admin-dns"
-
 # ---------- dev
 
 #- include: "cluster-network-dev-dns.yml"

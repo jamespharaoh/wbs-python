@@ -9,15 +9,4 @@
     - "/home/vagrant/work"
     - "/home/vagrant/work/{{ cluster_name }}"
 
-- name: "make sure cluster data exists"
-  shell:
-    if test -f /home/vagrant/work/{{ cluster_name }}/cluster-data; then
-      echo 'UNCHANGED';
-    else
-      touch -f /home/vagrant/work/{{ cluster_name }}/cluster-data;
-      echo 'CHANGED';
-    fi;
-  register: "touch_result"
-  changed_when: "touch_result.stdout != 'UNCHANGED'"
-
 # ex: et ts=2 filetype=yaml

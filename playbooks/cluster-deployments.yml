@@ -47,4 +47,12 @@
       cluster_deployment_name: "test-montblanc"
       tags: [ "cluster-deployment", "test-montblanc" ]
 
+    - role: "cluster-deployment"
+      cluster_deployment_name: "test-erebus"
+      tags: [ "cluster-deployment", "test-erebus" ]
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "test-fitzroy"
+      tags: [ "cluster-deployment", "test-fitzroy" ]
+
 # ex: et ts=2 filetype=yaml

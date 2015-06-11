@@ -31,6 +31,7 @@ third_parties:
 {% if 'production' in secrets %}
   production: {{ lookup ('file', HOME + '/security/third-parties/production') | from_yaml | to_json }}
   staging: {{ lookup ('file', HOME + '/security/third-parties/staging') | from_yaml | to_json }}
+  test: {{ lookup ('file', HOME + '/security/third-parties/test') | from_yaml | to_json }}
   ops: {{ lookup ('file', HOME + '/security/third-parties/ops') | from_yaml | to_json }}
 {% endif %}
 {% endif %}

@@ -1,12 +1,5 @@
 ---
 
-- name: "restart nginx"
-  action:
-    module: "service"
-    name: "nginx"
-    state: "restarted"
-  sudo: "yes"
-
 - name: "restart cron"
   action:
     module: "service"

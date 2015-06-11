@@ -5,63 +5,33 @@
 - hosts: "cluster-jenkins"
   roles:
 
-    # ----- create
+    - "cluster-create"
+    - "wait-for-ssh"
 
-    - role: "cluster-create"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-create" ]
+    - "setup-common-users"
+    - "setup-hostname"
+    - "setup-system"
+    - "setup-dns"
+    - "cluster-ssh"
+    - "install-system-packages"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-volumes"
+    - "cluster-user"
 
-    # ----- system
+    - "build-python"
+    - "setup-python-alternatives"
+    - "install-python-pip"
+    - "setup-python-pip-alternatives"
+    - "install-python-packages"
 
-    - role: "cluster-volumes"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-volumes" ]
+    - "install-mongodb"
+    - "install-tools"
+    - "install-nodejs"
+    - "install-iojs"
+    - "install-node-packages"
 
-    - role: "install-kernel"
-      when: "cluster == 'ops'"
-      tags: [ "install-kernel" ]
-
-    - role: "setup-system"
-      when: "cluster == 'ops'"
-      tags: [ "setup-system" ]
-
-    - role: "cluster-ssh"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-user" ]
-
-    - role: "install-postfix"
-      when: "cluster == 'ops'"
-      tags: [ "install-postfix" ]
-
-    - role: "setup-common-users"
-      when: "cluster == 'ops'"
-      tags: [ "setup-common-users" ]
-
-    - role: "install-nodejs"
-      when: "cluster == 'ops'"
-      tags: [ "install-nodejs" ]
-
-    - role: "install-iojs"
-      when: "cluster == 'ops'"
-      tags: [ "install-iojs" ]
-
-    - role: "setup-alternatives"
-      when: "cluster == 'ops'"
-      tags: [ "setup-alternatives" ]
-
-    - role: "install-node-packages"
-      when: "cluster == 'ops'"
-      tags: [ "install-node-packages" ]
-
-    # ----- services
-
-    - role: "cluster-user"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-user" ]
-
-    - role: "cluster-jenkins"
-      when: "cluster == 'ops'"
-      tags: [ "cluster-jenkins" ]
+    - "cluster-jenkins"
 
     #- role: "cluster-icinga"
     #  when: "cluster == 'ops'"

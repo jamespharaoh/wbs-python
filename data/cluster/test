@@ -25,6 +25,8 @@ deployment_names:
   - "test-everest"
   - "test-k2"
   - "test-montblanc"
+  - "test-erebus"
+  - "test-fitzroy"
 
 # ========== amazon miscellaneous
 
@@ -81,84 +83,62 @@ smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.test@wistla.com"
 
+etcd_credentials:
+
+  peer_ca_certificate: "/authority/test-etcd-peer/certificate"
+  client_ca_certificate: "/authority/test-etcd-client/certificate"
+
+  admin:
+
+    a:
+
+      peer_certificate: "/authority/test-etcd-peer/issue/0/certificate"
+      peer_private_key: "/authority/test-etcd-peer/issue/0/key"
+
+      client_certificate: "/authority/test-etcd-client/issue/0/certificate"
+      client_private_key: "/authority/test-etcd-client/issue/0/key"
+
+    b:
+
+      peer_certificate: "/authority/test-etcd-peer/issue/1/certificate"
+      peer_private_key: "/authority/test-etcd-peer/issue/1/key"
+
+      client_certificate: "/authority/test-etcd-client/issue/1/certificate"
+      client_private_key: "/authority/test-etcd-client/issue/1/key"
+
+    c:
+
+      peer_certificate: "/authority/test-etcd-peer/issue/2/certificate"
+      peer_private_key: "/authority/test-etcd-peer/issue/2/key"
+
+      client_certificate: "/authority/test-etcd-client/issue/2/certificate"
+      client_private_key: "/authority/test-etcd-client/issue/2/key"
+
 app_certificates:
 
-  # ----- everest
+  - "everest.test.wistla.com"
+  - "api.everest.test.wistla.com"
+  - "admin.everest.test.wistla.com"
+  - "everest.test.wist.la"
 
-  - name: "everest.test.wistla.com"
-    private_key: "security/ssl/everest.test.wistla.com.key"
-    certificates:
-      - "security/ssl/everest.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "k2.test.wistla.com"
+  - "api.k2.test.wistla.com"
+  - "admin.k2.test.wistla.com"
+  - "k2.test.wist.la"
 
-  - name: "api.everest.test.wistla.com"
-    private_key: "security/ssl/api.everest.test.wistla.com.key"
-    certificates:
-      - "security/ssl/api.everest.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "montblanc.test.wistla.com"
+  - "api.montblanc.test.wistla.com"
+  - "admin.montblanc.test.wistla.com"
+  - "montblanc.test.wist.la"
 
-  - name: "admin.everest.test.wistla.com"
-    private_key: "security/ssl/admin.everest.test.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.everest.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "erebus.test.wistla.com"
+  - "api.erebus.test.wistla.com"
+  - "admin.erebus.test.wistla.com"
+  - "erebus.test.wist.la"
 
-  - name: "everest.test.wist.la"
-    private_key: "security/ssl/everest.test.wist.la.key"
-    certificates:
-      - "security/ssl/everest.test.wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  # ----- k2
-
-  - name: "k2.test.wistla.com"
-    private_key: "security/ssl/k2.test.wistla.com.key"
-    certificates:
-      - "security/ssl/k2.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.k2.test.wistla.com"
-    private_key: "security/ssl/api.k2.test.wistla.com.key"
-    certificates:
-      - "security/ssl/api.k2.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.k2.test.wistla.com"
-    private_key: "security/ssl/admin.k2.test.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.k2.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "k2.test.wist.la"
-    private_key: "security/ssl/k2.test.wist.la.key"
-    certificates:
-      - "security/ssl/k2.test.wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  # ----- montblanc
-
-  - name: "montblanc.test.wistla.com"
-    private_key: "security/ssl/montblanc.test.wistla.com.key"
-    certificates:
-      - "security/ssl/montblanc.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.montblanc.test.wistla.com"
-    private_key: "security/ssl/api.montblanc.test.wistla.com.key"
-    certificates:
-      - "security/ssl/api.montblanc.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.montblanc.test.wistla.com"
-    private_key: "security/ssl/admin.montblanc.test.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.montblanc.test.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "montblanc.test.wist.la"
-    private_key: "security/ssl/montblanc.test.wist.la.key"
-    certificates:
-      - "security/ssl/montblanc.test.wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "fitzroy.test.wistla.com"
+  - "api.fitzroy.test.wistla.com"
+  - "admin.fitzroy.test.wistla.com"
+  - "fitzroy.test.wist.la"
 
 # ex: et ts=2 filetype=yaml

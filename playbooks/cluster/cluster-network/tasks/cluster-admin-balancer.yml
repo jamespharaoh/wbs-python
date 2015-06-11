@@ -39,7 +39,7 @@
 
   register: "admin_balancer_result"
 
-- store_runtime:
+- update_resource:
 
     admin_balancer_hosted_zone_name: "{{ admin_balancer_result.elb.canonical_hosted_zone_name }}"
     admin_balancer_hosted_zone_name_id: "{{ admin_balancer_result.elb.canonical_hosted_zone_name_id }}"

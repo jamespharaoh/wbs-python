@@ -1,16 +1,16 @@
 ---
 
-- name: "create robots.txt"
+- name: "create dev robots.txt"
   action:
     module: "template"
-    src: "cluster-admin-nginx-robots"
+    src: "cluster-app-dev-robots-txt"
     dest: "/etc/nginx/dev-robots.txt"
   sudo: "yes"
 
 - name: "create nginx config"
   action:
     module: "template"
-    src: "cluster-admin-nginx-config"
+    src: "cluster-app-nginx-config"
     dest: "/etc/nginx/nginx.conf"
   sudo: "yes"
   notify: "restart nginx"
@@ -25,10 +25,10 @@
 - name: "write nginx certificates"
   action:
     module: "template"
-    src: "cluster-admin-ssl-bundle"
+    src: "cluster-app-ssl-bundle"
     dest: "/etc/nginx/ssl/{{ item }}.cert"
   sudo: "yes"
-  with_items: "cluster.admin_certificates | default ([])"
+  with_items: "cluster.app_certificates | default ([])"
   notify: "restart nginx"
 
 - name: "write nginx private keys"
@@ -44,7 +44,7 @@
     ] | join ('')) + '\n' }}"
     mode: "0600"
   sudo: "yes"
-  with_items: "cluster.admin_certificates | default ([])"
+  with_items: "cluster.app_certificates | default ([])"
   notify: "restart nginx"
 
 - name: "write nginx htpasswd"

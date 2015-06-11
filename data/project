@@ -15,6 +15,13 @@ ansible:
   dynamic_inventory: "no"
   write_ssh_data: "no"
 
+  ssh_args:
+
+    - "-o ControlMaster=auto"
+    - "-o ControlPersist=60s"
+    - "-o ForwardAgent=yes"
+    - "-o StrictHostKeyChecking=yes"
+
 etcd:
 
   default_prefix: "/wistla-devops"

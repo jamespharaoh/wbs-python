@@ -17,7 +17,7 @@
   register: "create_group"
   with_items: "amazon_security_groups"
 
-- store_runtime:
+- update_resource:
 
     security_group_id_admin: "{{ create_group.results.0.group_id }}"
     security_group_id_app: "{{ create_group.results.1.group_id }}"

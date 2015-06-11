@@ -1,5 +1,31 @@
 ---
 
+- name: "create admin per-zone dns"
+  delegate_to: "localhost"
+  action:
+
+    module: "route53"
+    command: "create"
+    overwrite: "yes"
+
+    zone: "{{ cluster.main_domain }}"
+    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.main_domain }}"
+    ttl: "60"
+    type: "A"
+    value: "{{ cluster.amazon_admin_ips [item.1] }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  with_nested:
+
+    - - "admin"
+      - "vpn"
+
+    - - "a"
+      - "b"
+      - "c"
+
 - name: "create main misc records"
   action:
 
@@ -41,7 +67,7 @@
   when: "item.0.main_domain is defined"
   with_nested:
 
-    - "{{ cluster.deployment_names | dict_map (deployments) }}"
+    - "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
 
     - - ""
       - "admin."
@@ -70,11 +96,31 @@
   when: "item.0.short_domain is defined"
   with_nested:
 
-    - "{{ cluster.deployment_names | dict_map (deployments) }}"
+    - "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
 
     - - ""
 
-# TODO admin hosts
-# TODO vpn hosts
+- name: "create jenkins deployment record"
+  action:
+
+    module: "route53"
+    record: "jenkins.ops.wistla.com"
+    command: "create"
+
+    zone: "ops.wistla.com"
+    overwrite: "yes"
+
+    type: "A"
+    ttl: "30"
+    value: "{{ admin_balancer_hosted_zone_name }}"
+    alias: "yes"
+    alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  when: "cluster_name == 'ops'"
+
+# TODO dev
 
 # ex: et ts=2 filetype=yaml

@@ -1,23 +1,12 @@
 ---
 
-- include: "cluster-jenkins-system.yml"
-  tags: "cluster-jenkins-system"
-  when: "cluster == 'ops'"
-
 - include: "cluster-jenkins-network.yml"
   tags: "cluster-jenkins-network"
-  when: "cluster == 'ops'"
-
-- include: "cluster-jenkins-dns.yml"
-  tags: "cluster-jenkins-dns"
-  when: "cluster == 'ops'"
 
 - include: "cluster-jenkins-install.yml"
   tags: "cluster-jenkins-install"
-  when: "cluster == 'ops'"
 
 - include: "cluster-jenkins-nginx.yml"
   tags: "cluster-jenkins-nginx"
-  when: "cluster == 'ops'"
 
 # ex: et ts=2 filetype=yaml

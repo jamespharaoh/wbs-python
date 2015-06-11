@@ -2,16 +2,14 @@
 
 cluster: "{{ clusters [cluster_name] }}"
 
+cluster_network_name: "cluster-{{ cluster_name }}-network"
+cluster_network: "{{ hostvars [cluster_network_name] }}"
+
 amazon_account: "{{ cluster.amazon_account }}"
 amazon_region: "{{ cluster.amazon_region }}"
 amazon_key_name: "{{ cluster.amazon_key_name }}"
 
 node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
-
-cluster_dynamic: "{{
-  lookup ('file', '/home/vagrant/work/' + cluster_name + '/cluster-data')
-  | from_yaml
-}}"
 
 # ex: et ts=2 filetype=yaml

@@ -87,30 +87,9 @@ cron_email: "cron.production@wistla.com"
 
 app_certificates:
 
-  # ----- production
-
-  - name: "wistla.com"
-    private_key: "security/ssl/wistla.com.key"
-    certificates:
-      - "security/ssl/wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "api.wistla.com"
-    private_key: "security/ssl/api.wistla.com.key"
-    certificates:
-      - "security/ssl/api.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "admin.wistla.com"
-    private_key: "security/ssl/admin.wistla.com.key"
-    certificates:
-      - "security/ssl/admin.wistla.com.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
-
-  - name: "wist.la"
-    private_key: "security/ssl/wist.la.key"
-    certificates:
-      - "security/ssl/wist.la.cert"
-      - "security/ssl/comodo-rsa-domain-validation-chain.cert"
+  - "wistla.com"
+  - "api.wistla.com"
+  - "admin.wistla.com"
+  - "wist.la"
 
 # ex: et ts=2 filetype=yaml

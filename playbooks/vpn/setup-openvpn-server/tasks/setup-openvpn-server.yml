@@ -3,7 +3,7 @@
 - name: "install openvpn ca cert"
   action:
     module: "copy"
-    src: "security/wistla-ca.cert"
+    src: "{{ HOME }}/security/wistla-ca.cert"
     dest: "/etc/openvpn/wistla-ca.cert"
   sudo: "yes"
   notify: "restart openvpn"
@@ -11,7 +11,7 @@
 - name: "install wistla-dh.pem"
   action:
     module: "copy"
-    src: "security/wistla-dh.pem"
+    src: "{{ HOME }}/security/wistla-dh.pem"
     dest: "/etc/openvpn/wistla-dh.pem"
   sudo: "yes"
   notify: "restart openvpn"
@@ -19,7 +19,7 @@
 - name: "install openvpn server cert"
   action:
     module: "copy"
-    src: "security/vpn-server/{{ cluster_name }}.cert"
+    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.cert"
     dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.cert"
   sudo: "yes"
   notify: "restart openvpn"
@@ -27,7 +27,7 @@
 - name: "install openvpn server key"
   action:
     module: "copy"
-    src: "security/vpn-server/{{ cluster_name }}.key"
+    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.key"
     dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.key"
     mode: "0600"
   sudo: "yes"

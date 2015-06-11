@@ -335,6 +335,88 @@ test-montblanc:
     rabbit: "1"
     web: "1"
 
+test-erebus:
+
+  name: "test-erebus"
+  type: "simple"
+
+  cluster: "test"
+
+  main_domain: "erebus.test.wistla.com"
+  short_domain: "erebus.test.wist.la"
+
+  parent_cluster: "test"
+  parent_domain: "test.wistla.com"
+
+  bridge_name: "br165"
+  bridge_network: "10.165"
+  bridge_mac: "aa:bb:0a:a5"
+
+  apple_push_notifications_enabled: "yes"
+  apple_push_notifications_name: "wistla-dev"
+  apple_push_notifications_production: "no"
+
+  emails_enabled: "yes"
+
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    mongo: "512"
+    rabbit: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    mongo: "1"
+    rabbit: "1"
+    web: "1"
+
+test-fitzroy:
+
+  name: "test-fitzroy"
+  type: "simple"
+
+  cluster: "test"
+
+  main_domain: "fitzroy.test.wistla.com"
+  short_domain: "fitzroy.test.wist.la"
+
+  parent_cluster: "test"
+  parent_domain: "test.wistla.com"
+
+  bridge_name: "br166"
+  bridge_network: "10.166"
+  bridge_mac: "aa:bb:0a:a6"
+
+  apple_push_notifications_enabled: "yes"
+  apple_push_notifications_name: "wistla-dev"
+  apple_push_notifications_production: "no"
+
+  emails_enabled: "yes"
+
+  node_memory:
+
+    api: "512"
+    browser: "256"
+    load: "128"
+    mongo: "512"
+    rabbit: "256"
+    web: "1024"
+
+  node_instance_count:
+
+    api: "1"
+    browser: "1"
+    load: "1"
+    mongo: "1"
+    rabbit: "1"
+    web: "1"
+
 dev:
 
   name: "dev"
