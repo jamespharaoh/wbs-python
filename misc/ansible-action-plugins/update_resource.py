@@ -62,3 +62,5 @@ class ActionModule (object):
 			conn = conn,
 			result = dict (
 				ansible_facts = options))
+
+# ex: noet ts=4 filetype=python

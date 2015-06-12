@@ -2,9 +2,7 @@
 
 - update_resource:
     python.pip_state: "installing"
-  when: "
-    python_pip_state is not defined
-  "
+  when: "python_pip_state is not defined"
   tags: [ "python", "install-python-pip" ]
 
 - include: "install-python-pip.yml"
