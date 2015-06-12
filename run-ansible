@@ -52,6 +52,11 @@ def basic_setup ():
 	HOME = os.path.abspath (os.path.dirname (__file__))
 	os.chdir (HOME)
 
+	if os.path.isfile ("config"):
+		os.rename ("config", "config-temp")
+		os.mkdir ("config")
+		os.rename ("config-temp", "config/overrides.yml")
+
 def load_state ():
 
 	global STATE

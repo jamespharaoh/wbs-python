@@ -24,7 +24,18 @@ ansible:
 
 etcd:
 
-  default_prefix: "/wistla-devops"
+  default_connections:
+
+    wistla-devops:
+
+      etcd_servers:
+        - "wistla-ops-admin-a"
+        - "wistla-ops-admin-b"
+        - "wistla-ops-admin-c"
+
+      etcd_secure: "yes"
+
+      etcd_prefix: "/wistla-devops"
 
 certificate_data:
 
