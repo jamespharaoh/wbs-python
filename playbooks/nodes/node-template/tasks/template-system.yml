@@ -9,7 +9,7 @@
   register: "create_apt_sources_result"
 
 - name: "update apt package lists"
-  shell: apt-get update
+  shell: "apt-get update"
   sudo: "yes"
   when: "create_apt_sources_result | changed"
 
