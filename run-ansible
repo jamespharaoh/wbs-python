@@ -234,6 +234,8 @@ def update_config ():
 		"playbooks/devops.yml",
 	])
 
+	time.sleep (0.3)
+
 	if CONFIG ["deployment_mode"] != "vagrant":
 		return
 
