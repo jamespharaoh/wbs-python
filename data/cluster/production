@@ -11,8 +11,6 @@ vpn_networks:
   c: "10.164.2"
   d: "10.164.3"
 
-short_name: "prod"
-
 main_domain: "wistla.com"
 short_domain: "wist.la"
 
@@ -84,6 +82,37 @@ route53_main_domain:
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.production@wistla.com"
+
+etcd_credentials:
+
+  peer_ca_certificate: "/authority/production-etcd-peer/certificate"
+  client_ca_certificate: "/authority/production-etcd-client/certificate"
+
+  admin:
+
+    a:
+
+      peer_certificate: "/authority/production-etcd-peer/issue/0/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/0/key"
+
+      client_certificate: "/authority/production-etcd-client/issue/0/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/0/key"
+
+    b:
+
+      peer_certificate: "/authority/production-etcd-peer/issue/1/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/1/key"
+
+      client_certificate: "/authority/production-etcd-client/issue/1/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/1/key"
+
+    c:
+
+      peer_certificate: "/authority/production-etcd-peer/issue/2/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/2/key"
+
+      client_certificate: "/authority/production-etcd-client/issue/2/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/2/key"
 
 app_certificates:
 

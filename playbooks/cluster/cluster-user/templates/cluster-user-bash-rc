@@ -33,7 +33,7 @@ export PAGER=less
 {% set colour_normal = '\[\e[0m\]' %}
 
 PS1="{{ [
-	colour_cluster, 'wistla-', cluster.short_name,
+	colour_cluster, 'wistla-', cluster_name,
 	colour_misc, '-',
 	colour_type, instance_type,
 	colour_misc, '-',

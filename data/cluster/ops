@@ -11,8 +11,6 @@ vpn_networks:
   c: "10.164.14"
   d: "10.164.15"
 
-short_name: "ops"
-
 main_domain: "ops.wistla.com"
 short_domain: "ops.wist.la"
 

@@ -11,8 +11,6 @@ vpn_networks:
   c: "10.164.6"
   d: "10.164.7"
 
-short_name: "stage"
-
 main_domain: "staging.wistla.com"
 short_domain: "staging.wist.la"
 

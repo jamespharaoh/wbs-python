@@ -191,7 +191,7 @@ cluster-{{ other_cluster_name }}-network
 	{%- print [
 		[
 			'wistla',
-			other_cluster.short_name,
+			other_cluster_name,
 			'admin',
 			instance_zone,
 		] | join ('-'),
@@ -218,7 +218,7 @@ cluster-{{ other_cluster_name }}-network
 	{%- print [
 		[
 			'wistla',
-			other_cluster.short_name,
+			other_cluster_name,
 			'app',
 			instance_zone,
 			instance_index,
@@ -247,7 +247,7 @@ cluster-{{ other_cluster_name }}-network
 	{%- print [
 		[
 			'wistla',
-			other_cluster.short_name,
+			other_cluster_name,
 			'jenkins',
 		] | join ('-'),
 		'cluster_name=' + other_cluster_name,

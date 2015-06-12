@@ -4,7 +4,7 @@
 
 Host {{ [
 	'wistla-' + cluster_name + '-*',
-	'wistla-' + cluster.short_name + '-*',
+	'wistla-' + cluster_name + '-*',
 	'*.admin.' + cluster.main_domain,
 ] | join (' ') }}
 ForwardAgent yes

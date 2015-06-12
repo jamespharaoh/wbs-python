@@ -1,0 +1,6 @@
+---
+etcd:
+  needs_restart: 'no'
+  state: running
+etcd_needs_restart: 'no'
+etcd_state: running

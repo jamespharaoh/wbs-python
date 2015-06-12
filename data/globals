@@ -173,4 +173,10 @@ python_pip_version: "7.0.3"
 python_pip_archive: "get-pip-{{ python_pip_version }}.py"
 python_pip_url: "{{ wistla_dist }}/python/{{ python_pip_archive }}"
 
+python_apt_version: "0.9.3-1"
+python_apt_url: "{{ wistla_dist }}/python/{{ python_apt_archive }}"
+
+etcd_version: "2.0.11"
+etcd_url: "{{ wistla_dist }}/etcd/{{ etcd_archive }}"
+
 # ex: et ts=2 filetype=yaml
