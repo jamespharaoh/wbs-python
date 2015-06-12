@@ -43,6 +43,9 @@ my_system_packages:
   - name: "libav-tools"
     state: "present"
 
+  - name: "libffi-dev"
+    state: "present"
+
   - name: "lxc"
     state: "present"
 
@@ -93,6 +96,9 @@ python_packages:
 
   - name: "awscli"
     version: "1.7.31"
+
+  - name: "ipaddress"
+    version: "1.0.7"
 
 node_packages:
 

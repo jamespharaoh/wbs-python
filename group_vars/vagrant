@@ -65,6 +65,9 @@ system_packages:
 
   - name: "libav-tools"
 
+  - name: "libffi-dev"
+    state: "present"
+
   - name: "lxc"
 
   - name: "mailutils"
@@ -129,5 +132,14 @@ python_packages:
 
   - name: "GitPython"
     version: "1.0.1"
+
+  - name: "pyyaml"
+    version: "3.11"
+
+  - name: "pyopenssl"
+    version: "0.15.1"
+
+  - name: "paramiko"
+    version: "1.15.2"
 
 # ex: et ts=2 filetype=yaml

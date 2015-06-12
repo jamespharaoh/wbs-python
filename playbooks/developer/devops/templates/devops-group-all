@@ -21,7 +21,7 @@ amazon_security_groups: {{ lookup ('file', DATA + '/security-groups') | from_yam
 ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys') | from_yaml | to_json }}
 ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys') | from_yaml | to_json }}
 
-{% if not secrets %}
+{% if not secrets | default ([]) %}
 third_parties: {}
 {% else %}
 third_parties:

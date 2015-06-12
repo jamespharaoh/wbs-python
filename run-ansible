@@ -56,6 +56,7 @@ def basic_setup ():
 		os.rename ("config", "config-temp")
 		os.mkdir ("config")
 		os.rename ("config-temp", "config/overrides.yml")
+		os.rename ("accounts", "config/accounts.yml")
 
 def load_state ():
 
