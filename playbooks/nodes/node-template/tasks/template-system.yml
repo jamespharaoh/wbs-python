@@ -6,6 +6,12 @@
     src: "template-apt-sources-list"
     dest: "/etc/apt/sources.list"
   sudo: "yes"
+  register: "create_apt_sources_result"
+
+- name: "update apt package lists"
+  shell: apt-get update
+  sudo: "yes"
+  when: "create_apt_sources_result | changed"
 
 - name: "create resolv.conf"
   action:

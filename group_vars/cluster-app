@@ -64,27 +64,6 @@ my_system_packages:
   - name: "openvpn"
     state: "present"
 
-  - name: "python-boto"
-    state: "present"
-
-  - name: "python-dev"
-    state: "present"
-
-  - name: "python-httplib2"
-    state: "present"
-
-  - name: "python-jinja2"
-    state: "present"
-
-  - name: "python-paramiko"
-    state: "present"
-
-  - name: "python-pip"
-    state: "present"
-
-  - name: "python-yaml"
-    state: "present"
-
   - name: "whois"
     state: "present"
 
@@ -99,6 +78,15 @@ python_packages:
 
   - name: "ipaddress"
     version: "1.0.7"
+
+  - name: "pyyaml"
+    version: "3.11"
+
+  - name: "pyopenssl"
+    version: "0.15.1"
+
+  - name: "paramiko"
+    version: "1.15.2"
 
 node_packages:
 

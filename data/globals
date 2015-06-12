@@ -137,7 +137,7 @@ kernel_build: "{{ kernel_versions [kernel_version].build }}"
 kernel_type: "{{ kernel_versions [kernel_version].type }}"
 kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
 
-wistla_dist: "http://dist.ops.wistla.com"
+wistla_dist: "https://dist.ops.wistla.com"
 
 system_reboot_on_error: "yes"
 
