@@ -16,9 +16,9 @@ from wbs import yamlx
 from wbs import LazyDictionary
 from wbs import SchemaDatabase
 
-from gridlinker.certificate import CertificateAuthority
-
-from gridlinker.generic.collection import GenericCollection
+from gridlinker.certificate.authority import CertificateAuthority
+from gridlinker.etcd import GenericCollection
+from gridlinker.etcd import EtcdClient
 
 class GenericContext (object):
 
@@ -36,7 +36,7 @@ class GenericContext (object):
 	@lazy_property
 	def support_package (self):
 
-		return "gridlinker.generic"
+		return "gridlinker.ansible"
 
 	@lazy_property
 	def devops_script (self):
@@ -83,7 +83,7 @@ class GenericContext (object):
 
 		if self.connection_config ["etcd_secure"] == "yes":
 
-			return gridlinker.Client (
+			return EtcdClient (
 				servers = self.connection_config ["etcd_servers"],
 				secure = True,
 				client_ca_cert = "%s/%s-ca.cert" % (
@@ -96,7 +96,7 @@ class GenericContext (object):
 
 		elif self.connection_config ["etcd_secure"] == "no":
 
-			return gridlinker.Client (
+			return EtcdClient (
 				servers = self.connection_config ["etcd_servers"],
 				prefix = self.connection_config ["etcd_prefix"])
 
@@ -521,10 +521,10 @@ class GenericContext (object):
 
 	def map_resource_variable (self, resource_name, resource_data, name):
 
-		if name == "inventory_hostname":
+		if name == "identity.name":
 			return resource_name
 
-		elif name == "private_address":
+		elif name == "private.address":
 
 			if "private" in resource_data \
 			and "address" in resource_data ["private"]:
@@ -535,7 +535,7 @@ class GenericContext (object):
 
 				return None
 
-		elif name == "public_address":
+		elif name == "public.address":
 			return resource_data.get ("public", {}).get ("address", None)
 
 		else:
