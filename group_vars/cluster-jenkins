@@ -1,5 +1,7 @@
 ---
 
+ansible_connection: "local"
+
 cluster_type: "jenkins"
 
 instance_type_colour: "197"
