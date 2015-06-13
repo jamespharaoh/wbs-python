@@ -39,6 +39,9 @@ class Connection (object):
 
 		self.chroot_cmd = distutils.spawn.find_executable ("chroot")
 
+		if not self.chroot_cmd and os.path.isfile ("/usr/sbin/chroot"):
+			self.chroot_cmd = "/usr/sbin/chroot"
+
 		if not self.chroot_cmd:
 			raise errors.AnsibleError ("chroot command not found in PATH")
 
