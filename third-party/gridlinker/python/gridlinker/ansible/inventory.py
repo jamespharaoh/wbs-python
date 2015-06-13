@@ -46,6 +46,9 @@ class Inventory (object):
 
 	def load_classes (self):
 
+		if not "classes" in self.context.local_data:
+			return
+
 		class_list = self.context.local_data ["classes"].items ()
 
 		for class_name, class_data in class_list:
