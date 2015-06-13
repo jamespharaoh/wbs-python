@@ -144,7 +144,7 @@ system_reboot_on_error: "yes"
 ansible_warning_lines:
 
   - "######################################################################"
-  - "################### THIS FILE IS MANAGED BY ANSIBLE ##################"
+  - "##################  THIS FILE IS MANAGED BY ANSIBLE  #################"
   - "######################################################################"
   - "#                                                                    #"
   - "#  Please do not make changes to this file, since they will be       #"
