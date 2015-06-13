@@ -133,6 +133,9 @@ python_packages:
   - name: "GitPython"
     version: "1.0.1"
 
+  - name: "netaddr"
+    version: "0.7.14"
+
   - name: "pyyaml"
     version: "3.11"
 
