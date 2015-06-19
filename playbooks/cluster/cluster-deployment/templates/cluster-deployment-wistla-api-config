@@ -15,6 +15,9 @@ config.webTest = 'http://www.{{ cluster_deployment.main_domain }}';
 config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
 
+// admin url
+config.adminUrl = 'https://admin.{{ cluster_deployment_alias.main_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla';
 
@@ -22,6 +25,9 @@ config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_
 config.amqpOptions = {
 	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ instance_zone }}-{{ instance_index }}',
 };
+
+// CORS
+config.CORS.origins.push(config.webUrl, config.adminUrl);
 
 {% if use_s3 == 'yes' %}
 
