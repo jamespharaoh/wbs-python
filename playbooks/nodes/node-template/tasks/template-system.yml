@@ -34,4 +34,11 @@
     dest: "/etc/ssh/ssh_known_hosts"
   sudo: "yes"
 
+- name: "create sudoers"
+  action:
+    module: "template"
+    src: "template-sudoers"
+    dest: "/etc/sudoers"
+  sudo: "yes"
+
 # ex: et ts=2 filetype=yaml
