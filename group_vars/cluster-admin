@@ -74,8 +74,16 @@ amazon_elastic_ip: "{{ cluster.amazon_admin_ips [instance_zone] }}"
 
 vpn_network: "{{ cluster.vpn_networks [instance_zone] }}"
 
+etcd_version: "2.1.0-alpha.0"
 etcd_clustered: "yes"
 etcd_secured: "yes"
+
+etcd_initial_cluster_state: "new"
+etcd_initial_cluster: "{{ [
+  'wistla-ops-admin-a=https://wistla-ops-admin-a:2380',
+  'wistla-ops-admin-b=https://wistla-ops-admin-b:2380',
+  'wistla-ops-admin-c=https://wistla-ops-admin-c:2380',
+] | join (',') }}"
 
 etcd_peer_ca_certificate: "{{ cluster.etcd_credentials.peer_ca_certificate }}"
 etcd_peer_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].peer_certificate }}"

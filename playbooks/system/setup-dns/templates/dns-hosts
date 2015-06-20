@@ -80,7 +80,8 @@ and (inventory_hostname in groups.vagrant
 		{%- endfor -%}
 		{%- endfor -%}
 
-		{%- if other_deployment_name == deployment_name -%}
+		{%- if other_deployment_name == deployment_name
+			or inventory_hostname == 'wistla-ops-jenkins' -%}
 
 			{%- print '\n' -%}
 
@@ -93,8 +94,11 @@ and (inventory_hostname in groups.vagrant
 						node_type_indices.load,
 					] | join ('.'),
 					other_deployment.main_domain,
-					'api.' + other_deployment.main_domain,
-					'www.' + other_deployment.main_domain,
+					other_deployment.api_domain,
+					other_deployment.web_domain,
+					other_deployment.assets_domain,
+					other_deployment.admin_domain,
+					other_deployment.short_domain,
 				] | join (' ') + '\n' -%}
 
 			{%- endfor -%}

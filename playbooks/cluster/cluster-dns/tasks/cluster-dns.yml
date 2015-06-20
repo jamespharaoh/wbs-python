@@ -74,6 +74,40 @@
       - "api."
       - "www."
 
+- name: "create dev deployment records"
+  action:
+
+    module: "route53"
+    record: "{{ item.0 [item.1] }}"
+    command: "create"
+
+    zone: "dev.wistla.com"
+    overwrite: "yes"
+
+    type: "A"
+    ttl: "30"
+    value: "{{ admin_balancer_hosted_zone_name }}"
+    alias: "yes"
+    alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  when: "
+    cluster_name == 'ops'
+    and '.dev.wistla.com' in item.0 [item.1]
+  "
+
+  with_nested:
+
+    - "{{ dev_deployment_names | default ([]) | dict_map (deployments) }}"
+
+    - - "main_domain"
+      - "admin_domain"
+      - "api_domain"
+      - "assets_domain"
+      - "web_domain"
+
 - name: "create short deployment records"
   action:
 

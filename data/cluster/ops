@@ -103,29 +103,34 @@ etcd_credentials:
 admin_certificates:
 
   - "berk.wistla.com"
-  - "api.berk.wistla.com"
   - "admin.berk.wistla.com"
+  - "api.berk.wistla.com"
+  - "assets.berk.dev.wistla.com"
   - "berk.dev.wist.la"
 
   - "bruce.wistla.com"
-  - "api.bruce.wistla.com"
   - "admin.bruce.wistla.com"
+  - "api.bruce.wistla.com"
+  - "assets.bruce.dev.wistla.com"
   - "bruce.dev.wist.la"
 
   - "mrbenn.wistla.com"
-  - "api.mrbenn.wistla.com"
   - "admin.mrbenn.wistla.com"
+  - "api.mrbenn.wistla.com"
+  - "assets.mrbenn.dev.wistla.com"
   - "mrbenn.dev.wist.la"
 
   - "7-zark-7.wistla.com"
-  - "api.7-zark-7.wistla.com"
   - "test.7-zark-7.wistla.com"
   - "admin.7-zark-7.wistla.com"
+  - "api.7-zark-7.wistla.com"
+  - "assets.7-zark-7.dev.wistla.com"
   - "7-zark-7.dev.wist.la"
 
   - "optimus.dev.wistla.com"
-  - "api.optimus.dev.wistla.com"
   - "admin.optimus.dev.wistla.com"
+  - "api.optimus.dev.wistla.com"
+  - "assets.optimus.dev.wistla.com"
   - "optimus.dev.wist.la"
 
   - "icinga.ops.wistla.com"

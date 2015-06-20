@@ -132,8 +132,9 @@ etcd_credentials:
 app_certificates:
 
   - "staging.wistla.com"
-  - "api.staging.wistla.com"
   - "admin.staging.wistla.com"
+  - "api.staging.wistla.com"
+  - "assets.staging.wistla.com"
   - "staging.wist.la"
 
 # ex: et ts=2 filetype=yaml

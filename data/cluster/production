@@ -117,8 +117,9 @@ etcd_credentials:
 app_certificates:
 
   - "wistla.com"
-  - "api.wistla.com"
   - "admin.wistla.com"
+  - "api.wistla.com"
+  - "assets.wistla.com"
   - "wist.la"
 
 # ex: et ts=2 filetype=yaml

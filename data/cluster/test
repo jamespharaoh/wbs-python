@@ -115,28 +115,33 @@ etcd_credentials:
 app_certificates:
 
   - "everest.test.wistla.com"
-  - "api.everest.test.wistla.com"
   - "admin.everest.test.wistla.com"
+  - "api.everest.test.wistla.com"
+  - "assets.everest.test.wistla.com"
   - "everest.test.wist.la"
 
   - "k2.test.wistla.com"
-  - "api.k2.test.wistla.com"
   - "admin.k2.test.wistla.com"
+  - "api.k2.test.wistla.com"
+  - "assets.k2.test.wistla.com"
   - "k2.test.wist.la"
 
   - "montblanc.test.wistla.com"
-  - "api.montblanc.test.wistla.com"
   - "admin.montblanc.test.wistla.com"
+  - "api.montblanc.test.wistla.com"
+  - "assets.montblanc.test.wistla.com"
   - "montblanc.test.wist.la"
 
   - "erebus.test.wistla.com"
-  - "api.erebus.test.wistla.com"
   - "admin.erebus.test.wistla.com"
+  - "api.erebus.test.wistla.com"
+  - "assets.erebus.test.wistla.com"
   - "erebus.test.wist.la"
 
   - "fitzroy.test.wistla.com"
-  - "api.fitzroy.test.wistla.com"
   - "admin.fitzroy.test.wistla.com"
+  - "api.fitzroy.test.wistla.com"
+  - "assets.fitzroy.test.wistla.com"
   - "fitzroy.test.wist.la"
 
 # ex: et ts=2 filetype=yaml

@@ -4,12 +4,16 @@ var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // api url
-config.apiUrl = 'https://api.{{ deployment.main_domain }}';
-config.apiTest = 'http://api.{{ deployment.main_domain }}';
+config.apiUrl = 'https://{{ deployment.api_domain }}';
+config.apiTest = 'http://{{ deployment.api_domain }}';
 
 // web url
-config.webUrl = 'https://{{ deployment.main_domain }}';
-config.webTest = 'http://{{ deployment.main_domain }}';
+config.webUrl = 'https://{{ deployment.web_domain }}';
+config.webTest = 'http://{{ deployment.web_domain }}';
+
+// assets url
+config.assetsUrl = 'https://{{ deployment.assets_domain }}';
+config.assetsTest = 'http://{{ deployment.assets_domain }}';
 
 // short url for links sent out
 config.shortUrl = 'https://{{ deployment.short_domain }}';

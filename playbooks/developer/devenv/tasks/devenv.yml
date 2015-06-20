@@ -107,7 +107,7 @@
 - name: "create deployment name link"
   action:
     module: "file"
-    path: "{{ deployment_home }}/{{ deployment }}"
+    path: "{{ deployment_home }}/{{ deployment_name }}"
     state: "link"
     src: "."
   when: "deployment_mode == 'vagrant'"

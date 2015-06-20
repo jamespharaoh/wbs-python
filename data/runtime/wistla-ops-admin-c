@@ -1,6 +1,8 @@
 ---
 etcd:
+  installed_version: 2.1.0-alpha.0
   needs_restart: 'no'
   state: running
+etcd_installed_version: 2.1.0-alpha.0
 etcd_needs_restart: 'no'
 etcd_state: running

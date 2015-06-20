@@ -136,4 +136,33 @@ http {
 
 	}
 
+	# assets
+
+	server {
+
+		server_name {{ deployment.assets_domain }};
+{% if deployment.type == 'alias' %}
+		server_name {{ deployment_alias.assets_domain }};
+{% endif %}
+
+		location /1/images {
+			proxy_pass http://api/images;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /1/audio {
+			proxy_pass http://api/audio;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /1/video {
+			proxy_pass http://api/video;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
 }
