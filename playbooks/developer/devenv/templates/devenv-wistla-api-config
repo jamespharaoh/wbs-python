@@ -38,6 +38,7 @@ config.CORS = {
 		'https://{{ deployment.main_domain }}',
 		'https://{{ deployment.short_domain }}',
 		'https://{{ deployment.web_domain }}',
+		config.adminUrl,
 
 		'http://{{ deployment.api_domain }}',
 		'http://{{ deployment.main_domain }}',
