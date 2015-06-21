@@ -200,6 +200,60 @@ http {
 
 	}
 
+	# assets redirect http to https
+
+	server {
+
+		listen 80;
+
+		server_name {{ deployment.assets_domain }};
+		server_name www.{{ deployment.assets_domain }};
+
+		return 301 https://{{ deployment.assets_domain }}$request_uri;
+
+	}
+
+	# assets
+
+	server {
+
+		listen 443 ssl;
+
+		server_name {{ deployment.assets_domain }};
+
+		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.assets_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.assets_domain }}.key;
+
+		location / {
+			proxy_pass http://deployment-{{ target }};
+			proxy_set_header Host "{{ deployment.assets_domain }}";
+		}
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+	}
+
+	# assets origin
+
+	server {
+
+		listen 80;
+
+		server_name {{ deployment.assets_origin }};
+
+		location / {
+			proxy_pass http://deployment-{{ target }};
+			proxy_set_header Host "{{ deployment.assets_domain }}";
+		}
+
+		location /robots.txt {
+			alias /etc/nginx/dev-robots.txt;
+		}
+
+	}
+
 {% endmacro %}
 
 {% for deployment_name, deployment in deployments.items ()

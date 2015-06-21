@@ -8,6 +8,8 @@ events {
 	worker_connections 768;
 }
 
+include environment.conf;
+
 http {
 
 	# basic settings
@@ -34,11 +36,13 @@ http {
 	# proxy defaults
 
 	proxy_connect_timeout 5s;
-{% if dev_debug | default ('no') == 'yes' %}
-	proxy_read_timeout 10m;
-{% else %}
-	proxy_read_timeout 60s;
-{% endif %}
+
+	if ($debug == 'yes') {
+		proxy_read_timeout 10m;
+	} else {
+		proxy_read_timeout 60s;
+	}
+
 	proxy_next_upstream error;
 
 	# upstream servers
@@ -49,10 +53,11 @@ http {
 
 	server {
 
-		server_name api.{{ deployment.main_domain }};
-{% if deployment.type == 'alias' %}
-		server_name api.{{ deployment_alias.main_domain }};
-{% endif %}
+		server_name $api_domain;
+
+		if ($deployment_type == 'alias') {
+			server_name $api_alias;
+		}
 
 		client_max_body_size 16m;
 
@@ -62,18 +67,27 @@ http {
 			proxy_set_header Connection "";
 		}
 
+		if ($test_routes_enabled != 'yes') {
+
+			location /TEST {
+				deny all;
+			}
+
+		}
+
 	}
 
 	# web
 
 	server {
 
-		server_name {{ deployment.main_domain }};
-		server_name www.{{ deployment.main_domain }};
-{% if deployment.type == 'alias' %}
-		server_name {{ deployment_alias.main_domain }};
-		server_name www.{{ deployment_alias.main_domain }};
-{% endif %}
+		server_name $web_domain;
+		server_name $main_domain;
+
+		if ($deployment_type == 'alias') {
+			server_name $web_alias;
+			server_name $main_alias;
+		}
 
 		client_max_body_size 16m;
 
@@ -95,10 +109,11 @@ http {
 
 	server {
 
-		server_name admin.{{ deployment.main_domain }};
-{% if deployment.type == 'alias' %}
-		server_name admin.{{ deployment_alias.main_domain }};
-{% endif %}
+		server_name $admin_domain;
+
+		if ($deployment_type == 'alias') {
+			server_name $admin_alias;
+		}
 
 		root /home/ubuntu/wistla-admin;
 
@@ -117,10 +132,11 @@ http {
 
 	server {
 
-		server_name {{ deployment.short_domain }};
-{% if deployment.type == 'alias' %}
-		server_name {{ deployment_alias.short_domain }};
-{% endif %}
+		server_name $short_domain;
+
+		if ($deployment_type == 'alias') {
+			server_name $short_alias;
+		}
 
 		location / {
 			proxy_pass http://browser/in/;
@@ -140,10 +156,11 @@ http {
 
 	server {
 
-		server_name {{ deployment.assets_domain }};
-{% if deployment.type == 'alias' %}
-		server_name {{ deployment_alias.assets_domain }};
-{% endif %}
+		server_name $assets_domain;
+
+		if ($deployment_type == 'alias') {
+			server_name $assets_alias;
+		}
 
 		location /1/images {
 			proxy_pass http://api/images;

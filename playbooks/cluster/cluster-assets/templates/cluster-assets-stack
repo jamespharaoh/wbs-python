@@ -1,0 +1,51 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+{% set deployment_name = item %}
+{% set deployment = deployments [deployment_name] %}
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Wistla assets cloudfront {{ deployment.name }}"
+
+Resources:
+
+  Distribution:
+
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+
+      DistributionConfig:
+
+        Aliases: [ "{{ deployment.assets_domain }}" ]
+        Enabled: "true"
+
+        DefaultCacheBehavior:
+
+          TargetOriginId: "{{ deployment_name }}-assets"
+          ViewerProtocolPolicy: "redirect-to-https"
+
+          ForwardedValues:
+            QueryString: "false"
+
+        ViewerCertificate:
+
+          IamCertificateId: "{{ deployment.assets_certificate_id }}"
+          SslSupportMethod: "sni-only"
+
+        Origins:
+
+          - Id: "{{ deployment_name }}-assets"
+            DomainName: "{{ deployment.assets_origin }}"
+            CustomOriginConfig:
+              OriginProtocolPolicy: "http-only"
+
+Outputs:
+
+  DistributionId:
+    Value: { Ref: "Distribution" }
+
+  DistributionDomain:
+    Value: { "Fn::GetAtt": [ "Distribution", "DomainName" ] }
+
+# ex: et ts=2 filetype=yaml

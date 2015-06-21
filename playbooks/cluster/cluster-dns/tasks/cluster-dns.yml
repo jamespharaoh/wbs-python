@@ -49,14 +49,14 @@
   action:
 
     module: "route53"
-    record: "{{ item.1 }}{{ item.0.main_domain }}"
+    record: "{{ item.0 [item.1] }}"
     command: "create"
 
     zone: "{{ cluster.main_domain }}"
     overwrite: "yes"
 
     type: "A"
-    ttl: "30"
+    ttl: "{{ ttl_medium }}"
     value: "{{ app_balancer_hosted_zone_name }}"
     alias: "yes"
     alias_hosted_zone_id: "{{ app_balancer_hosted_zone_name_id }}"
@@ -64,15 +64,38 @@
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
-  when: "item.0.main_domain is defined"
+  when: "item.0.type in [ 'shared', 'simple' ]"
   with_nested:
 
     - "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
+    - "cluster_dns_deployment_keys"
 
-    - - ""
-      - "admin."
-      - "api."
-      - "www."
+- name: "create assets records"
+  with_items: "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
+  when: "'assets_origin' in item"
+  action:
+
+    module: "route53"
+    record: "{{ item.assets_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.main_domain }}"
+    overwrite: "yes"
+
+    type: "CNAME"
+    ttl: "{{ ttl_medium }}"
+
+    value: "{{ hostvars [inventory_hostname] [
+      'assets_cloudfront_' + item.name | replace ('-', '_') + '_domain'
+    ] }}"
+
+    # TODO should use zone id but can't find how to retrieve this, it seems like
+    # there should be a way to do this in cloudformation but i can't see that it
+    # exists currently, so in the mean time we use a CNAME instead of an alias
+    # here
+
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
 
 - name: "create dev deployment records"
   action:
@@ -85,7 +108,7 @@
     overwrite: "yes"
 
     type: "A"
-    ttl: "30"
+    ttl: "{{ ttl_medium }}"
     value: "{{ admin_balancer_hosted_zone_name }}"
     alias: "yes"
     alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
@@ -119,7 +142,7 @@
     overwrite: "yes"
 
     type: "A"
-    ttl: "30"
+    ttl: "{{ ttl_medium }}"
     value: "{{ app_balancer_hosted_zone_name }}"
     alias: "yes"
     alias_hosted_zone_id: "{{ app_balancer_hosted_zone_name_id }}"
@@ -145,7 +168,7 @@
     overwrite: "yes"
 
     type: "A"
-    ttl: "30"
+    ttl: "{{ ttl_medium }}"
     value: "{{ admin_balancer_hosted_zone_name }}"
     alias: "yes"
     alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"

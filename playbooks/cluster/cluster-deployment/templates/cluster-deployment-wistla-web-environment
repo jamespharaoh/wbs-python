@@ -1,0 +1,3 @@
+{{ ansible_warning ['#'] }}
+
+WISTLA_WEB_COUNT="{{ cluster_deployment.node_instance_count.web }}"

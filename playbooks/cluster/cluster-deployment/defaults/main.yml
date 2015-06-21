@@ -135,14 +135,7 @@ cluster_deployment_types:
 
     config_templates:
 
-      - template: "cluster-deployment-wistla-devops-config"
-        target: "wistla-devops/config"
-
-      - template: "cluster-deployment-wistla-devops-accounts"
-        target: "wistla-devops/accounts"
-
-      - template: "cluster-deployment-wistla-admin-config"
-        target: "config/load/wistla-admin-config.local.js"
+      # api
 
       - template: "cluster-deployment-wistla-api-config"
         target: "config/api/config.local.js"
@@ -150,14 +143,37 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api-environment"
         target: "config/api/environment"
 
+      # browser
+
       - template: "cluster-deployment-wistla-browser-config"
         target: "config/browser/config.local.js"
+
+      - template: "cluster-deployment-wistla-browser-environment"
+        target: "config/browser/environment"
+
+      # devops
+
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config"
+
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
+
+      # load
+
+      - template: "cluster-deployment-wistla-load-upstream"
+        target: "config/load/nginx-upstream.conf"
+
+      - template: "cluster-deployment-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
+
+      # web
 
       - template: "cluster-deployment-wistla-web-config"
         target: "config/web/config.local.js"
 
-      - template: "cluster-deployment-wistla-load-upstream"
-        target: "config/load/nginx-upstream.conf"
+      - template: "cluster-deployment-wistla-web-environment"
+        target: "config/web/environment"
 
     shared_directories: []
 

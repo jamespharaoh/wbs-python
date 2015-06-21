@@ -178,4 +178,8 @@ python_apt_url: "{{ wistla_dist }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist }}/etcd/{{ etcd_archive }}"
 
+ttl_short: "30"
+ttl_medium: "300"
+ttl_long: "3600"
+
 # ex: et ts=2 filetype=yaml

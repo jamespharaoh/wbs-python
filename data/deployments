@@ -12,6 +12,8 @@ production:
   api_domain: "api.wistla.com"
   web_domain: "www.wistla.com"
 
+  assets_origin: "assets-origin.wistla.com"
+
   cluster: "production"
   target: "production-a"
 
@@ -29,6 +31,9 @@ production:
     mongo: "1"
     rabbit: "1"
 
+  assets_certificate_id: "ASCAJKKYFOD6QGXK67ZRM"
+  assets_certificate_arn: "arn:aws:iam::670055293867:server-certificate/cloudfront/assets.wistla.com"
+
 production-a:
 
   name: "production-a"
@@ -44,6 +49,8 @@ production-a:
   api_domain: "api.a.wistla.com"
   web_domain: "www.a.wistla.com"
 
+  assets_origin: "assets-origin.a.wistla.com"
+
   parent_cluster: "production"
   parent_domain: "wistla.com"
 
@@ -56,6 +63,7 @@ production-a:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "no"
 
   node_memory:
 
@@ -86,6 +94,8 @@ production-b:
   api_domain: "api.b.wistla.com"
   web_domain: "www.b.wistla.com"
 
+  assets_origin: "assets-origin.b.wistla.com"
+
   parent_cluster: "production"
   parent_domain: "wistla.com"
 
@@ -98,6 +108,7 @@ production-b:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "no"
 
   node_memory:
 
@@ -125,6 +136,8 @@ staging:
   api_domain: "api.staging.wistla.com"
   web_domain: "www.staging.wistla.com"
 
+  assets_origin: "assets-origin.staging.wistla.com"
+
   cluster: "staging"
   target: "staging-a"
 
@@ -142,6 +155,9 @@ staging:
     mongo: "1"
     rabbit: "1"
 
+  assets_certificate_id: "ASCAIVCR7DK3J5TTII3JI"
+  assets_certificate_arn: "arn:aws:iam::155823734687:server-certificate/cloudfront/assets.staging.wistla.com"
+
 staging-a:
 
   name: "staging-a"
@@ -157,6 +173,8 @@ staging-a:
   api_domain: "api.a.staging.wistla.com"
   web_domain: "www.a.staging.wistla.com"
 
+  assets_origin: "assets-origin.a.staging.wistla.com"
+
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
 
@@ -169,6 +187,7 @@ staging-a:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "no"
 
   node_memory:
 
@@ -199,6 +218,8 @@ staging-b:
   api_domain: "api.b.staging.wistla.com"
   web_domain: "www.b.staging.wistla.com"
 
+  assets_origin: "assets-origin.b.staging.wistla.com"
+
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
 
@@ -211,6 +232,7 @@ staging-b:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "no"
 
   node_memory:
 
@@ -233,10 +255,6 @@ test:
 
   main_domain: "test.wistla.com"
   short_domain: "test.wist.la"
-  assets_domain: "assets.test.wistla.com"
-  admin_domain: "admin.test.wistla.com"
-  api_domain: "api.test.wistla.com"
-  web_domain: "www.test.wistla.com"
 
   cluster: "test"
 
@@ -254,6 +272,8 @@ test-everest:
   api_domain: "api.everest.test.wistla.com"
   web_domain: "www.everest.test.wistla.com"
 
+  assets_origin: "assets-origin.everest.test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -266,6 +286,7 @@ test-everest:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -284,6 +305,9 @@ test-everest:
     mongo: "1"
     rabbit: "1"
     web: "1"
+
+  assets_certificate_id: "ASCAIKM6A6TS345ZNQYXQ"
+  assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.everest.test.wistla.com"
 
 test-k2:
 
@@ -299,6 +323,8 @@ test-k2:
   api_domain: "api.k2.test.wistla.com"
   web_domain: "www.k2.test.wistla.com"
 
+  assets_origin: "assets-origin.k2.test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -311,6 +337,7 @@ test-k2:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -329,6 +356,9 @@ test-k2:
     mongo: "1"
     rabbit: "1"
     web: "1"
+
+  assets_certificate_id: "ASCAIEDRJQCGGFX245YCQ"
+  assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.k2.test.wistla.com"
 
 test-montblanc:
 
@@ -344,6 +374,8 @@ test-montblanc:
   api_domain: "api.montblanc.test.wistla.com"
   web_domain: "www.montblanc.test.wistla.com"
 
+  assets_origin: "assets-origin.montblanc.test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -356,6 +388,7 @@ test-montblanc:
   apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -374,6 +407,9 @@ test-montblanc:
     mongo: "1"
     rabbit: "1"
     web: "1"
+
+  assets_certificate_id: "ASCAJDTNUCAQRD7PBDKAW"
+  assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.montblanc.test.wistla.com"
 
 test-erebus:
 
@@ -389,6 +425,8 @@ test-erebus:
   api_domain: "api.erebus.test.wistla.com"
   web_domain: "www.erebus.test.wistla.com"
 
+  assets_origin: "assets-origin.erebus.test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -401,6 +439,7 @@ test-erebus:
   apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -419,6 +458,9 @@ test-erebus:
     mongo: "1"
     rabbit: "1"
     web: "1"
+
+  assets_certificate_id: "ASCAJFIEU4AV2IQTBDETC"
+  assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.erebus.test.wistla.com"
 
 test-fitzroy:
 
@@ -434,6 +476,8 @@ test-fitzroy:
   api_domain: "api.fitzroy.test.wistla.com"
   web_domain: "www.fitzroy.test.wistla.com"
 
+  assets_origin: "assets-origin.fitzroy.test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -446,6 +490,7 @@ test-fitzroy:
   apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -465,6 +510,9 @@ test-fitzroy:
     rabbit: "1"
     web: "1"
 
+  assets_certificate_id: "ASCAILU6JEFLQM2EB4DPA"
+  assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.fitzroy.test.wistla.com"
+
 dev:
 
   name: "dev"
@@ -478,6 +526,8 @@ dev:
   admin_domain: "admin.dev.wistla.com"
   api_domain: "api.dev.wistla.com"
   web_domain: "www.dev.wistla.com"
+
+  assets_origin: "assets-origin.dev.wistla.com"
 
   bridge_name: "br152"
   bridge_network: "10.152"
@@ -497,6 +547,8 @@ berk:
   api_domain: "api.berk.wistla.com"
   web_domain: "www.berk.wistla.com"
 
+  assets_origin: "assets-origin.berk.dev.wistla.com"
+
   bridge_name: "br150"
   bridge_network: "10.150"
   bridge_mac: "aa:bb:0a:96"
@@ -514,6 +566,8 @@ bruce:
   admin_domain: "admin.bruce.wistla.com"
   api_domain: "api.bruce.wistla.com"
   web_domain: "www.bruce.wistla.com"
+
+  assets_origin: "assets-origin.bruce.dev.wistla.com"
 
   bridge_name: "br154"
   bridge_network: "10.154"
@@ -533,6 +587,8 @@ mrbenn:
   api_domain: "api.mrbenn.wistla.com"
   web_domain: "www.mrbenn.wistla.com"
 
+  assets_origin: "assets-origin.mrbenn.dev.wistla.com"
+
   bridge_name: "br151"
   bridge_network: "10.151"
   bridge_mac: "aa:bb:0a:97"
@@ -550,6 +606,8 @@ mrbenn:
   admin_domain: "admin.7-zark-7.wistla.com"
   api_domain: "api.7-zark-7.wistla.com"
   web_domain: "www.7-zark-7.wistla.com"
+
+  assets_origin: "assets-origin.7-zark-7.dev.wistla.com"
 
   bridge_name: "br153"
   bridge_network: "10.153"
@@ -569,6 +627,8 @@ optimus:
   api_domain: "api.optimus.dev.wistla.com"
   web_domain: "www.optimus.dev.wistla.com"
 
+  assets_origin: "assets-origin.optimus.dev.wistla.com"
+
   bridge_name: "br161"
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
@@ -586,6 +646,8 @@ jenkins-latest:
   admin_domain: "admin.latest.jenkins.wistla.com"
   api_domain: "api.latest.jenkins.wistla.com"
   web_domain: "www.latest.jenkins.wistla.com"
+
+  assets_origin: "assets-origin.latest.jenkins.wistla.com"
 
   bridge_name: "br160"
   bridge_network: "10.160"

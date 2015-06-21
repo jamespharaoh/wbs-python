@@ -1,0 +1,111 @@
+---
+
+- name: "write certificate chain to files"
+  action:
+
+    module: "copy"
+    dest: "/home/vagrant/work/{{ cluster_name }}/comodo-certificate-chain.cert"
+    content: "{{ [
+      lookup ('etcd', '/certificate/production-ssl/wistla.com/current/chain/0'),
+      lookup ('etcd', '/certificate/production-ssl/wistla.com/current/chain/1'),
+      lookup ('etcd', '/certificate/production-ssl/wistla.com/current/chain/2'),
+    ] | join ('\n') + '\n' }}"
+
+- name: "write security credentials to files"
+  when: "deployments [item.0].type in [ 'shared', 'simple' ]"
+  with_nested:
+
+    - "cluster.deployment_names"
+
+    - - source: "certificate"
+        target: "cert"
+        mode: "0644"
+
+      - source: "key"
+        target: "key"
+        mode: "0600"
+
+  action:
+
+    module: "copy"
+    dest: "/home/vagrant/work/{{ cluster_name }}/{{ deployments [item.0].assets_domain }}.{{ item.1.target }}"
+    content: "{{ lookup ('etcd', '/certificate/' + cluster_name + '-ssl/' + deployments [item.0].assets_domain + '/current/' + item.1.source) }}"
+    mode: "{{ item.1.mode }}"
+
+- name: "convert private key to other format"
+  with_items: "cluster.deployment_names"
+  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  args:
+    creates: "/home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.awskey"
+    executable: "/bin/bash"
+  shell:
+
+    set -euf -o pipefail;
+
+    openssl rsa -outform pem
+      < /home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.key
+      > /home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.awskey;
+
+- name: "upload assets certificate"
+  with_items: "cluster.deployment_names"
+  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  args:
+
+    executable: "/bin/bash"
+
+  environment:
+
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    aws iam upload-server-certificate
+      --path /cloudfront/
+      --server-certificate-name {{ deployments [item].assets_domain }}
+      --certificate-body "file:///home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.cert"
+      --certificate-chain "file:///home/vagrant/work/{{ cluster_name }}/comodo-certificate-chain.cert"
+      --private-key "file:///home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.awskey"
+    || true;
+
+- name: "write cloudformation config for assets"
+  with_items: "cluster.deployment_names"
+  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  action:
+
+    module: "template"
+    dest: "/home/vagrant/work/{{ cluster_name }}/{{ item }}-assets-stack.yml"
+    src: "cluster-assets-stack"
+
+- name: "create cloudformation stack for assets"
+  with_items: "cluster.deployment_names"
+  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  register: "assets_stack_result"
+  action:
+
+    module: "cloudformation"
+    stack_name: "{{ item }}-assets"
+    state: "present"
+    template: "/home/vagrant/work/{{ cluster_name }}/{{ item }}-assets-stack.yml"
+    template_format: "yaml"
+    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
+    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region }}"
+
+- name: "store cloudformation details for assets"
+  with_indexed_items: "cluster.deployment_names"
+  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  update_resource:
+
+    "assets_cloudfront_{{ item.1 | replace ('-', '_') }}_id": "{{
+      assets_stack_result.results [item.0].stack_outputs ['DistributionId']
+    }}"
+
+    "assets_cloudfront_{{ item.1 | replace ('-', '_') }}_domain": "{{
+      assets_stack_result.results [item.0].stack_outputs ['DistributionDomain']
+    }}"
+
+# ex: et ts=2 filetype=yaml

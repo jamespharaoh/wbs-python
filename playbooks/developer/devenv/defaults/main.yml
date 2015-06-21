@@ -48,9 +48,21 @@ devenv_config_templates:
     type: "browser"
     target: "config.local.js"
 
+  - template: "devenv-wistla-browser-environment"
+    type: "browser"
+    target: "environment"
+
   - template: "devenv-wistla-web-config"
     type: "web"
     target: "config.local.js"
+
+  - template: "devenv-wistla-web-environment"
+    type: "web"
+    target: "environment"
+
+  - template: "devenv-wistla-load-environment"
+    type: "load"
+    target: "nginx-environment.conf"
 
   - template: "devenv-wistla-load-upstream"
     type: "load"

@@ -3,6 +3,16 @@ admin_balancer_hosted_zone_name: test-admin-1711888177.eu-west-1.elb.amazonaws.c
 admin_balancer_hosted_zone_name_id: Z3NF1Z3NOM5OY2
 app_balancer_hosted_zone_name: test-app-406779835.eu-west-1.elb.amazonaws.com
 app_balancer_hosted_zone_name_id: Z3NF1Z3NOM5OY2
+assets_cloudfront_test_erebus_domain: d31wv75xpktp3j.cloudfront.net
+assets_cloudfront_test_erebus_id: E2MWJAI5LTME80
+assets_cloudfront_test_everest_domain: d5djnbewg0uid.cloudfront.net
+assets_cloudfront_test_everest_id: E10DCO7VMINPP1
+assets_cloudfront_test_fitzroy_domain: d17i3mrfvok7nh.cloudfront.net
+assets_cloudfront_test_fitzroy_id: E3VLW14CLXJSF0
+assets_cloudfront_test_k2_domain: d2p78f9i1bs2qu.cloudfront.net
+assets_cloudfront_test_k2_id: E3ME4WRBVJT70L
+assets_cloudfront_test_montblanc_domain: d2w89ugju1b7j9.cloudfront.net
+assets_cloudfront_test_montblanc_id: E2BECU6VTIPGP0
 internet_gateway_id: igw-201acd45
 routes_admin_a: rtb-412daf24
 routes_admin_b: rtb-402daf25

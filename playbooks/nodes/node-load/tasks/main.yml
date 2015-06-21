@@ -50,6 +50,9 @@
     - link: "/etc/nginx/upstream.conf"
       source: "/config/nginx-upstream.conf"
 
+    - link: "/etc/nginx/environment.conf"
+      source: "/config/nginx-environment.conf"
+
     - link: "/home/ubuntu/wistla-admin/config/config.local.js"
       source: "/config/wistla-admin-config.local.js"
 
