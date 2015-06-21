@@ -1,0 +1,222 @@
+{{ ansible_warning ['#'] }}
+
+user www-data;
+worker_processes 4;
+pid /run/nginx.pid;
+
+events {
+	worker_connections 768;
+}
+
+http {
+
+	# basic settings
+
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	keepalive_timeout 65;
+	types_hash_max_size 2048;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	# logging
+
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
+	# compression
+
+	gzip on;
+	gzip_disable "msie6";
+
+	# proxy defaults
+
+	proxy_connect_timeout 5s;
+	proxy_read_timeout 60s;
+	proxy_next_upstream error;
+
+	# upstream servers
+
+	{%- macro upstream (name, port) -%}
+
+		{%- print '\n' -%}
+
+		{%- print '\tupstream ', name, ' {\n' -%}
+
+		{%- for node_index in range (0, cluster_deployment.node_instance_count [name] | int) -%}
+
+			{%- print
+				'\t\tserver ',
+				[
+					cluster_deployment_name,
+					name,
+					instance_zone,
+					instance_index,
+				] | join ('-'),
+				':',
+				port + node_index,
+				' fail_timeout=30s max_fails=1;\n'
+			-%}
+
+		{%- endfor -%}
+
+		{%- print '\t}\n' -%}
+
+	{%- endmacro -%}
+
+	{{ upstream ('api', 7000) }}
+	{{ upstream ('web', 3000) }}
+	{{ upstream ('browser', 3000) }}
+
+	# api
+
+	server {
+
+		include server-environment.conf;
+
+		server_name {{ cluster_deployment.api_domain }};
+
+{% if cluster_deployment.type == 'alias' %}
+		server_name {{ cluster_deployment_alias.api_domain }};
+{% endif %}
+
+		client_max_body_size 16m;
+
+		location / {
+			proxy_pass http://api;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+{% if cluster_deployment.test_routes_enabled != 'yes' %}
+
+		# block test routes
+
+		location /TEST {
+			deny all;
+		}
+
+{% endif %}
+
+	}
+
+	# web
+
+	server {
+
+		include server-environment.conf;
+
+		server_name {{ cluster_deployment.web_domain }};
+		server_name {{ cluster_deployment.main_domain }};
+
+{% if cluster_deployment.type == 'alias' %}
+		server_name {{ cluster_deployment_alias.web_domain }};
+		server_name {{ cluster_deployment_alias.main_domain }};
+{% endif %}
+
+		client_max_body_size 16m;
+
+		location / {
+			proxy_pass http://web;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /in {
+			proxy_pass http://browser;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
+	# admin
+
+	server {
+
+		include server-environment.conf;
+
+		server_name {{ cluster_deployment.admin_domain }};
+
+{% if cluster_deployment.type == 'alias' %}
+		server_name {{ cluster_deployment_alias.admin_domain }};
+{% endif %}
+
+		root /home/ubuntu/wistla-admin;
+
+		location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+			expires max;
+			log_not_found off;
+		}
+
+		location / {
+			try_files $uri /index.html;
+		}
+
+	}
+
+	# short
+
+	server {
+
+		include server-environment.conf;
+
+		server_name {{ cluster_deployment.short_domain }};
+
+{% if cluster_deployment_type == 'alias' %}
+		server_name {{ cluster_deployment_alias.short_domain }};
+{% endif %}
+
+		location / {
+			proxy_pass http://browser/in/;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /v/ {
+			proxy_pass http://browser/in/registration/verification/;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
+	# assets
+
+	server {
+
+		include server-environment.conf;
+
+		server_name {{ cluster_deployment.assets_domain }};
+		server_name {{ cluster_deployment.assets_origin_domain }};
+
+{% if cluster_deployment.type == 'alias' %}
+		server_name {{ cluster_deployment_alias.assets_domain }};
+		server_name {{ cluster_deployment_alias.assets_origin_domain }};
+{% endif %}
+
+		expires max;
+
+		location /1/images {
+			proxy_pass http://api/images;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /1/audio {
+			proxy_pass http://api/audio;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /1/video {
+			proxy_pass http://api/video;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
+}

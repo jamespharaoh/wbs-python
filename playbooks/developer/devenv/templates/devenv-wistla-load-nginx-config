@@ -8,8 +8,6 @@ events {
 	worker_connections 768;
 }
 
-include environment.conf;
-
 http {
 
 	# basic settings
@@ -35,29 +33,67 @@ http {
 
 	# proxy defaults
 
+{% if dev_debug | default ('no') == 'yes' %}
+
 	proxy_connect_timeout 5s;
-
-	if ($debug == 'yes') {
-		proxy_read_timeout 10m;
-	} else {
-		proxy_read_timeout 60s;
-	}
-
+	proxy_read_timeout 10m;
 	proxy_next_upstream error;
 
-	# upstream servers
+{% else %}
 
-	include upstream.conf;
+	proxy_connect_timeout 5s;
+	proxy_read_timeout 60s;
+	proxy_next_upstream error;
+
+{% endif %}
+
+	{%- macro upstream (name, port) -%}
+
+		{%- print '\tupstream ', name, ' {\n' -%}
+
+		{%- for node_name in groups ['node-' + name + '-host'] -%}
+
+			{%- set node_host = hostvars [node_name] -%}
+			{%- for node_instance in range (0, dev_node_instance_count [name] | int) -%}
+
+				{%- if node_host.node_index < dev_node_count [name] | int -%}
+
+					{%- print
+						'\t\tserver ',
+						node_name,
+						':',
+						port + node_instance,
+						' fail_timeout=30s max_fails=1;\n'
+					-%}
+
+				{%- else -%}
+
+					{%- print
+						'\tserver ',
+						node_name,
+						':',
+						port + node_instance,
+						' down;\n'
+					-%}
+
+				{%- endif -%}
+			{%- endfor -%}
+
+		{%- endfor -%}
+
+		{%- print '\t}\n' -%}
+
+	{%- endmacro -%}
+
+	{%- print upstream ('api', 7000) + '\n' -%}
+	{%- print upstream ('web', 3000) + '\n' -%}
+	{%- print upstream ('browser', 3000) + '\n' -%}
 
 	# api
 
 	server {
 
-		server_name $api_domain;
-
-		if ($deployment_type == 'alias') {
-			server_name $api_alias;
-		}
+		server_name {{ deployment.api_domain }};
 
 		client_max_body_size 16m;
 
@@ -67,27 +103,14 @@ http {
 			proxy_set_header Connection "";
 		}
 
-		if ($test_routes_enabled != 'yes') {
-
-			location /TEST {
-				deny all;
-			}
-
-		}
-
 	}
 
 	# web
 
 	server {
 
-		server_name $web_domain;
-		server_name $main_domain;
-
-		if ($deployment_type == 'alias') {
-			server_name $web_alias;
-			server_name $main_alias;
-		}
+		server_name {{ deployment.web_domain }};
+		server_name {{ deployment.main_domain }};
 
 		client_max_body_size 16m;
 
@@ -109,11 +132,7 @@ http {
 
 	server {
 
-		server_name $admin_domain;
-
-		if ($deployment_type == 'alias') {
-			server_name $admin_alias;
-		}
+		server_name {{ deployment.admin_domain }};
 
 		root /home/ubuntu/wistla-admin;
 
@@ -132,11 +151,7 @@ http {
 
 	server {
 
-		server_name $short_domain;
-
-		if ($deployment_type == 'alias') {
-			server_name $short_alias;
-		}
+		server_name {{ deployment.short_domain }};
 
 		location / {
 			proxy_pass http://browser/in/;
@@ -156,11 +171,10 @@ http {
 
 	server {
 
-		server_name $assets_domain;
+		server_name {{ deployment.assets_domain }};
+		server_name {{ deployment.assets_origin_domain }};
 
-		if ($deployment_type == 'alias') {
-			server_name $assets_alias;
-		}
+		expires max;
 
 		location /1/images {
 			proxy_pass http://api/images;

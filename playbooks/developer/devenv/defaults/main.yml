@@ -60,13 +60,9 @@ devenv_config_templates:
     type: "web"
     target: "environment"
 
-  - template: "devenv-wistla-load-environment"
+  - template: "devenv-wistla-load-nginx-config"
     type: "load"
-    target: "nginx-environment.conf"
-
-  - template: "devenv-wistla-load-upstream"
-    type: "load"
-    target: "nginx-upstream.conf"
+    target: "nginx-config"
 
 devenv_config_links:
 

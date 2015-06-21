@@ -1,13 +1,5 @@
 ---
 
-- name: "install nginx config"
-  action:
-    module: "template"
-    src: "nginx-config"
-    dest: "/etc/nginx/nginx.conf"
-  sudo: "yes"
-  sudo_user: "root"
-
 - name: "deploy projects"
   delegate_to: "localhost"
   shell:
@@ -47,11 +39,14 @@
     force: "yes"
   with_items:
 
-    - link: "/etc/nginx/upstream.conf"
-      source: "/config/nginx-upstream.conf"
+    - link: "/etc/nginx/nginx.conf"
+      source: "/config/nginx-config"
 
-    - link: "/etc/nginx/environment.conf"
-      source: "/config/nginx-environment.conf"
+    - link: "/etc/nginx/http-environment.conf"
+      source: "/config/nginx-http-environment.conf"
+
+    - link: "/etc/nginx/server-environment.conf"
+      source: "/config/nginx-server-environment.conf"
 
     - link: "/home/ubuntu/wistla-admin/config/config.local.js"
       source: "/config/wistla-admin-config.local.js"

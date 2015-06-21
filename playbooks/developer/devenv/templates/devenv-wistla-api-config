@@ -35,13 +35,11 @@ config.CORS = {
 	origins: [
 
 		'https://{{ deployment.api_domain }}',
-		'https://{{ deployment.browser_domain }}',
 		'https://{{ deployment.main_domain }}',
 		'https://{{ deployment.short_domain }}',
 		'https://{{ deployment.web_domain }}',
 
 		'http://{{ deployment.api_domain }}',
-		'http://{{ deployment.browser_domain }}',
 		'http://{{ deployment.main_domain }}',
 		'http://{{ deployment.short_domain }}',
 		'http://{{ deployment.web_domain }}',

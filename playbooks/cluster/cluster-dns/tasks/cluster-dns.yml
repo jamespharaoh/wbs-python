@@ -72,7 +72,10 @@
 
 - name: "create assets records"
   with_items: "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
-  when: "'assets_origin' in item"
+  when: "
+    'assets_origin_domain' in item
+    and item.type in [ 'shared', 'simple' ]
+  "
   action:
 
     module: "route53"

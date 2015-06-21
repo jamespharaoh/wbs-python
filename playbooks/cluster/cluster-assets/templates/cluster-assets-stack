@@ -36,7 +36,7 @@ Resources:
         Origins:
 
           - Id: "{{ deployment_name }}-assets"
-            DomainName: "{{ deployment.assets_origin }}"
+            DomainName: "{{ deployment.assets_origin_domain }}"
             CustomOriginConfig:
               OriginProtocolPolicy: "http-only"
 

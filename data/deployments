@@ -8,11 +8,10 @@ production:
   main_domain: "wistla.com"
   short_domain: "wist.la"
   assets_domain: "assets.wistla.com"
+  assets_origin_domain: "assets-origin.wistla.com"
   admin_domain: "admin.wistla.com"
   api_domain: "api.wistla.com"
   web_domain: "www.wistla.com"
-
-  assets_origin: "assets-origin.wistla.com"
 
   cluster: "production"
   target: "production-a"
@@ -45,11 +44,10 @@ production-a:
   main_domain: "a.wistla.com"
   short_domain: "a.wist.la"
   assets_domain: "assets.a.wistla.com"
+  assets_origin_domain: "assets-origin.a.wistla.com"
   admin_domain: "admin.a.wistla.com"
   api_domain: "api.a.wistla.com"
   web_domain: "www.a.wistla.com"
-
-  assets_origin: "assets-origin.a.wistla.com"
 
   parent_cluster: "production"
   parent_domain: "wistla.com"
@@ -90,11 +88,10 @@ production-b:
   main_domain: "b.wistla.com"
   short_domain: "b.wist.la"
   assets_domain: "assets.b.wistla.com"
+  assets_origin_domain: "assets-origin.b.wistla.com"
   admin_domain: "admin.b.wistla.com"
   api_domain: "api.b.wistla.com"
   web_domain: "www.b.wistla.com"
-
-  assets_origin: "assets-origin.b.wistla.com"
 
   parent_cluster: "production"
   parent_domain: "wistla.com"
@@ -132,11 +129,10 @@ staging:
   main_domain: "staging.wistla.com"
   short_domain: "staging.wist.la"
   assets_domain: "assets.staging.wistla.com"
+  assets_origin_domain: "assets-origin.staging.wistla.com"
   admin_domain: "admin.staging.wistla.com"
   api_domain: "api.staging.wistla.com"
   web_domain: "www.staging.wistla.com"
-
-  assets_origin: "assets-origin.staging.wistla.com"
 
   cluster: "staging"
   target: "staging-a"
@@ -169,11 +165,10 @@ staging-a:
   main_domain: "a.staging.wistla.com"
   short_domain: "a.staging.wist.la"
   assets_domain: "assets.a.staging.wistla.com"
+  assets_origin_domain: "assets-origin.a.staging.wistla.com"
   admin_domain: "admin.a.staging.wistla.com"
   api_domain: "api.a.staging.wistla.com"
   web_domain: "www.a.staging.wistla.com"
-
-  assets_origin: "assets-origin.a.staging.wistla.com"
 
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
@@ -214,11 +209,10 @@ staging-b:
   main_domain: "b.staging.wistla.com"
   short_domain: "b.staging.wist.la"
   assets_domain: "assets.b.staging.wistla.com"
+  assets_origin_domain: "assets-origin.b.staging.wistla.com"
   admin_domain: "admin.b.staging.wistla.com"
   api_domain: "api.b.staging.wistla.com"
   web_domain: "www.b.staging.wistla.com"
-
-  assets_origin: "assets-origin.b.staging.wistla.com"
 
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
@@ -268,11 +262,10 @@ test-everest:
   main_domain: "everest.test.wistla.com"
   short_domain: "everest.test.wist.la"
   assets_domain: "assets.everest.test.wistla.com"
+  assets_origin_domain: "assets-origin.everest.test.wistla.com"
   admin_domain: "admin.everest.test.wistla.com"
   api_domain: "api.everest.test.wistla.com"
   web_domain: "www.everest.test.wistla.com"
-
-  assets_origin: "assets-origin.everest.test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -319,11 +312,10 @@ test-k2:
   main_domain: "k2.test.wistla.com"
   short_domain: "k2.test.wist.la"
   assets_domain: "assets.k2.test.wistla.com"
+  assets_origin_domain: "assets-origin.k2.test.wistla.com"
   admin_domain: "admin.k2.test.wistla.com"
   api_domain: "api.k2.test.wistla.com"
   web_domain: "www.k2.test.wistla.com"
-
-  assets_origin: "assets-origin.k2.test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -370,11 +362,10 @@ test-montblanc:
   main_domain: "montblanc.test.wistla.com"
   short_domain: "montblanc.test.wist.la"
   assets_domain: "assets.montblanc.test.wistla.com"
+  assets_origin_domain: "assets-origin.montblanc.test.wistla.com"
   admin_domain: "admin.montblanc.test.wistla.com"
   api_domain: "api.montblanc.test.wistla.com"
   web_domain: "www.montblanc.test.wistla.com"
-
-  assets_origin: "assets-origin.montblanc.test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -421,11 +412,10 @@ test-erebus:
   main_domain: "erebus.test.wistla.com"
   short_domain: "erebus.test.wist.la"
   assets_domain: "assets.erebus.test.wistla.com"
+  assets_origin_domain: "assets-origin.erebus.test.wistla.com"
   admin_domain: "admin.erebus.test.wistla.com"
   api_domain: "api.erebus.test.wistla.com"
   web_domain: "www.erebus.test.wistla.com"
-
-  assets_origin: "assets-origin.erebus.test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -472,11 +462,10 @@ test-fitzroy:
   main_domain: "fitzroy.test.wistla.com"
   short_domain: "fitzroy.test.wist.la"
   assets_domain: "assets.fitzroy.test.wistla.com"
+  assets_origin_domain: "assets-origin.fitzroy.test.wistla.com"
   admin_domain: "admin.fitzroy.test.wistla.com"
   api_domain: "api.fitzroy.test.wistla.com"
   web_domain: "www.fitzroy.test.wistla.com"
-
-  assets_origin: "assets-origin.fitzroy.test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -523,11 +512,10 @@ dev:
   main_domain: "dev.wistla.com"
   short_domain: "dev.wist.la"
   assets_domain: "assets.dev.wistla.com"
+  assets_origin_domain: "assets-origin.dev.wistla.com"
   admin_domain: "admin.dev.wistla.com"
   api_domain: "api.dev.wistla.com"
   web_domain: "www.dev.wistla.com"
-
-  assets_origin: "assets-origin.dev.wistla.com"
 
   bridge_name: "br152"
   bridge_network: "10.152"
@@ -543,11 +531,10 @@ berk:
   main_domain: "berk.wistla.com"
   short_domain: "berk.dev.wist.la"
   assets_domain: "assets.berk.dev.wistla.com"
+  assets_origin_domain: "assets-origin.berk.dev.wistla.com"
   admin_domain: "admin.berk.wistla.com"
   api_domain: "api.berk.wistla.com"
   web_domain: "www.berk.wistla.com"
-
-  assets_origin: "assets-origin.berk.dev.wistla.com"
 
   bridge_name: "br150"
   bridge_network: "10.150"
@@ -563,11 +550,10 @@ bruce:
   main_domain: "bruce.wistla.com"
   short_domain: "bruce.dev.wist.la"
   assets_domain: "assets.bruce.dev.wistla.com"
+  assets_origin_domain: "assets-origin.bruce.dev.wistla.com"
   admin_domain: "admin.bruce.wistla.com"
   api_domain: "api.bruce.wistla.com"
   web_domain: "www.bruce.wistla.com"
-
-  assets_origin: "assets-origin.bruce.dev.wistla.com"
 
   bridge_name: "br154"
   bridge_network: "10.154"
@@ -583,11 +569,10 @@ mrbenn:
   main_domain: "mrbenn.wistla.com"
   short_domain: "mrbenn.dev.wist.la"
   assets_domain: "assets.mrbenn.dev.wistla.com"
+  assets_origin_domain: "assets-origin.mrbenn.dev.wistla.com"
   admin_domain: "admin.mrbenn.wistla.com"
   api_domain: "api.mrbenn.wistla.com"
   web_domain: "www.mrbenn.wistla.com"
-
-  assets_origin: "assets-origin.mrbenn.dev.wistla.com"
 
   bridge_name: "br151"
   bridge_network: "10.151"
@@ -603,11 +588,10 @@ mrbenn:
   main_domain: "7-zark-7.wistla.com"
   short_domain: "7-zark-7.dev.wist.la"
   assets_domain: "assets.7-zark-7.dev.wistla.com"
+  assets_origin_domain: "assets-origin.7-zark-7.dev.wistla.com"
   admin_domain: "admin.7-zark-7.wistla.com"
   api_domain: "api.7-zark-7.wistla.com"
   web_domain: "www.7-zark-7.wistla.com"
-
-  assets_origin: "assets-origin.7-zark-7.dev.wistla.com"
 
   bridge_name: "br153"
   bridge_network: "10.153"
@@ -623,11 +607,10 @@ optimus:
   main_domain: "optimus.dev.wistla.com"
   short_domain: "optimus.dev.wist.la"
   assets_domain: "assets.optimus.dev.wistla.com"
+  assets_origin_domain: "assets-origin.optimus.dev.wistla.com"
   admin_domain: "admin.optimus.dev.wistla.com"
   api_domain: "api.optimus.dev.wistla.com"
   web_domain: "www.optimus.dev.wistla.com"
-
-  assets_origin: "assets-origin.optimus.dev.wistla.com"
 
   bridge_name: "br161"
   bridge_network: "10.161"
@@ -643,11 +626,10 @@ jenkins-latest:
   main_domain: "latest.jenkins.wistla.com"
   short_domain: "latest.jenkins.wist.la"
   assets_domain: "assets.latest.jenkins.wistla.com"
+  assets_origin_domain: "assets-origin.latest.jenkins.wistla.com"
   admin_domain: "admin.latest.jenkins.wistla.com"
   api_domain: "api.latest.jenkins.wistla.com"
   web_domain: "www.latest.jenkins.wistla.com"
-
-  assets_origin: "assets-origin.latest.jenkins.wistla.com"
 
   bridge_name: "br160"
   bridge_network: "10.160"

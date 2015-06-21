@@ -97,7 +97,7 @@
 
 - name: "store cloudformation details for assets"
   with_indexed_items: "cluster.deployment_names"
-  when: "deployments [item].type in [ 'shared', 'simple' ]"
+  when: "deployments [item.1].type in [ 'shared', 'simple' ]"
   update_resource:
 
     "assets_cloudfront_{{ item.1 | replace ('-', '_') }}_id": "{{

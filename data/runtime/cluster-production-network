@@ -3,6 +3,8 @@ admin_balancer_hosted_zone_name: production-admin-954318471.eu-west-1.elb.amazon
 admin_balancer_hosted_zone_name_id: Z3NF1Z3NOM5OY2
 app_balancer_hosted_zone_name: production-app-56456574.eu-west-1.elb.amazonaws.com
 app_balancer_hosted_zone_name_id: Z3NF1Z3NOM5OY2
+assets_cloudfront_production_domain: d1j9jvgubmrxbw.cloudfront.net
+assets_cloudfront_production_id: E7YX19FRFN80P
 internet_gateway_id: igw-e81af78d
 routes_admin_a: rtb-60ae6205
 routes_admin_b: rtb-61ae6204
