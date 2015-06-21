@@ -34,12 +34,13 @@ config.amqpOptions = {
 config.CORS = {
 	origins: [
 
+		'https://{{ deployment.admin_domain }}',
 		'https://{{ deployment.api_domain }}',
 		'https://{{ deployment.main_domain }}',
 		'https://{{ deployment.short_domain }}',
 		'https://{{ deployment.web_domain }}',
-		config.adminUrl,
 
+		'http://{{ deployment.admin_domain }}',
 		'http://{{ deployment.api_domain }}',
 		'http://{{ deployment.main_domain }}',
 		'http://{{ deployment.short_domain }}',
