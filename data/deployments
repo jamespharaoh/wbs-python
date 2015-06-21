@@ -306,7 +306,7 @@ test-everest:
   assets_certificate_id: "ASCAIKM6A6TS345ZNQYXQ"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.everest.test.wistla.com"
 
-  blob_storage: "local"
+  blob_storage: "amazon"
 
 test-k2:
 
