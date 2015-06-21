@@ -85,15 +85,6 @@
   with_items: "cluster_deployment_shared_directories"
   when: "cluster_deployment.type != 'alias'"
 
-- name: "create shared links"
-  action:
-    module: "file"
-    path: "{{ cluster_deployment_home }}/shared/{{ item.link }}"
-    state: "link"
-    src: "{{ item.target }}"
-  with_items: "cluster_deployment_shared_links"
-  when: "cluster_deployment.type != 'alias'"
-
 - name: "create config files"
   action:
     module: "template"

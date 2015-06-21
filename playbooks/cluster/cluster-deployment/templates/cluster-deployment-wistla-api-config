@@ -47,15 +47,15 @@ config.CORS = {
 	credentials: true
 };
 
-{% if use_s3 == 'yes' %}
+{% if cluster_deployment_alias.blob_storage == 'amazon' %}
 
 // amazon s3 blob storage
 config.blobMode = 'amazon';
 config.blobAmazon = {
-	accessKey: '{{ amazon_accounts.test.access_key }}',
-	secretKey: '{{ amazon_accounts.test.secret_key }}',
-	bucketName: 'wistla-dev',
-	bucketPrefix: '/{{ deployment_name }}/blobs'
+	accessKey: '{{ amazon_accounts [cluster_name].access_key }}',
+	secretKey: '{{ amazon_accounts [cluster_name].secret_key }}',
+	bucketName: 'wistla-{{ cluster_deployment_alias.name }}-blobs',
+	bucketPrefix: ''
 };
 
 {% else %}
@@ -79,21 +79,28 @@ config.loadingData = {
 };
 
 // apple push notifications
+
 config.applePush = {
-{% if cluster_deployment.apple_push_notifications_enabled == 'yes' %}
+{% if bool_native [cluster_deployment.apple_push_notifications_enabled] %}
+
 	enabled: true,
 	caCertFile: ROOT + '/config/apple-ca.cert',
 	certFile: ROOT + '/config/apple-push.cert',
 	keyFile: ROOT + '/config/apple-push.key',
-	production: {{ 'true' if cluster_deployment.apple_push_notifications_production == 'yes' else 'false' }},
+	production: {{ bool_javascript [cluster_deployment.apple_push_notifications_production] }},
+
 {% else %}
+
 	enabled: false,
+
 {% endif %}
 };
 
-{% if cluster_deployment.emails_enabled == 'yes' %}
+{% if bool_native [cluster_deployment.emails_enabled] %}
+
 // Enable email sends.
 config.sendEmails = true;
+
 {% endif %}
 
 module.exports = config;

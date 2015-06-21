@@ -18,7 +18,6 @@ cluster_deployment_config_templates: "{{ cluster_deployment_type.config_template
 cluster_deployment_config_files: "{{ cluster_deployment_type.config_files }}"
 cluster_deployment_config_links: "{{ cluster_deployment_type.config_links }}"
 cluster_deployment_shared_directories: "{{ cluster_deployment_type.shared_directories }}"
-cluster_deployment_shared_links: "{{ cluster_deployment_type.shared_links }}"
 cluster_deployment_override_templates: "{{ cluster_deployment_type.override_templates }}"
 
 cluster_deployment_types:
@@ -44,16 +43,8 @@ cluster_deployment_types:
         target: "wistla-devops/accounts"
 
     config_files: []
-
     config_links: []
-
     shared_directories: []
-
-    shared_links:
-
-      - link: "userUpload"
-        target: "user-upload"
-
     override_templates: []
 
   alias:
@@ -313,11 +304,6 @@ cluster_deployment_types:
       - "log"
       - "user-upload"
       - "video"
-
-    shared_links:
-
-      - link: "userUpload"
-        target: "user-upload"
 
     override_templates:
 

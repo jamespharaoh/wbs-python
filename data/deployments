@@ -33,6 +33,8 @@ production:
   assets_certificate_id: "ASCAJKKYFOD6QGXK67ZRM"
   assets_certificate_arn: "arn:aws:iam::670055293867:server-certificate/cloudfront/assets.wistla.com"
 
+  blob_storage: "local"
+
 production-a:
 
   name: "production-a"
@@ -61,7 +63,7 @@ production-a:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
-  test_routes_enabled: "no"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -105,7 +107,7 @@ production-b:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
-  test_routes_enabled: "no"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -154,6 +156,8 @@ staging:
   assets_certificate_id: "ASCAIVCR7DK3J5TTII3JI"
   assets_certificate_arn: "arn:aws:iam::155823734687:server-certificate/cloudfront/assets.staging.wistla.com"
 
+  blob_storage: "amazon"
+
 staging-a:
 
   name: "staging-a"
@@ -182,7 +186,7 @@ staging-a:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
-  test_routes_enabled: "no"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -226,7 +230,7 @@ staging-b:
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
-  test_routes_enabled: "no"
+  test_routes_enabled: "yes"
 
   node_memory:
 
@@ -302,6 +306,8 @@ test-everest:
   assets_certificate_id: "ASCAIKM6A6TS345ZNQYXQ"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.everest.test.wistla.com"
 
+  blob_storage: "local"
+
 test-k2:
 
   name: "test-k2"
@@ -351,6 +357,8 @@ test-k2:
 
   assets_certificate_id: "ASCAIEDRJQCGGFX245YCQ"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.k2.test.wistla.com"
+
+  blob_storage: "local"
 
 test-montblanc:
 
@@ -402,6 +410,8 @@ test-montblanc:
   assets_certificate_id: "ASCAJDTNUCAQRD7PBDKAW"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.montblanc.test.wistla.com"
 
+  blob_storage: "local"
+
 test-erebus:
 
   name: "test-erebus"
@@ -452,6 +462,8 @@ test-erebus:
   assets_certificate_id: "ASCAJFIEU4AV2IQTBDETC"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.erebus.test.wistla.com"
 
+  blob_storage: "amazon"
+
 test-fitzroy:
 
   name: "test-fitzroy"
@@ -501,6 +513,8 @@ test-fitzroy:
 
   assets_certificate_id: "ASCAILU6JEFLQM2EB4DPA"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.fitzroy.test.wistla.com"
+
+  blob_storage: "amazon"
 
 dev:
 
