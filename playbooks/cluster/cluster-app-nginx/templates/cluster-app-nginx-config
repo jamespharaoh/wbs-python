@@ -52,7 +52,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name {{ deployment.main_domain }};
 
@@ -79,7 +79,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name www.{{ deployment.main_domain }};
 
@@ -113,7 +113,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name api.{{ deployment.main_domain }};
 
@@ -147,7 +147,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name admin.{{ deployment.main_domain }};
 
@@ -182,7 +182,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name {{ deployment.short_domain }};
 
@@ -217,7 +217,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl spdy;
 
 		server_name {{ deployment.assets_domain }};
 
@@ -241,11 +241,11 @@ http {
 
 		listen 80;
 
-		server_name {{ deployment.assets_origin }};
+		server_name {{ deployment.assets_origin_domain }};
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
-			proxy_set_header Host "{{ deployment.assets_domain }}";
+			proxy_set_header Host "{{ deployment.assets_origin_domain }}";
 		}
 
 		location /robots.txt {

@@ -74,7 +74,7 @@ http {
 
 	server {
 
-		include server-environment.conf;
+		listen 80;
 
 		server_name {{ cluster_deployment.api_domain }};
 
@@ -106,7 +106,7 @@ http {
 
 	server {
 
-		include server-environment.conf;
+		listen 80;
 
 		server_name {{ cluster_deployment.web_domain }};
 		server_name {{ cluster_deployment.main_domain }};
@@ -136,7 +136,7 @@ http {
 
 	server {
 
-		include server-environment.conf;
+		listen 80;
 
 		server_name {{ cluster_deployment.admin_domain }};
 
@@ -161,7 +161,7 @@ http {
 
 	server {
 
-		include server-environment.conf;
+		listen 80;
 
 		server_name {{ cluster_deployment.short_domain }};
 
@@ -187,7 +187,7 @@ http {
 
 	server {
 
-		include server-environment.conf;
+		listen 80;
 
 		server_name {{ cluster_deployment.assets_domain }};
 		server_name {{ cluster_deployment.assets_origin_domain }};
