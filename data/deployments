@@ -33,7 +33,7 @@ production:
   assets_certificate_id: "ASCAJKKYFOD6QGXK67ZRM"
   assets_certificate_arn: "arn:aws:iam::670055293867:server-certificate/cloudfront/assets.wistla.com"
 
-  blob_storage: "local"
+  blob_storage: "amazon"
 
 production-a:
 
@@ -358,7 +358,7 @@ test-k2:
   assets_certificate_id: "ASCAIEDRJQCGGFX245YCQ"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.k2.test.wistla.com"
 
-  blob_storage: "local"
+  blob_storage: "amazon"
 
 test-montblanc:
 
@@ -410,7 +410,7 @@ test-montblanc:
   assets_certificate_id: "ASCAJDTNUCAQRD7PBDKAW"
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.montblanc.test.wistla.com"
 
-  blob_storage: "local"
+  blob_storage: "amazon"
 
 test-erebus:
 

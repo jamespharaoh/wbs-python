@@ -91,6 +91,12 @@ python_packages:
   - name: "paramiko"
     version: "1.15.2"
 
+  - name: "python-debian"
+    version: "0.1.23"
+
+  - name: "chardet"
+    version: "2.0.3"
+
 node_packages:
 
   - name: "bunyan"
