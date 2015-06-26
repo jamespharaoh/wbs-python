@@ -165,7 +165,7 @@ http {
 
 		server_name {{ cluster_deployment.short_domain }};
 
-{% if cluster_deployment_type == 'alias' %}
+{% if cluster_deployment.type == 'alias' %}
 		server_name {{ cluster_deployment_alias.short_domain }};
 {% endif %}
 
