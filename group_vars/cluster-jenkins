@@ -61,20 +61,26 @@ python_packages:
   - name: "awscli"
     version: "1.7.31"
 
+  - name: "chardet"
+    version: "2.3.0"
+
   - name: "ipaddress"
     version: "1.0.7"
 
   - name: "netaddr"
     version: "0.7.14"
 
-  - name: "pyyaml"
-    version: "3.11"
+  - name: "paramiko"
+    version: "1.15.2"
 
   - name: "pyopenssl"
     version: "0.15.1"
 
-  - name: "paramiko"
-    version: "1.15.2"
+  - name: "python-debian"
+    version: "0.1.23"
+
+  - name: "pyyaml"
+    version: "3.11"
 
 node_packages:
 
