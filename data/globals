@@ -185,4 +185,10 @@ ttl_long: "3600"
 bool_native: { "yes": True, "no": False }
 bool_javascript: { "yes": "true", "no": "false" }
 
+identity:
+  name: "{{ inventory_hostname }}"
+
+SHORT_NAME: "wistla"
+SHORT_TITLE: "Wistla"
+
 # ex: et ts=2 filetype=yaml

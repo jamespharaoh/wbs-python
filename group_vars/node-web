@@ -14,4 +14,25 @@ network_route_localnet: "{{
   [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []
 }}"
 
+node_deploy_projects:
+
+  - name: "wistla-web"
+    excludes:
+
+      - "/config/config.local.js"
+      - "/config/config.overrides.js"
+      - "/public/cms-images"
+
+    configs:
+
+      - "config.local.js"
+      - "config.overrides.js"
+
+    other_links:
+
+      - link: "/public/cms-images"
+        target: "/shared/cms-image"
+
+node_nodejs_main: "keystone.js"
+
 # ex: et ts=2 filetype=yaml

@@ -1,0 +1,61 @@
+{{ ansible_warning ['#'] }}
+
+{% set node_var = 'WISTLA_' + node_type | upper %}
+
+description "wistla {{ node_type }} instance"
+
+instance ${{ node_var }}_INDEX
+
+stop on runlevel [!2345]
+
+respawn
+respawn limit unlimited
+
+env HOME=/home/ubuntu
+
+script
+
+	. /config/environment
+
+	cd /home/ubuntu/wistla-{{ node_type }}
+
+	setuid ubuntu \
+	mkdir --parents /shared/log
+
+	setuid ubuntu \
+	touch /shared/log/wistla-{{ node_type }}.log
+
+	exec >> /shared/log/wistla-{{ node_type }}.log
+	exec 2>> /shared/log/wistla-{{ node_type }}.log
+
+	if test "${{ node_var }}_INDEX" = "0" \
+		-a "${{ node_var }}_DEBUG" = "yes"
+	then
+
+		exec setuid ubuntu \
+		node-debug --nodejs --harmony \
+		--debug-brk=0 \
+		--min_semi_space_size=${{ node_var }}_MIN_SEMI_SPACE_SIZE \
+		--max_semi_space_size=${{ node_var }}_MAX_SEMI_SPACE_SIZE \
+		--max_old_space_size=${{ node_var }}_MAX_OLD_SPACE_SIZE \
+		--max_executable_size=${{ node_var }}_MAX_EXECUTABLE_SIZE \
+		{{ node_nodejs_main }}
+
+	else
+
+		exec setuid ubuntu \
+		stdbuf -oL -eL \
+		node --harmony \
+		--trace_gc \
+		--expose_gc \
+		--min_semi_space_size=${{ node_var }}_MIN_SEMI_SPACE_SIZE \
+		--max_semi_space_size=${{ node_var }}_MAX_SEMI_SPACE_SIZE \
+		--max_old_space_size=${{ node_var }}_MAX_OLD_SPACE_SIZE \
+		--max_executable_size=${{ node_var }}_MAX_EXECUTABLE_SIZE \
+		{{ node_nodejs_main }}
+
+	fi
+
+end script
+
+post-stop exec sleep 2

@@ -21,9 +21,7 @@
 
     - "cluster-admin-firewall"
 
-    - "install-etcd"
-    - "setup-etcd"
-    - "start-etcd"
+    - "etcd"
 
     - "cluster-admin-nginx"
     - "setup-openvpn-server"

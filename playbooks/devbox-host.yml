@@ -25,9 +25,7 @@
     - "install-tools"
     - "install-node-packages"
 
-    - "install-etcd"
-    - "setup-etcd"
-    - "start-etcd"
+    - "etcd"
 
     - "devbox-user"
 

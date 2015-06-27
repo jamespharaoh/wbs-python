@@ -1,3 +1,11 @@
 {{ ansible_warning ['#'] }}
 
 WISTLA_API_COUNT="{{ dev_node_instance_count.api }}"
+WISTLA_API_DEBUG="{{ dev_debug }}"
+
+WISTLA_API_MIN_SEMI_SPACE_SIZE="4"
+WISTLA_API_MAX_SEMI_SPACE_SIZE="32"
+WISTLA_API_MAX_OLD_SPACE_SIZE="{{ (dev_node_memory.api | int) - 128 }}"
+WISTLA_API_MAX_EXECUTABLE_SIZE="32"
+
+# ex: noet ts=4 filetype=bash

@@ -19,4 +19,27 @@ network_route_localnet: "{{
   [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []
 }}"
 
+node_deploy_projects:
+
+  - name: "wistla-api"
+    excludes:
+
+      - "/config/config.local.js"
+      - "/config/config.overrides.js"
+      - "/config/google-service-account.key"
+      - "/config/apple-ca.cert"
+      - "/config/apple-push.cert"
+      - "/config/apple-push.key"
+
+    configs:
+
+      - "apple-ca.cert"
+      - "apple-push.cert"
+      - "apple-push.key"
+      - "config.local.js"
+      - "config.overrides.js"
+      - "google-service-account.key"
+
+node_nodejs_main: "server.js"
+
 # ex: et ts=2 filetype=yaml

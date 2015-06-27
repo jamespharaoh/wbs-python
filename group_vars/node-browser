@@ -15,4 +15,19 @@ network_route_localnet: "{{
   [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []
 }}"
 
+node_deploy_projects:
+
+  - name: "wistla-browser"
+    excludes:
+
+      - "/config/config.local.js"
+      - "/config/config.overrides.js"
+
+    configs:
+
+      - "config.local.js"
+      - "config.overrides.js"
+
+node_nodejs_main: "server.js"
+
 # ex: et ts=2 filetype=yaml

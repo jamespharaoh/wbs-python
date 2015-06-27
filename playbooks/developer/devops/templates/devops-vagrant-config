@@ -20,6 +20,7 @@ dev_apple_push_notifications_production: "{{ dev_apple_push_notifications_produc
 
 {% if secrets | default ([ 'dev' ]) %}
 secrets:
+
 {% for secret in secrets | default ([ 'dev' ]) %}
   - "{{ secret }}"
 {% endfor %}
@@ -29,6 +30,7 @@ secrets: []
 
 {% if vpns | default ([]) %}
 vpns:
+
 {% for vpn in vpns | default ([]) %}
   - "{{ vpn }}"
 {% endfor %}
@@ -51,9 +53,6 @@ dev_node_instance_count:
 
   api: "{{ (dev_node_instance_count | default ({})).api | default ('1') }}"
   browser: "{{ (dev_node_instance_count | default ({})).browser | default ('1') }}"
-  load: "{{ (dev_node_instance_count | default ({})).load | default ('1') }}"
-  mongo: "{{ (dev_node_instance_count | default ({})).mongo | default ('1') }}"
-  rabbit: "{{ (dev_node_instance_count | default ({})).rabbit | default ('1') }}"
   web: "{{ (dev_node_instance_count | default ({})).web | default ('1') }}"
 
 dev_node_memory:
