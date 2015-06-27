@@ -5,58 +5,38 @@ from gridlinker.tools import *
 
 class ResourceHelper (CommandHelper):
 
-	def get_unique_name (self, context, args):
+	def create_unique_name (self, context, args):
 
 		arg_vars = vars (args)
 
-		# verify group or class
+		# verify class
 
-		if "group" in arg_vars and arg_vars ["group"]:
+		class_name = arg_vars ["class"]
 
-			if getattr (args, "class"):
-				raise Exception ()
+		if not class_name in context.classes:
 
-			group_name = args.group
-			group_data = context.groups.get_quick (group_name)
+			raise Exception (
+				"No such class: %s" % (
+					class_name))
 
-			class_name = group_data ["identity"] ["class"]
-			class_data = context.local_data ["classes"] [class_name]
+		class_data = context.local_data ["classes"] [class_name]
 
-		elif "class" in arg_vars \
-		and arg_vars ["class"]:
+		return "%s/%s" % (
+			class_data ["class"] ["namespace"],
+			args.name)
 
-			class_name = arg_vars ["class"]
+	def existing_unique_name (self, context, resource_data):
 
-			if not class_name in context.classes:
+		resource_name = resource_data ["identity"] ["name"]
 
-				raise Exception (
-					"No such class: %s" % (
-						class_name))
-
-			class_data = context.local_data ["classes"] [class_name]
-
-		else:
-
-			resource_data = context.resources.get_slow (args.name)
-
-			class_name = resource_data ["identity"] ["class"]
-			class_data = context.local_data ["classes"] [class_name]
+		class_name = resource_data ["identity"] ["class"]
+		class_data = context.local_data ["classes"] [class_name]
 
 		# determine unique name depending on scope
 
-		if class_data ["class"] ["scope"] == "group":
-			unique_name = "%s/%s" % (group_name, args.name)
-
-		elif class_data ["class"] ["scope"] == "class":
-			unique_name = "%s/%s" % (class_name, args.name)
-
-		elif class_data ["class"] ["scope"] == "global":
-			unique_name = args.name
-
-		else:
-			raise Exception ()
-
-		return unique_name
+		return "%s/%s" % (
+			class_data ["class"] ["namespace"],
+			resource_data ["identity"] ["name"])
 
 resource_command = GenericCommand (
 
@@ -73,7 +53,6 @@ resource_command = GenericCommand (
 
 				NameArgument (),
 				ClassArgument (),
-				GroupArgument (),
 				ParentArgument (),
 				IndexArgument (),
 
@@ -102,17 +81,7 @@ resource_command = GenericCommand (
 
 		custom_columns = [
 
-			SimpleColumn (
-				section = "identity",
-				name = "name",
-				label = "Name",
-				default = True),
-
-			SimpleColumn (
-				section = "identity",
-				name = "group",
-				label = "Group",
-				default = True),
+			UniqueNameColumn (),
 
 			SimpleColumn (
 				section = "identity",
@@ -130,12 +99,6 @@ resource_command = GenericCommand (
 				section = "identity",
 				name = "description",
 				label = "Description",
-				default = True),
-
-			SimpleColumn (
-				section = "private",
-				name = "address",
-				label = "Private IP",
 				default = True),
 
 		],
