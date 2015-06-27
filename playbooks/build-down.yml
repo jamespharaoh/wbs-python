@@ -1,0 +1,9 @@
+---
+
+- hosts: "node-template-concrete"
+  roles:
+
+    - "build-download"
+    - "build-unpack"
+
+# ex: et ts=2 filetype=yaml

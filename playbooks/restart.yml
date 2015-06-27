@@ -1,0 +1,6 @@
+---
+
+- include: "stop.yml"
+- include: "start.yml"
+
+# ex: et ts=2 filetype=yaml

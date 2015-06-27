@@ -1,0 +1,36 @@
+---
+
+- name: "unpack build"
+  delegate_to: "localhost"
+  sudo: "yes"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    if test -e "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+    then
+
+      btrfs subvolume delete
+        "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+
+      sleep 2;
+
+    fi;
+
+    btrfs subvolume create
+      "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+
+    cd "{{ deployment_home }}/work/build";
+
+    tar
+      --extract
+      --gzip
+      --file "{{ node_type }}-{{ build_id }}.tar.gz"
+      --directory "/var/lib/lxc/{{ inventory_hostname }}"
+      rootfs;
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,40 @@
+---
+
+- name: "create directory"
+  delegate_to: "localhost"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/work/build"
+    state: "directory"
+
+- name: "create package"
+  delegate_to: "localhost"
+  sudo: "yes"
+  args:
+
+    creates: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    cd "{{ deployment_home }}/work/build";
+
+    tar
+      --create
+      --gzip
+      --file "{{ node_type }}-{{ build_id }}.tar.gz.temp"
+      --directory "/var/lib/lxc/{{ inventory_hostname }}"
+      rootfs;
+
+    chown
+      "{{ deployment_user }}:{{ deployment_user }}"
+      "{{ node_type }}-{{ build_id }}.tar.gz.temp";
+
+    mv
+      "{{ node_type }}-{{ build_id }}.tar.gz.temp"
+      "{{ node_type }}-{{ build_id }}.tar.gz";
+
+# ex: et ts=2 filetype=yaml
