@@ -9,7 +9,7 @@
 
     bucket: "{{ build_bucket }}"
     object: "{{ build_target }}/{{ node_type }}-{{ build_id }}.tar.gz"
-    src: "/home/vagrant/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
+    src: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
 
     region: "{{ devops_region }}"
     aws_access_key: "{{ amazon_accounts.ops.access_key }}"
