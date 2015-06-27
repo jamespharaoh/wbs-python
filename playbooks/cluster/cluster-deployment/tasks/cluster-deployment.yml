@@ -147,4 +147,12 @@
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
 
+- name: "create logrotate config"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/logrotate.d/wistla-{{ cluster_deployment_name }}"
+    src: "cluster-deployment-wistla-logrotate"
+
 # ex: et ts=2 filetype=yaml
