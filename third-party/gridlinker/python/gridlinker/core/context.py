@@ -17,6 +17,9 @@ from wbs import LazyDictionary
 from wbs import SchemaDatabase
 
 from gridlinker.certificate.authority import CertificateAuthority
+
+from gridlinker.core.inventory import Inventory
+
 from gridlinker.etcd import GenericCollection
 from gridlinker.etcd import EtcdClient
 
@@ -62,10 +65,21 @@ class GenericContext (object):
 	@lazy_property
 	def connections_config (self):
 
-		file_path = self.connections_path
+		if not os.path.isfile (self.connections_path):
 
-		with open (file_path) as file_handle:
-			return yaml.load (file_handle)
+			raise Exception (
+				"Connections config does not exist: %s" % (
+					self.connections_path))
+
+		with open (self.connections_path) as file_handle:
+			ret = yaml.load (file_handle)
+
+		if not isinstance (ret, dict):
+
+			raise Exception (
+				"Connections config is not a dict")
+
+		return ret
 
 	@lazy_property
 	def connection_config (self):
@@ -262,15 +276,22 @@ class GenericContext (object):
 		return {
 
 			"defaults": {
+
+				"display_skipped_hosts": "False",
 				"force_color": "True",
 				"gathering": "explicit",
+
+				"retry_files_save_path": "%s/work/retry" % self.home,
+
 				"library": ":".join (self.ansible_library),
+				"roles_path": ":".join (self.ansible_roles_path),
+
 				"action_plugins": ":".join (self.ansible_action_plugins),
 				"connection_plugins": ":".join (self.ansible_connection_plugins),
 				"filter_plugins": ":".join (self.ansible_filter_plugins),
 				"lookup_plugins": ":".join (self.ansible_lookup_plugins),
 				"callback_plugins": ":".join (self.ansible_callback_plugins),
-				"roles_path": ":".join (self.ansible_roles_path),
+
 			},
 
 			"ssh_connection": {
@@ -421,38 +442,24 @@ class GenericContext (object):
 
 					class_data = self.local_data ["classes"] [class_name]
 
-					if "ssh" in class_data \
-					and "hostnames" in class_data ["ssh"]:
+					if not "ssh" in class_data \
+					or not "hostnames" in class_data ["ssh"]:
 
-						try:
+						continue
 
-							addresses = map (
+					addresses = [
 
-								lambda value: self.map_resource (
-									resource_name,
-									resource_data,
-									value),
+						address for address in map (
 
-								class_data ["ssh"] ["hostnames"])
+							lambda value: self.inventory.resolve_value_or_none (
+								resource_name,
+								value),
 
-						except Exception as exception:
+							class_data ["ssh"] ["hostnames"])
 
-							raise Exception (
-								"Error mapping ssh hostnames for %s: %s" % (
-									resource_name,
-									exception))
+						if address is not None
 
-					else:
-
-						addresses = [ resource_name ] + sorted (set (filter (None, [
-							resource_data.get ("private", {}).get ("address", None),
-							resource_data.get ("public", {}).get ("address", None),
-							resource_data.get ("amazon", {}).get ("public_ip", None),
-							resource_data.get ("amazon", {}).get ("public_dns_name", None),
-							resource_data.get ("amazon", {}).get ("private_ip", None),
-							resource_data.get ("amazon", {}).get ("private_dns_name", None),
-							resource_data.get ("ansible", {}).get ("ssh_host", None),
-						])))
+					]
 
 					if not addresses:
 						continue
@@ -504,46 +511,14 @@ class GenericContext (object):
 					os.fchmod (file_handle.fileno (), 0o600)
 					file_handle.write (key_data)
 
-	def map_resource (self, resource_name, resource_data, value):
-
-		return re.sub (
-
-			r"\{\{\s*(.*?)\s*\}\}",
-
-			lambda match:
-
-				self.map_resource_variable (
-					resource_name,
-					resource_data,
-					match.group (1)),
-
-			value)
-
-	def map_resource_variable (self, resource_name, resource_data, name):
-
-		if name == "identity.name":
-			return resource_name
-
-		elif name == "private.address":
-
-			if "private" in resource_data \
-			and "address" in resource_data ["private"]:
-
-				return resource_data ["private"] ["address"]
-
-			else:
-
-				return None
-
-		elif name == "public.address":
-			return resource_data.get ("public", {}).get ("address", None)
-
-		else:
-			raise Exception (name)
-
 	@lazy_property
 	def classes (self):
 
 		return self.local_data ["classes"]
+
+	@lazy_property
+	def inventory (self):
+
+		return Inventory (self)
 
 # ex: noet ts=4 filetype=yaml

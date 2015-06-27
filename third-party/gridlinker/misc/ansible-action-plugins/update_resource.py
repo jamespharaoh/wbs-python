@@ -52,13 +52,13 @@ class ActionModule (object):
 			resource_data.setdefault (prefix, {})
 			resource_data [prefix] [rest] = value
 
-			options [prefix] = resource_data [prefix]
+			options.setdefault (prefix, inject.get (prefix, {}))
+			options [prefix] [rest] = value
 			options [prefix + "_" + rest] = value
 
 		self.context.resources.set (resource_name, resource_data)
 
 		return ReturnData (
-
 			conn = conn,
 			result = dict (
 				ansible_facts = options))
