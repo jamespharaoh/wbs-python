@@ -5,16 +5,18 @@
 if test $# -eq 0; then
 
 	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
-	sudo --set-home --user ubuntu bash -
+	sudo --set-home --login --user ubuntu bash -
 
 elif test $# -eq 1; then
 
 	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
-	sudo --set-home --user ubuntu bash -c "$1"
+	sudo --set-home --login --user ubuntu bash -c "$1"
 
 else
 
 	exec sudo lxc-attach --name {{ inventory_hostname }} -- \
-	sudo --set-home --user ubuntu "$@"
+	sudo --set-home --login --user ubuntu "$@"
 
 fi
+
+# ex: noet ts=4 filetype=bash

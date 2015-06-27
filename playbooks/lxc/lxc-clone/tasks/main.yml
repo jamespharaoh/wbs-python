@@ -86,13 +86,4 @@
   sudo_user: "root"
   with_items: "data_dirs"
 
-- name: "create container shortcut"
-  action:
-    module: "template"
-    src: "lxc-shortcut"
-    dest: "/usr/local/bin/{{ inventory_hostname }}"
-    mode: "0755"
-  delegate_to: "localhost"
-  sudo: "yes"
-
 # ex: et ts=2 filetype=yaml

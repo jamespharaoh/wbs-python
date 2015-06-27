@@ -32,4 +32,13 @@
   register: stop_result
   changed_when: stop_result.stdout != 'UNCHANGED'
 
+- name: "remove container shortcut"
+  delegate_to: "localhost"
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "/usr/local/bin/{{ inventory_hostname }}"
+    state: "absent"
+
 # ex: et ts=2 filetype=yaml

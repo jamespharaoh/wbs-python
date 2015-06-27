@@ -26,4 +26,14 @@
   register: start_result
   changed_when: start_result.stdout != 'UNCHANGED'
 
+- name: "create container shortcut"
+  delegate_to: "localhost"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    src: "lxc-shortcut"
+    dest: "/usr/local/bin/{{ inventory_hostname }}"
+    mode: "0755"
+
 # ex: et ts=2 filetype=yaml
