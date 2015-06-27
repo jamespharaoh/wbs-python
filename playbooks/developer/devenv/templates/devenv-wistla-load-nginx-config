@@ -69,7 +69,7 @@ http {
 				{%- else -%}
 
 					{%- print
-						'\tserver ',
+						'\t\tserver ',
 						node_name,
 						':',
 						port + node_instance,
