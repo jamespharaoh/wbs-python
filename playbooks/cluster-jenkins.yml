@@ -19,12 +19,7 @@
     - "cluster-volumes"
     - "cluster-user"
 
-    - "build-python"
-    - "setup-python-alternatives"
-    - "install-python-pip"
-    - "setup-python-pip-alternatives"
-    - "build-python-apt"
-    - "install-python-packages"
+    - "python"
 
     - "install-mongodb"
     - "install-tools"
