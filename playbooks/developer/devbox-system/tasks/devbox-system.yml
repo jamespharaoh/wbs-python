@@ -6,6 +6,29 @@
     src: "devbox-sudoers-ssh-agent"
     dest: "/etc/sudoers.d/ssh-agent"
   sudo: "yes"
-  sudo_user: "root"
+
+- name: "install motd"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/motd"
+    src: "{{ HOME }}/misc/deployment-icons/{{ deployment_name }}.xterm"
+
+- name: "remove annoying motd elements"
+  with_items:
+
+    - "10-help-text"
+    - "50-landscape-sysinfo"
+    - "51-cloudguest"
+    - "98-cloudguest"
+    - "98-fsck-at-reboot"
+
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/update-motd.d/{{ item }}"
+    state: "absent"
 
 # ex: et ts=2 filetype=yaml
