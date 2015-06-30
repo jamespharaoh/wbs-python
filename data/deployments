@@ -573,6 +573,25 @@ bruce:
   bridge_network: "10.154"
   bridge_mac: "aa:bb:0a:9a"
 
+chuggington:
+
+  name: "chuggington"
+  type: "simple"
+
+  cluster: "dev"
+
+  main_domain: "chuggington.dev.wistla.com"
+  short_domain: "chuggington.dev.wist.la"
+  assets_domain: "assets.chuggington.dev.wistla.com"
+  assets_origin_domain: "assets-origin.chuggington.dev.wistla.com"
+  admin_domain: "admin.chuggington.dev.wistla.com"
+  api_domain: "api.chuggington.dev.wistla.com"
+  web_domain: "www.chuggington.dev.wistla.com"
+
+  bridge_name: "br167"
+  bridge_network: "10.167"
+  bridge_mac: "aa:bb:0a:a7"
+
 mrbenn:
 
   name: "mrbenn"
@@ -606,6 +625,7 @@ mrbenn:
   admin_domain: "admin.7-zark-7.wistla.com"
   api_domain: "api.7-zark-7.wistla.com"
   web_domain: "www.7-zark-7.wistla.com"
+  test_domain: "test.7-zark-7.wistla.com"
 
   bridge_name: "br153"
   bridge_network: "10.153"

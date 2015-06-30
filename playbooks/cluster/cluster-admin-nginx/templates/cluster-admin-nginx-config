@@ -203,6 +203,8 @@ http {
 
 	}
 
+{% if 'test_domain' in dev_deployment %}
+
 	# test
 
 	server {
@@ -210,10 +212,10 @@ http {
 		listen 80;
 		listen 443 ssl;
 
-		server_name test.{{ dev_deployment.main_domain }};
+		server_name {{ dev_deployment.test_domain }};
 
-		ssl_certificate /etc/nginx/ssl/test.{{ dev_deployment.main_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/test.{{ dev_deployment.main_domain }}.key;
+		ssl_certificate /etc/nginx/ssl/{{ dev_deployment.test_domain }}.cert;
+		ssl_certificate_key /etc/nginx/ssl/{{ dev_deployment.test_domain }}.key;
 
 		location /robots.txt {
 			alias /etc/nginx/dev-robots.txt;
@@ -225,6 +227,8 @@ http {
 		}
 
 	}
+
+{% endif %}
 
 	# assets
 

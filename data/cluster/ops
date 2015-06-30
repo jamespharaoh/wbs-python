@@ -114,6 +114,12 @@ admin_certificates:
   - "assets.bruce.dev.wistla.com"
   - "bruce.dev.wist.la"
 
+  - "chuggington.dev.wistla.com"
+  - "admin.chuggington.dev.wistla.com"
+  - "api.chuggington.dev.wistla.com"
+  - "assets.chuggington.dev.wistla.com"
+  - "chuggington.dev.wist.la"
+
   - "mrbenn.wistla.com"
   - "admin.mrbenn.wistla.com"
   - "api.mrbenn.wistla.com"

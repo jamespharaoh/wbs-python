@@ -15,7 +15,7 @@
   when: "deployments [item.0].type in [ 'shared', 'simple' ]"
   with_nested:
 
-    - "cluster.deployment_names"
+    - "cluster.deployment_names | default ([])"
 
     - - source: "certificate"
         target: "cert"
@@ -33,7 +33,7 @@
     mode: "{{ item.1.mode }}"
 
 - name: "convert private key to other format"
-  with_items: "cluster.deployment_names"
+  with_items: "cluster.deployment_names | default ([])"
   when: "deployments [item].type in [ 'shared', 'simple' ]"
   args:
     creates: "/home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.awskey"
@@ -47,7 +47,7 @@
       > /home/vagrant/work/{{ cluster_name }}/{{ deployments [item].assets_domain }}.awskey;
 
 - name: "upload assets certificate"
-  with_items: "cluster.deployment_names"
+  with_items: "cluster.deployment_names | default ([])"
   when: "deployments [item].type in [ 'shared', 'simple' ]"
   args:
 
@@ -72,7 +72,7 @@
     || true;
 
 - name: "write cloudformation config for assets"
-  with_items: "cluster.deployment_names"
+  with_items: "cluster.deployment_names | default ([])"
   when: "deployments [item].type in [ 'shared', 'simple' ]"
   action:
 
@@ -81,7 +81,7 @@
     src: "cluster-assets-stack"
 
 - name: "create cloudformation stack for assets"
-  with_items: "cluster.deployment_names"
+  with_items: "cluster.deployment_names | default ([])"
   when: "deployments [item].type in [ 'shared', 'simple' ]"
   register: "assets_stack_result"
   action:
@@ -96,7 +96,7 @@
     region: "{{ amazon_region }}"
 
 - name: "store cloudformation details for assets"
-  with_indexed_items: "cluster.deployment_names"
+  with_indexed_items: "cluster.deployment_names | default ([])"
   when: "deployments [item.1].type in [ 'shared', 'simple' ]"
   update_resource:
 
