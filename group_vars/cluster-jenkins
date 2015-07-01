@@ -117,7 +117,7 @@ cluster_volumes:
     device: "/dev/xvdf"
 
   - type: "ext4"
-    path: "/data"
+    path: "/home"
     device: "/dev/xvdg"
 
 cluster_create_instance_tags:
