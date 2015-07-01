@@ -3,11 +3,15 @@
 var configLocal = {
 
 	urls: {
-		baseUrl: 'https://admin.{{ cluster_deployment_alias.main_domain }}',
-		adminUrl: 'https://admin.{{ cluster_deployment_alias.main_domain }}',
-		apiUrl: 'https://api.{{ cluster_deployment_alias.main_domain }}',
+
+		baseUrl: 'https://{{ cluster_deployment_alias.admin_domain }}',
+
+		adminUrl: 'https://{{ cluster_deployment_alias.admin_domain }}',
+		assetsUrl: 'https://{{ cluster_deployment_alias.assets_domain }}',
+		apiUrl: 'https://{{ cluster_deployment_alias.api_domain }}',
 		shortUrl: 'https://{{ cluster_deployment_alias.short_domain }}',
-		webUrl: 'https://www.{{ cluster_deployment_alias.main_domain }}'
+		webUrl: 'https://{{ cluster_deployment_alias.web_domain }}'
+
 	}
 
 };

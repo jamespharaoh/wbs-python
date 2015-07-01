@@ -1,7 +1,14 @@
 {{ ansible_warning ['//'] }}
 
-var ROOT = process.env.HOME+ '/wistla-web';
+var ROOT = process.env.HOME + '/wistla-web';
 var config = require(ROOT + '/config/config.global');
+
+// public urls
+config.adminUrl = 'https://{{ cluster_deployment_alias.admin_domain }}';
+config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}';
+config.assetsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}';
+config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
+config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla-web';

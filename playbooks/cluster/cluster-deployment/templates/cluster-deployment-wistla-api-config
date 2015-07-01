@@ -4,7 +4,6 @@ var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
 // public urls
-
 config.adminUrl = 'https://{{ cluster_deployment_alias.admin_domain }}';
 config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}';
 config.assetsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}';
@@ -12,7 +11,6 @@ config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
 // test urls
-
 config.adminTest = 'http://{{ cluster_deployment_alias.admin_domain }}';
 config.apiTest = 'http://{{ cluster_deployment.api_domain }}';
 config.assetsTest = 'http://{{ cluster_deployment_alias.assets_domain }}';
@@ -37,11 +35,13 @@ config.CORS = {
 		'https://{{ cluster_deployment.short_domain }}',
 		'https://{{ cluster_deployment.web_domain }}',
 
+{% if cluster_deployment.type == 'alias' %}
 		'https://{{ cluster_deployment_alias.admin_domain }}',
 		'https://{{ cluster_deployment_alias.api_domain }}',
 		'https://{{ cluster_deployment_alias.main_domain }}',
 		'https://{{ cluster_deployment_alias.short_domain }}',
 		'https://{{ cluster_deployment_alias.web_domain }}',
+{% endif %}
 
 	],
 	credentials: true

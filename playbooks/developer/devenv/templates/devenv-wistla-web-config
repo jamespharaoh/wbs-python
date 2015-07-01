@@ -3,6 +3,13 @@
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
+// public urls
+config.adminUrl = 'https://{{ deployment.admin_domain }}';
+config.apiUrl = 'https://{{ deployment.api_domain }}';
+config.assetsUrl = 'https://{{ deployment.assets_domain }}';
+config.shortUrl = 'https://{{ deployment.short_domain }}';
+config.webUrl = 'https://{{ deployment.web_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-web';
 

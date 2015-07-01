@@ -3,24 +3,19 @@
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
-// api url
+// public urls
+config.adminUrl = 'https://{{ deployment.admin_domain }}';
 config.apiUrl = 'https://{{ deployment.api_domain }}';
-config.apiTest = 'http://{{ deployment.api_domain }}';
-
-// web url
-config.webUrl = 'https://{{ deployment.web_domain }}';
-config.webTest = 'http://{{ deployment.web_domain }}';
-
-// assets url
 config.assetsUrl = 'https://{{ deployment.assets_domain }}';
-config.assetsTest = 'http://{{ deployment.assets_domain }}';
-
-// short url for links sent out
 config.shortUrl = 'https://{{ deployment.short_domain }}';
-config.shortTest = 'http://{{ deployment.short_domain }}';
+config.webUrl = 'https://{{ deployment.web_domain }}';
 
-// admin url
-config.adminUrl = 'https://admin.{{ deployment.main_domain }}';
+// test urls
+config.adminTest = 'http://{{ deployment.admin_domain }}';
+config.apiTest = 'http://{{ deployment.api_domain }}';
+config.assetsTest = 'http://{{ deployment.assets_domain }}';
+config.shortTest = 'http://{{ deployment.short_domain }}';
+config.webTest = 'http://{{ deployment.web_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
@@ -34,17 +29,19 @@ config.amqpOptions = {
 config.CORS = {
 	origins: [
 
-		'https://{{ deployment.admin_domain }}',
-		'https://{{ deployment.api_domain }}',
-		'https://{{ deployment.main_domain }}',
-		'https://{{ deployment.short_domain }}',
-		'https://{{ deployment.web_domain }}',
+		// public urls
+		config.adminUrl,
+		config.apiUrl,
+		config.assetsUrl,
+		config.shortUrl,
+		config.webUrl,
 
-		'http://{{ deployment.admin_domain }}',
-		'http://{{ deployment.api_domain }}',
-		'http://{{ deployment.main_domain }}',
-		'http://{{ deployment.short_domain }}',
-		'http://{{ deployment.web_domain }}',
+		// test urls
+		config.adminTest,
+		config.apiTest,
+		config.assetsTest,
+		config.shortTest,
+		config.webTest,
 
 	],
 	credentials: true
