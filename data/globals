@@ -91,6 +91,18 @@ mongodb_version: "3.0.3"
 
 devenv_checkouts:
 
+  - name: "content-browser"
+    branch: "master"
+
+  - name: "content-iOS"
+    branch: "master"
+
+  - name: "content-api"
+    branch: "master"
+
+  - name: "content-web"
+    branch: "master"
+
   - name: "wistla-admin"
     branch: "master"
     build_steps:
@@ -109,6 +121,9 @@ devenv_checkouts:
       - "npm install"
 
   - name: "wistla-devops"
+    branch: "master"
+
+  - name: "wistla-iOS"
     branch: "master"
 
   - name: "wistla-web"
