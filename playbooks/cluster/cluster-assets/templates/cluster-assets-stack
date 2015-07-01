@@ -37,6 +37,15 @@ Resources:
             ForwardedValues:
               QueryString: "false"
 
+        CacheBehaviors:
+
+          - PathPattern: "/web/*"
+            TargetOriginId: "{{ deployment_name }}-wistla"
+            ViewerProtocolPolicy: "redirect-to-https"
+
+            ForwardedValues:
+              QueryString: "false"
+
         ViewerCertificate:
 
           IamCertificateId: "{{ deployment.assets_certificate_id }}"
