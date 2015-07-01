@@ -1,10 +1,36 @@
-{{ ansible_warning ['#'] }}
+{%- print ansible_warning ['#'], '\n' -%}
 
-{% for name, lines in ssh_host_keys.general.items () %}
-{{ name }} {{ lines | join }}
-{% endfor %}
+{%- print '\n' -%}
 
-{% for host_name in groups ['cluster-host'] -%}
+{%- for name, lines in ssh_host_keys.general.items () -%}
+
+	{%- print [
+		name,
+		lines | join,
+	] | join (' '), '\n' -%}
+
+{%- endfor -%}
+
+{%- print '\n' -%}
+
+{%- for other_deployment_name in dev_deployment_names
+	if other_deployment_name in ssh_host_keys.dev -%}
+
+	{%- set other_deployment = deployments [other_deployment_name] -%}
+
+	{%- print [
+		[
+			'wistla-' + other_deployment_name + '-dev',
+			other_deployment.bridge_network + '.0.1',
+		] | join (','),
+		ssh_host_keys.dev [other_deployment_name] | join,
+	] | join (' '), '\n' -%}
+
+{%- endfor -%}
+
+{%- print '\n' -%}
+
+{%- for host_name in groups ['cluster-host'] -%}
 
 	{%- set host = hostvars [host_name] -%}
 	{%- set instance_cluster_name = host.cluster_name -%}
@@ -18,9 +44,9 @@
 	{%- if instance_type in ssh_host_keys [instance_cluster_name] -%}
 
 		{%- if instance_zone + '-' + instance_index in ssh_host_keys [instance_cluster_name] [instance_type] -%}
-			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone + '-' + instance_index] | join ('') -%}
+			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone + '-' + instance_index] | join -%}
 		{%- elif instance_zone in ssh_host_keys [instance_cluster_name] [instance_type] -%}
-			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone] | join ('') -%}
+			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone] | join -%}
 		{%- else -%}
 			{%- set ssh_host_key = None -%}
 		{%- endif -%}

@@ -17,6 +17,26 @@ general:
     - "BMEiWKmsoIvUoXuGiQNF7N/bCiq1MkXJmQ4MJEJILqxBFqW35r4DeaPoFDzt5R0SuVqeK0E1"
     - "RtpINYqeYx1EQfU="
 
+dev:
+
+  berk:
+
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BC+AXwPcMZwhnyBlrub2V14gVLXUIgbvwJBbqjpt1S5q7lTfM22jqWy6ioEMFzZupbOJymih"
+    - "5F1rTVT7VZSftqM="
+
+  mrbenn:
+
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BHZIdTWOiqdqROy+pANZMprtsH51aWrFN1nWjCOXBCp2jHiChwH+1dENl3l+SFOJgFDvCSCA"
+    - "9rzwwQgVrKrAJto="
+
+  optimus:
+
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BCOQvp4gmUPkD1SznsWeEaI3xEC2beq7b8S8jQ1EPTdxkGTt+EhVOMx/IG2FcOMNGe+QrrHa"
+    - "y/vzCpV1M/uWDzc="
+
 ops:
 
   admin:
