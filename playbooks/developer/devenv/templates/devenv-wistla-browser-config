@@ -10,6 +10,9 @@ config.assetsUrl = 'https://{{ deployment.assets_domain }}';
 config.shortUrl = 'https://{{ deployment.short_domain }}';
 config.webUrl = 'https://{{ deployment.web_domain }}';
 
+// private urls
+config.apiPrivate = 'http://{{ deployment_name }}-api-0:7000';
+
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-browser';
 
