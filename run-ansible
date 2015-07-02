@@ -368,6 +368,42 @@ def warn_upstream ():
 	if not HAVE_GIT:
 		return
 
+	if sys.argv [1:] == [ "--sync" ]:
+
+		updated_count = 0
+
+		for project in PROJECTS:
+
+			project_repo = git.Repo (
+				"/home/vagrant/%s" % project)
+
+			bases = project_repo.merge_base (
+				project_repo.head,
+				project_repo.remotes.origin.refs.master)
+
+			base = bases [0]
+
+			if base == project_repo.remotes.origin.refs.master.commit:
+				continue
+
+			if project_repo.active_branch.name != "master":
+				continue
+
+			if project_repo.is_dirty ():
+				continue
+
+			auto_newline ()
+
+			sys.stderr.write (
+				"Updating project: %s\n" % project)
+
+			project_repo.remotes.origin.pull ()
+
+			updated_count += 1
+
+		if updated_count:
+			set_newline ()
+
 	diverged_count = 0
 
 	for project in PROJECTS:
@@ -393,6 +429,11 @@ def warn_upstream ():
 			write_message ([
 				"New changes can be merged from master in at least one\n"
 				"project\n",
+			])
+
+			write_message ([
+				"Try running './run-ansible' --sync to automatically sync\n"
+				"projects in a clean state.\n",
 			])
 
 		auto_newline ()
@@ -522,6 +563,9 @@ def actually_pause ():
 def run_given_playbook ():
 
 	global STATE
+
+	if len (sys.argv) >= 2 and sys.argv [1] == "--sync":
+		del sys.argv [1]
 
 	if not sys.argv [1:]:
 		return
