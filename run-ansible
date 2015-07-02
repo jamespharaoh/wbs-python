@@ -17,10 +17,15 @@ except ImportError:
 need_newline = True
 
 PROJECTS = [
+	"content-api",
+	"content-browser",
+	"content-iOS",
+	"content-web",
 	"wistla-admin",
 	"wistla-api",
 	"wistla-browser",
 	"wistla-devops",
+	"wistla-iOS",
 	"wistla-test-images",
 	"wistla-web",
 ]
@@ -290,6 +295,23 @@ def fetch_upstream ():
 		"synchronize your local git repositories with the server. We\n",
 		"will now automatically attempt to fetch the latest code.\n",
 	])
+
+	if not os.path.exists ("/home/vagrant/.ssh/control_github.com_22_git"):
+
+		write_message ([
+			"Starting shared ssh connection to github.com.\n",
+		])
+
+		with open ("/dev/null", "r") as input_handle, \
+			open ("/dev/null", "w") as output_handle:
+
+			subprocess.Popen (
+				[ "ssh", "-fNM", "git@github.com" ],
+				stdin = input_handle,
+				stdout = output_handle,
+				stderr = output_handle)
+
+		time.sleep (0.5)
 
 	try:
 
