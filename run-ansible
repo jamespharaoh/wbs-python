@@ -5,6 +5,7 @@ import pipes
 import socket
 import subprocess
 import sys
+import threading
 import time
 import yaml
 
@@ -313,31 +314,49 @@ def fetch_upstream ():
 
 		time.sleep (0.5)
 
-	try:
+	threads = []
+	errors = {}
 
-		for project in PROJECTS:
+	for project in PROJECTS:
 
-			auto_newline ()
+		thread = threading.Thread (
+			target = fetch_one_upstream,
+			args = [ project, errors ])
 
-			sys.stderr.write ("Syncing %s\n" % project)
+		thread.start ()
 
-			project_repo = git.Repo (
-				"/home/vagrant/%s" % project)
+		threads.append (thread)
 
-			project_repo.remotes.origin.fetch ()
+	for thread in threads:
+		thread.join ()
 
-	except:
+	if len (errors):
 
 		auto_newline ()
 		sys.stderr.write ("Failed to sync, ignoring...\n")
 		set_newline ()
 
-	finally:
+	STATE ["last_sync_success"] = time.time ()
+	write_state ()
 
-		STATE ["last_sync_success"] = time.time ()
-		write_state ()
+	set_newline ()
 
-		set_newline ()
+def fetch_one_upstream (project, errors):
+
+	try:
+
+		project_repo = git.Repo (
+			"/home/vagrant/%s" % project)
+
+		project_repo.remotes.origin.fetch ()
+
+		auto_newline ()
+
+		sys.stderr.write ("Synced %s\n" % project)
+
+	except Exception as exception:
+
+		errors [project] = exception
 
 def warn_upstream ():
 
