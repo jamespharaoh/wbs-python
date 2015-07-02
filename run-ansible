@@ -374,8 +374,12 @@ def warn_upstream ():
 
 		for project in PROJECTS:
 
-			project_repo = git.Repo (
-				"/home/vagrant/%s" % project)
+			repo_path = "/home/vagrant/%s" % project
+
+			if not os.path.isdir (repo_path):
+				continue
+
+			project_repo = git.Repo (repo_path)
 
 			bases = project_repo.merge_base (
 				project_repo.head,
@@ -408,8 +412,12 @@ def warn_upstream ():
 
 	for project in PROJECTS:
 
-		project_repo = git.Repo (
-			"/home/vagrant/%s" % project)
+		repo_path = "/home/vagrant/%s" % project
+
+		if not os.path.isdir (repo_path):
+			continue
+
+		project_repo = git.Repo (repo_path)
 
 		bases = project_repo.merge_base (
 			project_repo.head,
