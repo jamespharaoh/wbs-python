@@ -100,7 +100,7 @@ http {
 			proxy_set_header Host "{{ deployment.main_domain }}";
 		}
 
-{% if cluster != 'production' %}
+{% if cluster_name != 'production' %}
 		location /robots.txt {
 			alias /etc/nginx/dev-robots.txt;
 		}
