@@ -2,7 +2,7 @@
 
 iojs_name: "iojs-v{{ iojs_version }}-linux-x64"
 iojs_archive: "{{ iojs_name }}.tar.xz"
-iojs_url: "{{ wistla_dist }}/iojs/{{ iojs_archive }}"
+iojs_url: "{{ wistla_dist_url }}/iojs/{{ iojs_archive }}"
 
 iojs_target: "/opt/{{ iojs_name }}"
 iojs_flag: "/etc/ios-{{ iojs_version }}-flag"

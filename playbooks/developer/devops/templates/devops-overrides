@@ -1,5 +1,17 @@
 ---
 
+{% if ansible_notice is defined %}
+{{ ansible_notice ['#'] }}
+{% endif %}
+
+#
+# identity
+#
+# configure the identity of the local dev environment and the developer who uses
+# it. this section is crucial and must be completed correctly for the system to
+# function.
+#
+
 deployment_name: "{{ deployment_name | default (deployment) | default ('dev') }}"
 deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
 
@@ -9,36 +21,17 @@ deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"
 
-ubuntu_main_url: "{{ ubuntu_main_url }}"
-ubuntu_security_url: "{{ ubuntu_security_url }}"
+#
+# dev runtime
+#
+# configure various aspects of the local dev environment.
+#
 
 dev_debug: "{{ dev_debug | default (debug | default ('yes')) }}"
 
 dev_apple_push_notifications_enabled: "{{ dev_apple_push_notifications_enabled | default ('yes') }}"
 dev_apple_push_notifications_name: "{{ dev_apple_push_notifications_name | default ('wistla-production') }}"
 dev_apple_push_notifications_production: "{{ dev_apple_push_notifications_production | default ('yes') }}"
-
-{% if secrets | default ([ 'dev' ]) %}
-secrets:
-
-{% for secret in secrets | default ([ 'dev' ]) %}
-  - "{{ secret }}"
-{% endfor %}
-{% else %}
-secrets: []
-{% endif %}
-
-{% if vpns | default ([]) %}
-vpns:
-
-{% for vpn in vpns | default ([]) %}
-  - "{{ vpn }}"
-{% endfor %}
-{% else %}
-vpns: []
-{% endif %}
-
-vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
 dev_node_count:
 
@@ -65,5 +58,45 @@ dev_node_memory:
   web: "{{ (dev_node_memory | default ({})).web | default ('768') }}"
 
 use_s3: "{{ use_s3 | default ('no') }}"
+
+#
+# security and networking
+#
+# configure security credentials and vpn connections.
+#
+
+{% if secrets | default ([ 'dev' ]) %}
+secrets:
+
+{% for secret in secrets | default ([ 'dev' ]) %}
+  - "{{ secret }}"
+{% endfor %}
+{% else %}
+secrets: []
+{% endif %}
+
+{% if vpns | default ([]) %}
+vpns:
+
+{% for vpn in vpns | default ([]) %}
+  - "{{ vpn }}"
+{% endfor %}
+{% else %}
+vpns: []
+{% endif %}
+
+vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
+
+#
+# package repository urls
+#
+# change these to a local mirror for faster deployments.
+#
+
+ubuntu_main_url: "{{ ubuntu_main_url }}"
+ubuntu_security_url: "{{ ubuntu_security_url }}"
+python_pip_packages_url: "{{ python_pip_packages_url | default ('https://pypi.python.org') }}"
+git_base_url: "{{ git_base_url | default ('git@github.com:wistla') }}"
+wistla_dist_url: "{{ wistla_dist_url | default ('https://dist.ops.wistla.com') }}"
 
 # ex: et ts=2 filetype=yaml

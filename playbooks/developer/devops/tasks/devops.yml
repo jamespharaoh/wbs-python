@@ -4,7 +4,7 @@
   action:
     module: "template"
     dest: "{{ deployment_home }}/wistla-devops/config/overrides.yml"
-    src: "devops-vagrant-config"
+    src: "devops-overrides"
   when: "deployment_mode == 'vagrant'"
 
 - name: "create group_vars/all"

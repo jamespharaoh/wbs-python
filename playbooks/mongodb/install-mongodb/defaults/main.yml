@@ -2,7 +2,7 @@
 
 mongodb_name: "mongodb-linux-x86_64-ubuntu1404-{{ mongodb_version }}"
 mongodb_archive: "{{ mongodb_name }}.tgz"
-mongodb_url: "{{ wistla_dist }}/mongodb/{{ mongodb_archive }}"
+mongodb_url: "{{ wistla_dist_url }}/mongodb/{{ mongodb_archive }}"
 
 mongodb_flag: "/etc/mongodb-{{ mongodb_version }}-flag"
 mongodb_tmp: "/tmp/mongodb-install"

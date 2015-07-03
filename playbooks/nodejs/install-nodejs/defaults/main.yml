@@ -2,7 +2,7 @@
 
 nodejs_name: "node-v{{ nodejs_version }}-linux-x64"
 nodejs_archive: "{{ nodejs_name }}.tar.gz"
-nodejs_url: "{{ wistla_dist }}/nodejs/{{ nodejs_archive }}"
+nodejs_url: "{{ wistla_dist_url }}/nodejs/{{ nodejs_archive }}"
 
 nodejs_target: "/opt/{{ nodejs_name }}"
 nodejs_flag: "/etc/node-{{ nodejs_version }}-flag"

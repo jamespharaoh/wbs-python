@@ -153,8 +153,6 @@ kernel_build: "{{ kernel_versions [kernel_version].build }}"
 kernel_type: "{{ kernel_versions [kernel_version].type }}"
 kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
 
-wistla_dist: "https://dist.ops.wistla.com"
-
 system_reboot_on_error: "yes"
 
 ansible_warning_lines:
@@ -182,17 +180,42 @@ ansible_warning:
   "//": "{{ ansible_warning_generic | replace ('SEP', '//') }}"
   "--": "{{ ansible_warning_generic | replace ('SEP', '--') }}"
 
+ansible_notice_lines:
+
+  - "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+  - "%%%%%%%%%%%%%  this file is PARTIALLY managed by ansible  %%%%%%%%%%%%"
+  - "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+  - "%                                                                    %"
+  - "%  This file will be automatically updated by ansible, although it   %"
+  - "%  should preserve local changes so long as they are included in     %"
+  - "%  the template. Formatting and comments will be lost.               %"
+  - "%                                                                    %"
+  - "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+ansible_notice_generic: "{{
+  'SEP ' + ansible_notice_lines | join ('\nSEP ')
+}}"
+
+ansible_notice:
+
+  "#": "{{ ansible_notice_generic | replace ('SEP', '#') }}"
+  ";": "{{ ansible_notice_generic | replace ('SEP', ';') }}"
+  "//": "{{ ansible_notice_generic | replace ('SEP', '//') }}"
+  "--": "{{ ansible_notice_generic | replace ('SEP', '--') }}"
+
+wistla_dist_url: "https://dist.ops.wistla.com"
+
 python_version: "2.7.10"
-python_url: "{{ wistla_dist }}/python/{{ python_archive }}"
+python_url: "{{ wistla_dist_url }}/python/{{ python_archive }}"
 
 python_pip_version: "7.0.3"
 python_pip_archive: "get-pip-{{ python_pip_version }}.py"
-python_pip_url: "{{ wistla_dist }}/python/{{ python_pip_archive }}"
+python_pip_url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
 
 python_apt_version: "0.9.3-1"
-python_apt_url: "{{ wistla_dist }}/python/{{ python_apt_archive }}"
+python_apt_url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
-etcd_url: "{{ wistla_dist }}/etcd/{{ etcd_archive }}"
+etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
 
 ttl_short: "30"
 ttl_medium: "300"
