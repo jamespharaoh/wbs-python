@@ -52,7 +52,11 @@ config.mailchimp = {
 
 config.cmsContent = {
 	mode: 'amazon',
+{% if 'jenkins-' in deployment_name %}
 	bucket: 'wistla-{{ deployment_name }}-web',
+{% else %}
+	bucket: 'wistla-dev-{{ deployment_name }}-web',
+{% endif %}
 	key: '{{ deployment_security.api.access_key_id }}',
 	secret: '{{ deployment_security.api.secret_access_key }}'
 };
@@ -62,7 +66,7 @@ config.cmsContent = {
 config.cmsContent = {
 	mode: 'local',
 };
-
+11
 {% endif %}
 
 module.exports = config;
