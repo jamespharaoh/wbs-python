@@ -84,3 +84,9 @@
 	{%- endif -%}
 
 {%- endfor %}
+
+{%- for ssh_host_key_extra in ssh_host_keys_extra | default ([]) -%}
+
+	{%- print ssh_host_key_extra, '\n' -%}
+
+{%- endfor -%}

@@ -65,10 +65,10 @@ use_s3: "{{ use_s3 | default ('no') }}"
 # configure security credentials and vpn connections.
 #
 
-{% if secrets | default ([ 'dev' ]) %}
+{% if secrets | default ([]) %}
 secrets:
 
-{% for secret in secrets | default ([ 'dev' ]) %}
+{% for secret in secrets | default ([]) %}
   - "{{ secret }}"
 {% endfor %}
 {% else %}
@@ -87,6 +87,19 @@ vpns: []
 
 vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
+{% if ssh_host_keys_extra | default ([]) %}
+ssh_host_keys_extra:
+
+{% for ssh_host_key_extra in ssh_host_keys_extra %}
+  - "{{ ssh_host_key_extra }}"
+{% endfor %}
+{% else %}
+ssh_host_keys_extra: []
+{% endif %}
+
+github_username: "{{ github_username | default ('') }}"
+github_access_token: "{{ github_access_token | default ('') }}"
+
 #
 # package repository urls
 #
@@ -95,8 +108,12 @@ vpn_mtu: "{{ vpn_mtu | default ('1500') }}"
 
 ubuntu_main_url: "{{ ubuntu_main_url }}"
 ubuntu_security_url: "{{ ubuntu_security_url }}"
+
 python_pip_packages_url: "{{ python_pip_packages_url | default ('https://pypi.python.org') }}"
+python_pip_trusted_host: "{{ python_pip_trusted_host | default ('no') }}"
+
 git_base_url: "{{ git_base_url | default ('git@github.com:wistla') }}"
+
 wistla_dist_url: "{{ wistla_dist_url | default ('https://dist.ops.wistla.com') }}"
 
 # ex: et ts=2 filetype=yaml

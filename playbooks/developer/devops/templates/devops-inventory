@@ -1,5 +1,7 @@
 {{ (ansible_warning | default ({ '#': '' })) ['#'] }}
 
+{% set deployment = deployments [deployment_name] %}
+
 # ---------- local box
 
 {% if deployment_mode == 'vagrant' %}

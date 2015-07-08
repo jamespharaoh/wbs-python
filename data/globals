@@ -106,6 +106,7 @@ devenv_checkouts:
   - name: "wistla-admin"
     branch: "master"
     build_steps:
+
       - "npm install"
       - "jspm install -y"
       - "gulp build"
@@ -113,11 +114,13 @@ devenv_checkouts:
   - name: "wistla-api"
     branch: "master"
     build_steps:
+
       - "npm install"
 
   - name: "wistla-browser"
     branch: "master"
     build_steps:
+
       - "npm install"
 
   - name: "wistla-devops"
@@ -129,6 +132,7 @@ devenv_checkouts:
   - name: "wistla-web"
     branch: "master"
     build_steps:
+
       - "npm install"
 
   - name: "wistla-test-images"
