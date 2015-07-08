@@ -1,5 +1,9 @@
 {{ ansible_warning ['//'] }}
 
+{% set cluster_deployment_security = lookup ('file',
+	HOME + '/security/deployments/' + cluster_deployment_name
+) | from_yaml %}
+
 var ROOT = process.env.HOME + '/wistla-web';
 var config = require(ROOT + '/config/config.global');
 
@@ -29,6 +33,12 @@ config.mailchimp = {
 // Enable email sends.
 config.sendEmails = true;
 {% endif %}
+
+config.cmsContent = {
+	bucket: 'wistla-{{ cluster_deployment_name }}-web',
+	key: '{{ cluster_deployment_security.web.access_key_id }}',
+	secret: '{{ cluster_deployment_security.web.secret_access_key }}'
+};
 
 module.exports = config;
 

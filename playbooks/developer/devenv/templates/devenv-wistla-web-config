@@ -1,5 +1,15 @@
 {{ ansible_warning ['//'] }}
 
+{% if 'jenkins-' in deployment_name %}
+{% set deployment_security = lookup ('file',
+	HOME + '/security/deployments/' + deployment_name
+) | from_yaml %}
+{% else %}
+{% set deployment_security = lookup ('file',
+	HOME + '/security/deployments/dev-' + deployment_name
+) | from_yaml %}
+{% endif %}
+
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
@@ -33,6 +43,21 @@ config.mailchimp = {
 config.mailchimp = {
 	listId: '',
 	apiKey: '',
+};
+{% endif %}
+
+// cms content
+
+{% if 'dev' in third_parties %}
+config.cmsContent = {
+	mode: 'amazon',
+	bucket: 'wistla-{{ deployment_name }}-web',
+	key: '{{ deployment_security.api.access_key_id }}',
+	secret: '{{ deployment_security.api.secret_access_key }}'
+};
+{% else %}
+config.cmsContent = {
+	mode: 'local',
 };
 {% endif %}
 

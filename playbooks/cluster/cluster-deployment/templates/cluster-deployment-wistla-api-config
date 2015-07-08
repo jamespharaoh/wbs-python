@@ -1,5 +1,9 @@
 {{ ansible_warning ['//'] }}
 
+{% set cluster_deployment_security = lookup ('file',
+	HOME + '/security/deployments/' + cluster_deployment_name
+) | from_yaml %}
+
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
@@ -52,8 +56,8 @@ config.CORS = {
 // amazon s3 blob storage
 config.blobMode = 'amazon';
 config.blobAmazon = {
-	accessKey: '{{ amazon_accounts [cluster_name].access_key }}',
-	secretKey: '{{ amazon_accounts [cluster_name].secret_key }}',
+	accessKey: '{{ cluster_deployment_security.api.access_key_id }}',
+	secretKey: '{{ cluster_deployment_security.api.secret_access_key }}',
 	bucketName: 'wistla-{{ cluster_deployment_alias.name }}-blobs',
 	bucketPrefix: ''
 };

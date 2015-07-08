@@ -1,5 +1,15 @@
 {{ ansible_warning ['//'] }}
 
+{% if 'jenkins-' in deployment_name %}
+{% set deployment_security = lookup ('file',
+	HOME + '/security/deployments/' + deployment_name
+) | from_yaml %}
+{% else %}
+{% set deployment_security = lookup ('file',
+	HOME + '/security/deployments/dev-' + deployment_name
+) | from_yaml %}
+{% endif %}
+
 var ROOT = process.cwd ();
 var config = require(ROOT + '/config/config.global');
 
@@ -52,10 +62,14 @@ config.CORS = {
 // amazon s3 blob storage
 config.blobMode = 'amazon';
 config.blobAmazon = {
-	accessKey: '{{ amazon_accounts.test.access_key }}',
-	secretKey: '{{ amazon_accounts.test.secret_key }}',
-	bucketName: 'wistla-dev',
-	bucketPrefix: '/{{ deployment_name }}/blobs'
+	accessKey: '{{ deployment_security.api.access_key_id }}',
+	secretKey: '{{ deployment_security.api.secret_access_key }}',
+{% if 'jenkins-' in deployment_name %}
+	bucketName: 'wistla-dev-{{ deployment_name }}-blobs',
+{% else %}
+	bucketName: 'wistla-{{ deployment_name }}-blobs',
+{% endif %}
+	bucketPrefix: ''
 };
 
 {% else %}
