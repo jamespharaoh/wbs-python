@@ -48,26 +48,25 @@ config.mailchimp = {
 
 // cms content
 
-{% if use_s3 == 'yes' %}
-
 config.cmsContent = {
+{% if use_s3 == 'yes' %}
 	mode: 'amazon',
+{% else %}
+	mode: 'local',
+{% endif %}
 {% if 'jenkins-' in deployment_name %}
 	bucket: 'wistla-{{ deployment_name }}-web',
 {% else %}
 	bucket: 'wistla-dev-{{ deployment_name }}-web',
 {% endif %}
+{% if 'dev' in third_parties %}
 	key: '{{ deployment_security.api.access_key_id }}',
-	secret: '{{ deployment_security.api.secret_access_key }}'
-};
-
+	secret: '{{ deployment_security.api.secret_access_key }}',
 {% else %}
-
-config.cmsContent = {
-	mode: 'local',
-};
-11
+	key: '',
+	secret: '',
 {% endif %}
+};
 
 module.exports = config;
 
