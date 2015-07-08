@@ -111,7 +111,7 @@ node_packages:
     version: "3.8.11"
 
   - name: "jspm"
-    version: "0.15.3"
+    version: "0.15.7"
 
   - name: "mocha"
     version: "2.2.4"
