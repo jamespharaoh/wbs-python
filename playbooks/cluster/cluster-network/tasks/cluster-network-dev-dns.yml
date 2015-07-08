@@ -1,35 +1,45 @@
 ---
 
 - name: "write dev dns stack yaml"
+  with_items: "dev_deployment_names"
+  when: "cluster_name == 'ops'"
   action:
+
     module: "template"
     src: "cluster-dev-dns-stack"
     dest: "/home/vagrant/work/{{ cluster_name }}/dev-dns-{{ item }}-stack"
-  sudo: "yes"
-  sudo_user: "vagrant"
-  when: "cluster_name == 'ops'"
-  with_items: "dev_deployment_names"
 
 - name: "create dev dns stack"
+  with_items: "dev_deployment_names"
+  when: "cluster_name == 'ops'"
+  register: "dev_dns_stack_result"
   action:
+
     module: "cloudformation"
     stack_name: "{{ cluster_name }}-dev-dns-{{ item }}"
     state: "present"
+
     template: "/home/vagrant/work/{{ cluster_name }}/dev-dns-{{ item }}-stack"
     template_format: "yaml"
+
+    region: "{{ amazon_region }}"
     aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
     aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-    region: "{{ amazon_region }}"
-  sudo: "yes"
-  sudo_user: "vagrant"
-  when: "cluster_name == 'ops'"
-  with_items: "dev_deployment_names"
-  register: "dev_dns_stack_result"
 
 - name: "write dev dns nameservers"
+  with_indexed_items: "dev_deployment_names"
+  when: "cluster_name == 'ops'"
+  args:
+    executable: "/bin/bash"
+  environment:
+
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
   shell:
 
-    set -e;
+    set -euf -o pipefail;
 
     name="{{ deployment_home }}/work/ops/dev-dns-{{ item.1 }}-nameservers";
     touch $name;
@@ -50,16 +60,6 @@
     fi;
 
     return 0;
-
-  environment:
-    AWS_DEFAULT_REGION: "{{ amazon_region }}"
-    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-  sudo: "yes"
-  sudo_user: "vagrant"
-  when: "cluster_name == 'ops'"
-  with_indexed_items: "dev_deployment_names"
 
 - name: "create dev dns delegations"
   action:
