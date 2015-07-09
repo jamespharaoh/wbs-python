@@ -11,7 +11,9 @@ var config = require(ROOT + '/config/config.global');
 config.adminUrl = 'https://{{ cluster_deployment_alias.admin_domain }}';
 config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}';
 config.assetsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}';
+config.cmsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}/cms';
 config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
+config.staticWebUrl = 'https://{{ cluster_deployment_alias.assets_domain }}/web';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
 // Database.

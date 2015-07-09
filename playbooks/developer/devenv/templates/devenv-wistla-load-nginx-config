@@ -194,6 +194,40 @@ http {
 			proxy_set_header Connection "";
 		}
 
+		location /cms {
+{% if 'jenkins-' in deployment_name %}
+			proxy_pass http://wistla-{{ deployment_name }}-web.s3.amazonaws.com/cms;
+{% else %}
+			proxy_pass http://wistla-dev-{{ deployment_name }}-web.s3.amazonaws.com/cms;
+{% endif %}
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /emails {
+			alias /home/ubuntu/content-api/emails;
+		}
+
+		location /browser/assets {
+			alias /home/ubuntu/content-browser/assets;
+		}
+
+		location /browser/fonts {
+			alias /home/ubuntu/content-browser/fonts;
+		}
+
+		location /web/assets {
+			alias /home/ubuntu/content-web/assets;
+		}
+
+		location /web/videos {
+			alias /home/ubuntu/content-web/videos;
+		}
+
+		location /web/fonts {
+			alias /home/ubuntu/content-web/fonts;
+		}
+
 	}
 
 }

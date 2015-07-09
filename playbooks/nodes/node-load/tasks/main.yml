@@ -1,54 +1,34 @@
 ---
 
 - name: "deploy projects"
+  tags: "quick"
+  with_items: "node_load_deploy_projects"
+  changed_when: "deploy_output.stdout != ''"
+  register: "deploy_output"
   delegate_to: "localhost"
+  sudo: "yes"
+  args:
+    executable: "/bin/bash"
   shell:
 
-    set -e;
+    set -euf -o pipefail;
 
     rsync
       --archive
       --delete
       --itemize-changes
-      {{ deployment_home }}/{{ item }}/
-      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item }}/
-      --exclude /config/config.local.js
-      --include /config
-      --include /config.js
-      --include /dist
-      --include /favicon.ico
-      --include /index.html
-      --include /jspm_packages
-      --include /styles
-      --exclude '/*';
-
-  sudo: "yes"
-  sudo_user: "root"
-  register: "deploy_output"
-  changed_when: "deploy_output.stdout != ''"
-  tags: "quick"
-  with_items:
-    - "wistla-admin"
+      {{ deployment_home }}/{{ item.name }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item.name }}/
+      {{ item.filters | join (' ') }};
 
 - name: "link to upstream config"
+  with_items: "node_load_config_links"
   action:
+
     module: "file"
     path: "{{ item.link }}"
     state: "link"
     src: "{{ item.source }}"
     force: "yes"
-  with_items:
-
-    - link: "/etc/nginx/nginx.conf"
-      source: "/config/nginx-config"
-
-    - link: "/etc/nginx/http-environment.conf"
-      source: "/config/nginx-http-environment.conf"
-
-    - link: "/etc/nginx/server-environment.conf"
-      source: "/config/nginx-server-environment.conf"
-
-    - link: "/home/ubuntu/wistla-admin/config/config.local.js"
-      source: "/config/wistla-admin-config.local.js"
 
 # ex: et ts=2 filetype=yaml

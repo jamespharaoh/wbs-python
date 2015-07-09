@@ -217,6 +217,30 @@ http {
 			proxy_set_header Connection "";
 		}
 
+		location /emails {
+			alias /home/ubuntu/content-api/emails;
+		}
+
+		location /browser/assets {
+			alias /home/ubuntu/content-browser/assets;
+		}
+
+		location /browser/fonts {
+			alias /home/ubuntu/content-browser/fonts;
+		}
+
+		location /web/assets {
+			alias /home/ubuntu/content-web/assets;
+		}
+
+		location /web/videos {
+			alias /home/ubuntu/content-web/videos;
+		}
+
+		location /web/fonts {
+			alias /home/ubuntu/content-web/fonts;
+		}
+
 	}
 
 }

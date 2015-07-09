@@ -245,10 +245,6 @@ http {
 			alias /etc/nginx/dev-robots.txt;
 		}
 
-		location /emails {
-			proxy_pass https://s3-eu-west-1.amazonaws.com/wistla/emails;
-		}
-
 		location /1/images {
 			proxy_pass http://{{ dev_deployment_name }}-load/images;
 			proxy_set_header Host {{ dev_deployment.api_domain }};

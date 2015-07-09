@@ -51,6 +51,18 @@ cluster_deployment_types:
 
     checkouts:
 
+      - name: "content-browser"
+        branch: "master"
+
+      - name: "content-iOS"
+        branch: "master"
+
+      - name: "content-api"
+        branch: "master"
+
+      - name: "content-web"
+        branch: "master"
+
       - name: "wistla-admin"
         branch: "master"
         build_steps:
@@ -182,6 +194,18 @@ cluster_deployment_types:
   simple:
 
     checkouts:
+
+      - name: "content-browser"
+        branch: "master"
+
+      - name: "content-iOS"
+        branch: "master"
+
+      - name: "content-api"
+        branch: "master"
+
+      - name: "content-web"
+        branch: "master"
 
       - name: "wistla-admin"
         branch: "master"
