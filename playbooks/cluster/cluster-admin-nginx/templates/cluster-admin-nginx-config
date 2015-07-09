@@ -245,19 +245,9 @@ http {
 			alias /etc/nginx/dev-robots.txt;
 		}
 
-		location /1/images {
-			proxy_pass http://{{ dev_deployment_name }}-load/images;
-			proxy_set_header Host {{ dev_deployment.api_domain }};
-		}
-
-		location /1/audio {
-			proxy_pass http://{{ dev_deployment_name }}-load/audio;
-			proxy_set_header Host {{ dev_deployment.api_domain }};
-		}
-
-		location /1/video {
-			proxy_pass http://{{ dev_deployment_name }}-load/video;
-			proxy_set_header Host {{ dev_deployment.api_domain }};
+		location / {
+			proxy_pass http://{{ dev_deployment_name }}-load/;
+			proxy_set_header Host {{ dev_deployment.assets_domain }};
 		}
 
 	}
