@@ -217,7 +217,7 @@ http {
 			proxy_set_header Connection "";
 		}
 
-		location /emails {
+		location /api/emails {
 			alias /home/ubuntu/content-api/emails;
 		}
 
