@@ -1,0 +1,13 @@
+---
+
+api:
+
+  access_key_id: ""
+  secret_access_key: ""
+
+web:
+
+  access_key_id: ""
+  secret_access_key: ""
+
+# ex: et ts=2 filetype=yaml
