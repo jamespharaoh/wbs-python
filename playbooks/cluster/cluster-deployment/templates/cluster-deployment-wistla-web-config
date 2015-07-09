@@ -36,6 +36,7 @@ config.sendEmails = true;
 
 config.cmsContent = {
 	bucket: 'wistla-{{ cluster_deployment_name }}-web',
+	prefix: '/cms',
 	key: '{{ cluster_deployment_security.web.access_key_id }}',
 	secret: '{{ cluster_deployment_security.web.secret_access_key }}'
 };

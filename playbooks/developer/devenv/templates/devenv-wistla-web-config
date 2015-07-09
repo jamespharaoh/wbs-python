@@ -59,6 +59,7 @@ config.cmsContent = {
 {% else %}
 	bucket: 'wistla-dev-{{ deployment_name }}-web',
 {% endif %}
+	prefix: '/cms',
 {% if 'dev' in third_parties %}
 	key: '{{ deployment_security.web.access_key_id }}',
 	secret: '{{ deployment_security.web.secret_access_key }}',
