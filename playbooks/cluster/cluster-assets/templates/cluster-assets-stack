@@ -30,14 +30,19 @@ Resources:
 
         CacheBehaviors:
 
+          - PathPattern: "/cms/*"
+            TargetOriginId: "{{ deployment_name }}-web"
+            ViewerProtocolPolicy: "redirect-to-https"
+
+            ForwardedValues:
+              QueryString: "false"
+
           - PathPattern: "/emails/*"
             TargetOriginId: "{{ deployment_name }}-wistla"
             ViewerProtocolPolicy: "redirect-to-https"
 
             ForwardedValues:
               QueryString: "false"
-
-        CacheBehaviors:
 
           - PathPattern: "/web/*"
             TargetOriginId: "{{ deployment_name }}-wistla"
@@ -60,6 +65,10 @@ Resources:
 
           - Id: "{{ deployment_name }}-wistla"
             DomainName: "wistla.s3.amazonaws.com"
+            S3OriginConfig: {}
+
+          - Id: "{{ deployment_name }}-web"
+            DomainName: "wistla-{{ deployment_name }}-web.s3.amazonaws.com"
             S3OriginConfig: {}
 
 Outputs:
