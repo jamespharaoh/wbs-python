@@ -37,20 +37,6 @@ Resources:
             ForwardedValues:
               QueryString: "false"
 
-          - PathPattern: "/emails/*"
-            TargetOriginId: "{{ deployment_name }}-wistla"
-            ViewerProtocolPolicy: "redirect-to-https"
-
-            ForwardedValues:
-              QueryString: "false"
-
-          - PathPattern: "/web/*"
-            TargetOriginId: "{{ deployment_name }}-wistla"
-            ViewerProtocolPolicy: "redirect-to-https"
-
-            ForwardedValues:
-              QueryString: "false"
-
         ViewerCertificate:
 
           IamCertificateId: "{{ deployment.assets_certificate_id }}"
@@ -62,10 +48,6 @@ Resources:
             DomainName: "{{ deployment.assets_origin_domain }}"
             CustomOriginConfig:
               OriginProtocolPolicy: "http-only"
-
-          - Id: "{{ deployment_name }}-wistla"
-            DomainName: "wistla.s3.amazonaws.com"
-            S3OriginConfig: {}
 
           - Id: "{{ deployment_name }}-web"
             DomainName: "wistla-{{ deployment_name }}-web.s3.amazonaws.com"
