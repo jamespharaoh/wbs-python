@@ -57,10 +57,13 @@ config.CORS = {
 	credentials: true
 };
 
-{% if use_s3 == 'yes' %}
-
-// amazon s3 blob storage
+// blob storage
+{% if dev_api_use_s3 == 'yes' %}
 config.blobMode = 'amazon';
+{% else %}
+config.blobMode = 'local';
+{% endif %}
+
 config.blobAmazon = {
 	accessKey: '{{ deployment_security.api.access_key_id }}',
 	secretKey: '{{ deployment_security.api.secret_access_key }}',
@@ -71,13 +74,6 @@ config.blobAmazon = {
 {% endif %}
 	bucketPrefix: ''
 };
-
-{% else %}
-
-// local blob storage
-config.blobMode = 'local';
-
-{% endif %}
 
 // mailchimp
 {% if 'dev' in third_parties %}

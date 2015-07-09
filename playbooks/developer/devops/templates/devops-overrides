@@ -57,7 +57,8 @@ dev_node_memory:
   rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('256') }}"
   web: "{{ (dev_node_memory | default ({})).web | default ('768') }}"
 
-use_s3: "{{ use_s3 | default ('no') }}"
+dev_api_use_s3: "{{ dev_api_use_s3 | default ('no') }}"
+dev_web_use_s3: "{{ dev_web_use_s3 | default ('no') }}"
 
 #
 # security and networking

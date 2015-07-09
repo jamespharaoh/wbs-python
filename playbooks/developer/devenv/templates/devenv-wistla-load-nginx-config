@@ -195,6 +195,7 @@ http {
 		}
 
 		location /cms {
+{% if dev_web_use_s3 == 'yes' %}
 {% if 'jenkins-' in deployment_name %}
 			proxy_pass http://wistla-{{ deployment_name }}-web.s3.amazonaws.com/cms;
 {% else %}
@@ -202,6 +203,9 @@ http {
 {% endif %}
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
+{% else %}
+			alias /shared/cms-image;
+{% endif %}
 		}
 
 		location /emails {

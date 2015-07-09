@@ -51,7 +51,7 @@ config.mailchimp = {
 // cms content
 
 config.cmsContent = {
-{% if use_s3 == 'yes' %}
+{% if dev_web_use_s3 == 'yes' %}
 	mode: 'amazon',
 {% else %}
 	mode: 'local',
