@@ -36,7 +36,10 @@ config.mailchimp = {
 config.sendEmails = true;
 {% endif %}
 
+// cms content
+
 config.cmsContent = {
+	mode: 'amazon',
 	bucket: 'wistla-{{ cluster_deployment_name }}-web',
 	prefix: '/cms',
 	key: '{{ cluster_deployment_security.web.access_key_id }}',
