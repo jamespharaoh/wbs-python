@@ -112,6 +112,45 @@ config.applePush = {
 {% endif %}
 };
 
+// facebook app configuration options
+{% if 'dev' in third_parties %}
+config.authentication.facebook.apps = {
+        wistla = {
+                appId: '{{ third_parties.dev.facebookWistlaAppId }}',
+                appSecret: '{{ third_parties.dev.facebookWistlaAppSecret }}',
+                appAccessToken: '{{ third_parties.dev.facebookWistlaAppAccessToken }}'
+        },
+        wistlaEnterprise = {
+                appId: '{{ third_parties.dev.facebookWistlaEnterpriseAppId }}',
+                appSecret: '{{ third_parties.dev.facebookWistlaEnterpriseAppSecret }}',
+                appAccessToken: '{{ third_parties.dev.facebookWistlaEnterpriseAppAccessToken }}'
+        },
+        wistlaEnterpriseTwo = {
+                appId: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppId }}',
+                appSecret: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppSecret }}',
+                appAccessToken: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppAccessToken }}'
+        }
+};
+{% else %}
+config.authentication.facebook.apps = {
+	wistla = {
+		appId: '',
+		appSecret: '',
+		appAccessToken: ''
+	},
+	wistlaEnterprise = {
+                appId: '',
+                appSecret: '',
+                appAccessToken: ''
+	},
+	wistlaEnterpriseTwo = {
+                appId: '',
+                appSecret: '',
+                appAccessToken: ''
+	}
+};
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

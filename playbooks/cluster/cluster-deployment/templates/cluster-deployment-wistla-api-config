@@ -100,6 +100,25 @@ config.applePush = {
 {% endif %}
 };
 
+// facebook app configuration options
+config.authentication.facebook.apps = {
+        wistla = {
+                appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}',
+                appSecret: '{{ third_parties [cluster_name].facebookWistlaAppSecret }}',
+                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaAppAccessToken }}'
+        },
+        wistlaEnterprise = {
+                appId: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppId }}',
+                appSecret: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppSecret }}',
+                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppAccessToken }}'
+        },
+        wistlaEnterpriseTwo = {
+                appId: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppId }}',
+                appSecret: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppSecret }}',
+                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppAccessToken }}'
+        }
+};
+
 {% if bool_native [cluster_deployment.emails_enabled] %}
 
 // Enable email sends.
