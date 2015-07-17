@@ -238,6 +238,10 @@ http {
 			alias /home/ubuntu/content-web/fonts;
 		}
 
+		location /common/emails/assets {
+			alias /home/ubuntu/content-common/emails/assets;
+		}
+
 	}
 
 }
