@@ -36,11 +36,6 @@ node_load_deploy_projects:
       - "--include /fonts"
       - "--exclude '/*'"
 
-  - name: "content-common"
-    filters:
-      - "--include /emails/assets"
-      - "--exclude '/*'"
-
   - name: "content-web"
     filters:
 

@@ -105,9 +105,6 @@ devenv_checkouts:
   - name: "content-web"
     branch: "master"
 
-  - name: "content-common"
-    branch: "master"
-
   - name: "wistla-admin"
     branch: "master"
     build_steps:

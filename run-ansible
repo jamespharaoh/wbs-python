@@ -22,7 +22,6 @@ PROJECTS = [
 	"content-browser",
 	"content-iOS",
 	"content-web",
-	"content-common",
 	"wistla-admin",
 	"wistla-api",
 	"wistla-browser",
