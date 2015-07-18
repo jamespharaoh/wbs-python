@@ -441,7 +441,7 @@ def warn_upstream ():
 			])
 
 			write_message ([
-				"Try running './run-ansible' --sync to automatically sync\n"
+				"Try running './run-ansible --sync' to automatically sync\n"
 				"projects in a clean state.\n",
 			])
 

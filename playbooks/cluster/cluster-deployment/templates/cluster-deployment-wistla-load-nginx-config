@@ -229,7 +229,7 @@ http {
 			alias /home/ubuntu/content-browser/fonts;
 		}
 
-		location /content/emails/assets {
+		location /common/emails/assets {
 			alias /home/ubuntu/content-common/emails/assets;
 		}
 
