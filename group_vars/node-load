@@ -38,6 +38,7 @@ node_load_deploy_projects:
 
   - name: "content-common"
     filters:
+
       - "--include /emails/assets"
       - "--exclude '/*'"
 
