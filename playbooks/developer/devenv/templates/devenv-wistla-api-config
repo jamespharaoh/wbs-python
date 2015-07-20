@@ -99,6 +99,9 @@ config.loadingData = {
 {% endif %}
 };
 
+// Turn on longStackTraces in dev by default.
+config.longStackTraces = true;
+
 // apple push notifications
 config.applePush = {
 {% if dev_apple_push_notifications_enabled | default ('no') == 'yes' %}
