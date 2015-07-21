@@ -54,6 +54,9 @@ cluster_deployment_types:
       - name: "content-browser"
         branch: "master"
 
+      - name: "content-common"
+        branch: "master"
+
       - name: "content-iOS"
         branch: "master"
 
@@ -195,13 +198,16 @@ cluster_deployment_types:
 
     checkouts:
 
+      - name: "content-api"
+        branch: "master"
+
       - name: "content-browser"
         branch: "master"
 
-      - name: "content-iOS"
+      - name: "content-common"
         branch: "master"
 
-      - name: "content-api"
+      - name: "content-iOS"
         branch: "master"
 
       - name: "content-web"
