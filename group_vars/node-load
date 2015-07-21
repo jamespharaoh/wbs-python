@@ -21,20 +21,28 @@ node_load_deploy_projects:
       - "--include /index.html"
       - "--include /jspm_packages"
       - "--include /styles"
-      - "--exclude '/*'"
+      - "--exclude /'*'"
 
   - name: "content-api"
     filters:
 
       - "--include /emails"
-      - "--exclude '/*'"
+      - "--exclude /'*'"
 
   - name: "content-browser"
     filters:
 
       - "--include /assets"
       - "--include /fonts"
-      - "--exclude '/*'"
+      - "--exclude /'*'"
+
+  - name: "content-common"
+    filters:
+
+      - "--include /emails/assets"
+      - "--exclude /emails/'*'"
+      - "--include /emails"
+      - "--exclude /'*'"
 
   - name: "content-web"
     filters:
@@ -42,7 +50,7 @@ node_load_deploy_projects:
       - "--include /assets"
       - "--include /videos"
       - "--include /fonts"
-      - "--exclude '/*'"
+      - "--exclude /'*'"
 
 node_load_config_links:
 

@@ -102,6 +102,9 @@ devenv_checkouts:
   - name: "content-api"
     branch: "master"
 
+  - name: "content-common"
+    branch: "master"
+
   - name: "content-web"
     branch: "master"
 
