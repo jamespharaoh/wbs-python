@@ -16,6 +16,9 @@ config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.staticWebUrl = 'https://{{ cluster_deployment_alias.assets_domain }}/web';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
+// email
+config.emailDomain = '{{ cluster_deployment.email_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla-web';
 

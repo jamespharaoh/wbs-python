@@ -27,6 +27,9 @@ config.assetsTest = 'http://{{ deployment.assets_domain }}';
 config.shortTest = 'http://{{ deployment.short_domain }}';
 config.webTest = 'http://{{ deployment.web_domain }}';
 
+// email
+config.emailDomain = '{{ deployment.email_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
 

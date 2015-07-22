@@ -8,7 +8,7 @@ config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_
 
 // public urls
 config.adminUrl = 'https://{{ cluster_deployment_alias.admin_domain }}';
-config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}'; // !!! see TODO below !!!
+config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}';
 config.assetsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}';
 config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
@@ -16,10 +16,8 @@ config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 // private urls
 config.apiPrivate = 'http://{{ cluster_deployment_name }}-api-{{ instance_zone }}-{{ instance_index }}:7000';
 
-// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO //
-// this needs changing to use apiPrivate
-config.apiUrl = config.apiPrivate;
-// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO //
+// email
+config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
 module.exports = config;
 

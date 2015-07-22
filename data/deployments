@@ -13,6 +13,8 @@ production:
   api_domain: "api.wistla.com"
   web_domain: "www.wistla.com"
 
+  email_domain: "wistla.com"
+
   cluster: "production"
   target: "production-a"
 
@@ -50,6 +52,8 @@ production-a:
   admin_domain: "admin.a.wistla.com"
   api_domain: "api.a.wistla.com"
   web_domain: "www.a.wistla.com"
+
+  email_domain: "wistla.com"
 
   parent_cluster: "production"
   parent_domain: "wistla.com"
@@ -95,6 +99,8 @@ production-b:
   api_domain: "api.b.wistla.com"
   web_domain: "www.b.wistla.com"
 
+  email_domain: "wistla.com"
+
   parent_cluster: "production"
   parent_domain: "wistla.com"
 
@@ -136,6 +142,8 @@ staging:
   api_domain: "api.staging.wistla.com"
   web_domain: "www.staging.wistla.com"
 
+  email_domain: "staging.wistla.com"
+
   cluster: "staging"
   target: "staging-a"
 
@@ -173,6 +181,8 @@ staging-a:
   admin_domain: "admin.a.staging.wistla.com"
   api_domain: "api.a.staging.wistla.com"
   web_domain: "www.a.staging.wistla.com"
+
+  email_domain: "staging.wistla.com"
 
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
@@ -218,6 +228,8 @@ staging-b:
   api_domain: "api.b.staging.wistla.com"
   web_domain: "www.b.staging.wistla.com"
 
+  email_domain: "staging.wistla.com"
+
   parent_cluster: "staging"
   parent_domain: "staging.wistla.com"
 
@@ -254,6 +266,8 @@ test:
   main_domain: "test.wistla.com"
   short_domain: "test.wist.la"
 
+  email_domain: "test.wistla.com"
+
   cluster: "test"
 
 test-everest:
@@ -270,6 +284,8 @@ test-everest:
   admin_domain: "admin.everest.test.wistla.com"
   api_domain: "api.everest.test.wistla.com"
   web_domain: "www.everest.test.wistla.com"
+
+  email_domain: "test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -323,6 +339,8 @@ test-k2:
   api_domain: "api.k2.test.wistla.com"
   web_domain: "www.k2.test.wistla.com"
 
+  email_domain: "test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -374,6 +392,8 @@ test-montblanc:
   admin_domain: "admin.montblanc.test.wistla.com"
   api_domain: "api.montblanc.test.wistla.com"
   web_domain: "www.montblanc.test.wistla.com"
+
+  email_domain: "test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -427,6 +447,8 @@ test-erebus:
   api_domain: "api.erebus.test.wistla.com"
   web_domain: "www.erebus.test.wistla.com"
 
+  email_domain: "test.wistla.com"
+
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
 
@@ -478,6 +500,8 @@ test-fitzroy:
   admin_domain: "admin.fitzroy.test.wistla.com"
   api_domain: "api.fitzroy.test.wistla.com"
   web_domain: "www.fitzroy.test.wistla.com"
+
+  email_domain: "test.wistla.com"
 
   parent_cluster: "test"
   parent_domain: "test.wistla.com"
@@ -531,6 +555,8 @@ dev:
   api_domain: "api.dev.wistla.com"
   web_domain: "www.dev.wistla.com"
 
+  email_domain: "dev.wistla.com"
+
   bridge_name: "br152"
   bridge_network: "10.152"
   bridge_mac: "aa:bb:0a:98"
@@ -549,6 +575,8 @@ berk:
   admin_domain: "admin.berk.wistla.com"
   api_domain: "api.berk.wistla.com"
   web_domain: "www.berk.wistla.com"
+
+  email_domain: "dev.wistla.com"
 
   bridge_name: "br150"
   bridge_network: "10.150"
@@ -569,6 +597,8 @@ bruce:
   api_domain: "api.bruce.wistla.com"
   web_domain: "www.bruce.wistla.com"
 
+  email_domain: "dev.wistla.com"
+
   bridge_name: "br154"
   bridge_network: "10.154"
   bridge_mac: "aa:bb:0a:9a"
@@ -588,6 +618,8 @@ chuggington:
   api_domain: "api.chuggington.dev.wistla.com"
   web_domain: "www.chuggington.dev.wistla.com"
 
+  email_domain: "dev.wistla.com"
+
   bridge_name: "br167"
   bridge_network: "10.167"
   bridge_mac: "aa:bb:0a:a7"
@@ -606,6 +638,8 @@ mrbenn:
   admin_domain: "admin.mrbenn.wistla.com"
   api_domain: "api.mrbenn.wistla.com"
   web_domain: "www.mrbenn.wistla.com"
+
+  email_domain: "dev.wistla.com"
 
   bridge_name: "br151"
   bridge_network: "10.151"
@@ -627,6 +661,8 @@ mrbenn:
   web_domain: "www.7-zark-7.wistla.com"
   test_domain: "test.7-zark-7.wistla.com"
 
+  email_domain: "dev.wistla.com"
+
   bridge_name: "br153"
   bridge_network: "10.153"
   bridge_mac: "aa:bb:0a:99"
@@ -646,6 +682,8 @@ optimus:
   api_domain: "api.optimus.dev.wistla.com"
   web_domain: "www.optimus.dev.wistla.com"
 
+  email_domain: "dev.wistla.com"
+
   bridge_name: "br161"
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
@@ -664,6 +702,8 @@ jenkins-latest:
   admin_domain: "admin.latest.jenkins.wistla.com"
   api_domain: "api.latest.jenkins.wistla.com"
   web_domain: "www.latest.jenkins.wistla.com"
+
+  email_domain: "jenkins.wistla.com"
 
   bridge_name: "br160"
   bridge_network: "10.160"

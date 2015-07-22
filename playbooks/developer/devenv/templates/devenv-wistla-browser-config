@@ -13,6 +13,9 @@ config.webUrl = 'https://{{ deployment.web_domain }}';
 // private urls
 config.apiPrivate = 'http://{{ deployment_name }}-api-0:7000';
 
+// email
+config.emailDomain = '{{ deployment.email_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-browser';
 

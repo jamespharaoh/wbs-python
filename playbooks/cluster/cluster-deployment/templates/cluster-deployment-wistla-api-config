@@ -21,6 +21,9 @@ config.assetsTest = 'http://{{ cluster_deployment_alias.assets_domain }}';
 config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
 config.webTest = 'http://{{ cluster_deployment.web_domain }}';
 
+// email
+config.emailDomain = '{{ cluster_deployment.email_domain }}';
+
 // Database.
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla';
 
