@@ -245,6 +245,10 @@ http {
 			alias /home/ubuntu/content-web/fonts;
 		}
 
+		location /web/favicon {
+			alias /home/ubuntu/content-web/favicon;
+		}
+
 	}
 
 }

@@ -50,6 +50,7 @@ node_load_deploy_projects:
       - "--include /assets"
       - "--include /videos"
       - "--include /fonts"
+      - "--include /favicon"
       - "--exclude /'*'"
 
 node_load_config_links:
