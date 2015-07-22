@@ -2,6 +2,7 @@
 
 - name: "create directory"
   delegate_to: "localhost"
+  run_once: "true"
   action:
 
     module: "file"
