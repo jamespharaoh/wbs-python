@@ -230,6 +230,10 @@ http {
 			alias /home/ubuntu/content-common/emails/assets;
 		}
 
+		location /common/favicon {
+			alias /home/ubuntu/content-common/favicon;
+		}
+
 		location /web/assets {
 			alias /home/ubuntu/content-web/assets;
 		}
@@ -240,10 +244,6 @@ http {
 
 		location /web/fonts {
 			alias /home/ubuntu/content-web/fonts;
-		}
-
-		location /web/favicon {
-			alias /home/ubuntu/content-web/favicon;
 		}
 
 	}

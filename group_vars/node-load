@@ -42,6 +42,7 @@ node_load_deploy_projects:
       - "--include /emails/assets"
       - "--exclude /emails/'*'"
       - "--include /emails"
+      - "--include /favicon"
       - "--exclude /'*'"
 
   - name: "content-web"
@@ -50,7 +51,6 @@ node_load_deploy_projects:
       - "--include /assets"
       - "--include /videos"
       - "--include /fonts"
-      - "--include /favicon"
       - "--exclude /'*'"
 
 node_load_config_links:
