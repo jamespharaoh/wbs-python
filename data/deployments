@@ -124,7 +124,7 @@ production-b:
 
   node_instance_count:
 
-    api: "1"
+    api: "2"
     browser: "1"
     load: "1"
     web: "1"
@@ -200,9 +200,9 @@ staging-a:
 
   node_memory:
 
-    api: "512"
-    browser: "256"
-    load: "128"
+    api: "1024"
+    browser: "512"
+    load: "256"
     web: "1024"
 
   node_instance_count:
@@ -246,9 +246,9 @@ staging-b:
 
   node_memory:
 
-    api: "512"
-    browser: "256"
-    load: "128"
+    api: "1024"
+    browser: "512"
+    load: "256"
     web: "1024"
 
   node_instance_count:
