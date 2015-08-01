@@ -63,7 +63,7 @@ production-a:
   bridge_mac: "aa:bb:0a:94"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-production"
+  apple_push_notifications_name: "wistla-iphone-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
@@ -109,7 +109,7 @@ production-b:
   bridge_mac: "aa:bb:0a:95"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-production"
+  apple_push_notifications_name: "wistla-iphone-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
