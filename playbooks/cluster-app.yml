@@ -29,7 +29,6 @@
 
     - "cluster-app-nginx"
     - "cluster-app"
-    #- "cluster-icinga"
 
     - "cluster-activate"
 

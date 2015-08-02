@@ -25,7 +25,6 @@
 
     - "cluster-admin-nginx"
     - "setup-openvpn-server"
-    #- "cluster-icinga"
 
     - "cluster-admin-routes"
     - "cluster-activate"
