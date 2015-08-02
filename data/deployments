@@ -192,7 +192,7 @@ staging-a:
   bridge_mac: "aa:bb:0a:9b"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-iphone-production"
+  apple_push_notifications_name: "wistla-iphone-staging-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
@@ -238,7 +238,7 @@ staging-b:
   bridge_mac: "aa:bb:0a:9c"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-iphone-production"
+  apple_push_notifications_name: "wistla-iphone-staging-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
