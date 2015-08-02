@@ -192,7 +192,7 @@ staging-a:
   bridge_mac: "aa:bb:0a:9b"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-enterprise-production"
+  apple_push_notifications_name: "wistla-iphone-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
@@ -238,7 +238,7 @@ staging-b:
   bridge_mac: "aa:bb:0a:9c"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-enterprise-production"
+  apple_push_notifications_name: "wistla-iphone-production"
   apple_push_notifications_production: "yes"
 
   emails_enabled: "yes"
@@ -349,8 +349,8 @@ test-k2:
   bridge_mac: "aa:bb:0a:9e"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-iphone-production"
-  apple_push_notifications_production: "yes"
+  apple_push_notifications_name: "wistla-iphone-dev"
+  apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -457,7 +457,7 @@ test-erebus:
   bridge_mac: "aa:bb:0a:a5"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-dev"
+  apple_push_notifications_name: "wistla-iphone-dev"
   apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
@@ -511,7 +511,7 @@ test-fitzroy:
   bridge_mac: "aa:bb:0a:a6"
 
   apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "wistla-dev"
+  apple_push_notifications_name: "wistla-iphone-dev"
   apple_push_notifications_production: "no"
 
   emails_enabled: "yes"
