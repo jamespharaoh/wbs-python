@@ -530,12 +530,20 @@ class CertificateAuthority:
 			issue_path + "/key")
 
 		return Certificate (
+
 			serial = issue_serial,
 			digest = issue_digest,
+
 			certificate = certificate_string,
-			private_key = key_string,
 			certificate_path = issue_path + "/certificate",
-			private_key_path = issue_path + "/key")
+
+			chain = [ self.root_cert_string ],
+			chain_paths = [ "%s/certificate" % self.path ],
+
+			private_key = key_string,
+			private_key_path = issue_path + "/key",
+
+			rsa_private_key = "TODO")
 
 	def root_certificate (self):
 
