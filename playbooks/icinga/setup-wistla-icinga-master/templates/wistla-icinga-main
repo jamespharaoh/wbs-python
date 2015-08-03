@@ -1,4 +1,4 @@
-{{ ansible_warning ['#'] }}
+{{ ansible_warning ['//'] }}
 
 include "constants.conf"
 include "secrets.conf"
@@ -58,5 +58,3 @@ object SyslogLogger "syslog" {
 	severity = "warning"
 
 }
-
-include_recursive "conf.d"

@@ -44,6 +44,53 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
+- name: "create common zone directory"
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/icinga2/zones.d/common"
+    state: "directory"
+
+- name: "create wistla common templates"
+  with_items: "wistla_icinga_common_templates"
+  notify: "set icinga.needs_restart to 'yes'"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/icinga2/zones.d/common/{{ item.target }}"
+    src: "{{ item.template }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create admin zone directories"
+  with_dict: "clusters"
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/icinga2/zones.d/wistla-{{ item.key }}-admin"
+    state: "directory"
+
+- name: "create admin zone config templates"
+  notify: "set icinga.needs_restart to 'yes'"
+  with_nested:
+
+    - "clusters.keys ()"
+    - "wistla_icinga_zone_templates"
+
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/icinga2/zones.d/wistla-{{ item.0 }}-admin/{{ item.1.target }}"
+    src: "{{ item.1.template }}"
+    owner: "{{ item.1.user }}"
+    group: "{{ item.1.group }}"
+    mode: "{{ item.1.mode }}"
+
 - name: "set icinga_state to 'enabled'"
   when: "icinga_state == 'installed'"
   update_resource:

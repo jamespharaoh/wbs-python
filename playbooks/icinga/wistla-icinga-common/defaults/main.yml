@@ -46,6 +46,22 @@ wistla_icinga_config_templates:
     group: "root"
     mode: "0644"
 
+wistla_icinga_common_templates:
+
+  - template: "wistla-icinga-common-templates"
+    target: "templates.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+wistla_icinga_zone_templates:
+
+  - template: "wistla-icinga-zone-hosts"
+    target: "hosts.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
 wistla_icinga_web_config_templates:
 
   - template: "wistla-icinga-web-authentication"
@@ -71,5 +87,27 @@ wistla_icinga_web_config_templates:
     user: "root"
     group: "icingaweb2"
     mode: "0640"
+
+  - template: "wistla-icinga-web-monitoring-backends"
+    target: "/etc/icingaweb2/modules/monitoring/backends.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+  - template: "wistla-icinga-web-monitoring-config"
+    target: "/etc/icingaweb2/modules/monitoring/config.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+  - template: "wistla-icinga-web-monitoring-instances"
+    target: "/etc/icingaweb2/modules/monitoring/instances.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+wistla_icinga_web_enabled_modules:
+
+  - "monitoring"
 
 # ex: et ts=2 filetype=yaml

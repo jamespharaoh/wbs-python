@@ -12,6 +12,21 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
+- name: "enable wistla icinga web modules"
+  with_items: "wistla_icinga_web_enabled_modules"
+  sudo: "yes"
+  args:
+
+    creates: "/etc/icingaweb2/enabledModules/{{ item }}"
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    /opt/icinga-web-{{ icinga_web_version }}/bin/icingacli
+    module enable {{ item }};
+
 - name: "set icinga_web.state to 'enabled'"
   when: "icinga_web_state == 'installed'"
   update_resource:
