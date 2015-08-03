@@ -1,6 +1,9 @@
 ---
 
 - include: "install-postfix.yml"
-  tags: "install-postfix"
+  tags:
+
+    - "postfix"
+    - "install-postfix"
 
 # ex: et ts=2 filetype=yaml

@@ -1,3 +1,3 @@
 {{ ansible_warning ['#'] }}
 
-{{ cluster.smtp_server }}:25 {{ smtp_username }}:{{ smtp_password }}
+{{ cluster.smtp_server }}:587 {{ smtp_username }}:{{ smtp_password }}
