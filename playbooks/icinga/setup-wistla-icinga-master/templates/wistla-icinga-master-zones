@@ -49,4 +49,21 @@ object Endpoint "{{ host_name }}" {
 {% endfor %}
 {% endif %}
 
+{% if 'cluster-' + other_cluster_name + '-jenkins' in groups %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-jenkins'] %}
+
+object Zone "{{ host_name }}" {
+	endpoints = [ "{{ host_name }}" ]
+	parent = "wistla-{{ other_cluster_name }}-admin"
+}
+
+object Endpoint "{{ host_name }}" {
+{% if cluster_name == other_cluster_name %}
+	host = "{{ host_name }}"
+{% endif %}
+}
+
+{% endfor %}
+{% endif %}
+
 {% endfor %}

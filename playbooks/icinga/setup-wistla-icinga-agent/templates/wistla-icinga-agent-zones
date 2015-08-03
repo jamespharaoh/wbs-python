@@ -15,16 +15,30 @@ object Zone "wistla-ops-admin" {
 }
 
 object Endpoint "wistla-ops-admin-a" {
+{% if cluster_name == 'ops' %}
+	host = "wistla-ops-admin-a"
+{% else %}
 	host = "a.admin.ops.wistla.com"
+{% endif %}
 }
 
 object Endpoint "wistla-ops-admin-b" {
+{% if cluster_name == 'ops' %}
+	host = "wistla-ops-admin-b"
+{% else %}
 	host = "b.admin.ops.wistla.com"
+{% endif %}
 }
 
 object Endpoint "wistla-ops-admin-c" {
+{% if cluster_name == 'ops' %}
+	host = "wistla-ops-admin-c"
+{% else %}
 	host = "c.admin.ops.wistla.com"
+{% endif %}
 }
+
+{% if cluster_name != 'ops' %}
 
 # ==================== cluster {{ cluster_name }}
 
@@ -48,6 +62,8 @@ object Endpoint "wistla-{{ cluster_name }}-admin-b" {
 object Endpoint "wistla-{{ cluster_name }}-admin-c" {
 	host = "wistla-{{ cluster_name }}-admin-c"
 }
+
+{% endif %}
 
 # ==================== this host
 

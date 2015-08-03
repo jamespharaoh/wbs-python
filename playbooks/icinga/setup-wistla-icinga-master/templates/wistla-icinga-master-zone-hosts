@@ -16,6 +16,11 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ cluster_name }}"
+	vars.type = "admin"
+
+	vars.disks ["disk system"] = {
+		disk_partitions = "/"
+	}
 
 }
 
@@ -36,6 +41,53 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ cluster_name }}"
+	vars.type = "app"
+
+	vars.disks ["disk system"] = {
+		disk_partitions = "/"
+	}
+
+	vars.disks ["disk containers"] = {
+		disk_partitions = "/var/lib/lxc"
+	}
+
+	vars.disks ["disk data"] = {
+		disk_partitions = "/data"
+	}
+
+}
+
+{% endfor %}
+{% endif %}
+
+{% if 'cluster-' + cluster_name + '-jenkins' in groups %}
+
+# ==================== app instances
+
+{% for host_name in groups ['cluster-' + cluster_name + '-jenkins'] %}
+{% set host = hostvars [host_name] %}
+
+object Host "{{ host_name }}" {
+
+	import "generic-host"
+
+	address = "{{ host_name }}"
+
+	vars.endpoint = "{{ host_name }}"
+	vars.cluster = "{{ cluster_name }}"
+	vars.type = "jenkins"
+
+	vars.disks ["disk system"] = {
+		disk_partitions = "/"
+	}
+
+	vars.disks ["disk containers"] = {
+		disk_partitions = "/var/lib/lxc"
+	}
+
+	vars.disks ["disk data"] = {
+		disk_partitions = "/data"
+	}
 
 }
 
