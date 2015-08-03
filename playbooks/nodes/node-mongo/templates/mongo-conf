@@ -5,3 +5,4 @@ logpath = /var/log/mongodb/mongodb.log
 logappend = true
 bind_ip = 0.0.0.0
 smallfiles = true
+replSet = wistla-1-1
