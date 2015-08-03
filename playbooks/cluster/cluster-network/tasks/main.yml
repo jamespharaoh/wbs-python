@@ -35,17 +35,4 @@
 - include: "cluster-admin-balancer.yml"
   tags: "cluster-admin-balancer"
 
-# ---------- dev
-
-#- include: "cluster-network-dev-dns.yml"
-#  tags: "cluster-network-dev-dns"
-
-#- include: "cluster-network-dev-short-dns.yml"
-#  tags: "cluster-network-dev-short-dns"
-
-# ---------- misc
-
-#- include: "cluster-network-short-dns.yml"
-#  tags: "cluster-network-short-dns"
-
 # ex: et ts=2 filetype=yaml
