@@ -291,10 +291,47 @@ http {
 		#}
 
 		location /icinga {
+
 			alias /opt/icinga/share;
+
 			auth_basic "Restricted";
 			auth_basic_user_file /opt/icinga2/etc/icinga2-classicui/htpasswd.users;
+
 		}
+
+{% if inventory_hostname == 'wistla-ops-admin-a' %}
+
+		location ~ ^/icingaweb2/index\.php(.*)$ {
+
+			fastcgi_pass unix:/var/run/php5-fpm.sock;
+			fastcgi_index index.php;
+			include fastcgi_params;
+
+			fastcgi_param SCRIPT_FILENAME /opt/icinga-web-2.0.0-rc1/public/index.php;
+			fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;
+			fastcgi_param REMOTE_USER $remote_user;
+
+		}
+
+		location ~ ^/icingaweb2(.+)? {
+
+			alias /opt/icinga-web-2.0.0-rc1/public;
+
+			index index.php;
+			try_files $1 $uri $uri/ /icingaweb2/index.php$is_args$args;
+
+		}
+
+{% else %}
+
+		location /icingaweb2 {
+
+			proxy_pass http://wistla-ops-admin-a;
+			proxy_set_header Host $host;
+
+		}
+
+{% endif %}
 
 	}
 

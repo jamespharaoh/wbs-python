@@ -27,6 +27,4 @@
     - "install-iojs"
     - "install-node-packages"
 
-    - "cluster-jenkins"
-
 # ex: et ts=2 filetype=yaml

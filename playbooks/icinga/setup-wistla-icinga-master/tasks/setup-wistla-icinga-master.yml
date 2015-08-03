@@ -1,0 +1,53 @@
+---
+
+- name: "create wistla icinga certificate"
+  when: "icinga_certificate == 'no'"
+  register: "wistla_icinga_certificate_result"
+  action:
+
+    module: "certificate_authority_issue"
+    authority: "{{ icinga_authority }}"
+    common_name: "{{ inventory_hostname }}"
+    usage: "mixed"
+    alt_dns: [ "{{ inventory_hostname }}" ]
+
+- name: "store wistla icinga certificate"
+  when: "wistla_icinga_certificate_result | changed"
+  update_resource:
+
+    icinga.certificate: "{{ wistla_icinga_certificate_result.certificate }}"
+    icinga.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
+
+- name: "create wistla icinga configuration"
+  with_items: "wistla_icinga_config_templates"
+  notify: "set icinga.needs_restart to 'yes'"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create wistla security configuration"
+  with_items: "wistla_icinga_security_config"
+  notify: "set icinga.needs_restart to 'yes'"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "{{ item.target }}"
+    content: "{{ lookup ('etcd', item.source) }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "set icinga_state to 'enabled'"
+  when: "icinga_state == 'installed'"
+  update_resource:
+
+    icinga.state: "enabled"
+
+# ex: et ts=2 filetype=yaml

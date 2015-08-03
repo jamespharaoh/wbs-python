@@ -57,7 +57,13 @@ python_packages:
   - name: "awscli"
     version: "1.7.31"
 
+  - name: "mysql-python"
+    version: "1.2.5"
+
 icinga_name: "{{ inventory_hostname }}"
+icinga_ticket_salt: "{{ cluster_network.icinga_ticket_salt }}"
+icinga_database_password: "{{ cluster_network.icinga_database_password }}"
+icinga_web_database_password: "{{ cluster_network.icinga_web_database_password }}"
 
 load_balancer_name: "{{ cluster_name }}-admin"
 
@@ -92,5 +98,11 @@ etcd_peer_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].peer_p
 etcd_client_ca_certificate: "{{ cluster.etcd_credentials.client_ca_certificate }}"
 etcd_client_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].client_certificate }}"
 etcd_client_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].client_private_key }}"
+
+php_packages:
+
+  - "php5-cli"
+  - "php5-fpm"
+  - "php5-mysql"
 
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

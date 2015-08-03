@@ -1,0 +1,9 @@
+---
+
+- include: "setup-wistla-icinga-master.yml"
+  tags:
+
+    - "icinga"
+    - "setup-wistla-icinga-master"
+
+# ex: et ts=2 filetype=yaml

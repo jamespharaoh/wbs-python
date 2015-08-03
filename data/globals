@@ -154,6 +154,8 @@ zone_colours:
   b: "99"
   c: "105"
 
+ubuntu_mirror: "http:/"
+
 kernel_mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
 
 kernel_branch: "{{ kernel_versions [kernel_version].branch }}"

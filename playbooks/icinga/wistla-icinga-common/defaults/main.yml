@@ -1,0 +1,75 @@
+---
+
+wistla_icinga_security_config:
+
+  - target: "/etc/icinga2/pki/ca.cert"
+    source: "{{ icinga_ca_certificate }}"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - target: "/etc/icinga2/pki/{{ inventory_hostname }}.cert"
+    source: "{{ icinga_certificate }}"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - target: "/etc/icinga2/pki/{{ inventory_hostname }}.key"
+    source: "{{ icinga_private_key }}"
+    user: "root"
+    group: "nagios"
+    mode: "0640"
+
+wistla_icinga_config_templates:
+
+  - template: "wistla-icinga-main"
+    target: "/etc/icinga2/icinga2.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-constants"
+    target: "/etc/icinga2/constants.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-secrets"
+    target: "/etc/icinga2/secrets.conf"
+    user: "root"
+    group: "nagios"
+    mode: "0640"
+
+  - template: "wistla-icinga-zones"
+    target: "/etc/icinga2/zones.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+wistla_icinga_web_config_templates:
+
+  - template: "wistla-icinga-web-authentication"
+    target: "/etc/icingaweb2/authentication.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+  - template: "wistla-icinga-web-config"
+    target: "/etc/icingaweb2/config.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+  - template: "wistla-icinga-web-resources"
+    target: "/etc/icingaweb2/resources.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+  - template: "wistla-icinga-web-roles"
+    target: "/etc/icingaweb2/roles.ini"
+    user: "root"
+    group: "icingaweb2"
+    mode: "0640"
+
+# ex: et ts=2 filetype=yaml

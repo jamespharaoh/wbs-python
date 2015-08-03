@@ -1,0 +1,15 @@
+---
+
+dependencies:
+
+  - "icinga-common"
+  - "install-icinga"
+  - "setup-wistla-icinga-master"
+  - "control-icinga"
+
+  - "icinga-web-common"
+  - "install-icinga-web"
+  - "setup-icinga-web"
+  - "control-icinga-web"
+
+# ex: et ts=2 filetype=yaml

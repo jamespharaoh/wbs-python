@@ -12,4 +12,21 @@ amazon_key_name: "{{ cluster.amazon_key_name }}"
 node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
+icinga_web_version: "2.0.0-rc1"
+
+icinga_database_type: "mysql"
+icinga_database_hostname: "wistla-ops-admin-a"
+icinga_database_port: "3306"
+icinga_database_username: "icinga"
+icinga_database_delegate: "wistla-ops-admin-a"
+
+icinga_web_database_type: "mysql"
+icinga_web_database_hostname: "wistla-ops-admin-a"
+icinga_web_database_port: "3306"
+icinga_web_database_username: "icingaweb"
+icinga_web_database_delegate: "wistla-ops-admin-a"
+
+icinga_authority: "icinga"
+icinga_ca_certificate: "/authority/icinga/certificate"
+
 # ex: et ts=2 filetype=yaml

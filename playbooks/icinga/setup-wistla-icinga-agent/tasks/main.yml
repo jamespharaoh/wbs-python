@@ -1,0 +1,9 @@
+---
+
+- include: "setup-wistla-icinga-agent.yml"
+  tags:
+
+    - "icinga"
+    - "setup-wistla-icinga.agent"
+
+# ex: et ts=2 filetype=yaml

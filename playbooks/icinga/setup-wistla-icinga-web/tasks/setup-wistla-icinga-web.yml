@@ -1,0 +1,21 @@
+---
+
+- name: "create wistla icinga web configuration"
+  with_items: "wistla_icinga_web_config_templates"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "set icinga_web.state to 'enabled'"
+  when: "icinga_web_state == 'installed'"
+  update_resource:
+
+    icinga_web.state: "enabled"
+
+# ex: et ts=2 filetype=yaml

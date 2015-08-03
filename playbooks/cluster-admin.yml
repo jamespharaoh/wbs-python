@@ -23,6 +23,9 @@
 
     - "etcd"
 
+    - "mysql"
+    - "php"
+
     - "cluster-admin-nginx"
     - "setup-openvpn-server"
 

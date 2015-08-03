@@ -6,3 +6,29 @@ etcd:
 etcd_installed_version: 2.1.0-alpha.0
 etcd_needs_restart: 'no'
 etcd_state: enabled
+icinga:
+  certificate: /authority/icinga/issue/0/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/0/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/0/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/0/key
+icinga_state: enabled
+icinga_web:
+  installed_version: 2.0.0-rc1
+  state: enabled
+icinga_web_installed_version: 2.0.0-rc1
+icinga_web_state: enabled
+mysql:
+  needs_restart: 'no'
+  root_password: qgcgwfvfjkkoncidspvf
+  state: enabled
+mysql_needs_restart: 'no'
+mysql_root_password: qgcgwfvfjkkoncidspvf
+mysql_state: enabled
+php:
+  needs_restart: 'no'
+  state: enabled
+php_needs_restart: 'no'
+php_state: enabled
