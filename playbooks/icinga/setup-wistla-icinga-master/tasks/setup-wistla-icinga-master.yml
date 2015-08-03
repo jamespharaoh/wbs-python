@@ -9,7 +9,10 @@
     authority: "{{ icinga_authority }}"
     common_name: "{{ inventory_hostname }}"
     usage: "mixed"
-    alt_dns: [ "{{ inventory_hostname }}" ]
+    alt_dns:
+
+      - "{{ inventory_hostname }}"
+      - "{{ instance_zone }}.admin.ops.wistla.com"
 
 - name: "store wistla icinga certificate"
   when: "wistla_icinga_certificate_result | changed"
@@ -19,7 +22,7 @@
     icinga.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
 
 - name: "create wistla icinga configuration"
-  with_items: "wistla_icinga_config_templates"
+  with_items: "wistla_icinga_master_config_templates"
   notify: "set icinga.needs_restart to 'yes'"
   sudo: "yes"
   action:
@@ -53,7 +56,7 @@
     state: "directory"
 
 - name: "create wistla common templates"
-  with_items: "wistla_icinga_common_templates"
+  with_items: "wistla_icinga_master_common_templates"
   notify: "set icinga.needs_restart to 'yes'"
   sudo: "yes"
   action:
@@ -79,7 +82,7 @@
   with_nested:
 
     - "clusters.keys ()"
-    - "wistla_icinga_zone_templates"
+    - "wistla_icinga_master_zone_templates"
 
   sudo: "yes"
   action:

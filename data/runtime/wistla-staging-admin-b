@@ -4,6 +4,15 @@ etcd:
   state: enabled
 etcd_needs_restart: 'no'
 etcd_state: enabled
+icinga:
+  certificate: /authority/icinga/issue/6/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/6/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/6/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/6/key
+icinga_state: enabled
 icinga_web:
   installed_version: 2.0.0-rc1
   state: installed

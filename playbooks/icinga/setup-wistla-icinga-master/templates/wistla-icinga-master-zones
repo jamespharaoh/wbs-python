@@ -1,0 +1,52 @@
+{{ ansible_warning ['//'] }}
+
+object Zone "common" {
+	global = true
+}
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+
+# ==================== cluster {{ other_cluster_name }}
+
+object Zone "wistla-{{ other_cluster_name }}-admin" {
+	endpoints = [
+		"wistla-{{ other_cluster_name }}-admin-a",
+		"wistla-{{ other_cluster_name }}-admin-b",
+		"wistla-{{ other_cluster_name }}-admin-c",
+	]
+{% if other_cluster_name != 'ops' %}
+	parent = "wistla-ops-admin"
+{% endif %}
+}
+
+{% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] %}
+{% set host = hostvars [host_name] %}
+
+object Endpoint "{{ host_name }}" {
+{% if cluster_name == other_cluster_name %}
+	host = "{{ host_name }}"
+{% elif other_cluster_name == 'ops' %}
+	host = "{{ host.instance_zone }}.admin.{{ cluster.main_domain }}"
+{% endif %}
+}
+
+{% endfor %}
+
+{% if 'cluster-' + other_cluster_name + '-app' in groups %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-app'] %}
+
+object Zone "{{ host_name }}" {
+	endpoints = [ "{{ host_name }}" ]
+	parent = "wistla-{{ other_cluster_name }}-admin"
+}
+
+object Endpoint "{{ host_name }}" {
+{% if cluster_name == other_cluster_name %}
+	host = "{{ host_name }}"
+{% endif %}
+}
+
+{% endfor %}
+{% endif %}
+
+{% endfor %}

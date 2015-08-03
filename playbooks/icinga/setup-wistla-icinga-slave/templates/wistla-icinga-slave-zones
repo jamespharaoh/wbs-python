@@ -1,0 +1,66 @@
+{{ ansible_warning ['//'] }}
+
+object Zone "common" {
+	global = true
+}
+
+# ==================== cluster ops
+
+object Zone "wistla-ops-admin" {
+	endpoints = [
+		"wistla-ops-admin-a",
+		"wistla-ops-admin-b",
+		"wistla-ops-admin-c",
+	]
+}
+
+object Endpoint "wistla-ops-admin-a" {
+	host = "a.admin.ops.wistla.com"
+}
+
+object Endpoint "wistla-ops-admin-b" {
+	host = "b.admin.ops.wistla.com"
+}
+
+object Endpoint "wistla-ops-admin-c" {
+	host = "c.admin.ops.wistla.com"
+}
+
+# ==================== cluster {{ cluster_name }}
+
+object Zone "wistla-{{ cluster_name }}-admin" {
+	endpoints = [
+		"wistla-{{ cluster_name }}-admin-a",
+		"wistla-{{ cluster_name }}-admin-b",
+		"wistla-{{ cluster_name }}-admin-c",
+	]
+	parent = "wistla-ops-admin"
+}
+
+object Endpoint "wistla-{{ cluster_name }}-admin-a" {
+	host = "wistla-{{ cluster_name }}-admin-a"
+}
+
+object Endpoint "wistla-{{ cluster_name }}-admin-b" {
+	host = "wistla-{{ cluster_name }}-admin-b"
+}
+
+object Endpoint "wistla-{{ cluster_name }}-admin-c" {
+	host = "wistla-{{ cluster_name }}-admin-c"
+}
+
+# ==================== app instances {{ inventory_hostname }}
+
+{% if 'cluster-' + cluster_name + '-app' in groups %}
+{% for host_name in groups ['cluster-' + cluster_name + '-app'] %}
+
+object Zone "{{ host_name }}" {
+	endpoints = [ "{{ host_name }}" ]
+	parent = "wistla-{{ cluster_name }}-admin"
+}
+
+object Endpoint "{{ host_name }}" {
+}
+
+{% endfor %}
+{% endif %}

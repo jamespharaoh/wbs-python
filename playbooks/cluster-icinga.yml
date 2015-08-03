@@ -1,33 +1,68 @@
 ---
 
-- hosts: "cluster-admin"
+# ==================== icinga
+
+- hosts:
+
+    - "cluster-admin"
+    - "cluster-app"
+    - "cluster-jenkins"
+
   roles:
 
     - "install-icinga"
-    - "install-icinga-web"
 
 - hosts: "cluster-ops-network"
   roles:
 
     - "setup-icinga-database"
-    - "setup-icinga-web-database"
 
-- hosts: "cluster-admin"
+- hosts: "cluster-ops-admin"
+  serial: "1"
   roles:
 
-    - role: "setup-wistla-icinga-master"
-      when: "cluster_name == 'ops'"
+    - "setup-wistla-icinga-master"
+    - "control-icinga"
 
-    - role: "setup-wistla-icinga-agent"
-      when: "cluster_name != 'ops'"
+- hosts:
 
-    - role: "control-icinga"
-      when: "cluster_name == 'ops'"
+    - "cluster-production-admin"
+    - "cluster-staging-admin"
+    - "cluster-test-admin"
 
-    - role: "setup-wistla-icinga-web"
-      when: "cluster_name == 'ops'"
+  serial: "1"
+  roles:
 
-    - role: "control-icinga-web"
-      when: "cluster_name == 'ops'"
+    - "setup-wistla-icinga-slave"
+    - "control-icinga"
+
+- hosts:
+
+    - "cluster-app"
+    - "cluster-jenkins"
+
+  serial: "1"
+  roles:
+
+    - "setup-wistla-icinga-agent"
+    - "control-icinga"
+
+# ==================== icinga web
+
+- hosts: "cluster-ops-admin"
+  roles:
+
+    - "install-icinga-web"
+
+- hosts: "cluster-ops-network"
+  roles:
+
+    - "setup-icinga-web-database"
+
+- hosts: "cluster-ops-admin"
+  roles:
+
+    - "setup-wistla-icinga-web"
+    - "control-icinga-web"
 
 # ex: et ts=2 filetype=yaml

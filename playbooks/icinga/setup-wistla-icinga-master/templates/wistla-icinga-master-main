@@ -1,0 +1,63 @@
+{{ ansible_warning ['//'] }}
+
+include "constants.conf"
+include "secrets.conf"
+include "zones.conf"
+
+include <itl>
+include <plugins>
+
+library "checker"
+library "compat"
+library "db_ido_mysql"
+library "notification"
+
+object ApiListener "api" {
+
+	cert_path = SysconfDir + "/icinga2/pki/" + NodeName + ".cert"
+	key_path = SysconfDir + "/icinga2/pki/" + NodeName + ".key"
+	ca_path = SysconfDir + "/icinga2/pki/ca.cert"
+
+	ticket_salt = TicketSalt
+
+	accept_config = false
+	accept_commands = true
+
+}
+
+object CheckerComponent "checker" {
+}
+
+object CompatLogger "compatlog" {
+}
+
+object ExternalCommandListener "command" {
+}
+
+object FileLogger "main-log" {
+
+	severity = "information"
+	path = LocalStateDir + "/log/icinga2/icinga2.log"
+
+}
+
+object IdoMysqlConnection "ido-mysql" {
+
+	host = "{{ icinga_database_hostname }}"
+	database = "{{ icinga_database_name }}"
+	user = "{{ icinga_database_username }}"
+	password = DatabasePassword
+
+}
+
+object NotificationComponent "notification" {
+}
+
+object StatusDataWriter "status" {
+}
+
+object SyslogLogger "syslog" {
+
+	severity = "warning"
+
+}

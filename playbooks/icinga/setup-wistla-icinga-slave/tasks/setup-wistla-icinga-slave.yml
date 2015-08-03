@@ -19,7 +19,7 @@
     icinga.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
 
 - name: "create wistla icinga configuration"
-  with_items: "wistla_icinga_agent_config_templates"
+  with_items: "wistla_icinga_slave_config_templates"
   notify: "set icinga.needs_restart to 'yes'"
   sudo: "yes"
   action:

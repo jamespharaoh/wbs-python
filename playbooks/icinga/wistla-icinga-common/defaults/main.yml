@@ -1,5 +1,7 @@
 ---
 
+# ==================== icinga security
+
 wistla_icinga_security_config:
 
   - target: "/etc/icinga2/pki/ca.cert"
@@ -20,47 +22,101 @@ wistla_icinga_security_config:
     group: "nagios"
     mode: "0640"
 
-wistla_icinga_config_templates:
+# ==================== icinga master config
 
-  - template: "wistla-icinga-main"
+wistla_icinga_master_config_templates:
+
+  - template: "wistla-icinga-master-main"
     target: "/etc/icinga2/icinga2.conf"
     user: "root"
     group: "root"
     mode: "0644"
 
-  - template: "wistla-icinga-constants"
+  - template: "wistla-icinga-master-constants"
     target: "/etc/icinga2/constants.conf"
     user: "root"
     group: "root"
     mode: "0644"
 
-  - template: "wistla-icinga-secrets"
+  - template: "wistla-icinga-master-secrets"
     target: "/etc/icinga2/secrets.conf"
     user: "root"
     group: "nagios"
     mode: "0640"
 
-  - template: "wistla-icinga-zones"
+  - template: "wistla-icinga-master-zones"
     target: "/etc/icinga2/zones.conf"
     user: "root"
     group: "root"
     mode: "0644"
 
-wistla_icinga_common_templates:
+wistla_icinga_master_common_templates:
 
-  - template: "wistla-icinga-common-templates"
+  - template: "wistla-icinga-master-common-templates"
     target: "templates.conf"
     user: "root"
     group: "root"
     mode: "0644"
 
-wistla_icinga_zone_templates:
+wistla_icinga_master_zone_templates:
 
-  - template: "wistla-icinga-zone-hosts"
+  - template: "wistla-icinga-master-zone-hosts"
     target: "hosts.conf"
     user: "root"
     group: "root"
     mode: "0644"
+
+  - template: "wistla-icinga-master-zone-services"
+    target: "services.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+# ==================== icinga slave config
+
+wistla_icinga_slave_config_templates:
+
+  - template: "wistla-icinga-slave-main"
+    target: "/etc/icinga2/icinga2.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-slave-constants"
+    target: "/etc/icinga2/constants.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-slave-zones"
+    target: "/etc/icinga2/zones.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+# ==================== icinga agent config
+
+wistla_icinga_agent_config_templates:
+
+  - template: "wistla-icinga-agent-main"
+    target: "/etc/icinga2/icinga2.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-agent-constants"
+    target: "/etc/icinga2/constants.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-agent-zones"
+    target: "/etc/icinga2/zones.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+# ==================== icinga web config
 
 wistla_icinga_web_config_templates:
 

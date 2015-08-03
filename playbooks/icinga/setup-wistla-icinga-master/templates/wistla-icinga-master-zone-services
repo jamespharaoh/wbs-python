@@ -1,0 +1,81 @@
+apply Service "ping4" {
+
+	import "generic-service"
+
+	check_command = "ping4"
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service "ssh" {
+
+	import "generic-service"
+
+	check_command = "ssh"
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service for (disk => config in host.vars.disks) {
+
+	import "generic-service"
+
+	check_command = "disk"
+
+	command_endpoint = host.vars.endpoint
+
+	vars += config
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service "load" {
+
+	import "generic-service"
+
+	check_command = "load"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service "procs" {
+
+	import "generic-service"
+
+	check_command = "procs"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service "swap" {
+
+	import "generic-service"
+
+	check_command = "swap"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}
+
+apply Service "users" {
+
+	import "generic-service"
+
+	check_command = "users"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.cluster == "{{ item.0 }}"
+
+}

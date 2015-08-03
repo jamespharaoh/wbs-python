@@ -58,6 +58,21 @@
       to_port: "5665"
       cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
 
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.c }}/32"
+
     - proto: "udp"
       from_port: "1194"
       to_port: "1194"
