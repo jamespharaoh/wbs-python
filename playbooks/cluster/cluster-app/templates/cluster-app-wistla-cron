@@ -6,9 +6,23 @@ MAILTO="{{ cluster.cron_email }}"
 
 {% for cluster_deployment_name in cluster.deployment_names -%}
 {%- set cluster_deployment = deployments [cluster_deployment_name] -%}
-{%- if cluster_deployment.type != 'virtual' -%}
 
-	{%- if instance_zone == 'a' and instance_index == 4 -%}
+	{%- if cluster_deployment.type == 'alias' -%}
+		{%- set cluster_deployment_alias = deployments [cluster_deployment.alias] -%}
+	{%- else -%}
+		{%- set cluster_deployment_alias = cluster_deployment -%}
+	{%- endif -%}
+
+	{%- if cluster_name == 'production'
+		and (
+			cluster_deployment.type == 'simple'
+			or (
+				cluster_deployment.type == 'alias'
+				and cluster_deployment_alias.target == cluster_deployment_name
+			)
+		)
+		and instance_zone == 'a'
+		and instance_index == 4 -%}
 
 		{%- print [
 			'*/5 * * * *',
@@ -23,7 +37,6 @@ MAILTO="{{ cluster.cron_email }}"
 
 	{%- endif -%}
 
-{%- endif -%}
 {%- endfor %}
 
 # ex: noet ts=4 filetype=crontab
