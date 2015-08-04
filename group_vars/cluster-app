@@ -127,13 +127,26 @@ system_reboot_on_error: "yes"
 
 cluster_volumes:
 
-  - type: "btrfs"
+  - name: "system"
+    type: "ext4"
+    path: "/"
+    device: "/dev/xvda1"
+    amazon: "/dev/sda1"
+    backup: "daily"
+
+  - name: "containers"
+    type: "btrfs"
     path: "/var/lib/lxc"
     device: "/dev/xvdf"
+    amazon: "/dev/svdf"
+    backup: "never"
 
-  - type: "ext4"
+  - name: "data"
+    type: "ext4"
     path: "/data"
     device: "/dev/xvdg"
+    amazon: "/dev/svdg"
+    backup: "hourly"
 
 cluster_create_volumes:
 

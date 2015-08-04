@@ -17,6 +17,7 @@
     - "install-system-packages"
     - "install-kernel"
     - "install-postfix"
+    - "cluster-volumes"
     - "cluster-user"
 
     - "cluster-admin-firewall"
@@ -31,5 +32,7 @@
 
     - "cluster-admin-routes"
     - "cluster-activate"
+
+    - "cluster-admin-snapshots"
 
 # ex: et ts=2 filetype=yaml

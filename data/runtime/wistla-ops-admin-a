@@ -20,6 +20,7 @@ icinga_web:
   state: enabled
 icinga_web_installed_version: 2.0.0-rc1
 icinga_web_state: enabled
+instance_id: i-23bbc389
 mysql:
   needs_restart: 'no'
   root_password: ghvawkujrjlehxjrudxy
@@ -32,3 +33,6 @@ php:
   state: enabled
 php_needs_restart: 'no'
 php_state: enabled
+volume_ids:
+  system: vol-b5e862a6
+volume_ids_system: vol-b5e862a6

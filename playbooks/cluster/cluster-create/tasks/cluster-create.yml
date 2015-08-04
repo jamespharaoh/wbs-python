@@ -32,7 +32,8 @@
   sudo_user: "vagrant"
   register: "create_result"
 
-- set_fact:
+- update_resource:
+
     instance_id: "{{ create_result.tagged_instances.0.id }}"
 
 # ex: et ts=2 filetype=yaml

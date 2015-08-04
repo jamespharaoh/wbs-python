@@ -1,0 +1,9 @@
+---
+
+- include: "cluster-admin-snapshots.yml"
+  tags:
+
+    - "cluster-admin"
+    - "cluster-admin-snapshots"
+
+# ex: et ts=2 filetype=yaml

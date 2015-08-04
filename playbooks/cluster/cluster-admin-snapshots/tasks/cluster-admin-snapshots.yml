@@ -1,0 +1,12 @@
+---
+
+- name: "configure snapshots"
+  notify: "restart cron"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/cron.d/wistla-snapshots"
+    src: "cluster-admin-snapshots"
+
+# ex: et ts=2 filetype=yaml

@@ -8,6 +8,7 @@ icinga_certificate: /authority/icinga/issue/15/certificate
 icinga_needs_restart: 'no'
 icinga_private_key: /authority/icinga/issue/15/key
 icinga_state: enabled
+instance_id: i-9265b938
 python:
   apt_installed_version: 0.9.3-1
   apt_state: installed
@@ -19,3 +20,8 @@ python_apt_state: installed
 python_installed_version: 2.7.10
 python_pip_state: installed
 python_state: installed
+volume_ids:
+  data: vol-6e123579
+  system: vol-74082f63
+volume_ids_data: vol-6e123579
+volume_ids_system: vol-74082f63

@@ -69,6 +69,15 @@ load_balancer_name: "{{ cluster_name }}-admin"
 
 system_reboot_on_error: "yes"
 
+cluster_volumes:
+
+  - name: "system"
+    type: "ext4"
+    path: "/"
+    device: "/dev/xvda1"
+    amazon: "/dev/sda1"
+    backup: "daily"
+
 cluster_create_volumes:
 
   - device_name: "/dev/sda1"

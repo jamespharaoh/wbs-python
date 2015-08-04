@@ -1,21 +1,8 @@
 ---
 
-- name: "create fileystems"
-  action:
-    module: "filesystem"
-    dev: "{{ item.device }}"
-    fstype: "{{ item.type }}"
-  sudo: "yes"
-  with_items: "cluster_volumes"
+- include: "cluster-volumes.yml"
+  tags:
 
-- name: "mount filesystems"
-  action:
-    module: "mount"
-    name: "{{ item.path }}"
-    state: "mounted"
-    fstype: "{{ item.type }}"
-    src: "{{ item.device }}"
-  sudo: "yes"
-  with_items: "cluster_volumes"
+    - "cluster-volumes"
 
 # ex: et ts=2 filetype=yaml
