@@ -4,6 +4,26 @@ SHELL="/bin/bash"
 HOME="/home/ubuntu"
 MAILTO="{{ cluster.cron_email }}"
 
-# no crons at this time
+{% for cluster_deployment_name in cluster.deployment_names -%}
+{%- set cluster_deployment = deployments [cluster_deployment_name] -%}
+{%- if cluster_deployment.type != 'virtual' -%}
+
+	{%- if instance_zone == 'a' and instance_index == 4 -%}
+
+		{%- print [
+			'*/5 * * * *',
+			'root',
+			'/usr/local/bin/' + cluster_deployment_name + '-api-a-4',
+			'\'' + [
+				'cd wistla-api/scripts',
+				'node --harmony wistlsCreated_last5Minutes.js &>/dev/null',
+				'node --harmony warningsCreated_last5Minutes.js &>/dev/null',
+			] | join ('; ') + '\'',
+		] | join (' '), '\n' -%}qq
+
+	{%- endif -%}
+
+{%- endif -%}
+{%- endfor %}
 
 # ex: noet ts=4 filetype=crontab

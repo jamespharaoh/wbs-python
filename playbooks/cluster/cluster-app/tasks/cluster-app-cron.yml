@@ -1,12 +1,12 @@
 ---
 
 - name: "install wistla cron"
+  notify: "restart cron"
+  sudo: "yes"
   action:
+
     module: "template"
     src: "cluster-app-wistla-cron"
     dest: "/etc/cron.d/wistla-cron"
-  sudo: "yes"
-  sudo_user: "root"
-  notify: "restart cron"
 
 # ex: et ts=2 filetype=yaml
