@@ -20,7 +20,7 @@ config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
 // Database.
-{% if cluster_name in [ 'staging' ] %}
+{% if cluster_name in [ 'staging', 'production' ] %}
 config.dbUrl = [
 	'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla-web',
 	'mongodb://{{ cluster_deployment_alias.name }}-mongo-b-4:27017/wistla-web',
