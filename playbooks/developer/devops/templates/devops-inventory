@@ -85,7 +85,8 @@ node-{{ node_type }}-host
 		'private_address=' + [
 			deployment.bridge_network,
 			instance_index | string,
-			node_type_indices [node_type],
+			(cluster_zone_indices [node_zone] * 64
+				+ node_type_indices [node_type]) | string,
 		] | join ('.'),
 		'private_mac=' + [
 			deployment.bridge_mac,
