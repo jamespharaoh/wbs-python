@@ -136,6 +136,7 @@ or other_cluster_name == cluster_name -%}
 [cluster-host:children]
 cluster-admin
 cluster-app
+cluster-data
 cluster-jenkins
 
 [cluster-admin:children]
@@ -154,6 +155,17 @@ or other_cluster_name == cluster_name -%}
 
 	{%- if other_cluster_name != 'ops' -%}
 		{%- print 'cluster-', other_cluster_name, '-app\n' -%}
+	{%- endif -%}
+
+{%- endfor %}
+
+[cluster-data:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if deployment_mode in [ 'vagrant', 'jenkins' ]
+or other_cluster_name == cluster_name -%}
+
+	{%- if other_cluster_name not in [ 'ops', 'test' ] -%}
+		{%- print 'cluster-', other_cluster_name, '-data\n' -%}
 	{%- endif -%}
 
 {%- endfor %}
@@ -179,6 +191,9 @@ or other_cluster_name == cluster_name %}
 cluster-{{ other_cluster_name }}-admin
 {% if other_cluster_name != 'ops' %}
 cluster-{{ other_cluster_name }}-app
+{% endif %}
+{% if other_cluster_name not in [ 'ops', 'test' ] %}
+cluster-{{ other_cluster_name }}-data
 {% endif %}
 {% if other_cluster_name == 'ops' %}
 cluster-{{ other_cluster_name }}-jenkins
@@ -234,6 +249,35 @@ cluster-{{ other_cluster_name }}-network
 			other_cluster.cluster_network,
 			(cluster_zone_indices [instance_zone] | int * 64
 				+ cluster_instance_type_indices.app | int) | string,
+			instance_index,
+		] | join ('.'),
+	] | join (' ') + '\n' -%}
+
+{%- endfor -%}
+{%- endfor -%}
+{%- endif %}
+
+{% if other_cluster_name not in [ 'ops', 'test' ] %}
+[cluster-{{ other_cluster_name }}-data]
+{% for instance_zone in [ 'a', 'b', 'c' ] -%}
+{%- for instance_index in [ '4' ] -%}
+
+	{%- print [
+		[
+			'wistla',
+			other_cluster_name,
+			'data',
+			instance_zone,
+			instance_index,
+		] | join ('-'),
+		'cluster_name=' + other_cluster_name,
+		'instance_type=data',
+		'instance_zone=' + instance_zone,
+		'instance_index=' + instance_index,
+		'private_address=' + [
+			other_cluster.cluster_network,
+			(cluster_zone_indices [instance_zone] | int * 64
+				+ cluster_instance_type_indices.data | int) | string,
 			instance_index,
 		] | join ('.'),
 	] | join (' ') + '\n' -%}

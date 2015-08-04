@@ -53,11 +53,13 @@ amazon_instance_types:
 
   admin: "t2.small"
   app: "c4.large"
+  data: "m4.large"
 
 kernel_versions:
 
   admin: "3.19.8"
   app: "3.19.8"
+  data: "3.19.8"
 
 route53_main_domain:
 

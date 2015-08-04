@@ -133,6 +133,11 @@
       from_port: "443"
       to_port: "443"
 
+    - proto: "tcp"
+      from_port: "27017"
+      to_port: "27017"
+      group_id: "{{ security_group_id_data }}"
+
 - name: "balancer"
   rules:
 
@@ -150,6 +155,29 @@
       from_port: "443"
       to_port: "443"
       cidr_ip: "0.0.0.0/0"
+
+- name: "data"
+  rules:
+
+    - proto: "icmp"
+      cidr_ip: "0.0.0.0/0"
+      from_port: "-1"
+      to_port: "-1"
+
+    - proto: "tcp"
+      from_port: "22"
+      to_port: "22"
+      cidr_ip: "10.0.0.0/8"
+
+    - proto: "tcp"
+      from_port: "27017"
+      to_port: "27017"
+      group_id: "{{ security_group_id_app }}"
+
+    - proto: "tcp"
+      from_port: "27017"
+      to_port: "27017"
+      group_id: "{{ security_group_id_data }}"
 
 - name: "jenkins"
   rules:

@@ -1,0 +1,24 @@
+---
+instance_id: i-b182811c
+python:
+  installed_version: 2.7.10
+  pip_state: installed
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip_state: installed
+python_state: installed
+ssh:
+  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG3KZ1jD8jxTCe4eUtK94+QjgwlO0LyoQAD7VRh5ia12JFh84j2UVtXHPg0dIsuKgj03+gsniq3bgFNaFJKvUaE=
+  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ6pQVprkKz/vlX9/sUAnBOv5twkfHh+vJRBiKcTdJvQUPp+1JHVqsDjpYFIA9YkU8klUSYhKoDSQixmxbUKQFADSNW56apbJl4vzayyZP2KAgajTw+eWzwmQSFSGq9V2t+bhq79xU3OvM/Yx7JDjb0bHj4c3X7Tgcaj2WlGsx0DqGwJb9hyWs/oe7fiUmWDaK7Z1CMAAujqNR4c9xhf3Zc4T7e+lhjGd4Fo1XaLnih3r0OAJVfxt8LYjGW8bAPLE48fflabtDph0q1SiRqjE+rMVS7XXcV43MxGJZOa5NfxiYU/ukjLWlr//7lr+AK5LKZZUZ/JmFXU7VkqgegCY5
+ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG3KZ1jD8jxTCe4eUtK94+QjgwlO0LyoQAD7VRh5ia12JFh84j2UVtXHPg0dIsuKgj03+gsniq3bgFNaFJKvUaE=
+ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ6pQVprkKz/vlX9/sUAnBOv5twkfHh+vJRBiKcTdJvQUPp+1JHVqsDjpYFIA9YkU8klUSYhKoDSQixmxbUKQFADSNW56apbJl4vzayyZP2KAgajTw+eWzwmQSFSGq9V2t+bhq79xU3OvM/Yx7JDjb0bHj4c3X7Tgcaj2WlGsx0DqGwJb9hyWs/oe7fiUmWDaK7Z1CMAAujqNR4c9xhf3Zc4T7e+lhjGd4Fo1XaLnih3r0OAJVfxt8LYjGW8bAPLE48fflabtDph0q1SiRqjE+rMVS7XXcV43MxGJZOa5NfxiYU/ukjLWlr//7lr+AK5LKZZUZ/JmFXU7VkqgegCY5
+volume_ids:
+  data: vol-b40ef5a2
+  system: vol-b50ef5a3
+volume_ids_data: vol-b40ef5a2
+volume_ids_system: vol-b50ef5a3

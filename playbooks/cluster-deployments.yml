@@ -17,6 +17,13 @@
       cluster_deployment_name: "production-b"
       tags: [ "cluster-deployment", "production-b" ]
 
+- hosts: "cluster-production-data"
+  roles:
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "production"
+      tags: [ "cluster-deployment", "production" ]
+
 - hosts: "cluster-staging-app"
   roles:
 
@@ -31,6 +38,13 @@
     - role: "cluster-deployment"
       cluster_deployment_name: "staging-b"
       tags: [ "cluster-deployment", "staging-b" ]
+
+- hosts: "cluster-staging-data"
+  roles:
+
+    - role: "cluster-deployment"
+      cluster_deployment_name: "staging"
+      tags: [ "cluster-deployment", "staging" ]
 
 - hosts: "cluster-test-app"
   roles:

@@ -24,6 +24,7 @@ routes_jenkins_c: rtb-c0fc31a5
 security_group_id_admin: sg-d8963dbd
 security_group_id_app: sg-a7d96ac2
 security_group_id_balancer: sg-ecc46e89
+security_group_id_data: sg-a80e15cd
 security_group_id_jenkins: sg-efc46e8a
 subnet_admin_a: subnet-6a76e41d
 subnet_admin_b: subnet-94fb4ccd

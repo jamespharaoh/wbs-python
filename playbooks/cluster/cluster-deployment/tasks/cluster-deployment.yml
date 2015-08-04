@@ -18,12 +18,16 @@
     src: "{{ cluster_deployment_home }}"
 
 - name: "create active deployment link"
+  when: "
+    cluster_deployment.type == 'alias'
+    and cluster_deployment_alias.target == cluster_deployment_name
+  "
   action:
+
     module: "file"
-    path: "/home/ubuntu/{{ cluster_deployment_name }}-active"
+    path: "/home/ubuntu/{{ cluster_deployment.alias }}-active"
     state: "link"
-    src: "{{ cluster_deployment.target }}"
-  when: "cluster_deployment.type == 'shared'"
+    src: "{{ cluster_deployment_name }}"
 
 - name: "checkout projects from git"
   shell:
@@ -154,5 +158,62 @@
     module: "template"
     dest: "/etc/logrotate.d/wistla-{{ cluster_deployment_name }}"
     src: "cluster-deployment-wistla-logrotate"
+
+- name: "create routes"
+  delegate_to: "localhost"
+  when: "
+    (
+      instance_type != 'data'
+      or instance_zone != 'a'
+      or instance_index != 4
+    ) and item
+  "
+  with_items:
+
+    - "{{ cluster_network.routes_admin_a | default ('') }}"
+    - "{{ cluster_network.routes_admin_b | default ('') }}"
+    - "{{ cluster_network.routes_admin_c | default ('') }}"
+    - "{{ cluster_network.routes_app_a | default ('') }}"
+    - "{{ cluster_network.routes_app_b | default ('') }}"
+    - "{{ cluster_network.routes_app_c | default ('') }}"
+    - "{{ cluster_network.routes_data_a | default ('') }}"
+    - "{{ cluster_network.routes_data_b | default ('') }}"
+    - "{{ cluster_network.routes_data_c | default ('') }}"
+    - "{{ cluster_network.routes_jenkins_a | default ('') }}"
+    - "{{ cluster_network.routes_jenkins_b | default ('') }}"
+    - "{{ cluster_network.routes_jenkins_c | default ('') }}"
+
+  environment:
+
+    AWS_DEFAULT_REGION: "{{ amazon_region }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    aws ec2 create-route
+      --route-table-id "{{ item }}"
+      --destination-cidr-block "{{ [
+        cluster_deployment.bridge_network,
+        instance_index,
+        cluster_zone_indices [instance_zone] * 64,
+      ] | join ('.') }}/26"
+      --instance-id "{{ instance_id }}"
+    || true;
+
+    aws ec2 replace-route
+      --route-table-id "{{ item }}"
+      --destination-cidr-block "{{ [
+        cluster_deployment.bridge_network,
+        instance_index,
+        cluster_zone_indices [instance_zone] * 64,
+      ] | join ('.') }}/26"
+      --instance-id "{{ instance_id }}";
 
 # ex: et ts=2 filetype=yaml

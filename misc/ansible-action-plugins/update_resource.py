@@ -29,6 +29,7 @@ class ActionModule (object):
 	):
 
 		options = {}
+		changed = False
 
 		# read in the existing file
 
@@ -55,6 +56,11 @@ class ActionModule (object):
 				prefix, rest = dynamic_key.split (".", 2)
 
 				runtime_data.setdefault (prefix, {})
+
+				if runtime_data [prefix].get (rest) != value \
+				or runtime_data.get (prefix + "_" + rest) != value:
+					changed = True
+
 				runtime_data [prefix] [rest] = value
 				runtime_data [prefix + "_" + rest] = value
 
@@ -62,6 +68,9 @@ class ActionModule (object):
 				options [prefix + "_" + rest] = value
 
 			else:
+
+				if runtime_data.get (dynamic_key) != value:
+					changed = True
 
 				runtime_data [dynamic_key] = value
 				options [dynamic_key] = value
@@ -78,6 +87,7 @@ class ActionModule (object):
 		return ReturnData (
 			conn = conn,
 			result = dict (
-				ansible_facts = options))
+				ansible_facts = options,
+				changed = changed))
 
 # ex: noet ts=4 filetype=python

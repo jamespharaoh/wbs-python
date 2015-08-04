@@ -27,6 +27,15 @@ config.emailDomain = '{{ deployment.email_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-web';
+config.dbOptions = {
+	replSet: {
+		rs_name: 'wistla-1-1',
+	},
+	db: {
+		w: 1,
+		j: false,
+	},
+};
 
 // semi-persistent storage
 config.cmsImagePath = '/shared/cms-image';

@@ -49,7 +49,7 @@
     volume_ids.system: "{{ system_volume_id_result.stdout }}"
 
 - name: "record data volume id"
-  when: "instance_type in [ 'app', 'jenkins' ]"
+  when: "instance_type in [ 'app', 'data', 'jenkins' ]"
   register: "data_volume_id_result"
   delegate_to: "wistla-{{ cluster_name }}-admin-a"
   sudo: "yes"
@@ -73,7 +73,7 @@
     | cut -f2;
 
 - name: "save data volume id"
-  when: "instance_type in [ 'app', 'jenkins' ]"
+  when: "instance_type in [ 'app', 'data', 'jenkins' ]"
   update_resource:
 
     volume_ids.data: "{{ data_volume_id_result.stdout }}"

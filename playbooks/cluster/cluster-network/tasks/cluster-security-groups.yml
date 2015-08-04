@@ -22,7 +22,8 @@
     security_group_id_admin: "{{ create_group.results.0.group_id }}"
     security_group_id_app: "{{ create_group.results.1.group_id }}"
     security_group_id_balancer: "{{ create_group.results.2.group_id }}"
-    security_group_id_jenkins: "{{ create_group.results.3.group_id }}"
+    security_group_id_data: "{{ create_group.results.3.group_id }}"
+    security_group_id_jenkins: "{{ create_group.results.4.group_id }}"
 
 - name: "update security group"
   action:

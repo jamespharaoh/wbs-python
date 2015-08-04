@@ -25,7 +25,33 @@ config.webTest = 'http://{{ cluster_deployment.web_domain }}';
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
 // Database.
-config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ instance_zone }}-{{ instance_index }}:27017/wistla';
+{% if cluster_name in [ 'staging' ] %}
+config.dbUrl = [
+	'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla',
+	'mongodb://{{ cluster_deployment_alias.name }}-mongo-b-4:27017/wistla',
+	'mongodb://{{ cluster_deployment_alias.name }}-mongo-c-4:27017/wistla',
+].join (',');
+config.dbOptions = {
+	replSet: {
+		rs_name: 'wistla-1-1',
+	},
+	db: {
+		w: 2,
+		j: false,
+	},
+};
+{% else %}
+config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla';
+config.dbOptions = {
+	replSet: {
+		rs_name: 'wistla-1-1',
+	},
+	db: {
+		w: 1,
+		j: false,
+	},
+};
+{% endif %}
 
 // message exchange
 config.amqpOptions = {

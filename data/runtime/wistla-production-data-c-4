@@ -1,0 +1,7 @@
+---
+instance_id: i-99999a34
+ssh:
+  host_key_ecdsa: ''
+  host_key_rsa: ''
+ssh_host_key_ecdsa: ''
+ssh_host_key_rsa: ''

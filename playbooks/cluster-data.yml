@@ -1,8 +1,6 @@
 ---
 
-# ========== jenkins
-
-- hosts: "cluster-jenkins"
+- hosts: "cluster-data"
   roles:
 
     - "cluster-create"

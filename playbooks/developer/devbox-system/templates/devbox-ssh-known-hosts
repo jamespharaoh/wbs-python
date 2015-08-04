@@ -33,57 +33,32 @@
 {%- for host_name in groups ['cluster-host'] -%}
 
 	{%- set host = hostvars [host_name] -%}
-	{%- set instance_cluster_name = host.cluster_name -%}
 	{%- set instance_type = host.instance_type -%}
 	{%- set instance_zone = host.instance_zone -%}
 	{%- set instance_index = host.instance_index | string -%}
-
+	{%- set instance_cluster_name = host.cluster_name -%}
 	{%- set instance_cluster = clusters [instance_cluster_name] -%}
 
-	{%- if instance_cluster_name in ssh_host_keys -%}
-	{%- if instance_type in ssh_host_keys [instance_cluster_name] -%}
+	{%- for key_type in [ 'rsa', 'ecdsa' ] -%}
+	{%- if 'ssh_host_key_' + key_type in host
+		and host ['ssh_host_key_' + key_type] -%}
 
-		{%- if instance_zone + '-' + instance_index in ssh_host_keys [instance_cluster_name] [instance_type] -%}
-			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone + '-' + instance_index] | join -%}
-		{%- elif instance_zone in ssh_host_keys [instance_cluster_name] [instance_type] -%}
-			{%- set ssh_host_key = ssh_host_keys [instance_cluster_name] [instance_type] [instance_zone] | join -%}
-		{%- else -%}
-			{%- set ssh_host_key = None -%}
-		{%- endif -%}
-
-		{%- if ssh_host_key and instance_type == 'admin' -%}
-
-			{%- print [
-				[
-					host_name,
-					host_name + '.' + instance_cluster.main_domain,
-					instance_zone + '.admin.' + instance_cluster.main_domain,
-					host.private_address,
-				] | join (','),
-				ssh_host_key,
-			] | join (' ') + '\n' -%}
-
-		{%- elif ssh_host_key -%}
-
-			{%- print [
-				[
-					host_name,
-					host_name + '.' + instance_cluster.main_domain,
-					host.private_address,
-				] | join (','),
-				ssh_host_key,
-			] | join (' ') + '\n' -%}
-
-		{%- else -%}
-
-			{%- print '# ' + host_name + ' (no host key)\n' -%}
-
-		{%- endif -%}
+		{%- print [
+			[
+				host_name,
+				host_name + '.' + instance_cluster.main_domain,
+				instance_zone + '.admin.' + instance_cluster.main_domain,
+				host.private_address,
+			] | join (','),
+			host ['ssh_host_key_' + key_type],
+		] | join (' '), '\n' -%}
 
 	{%- endif -%}
-	{%- endif -%}
+	{%- endfor -%}
 
-{%- endfor %}
+{%- endfor -%}
+
+{%- print '\n' -%}
 
 {%- for ssh_host_key_extra in ssh_host_keys_extra | default ([]) -%}
 

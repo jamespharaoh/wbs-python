@@ -18,6 +18,7 @@ routes_data_c: rtb-62984907
 security_group_id_admin: sg-cbf775ae
 security_group_id_app: sg-caf775af
 security_group_id_balancer: sg-d7f775b2
+security_group_id_data: sg-aa0e15cf
 security_group_id_jenkins: sg-dcf775b9
 subnet_admin_a: subnet-0014a059
 subnet_admin_b: subnet-d687edb3

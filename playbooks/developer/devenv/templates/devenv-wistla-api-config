@@ -32,6 +32,15 @@ config.emailDomain = '{{ deployment.email_domain }}';
 
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
+config.dbOptions = {
+	replSet: {
+		rs_name: 'wistla-1-1',
+	},
+	db: {
+		w: 1,
+		j: false,
+	},
+};
 
 // message exchange
 config.amqpOptions = {

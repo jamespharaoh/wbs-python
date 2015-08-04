@@ -8,6 +8,7 @@
     - "cluster-create"
     - "cluster-assign-elastic-ip"
     - "wait-for-ssh"
+    - "scan-ssh-key"
 
     - "setup-common-users"
     - "setup-hostname"
