@@ -33,7 +33,7 @@ MAILTO="{{ cluster.cron_email }}"
 				'node --harmony wistlsCreated_last5Minutes.js &>/dev/null',
 				'node --harmony warningsCreated_last5Minutes.js &>/dev/null',
 			] | join ('; ') + '\'',
-		] | join (' '), '\n' -%}qq
+		] | join (' '), '\n' -%}
 
 	{%- endif -%}
 
