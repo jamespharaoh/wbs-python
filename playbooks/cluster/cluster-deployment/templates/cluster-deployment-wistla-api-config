@@ -43,9 +43,6 @@ config.dbOptions = {
 {% else %}
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla';
 config.dbOptions = {
-	replSet: {
-		rs_name: 'wistla-1-1',
-	},
 	db: {
 		w: 1,
 		j: false,
@@ -55,7 +52,7 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ instance_zone }}-{{ instance_index }}',
+	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4',
 };
 
 // CORS

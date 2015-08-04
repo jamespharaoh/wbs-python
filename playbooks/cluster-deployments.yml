@@ -6,10 +6,6 @@
   roles:
 
     - role: "cluster-deployment"
-      cluster_deployment_name: "production"
-      tags: [ "cluster-deployment", "production" ]
-
-    - role: "cluster-deployment"
       cluster_deployment_name: "production-a"
       tags: [ "cluster-deployment", "production-a" ]
 

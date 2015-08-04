@@ -38,9 +38,6 @@ config.dbOptions = {
 {% else %}
 config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla-web';
 config.dbOptions = {
-	replSet: {
-		rs_name: 'wistla-1-1',
-	},
 	db: {
 		w: 1,
 		j: false,
