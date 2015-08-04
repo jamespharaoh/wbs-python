@@ -126,6 +126,21 @@ config.authentication.facebook.apps = {
 		appSecret: '{{ third_parties.dev.facebookWistlaAppSecret }}',
 		appAccessToken: '{{ third_parties.dev.facebookWistlaAppAccessToken }}'
 	},
+	wistlaStaging: {
+		appId: '{{ third_parties.dev.facebookWistlaStagingAppId }}',
+		appSecret: '{{ third_parties.dev.facebookWistlaStagingAppSecret }}',
+		appAccessToken: '{{ third_parties.dev.facebookWistlaStagingAppAccessToken }}'
+	},
+	wistlaTest: {
+		appId: '{{ third_parties.dev.facebookWistlaTestAppId }}',
+		appSecret: '{{ third_parties.dev.facebookWistlaTestAppSecret }}',
+		appAccessToken: '{{ third_parties.dev.facebookWistlaTestAppAccessToken }}'
+	},
+	wistlaDev: {
+		appId: '{{ third_parties.dev.facebookWistlaDevAppId }}',
+		appSecret: '{{ third_parties.dev.facebookWistlaDevAppSecret }}',
+		appAccessToken: '{{ third_parties.dev.facebookWistlaDevAppAccessToken }}'
+	},
 	wistlaEnterprise: {
 		appId: '{{ third_parties.dev.facebookWistlaEnterpriseAppId }}',
 		appSecret: '{{ third_parties.dev.facebookWistlaEnterpriseAppSecret }}',
@@ -140,6 +155,21 @@ config.authentication.facebook.apps = {
 {% else %}
 config.authentication.facebook.apps = {
 	wistla: {
+		appId: '',
+		appSecret: '',
+		appAccessToken: ''
+	},
+	wistlaStaging: {
+		appId: '',
+		appSecret: '',
+		appAccessToken: ''
+	},
+	wistlaTest: {
+		appId: '',
+		appSecret: '',
+		appAccessToken: ''
+	},
+	wistlaDev: {
 		appId: '',
 		appSecret: '',
 		appAccessToken: ''
