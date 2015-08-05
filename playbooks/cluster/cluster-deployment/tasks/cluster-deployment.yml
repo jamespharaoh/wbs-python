@@ -161,13 +161,7 @@
 
 - name: "create routes"
   delegate_to: "localhost"
-  when: "
-    (
-      instance_type != 'data'
-      or instance_zone != 'a'
-      or instance_index != 4
-    ) and item
-  "
+  when: "item != ''"
   with_items:
 
     - "{{ cluster_network.routes_admin_a | default ('') }}"
