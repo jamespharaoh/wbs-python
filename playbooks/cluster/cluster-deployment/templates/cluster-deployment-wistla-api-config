@@ -126,6 +126,9 @@ config.applePush = {
 {% endif %}
 };
 
+// facebook app to use
+config.authentication.facebook.appToUse = '{{ third_parties [cluster_name].facebookAppToUse }}';
+
 // facebook app configuration options
 config.authentication.facebook.apps = {
         wistla: {

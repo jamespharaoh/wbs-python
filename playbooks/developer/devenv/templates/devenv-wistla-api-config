@@ -127,6 +127,13 @@ config.applePush = {
 {% endif %}
 };
 
+// facebook app to use
+{% if 'dev' in third_parties %}
+config.authentication.facebook.appToUse = '{{ third_parties.dev.facebookAppToUse }}';
+{% else %}
+config.authentication.facebook.appToUse = '';
+{% endif %}
+
 // facebook app configuration options
 {% if 'dev' in third_parties %}
 config.authentication.facebook.apps = {
