@@ -30,8 +30,8 @@ MAILTO="{{ cluster.cron_email }}"
 			'/usr/local/bin/' + cluster_deployment_name + '-api-a-4',
 			'\'' + [
 				'cd wistla-api/scripts',
-				'node --harmony wistlsCreated_last5Minutes.js &>/dev/null',
-				'node --harmony warningsCreated_last5Minutes.js &>/dev/null',
+				'node --harmony wistlsCreated_last5Minutes.js',
+				'node --harmony warningsCreated_last5Minutes.js',
 			] | join ('; ') + '\'',
 		] | join (' '), '\n' -%}
 
