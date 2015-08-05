@@ -61,3 +61,11 @@ object SyslogLogger "syslog" {
 	severity = "warning"
 
 }
+
+include "commands.conf"
+include "hosts.conf"
+include "notifications.conf"
+include "services.conf"
+include "templates.conf"
+include "time-periods.conf"
+include "users.conf"

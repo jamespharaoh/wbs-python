@@ -49,10 +49,22 @@ amazon_key_name: "wistla-staging"
 
 # ========== resources and version
 
+instance_formation:
+
+  app:
+
+    zones: [ "a", "b" ]
+    indices: [ "4" ]
+
+  data:
+
+    zones: [ "a", "b", "c" ]
+    indices: [ "4" ]
+
 amazon_instance_types:
 
   admin: "t2.micro"
-  app: "m3.medium"
+  app: "c4.large"
   data: "m4.large"
 
 kernel_versions:

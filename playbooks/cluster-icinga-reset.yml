@@ -18,13 +18,24 @@
         name: "icinga"
         state: "stopped"
 
+    - name: "wait 10 seconds"
+      action:
+
+        module: "pause"
+        seconds: "10"
+
     - name: "kill icinga"
       tags: "kill"
       sudo: "yes"
       shell:
 
-        sleep 2;
-        killall icinga2 || true;
+        killall --signal SIGKILL icinga2 || true;
+
+    - name: "wait 10 seconds"
+      action:
+
+        module: "pause"
+        seconds: "10"
 
     - name: "delete files"
       tags: "files"
@@ -59,8 +70,24 @@
           ADD UNIQUE (instance_name);
         ";
 
-    - name: "start icinga"
-      tags: "start"
+    - name: "start icinga on one host"
+      when: "inventory_hostname == icinga_database_delegate"
+      tags: "start-one"
+      sudo: "yes"
+      action:
+
+        module: "service"
+        name: "icinga"
+        state: "started"
+
+    - name: "wait 10 seconds"
+      action:
+
+        module: "pause"
+        seconds: "10"
+
+    - name: "start icinga on all hosts"
+      tags: "start-all"
       sudo: "yes"
       action:
 

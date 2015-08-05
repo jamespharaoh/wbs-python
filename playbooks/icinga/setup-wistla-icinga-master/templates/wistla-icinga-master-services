@@ -1,4 +1,4 @@
-{% if item.0 == 'ops' %}
+{{ ansible_warning ['//'] }}
 
 apply Service "ping4" {
 
@@ -85,5 +85,3 @@ apply Service "users" {
 	assign where true
 
 }
-
-{% endif %}

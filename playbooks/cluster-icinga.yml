@@ -18,7 +18,7 @@
 
     - "setup-icinga-database"
 
-- hosts: "cluster-ops-admin"
+- hosts: "wistla-ops-admin-a"
   roles:
 
     - "setup-wistla-icinga-master"
@@ -26,10 +26,7 @@
 
 - hosts:
 
-    - "cluster-production-admin"
-    - "cluster-staging-admin"
-    - "cluster-test-admin"
-
+    - "cluster-admin:!wistla-ops-admin-a"
     - "cluster-app"
     - "cluster-data"
     - "cluster-jenkins"

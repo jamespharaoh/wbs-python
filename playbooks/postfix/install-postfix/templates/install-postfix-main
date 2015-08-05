@@ -11,6 +11,7 @@ myhostname = {{ inventory_hostname }}.{{ cluster.main_domain }}
 # addresses
 
 myorigin = {{ cluster.main_domain }}
+masquerade_domains = {{ cluster.main_domain }}
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 mydestination = localdomain, localhost, localhost.localdomain, localhost

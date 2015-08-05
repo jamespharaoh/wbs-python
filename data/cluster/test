@@ -52,6 +52,18 @@ amazon_key_name: "wistla-test"
 
 # ========== resources and version
 
+instance_formation:
+
+  app:
+
+    zones: [ "a" ]
+    indices: [ "4" ]
+
+  data:
+
+    zones: [ ]
+    indices: [ ]
+
 amazon_instance_types:
 
   admin: "t2.micro"

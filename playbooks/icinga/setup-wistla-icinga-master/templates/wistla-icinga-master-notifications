@@ -1,0 +1,21 @@
+{{ ansible_warning ['//'] }}
+
+apply Notification "mail" to Host {
+
+	import "mail-host-notification"
+
+	user_groups = host.vars.notification.mail.groups
+
+	assign where host.vars.notification.mail && host.vars.cluster == "production"
+
+}
+
+apply Notification "mail" to Service {
+
+	import "mail-service-notification"
+
+	user_groups = host.vars.notification.mail.groups
+
+	assign where host.vars.notification.mail && host.vars.cluster == "production"
+
+}

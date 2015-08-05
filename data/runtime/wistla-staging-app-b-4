@@ -1,0 +1,33 @@
+---
+icinga:
+  certificate: /authority/icinga/issue/23/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/23/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/23/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/23/key
+icinga_state: enabled
+instance_id: i-30b3be9d
+python:
+  installed_version: 2.7.10
+  pip_state: installed
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip_state: installed
+python_state: installed
+ssh:
+  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDzJk6nePajkY8eph/213qCyofEPbk+Q3P1Js6Fwj17xEzKLmgfq1bQGlZ4lF1WgTL5SjYh96Dx4QKRVdVt9U2U=
+  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzF1E6NPl38h8oFk28vFaHnfi5hPN+RzgdXb8Z4rYoHhjMwpsZ9fgRBnNLK4L8Hl1zOqawI5KgkW/mlIrQ+K1FbJ5cdzKaDX1Do8079YEnds+T4zhahqzwc9o0glGT8+Z4IF8T0BbsFfHNcZKT7iwkbhGzk4SA9TAwSuVK7jsp0azLJh68BWfCRFLiKevnZuYg0BFYPniHlbF2JrXC0LT1+grs/yDQIjWMLseIqB1o5+Hm2RihoO+6nyVDPQaXaDRO18qK0uCbSxZsKiNq3DNCSoJOTGXVjZIdgg4ur7/K1+cHTSitO80EKPwaLFXoFAf6ZAN4rBUpTeuixYCQrr07
+ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDzJk6nePajkY8eph/213qCyofEPbk+Q3P1Js6Fwj17xEzKLmgfq1bQGlZ4lF1WgTL5SjYh96Dx4QKRVdVt9U2U=
+ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzF1E6NPl38h8oFk28vFaHnfi5hPN+RzgdXb8Z4rYoHhjMwpsZ9fgRBnNLK4L8Hl1zOqawI5KgkW/mlIrQ+K1FbJ5cdzKaDX1Do8079YEnds+T4zhahqzwc9o0glGT8+Z4IF8T0BbsFfHNcZKT7iwkbhGzk4SA9TAwSuVK7jsp0azLJh68BWfCRFLiKevnZuYg0BFYPniHlbF2JrXC0LT1+grs/yDQIjWMLseIqB1o5+Hm2RihoO+6nyVDPQaXaDRO18qK0uCbSxZsKiNq3DNCSoJOTGXVjZIdgg4ur7/K1+cHTSitO80EKPwaLFXoFAf6ZAN4rBUpTeuixYCQrr07
+volume_ids:
+  data: vol-26ea2f30
+  system: vol-47ea2f51
+volume_ids_data: vol-26ea2f30
+volume_ids_system: vol-47ea2f51

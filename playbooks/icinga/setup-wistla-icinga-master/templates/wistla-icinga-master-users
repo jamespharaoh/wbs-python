@@ -1,0 +1,35 @@
+{{ ansible_warning ['//'] }}
+
+object UserGroup "shared" {
+	display_name = "Shared users"
+}
+
+object User "shared-warning" {
+
+	import "generic-user"
+
+	display_name = "Shared warning"
+
+	groups = [ "shared" ]
+
+	email = "notifications.production.warning@wistla.com"
+
+	states = [ Warning, Critical, Unknown ]
+	types = [ Problem, Recovery ]
+
+}
+
+object User "shared-critical" {
+
+	import "generic-user"
+
+	display_name = "Shared critical"
+
+	groups = [ "shared" ]
+
+	email = "notifications.production.critical@wistla.com"
+
+	states = [ Critical ]
+	types = [ Problem, Recovery ]
+
+}

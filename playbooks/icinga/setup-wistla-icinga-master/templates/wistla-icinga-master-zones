@@ -1,36 +1,20 @@
 {{ ansible_warning ['//'] }}
 
-object Zone "common" {
-	global = true
-}
-
 {% for other_cluster_name, other_cluster in clusters.items () %}
 
 # ==================== cluster {{ other_cluster_name }}
 
-{% if other_cluster_name == 'ops' %}
-object Zone "wistla-ops-admin" {
-	endpoints = [
-		"wistla-ops-admin-a",
-		"wistla-ops-admin-b",
-		"wistla-ops-admin-c",
-	]
-}
-{% endif %}
-
 {% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] %}
+{% set host = hostvars [host_name] %}
 
-{% if other_cluster_name != 'ops' %}
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
+{% if host_name != 'wistla-ops-admin-a' %}
+	parent = "wistla-ops-admin-a"
+{% endif %}
 }
-{% endif %}
 
-{% set host = hostvars [host_name] %}
 object Endpoint "{{ host_name }}" {
-{% if other_cluster_name == 'ops' %}
-	host = "{{ host_name }}"
-{% endif %}
 }
 
 {% endfor %}
@@ -40,7 +24,7 @@ object Endpoint "{{ host_name }}" {
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
-	parent = "wistla-ops-admin"
+	parent = "wistla-ops-admin-a"
 }
 
 object Endpoint "{{ host_name }}" {
@@ -54,7 +38,7 @@ object Endpoint "{{ host_name }}" {
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
-	parent = "wistla-ops-admin"
+	parent = "wistla-ops-admin-a"
 }
 
 object Endpoint "{{ host_name }}" {
@@ -68,7 +52,7 @@ object Endpoint "{{ host_name }}" {
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
-	parent = "wistla-ops-admin"
+	parent = "wistla-ops-admin-a"
 }
 
 object Endpoint "{{ host_name }}" {

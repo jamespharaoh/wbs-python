@@ -32,8 +32,20 @@ wistla_icinga_master_config_templates:
     group: "root"
     mode: "0644"
 
+  - template: "wistla-icinga-master-commands"
+    target: "/etc/icinga2/commands.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
   - template: "wistla-icinga-master-constants"
     target: "/etc/icinga2/constants.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-master-hosts"
+    target: "/etc/icinga2/hosts.conf"
     user: "root"
     group: "root"
     mode: "0644"
@@ -44,30 +56,38 @@ wistla_icinga_master_config_templates:
     group: "nagios"
     mode: "0640"
 
+  - template: "wistla-icinga-master-services"
+    target: "/etc/icinga2/services.conf"
+    user: "root"
+    group: "nagios"
+    mode: "0640"
+
+  - template: "wistla-icinga-master-notifications"
+    target: "/etc/icinga2/notifications.conf"
+    user: "root"
+    group: "nagios"
+    mode: "0640"
+
+  - template: "wistla-icinga-master-templates"
+    target: "/etc/icinga2/templates.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-master-time-periods"
+    target: "/etc/icinga2/time-periods.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
+  - template: "wistla-icinga-master-users"
+    target: "/etc/icinga2/users.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
   - template: "wistla-icinga-master-zones"
     target: "/etc/icinga2/zones.conf"
-    user: "root"
-    group: "root"
-    mode: "0644"
-
-wistla_icinga_master_common_templates:
-
-  - template: "wistla-icinga-master-common-templates"
-    target: "templates.conf"
-    user: "root"
-    group: "root"
-    mode: "0644"
-
-wistla_icinga_master_zone_templates:
-
-  - template: "wistla-icinga-master-zone-hosts"
-    target: "hosts.conf"
-    user: "root"
-    group: "root"
-    mode: "0644"
-
-  - template: "wistla-icinga-master-zone-services"
-    target: "services.conf"
     user: "root"
     group: "root"
     mode: "0644"

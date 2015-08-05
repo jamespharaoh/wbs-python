@@ -1,9 +1,16 @@
 {{ ansible_warning ['//'] }}
 
-{% if item.0 == 'ops' %}
 {% for other_cluster_name, other_cluster in clusters.items () %}
 
 # ==================== cluster {{ other_cluster_name }}
+
+object HostGroup "cluster-{{ other_cluster_name }}" {
+
+	display_name = "Cluster {{ other_cluster_name }}"
+
+	assign where host.vars.cluster == "{{ other_cluster_name }}"
+
+}
 
 # --------- admin instances
 
@@ -139,4 +146,3 @@ object Host "{{ host_name }}" {
 {% endif %}
 
 {% endfor %}
-{% endif %}

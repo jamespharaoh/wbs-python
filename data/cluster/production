@@ -49,6 +49,18 @@ amazon_key_name: "wistla-production"
 
 # ========== resources and versions
 
+instance_formation:
+
+  app:
+
+    zones: [ "a", "b" ]
+    indices: [ "4" ]
+
+  data:
+
+    zones: [ "a", "b", "c" ]
+    indices: [ "4" ]
+
 amazon_instance_types:
 
   admin: "t2.small"

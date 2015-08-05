@@ -230,8 +230,8 @@ cluster-{{ other_cluster_name }}-network
 
 {% if other_cluster_name != 'ops' %}
 [cluster-{{ other_cluster_name }}-app]
-{% for instance_zone in [ 'a' ] -%}
-{%- for instance_index in [ '4' ] -%}
+{% for instance_zone in other_cluster.instance_formation.app.zones -%}
+{%- for instance_index in other_cluster.instance_formation.app.indices -%}
 
 	{%- print [
 		[
@@ -259,8 +259,8 @@ cluster-{{ other_cluster_name }}-network
 
 {% if other_cluster_name not in [ 'ops', 'test' ] %}
 [cluster-{{ other_cluster_name }}-data]
-{% for instance_zone in [ 'a', 'b', 'c' ] -%}
-{%- for instance_index in [ '4' ] -%}
+{% for instance_zone in other_cluster.instance_formation.data.zones -%}
+{%- for instance_index in other_cluster.instance_formation.data.indices -%}
 
 	{%- print [
 		[

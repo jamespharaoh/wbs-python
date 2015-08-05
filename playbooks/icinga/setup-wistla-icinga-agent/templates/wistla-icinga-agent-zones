@@ -1,17 +1,9 @@
 {{ ansible_warning ['//'] }}
 
-object Zone "common" {
-	global = true
-}
-
 # ==================== cluster ops
 
-object Zone "wistla-ops-admin" {
-	endpoints = [
-		"wistla-ops-admin-a",
-		"wistla-ops-admin-b",
-		"wistla-ops-admin-c",
-	]
+object Zone "wistla-ops-admin-a" {
+	endpoints = [ "wistla-ops-admin-a" ]
 }
 
 object Endpoint "wistla-ops-admin-a" {
@@ -22,27 +14,11 @@ object Endpoint "wistla-ops-admin-a" {
 {% endif %}
 }
 
-object Endpoint "wistla-ops-admin-b" {
-{% if cluster_name == 'ops' %}
-	host = "wistla-ops-admin-b"
-{% else %}
-	host = "b.admin.ops.wistla.com"
-{% endif %}
-}
-
-object Endpoint "wistla-ops-admin-c" {
-{% if cluster_name == 'ops' %}
-	host = "wistla-ops-admin-c"
-{% else %}
-	host = "c.admin.ops.wistla.com"
-{% endif %}
-}
-
 # ==================== this host
 
 object Zone "{{ inventory_hostname }}" {
 	endpoints = [ "{{ inventory_hostname }}" ]
-	parent = "wistla-ops-admin"
+	parent = "wistla-ops-admin-a"
 }
 
 object Endpoint "{{ inventory_hostname }}" {

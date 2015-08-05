@@ -12,7 +12,7 @@ object ApiListener "api" {
 	key_path = SysconfDir + "/icinga2/pki/" + NodeName + ".key"
 	ca_path = SysconfDir + "/icinga2/pki/ca.cert"
 
-	accept_config = true
+	accept_config = false
 	accept_commands = true
 
 }
