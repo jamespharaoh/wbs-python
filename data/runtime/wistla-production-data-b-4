@@ -1,4 +1,13 @@
 ---
+icinga:
+  certificate: /authority/icinga/issue/18/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/18/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/18/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/18/key
+icinga_state: enabled
 instance_id: i-eb0e8f46
 python:
   installed_version: 2.7.10

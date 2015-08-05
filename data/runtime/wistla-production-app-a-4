@@ -1,12 +1,12 @@
 ---
 icinga:
-  certificate: /authority/icinga/issue/19/certificate
+  certificate: /authority/icinga/issue/12/certificate
   needs_restart: 'no'
-  private_key: /authority/icinga/issue/19/key
+  private_key: /authority/icinga/issue/12/key
   state: enabled
-icinga_certificate: /authority/icinga/issue/19/certificate
+icinga_certificate: /authority/icinga/issue/12/certificate
 icinga_needs_restart: 'no'
-icinga_private_key: /authority/icinga/issue/19/key
+icinga_private_key: /authority/icinga/issue/12/key
 icinga_state: enabled
 instance_id: i-3e98e394
 python:

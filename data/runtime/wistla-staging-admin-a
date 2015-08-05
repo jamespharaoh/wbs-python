@@ -1,17 +1,19 @@
 ---
 etcd:
+  installed_version: 2.1.1
   needs_restart: 'no'
   state: enabled
+etcd_installed_version: 2.1.1
 etcd_needs_restart: 'no'
 etcd_state: enabled
 icinga:
-  certificate: /authority/icinga/issue/5/certificate
+  certificate: /authority/icinga/issue/3/certificate
   needs_restart: 'no'
-  private_key: /authority/icinga/issue/5/key
+  private_key: /authority/icinga/issue/3/key
   state: enabled
-icinga_certificate: /authority/icinga/issue/5/certificate
+icinga_certificate: /authority/icinga/issue/3/certificate
 icinga_needs_restart: 'no'
-icinga_private_key: /authority/icinga/issue/5/key
+icinga_private_key: /authority/icinga/issue/3/key
 icinga_state: enabled
 icinga_web:
   installed_version: 2.0.0-rc1

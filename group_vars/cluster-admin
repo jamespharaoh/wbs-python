@@ -89,7 +89,7 @@ amazon_elastic_ip: "{{ cluster.amazon_admin_ips [instance_zone] }}"
 
 vpn_network: "{{ cluster.vpn_networks [instance_zone] }}"
 
-etcd_version: "2.1.0-alpha.0"
+etcd_version: "2.1.1"
 etcd_clustered: "yes"
 etcd_secured: "yes"
 

@@ -1,10 +1,14 @@
+{% if item.0 == 'ops' %}
+
 apply Service "ping4" {
 
 	import "generic-service"
 
 	check_command = "ping4"
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	command_endpoint = host.command_endpoint
+
+	assign where true
 
 }
 
@@ -14,7 +18,9 @@ apply Service "ssh" {
 
 	check_command = "ssh"
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	command_endpoint = host.command_endpoint
+
+	assign where true
 
 }
 
@@ -28,7 +34,7 @@ apply Service for (disk => config in host.vars.disks) {
 
 	vars += config
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	assign where true
 
 }
 
@@ -40,7 +46,7 @@ apply Service "load" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	assign where true
 
 }
 
@@ -52,7 +58,7 @@ apply Service "procs" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	assign where true
 
 }
 
@@ -64,7 +70,7 @@ apply Service "swap" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	assign where true
 
 }
 
@@ -76,6 +82,8 @@ apply Service "users" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where host.vars.cluster == "{{ item.0 }}"
+	assign where true
 
 }
+
+{% endif %}

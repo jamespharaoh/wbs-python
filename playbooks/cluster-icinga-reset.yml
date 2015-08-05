@@ -1,0 +1,71 @@
+---
+
+- hosts:
+
+    - "cluster-admin"
+    - "cluster-app"
+    - "cluster-data"
+    - "cluster-jenkins"
+
+  tasks:
+
+    - name: "stop icinga"
+      tags: "stop"
+      sudo: "yes"
+      action:
+
+        module: "service"
+        name: "icinga"
+        state: "stopped"
+
+    - name: "kill icinga"
+      tags: "kill"
+      sudo: "yes"
+      shell:
+
+        sleep 2;
+        killall icinga2 || true;
+
+    - name: "delete files"
+      tags: "files"
+      sudo: "yes"
+      shell:
+
+        rm -rf
+          /etc/init.d/icinga2
+          /etc/rc?.d/[SK]??icinga2
+          /var/lib/icinga2/icinga2.state
+          /var/lib/icinga2/api/log/*
+          /var/lib/icinga2/api/repository/*
+          /var/lib/icinga2/api/zones/*
+          /var/log/icinga2/icinga2.*
+          /var/log/icinga2/startup.log;
+
+    - name: "wipe icinga database"
+      tags: "db"
+      when: "inventory_hostname == icinga_database_delegate"
+      shell:
+
+        mysql --execute "
+          DROP DATABASE icinga;
+          CREATE DATABASE icinga;
+        ";
+
+        mysql icinga
+          </usr/share/icinga2-ido-mysql/schema/mysql.sql;
+
+        mysql icinga --execute "
+          ALTER TABLE icinga_instances
+          ADD UNIQUE (instance_name);
+        ";
+
+    - name: "start icinga"
+      tags: "start"
+      sudo: "yes"
+      action:
+
+        module: "service"
+        name: "icinga"
+        state: "started"
+
+# ex: et ts=2 filetype=yaml

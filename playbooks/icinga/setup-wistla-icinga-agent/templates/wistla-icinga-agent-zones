@@ -38,40 +38,12 @@ object Endpoint "wistla-ops-admin-c" {
 {% endif %}
 }
 
-{% if cluster_name != 'ops' %}
-
-# ==================== cluster {{ cluster_name }}
-
-object Zone "wistla-{{ cluster_name }}-admin" {
-	endpoints = [
-		"wistla-{{ cluster_name }}-admin-a",
-		"wistla-{{ cluster_name }}-admin-b",
-		"wistla-{{ cluster_name }}-admin-c",
-	]
-	parent = "wistla-ops-admin"
-}
-
-object Endpoint "wistla-{{ cluster_name }}-admin-a" {
-	host = "wistla-{{ cluster_name }}-admin-a"
-}
-
-object Endpoint "wistla-{{ cluster_name }}-admin-b" {
-	host = "wistla-{{ cluster_name }}-admin-b"
-}
-
-object Endpoint "wistla-{{ cluster_name }}-admin-c" {
-	host = "wistla-{{ cluster_name }}-admin-c"
-}
-
-{% endif %}
-
 # ==================== this host
 
 object Zone "{{ inventory_hostname }}" {
 	endpoints = [ "{{ inventory_hostname }}" ]
-	parent = "wistla-{{ cluster_name }}-admin"
+	parent = "wistla-ops-admin"
 }
 
 object Endpoint "{{ inventory_hostname }}" {
-	host = "{{ inventory_hostname }}"
 }

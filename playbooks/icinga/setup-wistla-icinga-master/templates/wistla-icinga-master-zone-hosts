@@ -1,11 +1,13 @@
 {{ ansible_warning ['//'] }}
 
-{% set cluster_name = item.0 %}
-{% set cluster = clusters [cluster_name] %}
+{% if item.0 == 'ops' %}
+{% for other_cluster_name, other_cluster in clusters.items () %}
 
-# ==================== admin instances
+# ==================== cluster {{ other_cluster_name }}
 
-{% for host_name in groups ['cluster-' + cluster_name + '-admin'] %}
+# --------- admin instances
+
+{% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] %}
 {% set host = hostvars [host_name] %}
 
 object Host "{{ host_name }}" {
@@ -14,8 +16,10 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
+	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
+
 	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ cluster_name }}"
+	vars.cluster = "{{ other_cluster_name }}"
 	vars.type = "admin"
 
 	vars.disks ["disk system"] = {
@@ -26,11 +30,11 @@ object Host "{{ host_name }}" {
 
 {% endfor %}
 
-{% if 'cluster-' + cluster_name + '-app' in groups %}
+{% if 'cluster-' + other_cluster_name + '-app' in groups %}
 
-# ==================== app instances
+# ---------- app instances
 
-{% for host_name in groups ['cluster-' + cluster_name + '-app'] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-app'] %}
 {% set host = hostvars [host_name] %}
 
 object Host "{{ host_name }}" {
@@ -39,8 +43,10 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
+	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
+
 	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ cluster_name }}"
+	vars.cluster = "{{ other_cluster_name }}"
 	vars.type = "app"
 
 	vars.disks ["disk system"] = {
@@ -60,11 +66,11 @@ object Host "{{ host_name }}" {
 {% endfor %}
 {% endif %}
 
-{% if 'cluster-' + cluster_name + '-jenkins' in groups %}
+{% if 'cluster-' + other_cluster_name + '-data' in groups %}
 
-# ==================== app instances
+# ---------- data instances
 
-{% for host_name in groups ['cluster-' + cluster_name + '-jenkins'] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-data'] %}
 {% set host = hostvars [host_name] %}
 
 object Host "{{ host_name }}" {
@@ -73,8 +79,46 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
+	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
+
 	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ cluster_name }}"
+	vars.cluster = "{{ other_cluster_name }}"
+	vars.type = "data"
+
+	vars.disks ["disk system"] = {
+		disk_partitions = "/"
+	}
+
+	vars.disks ["disk containers"] = {
+		disk_partitions = "/var/lib/lxc"
+	}
+
+	vars.disks ["disk data"] = {
+		disk_partitions = "/data"
+	}
+
+}
+
+{% endfor %}
+{% endif %}
+
+{% if 'cluster-' + other_cluster_name + '-jenkins' in groups %}
+
+# ---------- jenkins instances
+
+{% for host_name in groups ['cluster-' + other_cluster_name + '-jenkins'] %}
+{% set host = hostvars [host_name] %}
+
+object Host "{{ host_name }}" {
+
+	import "generic-host"
+
+	address = "{{ host_name }}"
+
+	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
+
+	vars.endpoint = "{{ host_name }}"
+	vars.cluster = "{{ other_cluster_name }}"
 	vars.type = "jenkins"
 
 	vars.disks ["disk system"] = {
@@ -90,6 +134,9 @@ object Host "{{ host_name }}" {
 	}
 
 }
+
+{% endfor %}
+{% endif %}
 
 {% endfor %}
 {% endif %}

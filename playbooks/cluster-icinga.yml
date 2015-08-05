@@ -6,6 +6,7 @@
 
     - "cluster-admin"
     - "cluster-app"
+    - "cluster-data"
     - "cluster-jenkins"
 
   roles:
@@ -18,7 +19,6 @@
     - "setup-icinga-database"
 
 - hosts: "cluster-ops-admin"
-  serial: "1"
   roles:
 
     - "setup-wistla-icinga-master"
@@ -30,18 +30,10 @@
     - "cluster-staging-admin"
     - "cluster-test-admin"
 
-  serial: "1"
-  roles:
-
-    - "setup-wistla-icinga-slave"
-    - "control-icinga"
-
-- hosts:
-
     - "cluster-app"
+    - "cluster-data"
     - "cluster-jenkins"
 
-  serial: "1"
   roles:
 
     - "setup-wistla-icinga-agent"
