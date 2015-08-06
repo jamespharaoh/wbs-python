@@ -126,27 +126,40 @@ config.applePush = {
 {% endif %}
 };
 
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties [cluster_name].urlScheme }}';
+
 // facebook app to use
 config.authentication.facebook.appToUse = '{{ third_parties [cluster_name].facebookAppToUse }}';
 
 // facebook app configuration options
+{% if cluster_name == 'production' %}
 config.authentication.facebook.apps = {
-        wistla: {
-                appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}',
-                appSecret: '{{ third_parties [cluster_name].facebookWistlaAppSecret }}',
-                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaAppAccessToken }}'
-        },
-        wistlaEnterprise: {
-                appId: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppId }}',
-                appSecret: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppSecret }}',
-                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaEnterpriseAppAccessToken }}'
-        },
-        wistlaEnterpriseTwo: {
-                appId: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppId }}',
-                appSecret: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppSecret }}',
-                appAccessToken: '{{ third_parties [cluster_name].facebookWistlaEnterpriseTwoAppAccessToken }}'
-        }
+	wistla: {
+		appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}',
+		appSecret: '{{ third_parties [cluster_name].facebookWistlaAppSecret }}',
+		appAccessToken: '{{ third_parties [cluster_name].facebookWistlaAppAccessToken }}'
+	}
 };
+{% endif %}
+{% if cluster_name == 'staging' %}
+config.authentication.facebook.apps = {
+	wistlaStaging: {
+		appId: '{{ third_parties.dev.facebookWistlaStagingAppId }}',
+		appSecret: '{{ third_parties.dev.facebookWistlaStagingAppSecret }}',
+		appAccessToken: '{{ third_parties.dev.facebookWistlaStagingAppAccessToken }}'
+	}
+};
+{% endif %}
+{% if cluster_name == 'test' %}
+config.authentication.facebook.apps = {
+	wistlaTest: {
+		appId: '{{ third_parties.dev.facebookWistlaTestAppId }}',
+		appSecret: '{{ third_parties.dev.facebookWistlaTestAppSecret }}',
+		appAccessToken: '{{ third_parties.dev.facebookWistlaTestAppAccessToken }}'
+	}
+};
+{% endif %}
 
 {% if bool_native [cluster_deployment.emails_enabled] %}
 

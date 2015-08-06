@@ -19,6 +19,13 @@ config.emailDomain = '{{ deployment.email_domain }}';
 // Database.
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-browser';
 
+// Deep link url scheme for use in sending out emails.
+{% if 'dev' in third_parties %}
+config.urlScheme = '{{ third_parties.dev.urlScheme }}';
+{% else %}
+config.urlScheme = '';
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript
