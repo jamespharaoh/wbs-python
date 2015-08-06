@@ -124,6 +124,12 @@ wistla_icinga_agent_config_templates:
     group: "root"
     mode: "0644"
 
+  - template: "wistla-icinga-agent-commands"
+    target: "/etc/icinga2/commands.conf"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
   - template: "wistla-icinga-agent-constants"
     target: "/etc/icinga2/constants.conf"
     user: "root"
@@ -185,5 +191,11 @@ wistla_icinga_web_config_templates:
 wistla_icinga_web_enabled_modules:
 
   - "monitoring"
+
+# =================== icinga plugins
+
+wistla_icinga_plugins:
+
+  - name: "check_postfixmailqueue"
 
 # ex: et ts=2 filetype=yaml

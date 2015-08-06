@@ -1,0 +1,21 @@
+---
+
+- name: "create wistla icinga plugins directory"
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/icinga2/plugins"
+    state: "directory"
+
+- name: "install wistla icinga plugins"
+  with_items: "wistla_icinga_plugins"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/icinga2/plugins/{{ item.name }}"
+    src: "{{ item.name }}"
+    mode: "0755"
+
+# ex: et ts=2 filetype=yaml

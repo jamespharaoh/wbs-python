@@ -12,6 +12,7 @@
   roles:
 
     - "install-icinga"
+    - "install-wistla-icinga-plugins"
 
 - hosts: "cluster-ops-network"
   roles:

@@ -85,3 +85,15 @@ apply Service "users" {
 	assign where true
 
 }
+
+apply Service "mail queue" {
+
+	import "generic-service"
+
+	check_command = "check-postfix-mail-queue"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where true
+
+}
