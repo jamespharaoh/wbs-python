@@ -9,7 +9,7 @@ kernel_version: "{{ cluster.kernel_versions [instance_type] }}"
 zone_colour: "{{ zone_colours [instance_zone] }}"
 
 amazon_image: "{{
-  cluster.amazon_images [amazon_region].base
+  cluster.amazon_images [amazon_region_name].base
 }}"
 
 amazon_instance_type: "{{

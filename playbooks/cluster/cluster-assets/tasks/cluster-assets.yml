@@ -55,9 +55,9 @@
 
   environment:
 
-    AWS_DEFAULT_REGION: "{{ amazon_region }}"
-    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+    AWS_DEFAULT_REGION: "{{ amazon_region_name }}"
+    AWS_ACCESS_KEY_ID: "{{ amazon_account.access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_account.secret_key }}"
 
   shell:
 
@@ -91,9 +91,10 @@
     state: "present"
     template: "/home/vagrant/work/{{ cluster_name }}/{{ item }}-assets-stack.yml"
     template_format: "yaml"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-    region: "{{ amazon_region }}"
+
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
+    region: "{{ amazon_region_name }}"
 
 - name: "store cloudformation details for assets"
   with_indexed_items: "cluster.deployment_names | default ([])"

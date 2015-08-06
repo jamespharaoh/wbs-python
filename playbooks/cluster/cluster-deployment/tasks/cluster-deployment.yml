@@ -160,7 +160,7 @@
     src: "cluster-deployment-wistla-logrotate"
 
 - name: "create routes"
-  delegate_to: "localhost"
+  connection: "local"
   when: "item != ''"
   with_items:
 
@@ -179,9 +179,7 @@
 
   environment:
 
-    AWS_DEFAULT_REGION: "{{ amazon_region }}"
-    AWS_ACCESS_KEY_ID: "{{ amazon_accounts [amazon_account].access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ amazon_accounts [amazon_account].secret_key }}"
+    AWS_DEFAULT_REGION: "{{ amazon_region_name }}"
 
   args:
 
@@ -191,7 +189,11 @@
 
     set -euf -o pipefail;
 
-    aws ec2 create-route
+    if test "{{ deployment_mode }}" = "vagrant"; then
+      eval `cd {{ HOME }}; misc/amazon-auth {{ amazon_account_name }}`;
+    fi;
+
+    aws ec2 replace-route
       --route-table-id "{{ item }}"
       --destination-cidr-block "{{ [
         cluster_deployment.bridge_network,
@@ -199,9 +201,7 @@
         cluster_zone_indices [instance_zone] * 64,
       ] | join ('.') }}/26"
       --instance-id "{{ instance_id }}"
-    || true;
-
-    aws ec2 replace-route
+    || aws ec2 create-route
       --route-table-id "{{ item }}"
       --destination-cidr-block "{{ [
         cluster_deployment.bridge_network,

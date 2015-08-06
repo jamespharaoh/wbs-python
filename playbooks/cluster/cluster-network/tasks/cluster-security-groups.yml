@@ -1,21 +1,20 @@
 ---
 
 - name: "create security groups"
+  with_items: "amazon_security_groups"
+  register: "create_group"
   action:
-    module: "ec2_group"
 
+    module: "ec2_group"
     name: "{{ cluster_name }}-{{ item.name }}"
     description: "Security group {{ cluster_name }}-{{ item.name }}"
+
     vpc_id: "{{ vpc_id }}"
-
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
     purge_rules: "no"
 
-  register: "create_group"
-  with_items: "amazon_security_groups"
+    region: "{{ amazon_region_name }}"
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
 
 - update_resource:
 
@@ -26,19 +25,18 @@
     security_group_id_jenkins: "{{ create_group.results.4.group_id }}"
 
 - name: "update security group"
+  with_items: "amazon_security_groups"
   action:
-    module: "ec2_group"
 
+    module: "ec2_group"
     name: "{{ cluster_name }}-{{ item.name }}"
     description: "Security group {{ cluster_name }}-{{ item.name }}"
-    rules: "{{ item.rules }}"
 
     vpc_id: "{{ vpc_id }}"
+    rules: "{{ item.rules }}"
 
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-  with_items: "amazon_security_groups"
+    region: "{{ amazon_region_name }}"
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
 
 # ex: et ts=2 filetype=yaml

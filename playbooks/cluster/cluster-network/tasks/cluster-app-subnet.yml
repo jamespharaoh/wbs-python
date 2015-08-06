@@ -1,29 +1,30 @@
 ---
 
 - set_fact:
+
     subnet: "app"
 
 - name: "write app subnet stack yaml"
   action:
+
     module: "template"
     src: "cluster-subnet-stack"
     dest: "/home/vagrant/work/{{ cluster_name }}/app-subnet-stack.yaml"
-  sudo: "yes"
-  sudo_user: "vagrant"
 
 - name: "create app subnet stack"
+  register: "app_subnet_stack_result"
   action:
+
     module: "cloudformation"
     stack_name: "{{ cluster_name }}-subnet-app"
     state: "present"
+
     template: "/home/vagrant/work/{{ cluster_name }}/app-subnet-stack.yaml"
     template_format: "yaml"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-    region: "{{ amazon_region }}"
-  sudo: "yes"
-  sudo_user: "vagrant"
-  register: "app_subnet_stack_result"
+
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
+    region: "{{ amazon_region_name }}"
 
 - update_resource:
 
