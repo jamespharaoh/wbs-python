@@ -16,6 +16,15 @@ import boto
 from boto.s3.connection import S3Connection
 from boto.sts import STSConnection
 
+for key in [
+	"AWS_ACCESS_KEY_ID",
+	"AWS_SECRET_ACCESS_KEY",
+	"AWS_SESSION_TOKEN",
+]:
+
+	if key in os.environ:
+		del os.environ [key]
+
 with open ("config/overrides.yml") as file_handle:
 	CONFIG = yaml.load (file_handle)
 
