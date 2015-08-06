@@ -20,6 +20,7 @@ kernel_versions: {{ lookup ('file', DATA + '/kernel-versions') | from_yaml | to_
 amazon_security_groups: {{ lookup ('file', DATA + '/security-groups') | from_yaml | to_json }}
 ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys') | from_yaml | to_json }}
 ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys') | from_yaml | to_json }}
+amazon_accounts: {{ lookup ('file', DATA + '/amazon-accounts') | from_yaml | to_json }}
 
 {% if not secrets | default ([]) %}
 third_parties: {}

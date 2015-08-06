@@ -1,9 +1,10 @@
 ---
 
 - name: "create admin balancer"
+  register: "admin_balancer_result"
   action:
-    module: "ec2_elb_lb"
 
+    module: "ec2_elb_lb"
     name: "{{ cluster_name }}-admin"
     state: "present"
 
@@ -26,6 +27,7 @@
       - "{{ subnet_admin_c }}"
 
     health_check:
+
       ping_protocol: "tcp"
       ping_port: "80"
       response_timeout: "2"
@@ -33,11 +35,9 @@
       unhealthy_threshold: "2"
       healthy_threshold: "4"
 
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
-
-  register: "admin_balancer_result"
+    region: "{{ amazon_region_name }}"
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
 
 - update_resource:
 

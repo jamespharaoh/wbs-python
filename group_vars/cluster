@@ -5,8 +5,10 @@ cluster: "{{ clusters [cluster_name] }}"
 cluster_network_name: "cluster-{{ cluster_name }}-network"
 cluster_network: "{{ hostvars [cluster_network_name] }}"
 
-amazon_account: "{{ cluster.amazon_account }}"
-amazon_region: "{{ cluster.amazon_region }}"
+amazon_account_name: "{{ cluster.amazon_account }}"
+amazon_account: "{{ amazon_accounts [amazon_account_name] }}"
+
+amazon_region_name: "{{ cluster.amazon_region }}"
 amazon_key_name: "{{ cluster.amazon_key_name }}"
 
 node_memory: "{{ cluster_deployment.node_memory }}"

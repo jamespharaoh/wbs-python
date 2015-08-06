@@ -1,7 +1,9 @@
 ---
 
 - name: "create cluster instance"
+  register: "create_result"
   local_action:
+
     module: "ec2"
 
     instance_tags: "{{ amazon_instance_tags }}"
@@ -22,15 +24,11 @@
 
     volumes: "{{ cluster_create_volumes }}"
 
-    region: "{{ amazon_region }}"
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    region: "{{ amazon_region_name }}"
+    aws_access_key: "{{ amazon_account.access_key }}"
+    aws_secret_key: "{{ amazon_account.secret_key }}"
 
     wait: "yes"
-
-  sudo: "yes"
-  sudo_user: "vagrant"
-  register: "create_result"
 
 - update_resource:
 

@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import generators
+from __future__ import nested_scopes
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import with_statement
+
+import os
+import sys
+import yaml
+
+import boto
+from boto.s3.connection import S3Connection
+from boto.sts import STSConnection
+
+with open ("config/overrides.yml") as file_handle:
+	CONFIG = yaml.load (file_handle)
+
+with open ("data/amazon-accounts") as file_handle:
+	AMAZON_ACCOUNTS = yaml.load (file_handle)
+
+if len (sys.argv) == 0:
+
+	mfa_token = raw_input ("Please enter your Wistla AWS MFA code: ")
+
+	sts_connection = STSConnection ()
+
+	mfa_serial_number = "arn:aws:iam::%s:mfa/%s" % (
+		AMAZON_ACCOUNTS ["admin"] ["numeric"].replace ("-", ""),
+		CONFIG ["developer_email"])
+
+	admin_credentials = sts_connection.get_session_token (
+		duration = 24 * 60 * 60,
+		mfa_serial_number = mfa_serial_number,
+		mfa_token = mfa_token)
+
+	all_credentials = {
+		"admin": {
+			"access_key": admin_credentials.access_key,
+			"secret_key": admin_credentials.secret_key,
+			"session_token": admin_credentials.session_token,
+		},
+	}
+
+	sts_connection = STSConnection (
+		aws_access_key_id = admin_credentials.access_key,
+		aws_secret_access_key = admin_credentials.secret_key,
+		security_token = admin_credentials.session_token)
+
+	for account in [ "production", "staging", "test", "ops" ]:
+
+		assumed_role = sts_connection.assume_role (
+			role_arn = "arn:aws:iam::%s:role/super" % (
+				AMAZON_ACCOUNTS [account] ["numeric"].replace ("-", "")),
+			role_session_name = "%s-super" % (
+				account),
+			duration_seconds = 3600)
+
+		account_credentials = assumed_role.credentials
+
+		all_credentials [account] = {
+			"access_key": account_credentials.access_key,
+			"secret_key": account_credentials.secret_key,
+			"session_token": account_credentials.session_token,
+		}
+
+	with open ("work/amazon-credentials", "w") as file_handle:
+
+		yaml.safe_dump (
+			all_credentials,
+			file_handle,
+			default_flow_style = False,
+			allow_unicode = True,
+			explicit_start = True)
+
+else:
+
+	account_name = sys.argv [1]
+
+	with open ("work/amazon-credentials") as file_handle:
+		all_credentials = yaml.load (file_handle)
+
+	account_credentials = all_credentials [account_name]
+
+	print ("export AWS_ACCESS_KEY_ID=\"%s\"" % (
+		account_credentials ["access_key"]))
+
+	print ("export AWS_SECRET_ACCESS_KEY=\"%s\"" % (
+		account_credentials ["secret_key"]))
+
+	print ("export AWS_SESSION_TOKEN=\"%s\"" % (
+		account_credentials ["session_token"]))
+
+# ex: noet ts=4 filetype=python
