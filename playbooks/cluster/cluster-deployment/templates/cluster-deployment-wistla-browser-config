@@ -19,6 +19,20 @@ config.apiPrivate = 'http://{{ cluster_deployment_name }}-api-{{ instance_zone }
 // email
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties [cluster_name].urlScheme }}';
+
+// Facebook AppId.
+{% if cluster_name == 'production' %}
+config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}';
+{% endif %}
+{% if cluster_name == 'staging' %}
+config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaStagingAppId }}';
+{% endif %}
+{% if cluster_name == 'test' %}
+config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaTestAppId }}';
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

@@ -127,6 +127,20 @@ config.applePush = {
 {% endif %}
 };
 
+// Deep link url scheme for use in sending out emails.
+{% if 'dev' in third_parties %}
+config.urlScheme = '{{ third_parties.dev.urlScheme }}';
+{% else %}
+config.urlScheme = '';
+{% endif %}
+
+// facebook app to use
+{% if 'dev' in third_parties %}
+config.authentication.facebook.appToUse = '{{ third_parties.dev.facebookAppToUse }}';
+{% else %}
+config.authentication.facebook.appToUse = '';
+{% endif %}
+
 // facebook app configuration options
 {% if 'dev' in third_parties %}
 config.authentication.facebook.apps = {
@@ -149,16 +163,6 @@ config.authentication.facebook.apps = {
 		appId: '{{ third_parties.dev.facebookWistlaDevAppId }}',
 		appSecret: '{{ third_parties.dev.facebookWistlaDevAppSecret }}',
 		appAccessToken: '{{ third_parties.dev.facebookWistlaDevAppAccessToken }}'
-	},
-	wistlaEnterprise: {
-		appId: '{{ third_parties.dev.facebookWistlaEnterpriseAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaEnterpriseAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaEnterpriseAppAccessToken }}'
-	},
-	wistlaEnterpriseTwo: {
-		appId: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaEnterpriseTwoAppAccessToken }}'
 	}
 };
 {% else %}
@@ -182,17 +186,6 @@ config.authentication.facebook.apps = {
 		appId: '',
 		appSecret: '',
 		appAccessToken: ''
-	},
-	wistlaEnterprise: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-	},
-	wistlaEnterpriseTwo: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-	}
 };
 {% endif %}
 
