@@ -22,7 +22,7 @@ with open ("config/overrides.yml") as file_handle:
 with open ("data/amazon-accounts") as file_handle:
 	AMAZON_ACCOUNTS = yaml.load (file_handle)
 
-if len (sys.argv) == 0:
+if len (sys.argv) == 1:
 
 	mfa_token = raw_input ("Please enter your Wistla AWS MFA code: ")
 

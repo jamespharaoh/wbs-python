@@ -130,6 +130,9 @@ python_packages:
   - name: "awscli"
     version: "1.7.26"
 
+  - name: "boto"
+    version: "2.38.0"
+
   - name: "GitPython"
     version: "1.0.1"
 
