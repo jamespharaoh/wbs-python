@@ -29,3 +29,5 @@ object SyslogLogger "syslog" {
 	severity = "warning"
 
 }
+
+include "commands.conf"

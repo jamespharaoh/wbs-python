@@ -1,0 +1,17 @@
+{{ ansible_warning ['//'] }}
+
+object CheckCommand "postfix-mail-queue" {
+
+	import "plugin-check-command"
+
+	command = [ "/etc/icinga2/plugins/check_postfixmailqueue" ]
+
+	arguments = {
+		"-w" = "$mailq_warning$"
+		"-c" = "$mailq_critical$",
+	}
+
+	vars.mailq_warning = 1
+	vars.mailq_critical = 5
+
+}

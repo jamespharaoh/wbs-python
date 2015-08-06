@@ -5,6 +5,9 @@ production:
   name: "production"
   type: "shared"
 
+  enabled: "yes"
+  monitoring: "yes"
+
   main_domain: "wistla.com"
   short_domain: "wist.la"
   assets_domain: "assets.wistla.com"
@@ -41,6 +44,9 @@ production-a:
 
   name: "production-a"
   type: "alias"
+
+  enabled: "yes"
+  monitoring: "yes"
 
   cluster: "production"
   alias: "production"
@@ -88,6 +94,9 @@ production-b:
   name: "production-b"
   type: "alias"
 
+  enabled: "no"
+  monitoring: "no"
+
   cluster: "production"
   alias: "production"
 
@@ -134,6 +143,9 @@ staging:
   name: "staging"
   type: "shared"
 
+  enabled: "yes"
+  monitoring: "yes"
+
   main_domain: "staging.wistla.com"
   short_domain: "staging.wist.la"
   assets_domain: "assets.staging.wistla.com"
@@ -170,6 +182,9 @@ staging-a:
 
   name: "staging-a"
   type: "alias"
+
+  enabled: "yes"
+  monitoring: "yes"
 
   cluster: "staging"
   alias: "staging"
@@ -216,6 +231,9 @@ staging-b:
 
   name: "staging-b"
   type: "alias"
+
+  enabled: "no"
+  monitoring: "no"
 
   cluster: "staging"
   alias: "staging"
@@ -275,6 +293,9 @@ test-everest:
   name: "test-everest"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "yes"
+
   cluster: "test"
 
   main_domain: "everest.test.wistla.com"
@@ -328,6 +349,9 @@ test-k2:
 
   name: "test-k2"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "yes"
 
   cluster: "test"
 
@@ -383,6 +407,9 @@ test-montblanc:
   name: "test-montblanc"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "yes"
+
   cluster: "test"
 
   main_domain: "montblanc.test.wistla.com"
@@ -436,6 +463,9 @@ test-erebus:
 
   name: "test-erebus"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "yes"
 
   cluster: "test"
 
@@ -491,6 +521,9 @@ test-fitzroy:
   name: "test-fitzroy"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "yes"
+
   cluster: "test"
 
   main_domain: "fitzroy.test.wistla.com"
@@ -545,6 +578,9 @@ dev:
   name: "dev"
   type: "simple"
 
+  enabled: "no"
+  monitoring: "no"
+
   cluster: "dev"
 
   main_domain: "dev.wistla.com"
@@ -565,6 +601,9 @@ berk:
 
   name: "berk"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
 
   cluster: "dev"
 
@@ -587,6 +626,9 @@ bruce:
   name: "bruce"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "no"
+
   cluster: "dev"
 
   main_domain: "bruce.wistla.com"
@@ -607,6 +649,9 @@ chuggington:
 
   name: "chuggington"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
 
   cluster: "dev"
 
@@ -629,6 +674,9 @@ mrbenn:
   name: "mrbenn"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "no"
+
   cluster: "dev"
 
   main_domain: "mrbenn.wistla.com"
@@ -649,6 +697,9 @@ mrbenn:
 
   name: "7-zark-7"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
 
   cluster: "dev"
 
@@ -672,6 +723,9 @@ optimus:
   name: "optimus"
   type: "simple"
 
+  enabled: "yes"
+  monitoring: "no"
+
   cluster: "dev"
 
   main_domain: "optimus.dev.wistla.com"
@@ -692,6 +746,9 @@ jenkins-latest:
 
   name: "jenkins-latest"
   type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
 
   cluster: "jenkins"
 
