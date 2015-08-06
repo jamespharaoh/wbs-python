@@ -27,7 +27,8 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ other_cluster_name }}"
-	vars.type = "admin"
+	vars.stature = "cluster"
+	vars.type = "cluster-admin"
 
 	vars.disks ["disk system"] = {
 		disk_partitions = "/"
@@ -54,7 +55,8 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ other_cluster_name }}"
-	vars.type = "app"
+	vars.stature = "cluster"
+	vars.type = "cluster-app"
 
 	vars.disks ["disk system"] = {
 		disk_partitions = "/"
@@ -67,6 +69,16 @@ object Host "{{ host_name }}" {
 	vars.disks ["disk data"] = {
 		disk_partitions = "/data"
 	}
+
+	vars.procs_warning = {{ [
+		200,
+		other_cluster.deployment_names | length * 100,
+	] | sum }}
+
+	vars.procs_critical = {{ [
+		400,
+		other_cluster.deployment_names | length * 100,
+	] | sum }}
 
 }
 
@@ -90,7 +102,8 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ other_cluster_name }}"
-	vars.type = "data"
+	vars.stature = "cluster"
+	vars.type = "cluster-data"
 
 	vars.disks ["disk system"] = {
 		disk_partitions = "/"
@@ -126,7 +139,8 @@ object Host "{{ host_name }}" {
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ other_cluster_name }}"
-	vars.type = "jenkins"
+	vars.stature = "cluster"
+	vars.type = "cluster-jenkins"
 
 	vars.disks ["disk system"] = {
 		disk_partitions = "/"
@@ -140,9 +154,135 @@ object Host "{{ host_name }}" {
 		disk_partitions = "/data"
 	}
 
+	vars.procs_warning = {{ [
+		200,
+		host.jenkins_deployment_names | length * 100,
+	] | sum }}
+
+	vars.procs_critical = {{ [
+		400,
+		host.jenkins_deployment_names | length * 100,
+	] | sum }}
+
 }
 
 {% endfor %}
 {% endif %}
 
+{% endfor %}
+
+{% macro deployment_nodes (
+	node_type,
+	other_deployment_name,
+	parent_instance_type) %}
+
+{%	set other_deployment = deployments [other_deployment_name] %}
+{%	set other_cluster_name = other_deployment.cluster %}
+{%	set other_cluster = clusters [other_cluster_name] %}
+{%	set instance_formation = other_cluster.instance_formation [parent_instance_type] %}
+
+# --------- {{ node_type }} nodes
+
+{%	for zone in instance_formation.zones %}
+{%	for index in instance_formation.indices %}
+
+{%		set host_name = [
+			other_deployment_name,
+			node_type,
+			zone,
+			index,
+		] | join ('-') %}
+
+{%		set parent_name = [
+			'wistla',
+			other_deployment.cluster,
+			parent_instance_type,
+			zone,
+			index,
+		] | join ('-') %}
+
+object Host "{{ host_name }}" {
+
+	import "generic-host"
+
+	address = "{{ host_name }}"
+
+	command_endpoint = "wistla-{{ other_deployment.cluster }}-admin-a"
+
+	vars.parent = "{{ parent_name }}"
+	vars.endpoint = "{{ parent_name }}"
+	vars.deployment = "{{ other_deployment_name }}"
+	vars.stature = "node"
+	vars.type = "node-{{ node_type }}"
+
+}
+
+{%	endfor %}
+{%	endfor %}
+
+{% endmacro %}
+
+{% for other_deployment_name, other_deployment in deployments.items () %}
+{% if other_deployment.cluster in clusters
+	and other_deployment.type in [ 'simple', 'shared', 'alias' ]
+	and other_deployment.monitoring == 'yes' %}
+{% set other_cluster = clusters [other_deployment.cluster] %}
+
+# ==================== deployment {{ other_deployment_name }}
+
+object HostGroup "deployment-{{ other_deployment_name }}" {
+
+	display_name = "Deployment {{ other_deployment_name }}"
+
+	assign where host.vars.deployment == "{{ other_deployment_name }}"
+
+}
+
+{%	if other_deployment.cluster == 'test' %}
+{%		set app_instance_type = 'app' %}
+{%		set data_instance_type = 'app' %}
+{%	else %}
+{%		set app_instance_type = 'app' %}
+{%		set data_instance_type = 'data' %}
+{%	endif %}
+
+{%	if other_deployment.type in [ 'shared', 'simple' ] %}
+
+{%		print deployment_nodes (
+			'mongo',
+			other_deployment_name,
+			data_instance_type) %}
+
+{%		print deployment_nodes (
+			'rabbit',
+			other_deployment_name,
+			data_instance_type) %}
+
+{%	endif %}
+
+{%	if other_deployment.type in [ 'alias', 'simple' ] %}
+
+{%		print deployment_nodes (
+			'api',
+			other_deployment_name,
+			app_instance_type) %}
+
+{%		print deployment_nodes (
+			'browser',
+			other_deployment_name,
+			app_instance_type) %}
+
+{%		print deployment_nodes (
+			'load',
+			other_deployment_name,
+			app_instance_type) %}
+
+{%		print deployment_nodes (
+			'web',
+			other_deployment_name,
+			app_instance_type) %}
+
+{%	endif %}
+
+{% endif %}
 {% endfor %}

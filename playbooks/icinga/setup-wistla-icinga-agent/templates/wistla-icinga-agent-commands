@@ -1,6 +1,6 @@
 {{ ansible_warning ['//'] }}
 
-object CheckCommand "check-postfix-mail-queue" {
+object CheckCommand "postfix-mail-queue" {
 
 	import "plugin-check-command"
 

@@ -20,7 +20,7 @@ apply Service "ssh" {
 
 	command_endpoint = host.command_endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -34,7 +34,7 @@ apply Service for (disk => config in host.vars.disks) {
 
 	vars += config
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -46,7 +46,7 @@ apply Service "load" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -58,7 +58,7 @@ apply Service "procs" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -70,7 +70,7 @@ apply Service "swap" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -82,7 +82,7 @@ apply Service "users" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
 
 }
 
@@ -90,10 +90,112 @@ apply Service "mail queue" {
 
 	import "generic-service"
 
-	check_command = "check-postfix-mail-queue"
+	check_command = "postfix-mail-queue"
 
 	command_endpoint = host.vars.endpoint
 
-	assign where true
+	assign where host.vars.stature == "cluster"
+
+}
+
+apply Service "http" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.type in [
+		"cluster-app",
+		"cluster-admin",
+	]
+
+}
+
+apply Service "wistla api" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_port = 7000
+	vars.http_expect = "HTTP/1.1 404 Not Found"
+
+	assign where host.vars.type == "node-api"
+
+}
+
+apply Service "wistla browser" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_port = 3000
+	vars.http_expect = "HTTP/1.1 404 Not Found"
+
+	assign where host.vars.type == "node-browser"
+
+}
+
+apply Service "wistla web" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_port = 3000
+
+	assign where host.vars.type == "node-web"
+
+}
+
+apply Service "wistla load balancer" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_port = 80
+	vars.http_expect = "HTTP/1.1 404 Not Found"
+
+	assign where host.vars.type == "node-load"
+
+}
+
+apply Service "wistla mongo" {
+
+	import "generic-service"
+
+	check_command = "tcp"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.tcp_port = 27017
+
+	assign where host.vars.type == "node-mongo"
+
+}
+
+apply Service "wistla rabbit" {
+
+	import "generic-service"
+
+	check_command = "tcp"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.tcp_port = 5672
+
+	assign where host.vars.type == "node-rabbit"
 
 }

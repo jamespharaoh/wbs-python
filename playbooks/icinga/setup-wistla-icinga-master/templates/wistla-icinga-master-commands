@@ -44,7 +44,7 @@ object NotificationCommand "mail-service-notification" {
 
 }
 
-object CheckCommand "check-postfix-mail-queue" {
+object CheckCommand "postfix-mail-queue" {
 
 	import "plugin-check-command"
 
