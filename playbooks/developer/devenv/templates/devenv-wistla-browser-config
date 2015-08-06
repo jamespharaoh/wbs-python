@@ -26,6 +26,13 @@ config.urlScheme = '{{ third_parties.dev.urlScheme }}';
 config.urlScheme = '';
 {% endif %}
 
+// facebook app configuration options
+{% if 'dev' in third_parties %}
+config.facebook.appId = '{{ third_parties.dev.facebookWistlaDevAppId }}';
+{% else %}
+config.facebook.appId = '';
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript
