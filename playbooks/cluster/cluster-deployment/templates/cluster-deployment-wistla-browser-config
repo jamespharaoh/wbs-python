@@ -23,9 +23,6 @@ config.emailDomain = '{{ cluster_deployment.email_domain }}';
 config.urlScheme = '{{ third_parties [cluster_name].urlScheme }}';
 
 // Facebook AppId.
-config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}';
-
-// Facebook AppId.
 {% if cluster_name == 'production' %}
 config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}';
 {% endif %}
