@@ -2,16 +2,19 @@
 
 - name: "create deployment directory"
   action:
+  sudo: "yes"
+
     module: "file"
     path: "{{ cluster_deployment_home }}"
     state: "directory"
+
     owner: "ubuntu"
     group: "ubuntu"
     mode: "0755"
-  sudo: "yes"
 
 - name: "create deployment link"
   action:
+
     module: "file"
     path: "/home/ubuntu/{{ cluster_deployment_name }}"
     state: "link"
@@ -30,9 +33,15 @@
     src: "{{ cluster_deployment_name }}"
 
 - name: "checkout projects from git"
+  with_items: "cluster_deployment_checkouts"
+  args:
+
+    creates: "{{ cluster_deployment_home }}/{{ item.name }}"
+    executable: "/bin/bash"
+
   shell:
 
-    set -e;
+    set -euf -o pipefail;
 
     cd {{ cluster_deployment_home }};
 
@@ -40,54 +49,57 @@
       git@github.com:/wistla/{{ item.name }}
       --branch {{ item.branch }};
 
-  args:
-    creates: "{{ cluster_deployment_home }}/{{ item.name }}"
-  with_items: "cluster_deployment_checkouts"
-
 - name: "run project build steps"
-  shell: "{{ item.build_steps | default ([ 'true' ]) | join (' && ') }}"
-  args:
-    chdir: "{{ cluster_deployment_home }}/{{ item.name }}"
   tags: "build"
   with_items: "cluster_deployment_checkouts"
+  args:
+
+    chdir: "{{ cluster_deployment_home }}/{{ item.name }}"
+
+  shell: "{{ item.build_steps | default ([ 'true' ]) | join (' && ') }}"
 
 - name: "create config directory"
+  with_items: "cluster_deployment_shared_directories"
   action:
+
     module: "file"
     path: "{{ cluster_deployment_home }}/config"
     state: "directory"
-  with_items: "cluster_deployment_shared_directories"
 
 - name: "create config directories"
+  with_items: "cluster_deployment_config_directories"
   action:
+
     module: "file"
     path: "{{ cluster_deployment_home }}/config/{{ item }}"
     state: "directory"
-  with_items: "cluster_deployment_config_directories"
 
 - name: "create shared link"
+  when: "cluster_deployment.type == 'alias'"
   action:
+
     module: "file"
     path: "{{ cluster_deployment_home }}/shared"
     state: "link"
     src: "../{{ cluster_deployment.alias }}/shared"
-  when: "cluster_deployment.type == 'alias'"
 
 - name: "create shared directory"
+  with_items: "cluster_deployment_shared_directories"
+  when: "cluster_deployment.type != 'alias'"
   action:
+
     module: "file"
     path: "{{ cluster_deployment_home }}/shared"
     state: "directory"
-  with_items: "cluster_deployment_shared_directories"
-  when: "cluster_deployment.type != 'alias'"
 
 - name: "create shared directories"
+  with_items: "cluster_deployment_shared_directories"
+  when: "cluster_deployment.type != 'alias'"
   action:
+
     module: "file"
     path: "{{ cluster_deployment_home }}/shared/{{ item }}"
     state: "directory"
-  with_items: "cluster_deployment_shared_directories"
-  when: "cluster_deployment.type != 'alias'"
 
 - name: "create config files"
   with_items: "cluster_deployment_config_templates"
@@ -103,43 +115,49 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "copy config files"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/{{ item.source }}"
-    dest: "{{ cluster_deployment_home }}/{{ item.target }}"
-    mode: "{{ item.mode }}"
   with_items: "cluster_deployment_config_files"
+  action:
+
+    module: "copy"
+    dest: "{{ cluster_deployment_home }}/{{ item.target }}"
+    src: "{{ HOME }}/{{ item.source }}"
+    mode: "{{ item.mode }}"
 
 - name: "create links to config files"
   action:
-    module: "file"
-    path: "{{ cluster_deployment_home }}/{{ item.target }}"
-    src: "{{ item.source }}"
-    state: "link"
-    force: "yes"
   with_items: "cluster_deployment_config_links"
 
-- name: "stat override config files"
-  action:
-    module: "stat"
+    module: "file"
     path: "{{ cluster_deployment_home }}/{{ item.target }}"
+    state: "link"
+
+    src: "{{ item.source }}"
+    force: "yes"
+
+- name: "stat override config files"
   with_items: "cluster_deployment_override_templates"
   register: "cluster_deployment_stat_override_templates_result"
+  action:
+
+    module: "stat"
+    path: "{{ cluster_deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
+  with_indexed_items: "cluster_deployment_override_templates"
+  when: "not cluster_deployment_stat_override_templates_result.results [item.0].stat.exists"
   action:
+
     module: "template"
     dest: "{{ cluster_deployment_home }}/{{ item.1.target }}"
     src: "{{ item.1.template }}"
-  with_indexed_items: "cluster_deployment_override_templates"
-  when: "not cluster_deployment_stat_override_templates_result.results [item.0].stat.exists"
 
 - name: "create deployment bridge network interface"
-  action:
-    module: "template"
-    src: "cluster-deployment-bridge-interface"
-    dest: "/etc/network/interfaces.d/{{ cluster_deployment.bridge_name }}.cfg"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/network/interfaces.d/{{ cluster_deployment.bridge_name }}.cfg"
+    src: "cluster-deployment-bridge-interface"
 
 - name: "start deployment network bridge"
   shell:
@@ -199,21 +217,28 @@
       eval `cd {{ HOME }}; misc/amazon-auth {{ amazon_account_name }}`;
     fi;
 
-    aws ec2 replace-route
-      --route-table-id "{{ item }}"
-      --destination-cidr-block "{{ [
-        cluster_deployment.bridge_network,
-        instance_index,
-        cluster_zone_indices [instance_zone] * 64,
-      ] | join ('.') }}/26"
-      --instance-id "{{ instance_id }}"
-    || aws ec2 create-route
-      --route-table-id "{{ item }}"
-      --destination-cidr-block "{{ [
-        cluster_deployment.bridge_network,
-        instance_index,
-        cluster_zone_indices [instance_zone] * 64,
-      ] | join ('.') }}/26"
-      --instance-id "{{ instance_id }}";
+    {
+
+      aws ec2 replace-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ [
+          cluster_deployment.bridge_network,
+          instance_index,
+          cluster_zone_indices [instance_zone] * 64,
+        ] | join ('.') }}/26"
+        --instance-id "{{ instance_id }}";
+
+    } || {
+
+      aws ec2 create-route
+        --route-table-id "{{ item }}"
+        --destination-cidr-block "{{ [
+          cluster_deployment.bridge_network,
+          instance_index,
+          cluster_zone_indices [instance_zone] * 64,
+        ] | join ('.') }}/26"
+        --instance-id "{{ instance_id }}";
+
+    };
 
 # ex: et ts=2 filetype=yaml
