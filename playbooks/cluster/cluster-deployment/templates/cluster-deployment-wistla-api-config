@@ -54,15 +54,19 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-{% if cluster_name in [ 'staging', 'production' ] %}
-config.amqpOptions = {
+{% if cluster_name in [ 'production' ] %}
 	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
 	urls: [
-{% for zone in cluster.instance_formation.data.zones %}
-{% for instance in cluster.instance_formation.data.instances %}
+		'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4',
+	],
+{% elif cluster_name in ['staging'] %}
+	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
+	urls: [
+{%	for zone in cluster.instance_formation.data.zones %}
+{%	for instance in cluster.instance_formation.data.instances %}
 		'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ zone }}-{{ instance }}',
-{% endfor %}
-{% endfor %}
+{%	endfor %}
+{%	endfor %}
 	],
 {% else %}
 	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4', // TODO deprecate
