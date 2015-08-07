@@ -49,7 +49,7 @@ config.dbOptions = {
 config.cmsImagePath = '/shared/cms-image';
 
 // Google Maps API Key for showing office location on a map.
-config.googleMapsApiKey = '{{ third_parties [cluster_name].googleMapsApiKey }}';
+config.googleMapsApiKey = '{{ third_parties [cluster_name].google_maps_api_key }}';
 
 // mailchimp
 config.mailchimp = {

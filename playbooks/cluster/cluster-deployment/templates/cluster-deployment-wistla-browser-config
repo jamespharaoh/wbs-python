@@ -20,18 +20,10 @@ config.apiPrivate = 'http://{{ cluster_deployment_name }}-api-{{ instance_zone }
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
 // Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties [cluster_name].urlScheme }}';
+config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
 
 // Facebook AppId.
-{% if cluster_name == 'production' %}
-config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaAppId }}';
-{% endif %}
-{% if cluster_name == 'staging' %}
-config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaStagingAppId }}';
-{% endif %}
-{% if cluster_name == 'test' %}
-config.facebook.appId: '{{ third_parties [cluster_name].facebookWistlaTestAppId }}';
-{% endif %}
+config.facebook.appId = '{{ third_parties [cluster_name].facebook_app_id }}';
 
 module.exports = config;
 

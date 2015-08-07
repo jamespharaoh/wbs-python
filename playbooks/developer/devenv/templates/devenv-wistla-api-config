@@ -129,65 +129,41 @@ config.applePush = {
 
 // Deep link url scheme for use in sending out emails.
 {% if 'dev' in third_parties %}
-config.urlScheme = '{{ third_parties.dev.urlScheme }}';
+config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 {% else %}
 config.urlScheme = '';
 {% endif %}
 
 // facebook app to use
 {% if 'dev' in third_parties %}
-config.authentication.facebook.appToUse = '{{ third_parties.dev.facebookAppToUse }}';
+config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
 {% else %}
 config.authentication.facebook.appToUse = '';
 {% endif %}
 
 // facebook app configuration options
+config.authentication.facebook.apps = {
+{% for key, cluster_name in {
+	'wistla': 'production',
+	'wistlaStaging': 'staging',
+	'wistlaTest': 'test',
+	'wistlaDev': 'dev',
+} %}
 {% if 'dev' in third_parties %}
-config.authentication.facebook.apps = {
-	wistla: {
-		appId: '{{ third_parties.dev.facebookWistlaAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaAppAccessToken }}'
+	{{ key }}: {
+		appId: '{{ third_parties [cluster_name].facebook_app_id }}',
+		appSecret: '{{ third_parties [cluster_name].facebook_app_secret }}',
+		appAccessToken: '{{ third_parties [cluster_name].facebook_app_access_token }}'
 	},
-	wistlaStaging: {
-		appId: '{{ third_parties.dev.facebookWistlaStagingAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaStagingAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaStagingAppAccessToken }}'
-	},
-	wistlaTest: {
-		appId: '{{ third_parties.dev.facebookWistlaTestAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaTestAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaTestAppAccessToken }}'
-	},
-	wistlaDev: {
-		appId: '{{ third_parties.dev.facebookWistlaDevAppId }}',
-		appSecret: '{{ third_parties.dev.facebookWistlaDevAppSecret }}',
-		appAccessToken: '{{ third_parties.dev.facebookWistlaDevAppAccessToken }}'
-	}
-};
 {% else %}
-config.authentication.facebook.apps = {
-	wistla: {
+	{{ key }}: {
 		appId: '',
 		appSecret: '',
 		appAccessToken: ''
 	},
-	wistlaStaging: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-	},
-	wistlaTest: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-	},
-	wistlaDev: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-};
 {% endif %}
+{% endfor %}
+};
 
 module.exports = config;
 

@@ -42,7 +42,7 @@ config.cmsImagePath = '/shared/cms-image';
 
 // Google Maps API Key for showing office location on a map.
 {% if 'dev' in third_parties %}
-config.googleMapsApiKey = '{{ third_parties.dev.googleMapsApiKey }}';
+config.googleMapsApiKey = '{{ third_parties.dev.google_maps_api_key }}';
 {% else %}
 config.googleMapsApiKey = '';
 {% endif %}

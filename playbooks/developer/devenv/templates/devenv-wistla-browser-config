@@ -21,14 +21,14 @@ config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-browser';
 
 // Deep link url scheme for use in sending out emails.
 {% if 'dev' in third_parties %}
-config.urlScheme = '{{ third_parties.dev.urlScheme }}';
+config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 {% else %}
 config.urlScheme = '';
 {% endif %}
 
 // facebook app configuration options
 {% if 'dev' in third_parties %}
-config.facebook.appId = '{{ third_parties.dev.facebookWistlaDevAppId }}';
+config.facebook.appId = '{{ third_parties.dev.facebook_app_id }}';
 {% else %}
 config.facebook.appId = '';
 {% endif %}
