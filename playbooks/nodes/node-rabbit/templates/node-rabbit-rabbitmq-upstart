@@ -10,6 +10,12 @@ respawn limit unlimited
 
 env HOME=/var/lib/rabbitmq
 
+pre-start script
+
+	cp -a /config/erlang-cookie /var/lib/rabbitmq/.erlang.cookie
+
+end script
+
 script
 
 	setuid rabbitmq \
