@@ -439,7 +439,7 @@ test-montblanc:
   node_memory:
 
     api: "512"
-    browser: "256"
+    browser: "768"
     load: "128"
     mongo: "512"
     rabbit: "256"
