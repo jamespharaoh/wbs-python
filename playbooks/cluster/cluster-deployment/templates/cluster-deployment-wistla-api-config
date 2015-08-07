@@ -27,9 +27,11 @@ config.emailDomain = '{{ cluster_deployment.email_domain }}';
 // Database.
 {% if cluster_name in [ 'staging', 'production' ] %}
 config.dbUrl = [
-	'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla',
-	'mongodb://{{ cluster_deployment_alias.name }}-mongo-b-4:27017/wistla',
-	'mongodb://{{ cluster_deployment_alias.name }}-mongo-c-4:27017/wistla',
+{% for zone in cluster.instance_formation.data.zones %}
+{% for instance in cluster.instance_formation.data.instances %}
+	'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ zone }}-{{ instance }}:27017/wistla',
+{% endfor %}
+{% endfor %}
 ].join (',');
 config.dbOptions = {
 	replSet: {
@@ -52,7 +54,22 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4',
+{% if cluster_name in [ 'staging', 'production' ] %}
+config.amqpOptions = {
+	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
+	urls: [
+{% for zone in cluster.instance_formation.data.zones %}
+{% for instance in cluster.instance_formation.data.instances %}
+		'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ zone }}-{{ instance }}',
+{% endfor %}
+{% endfor %}
+	],
+{% else %}
+	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4', // TODO deprecate
+	urls: [
+		'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4',
+	],
+{% endif %}
 };
 
 // CORS

@@ -90,11 +90,17 @@
   when: "cluster_deployment.type != 'alias'"
 
 - name: "create config files"
-  action:
-    module: "template"
-    src: "{{ item.template }}"
-    dest: "{{ cluster_deployment_home }}/{{ item.target }}"
   with_items: "cluster_deployment_config_templates"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ cluster_deployment_home }}/{{ item.target }}"
+    src: "{{ item.template }}"
+
+    owner: "{{ item.owner | default ('ubuntu') }}"
+    group: "{{ item.group | default ('ubuntu') }}"
+    mode: "{{ item.mode | default ('0644') }}"
 
 - name: "copy config files"
   action:

@@ -52,6 +52,10 @@ devenv_config_templates:
     type: "browser"
     target: "environment"
 
+  - template: "devenv-wistla-rabbit-erlang-cookie"
+    type: "rabbit"
+    target: "erlang-cookie"
+
   - template: "devenv-wistla-web-config"
     type: "web"
     target: "config.local.js"

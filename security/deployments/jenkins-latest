@@ -10,4 +10,8 @@ web:
   access_key_id: ""
   secret_access_key: ""
 
+rabbit:
+
+  erlang_cookie: "FHUGYZHKVXOFREKZWSDF"
+
 # ex: et ts=2 filetype=yaml

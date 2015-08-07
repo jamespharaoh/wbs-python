@@ -44,7 +44,15 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ deployment_name }}-rabbit-0',
+	url: 'amqp://{{ deployment_name }}-rabbit-0', // TODO deprecate this
+	urls: [
+{% for rabbit_name in groups ['node-rabbit-host'] %}
+{% set rabbit_host = hostvars [rabbit_name] %}
+{% if rabbit_host.node_index < dev_node_count.rabbit | int %}
+		'amqp://{{ rabbit_name }}',
+{% endif %}
+{% endfor %}
+	],
 };
 
 // CORS
