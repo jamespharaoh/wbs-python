@@ -28,7 +28,7 @@ config.emailDomain = '{{ cluster_deployment.email_domain }}';
 {% if cluster_name in [ 'staging', 'production' ] %}
 config.dbUrl = [
 {% for zone in cluster.instance_formation.data.zones %}
-{% for instance in cluster.instance_formation.data.instances %}
+{% for instance in cluster.instance_formation.data.indices %}
 	'mongodb://{{ cluster_deployment_alias.name }}-mongo-{{ zone }}-{{ instance }}:27017/wistla',
 {% endfor %}
 {% endfor %}
@@ -63,7 +63,7 @@ config.amqpOptions = {
 	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
 	urls: [
 {%	for zone in cluster.instance_formation.data.zones %}
-{%	for instance in cluster.instance_formation.data.instances %}
+{%	for instance in cluster.instance_formation.data.indices %}
 		'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ zone }}-{{ instance }}',
 {%	endfor %}
 {%	endfor %}
