@@ -10,11 +10,14 @@ from __future__ import with_statement
 
 import os
 import sys
+import time
 import yaml
 
 import boto
 from boto.s3.connection import S3Connection
 from boto.sts import STSConnection
+
+current_time = int (time.time ())
 
 for key in [
 	"AWS_ACCESS_KEY_ID",
@@ -47,6 +50,7 @@ if len (sys.argv) == 1:
 		mfa_token = mfa_token)
 
 	all_credentials = {
+		"timestamp": 0,
 		"admin": {
 			"access_key": admin_credentials.access_key,
 			"secret_key": admin_credentials.secret_key,
@@ -54,10 +58,19 @@ if len (sys.argv) == 1:
 		},
 	}
 
+else:
+
+	with open ("work/amazon-credentials") as file_handle:
+		all_credentials = yaml.load (file_handle)
+
+if all_credentials ["timestamp"] + 30 * 60 < current_time:
+
+	admin_credentials = all_credentials ["admin"]
+
 	sts_connection = STSConnection (
-		aws_access_key_id = admin_credentials.access_key,
-		aws_secret_access_key = admin_credentials.secret_key,
-		security_token = admin_credentials.session_token)
+		aws_access_key_id = admin_credentials ["access_key"],
+		aws_secret_access_key = admin_credentials ["secret_key"],
+		security_token = admin_credentials ["session_token"])
 
 	for account in [ "production", "staging", "test", "ops" ]:
 
@@ -76,6 +89,8 @@ if len (sys.argv) == 1:
 			"session_token": account_credentials.session_token,
 		}
 
+	all_credentials ["timestamp"] = current_time
+
 	with open ("work/amazon-credentials", "w") as file_handle:
 
 		yaml.safe_dump (
@@ -85,12 +100,9 @@ if len (sys.argv) == 1:
 			allow_unicode = True,
 			explicit_start = True)
 
-else:
+if len (sys.argv) > 1:
 
 	account_name = sys.argv [1]
-
-	with open ("work/amazon-credentials") as file_handle:
-		all_credentials = yaml.load (file_handle)
 
 	account_credentials = all_credentials [account_name]
 
