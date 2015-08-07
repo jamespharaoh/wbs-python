@@ -134,7 +134,7 @@ config.authentication.facebook.appToUse = '{{ third_parties [cluster_name].faceb
 
 // facebook app configuration options
 config.authentication.facebook.apps = {
-	{{ third_parties [cluster_name].facebook_api_to_use }}: {
+	{{ third_parties [cluster_name].facebook_app_to_use }}: {
 		appId: '{{ third_parties [cluster_name].facebook_app_id }}',
 		appSecret: '{{ third_parties [cluster_name].facebook_app_secret }}',
 		appAccessToken: '{{ third_parties [cluster_name].facebook_app_access_token }}'
