@@ -32,6 +32,12 @@ script
 		-a "${{ node_var }}_DEBUG" = "yes"
 	then
 
+		{#
+		 # WARNING - node-debug doesn't seem to allow you to pass extra options
+		 # to the node process which runs the script, so don't add them and
+		 # expect it to work.
+		 #}
+
 		exec setuid ubuntu \
 		node-debug --nodejs --harmony \
 		--debug-brk=0 \

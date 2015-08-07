@@ -27,6 +27,9 @@ developer_email: "{{ developer_email | default ('') }}"
 # configure various aspects of the local dev environment.
 #
 
+# NB - this debug option causes other node.js options to be disabled, including
+# memory limits and garbage collection.
+
 dev_debug: "{{ dev_debug | default (debug | default ('yes')) }}"
 
 dev_apple_push_notifications_enabled: "{{ dev_apple_push_notifications_enabled | default ('yes') }}"
