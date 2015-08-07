@@ -1,21 +1,19 @@
 {{ ansible_warning ['//'] }}
 
-{% for other_cluster_name, other_cluster in clusters.items () %}
+{##############################################################################}
 
-# ==================== cluster {{ other_cluster_name }}
+{% macro cluster_instances (
+	other_cluster_name,
+	instance_type) %}
 
-object HostGroup "cluster-{{ other_cluster_name }}" {
+{%	set other_cluster = clusters [other_cluster_name] %}
+{%	set group_name = 'cluster-' + other_cluster_name + '-' + instance_type %}
+{%	if group_name in groups %}
 
-	display_name = "Cluster {{ other_cluster_name }}"
+# --------- {{ instance_type }} instances
 
-	assign where host.vars.cluster == "{{ other_cluster_name }}"
-
-}
-
-# --------- admin instances
-
-{% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] %}
-{% set host = hostvars [host_name] %}
+{%		for host_name in groups [group_name] %}
+{%			set host = hostvars [host_name] %}
 
 object Host "{{ host_name }}" {
 
@@ -23,52 +21,22 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
-	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
+	command_endpoint = "wistla-{{ other_cluster_name }}-admin-{{ host.instance_zone }}"
 
 	vars.endpoint = "{{ host_name }}"
 	vars.cluster = "{{ other_cluster_name }}"
 	vars.stature = "cluster"
-	vars.type = "cluster-admin"
+	vars.type = "cluster-{{ instance_type }}"
 
-	vars.disks ["disk system"] = {
-		disk_partitions = "/"
+{%			for volume in host.cluster_volumes %}
+
+	vars.disks ["disk {{ volume.name }}"] = {
+		disk_partitions = "{{ volume.path }}"
 	}
 
-}
+{%			endfor %}
 
-{% endfor %}
-
-{% if 'cluster-' + other_cluster_name + '-app' in groups %}
-
-# ---------- app instances
-
-{% for host_name in groups ['cluster-' + other_cluster_name + '-app'] %}
-{% set host = hostvars [host_name] %}
-
-object Host "{{ host_name }}" {
-
-	import "generic-host"
-
-	address = "{{ host_name }}"
-
-	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
-
-	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ other_cluster_name }}"
-	vars.stature = "cluster"
-	vars.type = "cluster-app"
-
-	vars.disks ["disk system"] = {
-		disk_partitions = "/"
-	}
-
-	vars.disks ["disk containers"] = {
-		disk_partitions = "/var/lib/lxc"
-	}
-
-	vars.disks ["disk data"] = {
-		disk_partitions = "/data"
-	}
+{%			if instance_type in [ 'app', 'data' ] %}
 
 	vars.procs_warning = {{ [
 		200,
@@ -80,79 +48,9 @@ object Host "{{ host_name }}" {
 		other_cluster.deployment_names | length * 100,
 	] | sum }}
 
-}
+{%			endif %}
 
-{% endfor %}
-{% endif %}
-
-{% if 'cluster-' + other_cluster_name + '-data' in groups %}
-
-# ---------- data instances
-
-{% for host_name in groups ['cluster-' + other_cluster_name + '-data'] %}
-{% set host = hostvars [host_name] %}
-
-object Host "{{ host_name }}" {
-
-	import "generic-host"
-
-	address = "{{ host_name }}"
-
-	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
-
-	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ other_cluster_name }}"
-	vars.stature = "cluster"
-	vars.type = "cluster-data"
-
-	vars.disks ["disk system"] = {
-		disk_partitions = "/"
-	}
-
-	vars.disks ["disk containers"] = {
-		disk_partitions = "/var/lib/lxc"
-	}
-
-	vars.disks ["disk data"] = {
-		disk_partitions = "/data"
-	}
-
-}
-
-{% endfor %}
-{% endif %}
-
-{% if 'cluster-' + other_cluster_name + '-jenkins' in groups %}
-
-# ---------- jenkins instances
-
-{% for host_name in groups ['cluster-' + other_cluster_name + '-jenkins'] %}
-{% set host = hostvars [host_name] %}
-
-object Host "{{ host_name }}" {
-
-	import "generic-host"
-
-	address = "{{ host_name }}"
-
-	command_endpoint = "wistla-{{ other_cluster_name }}-admin-a"
-
-	vars.endpoint = "{{ host_name }}"
-	vars.cluster = "{{ other_cluster_name }}"
-	vars.stature = "cluster"
-	vars.type = "cluster-jenkins"
-
-	vars.disks ["disk system"] = {
-		disk_partitions = "/"
-	}
-
-	vars.disks ["disk containers"] = {
-		disk_partitions = "/var/lib/lxc"
-	}
-
-	vars.disks ["disk data"] = {
-		disk_partitions = "/data"
-	}
+{%			if instance_type in [ 'jenkins' ] %}
 
 	vars.procs_warning = {{ [
 		200,
@@ -164,12 +62,15 @@ object Host "{{ host_name }}" {
 		host.jenkins_deployment_names | length * 100,
 	] | sum }}
 
+{%			endif %}
+
 }
 
-{% endfor %}
-{% endif %}
+{%		endfor %}
+{%	endif %}
+{% endmacro %}
 
-{% endfor %}
+{##############################################################################}
 
 {% macro deployment_nodes (
 	node_type,
@@ -207,10 +108,11 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
-	command_endpoint = "wistla-{{ other_deployment.cluster }}-admin-a"
+	command_endpoint = "wistla-{{ other_deployment.cluster }}-admin-{{ zone }}"
 
 	vars.parent = "{{ parent_name }}"
 	vars.endpoint = "{{ parent_name }}"
+	vars.cluster = "{{ other_cluster_name }}"
 	vars.deployment = "{{ other_deployment_name }}"
 	vars.stature = "node"
 	vars.type = "node-{{ node_type }}"
@@ -222,6 +124,51 @@ object Host "{{ host_name }}" {
 
 {% endmacro %}
 
+{##############################################################################}
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+
+# ==================== cluster {{ other_cluster_name }}
+
+object HostGroup "{{ other_cluster_name }}" {
+
+	display_name = "{{ other_cluster_name | capitalize }} everything"
+
+	assign where host.vars.cluster == "{{ other_cluster_name }}"
+
+}
+
+object HostGroup "{{ other_cluster_name }}-instances" {
+
+	display_name = "{{ other_cluster_name | capitalize }} instances"
+
+	assign where (
+		host.vars.stature == "cluster"
+		&& host.vars.cluster == "{{ other_cluster_name }}"
+	)
+
+}
+
+{% print cluster_instances (
+	other_cluster_name,
+	'admin') %}
+
+{% print cluster_instances (
+	other_cluster_name,
+	'app') %}
+
+{% print cluster_instances (
+	other_cluster_name,
+	'data') %}
+
+{% print cluster_instances (
+	other_cluster_name,
+	'jenkins') %}
+
+{% endfor %}
+
+{##############################################################################}
+
 {% for other_deployment_name, other_deployment in deployments.items () %}
 {% if other_deployment.cluster in clusters
 	and other_deployment.type in [ 'simple', 'shared', 'alias' ]
@@ -230,9 +177,9 @@ object Host "{{ host_name }}" {
 
 # ==================== deployment {{ other_deployment_name }}
 
-object HostGroup "deployment-{{ other_deployment_name }}" {
+object HostGroup "{{ other_deployment_name }}-nodes" {
 
-	display_name = "Deployment {{ other_deployment_name }}"
+	display_name = "{{ other_deployment_name | capitalize }} nodes"
 
 	assign where host.vars.deployment == "{{ other_deployment_name }}"
 
