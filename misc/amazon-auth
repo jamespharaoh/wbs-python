@@ -19,22 +19,48 @@ from boto.sts import STSConnection
 
 current_time = int (time.time ())
 
-for key in [
-	"AWS_ACCESS_KEY_ID",
-	"AWS_SECRET_ACCESS_KEY",
-	"AWS_SESSION_TOKEN",
-]:
+def main ():
 
-	if key in os.environ:
-		del os.environ [key]
+	clean_environment ()
+	load_config ()
 
-with open ("config/overrides.yml") as file_handle:
-	CONFIG = yaml.load (file_handle)
+	if len (sys.argv) == 1:
+		authenticate_with_mfa ()
 
-with open ("data/amazon-accounts") as file_handle:
-	AMAZON_ACCOUNTS = yaml.load (file_handle)
+	else:
+		load_credentials ()
 
-if len (sys.argv) == 1:
+	if all_credentials ["timestamp"] + 30 * 60 < current_time:
+		obtain_temporary_credentials ()
+
+	if len (sys.argv) == 2:
+		print_variables (sys.argv [1])
+
+def clean_environment ():
+
+	for key in [
+		"AWS_ACCESS_KEY_ID",
+		"AWS_SECRET_ACCESS_KEY",
+		"AWS_SESSION_TOKEN",
+	]:
+
+		if key in os.environ:
+			del os.environ [key]
+
+def load_config ():
+
+	global CONFIG
+	global AMAZON_ACCOUNTS
+
+	with open ("config/overrides.yml") as file_handle:
+		CONFIG = yaml.load (file_handle)
+
+	with open ("data/amazon-accounts") as file_handle:
+		AMAZON_ACCOUNTS = yaml.load (file_handle)
+
+def authenticate_with_mfa ():
+
+	global all_credentials
 
 	mfa_token = raw_input ("Please enter your Wistla AWS MFA code: ")
 
@@ -58,12 +84,18 @@ if len (sys.argv) == 1:
 		},
 	}
 
-else:
+	sys.stderr.write ("Successfully authenticated for 24 hours\n")
+
+def load_credentials ():
+
+	global all_credentials
 
 	with open ("work/amazon-credentials") as file_handle:
 		all_credentials = yaml.load (file_handle)
 
-if all_credentials ["timestamp"] + 30 * 60 < current_time:
+def obtain_temporary_credentials ():
+
+	sys.stderr.write ("Obtaining temporary credentials\n")
 
 	admin_credentials = all_credentials ["admin"]
 
@@ -100,9 +132,7 @@ if all_credentials ["timestamp"] + 30 * 60 < current_time:
 			allow_unicode = True,
 			explicit_start = True)
 
-if len (sys.argv) > 1:
-
-	account_name = sys.argv [1]
+def print_variables (account_name):
 
 	account_credentials = all_credentials [account_name]
 
@@ -114,5 +144,7 @@ if len (sys.argv) > 1:
 
 	print ("export AWS_SESSION_TOKEN=\"%s\"" % (
 		account_credentials ["session_token"]))
+
+main ()
 
 # ex: noet ts=4 filetype=python
