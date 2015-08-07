@@ -78,7 +78,7 @@ production-a:
   node_memory:
 
     api: "1024"
-    browser: "512"
+    browser: "1024"
     load: "256"
     web: "1024"
 
@@ -127,7 +127,7 @@ production-b:
   node_memory:
 
     api: "1024"
-    browser: "512"
+    browser: "1024"
     load: "256"
     web: "1024"
 
@@ -216,7 +216,7 @@ staging-a:
   node_memory:
 
     api: "1024"
-    browser: "512"
+    browser: "1024"
     load: "256"
     web: "1024"
 
@@ -265,7 +265,7 @@ staging-b:
   node_memory:
 
     api: "1024"
-    browser: "512"
+    browser: "1024"
     load: "256"
     web: "1024"
 
@@ -325,7 +325,7 @@ test-everest:
   node_memory:
 
     api: "512"
-    browser: "256"
+    browser: "1024"
     load: "128"
     mongo: "512"
     rabbit: "256"
@@ -382,7 +382,7 @@ test-k2:
   node_memory:
 
     api: "512"
-    browser: "256"
+    browser: "1024"
     load: "128"
     mongo: "512"
     rabbit: "256"
@@ -439,7 +439,7 @@ test-montblanc:
   node_memory:
 
     api: "512"
-    browser: "768"
+    browser: "1024"
     load: "128"
     mongo: "512"
     rabbit: "256"
@@ -496,7 +496,7 @@ test-erebus:
   node_memory:
 
     api: "512"
-    browser: "256"
+    browser: "1024"
     load: "128"
     mongo: "512"
     rabbit: "256"
@@ -553,7 +553,7 @@ test-fitzroy:
   node_memory:
 
     api: "512"
-    browser: "256"
+    browser: "1024"
     load: "128"
     mongo: "512"
     rabbit: "256"
