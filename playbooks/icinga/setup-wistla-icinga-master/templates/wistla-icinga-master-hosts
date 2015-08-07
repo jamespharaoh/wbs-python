@@ -130,6 +130,7 @@ object Host "{{ host_name }}" {
 
 # ==================== cluster {{ other_cluster_name }}
 
+{#
 object HostGroup "{{ other_cluster_name }}" {
 
 	display_name = "{{ other_cluster_name | capitalize }} everything"
@@ -137,6 +138,7 @@ object HostGroup "{{ other_cluster_name }}" {
 	assign where host.vars.cluster == "{{ other_cluster_name }}"
 
 }
+#}
 
 object HostGroup "{{ other_cluster_name }}-instances" {
 
