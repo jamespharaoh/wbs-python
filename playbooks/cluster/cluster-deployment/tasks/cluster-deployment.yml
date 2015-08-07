@@ -1,8 +1,8 @@
 ---
 
 - name: "create deployment directory"
-  action:
   sudo: "yes"
+  action:
 
     module: "file"
     path: "{{ cluster_deployment_home }}"
@@ -124,8 +124,8 @@
     mode: "{{ item.mode }}"
 
 - name: "create links to config files"
-  action:
   with_items: "cluster_deployment_config_links"
+  action:
 
     module: "file"
     path: "{{ cluster_deployment_home }}/{{ item.target }}"
