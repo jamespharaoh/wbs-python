@@ -1,11 +1,12 @@
 ---
 
-- hosts: "generic-template"
-  gather_facts: "no"
-  roles: [ "node-update" ]
+- hosts:
 
-- hosts: "concrete-template"
-  gather_facts: "no"
-  roles: [ "node-update" ]
+    - "node-template-generic"
+    - "node-template-concrete"
+
+  roles:
+
+    - "node-update"
 
 # ex: et ts=2 filetype=yaml
