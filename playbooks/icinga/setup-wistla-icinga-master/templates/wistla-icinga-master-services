@@ -113,6 +113,25 @@ apply Service "http" {
 
 }
 
+apply Service "https" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_ssl = 1
+
+	assign where (
+		host.vars.type == "cluster-app" || (
+			host.vars.type == "cluster-admin"
+			&& host.vars.cluster == "ops"
+		)
+	)
+
+}
+
 apply Service "wistla api" {
 
 	import "generic-service"
