@@ -55,6 +55,9 @@ devenv_config_templates:
   - template: "devenv-wistla-rabbit-erlang-cookie"
     type: "rabbit"
     target: "erlang-cookie"
+    owner: "rabbitmq"
+    group: "root"
+    mode: "0400"
 
   - template: "devenv-wistla-web-config"
     type: "web"
