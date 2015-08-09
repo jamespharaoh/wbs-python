@@ -150,6 +150,8 @@ config.applePush = {
 // Deep link url scheme for use in sending out emails.
 config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
 
+config.clusterName = '{{cluster_name}}';
+
 // facebook app to use
 config.authentication.facebook.appToUse = '{{ third_parties [cluster_name].facebook_app_to_use }}';
 
