@@ -147,10 +147,47 @@ config.applePush = {
 {% endif %}
 };
 
+{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
+
+{% if cluster_deployment_alias ['name'] == 'test-k2' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
+
+// facebook app to use
+config.authentication.facebook.appToUse = '{{ third_parties ['production'].facebook_app_to_use }}';
+
+// facebook app configuration options
+config.authentication.facebook.apps = {
+	{{ third_parties ['production'].facebook_app_to_use }}: {
+		appId: '{{ third_parties ['production'].facebook_app_id }}',
+		appSecret: '{{ third_parties ['production'].facebook_app_secret }}',
+		appAccessToken: '{{ third_parties ['production'].facebook_app_access_token }}'
+	}
+};
+{% endif %}
+
+{% if cluster_deployment_alias ['name'] == 'test-montblanc' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
+
+// facebook app to use
+config.authentication.facebook.appToUse = '{{ third_parties ['dev'].facebook_app_to_use }}';
+
+// facebook app configuration options
+config.authentication.facebook.apps = {
+	{{ third_parties ['dev'].facebook_app_to_use }}: {
+		appId: '{{ third_parties ['dev'].facebook_app_id }}',
+		appSecret: '{{ third_parties ['dev'].facebook_app_secret }}',
+		appAccessToken: '{{ third_parties ['dev'].facebook_app_access_token }}'
+	}
+};
+{% endif %}
+
+
+{% else %}
+
 // Deep link url scheme for use in sending out emails.
 config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
-
-config.clusterName = '{{cluster_name}}';
 
 // facebook app to use
 config.authentication.facebook.appToUse = '{{ third_parties [cluster_name].facebook_app_to_use }}';
@@ -163,6 +200,8 @@ config.authentication.facebook.apps = {
 		appAccessToken: '{{ third_parties [cluster_name].facebook_app_access_token }}'
 	}
 };
+
+{% endif %}
 
 {% if bool_native [cluster_deployment.emails_enabled] %}
 
