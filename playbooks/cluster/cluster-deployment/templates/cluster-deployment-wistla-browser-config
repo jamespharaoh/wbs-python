@@ -19,11 +19,35 @@ config.apiPrivate = 'http://{{ cluster_deployment_name }}-api-{{ instance_zone }
 // email
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
+{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
+
+{% if cluster_deployment_alias ['name'] == 'test-k2' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
+
+// Facebook AppId.
+config.facebook.appId = '{{ third_parties ['production'].facebook_app_id }}';
+
+{% endif %}
+
+{% if cluster_deployment_alias ['name'] == 'test-montblanc' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
+
+// Facebook AppId.
+config.facebook.appId = '{{ third_parties ['dev'].facebook_app_id }}';
+
+{% endif %}
+
+{% else %}
+
 // Deep link url scheme for use in sending out emails.
 config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
 
 // Facebook AppId.
 config.facebook.appId = '{{ third_parties [cluster_name].facebook_app_id }}';
+
+{% endif %}
 
 module.exports = config;
 
