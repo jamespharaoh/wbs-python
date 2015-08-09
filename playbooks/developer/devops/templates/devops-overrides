@@ -53,12 +53,12 @@ dev_node_instance_count:
 
 dev_node_memory:
 
-  api: "{{ (dev_node_memory | default ({})).api | default ('768') }}"
-  browser: "{{ (dev_node_memory | default ({})).browser | default ('512') }}"
-  load: "{{ (dev_node_memory | default ({})).load | default ('256') }}"
-  mongo: "{{ (dev_node_memory | default ({})).mongo | default ('256') }}"
-  rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('256') }}"
-  web: "{{ (dev_node_memory | default ({})).web | default ('768') }}"
+  api: "{{ (dev_node_memory | default ({})).api | default ('1024') }}"
+  browser: "{{ (dev_node_memory | default ({})).browser | default ('1024') }}"
+  load: "{{ (dev_node_memory | default ({})).load | default ('512') }}"
+  mongo: "{{ (dev_node_memory | default ({})).mongo | default ('512') }}"
+  rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('512') }}"
+  web: "{{ (dev_node_memory | default ({})).web | default ('512') }}"
 
 dev_api_use_s3: "{{ dev_api_use_s3 | default ('no') }}"
 dev_web_use_s3: "{{ dev_web_use_s3 | default ('no') }}"
