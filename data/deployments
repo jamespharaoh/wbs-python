@@ -27,8 +27,8 @@ production:
 
   node_memory:
 
-    mongo: "512"
-    rabbit: "256"
+    mongo: "2048"
+    rabbit: "1024"
 
   node_instance_count:
 
@@ -165,8 +165,8 @@ staging:
 
   node_memory:
 
-    mongo: "512"
-    rabbit: "256"
+    mongo: "2048"
+    rabbit: "1024"
 
   node_instance_count:
 
