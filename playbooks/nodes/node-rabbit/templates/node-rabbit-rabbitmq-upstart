@@ -14,6 +14,8 @@ pre-start script
 
 	cp -a /config/erlang-cookie /var/lib/rabbitmq/.erlang.cookie
 
+	rabbitmq-plugins enable rabbitmq_management
+
 end script
 
 script
