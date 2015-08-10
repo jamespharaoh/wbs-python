@@ -84,7 +84,7 @@ production-a:
 
   node_instance_count:
 
-    api: "2"
+    api: "4"
     browser: "1"
     load: "1"
     web: "1"
@@ -133,7 +133,7 @@ production-b:
 
   node_instance_count:
 
-    api: "2"
+    api: "4"
     browser: "1"
     load: "1"
     web: "1"
