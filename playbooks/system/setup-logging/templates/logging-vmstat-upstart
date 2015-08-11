@@ -1,0 +1,23 @@
+{{ ansible_warning ['#'] }}
+
+description "Vmstat logging"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+respawn limit unlimited
+script
+
+	exec vmstat \
+		--active \
+		--unit M \
+		--wide \
+		10 \
+	| awk '{ print strftime ("%Y-%m-%d %H:%M:%S"), $0; fflush (); }' \
+	>> /var/log/vmstat.log
+
+end script
+
+post-stop exec sleep 2

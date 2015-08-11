@@ -1,0 +1,9 @@
+---
+
+- include: "setup-logging.yml"
+  tags:
+
+    - "system"
+    - "setup-logging"
+
+# ex: et ts=2 filetype=yaml

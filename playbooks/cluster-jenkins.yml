@@ -13,6 +13,8 @@
     - "setup-hostname"
     - "setup-system"
     - "setup-dns"
+    - "setup-logging"
+
     - "cluster-ssh"
     - "install-system-packages"
     - "install-kernel"

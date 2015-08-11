@@ -1,0 +1,26 @@
+---
+
+- name: "install vmstat upstart"
+  notify:
+
+    - "reload upstart config"
+    - "restart vmstat"
+
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/init/vmstat.conf"
+    src: "logging-vmstat-upstart"
+
+- name: "install vmstat logrotate"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/logrotate.d/vmstat"
+    src: "logging-vmstat-logrotate"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

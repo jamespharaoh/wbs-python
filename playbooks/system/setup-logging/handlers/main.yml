@@ -1,0 +1,15 @@
+---
+
+- name: "reload upstart config"
+  sudo: "yes"
+  shell: "initctl reload-configuration"
+
+- name: "restart vmstat"
+  sudo: "yes"
+  action:
+
+    module: "service"
+    name: "vmstat"
+    state: "restarted"
+
+# ex: et ts=2 filetype=yaml

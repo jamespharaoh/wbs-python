@@ -1,0 +1,16 @@
+/var/log/vmstat.log {
+
+	rotate 30
+	daily
+
+	missingok
+	notifempty
+
+	delaycompress
+	compress
+
+	postrotate
+		reload vmstat &>/dev/null || true
+	endscript
+
+}
