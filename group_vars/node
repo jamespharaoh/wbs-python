@@ -40,6 +40,6 @@ node_memory: "{{
 }}"
 
 lxc_memory_soft: "{{ node_memory [node_type] }}"
-lxc_memory_hard: "{{ node_memory [node_type] | int * 2 }}"
+lxc_memory_hard: "{{ node_memory [node_type] | int * 1.5 }}"
 
 # ex: et ts=2 filetype=yaml

@@ -77,7 +77,7 @@ production-a:
 
   node_memory:
 
-    api: "1024"
+    api: "3072"
     browser: "1024"
     load: "256"
     web: "1024"
@@ -126,7 +126,7 @@ production-b:
 
   node_memory:
 
-    api: "1024"
+    api: "3072"
     browser: "1024"
     load: "256"
     web: "1024"
@@ -215,7 +215,7 @@ staging-a:
 
   node_memory:
 
-    api: "1024"
+    api: "1536"
     browser: "1024"
     load: "256"
     web: "1024"
@@ -264,7 +264,7 @@ staging-b:
 
   node_memory:
 
-    api: "1024"
+    api: "1536"
     browser: "1024"
     load: "256"
     web: "1024"
