@@ -13,11 +13,9 @@ respawn limit unlimited
 
 env HOME=/home/ubuntu
 
-script
+pre-start script
 
 	. /config/environment
-
-	cd /home/ubuntu/wistla-{{ node_type }}
 
 	setuid ubuntu \
 	mkdir --parents /shared/log
@@ -27,6 +25,22 @@ script
 
 	exec >> /shared/log/wistla-{{ node_type }}.log
 	exec 2>> /shared/log/wistla-{{ node_type }}.log
+
+	echo "$(date --iso-8601=seconds) $(hostname) START wistla-{{ node_type }}[${{ node_var }}_INDEX]"
+
+	START_TIME="$(date +"%s")"
+	echo "$START_TIME" > "/var/run/wistla-{{ node_type }}-${{ node_var }}_INDEX-start"
+
+end script
+
+script
+
+	. /config/environment
+
+	exec >> /shared/log/wistla-{{ node_type }}.log
+	exec 2>> /shared/log/wistla-{{ node_type }}.log
+
+	cd /home/ubuntu/wistla-{{ node_type }}
 
 	if test "${{ node_var }}_INDEX" = "0" \
 		-a "${{ node_var }}_DEBUG" = "yes"
@@ -60,4 +74,19 @@ script
 
 end script
 
-post-stop exec sleep 2
+post-stop script
+
+	. /config/environment
+
+	exec >> /shared/log/wistla-{{ node_type }}.log
+	exec 2>> /shared/log/wistla-{{ node_type }}.log
+
+	START_TIME="$(cat "/var/run/wistla-{{ node_type }}-${{ node_var }}_INDEX-start")"
+	END_TIME="$(date +"%s")"
+	DURATION="$((END_TIME - START_TIME))"
+
+	echo "$(date --iso-8601=seconds) $(hostname) STOP wistla-{{ node_type }}[${{ node_var }}_INDEX] (after $DURATION seconds)"
+
+	exec sleep 2
+
+end script
