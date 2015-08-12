@@ -22,6 +22,8 @@
     - "cluster-volumes"
     - "cluster-user"
 
+    - "wistla-heka-agent"
+
     - "python"
 
     - "install-mongodb"

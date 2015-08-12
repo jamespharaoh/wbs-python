@@ -228,6 +228,9 @@ python_apt_url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
 
+heka_version: "0.10.0b0"
+heka_mirror: "{{ wistla_dist_url }}/heka"
+
 ttl_short: "30"
 ttl_medium: "300"
 ttl_long: "3600"

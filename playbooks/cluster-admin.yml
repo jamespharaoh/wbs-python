@@ -23,6 +23,8 @@
     - "cluster-volumes"
     - "cluster-user"
 
+    - "wistla-heka-master"
+
     - "cluster-admin-firewall"
 
     - "etcd"

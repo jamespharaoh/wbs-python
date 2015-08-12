@@ -1,0 +1,11 @@
+---
+
+dependencies:
+
+  - "heka-common"
+  - "wistla-heka-common"
+  - "install-heka"
+  - "wistla-setup-heka-master"
+  - "control-heka"
+
+# ex: et ts=2 filetype=yaml

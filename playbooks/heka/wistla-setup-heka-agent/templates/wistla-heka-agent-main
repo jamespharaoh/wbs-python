@@ -1,0 +1,38 @@
+[hekad]
+maxprocs = 4
+base_dir = "{{ heka_target }}/var/cache"
+share_dir = "{{ heka_target }}/share/heka"
+
+[dashboard]
+type = "DashboardOutput"
+address = ":4352"
+ticker_interval = 15
+
+[input-syslog]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = "syslog"
+
+[output-admin-a]
+type = "TcpOutput"
+address = "wistla-{{ cluster_name }}-admin-a:5565"
+keep_alive = true
+keep_alive_period = 60
+use_buffering = false
+message_matcher = "TRUE"
+
+[output-admin-b]
+type = "TcpOutput"
+address = "wistla-{{ cluster_name }}-admin-b:5565"
+keep_alive = true
+keep_alive_period = 60
+use_buffering = false
+message_matcher = "TRUE"
+
+[output-admin-c]
+type = "TcpOutput"
+address = "wistla-{{ cluster_name }}-admin-c:5565"
+keep_alive = true
+keep_alive_period = 60
+use_buffering = false
+message_matcher = "TRUE"
