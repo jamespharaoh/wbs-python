@@ -1,5 +1,6 @@
 {{ ansible_warning ['//'] }}
 
+{#
 apply Service "ping4" {
 
 	import "generic-service"
@@ -11,6 +12,7 @@ apply Service "ping4" {
 	assign where true
 
 }
+#}
 
 apply Service "ssh" {
 
@@ -132,7 +134,7 @@ apply Service "https" {
 
 }
 
-apply Service "wistla api" {
+apply Service for (api => config in host.vars.wistla_apis) {
 
 	import "generic-service"
 
@@ -140,14 +142,15 @@ apply Service "wistla api" {
 
 	command_endpoint = host.vars.endpoint
 
-	vars.http_port = 7000
 	vars.http_expect = "HTTP/1.1 404 Not Found"
+
+	vars += config
 
 	assign where host.vars.type == "node-api"
 
 }
 
-apply Service "wistla browser" {
+apply Service for (browser => config in host.vars.wistla_browsers) {
 
 	import "generic-service"
 
@@ -155,14 +158,15 @@ apply Service "wistla browser" {
 
 	command_endpoint = host.vars.endpoint
 
-	vars.http_port = 3000
 	vars.http_expect = "HTTP/1.1 404 Not Found"
+
+	vars += config
 
 	assign where host.vars.type == "node-browser"
 
 }
 
-apply Service "wistla web" {
+apply Service for (web => config in host.vars.wistla_webs) {
 
 	import "generic-service"
 
@@ -170,7 +174,7 @@ apply Service "wistla web" {
 
 	command_endpoint = host.vars.endpoint
 
-	vars.http_port = 3000
+	vars += config
 
 	assign where host.vars.type == "node-web"
 
