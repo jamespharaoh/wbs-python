@@ -102,4 +102,22 @@ append_newlines = false
 
 # TODO
 
+{% if inventory_hostname == 'wistla-production-admin-a' %}
+
+# ---------- email events
+
+[output-wistla-api-restart]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'Fields[Category] == "wistla-api"',
+	'Payload =~ / (START|STOP) /',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.main_domain }}"
+send_to = [ "notifications.production.warning@wistla.com" ]
+subject = "Wistla API restart notifications"
+send_interval = 60
+encoder = "encoder-simple"
+
+{% endif %}
+
 # ex: noet ts=4 filetype=toml
