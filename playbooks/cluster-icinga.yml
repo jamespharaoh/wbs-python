@@ -12,6 +12,7 @@
   roles:
 
     - "install-icinga"
+    #- "install-icinga-classicui"
     - "install-wistla-icinga-plugins"
 
 - hosts: "cluster-ops-network"
@@ -23,6 +24,7 @@
   roles:
 
     - "setup-wistla-icinga-master"
+    #- "setup-wistla-icinga-classicui"
     - "control-icinga"
 
 - hosts:

@@ -98,4 +98,8 @@ encoder = "encoder-simple"
 type = "PayloadEncoder"
 append_newlines = false
 
+# ---------- icinga events
+
+# TODO
+
 # ex: noet ts=4 filetype=toml

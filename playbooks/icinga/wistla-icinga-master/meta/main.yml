@@ -3,9 +3,13 @@
 dependencies:
 
   - "icinga-common"
+
   - "install-icinga"
   - "setup-wistla-icinga-master"
   - "control-icinga"
+
+  - "install-icinga-classicui"
+  - "setup-wistla-icinga-classicui"
 
   - "icinga-web-common"
   - "install-icinga-web"
