@@ -1,4 +1,11 @@
 ---
+heka:
+  installed_version: 0.10.0b0
+  needs_restart: 'no'
+  state: enabled
+heka_installed_version: 0.10.0b0
+heka_needs_restart: 'no'
+heka_state: enabled
 icinga:
   certificate: /authority/icinga/issue/22/certificate
   needs_restart: 'no'

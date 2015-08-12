@@ -18,6 +18,13 @@ wistla_heka_master_templates:
     group: "root"
     mode: "0644"
 
+  - target: "/etc/logrotate.d/heka"
+    template: "wistla-heka-master-logrotate"
+
+    user: "root"
+    group: "root"
+    mode: "0644"
+
 # ---------- agent config
 
 wistla_heka_agent_directories:

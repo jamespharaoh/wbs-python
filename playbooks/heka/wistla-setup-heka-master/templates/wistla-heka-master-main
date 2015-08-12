@@ -1,17 +1,44 @@
+{{ ansible_warning ['#'] }}
+
+# ---------- basic configuration
+
 [hekad]
 maxprocs = 4
 base_dir = "{{ heka_target }}/var/cache"
 share_dir = "{{ heka_target }}/share/heka"
 
-[dashboard]
-type = "DashboardOutput"
-address = ":4352"
-ticker_interval = 15
+#[dashboard]
+#type = "DashboardOutput"
+#address = ":4352"
+#ticker_interval = 15
+
+# ---------- read local log files
 
 [input-syslog]
 type = "LogstreamerInput"
 log_directory = "/var/log"
 file_match = "syslog"
+decoder = "decode-syslog"
+
+[decode-syslog]
+type = "ScribbleDecoder"
+
+	[decode-syslog.message_fields]
+	Category = "system"
+
+[input-auth]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = "auth.log"
+decoder = "decode-auth"
+
+[decode-auth]
+type = "ScribbleDecoder"
+
+	[decode-auth.message_fields]
+	Category = "system"
+
+# ---------- accept remote connections
 
 [input-socket]
 type = "TcpInput"
@@ -19,12 +46,56 @@ address = ":5565"
 keep_alive = true
 keep_alive_period = 60
 
-[output-log]
+# ---------- forward to master servers
+
+{% for zone in [ 'a', 'b', 'c' ] %}
+{% if zone != instance_zone %}
+
+[output-admin-{{ zone }}]
+type = "TcpOutput"
+address = "wistla-{{ cluster_name }}-admin-{{ zone }}:5565"
+keep_alive = true
+keep_alive_period = 60
+use_buffering = false
+message_matcher = 'Hostname == "{{ inventory_hostname }}"'
+
+{% endif %}
+{% endfor %}
+
+# ---------- write local log files
+
+[output-system-log]
 type = "FileOutput"
-path = "/var/log/global.log"
-message_matcher = "TRUE"
+path = "/var/log/cluster-system.log"
+message_matcher = 'Fields[Category] == "system"'
+encoder = "encoder-simple"
+
+[output-wistla-api-log]
+type = "FileOutput"
+path = "/var/log/cluster-wistla-api.log"
+message_matcher = 'Fields[Category] == "wistla-api"'
+encoder = "encoder-simple"
+
+[output-wistla-browser-log]
+type = "FileOutput"
+path = "/var/log/cluster-wistla-browser.log"
+message_matcher = 'Fields[Category] == "wistla-browser"'
+encoder = "encoder-simple"
+
+[output-wistla-web-log]
+type = "FileOutput"
+path = "/var/log/cluster-wistla-web.log"
+message_matcher = 'Fields[Category] == "wistla-web"'
+encoder = "encoder-simple"
+
+[output-nginx-times-log]
+type = "FileOutput"
+path = "/var/log/cluster-nginx-times.log"
+message_matcher = 'Fields[Category] == "nginx-times"'
 encoder = "encoder-simple"
 
 [encoder-simple]
 type = "PayloadEncoder"
 append_newlines = false
+
+# ex: noet ts=4 filetype=toml

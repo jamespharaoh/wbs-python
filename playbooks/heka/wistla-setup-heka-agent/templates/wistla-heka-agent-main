@@ -1,38 +1,87 @@
+{{ ansible_warning ['#'] }}
+
+# ---------- basic configuration
+
 [hekad]
 maxprocs = 4
 base_dir = "{{ heka_target }}/var/cache"
 share_dir = "{{ heka_target }}/share/heka"
 
-[dashboard]
-type = "DashboardOutput"
-address = ":4352"
-ticker_interval = 15
+#[dashboard]
+#type = "DashboardOutput"
+#address = ":4352"
+#ticker_interval = 15
+
+# ---------- read local log files
 
 [input-syslog]
 type = "LogstreamerInput"
 log_directory = "/var/log"
 file_match = "syslog"
+decoder = "decode-syslog"
 
-[output-admin-a]
+[decode-syslog]
+type = "ScribbleDecoder"
+
+	[decode-syslog.message_fields]
+	Category = "system"
+
+[input-auth]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = "auth.log"
+decoder = "decode-auth"
+
+[decode-auth]
+type = "ScribbleDecoder"
+
+	[decode-auth.message_fields]
+	Category = "system"
+
+{% for cluster_deployment_name in cluster.deployment_names | default ([]) %}
+{% set cluster_deployment = deployments [cluster_deployment_name] %}
+{% for log_name in [ 'wistla-api', 'wistla-browser', 'wistla-web' ] %}
+
+[input-{{ cluster_deployment_name }}-{{ log_name }}]
+type = "LogstreamerInput"
+log_directory = "/data/{{ cluster_deployment_name }}/shared/log"
+file_match = "{{ log_name }}.log"
+decoder = "decode-{{ cluster_deployment_name }}-{{ log_name }}"
+
+[decode-{{ cluster_deployment_name }}-{{ log_name }}]
+type = "ScribbleDecoder"
+
+	[decode-{{ cluster_deployment_name }}-{{ log_name }}.message_fields]
+	Category = "{{ log_name }}"
+	Deployment = "{{ cluster_deployment_name }}"
+
+{% endfor %}
+{% endfor %}
+
+[input-nginx-times]
+type = "LogstreamerInput"
+log_directory = "/var/log/nginx"
+file_match = "times.log"
+decoder = "decode-nginx-times"
+
+[decode-nginx-times]
+type = "ScribbleDecoder"
+
+	[decode-nginx-times.message_fields]
+	Category = "nginx-times"
+
+# ---------- forward to master servers
+
+{% for zone in [ 'a', 'b', 'c' ] %}
+
+[output-admin-{{ zone }}]
 type = "TcpOutput"
-address = "wistla-{{ cluster_name }}-admin-a:5565"
+address = "wistla-{{ cluster_name }}-admin-{{ zone }}:5565"
 keep_alive = true
 keep_alive_period = 60
 use_buffering = false
 message_matcher = "TRUE"
 
-[output-admin-b]
-type = "TcpOutput"
-address = "wistla-{{ cluster_name }}-admin-b:5565"
-keep_alive = true
-keep_alive_period = 60
-use_buffering = false
-message_matcher = "TRUE"
+{% endfor %}
 
-[output-admin-c]
-type = "TcpOutput"
-address = "wistla-{{ cluster_name }}-admin-c:5565"
-keep_alive = true
-keep_alive_period = 60
-use_buffering = false
-message_matcher = "TRUE"
+# ex: noet ts=4 filetype=toml

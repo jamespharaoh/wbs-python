@@ -23,21 +23,24 @@
     - "cluster-volumes"
     - "cluster-user"
 
-    - "wistla-heka-master"
-
     - "cluster-admin-firewall"
 
     - "etcd"
-
     - "mysql"
     - "php"
 
+    - "install-mongodb"
+    - "install-tools"
+    - "install-nodejs"
+    - "install-iojs"
+    - "install-node-packages"
+
     - "cluster-admin-nginx"
     - "setup-openvpn-server"
-
     - "cluster-admin-routes"
-    - "cluster-activate"
-
+    - "wistla-heka-master"
     - "cluster-admin-snapshots"
+
+    - "cluster-activate"
 
 # ex: et ts=2 filetype=yaml

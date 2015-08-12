@@ -6,6 +6,13 @@ etcd:
 etcd_installed_version: 2.1.1
 etcd_needs_restart: 'no'
 etcd_state: enabled
+heka:
+  installed_version: 0.10.0b0
+  needs_restart: 'no'
+  state: enabled
+heka_installed_version: 0.10.0b0
+heka_needs_restart: 'no'
+heka_state: enabled
 icinga:
   certificate: /authority/icinga/issue/0/certificate
   needs_restart: 'no'
