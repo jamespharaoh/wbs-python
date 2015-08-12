@@ -1,6 +1,9 @@
 ---
 
 - include: "install-mongodb.yml"
-  tags: "install-mongodb"
+  tags:
+
+    - "mongodb"
+    - "install-mongodb"
 
 # ex: et ts=2 filetype=yaml

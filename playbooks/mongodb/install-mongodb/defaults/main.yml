@@ -24,4 +24,6 @@ mongodb_binaries:
   - "mongostat"
   - "mongotop"
 
+mongodb_enabled: "yes"
+
 # ex: et ts=2 filetype=yaml

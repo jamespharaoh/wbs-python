@@ -40,4 +40,6 @@ amazon_instance_create_count_tag:
   "Zone": "{{ instance_zone }}"
   "Index": "{{ instance_index }}"
 
+mongodb_enabled: "no"
+
 # ex: et ts=2 filetype=yaml
