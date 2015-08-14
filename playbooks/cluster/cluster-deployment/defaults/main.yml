@@ -76,6 +76,7 @@ cluster_deployment_types:
         branch: "master"
         build_steps:
           - "npm install"
+          - "jspm install -y"
           - "./build.sh"
 
       - name: "wistla-api"
@@ -223,7 +224,7 @@ cluster_deployment_types:
         build_steps:
           - "npm install"
           - "jspm install -y"
-          - "gulp build"
+          - "./build.sh"
 
       - name: "wistla-api"
         branch: "master"
