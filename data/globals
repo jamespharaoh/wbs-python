@@ -113,8 +113,7 @@ devenv_checkouts:
     build_steps:
 
       - "npm install"
-      - "jspm install -y"
-      - "gulp build"
+      - "./build.sh"
 
   - name: "wistla-api"
     branch: "master"
