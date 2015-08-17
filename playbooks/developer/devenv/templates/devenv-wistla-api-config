@@ -139,7 +139,7 @@ config.applePush = {
 {% if 'dev' in third_parties %}
 config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 {% else %}
-config.urlScheme = '';
+config.urlScheme = 'wistlaDev';
 {% endif %}
 
 // facebook app to use
