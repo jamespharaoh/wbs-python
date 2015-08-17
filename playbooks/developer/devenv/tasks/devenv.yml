@@ -74,8 +74,8 @@
     dest: "{{ deployment_home }}/config/{{ item.type }}/{{ item.target }}"
     src: "{{ item.template }}"
 
-    owner: "{{ item.owner | default (vagrant_user) }}"
-    group: "{{ item.group | default (vagrant_user) }}"
+    owner: "{{ item.owner | default (deployment_user) }}"
+    group: "{{ item.group | default (deployment_user) }}"
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "stat override config files"
