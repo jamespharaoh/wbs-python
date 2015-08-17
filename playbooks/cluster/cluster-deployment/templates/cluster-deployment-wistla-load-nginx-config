@@ -169,6 +169,10 @@ http {
 		server_name {{ cluster_deployment_alias.short_domain }};
 {% endif %}
 
+		location = / {
+			return 307 https://{{ cluster_deployment_alias.main_domain }}/;
+		}
+
 		location / {
 			proxy_pass http://browser/in/;
 			proxy_http_version 1.1;

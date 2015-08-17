@@ -153,6 +153,10 @@ http {
 
 		server_name {{ deployment.short_domain }};
 
+		location = / {
+			return 307 https://{{ deployment.main_domain }}/;
+		}
+
 		location / {
 			proxy_pass http://browser/in/;
 			proxy_http_version 1.1;
