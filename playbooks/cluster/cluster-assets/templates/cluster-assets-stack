@@ -23,7 +23,7 @@ Resources:
         DefaultCacheBehavior:
 
           TargetOriginId: "{{ deployment_name }}-assets"
-          ViewerProtocolPolicy: "redirect-to-https"
+          ViewerProtocolPolicy: "allow-all"
 
           ForwardedValues:
             QueryString: "false"
@@ -32,7 +32,7 @@ Resources:
 
           - PathPattern: "/cms/*"
             TargetOriginId: "{{ deployment_name }}-web"
-            ViewerProtocolPolicy: "redirect-to-https"
+            ViewerProtocolPolicy: "allow-all"
 
             ForwardedValues:
               QueryString: "false"

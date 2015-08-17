@@ -234,6 +234,7 @@ http {
 
 	server {
 
+		listen 80;
 		listen 443 ssl;
 
 		server_name {{ dev_deployment.assets_domain }};
@@ -252,17 +253,16 @@ http {
 
 	}
 
-	# assets redirect to ssl
-
-	server {
-
-		listen 80;
-
-		server_name {{ dev_deployment.assets_domain }};
-
-		return 301 https://{{ dev_deployment.assets_domain }}$request_uri;
-
-	}
+#	# assets redirect to ssl
+#
+#	server {
+#
+#
+#		server_name {{ dev_deployment.assets_domain }};
+#
+#		return 301 https://{{ dev_deployment.assets_domain }}$request_uri;
+#
+#	}
 
 {% endfor %}
 
