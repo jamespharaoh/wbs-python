@@ -78,6 +78,12 @@ post-stop script
 
 	. /config/environment
 
+	setuid ubuntu \
+	mkdir --parents /shared/log
+
+	setuid ubuntu \
+	touch /shared/log/wistla-{{ node_type }}.log
+
 	exec >> /shared/log/wistla-{{ node_type }}.log
 	exec 2>> /shared/log/wistla-{{ node_type }}.log
 
