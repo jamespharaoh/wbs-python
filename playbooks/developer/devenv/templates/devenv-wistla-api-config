@@ -146,7 +146,7 @@ config.urlScheme = 'wistlaDev';
 {% if 'dev' in third_parties %}
 config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
 {% else %}
-config.authentication.facebook.appToUse = '';
+config.authentication.facebook.appToUse = 'wistlaDev';
 {% endif %}
 
 // facebook app configuration options
