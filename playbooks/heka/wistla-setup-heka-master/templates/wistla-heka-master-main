@@ -110,7 +110,7 @@ append_newlines = false
 type = "SmtpOutput"
 message_matcher = '{{ [
 	'Fields[Category] == "wistla-api"',
-	'Payload =~ / (START|STOP) /',
+	'Payload =~ / %% CONTAINER-PROCESS-CONTROL %% (START|STOP) %% /',
 ] | join (' && ') }}'
 send_from = "heka@{{ cluster.main_domain }}"
 send_to = [ "notifications.production.warning@wistla.com" ]
