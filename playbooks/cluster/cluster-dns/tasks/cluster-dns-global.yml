@@ -2,6 +2,15 @@
 
 - name: "create admin per-zone dns"
   delegate_to: "localhost"
+  with_nested:
+
+    - - "admin"
+      - "vpn"
+
+    - - "a"
+      - "b"
+      - "c"
+
   action:
 
     module: "route53"
@@ -14,19 +23,12 @@
     type: "A"
     value: "{{ cluster.amazon_admin_ips [item.1] }}"
 
-    aws_access_key: "{{ amazon_account.access_key }}"
-    aws_secret_key: "{{ amazon_account.secret_key }}"
-
-  with_nested:
-
-    - - "admin"
-      - "vpn"
-
-    - - "a"
-      - "b"
-      - "c"
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
 - name: "create main misc records"
+  with_items: "cluster.route53_main_domain.misc_records"
   action:
 
     module: "route53"
@@ -40,9 +42,9 @@
     value: "{{ item.value }}"
 
     region: "{{ amazon_region_name }}"
-    aws_access_key: "{{ amazon_account.access_key }}"
-    aws_secret_key: "{{ amazon_account.secret_key }}"
 
-  with_items: "cluster.route53_main_domain.misc_records"
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
 # ex: et ts=2 filetype=yaml

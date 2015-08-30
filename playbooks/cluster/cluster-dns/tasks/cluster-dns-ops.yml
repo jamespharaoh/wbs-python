@@ -16,8 +16,9 @@
     alias: "yes"
     alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
 
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
   when: "'.dev.wistla.com' in item.0 [item.1]"
 
@@ -47,8 +48,9 @@
     alias: "yes"
     alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
 
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
   when: "'.dev.wist.la' in item.short_domain"
 
@@ -72,7 +74,8 @@
     alias: "yes"
     alias_hosted_zone_id: "{{ admin_balancer_hosted_zone_name_id }}"
 
-    aws_access_key: "{{ amazon_accounts [amazon_account].access_key }}"
-    aws_secret_key: "{{ amazon_accounts [amazon_account].secret_key }}"
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
 # ex: et ts=2 filetype=yaml

@@ -1,14 +1,23 @@
 ---
 
 - include: "cluster-dns-global.yml"
-  tags: [ "cluster-dns", "cluster-dns-global" ]
+  tags:
+
+    - "cluster-dns"
+    - "cluster-dns-global"
 
 - include: "cluster-dns-main.yml"
-  tags: [ "cluster-dns", "cluster-dns-main" ]
   when: "cluster_name != 'ops'"
+  tags:
+
+    - "cluster-dns"
+    - "cluster-dns-main"
 
 - include: "cluster-dns-ops.yml"
-  tags: [ "cluster-dns", "cluster-dns-ops" ]
   when: "cluster_name == 'ops'"
+  tags:
+
+    - "cluster-dns"
+    - "cluster-dns-ops"
 
 # ex: et ts=2 filetype=yaml

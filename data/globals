@@ -249,4 +249,6 @@ build_id: "{{ build_name }}-{{ build_seq }}"
 build_bucket: "wistla-builds"
 build_target: "/builds/{{ build_name }}"
 
+amazon_credentials: "{{ lookup ('file', HOME + '/work/amazon-credentials') | from_yaml }}"
+
 # ex: et ts=2 filetype=yaml

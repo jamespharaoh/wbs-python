@@ -63,7 +63,6 @@ def basic_setup ():
 		os.rename ("config", "config-temp")
 		os.mkdir ("config")
 		os.rename ("config-temp", "config/overrides.yml")
-		os.rename ("accounts", "config/accounts.yml")
 
 def load_state ():
 
@@ -211,7 +210,6 @@ def run_playbook (args):
 			"ansible", "playbook", "--",
 			"--inventory-file", "inventory",
 			"--extra-vars", "@config/overrides.yml",
-			"--extra-vars", "@config/accounts.yml",
 			"--extra-vars", "HOME=%s" % HOME,
 			"--extra-vars", "DATA=%s/data" % HOME,
 		] + args,
