@@ -226,6 +226,8 @@ def main():
 
     ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
 
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
+
     value_list = ()
 
     if type(value_in) is str:
@@ -251,7 +253,7 @@ def main():
 
     # connect to the route53 endpoint 
     try:
-        conn = boto.route53.connection.Route53Connection(aws_access_key, aws_secret_key)
+        conn = boto.route53.connection.Route53Connection(**aws_connect_kwargs)
     except boto.exception.BotoServerError, e:
         module.fail_json(msg = e.error_message)
 
