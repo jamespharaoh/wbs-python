@@ -157,7 +157,7 @@ staging:
   email_domain: "staging.wistla.com"
 
   cluster: "staging"
-  target: "staging-a"
+  target: "staging-b"
 
   bridge_name: "br163"
   bridge_network: "10.163"
