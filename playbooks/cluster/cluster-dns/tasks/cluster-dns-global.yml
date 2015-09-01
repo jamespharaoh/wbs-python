@@ -14,11 +14,11 @@
   action:
 
     module: "route53"
+    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.main_domain }}"
     command: "create"
     overwrite: "yes"
 
     zone: "{{ cluster.main_domain }}"
-    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.main_domain }}"
     ttl: "60"
     type: "A"
     value: "{{ cluster.amazon_admin_ips [item.1] }}"
@@ -32,11 +32,14 @@
   action:
 
     module: "route53"
-    record: "{{ item.name }}.{{ cluster.main_domain }}"
+    record: "{{
+      cluster.main_domain if item.name == '@'
+      else item.name + '.' + cluster.main_domain
+    }}"
     command: "create"
+    overwrite: "yes"
 
     zone: "{{ cluster.main_domain }}"
-
     type: "{{ item.type }}"
     ttl: "{{ item.ttl }}"
     value: "{{ item.value }}"

@@ -85,7 +85,19 @@ route53_main_domain:
     - "ns-919.awsdns-50.net."
     - "ns-1216.awsdns-24.org."
 
-  misc_records: []
+  misc_records:
+
+    - name: "k1._domainkey"
+      type: "CNAME"
+      ttl: "300"
+      value: "dkim.mcsv.net."
+
+    - name: "@"
+      type: "TXT"
+      ttl: "300"
+      value: "{{ [
+        '\"v=spf1 include:_spf.google.com include:servers.mcsv.net ~all\"',
+      ] | join (',') }}"
 
 # ========== accounts and security
 

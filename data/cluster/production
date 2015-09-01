@@ -91,6 +91,21 @@ route53_main_domain:
       ttl: "300"
       value: "\"oT8DqUnzbfbursWrUdOEnhk3ZFccYjKEhb7p++E3F0g=\""
 
+    - name: "k1._domainkey"
+      type: "CNAME"
+      ttl: "300"
+      value: "dkim.mcsv.net."
+
+    - name: "@"
+      type: "TXT"
+      ttl: "300"
+      value: "{{ [
+        '\"google-site-verification=DTfnVqElGV7kSqX5WbDFXejCh9aIBN2TugKCWAzI_VA\"',
+        '\"google-site-verification=m0FYY4mwhWUDyAiOEWpQL2z9cf-BsX49Mxf_9mBmgqY\"',
+        '\"google-site-verification=m9xOTKRAo-ujFQGJb_qHZOBrWhHYcX98nW_4_xeJjec\"',
+        '\"v=spf1 include:_spf.google.com include:servers.mcsv.net ~all\"',
+      ] | join (',') }}"
+
 # ========== accounts and security
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
