@@ -235,42 +235,26 @@ def update_config ():
 	with open ("inventory", "w") as file_handle:
 		file_handle.write ("localhost ansible_connection=local\n")
 
-	run_playbook ([
-		"playbooks/devops.yml",
-	])
-
 	time.sleep (0.3)
 
-	if CONFIG ["deployment_mode"] != "vagrant":
-		return
+	if not os.path.isfile ("work/amazon-credentials"):
 
-	if not os.path.isfile ("accounts"):
-
-		with open ("accounts", "w") as file_handle:
+		with open ("work/amazon-credentials", "w") as file_handle:
 
 			file_handle.write ("\n".join ([
 				"---",
 				"",
-				"amazon_accounts:",
-				"",
-				"  production:",
-				"    access_key: \"\"",
-				"    secret_key: \"\"",
-				"",
-				"  staging:",
-				"    access_key: \"\"",
-				"    secret_key: \"\"",
-				"",
-				"  test:",
-				"    access_key: \"\"",
-				"    secret_key: \"\"",
-				"",
-				"  ops:",
-				"    access_key: \"\"",
-				"    secret_key: \"\"",
+				"{}",
 				"",
 				"# ex: et ts=2 filetype=yaml",
 			]) + "\n")
+
+
+	time.sleep (0.3)
+
+	run_playbook ([
+		"playbooks/devops.yml",
+	])
 
 def fetch_upstream ():
 
