@@ -239,7 +239,7 @@ def update_config ():
 
 	if not os.path.isdir ("work"):
 
-		os.path.mkdir ("work")
+		os.mkdir ("work")
 
 	if not os.path.isfile ("work/amazon-credentials"):
 
