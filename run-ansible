@@ -237,6 +237,10 @@ def update_config ():
 
 	time.sleep (0.3)
 
+	if not os.path.isdir ("work"):
+
+		os.path.mkdir ("work")
+
 	if not os.path.isfile ("work/amazon-credentials"):
 
 		with open ("work/amazon-credentials", "w") as file_handle:
