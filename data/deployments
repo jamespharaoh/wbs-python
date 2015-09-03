@@ -543,11 +543,11 @@ test-fitzroy:
   bridge_network: "10.166"
   bridge_mac: "aa:bb:0a:a6"
 
-  apple_push_notifications_enabled: "yes"
-  apple_push_notifications_name: "c.w.w.i.t.e_prod_apns"
-  apple_push_notifications_production: "yes"
+  apple_push_notifications_enabled: "no"
+  apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
+  apple_push_notifications_production: "no"
 
-  emails_enabled: "yes"
+  emails_enabled: "no"
   test_routes_enabled: "yes"
 
   node_memory:
