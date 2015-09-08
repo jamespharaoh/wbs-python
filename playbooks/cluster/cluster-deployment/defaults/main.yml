@@ -29,6 +29,9 @@ cluster_deployment_types:
       - name: "wistla-devops"
         branch: "master"
 
+      - name: "wistla-scripts"
+        branch: "master"
+
     config_directories:
 
       - "mongo"
@@ -90,6 +93,9 @@ cluster_deployment_types:
           - "npm install"
 
       - name: "wistla-devops"
+        branch: "master"
+
+      - name: "wistla-scripts"
         branch: "master"
 
       - name: "wistla-web"
@@ -237,6 +243,9 @@ cluster_deployment_types:
           - "npm install"
 
       - name: "wistla-devops"
+        branch: "master"
+
+      - name: "wistla-scripts"
         branch: "master"
 
       - name: "wistla-web"

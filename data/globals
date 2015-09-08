@@ -134,6 +134,9 @@ devenv_checkouts:
   - name: "wistla-iOS"
     branch: "master"
 
+  - name: "wistla-scripts"
+    branch: "master"
+
   - name: "wistla-web"
     branch: "master"
     build_steps:

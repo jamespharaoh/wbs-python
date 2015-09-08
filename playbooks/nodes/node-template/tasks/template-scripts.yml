@@ -1,0 +1,25 @@
+---
+
+- name: "deploy scripts"
+  delegate_to: "localhost"
+  sudo: "yes"
+  register: "deploy_scripts_output"
+  changed_when: "deploy_scripts_output.stdout != ''"
+  tags: "quick"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    rsync
+      --archive
+      --delete
+      --itemize-changes
+      {{ deployment_home }}/wistla-scripts/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/wistla-scripts/
+      --exclude /.git;
+
+# ex: et ts=2 filetype=yaml
