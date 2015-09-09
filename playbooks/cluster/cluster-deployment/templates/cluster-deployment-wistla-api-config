@@ -148,6 +148,24 @@ config.applePush = {
 // Deep link url scheme for use in sending out emails.
 config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
 
+// Analytics
+
+config.analytics.provider = {
+	amplitude: {
+		apiKey: '{{ third_parties[cluster_name].analytics_amplitude_key_api }}',
+		secretKey: '{{ third_parties[cluster_name].analytics_amplitude_key_secret }}'
+	},
+	aws: {
+		appId: '{{ third_parties[cluster_name].analytics_aws_id_app }}',
+		appName: '{{ third_parties[cluster_name].analytics_aws_app_name }}',
+		identityPoolId: '{{ third_parties[cluster_name].analytics_aws_id_identity_pool }}',
+		region: '{{ third_parties[cluster_name].analytics_aws_region }}'
+	},
+	google: {
+		trackerId: '{{ third_parties[cluster_name].analytics_google_id_tracker }}'
+	}
+};
+
 // facebook app to use
 config.authentication.facebook.appToUse = '{{ third_parties ['production'].facebook_app_to_use }}';
 

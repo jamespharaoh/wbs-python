@@ -142,6 +142,41 @@ config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 config.urlScheme = 'wistlaDev';
 {% endif %}
 
+// Analytics
+{% if 'dev' in third_parties %}
+config.analytics.provider = {
+	amplitude: {
+		apiKey: '{{ third_parties.dev.analytics_amplitude_key_api }}',
+		secretKey: '{{ third_parties.dev.analytics_amplitude_key_secret }}'
+	},
+	aws: {
+		appId: '{{ third_parties.dev.analytics_aws_id_app }}',
+		appName: '{{ third_parties.dev.analytics_aws_app_name }}',
+		identityPoolId: '{{ third_parties.dev.analytics_aws_id_identity_pool }}',
+		region: '{{ third_parties.dev.analytics_aws_region }}'
+	},
+	google: {
+		trackerId: '{{ third_parties.dev.analytics_google_id_tracker }}'
+	}
+};
+{% else %}
+config.analytics.provider = {
+	amplitude: {
+		apiKey: '',
+		secretKey: ''
+	},
+	aws: {
+		appId: '',
+		appName: '',
+		identityPoolId: '',
+		region: ''
+	},
+	google: {
+		trackerId: ''
+	}
+};
+{% endif %}
+
 // facebook app to use
 {% if 'dev' in third_parties %}
 config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';

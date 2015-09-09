@@ -20,3 +20,8 @@
 /wistla-web
 /group_vars/all
 /work
+
+.DS_Store
+.localized
+.idea
+*.nogit
