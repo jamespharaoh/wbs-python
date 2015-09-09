@@ -144,6 +144,10 @@ config.applePush = {
 
 // Analytics
 
+if (!config.analytics || typeof config.analytics !== 'object') {
+	config.analytics = {};
+}
+
 config.analytics.provider = {
 	amplitude: {
 		apiKey: '{{ third_parties[cluster_name].analytics_amplitude_key_api }}',
