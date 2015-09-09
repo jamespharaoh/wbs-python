@@ -142,12 +142,6 @@ config.applePush = {
 {% endif %}
 };
 
-{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
-
-{% if cluster_deployment_alias ['name'] == 'test-k2' %}
-// Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
-
 // Analytics
 
 config.analytics.provider = {
@@ -165,6 +159,12 @@ config.analytics.provider = {
 		trackerId: '{{ third_parties[cluster_name].analytics_google_id_tracker }}'
 	}
 };
+
+{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
+
+{% if cluster_deployment_alias ['name'] == 'test-k2' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
 
 // facebook app to use
 config.authentication.facebook.appToUse = '{{ third_parties ['production'].facebook_app_to_use }}';
