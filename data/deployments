@@ -144,7 +144,7 @@ staging:
   type: "shared"
 
   enabled: "yes"
-  monitoring: "yes"
+  monitoring: "no"
 
   main_domain: "staging.wistla.com"
   short_domain: "staging.wist.la"
@@ -184,7 +184,7 @@ staging-a:
   type: "alias"
 
   enabled: "yes"
-  monitoring: "yes"
+  monitoring: "no"
 
   cluster: "staging"
   alias: "staging"
