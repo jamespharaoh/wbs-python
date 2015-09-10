@@ -14,6 +14,7 @@
 
 {%		for host_name in groups [group_name] %}
 {%			set host = hostvars [host_name] %}
+{%			if host.amazon_instance_state == 'running' %}
 
 object Host "{{ host_name }}" {
 
@@ -28,15 +29,15 @@ object Host "{{ host_name }}" {
 	vars.stature = "cluster"
 	vars.type = "cluster-{{ instance_type }}"
 
-{%			for volume in host.cluster_volumes %}
+{%				for volume in host.cluster_volumes %}
 
 	vars.disks ["disk {{ volume.name }}"] = {
 		disk_partitions = "{{ volume.path }}"
 	}
 
-{%			endfor %}
+{%				endfor %}
 
-{%			if instance_type in [ 'app', 'data' ] %}
+{%				if instance_type in [ 'app', 'data' ] %}
 
 	vars.procs_warning = {{ [
 		200,
@@ -48,9 +49,9 @@ object Host "{{ host_name }}" {
 		other_cluster.deployment_names | length * 100,
 	] | sum }}
 
-{%			endif %}
+{%				endif %}
 
-{%			if instance_type in [ 'jenkins' ] %}
+{%				if instance_type in [ 'jenkins' ] %}
 
 	vars.procs_warning = {{ [
 		200,
@@ -62,10 +63,11 @@ object Host "{{ host_name }}" {
 		host.jenkins_deployment_names | length * 100,
 	] | sum }}
 
-{%			endif %}
+{%				endif %}
 
 }
 
+{%			endif %}
 {%		endfor %}
 {%	endif %}
 {% endmacro %}

@@ -1,0 +1,12 @@
+---
+
+- hosts: "cluster-host"
+  tasks:
+
+    - name: "set amazon_instance_state to 'running'"
+      when: "amazon_instance_state != 'running'"
+      update_resource:
+
+        amazon_instance_state: "running"
+
+# ex: et ts=2 filetype=yaml
