@@ -164,6 +164,7 @@ if (!config.analytics.provider.google || typeof config.analytics.provider.google
 	config.analytics.provider.google = {};
 }
 
+{% if cluster_name in third_parties %}
 config.analytics.provider.amplitude.apiKey = '{{ third_parties[cluster_name].analytics_amplitude_key_api }}';
 config.analytics.provider.amplitude.secretKey = '{{ third_parties[cluster_name].analytics_amplitude_key_secret }}';
 
@@ -173,6 +174,7 @@ config.analytics.provider.aws.identityPoolId = '{{ third_parties[cluster_name].a
 config.analytics.provider.aws.region = '{{ third_parties[cluster_name].analytics_aws_region }}';
 
 config.analytics.provider.google.trackerId = '{{ third_parties[cluster_name].analytics_google_id_tracker }}';
+{% endif %}
 
 {% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
 
