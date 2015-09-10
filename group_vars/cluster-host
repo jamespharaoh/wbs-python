@@ -42,4 +42,9 @@ amazon_instance_create_count_tag:
 
 mongodb_enabled: "no"
 
+amazon_instance_state: "running"
+amazon_instance_type_running: ""
+
+cluster_production_override: ""
+
 # ex: et ts=2 filetype=yaml

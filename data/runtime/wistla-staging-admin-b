@@ -1,4 +1,5 @@
 ---
+amazon_instance_state: stopped
 etcd:
   installed_version: 2.1.1
   needs_restart: 'no'
