@@ -23,6 +23,8 @@ deployment_names:
   - "production-a"
   - "production-b"
 
+mail_bcc_address: "james+noise@wellbehavedsoftware.com"
+
 # ========== amazon miscellaneous
 
 amazon_account: "production"

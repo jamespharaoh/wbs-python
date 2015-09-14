@@ -1,7 +1,6 @@
 ---
 
 - hosts: "cluster-data"
-  when: "amazon_instance_state == 'running'"
   roles:
 
     - "cluster-stop"

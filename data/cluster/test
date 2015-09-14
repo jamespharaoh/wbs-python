@@ -26,6 +26,8 @@ deployment_names:
   - "test-erebus"
   - "test-fitzroy"
 
+mail_bcc_address: "james+noise@wellbehavedsoftware.com"
+
 # ========== amazon miscellaneous
 
 amazon_account: "test"

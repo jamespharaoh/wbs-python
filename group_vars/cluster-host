@@ -47,4 +47,6 @@ amazon_instance_type_running: ""
 
 cluster_production_override: ""
 
+mail_bcc_address: "{{ cluster.mail_bcc_address }}"
+
 # ex: et ts=2 filetype=yaml

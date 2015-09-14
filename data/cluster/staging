@@ -23,6 +23,8 @@ deployment_names:
   - "staging-a"
   - "staging-b"
 
+mail_bcc_address: "james+noise@wellbehavedsoftware.com"
+
 # ========== amazon miscellaneous
 
 amazon_account: "staging"

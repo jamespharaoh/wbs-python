@@ -16,6 +16,8 @@ short_domain: "ops.wist.la"
 
 cluster_colour: "207"
 
+mail_bcc_address: "james+noise@wellbehavedsoftware.com"
+
 # ========== amazon miscellaneous
 
 amazon_account: "ops"
