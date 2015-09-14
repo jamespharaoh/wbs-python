@@ -16,8 +16,6 @@ short_domain: "ops.wist.la"
 
 cluster_colour: "207"
 
-mail_bcc_address: "james+noise@wellbehavedsoftware.com"
-
 # ========== amazon miscellaneous
 
 amazon_account: "ops"
@@ -72,6 +70,7 @@ route53_main_domain:
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.ops@wistla.com"
+bcc_email: "notifications.ops.info@wistla.com"
 
 etcd_credentials:
 

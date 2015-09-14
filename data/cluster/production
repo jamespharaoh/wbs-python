@@ -23,8 +23,6 @@ deployment_names:
   - "production-a"
   - "production-b"
 
-mail_bcc_address: "james+noise@wellbehavedsoftware.com"
-
 # ========== amazon miscellaneous
 
 amazon_account: "production"
@@ -113,6 +111,8 @@ route53_main_domain:
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.production@wistla.com"
+bcc_email: "notifications.production.info@wistla.com"
+monitoring_email: "notifications.production.warning@wistla.com"
 
 etcd_credentials:
 

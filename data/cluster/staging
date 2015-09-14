@@ -23,8 +23,6 @@ deployment_names:
   - "staging-a"
   - "staging-b"
 
-mail_bcc_address: "james+noise@wellbehavedsoftware.com"
-
 # ========== amazon miscellaneous
 
 amazon_account: "staging"
@@ -125,6 +123,8 @@ route53_main_domain:
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
 cron_email: "cron.staging@wistla.com"
+bcc_email: "notifications.staging.info@wistla.com"
+monitoring_email: "notifications.production.warning@wistla.com"
 
 etcd_credentials:
 

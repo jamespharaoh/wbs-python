@@ -173,6 +173,10 @@ config.authentication.facebook.apps = {
 {% endfor %}
 };
 
+// monitoring email address (for email activation warnings)
+config.monitoringEmailAddress =
+	'Wistla Operations <notifications.production.warning@wistla.com>';
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

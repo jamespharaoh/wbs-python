@@ -205,6 +205,10 @@ config.sendEmails = true;
 
 {% endif %}
 
+// monitoring email address (for email activation warnings)
+config.monitoringEmailAddress =
+	'Wistla Operations <{{ cluster.monitoring_email }}>';
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript

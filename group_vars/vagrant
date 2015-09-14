@@ -152,6 +152,6 @@ etcd_version: "2.1.0-alpha.0"
 etcd_secured: "no"
 etcd_clustered: "no"
 
-mail_bcc_address: "james+noise@wellbehavedsoftware.com"
+postfix_always_bcc: "james+noise@wellbehavedsoftware.com"
 
 # ex: et ts=2 filetype=yaml
