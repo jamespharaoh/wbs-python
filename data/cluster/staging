@@ -122,9 +122,9 @@ route53_main_domain:
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
-cron_email: "cron.staging@wistla.com"
+cron_email: "notifications.staging.info@wistla.com"
 bcc_email: "notifications.staging.info@wistla.com"
-monitoring_email: "notifications.production.warning@wistla.com"
+monitoring_email: "notifications.staging.info@wistla.com"
 
 etcd_credentials:
 

@@ -69,7 +69,7 @@ route53_main_domain:
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"
 
-cron_email: "cron.ops@wistla.com"
+cron_email: "notifications.ops.info@wistla.com"
 bcc_email: "notifications.ops.info@wistla.com"
 
 etcd_credentials:
