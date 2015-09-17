@@ -16,6 +16,7 @@ alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 mydestination = localdomain, localhost, localhost.localdomain, localhost
 recipient_delimiter = +
+always_bcc = {{ postfix_always_bcc }}
 
 # inbound mail
 

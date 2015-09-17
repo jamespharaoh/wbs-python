@@ -1,5 +1,10 @@
 ---
 
+my_system_packages:
+
+  - name: "build-essential"
+    state: "present"
+
 web_install_packages:
 
   - "iptables"

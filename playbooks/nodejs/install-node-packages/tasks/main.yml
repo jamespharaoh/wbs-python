@@ -1,6 +1,9 @@
 ---
 
 - include: "install-node-packages.yml"
-  tags: "install-node-packages"
+  tags:
+
+    - "node"
+    - "install-node-packages"
 
 # ex: et ts=2 filetype=yaml

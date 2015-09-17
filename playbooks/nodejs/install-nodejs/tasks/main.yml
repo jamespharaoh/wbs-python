@@ -1,6 +1,9 @@
 ---
 
 - include: "install-nodejs.yml"
-  tags: "install-nodejs"
+  tags:
+
+    - "nodejs"
+    - "install-nodejs"
 
 # ex: et ts=2 filetype=yaml

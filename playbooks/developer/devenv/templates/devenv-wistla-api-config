@@ -139,7 +139,7 @@ config.applePush = {
 {% if 'dev' in third_parties %}
 config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 {% else %}
-config.urlScheme = 'wistlaDev';
+config.urlScheme = '';
 {% endif %}
 
 // Analytics
@@ -220,6 +220,10 @@ config.authentication.facebook.apps = {
 {% endif %}
 {% endfor %}
 };
+
+// monitoring email address (for email activation warnings)
+config.monitoringEmailAddress =
+	'Wistla Operations <notifications.production.warning@wistla.com>';
 
 module.exports = config;
 
