@@ -1,60 +1,69 @@
 ---
 
 - name: "create robots.txt"
-  action:
-    module: "template"
-    src: "cluster-admin-nginx-robots"
-    dest: "/etc/nginx/dev-robots.txt"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/nginx/dev-robots.txt"
+    src: "cluster-admin-nginx-robots"
 
 - name: "create nginx config"
-  action:
-    module: "template"
-    src: "cluster-admin-nginx-config"
-    dest: "/etc/nginx/nginx.conf"
-  sudo: "yes"
   notify: "restart nginx"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/nginx/nginx.conf"
+    src: "cluster-admin-nginx-config"
 
 - name: "create nginx ssl directory"
+  sudo: "yes"
   action:
+
     module: "file"
     name: "/etc/nginx/ssl"
     state: "directory"
-  sudo: "yes"
 
 - name: "write nginx certificates"
-  action:
-    module: "template"
-    src: "cluster-admin-ssl-bundle"
-    dest: "/etc/nginx/ssl/{{ item }}.cert"
-  sudo: "yes"
   with_items: "cluster.admin_certificates | default ([])"
   notify: "restart nginx"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/nginx/ssl/{{ item }}.cert"
+    src: "cluster-admin-ssl-bundle"
 
 - name: "write nginx private keys"
+  with_items: "cluster.admin_certificates | default ([])"
+  notify: "restart nginx"
+  sudo: "yes"
   action:
+
     module: "copy"
     dest: "/etc/nginx/ssl/{{ item }}.key"
+
     content: "{{ lookup ('etcd', [
       '/certificate/',
       cluster_name,
-      '-ssl/',
+      '-ssl/subjects/',
       item,
       '/current/key',
     ] | join ('')) + '\n' }}"
+
     mode: "0600"
-  sudo: "yes"
-  with_items: "cluster.admin_certificates | default ([])"
-  notify: "restart nginx"
 
 - name: "write nginx htpasswd"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/htpasswd"
-    dest: "/etc/nginx/htpasswd"
-    mode: "0640"
-    group: "www-data"
   sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/nginx/htpasswd"
+    src: "{{ HOME }}/security/htpasswd"
+
+    group: "www-data"
+    mode: "0640"
 
 - meta: "flush_handlers"
 
