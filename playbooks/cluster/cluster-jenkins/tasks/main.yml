@@ -1,12 +1,24 @@
 ---
 
 - include: "cluster-jenkins-network.yml"
-  tags: "cluster-jenkins-network"
+  tags:
+
+    - "cluster"
+    - "cluster-jenkins"
+    - "cluster-jenkins-network"
 
 - include: "cluster-jenkins-install.yml"
-  tags: "cluster-jenkins-install"
+  tags:
+
+    - "cluster"
+    - "cluster-jenkins"
+    - "cluster-jenkins-install"
 
 - include: "cluster-jenkins-nginx.yml"
-  tags: "cluster-jenkins-nginx"
+  tags:
+
+    - "cluster"
+    - "cluster-jenkins"
+    - "cluster-jenkins-nginx"
 
 # ex: et ts=2 filetype=yaml

@@ -3,6 +3,7 @@
 - include: "cluster-admin-snapshots.yml"
   tags:
 
+    - "cluster"
     - "cluster-admin"
     - "cluster-admin-snapshots"
 

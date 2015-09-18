@@ -1,6 +1,9 @@
 ---
 
 - include: "cluster-ssh.yml"
-  tags: "cluster-ssh"
+  tags:
+
+    - "cluster"
+    - "cluster-ssh"
 
 # ex: et ts=2 filetype=yaml

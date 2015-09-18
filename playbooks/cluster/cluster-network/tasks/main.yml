@@ -1,38 +1,74 @@
 ---
 
 - include: "cluster-setup.yml"
-  tags: "cluster-setup"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-setup"
 
 # ---------- vpc
 
 - include: "cluster-vpc.yml"
-  tags: "cluster-vpc"
+  tags:
+
+    - "cluster"
+    - "cluster-network-vpc"
+    - "cluster-network-vpc"
 
 - include: "cluster-admin-subnet.yml"
-  tags: "cluster-admin-subnet"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-admin-subnet"
 
 - include: "cluster-data-subnet.yml"
-  tags: "cluster-data-subnet"
   when: "cluster_name != 'ops'"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-data-subnet"
 
 - include: "cluster-app-subnet.yml"
-  tags: "cluster-app-subnet"
   when: "cluster_name != 'ops'"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-app-subnet"
 
 - include: "cluster-jenkins-subnet.yml"
-  tags: "cluster-jenkins-subnet"
   when: "cluster_name == 'ops'"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-jenkins-subnet"
 
 - include: "cluster-security-groups.yml"
-  tags: "cluster-security-groups"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-security-groups"
 
 # ---------- balancers
 
 - include: "cluster-app-balancer.yml"
-  tags: "cluster-app-balancer"
   when: "cluster_name != 'ops'"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-app-balancer"
 
 - include: "cluster-admin-balancer.yml"
-  tags: "cluster-admin-balancer"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-admin-balancer"
 
 # ex: et ts=2 filetype=yaml

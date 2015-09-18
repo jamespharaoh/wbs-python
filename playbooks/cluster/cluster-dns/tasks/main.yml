@@ -3,6 +3,7 @@
 - include: "cluster-dns-global.yml"
   tags:
 
+    - "cluster"
     - "cluster-dns"
     - "cluster-dns-global"
 
@@ -10,6 +11,7 @@
   when: "cluster_name != 'ops'"
   tags:
 
+    - "cluster"
     - "cluster-dns"
     - "cluster-dns-main"
 
@@ -17,6 +19,7 @@
   when: "cluster_name == 'ops'"
   tags:
 
+    - "cluster"
     - "cluster-dns"
     - "cluster-dns-ops"
 
