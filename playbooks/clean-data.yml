@@ -3,9 +3,17 @@
 - hosts: "localhost"
   tasks:
 
-    - fail:
-        msg: "not available in this deployment mode"
+    - name: "check deployment mode"
       when: "deployment_mode == 'alias'"
+      fail:
+
+        prompt: "not available in this deployment mode"
+
+    - name: "warning"
+      when: "deployment_mode == 'vagrant'"
+      pause:
+
+        prompt: "WARNING - this will delete all runtime data"
 
 - include: "stop.yml"
 
@@ -13,16 +21,16 @@
   tasks:
 
     - name: "remove shared directory"
-      shell:
-        rm -rf {{ deployment_home }}/shared/*
       sudo: "yes"
+      shell:
+
+        rm -rf {{ deployment_home }}/shared/*;
 
     - name: "create shared directory"
       action:
+
         module: "file"
         path: "{{ deployment_home }}/shared"
         state: "directory"
-      sudo: "yes"
-      sudo_user: "{{ deployment_user }}"
 
 # ex: et ts=2 filetype=yaml

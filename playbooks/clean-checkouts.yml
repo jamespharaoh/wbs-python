@@ -1,0 +1,33 @@
+---
+
+- hosts: "localhost"
+  tasks:
+
+    - name: "warning"
+      when: "deployment_mode == 'vagrant'"
+      pause:
+
+        prompt: "WARNING - this will delete ALMOST ALL files not managed by git"
+
+    - name: "clean checked out projects"
+      with_items: "devenv_checkouts"
+      when: "deployment_mode == 'vagrant'"
+      args:
+
+        executable: "/bin/bash"
+
+      shell:
+
+        set -euf -o pipefail;
+
+        cd "{{ deployment_home }}/{{ item.name }}";
+
+        git clean -xdf
+          {{
+            item.configs
+            | default ([])
+            | prepend_list ('--exclude ')
+            | join (' ')
+          }};
+
+# ex: et ts=2 filetype=yaml
