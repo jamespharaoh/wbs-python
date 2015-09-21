@@ -1,5 +1,5 @@
 ---
-amazon_instance_state: stopped
+amazon_instance_state: running
 heka:
   installed_version: 0.10.0b0
   needs_restart: 'no'

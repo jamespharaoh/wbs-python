@@ -1,7 +1,7 @@
 ---
 
 - name: "create cluster instance"
-  when: "amazon_instance_state == 'running'"
+  when: "instance_id is not defined"
   register: "create_result"
   local_action:
 
@@ -34,12 +34,26 @@
     wait: "yes"
 
 - name: "set instance_id"
-  when: "amazon_instance_state == 'running'"
+  when: "instance_id is not defined"
   update_resource:
 
     instance_id: "{{ create_result.tagged_instances.0.id }}"
 
-- name: "set amazon_instance_type_running to ''"
+- name: "start cluster instance"
+  when: "amazon_instance_state == 'running'"
+  local_action:
+
+    module: "ec2"
+    instance_ids: "{{ instance_id }}"
+    state: "running"
+
+    region: "{{ amazon_region_name }}"
+
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+- name: "set amazon_instance_type_running"
   when: "
     amazon_instance_state == 'running'
     and amazon_instance_type != amazon_instance_type_running
