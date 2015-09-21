@@ -1,12 +1,9 @@
 ---
 
-- name: "update system packages"
-  tags: "update"
-  sudo: "yes"
-  action:
+- include: "cluster-update.yml"
+  tags:
 
-    module: "apt"
-    upgrade: "dist"
-    update_cache: "yes"
+    - "cluster"
+    - "cluster-update"
 
 # ex: et ts=2 filetype=yaml

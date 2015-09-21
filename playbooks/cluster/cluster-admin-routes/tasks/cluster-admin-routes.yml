@@ -11,8 +11,10 @@
   environment:
 
     AWS_DEFAULT_REGION: "{{ amazon_region_name }}"
-    AWS_ACCESS_KEY_ID: "{{ amazon_account.access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ amazon_account.secret_key }}"
+
+    AWS_ACCESS_KEY_ID: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    AWS_SESSION_TOKEN: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
   args:
 
@@ -20,7 +22,9 @@
 
   shell:
 
-    set -e
+    set -euf -o pipefail;
+
+    set;
 
     if test "{{ item }}"; then
 
@@ -56,8 +60,10 @@
   environment:
 
     AWS_DEFAULT_REGION: "{{ amazon_region_name }}"
-    AWS_ACCESS_KEY_ID: "{{ amazon_account.access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ amazon_account.secret_key }}"
+
+    AWS_ACCESS_KEY_ID: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    AWS_SESSION_TOKEN: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
   args:
 

@@ -1,6 +1,9 @@
 ---
 
 - include: "cluster-assign-elastic-ip.yml"
-  tags: "cluster-assign-elastic-ip"
+  tags:
+
+    - "cluster"
+    - "cluster-assign-elastic-ip"
 
 # ex: et ts=2 filetype=yaml

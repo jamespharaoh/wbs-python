@@ -1,6 +1,9 @@
 ---
 
 - include: "cluster-create.yml"
-  tags: "cluster-create"
+  tags:
+
+    - "cluster"
+    - "cluster-create"
 
 # ex: et ts=2 filetype=yaml

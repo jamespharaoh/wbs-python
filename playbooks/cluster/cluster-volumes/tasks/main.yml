@@ -3,6 +3,7 @@
 - include: "cluster-volumes.yml"
   tags:
 
+    - "cluster"
     - "cluster-volumes"
 
 # ex: et ts=2 filetype=yaml

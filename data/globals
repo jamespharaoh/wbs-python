@@ -130,6 +130,11 @@ devenv_checkouts:
 
   - name: "wistla-devops"
     branch: "master"
+    configs:
+
+      - "config"
+      - "data/runtime"
+      - "security"
 
   - name: "wistla-iOS"
     branch: "master"

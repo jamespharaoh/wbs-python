@@ -1,6 +1,9 @@
 ---
 
 - include: "cluster-assets.yml"
-  tags: [ "cluster", "cluster-assets" ]
+  tags:
+
+    - "cluster"
+    - "cluster-assets"
 
 # ex: et ts=2 filetype=yaml

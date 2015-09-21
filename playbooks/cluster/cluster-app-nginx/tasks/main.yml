@@ -1,6 +1,10 @@
 ---
 
 - include: "cluster-app-nginx.yml"
-  tags: [ "nginx", "cluster-app-nginx" ]
+  tags:
+
+    - "cluster"
+    - "cluster-app"
+    - "cluster-app-nginx"
 
 # ex: et ts=2 filetype=yaml

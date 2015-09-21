@@ -3,18 +3,21 @@
 - include: "cluster-app-network.yml"
   tags:
 
+    - "cluster"
     - "cluster-app"
     - "cluster-app-network"
 
 - include: "cluster-app-firewall.yml"
   tags:
 
+    - "cluster"
     - "cluster-app"
     - "cluster-app-firewall"
 
 - include: "cluster-app-cron.yml"
   tags:
 
+    - "cluster"
     - "cluster-app"
     - "cluster-app-cron"
 

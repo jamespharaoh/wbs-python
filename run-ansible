@@ -37,6 +37,7 @@ NEED_PAUSE = False
 def main ():
 
 	basic_setup ()
+	special_cases ()
 	load_state ()
 
 	load_config ()
@@ -59,10 +60,13 @@ def basic_setup ():
 	HOME = os.path.abspath (os.path.dirname (__file__))
 	os.chdir (HOME)
 
-	if os.path.isfile ("config"):
-		os.rename ("config", "config-temp")
-		os.mkdir ("config")
-		os.rename ("config-temp", "config/overrides.yml")
+def special_cases ():
+
+	if sys.argv [1:] == [ "--help" ]:
+
+		os.execl (
+			"%s/third-party/ansible/bin/ansible-playbook" % HOME,
+			"--help")
 
 def load_state ():
 
