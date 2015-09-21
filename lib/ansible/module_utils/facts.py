@@ -16,6 +16,7 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import stat
 import array
 import errno
@@ -43,8 +44,16 @@ except ImportError:
 
 try:
     import json
+    # Detect python-json which is incompatible and fallback to simplejson in
+    # that case
+    try:
+        json.loads
+        json.dumps
+    except AttributeError:
+        raise ImportError
 except ImportError:
     import simplejson as json
+
 
 # --------------------------------------------------------------
 # timeout function to make sure some fact gathering
@@ -1975,7 +1984,7 @@ class GenericBsdIfconfigNetwork(Network):
 
         return interface['v4'], interface['v6']
 
-    def get_interfaces_info(self, ifconfig_path):
+    def get_interfaces_info(self, ifconfig_path, ifconfig_options='-a'):
         interfaces = {}
         current_if = {}
         ips = dict(
@@ -1985,7 +1994,7 @@ class GenericBsdIfconfigNetwork(Network):
         # FreeBSD, DragonflyBSD, NetBSD, OpenBSD and OS X all implicitly add '-a'
         # when running the command 'ifconfig'.
         # Solaris must explicitly run the command 'ifconfig -a'.
-        rc, out, err = module.run_command([ifconfig_path, '-a'])
+        rc, out, err = module.run_command([ifconfig_path, ifconfig_options])
 
         for line in out.split('\n'):
 
@@ -2155,14 +2164,14 @@ class AIXNetwork(GenericBsdIfconfigNetwork, Network):
     platform = 'AIX'
 
     # AIX 'ifconfig -a' does not have three words in the interface line
-    def get_interfaces_info(self, ifconfig_path):
+    def get_interfaces_info(self, ifconfig_path, ifconfig_options):
         interfaces = {}
         current_if = {}
         ips = dict(
             all_ipv4_addresses = [],
             all_ipv6_addresses = [],
         )
-        rc, out, err = module.run_command([ifconfig_path, '-a'])
+        rc, out, err = module.run_command([ifconfig_path, ifconfig_options])
 
         for line in out.split('\n'):
 
@@ -2196,7 +2205,7 @@ class AIXNetwork(GenericBsdIfconfigNetwork, Network):
                 rc, out, err = module.run_command([uname_path, '-W'])
                 # don't bother with wpars it does not work
                 # zero means not in wpar
-                if out.split()[0] == '0':
+                if not rc and out.split()[0] == '0':
                     if current_if['macaddress'] == 'unknown' and re.match('^en', current_if['device']):
                         entstat_path = module.get_bin_path('entstat')
                         if entstat_path:
@@ -2241,6 +2250,10 @@ class OpenBSDNetwork(GenericBsdIfconfigNetwork, Network):
     It uses the GenericBsdIfconfigNetwork.
     """
     platform = 'OpenBSD'
+
+    # OpenBSD 'ifconfig -a' does not have information about aliases
+    def get_interfaces_info(self, ifconfig_path, ifconfig_options='-aA'):
+       return super(OpenBSDNetwork, self).get_interfaces_info(ifconfig_path, ifconfig_options)
 
     # Return macaddress instead of lladdr
     def parse_lladdr_line(self, words, current_if, ips):
