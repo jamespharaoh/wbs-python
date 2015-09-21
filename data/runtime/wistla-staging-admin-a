@@ -1,5 +1,5 @@
 ---
-amazon_instance_state: running
+amazon_instance_state: stopped
 amazon_instance_type_running: t2.micro
 etcd:
   installed_version: 2.1.1

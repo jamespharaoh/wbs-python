@@ -1,5 +1,5 @@
 ---
-amazon_instance_state: running
+amazon_instance_state: stopped
 amazon_instance_type_running: m4.large
 heka:
   installed_version: 0.10.0b0
