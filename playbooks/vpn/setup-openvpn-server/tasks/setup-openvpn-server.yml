@@ -1,76 +1,88 @@
 ---
 
 - name: "install openvpn ca cert"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/wistla-ca.cert"
-    dest: "/etc/openvpn/wistla-ca.cert"
-  sudo: "yes"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-ca.cert"
+    src: "{{ HOME }}/security/wistla-ca.cert"
 
 - name: "install wistla-dh.pem"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/wistla-dh.pem"
-    dest: "/etc/openvpn/wistla-dh.pem"
-  sudo: "yes"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-dh.pem"
+    src: "{{ HOME }}/security/wistla-dh.pem"
 
 - name: "install openvpn server cert"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.cert"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.cert"
-  sudo: "yes"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.cert"
+    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.cert"
 
 - name: "install openvpn server key"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.key"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.key"
-    mode: "0600"
-  sudo: "yes"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.key"
+    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.key"
+
+    mode: "0600"
 
 - name: "create openvpn config"
-  action:
-    module: "template"
-    src: "openvpn-config"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.conf"
-  sudo: "yes"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.conf"
+    src: "openvpn-config"
 
 - name: "create openvpn client config dir"
+  sudo: "yes"
   action:
+
     module: "file"
     name: "/etc/openvpn/clients"
     state: "directory"
-  sudo: "yes"
 
 - name: "create openvpn client configs"
-  action:
-    module: "template"
-    src: "openvpn-client-config"
-    dest: "/etc/openvpn/clients/{{ item.name }}"
-  sudo: "yes"
   with_items: "vpn_clients"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/clients/{{ item.name }}"
+    src: "openvpn-client-config"
 
 - name: "create openvpn client connect script"
-  action:
-    module: "template"
-    src: "openvpn-client-connect-script"
-    dest: "/etc/openvpn/client-connect-script"
-    mode: "0755"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/client-connect-script"
+    src: "openvpn-client-connect-script"
+
+    mode: "0755"
 
 - name: "create openvpn client disconnect script"
-  action:
-    module: "template"
-    src: "openvpn-client-disconnect-script"
-    dest: "/etc/openvpn/client-disconnect-script"
-    mode: "0755"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/client-disconnect-script"
+    src: "openvpn-client-disconnect-script"
+
+    mode: "0755"
 
 - meta: "flush_handlers"
 

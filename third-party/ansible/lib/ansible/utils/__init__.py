@@ -140,7 +140,7 @@ def key_for_hostname(hostname):
 
     # use new AES keys every 2 hours, which means fireball must not allow running for longer either
     if not os.path.exists(key_path) or (time.time() - os.path.getmtime(key_path) > 60*60*2):
-        key = AesKey.Generate()
+        key = AesKey.Generate(size=256)
         fd = os.open(key_path, os.O_WRONLY | os.O_CREAT, int(C.ACCELERATE_KEYS_FILE_PERMS, 8))
         fh = os.fdopen(fd, 'w')
         fh.write(str(key))
@@ -155,7 +155,7 @@ def key_for_hostname(hostname):
         return key
 
 def encrypt(key, msg):
-    return key.Encrypt(msg)
+    return key.Encrypt(msg.encode('utf-8'))
 
 def decrypt(key, msg):
     try:
@@ -1024,9 +1024,9 @@ def base_parser(constants=C, usage="", output_opts=False, runas_opts=False,
 
     if runas_opts:
         # priv user defaults to root later on to enable detecting when this option was given here
-        parser.add_option('-K', '--ask-sudo-pass', default=False, dest='ask_sudo_pass', action='store_true',
+        parser.add_option('-K', '--ask-sudo-pass', default=constants.DEFAULT_ASK_SUDO_PASS, dest='ask_sudo_pass', action='store_true',
             help='ask for sudo password (deprecated, use become)')
-        parser.add_option('--ask-su-pass', default=False, dest='ask_su_pass', action='store_true',
+        parser.add_option('--ask-su-pass', default=constants.DEFAULT_ASK_SU_PASS, dest='ask_su_pass', action='store_true',
             help='ask for su password (deprecated, use become)')
         parser.add_option("-s", "--sudo", default=constants.DEFAULT_SUDO, action="store_true", dest='sudo',
             help="run operations with sudo (nopasswd) (deprecated, use become)")
@@ -1253,7 +1253,7 @@ def make_become_cmd(cmd, user, shell, method, flags=None, exe=None):
         prompt = 'assword:'
         exe = exe or 'pbrun'
         flags = flags or ''
-        becomecmd = '%s -b -l %s -u %s "%s"' % (exe, flags, user, pipes.quote('echo %s; %s' % (success_key,cmd)))
+        becomecmd = '%s -b %s -u %s "%s"' % (exe, flags, user, pipes.quote('echo %s; %s' % (success_key,cmd)))
 
     elif method == 'pfexec':
         exe = exe or 'pfexec'

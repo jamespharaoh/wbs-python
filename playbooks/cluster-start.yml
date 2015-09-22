@@ -9,4 +9,6 @@
 
         amazon_instance_state: "running"
 
+- include: "cluster-hosts.yml"
+
 # ex: et ts=2 filetype=yaml
