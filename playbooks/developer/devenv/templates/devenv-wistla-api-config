@@ -142,6 +142,54 @@ config.urlScheme = '{{ third_parties.dev.url_scheme }}';
 config.urlScheme = '';
 {% endif %}
 
+// Analytics
+
+
+if (!config.analytics || typeof config.analytics !== 'object') {
+	config.analytics = {};
+}
+
+if (!config.analytics.provider || typeof config.analytics.provider !== 'object') {
+	config.analytics.provider = {};
+}
+
+if (!config.analytics.provider.amplitude || typeof config.analytics.provider.amplitude !== 'object') {
+	config.analytics.provider.amplitude = {};
+}
+
+if (!config.analytics.provider.aws || typeof config.analytics.provider.aws !== 'object') {
+	config.analytics.provider.aws = {};
+}
+
+if (!config.analytics.provider.google || typeof config.analytics.provider.google !== 'object') {
+	config.analytics.provider.google = {};
+}
+
+{% if 'dev' in third_parties %}
+config.analytics.provider.amplitude.apiKey = '{{ third_parties.dev.analytics_amplitude_key_api }}';
+config.analytics.provider.amplitude.secretKey = '{{ third_parties.dev.analytics_amplitude_key_secret }}';
+
+config.analytics.provider.aws.appId = '{{ third_parties.dev.analytics_aws_id_app }}';
+config.analytics.provider.aws.appName = '{{ third_parties.dev.analytics_aws_app_name }}';
+config.analytics.provider.aws.identityPoolId = '{{ third_parties.dev.analytics_aws_id_identity_pool }}';
+config.analytics.provider.aws.region = '{{ third_parties.dev.analytics_aws_region }}';
+
+config.analytics.provider.google.trackerId = '{{ third_parties.dev.analytics_google_id_tracker }}';
+
+{% else %}
+config.analytics.provider.amplitude.apiKey = '';
+config.analytics.provider.amplitude.secretKey = '';
+
+config.analytics.provider.aws.appId = '';
+config.analytics.provider.aws.appName = '';
+config.analytics.provider.aws.identityPoolId = '';
+config.analytics.provider.aws.region = '';
+
+config.analytics.provider.google.trackerId = '';
+
+{% endif %}
+
+
 // facebook app to use
 {% if 'dev' in third_parties %}
 config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
