@@ -8,7 +8,9 @@
   with_items: "node_deploy_projects"
   tags: "quick"
   args:
+
     executable: "/bin/bash"
+
   shell:
 
     set -euf -o pipefail;
@@ -29,13 +31,16 @@
       }};
 
 - name: "deploy projects node modules"
-  delegate_to: "localhost"
-  sudo: "yes"
+  with_items: "node_deploy_projects"
+  when: "item.type == 'nodejs'"
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
-  with_items: "node_deploy_projects"
+  delegate_to: "localhost"
+  sudo: "yes"
   args:
+
     executable: "/bin/bash"
+
   shell:
 
     set -euf -o pipefail;

@@ -29,6 +29,7 @@ network_route_localnet: "{{
 node_deploy_projects:
 
   - name: "wistla-api"
+    type: "nodejs"
     excludes:
 
       - "/config/config.local.js"
@@ -46,6 +47,9 @@ node_deploy_projects:
       - "config.local.js"
       - "config.overrides.js"
       - "google-service-account.key"
+
+  - name: "content-common"
+    type: "content"
 
 node_nodejs_main: "server.js"
 

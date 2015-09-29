@@ -18,6 +18,7 @@ network_route_localnet: "{{
 node_deploy_projects:
 
   - name: "wistla-browser"
+    type: "nodejs"
     excludes:
 
       - "/config/config.local.js"
