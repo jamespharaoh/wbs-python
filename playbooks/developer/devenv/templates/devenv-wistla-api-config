@@ -193,10 +193,12 @@ if (!config.gcm || typeof config.gcm !== 'object') {
     config.gcm = {};
 }
 {% if 'dev' in third_parties %}
+config.gcm.enabled = true;
 config.gcm.apiKey = '{{ third_parties.dev.google_cloud_messaging_api_key }}';
 config.gcm.senderId = '{{ third_parties.dev.google_cloud_messaging_sender_id }}';
 config.gcm.appName = '{{ third_parties.dev.google_cloud_messaging_app_name }}';
 {% else %}
+config.gcm.enabled = false;
 config.gcm.apiKey = '';
 config.gcm.senderId = '';
 config.gcm.appName = '';
