@@ -176,6 +176,21 @@ config.analytics.provider.aws.region = '{{ third_parties[cluster_name].analytics
 config.analytics.provider.google.trackerId = '{{ third_parties[cluster_name].analytics_google_id_tracker }}';
 {% endif %}
 
+if (!config.gcm || typeof config.gcm !== 'object') {
+    config.gcm = {};
+}
+{% if cluster_name in third_parties %}
+config.gcm.enabled = true;
+config.gcm.apiKey = '{{ third_parties[cluster_name].google_cloud_messaging_api_key }}';
+config.gcm.senderId = '{{ third_parties[cluster_name].google_cloud_messaging_sender_id }}';
+config.gcm.appName = '{{ third_parties[cluster_name].google_cloud_messaging_app_name }}';
+{% else %}
+config.gcm.enabled = false;
+config.gcm.apiKey = '';
+config.gcm.senderId = '';
+config.gcm.appName = '';
+{% endif %}
+
 {% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
 
 {% if cluster_deployment_alias ['name'] == 'test-k2' %}
