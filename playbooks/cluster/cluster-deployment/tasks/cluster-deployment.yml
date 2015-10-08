@@ -49,6 +49,16 @@
       git@github.com:/wistla/{{ item.name }}
       --branch {{ item.branch }};
 
+- name: "create project links"
+  with_items: "cluster_deployment_checkouts | flatten_hash ('project_links')"
+  action:
+
+    module: "file"
+    path: "{{ cluster_deployment_home }}/{{ item.outer.name }}/{{ item.project_links.link }}"
+    state: "link"
+
+    src: "{{ item.project_links.target }}"
+
 - name: "run project build steps"
   tags: "build"
   with_items: "cluster_deployment_checkouts"

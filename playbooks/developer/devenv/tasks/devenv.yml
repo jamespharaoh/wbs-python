@@ -18,6 +18,16 @@
       {{ git_base_url }}/{{ item.name }}
       --branch {{ item.branch }};
 
+- name: "create project links"
+  with_items: "devenv_checkouts | flatten_hash ('project_links')"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/{{ item.outer.name }}/{{ item.project_links.link }}"
+    state: "link"
+
+    src: "{{ item.project_links.target }}"
+
 - name: "run build steps"
   tags: "build"
   with_items: "devenv_checkouts"

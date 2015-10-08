@@ -78,18 +78,37 @@ cluster_deployment_types:
       - name: "wistla-admin"
         branch: "master"
         build_steps:
+
           - "npm install"
           - "jspm install -y"
           - "./build.sh"
 
-      - name: "wistla-api"
+      - name: "wistla-analytics"
         branch: "master"
         build_steps:
+
+          - "npm install"
+
+      - name: "wistla-api"
+        branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            target: "../../wistla-analytics"
+
+        build_steps:
+
           - "npm install"
 
       - name: "wistla-browser"
         branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            target: "../../wistla-analytics"
+
         build_steps:
+
           - "npm install"
 
       - name: "wistla-devops"
@@ -101,6 +120,7 @@ cluster_deployment_types:
       - name: "wistla-web"
         branch: "master"
         build_steps:
+
           - "npm install"
 
       - name: "wistla-test-images"
@@ -228,18 +248,37 @@ cluster_deployment_types:
       - name: "wistla-admin"
         branch: "master"
         build_steps:
+
           - "npm install"
           - "jspm install -y"
           - "./build.sh"
 
-      - name: "wistla-api"
+      - name: "wistla-analytics"
         branch: "master"
         build_steps:
+
+          - "npm install"
+
+      - name: "wistla-api"
+        branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            target: "../../wistla-analytics"
+
+        build_steps:
+
           - "npm install"
 
       - name: "wistla-browser"
         branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            target: "../../wistla-analytics"
+
         build_steps:
+
           - "npm install"
 
       - name: "wistla-devops"
@@ -251,6 +290,7 @@ cluster_deployment_types:
       - name: "wistla-web"
         branch: "master"
         build_steps:
+
           - "npm install"
 
       - name: "wistla-test-images"
