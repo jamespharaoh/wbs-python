@@ -7,12 +7,10 @@
     module: "s3"
     mode: "put"
 
+    region: "{{ devops_region }}"
     bucket: "{{ build_bucket }}"
     object: "{{ build_target }}/{{ node_type }}-{{ build_id }}.tar.gz"
-    src: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
 
-    region: "{{ devops_region }}"
-    aws_access_key: "{{ amazon_accounts.ops.access_key }}"
-    aws_secret_key: "{{ amazon_accounts.ops.secret_key }}"
+    src: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
 
 # ex: et ts=4 filetype=yaml
