@@ -22,7 +22,8 @@ MAILTO="{{ cluster.cron_email }}"
 			)
 		)
 		and instance_zone == 'a'
-		and instance_index == 4 -%}
+		and instance_index == 4
+		and False -%}
 
 		{%- print [
 			'*/5 * * * *',
