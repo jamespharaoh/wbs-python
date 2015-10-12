@@ -547,7 +547,7 @@ test-fitzroy:
   apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
   apple_push_notifications_production: "no"
 
-  emails_enabled: "no"
+  emails_enabled: "yes"
   test_routes_enabled: "yes"
 
   node_memory:
