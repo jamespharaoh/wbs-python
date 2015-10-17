@@ -742,6 +742,30 @@ optimus:
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
 
+smurfette:
+
+  name: "smurfette"
+  type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
+
+  cluster: "dev"
+
+  main_domain: "smurfette.wistla.com"
+  short_domain: "smurfette.dev.wist.la"
+  assets_domain: "assets.smurfette.dev.wistla.com"
+  assets_origin_domain: "assets-origin.smurfette.dev.wistla.com"
+  admin_domain: "admin.smurfette.wistla.com"
+  api_domain: "api.smurfette.wistla.com"
+  web_domain: "www.smurfette.wistla.com"
+
+  email_domain: "dev.wistla.com"
+
+  bridge_name: "br168"
+  bridge_network: "10.168"
+  bridge_mac: "aa:bb:0a:a8"
+
 jenkins-latest:
 
   name: "jenkins-latest"
