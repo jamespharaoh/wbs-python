@@ -20,6 +20,7 @@ deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
 
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"
+developer_profile: "{{ developer_profile | default ('full') }}"
 
 #
 # dev runtime

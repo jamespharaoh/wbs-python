@@ -91,7 +91,7 @@ iojs_default: "no"
 
 mongodb_version: "3.0.3"
 
-devenv_checkouts:
+devenv_checkouts_full:
 
   - name: "content-browser"
     branch: "master"
@@ -166,6 +166,20 @@ devenv_checkouts:
 
   - name: "wistla-test-images"
     branch: "master"
+
+devenv_checkouts_devops:
+
+  - name: "wistla-devops"
+    branch: "master"
+    configs:
+
+      - "config"
+      - "data/runtime"
+      - "security"
+
+devenv_checkouts: "{{
+  hostvars [inventory_hostname] ['devenv_checkouts_' + developer_profile]
+}}"
 
 vagrant_templates:
 
