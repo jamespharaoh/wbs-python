@@ -257,6 +257,8 @@ config.sendEmails = true;
 // monitoring email address (for email activation warnings)
 config.monitoringEmailAddress =
 	'Wistla Operations <{{ cluster.monitoring_email }}>';
+// content email address (for new wistls and wistl warnings)
+config.contentEmailAddress = '{{ third_parties [cluster_name].content_email }}';
 
 module.exports = config;
 

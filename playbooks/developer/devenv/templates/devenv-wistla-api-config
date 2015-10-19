@@ -238,6 +238,12 @@ config.authentication.facebook.apps = {
 // monitoring email address (for email activation warnings)
 config.monitoringEmailAddress =
 	'Wistla Operations <notifications.production.warning@wistla.com>';
+// content email address (for new wistls and wistl warnings)
+{% if 'dev' in third_parties %}
+config.contentEmailAddress = '{{ third_parties.dev.content_email }}';
+{% else %}
+config.contentEmailAddress = '';
+{% endif %}
 
 module.exports = config;
 
