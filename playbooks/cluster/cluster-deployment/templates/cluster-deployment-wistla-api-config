@@ -191,7 +191,7 @@ config.gcm.senderId = '';
 config.gcm.appName = '';
 {% endif %}
 
-{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
+{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc', 'test-fitzroy' ] %}
 
 {% if cluster_deployment_alias ['name'] == 'test-k2' %}
 // Deep link url scheme for use in sending out emails.
@@ -210,7 +210,7 @@ config.authentication.facebook.apps = {
 };
 {% endif %}
 
-{% if cluster_deployment_alias ['name'] == 'test-montblanc' %}
+{% if cluster_deployment_alias ['name'] in [ 'test-montblanc', 'test-fitzroy' ] %}
 // Deep link url scheme for use in sending out emails.
 config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
 
