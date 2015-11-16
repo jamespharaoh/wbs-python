@@ -130,6 +130,8 @@ config.applePush = {
 	certFile: ROOT + '/config/apple-push.cert',
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ 'true' if dev_apple_push_notifications_production == 'yes' else 'false' }},
+	validityInSeconds: 3600,
+	feedbackIntervalInSeconds: 3600
 {% else %}
 	enabled: false,
 {% endif %}
