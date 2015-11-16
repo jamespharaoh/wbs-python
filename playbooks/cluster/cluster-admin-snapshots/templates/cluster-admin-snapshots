@@ -4,13 +4,14 @@ SHELL="/bin/bash"
 HOME="/home/ubuntu"
 MAILTO="{{ cluster.cron_email }}"
 
-AWS_DEFAULT_REGION="eu-west-1"
+AWS_DEFAULT_REGION="{{ cluster.amazon_region }}"
 
 {% if instance_zone == 'a' -%}
 
 {%- print '# ==================== admin\n' -%}
 {%- for host_name in groups ['cluster-' + cluster_name + '-admin'] -%}
 {%- set host = hostvars [host_name] -%}
+{%- if 'volume_ids' in host -%}
 
 	{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
@@ -21,12 +22,14 @@ AWS_DEFAULT_REGION="eu-west-1"
 		'--volume-id ' + host.volume_ids.system,
 	] | join (' '), '\n' -%}
 
+{%- endif -%}
 {%- endfor -%}
 
 {%- if 'cluster-' + cluster_name + '-app' in groups -%}
 {%- print '\n# ==================== app\n' -%}
 {%- for host_name in groups ['cluster-' + cluster_name + '-app'] -%}
 {%- set host = hostvars [host_name] -%}
+{%- if 'volume_ids' in host -%}
 
 	{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
@@ -44,6 +47,7 @@ AWS_DEFAULT_REGION="eu-west-1"
 		'--volume-id ' + host.volume_ids.data,
 	] | join (' '), '\n' -%}
 
+{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 
@@ -51,6 +55,7 @@ AWS_DEFAULT_REGION="eu-west-1"
 {%- print '\n# ==================== data\n' -%}
 {%- for host_name in groups ['cluster-' + cluster_name + '-data'] -%}
 {%- set host = hostvars [host_name] -%}
+{%- if 'volume_ids' in host -%}
 
 	{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
@@ -68,6 +73,7 @@ AWS_DEFAULT_REGION="eu-west-1"
 		'--volume-id ' + host.volume_ids.data,
 	] | join (' '), '\n' -%}
 
+{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 

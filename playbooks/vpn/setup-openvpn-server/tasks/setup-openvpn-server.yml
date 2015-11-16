@@ -24,8 +24,8 @@
   action:
 
     module: "copy"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.cert"
-    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.cert"
+    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.cert"
+    src: "{{ HOME }}/security/vpn-server/{{ supercluster_name }}.cert"
 
 - name: "install openvpn server key"
   notify: "restart openvpn"
@@ -33,8 +33,8 @@
   action:
 
     module: "copy"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.key"
-    src: "{{ HOME }}/security/vpn-server/{{ cluster_name }}.key"
+    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.key"
+    src: "{{ HOME }}/security/vpn-server/{{ supercluster_name }}.key"
 
     mode: "0600"
 
@@ -44,7 +44,7 @@
   action:
 
     module: "template"
-    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.conf"
+    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.conf"
     src: "openvpn-config"
 
 - name: "create openvpn client config dir"

@@ -1,6 +1,6 @@
 ---
 
-- include_vars: "{{ HOME }}/security/amazon/{{ cluster_name }}.yml"
+- include_vars: "{{ HOME }}/security/amazon/{{ supercluster_name }}.yml"
 
 - name: "install postfix"
   action:

@@ -1,6 +1,7 @@
 ---
 
 - include: "cluster-assets.yml"
+  when: "cluster_name == supercluster_name"
   tags:
 
     - "cluster"

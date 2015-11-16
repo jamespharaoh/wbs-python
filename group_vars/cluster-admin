@@ -1,6 +1,6 @@
 ---
 
-ansible_ssh_host: "{{ instance_zone }}.admin.{{ cluster.main_domain }}"
+ansible_ssh_host: "{{ instance_zone }}.admin.{{ cluster.local_domain }}"
 
 instance_type_colour: "196"
 
@@ -23,6 +23,9 @@ my_system_packages:
   # ---------- to install
 
   - name: "awscli"
+    state: "present"
+
+  - name: "build-essential"
     state: "present"
 
   - name: "fcgiwrap"

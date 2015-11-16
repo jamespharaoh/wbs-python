@@ -21,9 +21,11 @@
     template: "/home/vagrant/work/{{ cluster_name }}/data-subnet-stack.yaml"
     template_format: "yaml"
 
-    aws_access_key: "{{ amazon_account.access_key }}"
-    aws_secret_key: "{{ amazon_account.secret_key }}"
     region: "{{ amazon_region_name }}"
+
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
 - update_resource:
 

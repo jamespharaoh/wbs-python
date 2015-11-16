@@ -37,22 +37,22 @@ case "$common_name" in
 {% for iroute in vpn_client.iroutes %}
 
 	ip route replace \
-		{{ iroute.network }}/{{ iroute.netbits }} \
-		via {{ vpn_network }}.{{ vpn_client.vpn_ip }}
+		"{{ iroute.network }}/{{ iroute.netbits }}" \
+		via "{{ vpn_network }}.{{ vpn_client.vpn_ip }}"
 
 	for route_table in "${route_tables[@]}"; do
 
 		aws ec2 delete-route \
-			--region "eu-west-1" \
+			--region "{{ cluster.amazon_region }}" \
 			--route-table-id "$route_table" \
-			--destination-cidr-block {{ iroute.network }}/{{ iroute.netbits }} \
+			--destination-cidr-block "{{ iroute.network }}/{{ iroute.netbits }}" \
 		|| true
 
 		aws ec2 create-route \
-			--region "eu-west-1" \
+			--region "{{ cluster.amazon_region }}" \
 			--route-table-id "$route_table" \
-			--destination-cidr-block {{ iroute.network }}/{{ iroute.netbits }} \
-			--instance-id {{ instance_id }}
+			--destination-cidr-block "{{ iroute.network }}/{{ iroute.netbits }}" \
+			--instance-id "{{ instance_id }}"
 
 	done
 

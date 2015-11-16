@@ -226,7 +226,7 @@ or other_cluster_name == cluster_name -%}
 			{%- print [
 				cluster_host.private_address,
 				cluster_host_name,
-				cluster_host_name + '.' + other_cluster.main_domain,
+				cluster_host_name + '.' + other_cluster.super_domain,
 			] | join (' ') + '\n' -%}
 
 		{%- endif -%}

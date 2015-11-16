@@ -14,11 +14,11 @@
   action:
 
     module: "route53"
-    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.main_domain }}"
+    record: "{{ item.1 }}.{{ item.0 }}.{{ cluster.local_domain }}"
     command: "create"
     overwrite: "yes"
 
-    zone: "{{ cluster.main_domain }}"
+    zone: "{{ cluster.super_domain }}"
     ttl: "60"
     type: "A"
     value: "{{ cluster.amazon_admin_ips [item.1] }}"
@@ -33,18 +33,16 @@
 
     module: "route53"
     record: "{{
-      cluster.main_domain if item.name == '@'
-      else item.name + '.' + cluster.main_domain
+      cluster.super_domain if item.name == '@'
+      else item.name + '.' + cluster.super_domain
     }}"
     command: "create"
     overwrite: "yes"
 
-    zone: "{{ cluster.main_domain }}"
+    zone: "{{ cluster.super_domain }}"
     type: "{{ item.type }}"
     ttl: "{{ item.ttl }}"
     value: "{{ item.value }}"
-
-    region: "{{ amazon_region_name }}"
 
     aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
     aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"

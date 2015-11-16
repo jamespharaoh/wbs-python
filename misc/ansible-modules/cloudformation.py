@@ -235,19 +235,20 @@ def main():
             module.fail_json(msg='Module parameter "tags" requires at least Boto version 2.6.0')
         kwargs['tags'] = tags
 
-
     # convert the template parameters ansible passes into a tuple for boto
     template_parameters_tup = [(k, v) for k, v in template_parameters.items()]
     stack_outputs = {}
 
+    region, ec2_url, boto_params = get_aws_connection_info(module)
+
     try:
         cfn = boto.cloudformation.connect_to_region(
-                  region,
-                  aws_access_key_id=aws_access_key,
-                  aws_secret_access_key=aws_secret_key,
-              )
+            region,
+            **boto_params
+        )
     except boto.exception.NoAuthHandlerFound, e:
-        module.fail_json(msg=str(e))
+        module.fail_json(msg = str(e))
+
     update = False
     result = {}
     operation = None

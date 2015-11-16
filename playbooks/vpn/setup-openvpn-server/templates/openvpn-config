@@ -6,7 +6,7 @@ mode server
 proto udp
 port 1194
 keepalive 5 20
-status wistla-{{ cluster_name }}-vpn.log
+status wistla-{{ supercluster_name }}-vpn.log
 
 client-config-dir clients
 client-connect client-connect-script
@@ -54,5 +54,5 @@ dh wistla-dh.pem
 ca wistla-ca.cert
 #crl-verify wistla-ca.crl
 
-cert wistla-{{ cluster_name }}-vpn.cert
-key wistla-{{ cluster_name }}-vpn.key
+cert wistla-{{ supercluster_name }}-vpn.cert
+key wistla-{{ supercluster_name }}-vpn.key

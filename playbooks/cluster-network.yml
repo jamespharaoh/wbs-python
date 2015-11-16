@@ -4,7 +4,7 @@
   roles:
 
     - "cluster-network"
-    - "cluster-dns"
     - "cluster-assets"
+    - "cluster-dns"
 
 # ex: et ts=2 filetype=yaml

@@ -6,9 +6,9 @@ client
 resolv-retry infinite
 nobind
 pull
-remote a.vpn.{{ clusters [item].main_domain }} 1194
-remote b.vpn.{{ clusters [item].main_domain }} 1194
-remote c.vpn.{{ clusters [item].main_domain }} 1194
+remote a.vpn.{{ clusters [item].local_domain }} 1194
+remote b.vpn.{{ clusters [item].local_domain }} 1194
+remote c.vpn.{{ clusters [item].local_domain }} 1194
 remote-random
 proto udp
 status wistla-{{ item }}-vpn.log

@@ -6,12 +6,12 @@ smtpd_banner = $myhostname ESMTP $mail_name
 biff = no
 readme_directory = no
 mynetworks = 127.0.0.0/8 [::1]/128 10.0.0.0/8
-myhostname = {{ inventory_hostname }}.{{ cluster.main_domain }}
+myhostname = {{ inventory_hostname }}.{{ cluster.super_domain }}
 
 # addresses
 
-myorigin = {{ cluster.main_domain }}
-masquerade_domains = {{ cluster.main_domain }}
+myorigin = {{ cluster.super_domain }}
+masquerade_domains = {{ cluster.super_domain }}
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 mydestination = localdomain, localhost, localhost.localdomain, localhost

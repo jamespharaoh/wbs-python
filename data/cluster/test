@@ -2,6 +2,8 @@
 
 # ========== core configuration
 
+supercluster_name: "test"
+
 cluster_network: "10.146"
 
 vpn_networks:
@@ -11,7 +13,8 @@ vpn_networks:
   c: "10.164.10"
   d: "10.164.11"
 
-main_domain: "test.wistla.com"
+super_domain: "test.wistla.com"
+local_domain: "test.wistla.com"
 short_domain: "test.wist.la"
 
 cluster_colour: "221"

@@ -1,31 +1,33 @@
 ---
 
 - name: "create hosts file"
-  action:
-    module: "template"
-    src: "dns-hosts"
-    dest: "/etc/hosts"
-  sudo: "yes"
-  sudo_user: "root"
   notify: "restart dnsmasq"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/hosts"
+    src: "dns-hosts"
 
 - name: "install dnsmasq packages"
-  action:
-    module: "apt"
-    package: "{{ item }}"
-  sudo: "yes"
-  sudo_user: "root"
   with_items:
+
     - "dnsmasq"
 
-- name: "create dnsmasq config"
-  action:
-    module: "template"
-    src: "dns-dnsmasq-config"
-    dest: "/etc/dnsmasq.conf"
   sudo: "yes"
-  sudo_user: "root"
+  action:
+
+    module: "apt"
+    package: "{{ item }}"
+
+- name: "create dnsmasq config"
   notify: "restart dnsmasq"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/dnsmasq.conf"
+    src: "dns-dnsmasq-config"
 
 - meta: "flush_handlers"
 

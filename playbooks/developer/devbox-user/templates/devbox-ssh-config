@@ -2,13 +2,16 @@
 
 {% for cluster_name, cluster in clusters.items () %}
 
-Host {{ [
-	'wistla-' + cluster_name + '-*',
-	'wistla-' + cluster_name + '-*',
-	'*.admin.' + cluster.main_domain,
-] | join (' ') }}
+{% if cluster_name == cluster.supercluster_name %}
+Host wistla-{{ cluster_name }}-*
 ForwardAgent yes
-IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster_name }}
+IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster.supercluster_name }}
+User ubuntu
+{% endif %}
+
+Host *.admin.{{ cluster.local_domain }}
+ForwardAgent yes
+IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster.supercluster_name }}
 User ubuntu
 
 {% endfor %}

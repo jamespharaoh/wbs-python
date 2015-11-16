@@ -1,0 +1,37 @@
+---
+amazon_instance_type_running: t2.micro
+etcd:
+  installed_version: 2.1.1
+  needs_restart: 'no'
+  state: enabled
+etcd_installed_version: 2.1.1
+etcd_needs_restart: 'no'
+etcd_state: enabled
+heka:
+  installed_version: 0.10.0b0
+  needs_restart: 'no'
+  state: enabled
+heka_installed_version: 0.10.0b0
+heka_needs_restart: 'no'
+heka_state: enabled
+instance_id: i-92b40a22
+mysql:
+  needs_restart: 'no'
+  root_password: zuojplgtxrahdntvxwua
+  state: enabled
+mysql_needs_restart: 'no'
+mysql_root_password: zuojplgtxrahdntvxwua
+mysql_state: enabled
+php:
+  needs_restart: 'no'
+  state: enabled
+php_needs_restart: 'no'
+php_state: enabled
+ssh:
+  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw=
+  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F
+ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw=
+ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F
+volume_ids:
+  system: vol-df49a722
+volume_ids_system: vol-df49a722

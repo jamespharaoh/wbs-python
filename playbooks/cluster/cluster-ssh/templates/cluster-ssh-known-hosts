@@ -30,7 +30,7 @@
 			{%- print [
 				[
 					host_name,
-					instance_zone + '.admin.' + instance_cluster.main_domain,
+					instance_zone + '.admin.' + instance_cluster.local_domain,
 					host.private_address,
 				] | join (','),
 				ssh_host_key,

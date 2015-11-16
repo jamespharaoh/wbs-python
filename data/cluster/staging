@@ -2,6 +2,8 @@
 
 # ========== core configuration
 
+supercluster_name: "staging"
+
 cluster_network: "10.144"
 
 vpn_networks:
@@ -11,7 +13,8 @@ vpn_networks:
   c: "10.164.6"
   d: "10.164.7"
 
-main_domain: "staging.wistla.com"
+super_domain: "staging.wistla.com"
+local_domain: "1.staging.wistla.com"
 short_domain: "staging.wist.la"
 
 cluster_colour: "84"

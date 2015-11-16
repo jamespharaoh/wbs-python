@@ -8,7 +8,7 @@
     - "cluster-dns-global"
 
 - include: "cluster-dns-main.yml"
-  when: "cluster_name != 'ops'"
+  when: "cluster_name != 'ops' and cluster_name == supercluster_name"
   tags:
 
     - "cluster"
