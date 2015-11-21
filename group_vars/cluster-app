@@ -28,6 +28,9 @@ my_system_packages:
   - name: "btrfs-tools"
     state: "present"
 
+  - name: "build-essential"
+    state: "present"
+
   - name: "colordiff"
     state: "present"
 

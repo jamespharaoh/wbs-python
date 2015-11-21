@@ -7,7 +7,7 @@
     record: "{{ item.0 [item.1] }}"
     command: "create"
 
-    zone: "{{ cluster.main_domain }}"
+    zone: "{{ cluster.super_domain }}"
     overwrite: "yes"
 
     type: "A"
@@ -38,7 +38,7 @@
     record: "{{ item.assets_domain }}"
     command: "create"
 
-    zone: "{{ cluster.main_domain }}"
+    zone: "{{ cluster.super_domain }}"
     overwrite: "yes"
 
     type: "CNAME"
@@ -88,10 +88,10 @@
   action:
 
     module: "route53"
-    record: "{{ cluster.main_domain }}"
+    record: "{{ cluster.super_domain }}"
     command: "create"
 
-    zone: "{{ cluster.main_domain }}"
+    zone: "{{ cluster.super_domain }}"
     overwrite: "yes"
 
     type: "MX"

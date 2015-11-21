@@ -50,57 +50,85 @@ system_packages:
   # ---------- install
 
   - name: "btrfs-tools"
+    state: "present"
 
   - name: "colordiff"
+    state: "present"
 
   - name: "encfs"
+    state: "present"
 
   - name: "git"
+    state: "present"
 
   - name: "gitk"
+    state: "present"
 
   - name: "graphicsmagick"
+    state: "present"
 
   - name: "imagemagick"
+    state: "present"
 
   - name: "libav-tools"
+    state: "present"
 
   - name: "libffi-dev"
     state: "present"
 
   - name: "lxc"
+    state: "present"
 
   - name: "mailutils"
+    state: "present"
 
   - name: "nfs-kernel-server"
+    state: "present"
 
   - name: "ngrep"
+    state: "present"
 
   - name: "openvpn"
+    state: "present"
 
   - name: "parted"
+    state: "present"
 
   - name: "python-boto"
+    state: "present"
 
   - name: "python-dev"
+    state: "present"
 
   - name: "python-httplib2"
+    state: "present"
 
   - name: "python-jinja2"
+    state: "present"
 
   - name: "python-paramiko"
+    state: "present"
 
   - name: "python-pip"
+    state: "present"
 
   - name: "python-yaml"
+    state: "present"
+
+  - name: "rabbitmq-server"
+    state: "present"
 
   - name: "resolvconf"
+    state: "present"
 
   - name: "samba"
+    state: "present"
 
   - name: "super"
+    state: "present"
 
   - name: "whois"
+    state: "present"
 
 node_packages:
 
@@ -153,5 +181,15 @@ etcd_secured: "no"
 etcd_clustered: "no"
 
 postfix_always_bcc: "james+noise@wellbehavedsoftware.com"
+
+ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
+ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
+
+python_pip_packages_url: "{{ dev_python_pip_packages_url }}"
+python_pip_trusted_host: "{{ dev_python_pip_trusted_host }}"
+
+git_base_url: "{{ dev_git_base_url }}"
+
+wistla_dist_url: "{{ dev_wistla_dist_url }}"
 
 # ex: et ts=2 filetype=yaml

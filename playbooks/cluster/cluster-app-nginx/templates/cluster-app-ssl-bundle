@@ -7,7 +7,7 @@
 
 	{%- print lookup ('etcd', [
 		'/certificate/',
-		cluster_name,
+		supercluster_name,
 		'-ssl/subjects/',
 		item,
 		'/current',

@@ -42,4 +42,14 @@ node_memory: "{{
 lxc_memory_soft: "{{ node_memory [node_type] }}"
 lxc_memory_hard: "{{ node_memory [node_type] | int * 1.5 }}"
 
+ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
+ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
+
+python_pip_packages_url: "{{ dev_python_pip_packages_url }}"
+python_pip_trusted_host: "{{ dev_python_pip_trusted_host }}"
+
+git_base_url: "{{ dev_git_base_url }}"
+
+wistla_dist_url: "{{ dev_wistla_dist_url }}"
+
 # ex: et ts=2 filetype=yaml

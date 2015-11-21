@@ -1,10 +1,10 @@
 ---
 amazon_instance_state: running
 etcd:
-  installed_version: 2.1.1
+  installed_version: 2.2.2
   needs_restart: 'no'
   state: enabled
-etcd_installed_version: 2.1.1
+etcd_installed_version: 2.2.2
 etcd_needs_restart: 'no'
 etcd_state: enabled
 heka:

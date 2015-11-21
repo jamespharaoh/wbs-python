@@ -16,6 +16,8 @@ amazon_key_name: "{{ cluster.amazon_key_name }}"
 node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
+# --------- icinga
+
 icinga_web_version: "2.0.0-rc1"
 
 icinga_database_type: "mysql"
@@ -32,5 +34,17 @@ icinga_web_database_delegate: "wistla-ops-admin-a"
 
 icinga_authority: "icinga"
 icinga_ca_certificate: "/authority/icinga/certificate"
+
+# ---------- repository urls
+
+ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"
+ubuntu_security_url: "http://security.ubuntu.com/ubuntu"
+
+python_pip_packages_url: "https://pypi.python.org/simple"
+python_pip_trusted_host: "no"
+
+git_base_url: "git@github.com:/wistla"
+
+wistla_dist_url: "https://dist.ops.wistla.com"
 
 # ex: et ts=2 filetype=yaml
