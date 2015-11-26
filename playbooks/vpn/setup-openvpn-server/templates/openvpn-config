@@ -6,7 +6,7 @@ mode server
 proto udp
 port 1194
 keepalive 5 20
-status wistla-{{ supercluster_name }}-vpn.log
+status /var/log/vpn-wistla-{{ cluster_name }}.log
 
 client-config-dir clients
 client-connect client-connect-script
@@ -20,6 +20,16 @@ tun-mtu 1500
 persist-tun
 
 ifconfig {{ vpn_network }}.1 255.255.255.0
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+{% if other_cluster_name != cluster_name
+	and other_cluster.supercluster_name == supercluster_name
+	and other_cluster_name not in cluster.vpn_upstream_clusters %}
+{% for zone in [ 'a', 'b', 'c', 'd' ] %}
+route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [zone] * 64 }}.0 255.255.192.0 {{ vpn_network }}.{{ other_cluster.admin_vpn_ips [zone] }}
+{% endfor %}
+{% endif %}
+{% endfor %}
 
 push "route-gateway {{ vpn_network }}.1"
 
@@ -54,5 +64,5 @@ dh wistla-dh.pem
 ca wistla-ca.cert
 #crl-verify wistla-ca.crl
 
-cert wistla-{{ supercluster_name }}-vpn.cert
-key wistla-{{ supercluster_name }}-vpn.key
+cert wistla-{{ cluster_name }}-vpn.cert
+key wistla-{{ cluster_name }}-vpn.key

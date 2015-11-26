@@ -1,0 +1,54 @@
+{{ ansible_warning ['#'] }}
+
+{% set other_cluster_name = item.0 %}
+{% set other_cluster = clusters [other_cluster_name] %}
+
+{% set other_host = hostvars [
+	'wistla-' + other_cluster_name + '-admin-' + item.1] %}
+
+# ---------- client
+
+client
+resolv-retry infinite
+nobind
+remote {{ other_host.instance_zone }}.vpn.{{ other_cluster.local_domain }} 1194
+proto udp
+keepalive 5 20
+status /var/log/vpn-{{ other_host.inventory_hostname }}.log
+
+# ---------- network
+
+dev tun
+topology subnet
+tun-mtu 1500
+persist-tun
+
+max-routes 1024
+
+route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [other_host.instance_zone] * 64 }}.0 255.255.192.0
+
+{% for other_cluster_deployment_name in other_cluster.deployment_names %}
+{% set other_cluster_deployment = deployments [other_cluster_deployment_name] %}
+
+# deployment {{ other_cluster_deployment_name }}
+
+{% for index in range (256) %}
+route {{ [
+	other_cluster_deployment.bridge_network,
+	index,
+	cluster_zone_indices [other_host.instance_zone] * 64,
+] | join ('.') }} 255.255.255.192
+{% endfor %}
+{% endfor %}
+
+# ---------- security
+
+tls-client
+remote-cert-tls server
+persist-key
+
+ca wistla-ca.cert
+#crl-verify wistla-ca.crl
+
+cert wistla-{{ cluster_name }}-vpn.cert
+key wistla-{{ cluster_name }}-vpn.key

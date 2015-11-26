@@ -1132,9 +1132,33 @@ def startstop_instances(module, ec2, instance_ids, state):
                instance_dict_array.append(get_instance_info(inst))
                try:
                    if state == 'running':
+
+                       if (
+                           module.params.get ("ebs_optimized") is not None
+                           and instance_dict_array [0] ["ebs_optimized"]
+                               != module.params.get ("ebs_optimized")
+                       ):
+
+                           inst.modify_attribute (
+                               "ebsOptimized",
+                               module.params.get ("ebs_optimized"))
+
+                       if (
+                           module.params.get ("instance_type")
+                           and instance_dict_array [0] ["instance_type"]
+                               != module.params.get ("instance_type")
+                       ):
+
+                           inst.modify_attribute (
+                               "instanceType",
+                               module.params.get ("instance_type"))
+
                        inst.start()
+
                    else:
+
                        inst.stop()
+
                except EC2ResponseError, e:
                    module.fail_json(msg='Unable to change state for instance {0}, error: {1}'.format(inst.id, e))
                changed = True

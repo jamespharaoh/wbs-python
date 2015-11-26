@@ -13,6 +13,15 @@ vpn_networks:
   c: "10.164.6"
   d: "10.164.7"
 
+admin_vpn_ips:
+
+  a: "112"
+  b: "113"
+  c: "114"
+  d: "115"
+
+vpn_upstream_clusters: []
+
 super_domain: "staging.wistla.com"
 local_domain: "1.staging.wistla.com"
 short_domain: "staging.wist.la"
@@ -67,8 +76,14 @@ instance_formation:
 amazon_instance_types:
 
   admin: "t2.micro"
-  app: "c4.large"
-  data: "m4.large"
+  app: "t2.large"
+  data: "t2.small"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  app: "no"
+  data: "no"
 
 kernel_versions:
 

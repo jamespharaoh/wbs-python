@@ -29,6 +29,10 @@ case "$common_name" in
 
 {% endfor %}
 
+(wistla-*-admin-*)
+
+	;;
+
 (*)
 
 	echo "Common name not recognised: $common_name" >&2

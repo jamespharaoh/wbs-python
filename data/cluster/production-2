@@ -13,6 +13,15 @@ vpn_networks:
   c: "10.164.18"
   d: "10.164.19"
 
+admin_vpn_ips:
+
+  a: "108"
+  b: "109"
+  c: "110"
+  d: "111"
+
+vpn_upstream_clusters: []
+
 super_domain: "wistla.com"
 local_domain: "2.wistla.com"
 short_domain: "wist.la"

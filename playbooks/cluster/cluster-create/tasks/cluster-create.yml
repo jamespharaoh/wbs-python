@@ -1,5 +1,24 @@
 ---
 
+#- name: "stop cluster instance"
+#  when: "
+#    amazon_instance_state == 'running'
+#    and amazon_instance_type != amazon_instance_type_running
+#  "
+#  local_action:
+#
+#    module: "ec2"
+#    instance_ids: "{{ instance_id }}"
+#    state: "stopped"
+#
+#    region: "{{ amazon_region_name }}"
+#
+#    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+#    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+#    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+#
+#    wait: "yes"
+
 - name: "create cluster instance"
   when: "instance_id is not defined"
   register: "create_result"
@@ -46,6 +65,9 @@
     module: "ec2"
     instance_ids: "{{ instance_id }}"
     state: "running"
+
+    instance_type: "{{ amazon_instance_type }}"
+    ebs_optimized: "{{ amazon_instance_ebs_optimized }}"
 
     region: "{{ amazon_region_name }}"
 

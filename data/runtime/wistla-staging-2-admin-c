@@ -35,3 +35,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJl
 volume_ids:
   system: vol-df49a722
 volume_ids_system: vol-df49a722
+vpn_server:
+  certificate: /authority/ops-vpn/issue/23/certificate
+  private_key: /authority/ops-vpn/issue/23/key
+vpn_server_certificate: /authority/ops-vpn/issue/23/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/23/key

@@ -16,6 +16,10 @@ amazon_instance_type: "{{
   cluster.amazon_instance_types [instance_type]
 }}"
 
+amazon_instance_ebs_optimized: "{{
+  cluster.amazon_instance_ebs_optimized [instance_type]
+}}"
+
 amazon_vpc_subnet_id: "{{
   cluster_network ['subnet_' + instance_type + '_' + instance_zone]
 }}"

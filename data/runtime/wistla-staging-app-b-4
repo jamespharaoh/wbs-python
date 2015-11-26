@@ -1,6 +1,6 @@
 ---
 amazon_instance_state: running
-amazon_instance_type_running: c4.large
+amazon_instance_type_running: t2.large
 heka:
   installed_version: 0.10.0b0
   needs_restart: 'no'
@@ -28,6 +28,9 @@ python_apt:
 python_apt_installed_version: 0.9.3-1
 python_apt_state: installed
 python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+python_pip_installed_version: 7.0.3
 python_pip_state: installed
 python_state: installed
 ssh:

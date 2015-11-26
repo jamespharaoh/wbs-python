@@ -35,3 +35,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtFC3cOLxPUcc0zyotna7MT1
 volume_ids:
   system: vol-484f9fab
 volume_ids_system: vol-484f9fab
+vpn_server:
+  certificate: /authority/ops-vpn/issue/22/certificate
+  private_key: /authority/ops-vpn/issue/22/key
+vpn_server_certificate: /authority/ops-vpn/issue/22/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/22/key

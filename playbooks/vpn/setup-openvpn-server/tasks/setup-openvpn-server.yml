@@ -1,5 +1,26 @@
 ---
 
+- name: "issue vpn server certificate"
+  when: "vpn_server_certificate | default ('') == ''"
+  register: "vpn_server_certificate_result"
+  action:
+
+    module: "certificate_authority_issue"
+    authority: "ops-vpn"
+    common_name: "{{ inventory_hostname }}"
+    usage: "mixed"
+    alt_dns:
+      - "{{ inventory_hostname }}"
+      - "{{ inventory_hostname }}.{{ cluster.local_domain }}"
+      - "vpn.{{ cluster.local_domain }}"
+
+- name: "store vpn server certificate"
+  when: "vpn_server_certificate_result | changed"
+  update_resource:
+
+    vpn_server.certificate: "{{ vpn_server_certificate_result.certificate }}"
+    vpn_server.private_key: "{{ vpn_server_certificate_result.private_key }}"
+
 - name: "install openvpn ca cert"
   notify: "restart openvpn"
   sudo: "yes"
@@ -7,7 +28,7 @@
 
     module: "copy"
     dest: "/etc/openvpn/wistla-ca.cert"
-    src: "{{ HOME }}/security/wistla-ca.cert"
+    content: "{{ lookup ('etcd', '/authority/ops-vpn/certificate') }}"
 
 - name: "install wistla-dh.pem"
   notify: "restart openvpn"
@@ -24,8 +45,8 @@
   action:
 
     module: "copy"
-    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.cert"
-    src: "{{ HOME }}/security/vpn-server/{{ supercluster_name }}.cert"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.cert"
+    content: "{{ lookup ('etcd', vpn_server_certificate) }}"
 
 - name: "install openvpn server key"
   notify: "restart openvpn"
@@ -33,8 +54,8 @@
   action:
 
     module: "copy"
-    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.key"
-    src: "{{ HOME }}/security/vpn-server/{{ supercluster_name }}.key"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.key"
+    content: "{{ lookup ('etcd', vpn_server_private_key) }}"
 
     mode: "0600"
 
@@ -44,7 +65,7 @@
   action:
 
     module: "template"
-    dest: "/etc/openvpn/wistla-{{ supercluster_name }}-vpn.conf"
+    dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.conf"
     src: "openvpn-config"
 
 - name: "create openvpn client config dir"
@@ -64,8 +85,18 @@
     dest: "/etc/openvpn/clients/{{ item.name }}"
     src: "openvpn-client-config"
 
+- name: "create openvpn admin client configs"
+  with_items: "groups ['cluster-admin']"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/clients/{{ item }}"
+    src: "openvpn-admin-client-config"
+
 - name: "create openvpn client connect script"
   sudo: "yes"
+  tags: "aaa"
   action:
 
     module: "template"
@@ -76,6 +107,7 @@
 
 - name: "create openvpn client disconnect script"
   sudo: "yes"
+  tags: "aaa"
   action:
 
     module: "template"
@@ -83,6 +115,27 @@
     src: "openvpn-client-disconnect-script"
 
     mode: "0755"
+
+- name: "create openvpn cluster configs"
+  with_nested:
+
+    - "cluster.vpn_upstream_clusters"
+    - [ "a", "b", "c" ]
+
+  notify: "restart openvpn"
+  sudo: "yes"
+  tags: "aaa"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      '/etc/openvpn/wistla-',
+      item.0,
+      '-admin-',
+      item.1,
+      '.conf',
+    ] | join }}"
+    src: "openvpn-cluster-config"
 
 - meta: "flush_handlers"
 

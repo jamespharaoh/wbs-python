@@ -13,13 +13,26 @@ vpn_networks:
   c: "10.164.22"
   d: "10.164.23"
 
+admin_vpn_ips:
+
+  a: "116"
+  b: "117"
+  c: "118"
+  d: "119"
+
+vpn_upstream_clusters:
+
+  - "staging"
+
 super_domain: "staging.wistla.com"
 local_domain: "2.staging.wistla.com"
 short_domain: "staging.wist.la"
 
 cluster_colour: "84"
 
-deployment_names:
+deployment_names: []
+
+proxy_deployment_names:
 
   - "staging"
 
@@ -69,6 +82,11 @@ amazon_instance_types:
 
   admin: "t2.micro"
   app: "t2.micro"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  app: "no"
 
 kernel_versions:
 

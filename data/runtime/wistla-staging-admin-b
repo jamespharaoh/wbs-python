@@ -2,10 +2,10 @@
 amazon_instance_state: running
 amazon_instance_type_running: t2.micro
 etcd:
-  installed_version: 2.1.1
+  installed_version: 2.2.2
   needs_restart: 'no'
   state: enabled
-etcd_installed_version: 2.1.1
+etcd_installed_version: 2.2.2
 etcd_needs_restart: 'no'
 etcd_state: enabled
 heka:
@@ -48,3 +48,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9sQ9yaqDcSBUyO+PXz9eDgR
 volume_ids:
   system: vol-902d0a87
 volume_ids_system: vol-902d0a87
+vpn_server:
+  certificate: /authority/ops-vpn/issue/25/certificate
+  private_key: /authority/ops-vpn/issue/25/key
+vpn_server_certificate: /authority/ops-vpn/issue/25/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/25/key

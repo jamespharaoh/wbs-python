@@ -35,3 +35,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDsbcJt1PamT2zFaHtwDz6/n
 volume_ids:
   system: vol-7e958c92
 volume_ids_system: vol-7e958c92
+vpn_server:
+  certificate: /authority/ops-vpn/issue/21/certificate
+  private_key: /authority/ops-vpn/issue/21/key
+vpn_server_certificate: /authority/ops-vpn/issue/21/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/21/key
