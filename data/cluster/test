@@ -38,6 +38,18 @@ deployment_names:
   - "test-erebus"
   - "test-fitzroy"
 
+super_deployment_names:
+
+  - "test"
+
+  - "test-everest"
+  - "test-k2"
+  - "test-montblanc"
+  - "test-erebus"
+  - "test-fitzroy"
+
+region_code: "eu"
+
 # ========== amazon miscellaneous
 
 amazon_account: "test"
@@ -80,6 +92,11 @@ amazon_instance_types:
 
   admin: "t2.micro"
   app: "r3.large"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  app: "yes"
 
 kernel_versions:
 

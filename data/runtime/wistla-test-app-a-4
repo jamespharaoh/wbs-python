@@ -1,5 +1,6 @@
 ---
 amazon_instance_state: running
+amazon_instance_type_running: r3.large
 heka:
   installed_version: 0.10.0b0
   needs_restart: 'no'
@@ -17,6 +18,13 @@ icinga_needs_restart: 'no'
 icinga_private_key: /authority/icinga/issue/13/key
 icinga_state: enabled
 instance_id: i-9265b938
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'no'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'no'
+nginx_state: enabled
 python:
   apt_installed_version: 0.9.3-1
   apt_state: installed
@@ -26,6 +34,9 @@ python:
 python_apt_installed_version: 0.9.3-1
 python_apt_state: installed
 python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+python_pip_installed_version: 7.0.3
 python_pip_state: installed
 python_state: installed
 ssh:
