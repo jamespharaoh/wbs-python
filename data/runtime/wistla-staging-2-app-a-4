@@ -8,6 +8,13 @@ heka_installed_version: 0.10.0b0
 heka_needs_restart: 'no'
 heka_state: enabled
 instance_id: i-53dbbbed
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'yes'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'yes'
+nginx_state: enabled
 python:
   installed_version: 2.7.10
   state: installed

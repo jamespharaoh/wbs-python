@@ -32,12 +32,21 @@ cluster_colour: "84"
 
 deployment_names: []
 
+super_deployment_names:
+
+  - "staging"
+
+  - "staging-a"
+  - "staging-b"
+
 proxy_deployment_names:
 
   - "staging"
 
   - "staging-a"
   - "staging-b"
+
+region_code: "us"
 
 # ========== amazon miscellaneous
 

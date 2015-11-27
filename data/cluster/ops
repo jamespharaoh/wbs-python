@@ -28,6 +28,8 @@ short_domain: "ops.wist.la"
 
 cluster_colour: "207"
 
+region_code: "eu"
+
 # ========== amazon miscellaneous
 
 amazon_account: "ops"
@@ -58,6 +60,11 @@ amazon_instance_types:
 
   admin: "t2.micro"
   jenkins: "c4.large"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  jenkins: "yes"
 
 kernel_versions:
 

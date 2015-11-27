@@ -36,7 +36,7 @@
 {%- for other_deployment_name, other_deployment in deployments.items ()
 if 'bridge_network' in other_deployment
 and (inventory_hostname in groups.vagrant
-	or other_deployment.cluster == cluster_name
+	or other_deployment.supercluster == supercluster_name
 	or (inventory_hostname == 'wistla-ops-jenkins'
 		and other_deployment.cluster == 'jenkins')) -%}
 
@@ -213,7 +213,7 @@ and (inventory_hostname in groups.vagrant
 
 {%- for other_cluster_name, other_cluster in clusters.items ()
 if inventory_hostname in groups.vagrant
-or other_cluster_name == cluster_name -%}
+or other_cluster.supercluster_name == supercluster_name -%}
 
 	{%- print '\n# ---------- cluster ', other_cluster_name, '\n\n' -%}
 

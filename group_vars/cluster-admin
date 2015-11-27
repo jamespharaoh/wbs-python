@@ -40,9 +40,6 @@ my_system_packages:
   - name: "mailutils"
     state: "present"
 
-  - name: "nginx"
-    state: "present"
-
   - name: "ngrep"
     state: "present"
 
@@ -157,5 +154,7 @@ node_packages:
 
   - name: "request"
     version: "2.55.0"
+
+nginx_version: "1.9.7"
 
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

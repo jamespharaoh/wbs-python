@@ -1,0 +1,58 @@
+---
+
+- name: "create assets records"
+  with_items: "{{ cluster.deployment_names | default ([]) | dict_map (deployments) }}"
+  when: "
+    'assets_origin_domain' in item
+    and item.type in [ 'shared', 'simple' ]
+  "
+  action:
+
+    module: "route53"
+    record: "{{ item.assets_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.super_domain }}"
+    overwrite: "yes"
+
+    type: "CNAME"
+    ttl: "{{ ttl_medium }}"
+
+    value: "{{ hostvars [inventory_hostname] [
+      'assets_cloudfront_' + item.name | replace ('-', '_') + '_domain'
+    ] }}"
+
+    # TODO should use zone id but can't find how to retrieve this, it seems like
+    # there should be a way to do this in cloudformation but i can't see that it
+    # exists currently, so in the mean time we use a CNAME instead of an alias
+    # here
+
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+- name: "create mx records"
+  action:
+
+    module: "route53"
+    record: "{{ cluster.super_domain }}"
+    command: "create"
+
+    zone: "{{ cluster.super_domain }}"
+    overwrite: "yes"
+
+    type: "MX"
+    ttl: "{{ ttl_medium }}"
+    value: "{{ [
+      '10 aspmx.l.google.com.',
+      '20 alt1.aspmx.l.google.com.',
+      '20 alt2.aspmx.l.google.com.',
+      '30 aspmx2.googlemail.com.',
+      '30 aspmx3.googlemail.com.',
+    ] | join (', ') }}"
+
+    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+# ex: et ts=2 filetype=yaml

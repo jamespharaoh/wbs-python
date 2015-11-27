@@ -18,6 +18,11 @@ icinga_needs_restart: 'no'
 icinga_private_key: /authority/icinga/issue/21/key
 icinga_state: enabled
 instance_id: i-cbce2c32
+nginx:
+  installed_version: 1.9.7
+  state: installed
+nginx_installed_version: 1.9.7
+nginx_state: installed
 python:
   apt_installed_version: 0.9.3-1
   apt_state: installed

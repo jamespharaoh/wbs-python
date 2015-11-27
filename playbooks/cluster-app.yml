@@ -32,7 +32,10 @@
     - "install-iojs"
     - "install-node-packages"
 
+    - "build-nginx"
     - "cluster-app-nginx"
+    - "control-nginx"
+
     - "cluster-app"
 
     - "cluster-activate"

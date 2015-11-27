@@ -44,6 +44,8 @@ amazon_instance_create_count_tag:
   "Zone": "{{ instance_zone }}"
   "Index": "{{ instance_index }}"
 
+region_code: "{{ cluster.region_code }}"
+
 mongodb_enabled: "no"
 
 amazon_instance_state: "running"

@@ -16,7 +16,7 @@ http {
 	keepalive_timeout 65;
 	types_hash_max_size 2048;
 
-	include /etc/nginx/mime.types;
+	include {{ nginx_target }}/conf/mime.types;
 	default_type application/octet-stream;
 
 	log_format times '$time_iso8601 $status $body_bytes_sent $request_time $request_method $scheme://$host$request_uri $server_protocol';
@@ -30,19 +30,32 @@ http {
 
 	client_max_body_size 16m;
 
+	proxy_connect_timeout 1s;
+	proxy_read_timeout 60s;
+	proxy_send_timeout 60s;
+
+	proxy_http_version 1.1;
+	proxy_set_header Connection "";
+
 # ----- upstream servers per deployment -----
 
-{% for deployment_name in cluster.deployment_names %}
+{% for deployment_name in cluster.super_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
 {% if deployment.type != 'virtual' %}
 
 	upstream deployment-{{ deployment_name }} {
+
+{% for zone in [ 'a', 'b', 'c', 'd' ] %}
 		server {{ [
 			deployment.bridge_network,
 			instance_index,
-			cluster_zone_indices [instance_zone] * 64
+			cluster_zone_indices [zone] * 64
 				+ node_type_indices.load,
-		] | join ('.') }};
+		] | join ('.') }} fail_timeout=60s;
+{% endfor %}
+
+		keepalive 512;
+
 	}
 
 {% endif %}
@@ -55,12 +68,12 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name {{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.key;
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
@@ -82,12 +95,12 @@ http {
 
 	server {
 
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name www.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.key;
 
 		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
@@ -98,14 +111,14 @@ http {
 
 		location /keystone {
 			auth_basic "Restricted";
-			auth_basic_user_file /etc/nginx/htpasswd;
+			auth_basic_user_file {{ nginx_target }}/conf/htpasswd;
 			proxy_pass http://deployment-{{ target }}/keystone;
 			proxy_set_header Host "{{ deployment.main_domain }}";
 		}
 
 {% if cluster_name != 'production' %}
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
 
@@ -116,12 +129,12 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name api.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/api.{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/api.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/api.{{ deployment_alias.main_domain }}.key;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
@@ -129,7 +142,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
 	}
@@ -150,12 +163,12 @@ http {
 
 	server {
 
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name admin.{{ deployment.main_domain }};
 
-		ssl_certificate /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/admin.{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/admin.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/admin.{{ deployment_alias.main_domain }}.key;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
@@ -163,7 +176,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
 	}
@@ -185,12 +198,12 @@ http {
 
 	server {
 
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name {{ deployment.short_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.short_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.short_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.short_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.short_domain }}.key;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
@@ -198,7 +211,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
 	}
@@ -220,12 +233,12 @@ http {
 
 	server {
 
-		listen 443 ssl spdy;
+		listen 443 ssl http2;
 
 		server_name {{ deployment.assets_domain }};
 
-		ssl_certificate /etc/nginx/ssl/{{ deployment_alias.assets_domain }}.cert;
-		ssl_certificate_key /etc/nginx/ssl/{{ deployment_alias.assets_domain }}.key;
+		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.assets_domain }}.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.assets_domain }}.key;
 
 		location / {
 			proxy_pass http://deployment-{{ target }};
@@ -233,7 +246,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
 	}
@@ -252,7 +265,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias /etc/nginx/dev-robots.txt;
+			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
 	}
@@ -260,7 +273,7 @@ http {
 {% endmacro %}
 
 {% for deployment_name, deployment in deployments.items ()
-if deployment.cluster == cluster_name %}
+if deployment.supercluster == supercluster_name %}
 
 {% if deployment.type == 'shared' %}
 

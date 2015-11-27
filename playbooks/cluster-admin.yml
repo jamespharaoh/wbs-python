@@ -35,7 +35,10 @@
     - "install-iojs"
     - "install-node-packages"
 
+    - "build-nginx"
     - "cluster-admin-nginx"
+    - "control-nginx"
+
     - "setup-openvpn-server"
     - "cluster-admin-routes"
     - "wistla-heka-master"

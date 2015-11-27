@@ -6,5 +6,6 @@
     - "cluster"
     - "cluster-app"
     - "cluster-app-nginx"
+    - "nginx"
 
 # ex: et ts=2 filetype=yaml

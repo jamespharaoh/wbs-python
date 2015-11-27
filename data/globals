@@ -254,6 +254,8 @@ ansible_notice:
 
 wistla_dist_url: "https://dist.ops.wistla.com"
 
+nginx_build_mirror: "{{ wistla_dist_url }}/nginx"
+
 python_version: "2.7.10"
 python_url: "{{ wistla_dist_url }}/python/{{ python_archive }}"
 

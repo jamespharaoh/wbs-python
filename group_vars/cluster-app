@@ -55,9 +55,6 @@ my_system_packages:
   - name: "mailutils"
     state: "present"
 
-  - name: "nginx"
-    state: "present"
-
   - name: "ngrep"
     state: "present"
 
@@ -167,5 +164,7 @@ cluster_create_volumes:
     volume_size: "128"
     device_type: "gp2"
     delete_on_termination: "no"
+
+nginx_version: "1.9.7"
 
 # ex: et ts=2 filetype=yaml

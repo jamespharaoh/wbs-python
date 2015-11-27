@@ -35,6 +35,15 @@ deployment_names:
   - "staging-a"
   - "staging-b"
 
+super_deployment_names:
+
+  - "staging"
+
+  - "staging-a"
+  - "staging-b"
+
+region_code: "eu"
+
 # ========== amazon miscellaneous
 
 amazon_account: "staging"

@@ -22,6 +22,11 @@ mysql:
 mysql_needs_restart: 'no'
 mysql_root_password: affkppbwgcsmoccnoqte
 mysql_state: enabled
+nginx:
+  needs_restart: 'no'
+  state: enabled
+nginx_needs_restart: 'no'
+nginx_state: enabled
 php:
   needs_restart: 'no'
   state: enabled

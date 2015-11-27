@@ -37,6 +37,13 @@ mysql:
 mysql_needs_restart: 'no'
 mysql_root_password: ghvawkujrjlehxjrudxy
 mysql_state: enabled
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'no'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'no'
+nginx_state: enabled
 php:
   needs_restart: 'no'
   state: enabled
@@ -50,3 +57,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5RtEA0wMTcsQy2gWOLhErgm
 volume_ids:
   system: vol-b5e862a6
 volume_ids_system: vol-b5e862a6
+vpn_server:
+  certificate: /authority/ops-vpn/issue/27/certificate
+  private_key: /authority/ops-vpn/issue/27/key
+vpn_server_certificate: /authority/ops-vpn/issue/27/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/27/key

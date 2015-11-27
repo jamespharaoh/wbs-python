@@ -5,7 +5,7 @@
   action:
 
     module: "template"
-    dest: "/etc/nginx/dev-robots.txt"
+    dest: "{{ nginx_target }}/conf/dev-robots.txt"
     src: "cluster-app-dev-robots-txt"
 
 - name: "create nginx config"
@@ -14,16 +14,32 @@
   action:
 
     module: "template"
-    dest: "/etc/nginx/nginx.conf"
+    dest: "{{ nginx_target }}/conf/nginx.conf"
     src: "cluster-app-nginx-config"
 
-- name: "create nginx ssl directory"
+- name: "create nginx directories"
+  with_items:
+
+    - directory: "{{ nginx_target }}/conf/ssl"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+    - directory: "/var/log/nginx"
+      user: "www-data"
+      group: "adm"
+      mode: "0750"
+
   sudo: "yes"
   action:
 
     module: "file"
-    name: "/etc/nginx/ssl"
+    name: "{{ item.directory }}"
     state: "directory"
+
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
 
 - name: "write nginx certificates"
   with_items: "cluster.app_certificates | default ([])"
@@ -32,7 +48,7 @@
   action:
 
     module: "template"
-    dest: "/etc/nginx/ssl/{{ item }}.cert"
+    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.cert"
     src: "cluster-app-ssl-bundle"
 
 - name: "write nginx private keys"
@@ -42,7 +58,7 @@
   action:
 
     module: "copy"
-    dest: "/etc/nginx/ssl/{{ item }}.key"
+    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.key"
 
     content: "{{ lookup ('etcd', [
       '/certificate/',
@@ -59,12 +75,18 @@
   action:
 
     module: "copy"
-    dest: "/etc/nginx/htpasswd"
+    dest: "{{ nginx_target }}/conf/htpasswd"
     src: "{{ HOME }}/security/htpasswd"
 
     group: "www-data"
     mode: "0640"
 
 - meta: "flush_handlers"
+
+- name: "set nginx.state to 'enabled'"
+  when: "nginx_state == 'installed'"
+  update_resource:
+
+    nginx.state: "enabled"
 
 # ex: et ts=2 filetype=yaml
