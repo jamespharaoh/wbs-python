@@ -35,7 +35,7 @@ http {
 
 		server_name {{ inventory_hostname }};
 
-		root /usr/share/nginx/html;
+		root {{ nginx_target }}/html;
 
 	}
 
@@ -60,7 +60,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		server_name {{ dev_deployment.main_domain }};
 
@@ -87,7 +87,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.main_domain }}.cert;
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.main_domain }}.key;
@@ -121,7 +121,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.api_domain }}.cert;
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.api_domain }}.key;
@@ -156,7 +156,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		server_name {{ dev_deployment.admin_domain }};
 
@@ -189,7 +189,7 @@ http {
 
 	server {
 
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.short_domain }}.cert;
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.short_domain }}.key;
@@ -215,7 +215,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		server_name {{ dev_deployment.test_domain }};
 
@@ -241,7 +241,7 @@ http {
 	server {
 
 		listen 80;
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		server_name {{ dev_deployment.assets_domain }};
 
@@ -273,9 +273,30 @@ http {
 
 {% endfor %}
 
+	# icinga redirect to ssl
+
 	server {
 
 		server_name icinga.ops.wistla.com;
+
+		listen 80;
+
+		return 301 https://icinga.ops.wistla.com$request_uri;
+
+	}
+
+	# icinga ssl
+
+	server {
+
+		server_name icinga.ops.wistla.com;
+
+		listen 443 ssl http2;
+
+		ssl_certificate {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.cert;
+		ssl_certificate_key {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.key;
+
+		# classic ui
 
 		location /icinga/cgi-bin {
 
@@ -306,7 +327,26 @@ http {
 
 		}
 
-{% if inventory_hostname == 'wistla-ops-admin-a' %}
+		# icinga web2 proxy to admin-a
+
+		location /icingaweb2 {
+			proxy_pass http://wistla-ops-admin-a;
+			proxy_set_header Host icinga-origin.ops.wistla.com;
+			proxy_set_header X-Real-IP $http_x_real_ip;
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header X-Wistla-Entry-Region {{ region_code }};
+		}
+
+	}
+
+	# icinga web 2
+
+	server {
+
+		server_name icinga-origin.ops.wistla.com;
+
+		listen 80;
 
 		location ~ ^/icingaweb2/index\.php(.*)$ {
 
@@ -317,6 +357,7 @@ http {
 			fastcgi_param SCRIPT_FILENAME /opt/icinga-web-2.0.0-rc1/public/index.php;
 			fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;
 			fastcgi_param REMOTE_USER $remote_user;
+			fastcgi_param HTTPS on;
 
 		}
 
@@ -328,16 +369,6 @@ http {
 			try_files $1 $uri $uri/ /icingaweb2/index.php$is_args$args;
 
 		}
-
-{% else %}
-
-		location /icingaweb2 {
-			proxy_pass http://wistla-ops-admin-a;
-			proxy_set_header Host $host;
-			proxy_set_header X-Wistla-Entry-Region {{ region_code }};
-		}
-
-{% endif %}
 
 	}
 
@@ -359,7 +390,7 @@ http {
 
 		server_name jenkins.ops.wistla.com;
 
-		listen 443 ssl;
+		listen 443 ssl http2;
 
 		ssl_certificate {{ nginx_target }}/conf/ssl/jenkins.ops.wistla.com.cert;
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/jenkins.ops.wistla.com.key;
