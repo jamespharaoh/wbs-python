@@ -20,46 +20,61 @@ def setup ():
 	third_party_index = (
 		read_index ())
 
-	for project_name, project_data \
-	in third_party_index.items ():
+	subprocess.check_call ([
+		"git",
+		"stash",
+	])
 
-		repository = git.Repo (".")
+	try:
 
-		project_path = (
-			"third-party/%s" % (
-				project_name))
+		for project_name, project_data \
+		in third_party_index.items ():
 
-		if os.path.isdir (
-			project_path):
+			repository = git.Repo (".")
 
-			print (
-				"-- update %s --" % (
+			project_path = (
+				"third-party/%s" % (
 					project_name))
 
-			subprocess.check_call ([
-				"git",
-				"subtree",
-				"pull",
-				"--prefix", project_path,
-				project_data ["url"],
-				project_data ["version"],
-				"--squash",
-			])
+			if os.path.isdir (
+				project_path):
 
-		else:
+				print (
+					"-- update %s --" % (
+						project_name))
 
-			print (
-				"-- add %s --" % (
-					project_name))
+				subprocess.check_call ([
+					"git",
+					"subtree",
+					"pull",
+					"--prefix", project_path,
+					project_data ["url"],
+					project_data ["version"],
+					"--squash",
+				])
 
-			subprocess.check_call ([
-				"git",
-				"subtree",
-				"add",
-				"--prefix", project_path,
-				project_data ["url"],
-				project_data ["version"],
-				"--squash",
-			])
+			else:
+
+				print (
+					"-- add %s --" % (
+						project_name))
+
+				subprocess.check_call ([
+					"git",
+					"subtree",
+					"add",
+					"--prefix", project_path,
+					project_data ["url"],
+					project_data ["version"],
+					"--squash",
+				])
+
+	finally:
+
+		subprocess.check_call ([
+			"git",
+			"stash",
+			"pop",
+		])
 
 # ex: noet ts=4 filetype=python

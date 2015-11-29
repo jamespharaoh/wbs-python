@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import codecs
 import collections
 import os
 import sys
@@ -72,7 +73,9 @@ class OrderedDictYAMLLoader (yaml.Loader):
 
 def parse (string):
 
-	return yaml.load (string, OrderedDictYAMLLoader)
+	return yaml.load (
+		string,
+		OrderedDictYAMLLoader)
 
 def encode (schema, data):
 
@@ -216,8 +219,13 @@ def load_data (path):
 
 	elif os.path.isfile (path):
 
-		with open (path) as file_handle:
-			return parse (file_handle)
+		with codecs.open (
+			filename = path,
+			encoding = "utf-8") \
+		as file_handle:
+
+			return parse (
+				file_handle)
 
 	else:
 
