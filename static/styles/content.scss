@@ -118,3 +118,19 @@
 	font-family: sourcecodepro, monospace;
 	font-size: 90%;
 }
+
+.content label {
+	font-weight: bold;
+}
+
+.content input[type=text],
+.content input[type=email],
+.content input[type=password] {
+	font-family: inherit;
+	padding: 0.2rem 0.6rem;
+}
+
+.content input[type=submit] {
+	font-family: montserrat, sans-serif;
+	padding: 0.3rem 0.8rem;
+}
