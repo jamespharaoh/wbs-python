@@ -23,8 +23,10 @@ mysql_needs_restart: 'no'
 mysql_root_password: ezjiyqvlewyeeldkwdld
 mysql_state: enabled
 nginx:
+  installed_version: 1.9.7
   needs_restart: 'no'
   state: enabled
+nginx_installed_version: 1.9.7
 nginx_needs_restart: 'no'
 nginx_state: enabled
 php:

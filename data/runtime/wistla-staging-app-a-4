@@ -20,9 +20,11 @@ icinga_state: enabled
 instance_id: i-cbce2c32
 nginx:
   installed_version: 1.9.7
-  state: installed
+  needs_restart: 'no'
+  state: enabled
 nginx_installed_version: 1.9.7
-nginx_state: installed
+nginx_needs_restart: 'no'
+nginx_state: enabled
 python:
   apt_installed_version: 0.9.3-1
   apt_state: installed
