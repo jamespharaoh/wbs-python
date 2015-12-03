@@ -107,6 +107,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /keystone {
@@ -114,6 +115,7 @@ http {
 			auth_basic_user_file {{ nginx_target }}/conf/htpasswd;
 			proxy_pass http://deployment-{{ target }}/keystone;
 			proxy_set_header Host "{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 {% if cluster_name != 'production' %}
@@ -139,6 +141,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "api.{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /robots.txt {
@@ -173,6 +176,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "admin.{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /robots.txt {
@@ -208,6 +212,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "{{ deployment.short_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /robots.txt {
@@ -243,6 +248,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "{{ deployment.assets_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /robots.txt {
@@ -262,6 +268,7 @@ http {
 		location / {
 			proxy_pass http://deployment-{{ target }};
 			proxy_set_header Host "{{ deployment.assets_origin_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
 		}
 
 		location /robots.txt {
