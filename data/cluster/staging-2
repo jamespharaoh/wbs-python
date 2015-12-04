@@ -50,6 +50,8 @@ region_code: "us"
 
 activate_dns: "yes"
 
+monitoring: "no"
+
 # ========== amazon miscellaneous
 
 amazon_account: "staging"

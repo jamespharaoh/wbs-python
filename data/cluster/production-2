@@ -110,6 +110,8 @@ route53_main_domain:
 
   misc_records: []
 
+monitoring: "no"
+
 # ========== accounts and security
 
 smtp_server: "email-smtp.eu-west-1.amazonaws.com"

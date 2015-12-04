@@ -32,6 +32,8 @@ region_code: "eu"
 
 activate_dns: "yes"
 
+monitoring: "yes"
+
 # ========== amazon miscellaneous
 
 amazon_account: "ops"

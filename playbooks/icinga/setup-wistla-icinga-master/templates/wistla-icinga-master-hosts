@@ -139,7 +139,8 @@ object Host "{{ host_name }}" {
 
 {##############################################################################}
 
-{% for other_cluster_name, other_cluster in clusters.items () %}
+{% for other_cluster_name, other_cluster in clusters.items ()
+if other_cluster.monitoring == 'yes' %}
 
 # ==================== cluster {{ other_cluster_name }}
 
