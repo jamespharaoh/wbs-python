@@ -7,6 +7,15 @@ heka:
 heka_installed_version: 0.10.0b0
 heka_needs_restart: 'no'
 heka_state: enabled
+icinga:
+  certificate: /authority/icinga/issue/26/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/26/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/26/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/26/key
+icinga_state: enabled
 instance_id: i-698953df
 nginx:
   installed_version: 1.9.7

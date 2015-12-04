@@ -14,6 +14,15 @@ heka:
 heka_installed_version: 0.10.0b0
 heka_needs_restart: 'no'
 heka_state: enabled
+icinga:
+  certificate: /authority/icinga/issue/30/certificate
+  needs_restart: 'no'
+  private_key: /authority/icinga/issue/30/key
+  state: enabled
+icinga_certificate: /authority/icinga/issue/30/certificate
+icinga_needs_restart: 'no'
+icinga_private_key: /authority/icinga/issue/30/key
+icinga_state: enabled
 instance_id: i-92b40a22
 mysql:
   needs_restart: 'no'

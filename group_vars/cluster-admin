@@ -62,7 +62,10 @@ python_packages:
 
 icinga_name: "{{ inventory_hostname }}"
 icinga_ticket_salt: "{{ cluster_network.icinga_ticket_salt }}"
+icinga_database_type: "mysql"
 icinga_database_password: "{{ cluster_network.icinga_database_password }}"
+
+icinga_web_database_type: "mysql"
 icinga_web_database_password: "{{ cluster_network.icinga_web_database_password }}"
 
 load_balancer_name: "{{ cluster_name }}-admin"

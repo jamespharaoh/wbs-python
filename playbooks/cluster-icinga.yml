@@ -5,13 +5,22 @@
 - hosts:
 
     - "cluster-admin"
+
+  roles:
+
+    - "install-icinga-master"
+    #- "install-icinga-classicui"
+    - "install-wistla-icinga-plugins"
+
+- hosts:
+
     - "cluster-app"
     - "cluster-data"
     - "cluster-jenkins"
 
   roles:
 
-    - "install-icinga"
+    - "install-icinga-agent"
     #- "install-icinga-classicui"
     - "install-wistla-icinga-plugins"
 

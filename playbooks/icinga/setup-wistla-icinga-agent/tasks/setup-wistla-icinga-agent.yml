@@ -1,7 +1,7 @@
 ---
 
 - name: "create wistla icinga certificate"
-  when: "icinga_certificate == 'no'"
+  when: "icinga_certificate == ''"
   register: "wistla_icinga_certificate_result"
   action:
 
