@@ -5,7 +5,7 @@
 
     module: "route53"
     record: "{{ item.0 [item.1] }}"
-    command: "create"
+    command: "{{ 'create' if cluster.activate_dns == 'yes' else 'delete' }}"
 
     zone: "{{ cluster.super_domain }}"
     overwrite: "yes"
@@ -34,7 +34,7 @@
 
     module: "route53"
     record: "{{ item.1 }}{{ item.0.short_domain }}"
-    command: "create"
+    command: "{{ 'create' if cluster.activate_dns == 'yes' else 'delete' }}"
 
     zone: "{{ cluster.short_domain }}"
     overwrite: "yes"

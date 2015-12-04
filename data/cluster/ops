@@ -30,6 +30,8 @@ cluster_colour: "207"
 
 region_code: "eu"
 
+activate_dns: "yes"
+
 # ========== amazon miscellaneous
 
 amazon_account: "ops"

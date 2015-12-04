@@ -10,7 +10,7 @@
 clusters:
 
   production: {{ lookup ('file', DATA + '/cluster/production') | from_yaml | to_json }}
-  #production-2: {{ lookup ('file', DATA + '/cluster/production-2') | from_yaml | to_json }}
+  production-2: {{ lookup ('file', DATA + '/cluster/production-2') | from_yaml | to_json }}
 
   staging: {{ lookup ('file', DATA + '/cluster/staging') | from_yaml | to_json }}
   staging-2: {{ lookup ('file', DATA + '/cluster/staging-2') | from_yaml | to_json }}

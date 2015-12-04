@@ -25,15 +25,19 @@ def main ():
 	load_config ()
 
 	if len (sys.argv) == 1:
+
 		authenticate_with_mfa ()
 
 	else:
+
 		load_credentials ()
 
 	if all_credentials ["timestamp"] + 30 * 60 < current_time:
+
 		obtain_temporary_credentials ()
 
-	if len (sys.argv) == 2:
+	if len (sys.argv) == 2 and sys.argv [1] != "auto":
+
 		print_variables (sys.argv [1])
 
 def clean_environment ():

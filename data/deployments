@@ -22,6 +22,10 @@ production:
   cluster: "production"
   target: "production-a"
 
+  bridge_name: "br162"
+  bridge_network: "10.162"
+  bridge_mac: "aa:bb:0a:a2"
+
   node_memory:
 
     mongo: "2048"

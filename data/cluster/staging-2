@@ -48,6 +48,8 @@ proxy_deployment_names:
 
 region_code: "us"
 
+activate_dns: "yes"
+
 # ========== amazon miscellaneous
 
 amazon_account: "staging"

@@ -112,7 +112,7 @@ message_matcher = '{{ [
 	'Fields[Category] == "wistla-api"',
 	'Payload =~ / %% CONTAINER-PROCESS-CONTROL %% (START|STOP) %% /',
 ] | join (' && ') }}'
-send_from = "heka@{{ cluster.main_domain }}"
+send_from = "heka@{{ cluster.super_domain }}"
 send_to = [ "notifications.production.warning@wistla.com" ]
 subject = "Wistla API restart notifications"
 send_interval = 60

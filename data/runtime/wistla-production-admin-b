@@ -1,5 +1,6 @@
 ---
 amazon_instance_state: running
+amazon_instance_type_running: t2.small
 etcd:
   installed_version: 2.2.2
   needs_restart: 'no'
@@ -36,6 +37,13 @@ mysql:
 mysql_needs_restart: 'no'
 mysql_root_password: cqnbaawgetomjqgfjhyr
 mysql_state: enabled
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'no'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'no'
+nginx_state: enabled
 php:
   state: unconfigured
 php_state: unconfigured
@@ -47,3 +55,8 @@ ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaJjzjj2J93CZZ/UUtxiWF7v
 volume_ids:
   system: vol-43ea5c5c
 volume_ids_system: vol-43ea5c5c
+vpn_server:
+  certificate: /authority/ops-vpn/issue/34/certificate
+  private_key: /authority/ops-vpn/issue/34/key
+vpn_server_certificate: /authority/ops-vpn/issue/34/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/34/key

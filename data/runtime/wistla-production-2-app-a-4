@@ -1,0 +1,42 @@
+---
+amazon_instance_type_running: t2.small
+heka:
+  installed_version: 0.10.0b0
+  needs_restart: 'no'
+  state: enabled
+heka_installed_version: 0.10.0b0
+heka_needs_restart: 'no'
+heka_state: enabled
+instance_id: i-58393ee6
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'no'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'no'
+nginx_state: enabled
+python:
+  installed_version: 2.7.10
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+  state: installed
+python_pip_installed_version: 7.0.3
+python_pip_state: installed
+python_state: installed
+ssh:
+  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPWSZWduTgcIoPV+Lv72GdTIlebKJfHl6iZW6MLeZaNfenwjlgS0ek8Qal4FXu711DNvYNVspmThynMy1MTx40Y=
+  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC39EZf05pD4alX235z0Nm9iXNZUR0yCmd+zGg1widYTp0nwRWwLBOWi3vs6AWkadzbw/BfyAJT93PQtZlboUFYAtvaCKI5RXu/2+oe3iaOcLfG5v5fDWL8wDBvPRRlsH7iOQKaZi7/KG1AfU60+p+ltVEG+5NAcObrOnB7621NRwcacjmnuBCLooGT0n/OzS+zQ0/Ax2lHrieDgHkfsmBcSNNwrBVsJHurGErFgs6VZ0iZjss3Dn8Q+hZjhAjju6pbUhozTfFPtiOVvYPgfw8YvqxQn/OVBjV13aakAC9hBg+JXphllWJzh6pj0hEkS+4xaHZtldY8tgOg8UED0qI5
+ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPWSZWduTgcIoPV+Lv72GdTIlebKJfHl6iZW6MLeZaNfenwjlgS0ek8Qal4FXu711DNvYNVspmThynMy1MTx40Y=
+ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC39EZf05pD4alX235z0Nm9iXNZUR0yCmd+zGg1widYTp0nwRWwLBOWi3vs6AWkadzbw/BfyAJT93PQtZlboUFYAtvaCKI5RXu/2+oe3iaOcLfG5v5fDWL8wDBvPRRlsH7iOQKaZi7/KG1AfU60+p+ltVEG+5NAcObrOnB7621NRwcacjmnuBCLooGT0n/OzS+zQ0/Ax2lHrieDgHkfsmBcSNNwrBVsJHurGErFgs6VZ0iZjss3Dn8Q+hZjhAjju6pbUhozTfFPtiOVvYPgfw8YvqxQn/OVBjV13aakAC9hBg+JXphllWJzh6pj0hEkS+4xaHZtldY8tgOg8UED0qI5
+volume_ids:
+  data: vol-844bc76b
+  system: vol-d84bc737
+volume_ids_data: vol-844bc76b
+volume_ids_system: vol-d84bc737

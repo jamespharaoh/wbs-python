@@ -44,6 +44,8 @@ super_deployment_names:
 
 region_code: "eu"
 
+activate_dns: "yes"
+
 # ========== amazon miscellaneous
 
 amazon_account: "staging"

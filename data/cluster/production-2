@@ -20,7 +20,9 @@ admin_vpn_ips:
   c: "110"
   d: "111"
 
-vpn_upstream_clusters: []
+vpn_upstream_clusters:
+
+  - "production"
 
 super_domain: "wistla.com"
 local_domain: "2.wistla.com"
@@ -28,12 +30,18 @@ short_domain: "wist.la"
 
 cluster_colour: "27"
 
-deployment_names:
+deployment_names: []
+
+super_deployment_names:
 
   - "production"
 
   - "production-a"
   - "production-b"
+
+region_code: "us"
+
+activate_dns: "no"
 
 # ========== amazon miscellaneous
 
@@ -42,16 +50,15 @@ amazon_region: "us-east-1"
 
 amazon_zones:
 
-  a: "us-east-1a"
-  b: "us-east-1b"
-  c: "us-east-1c"
+  a: "us-east-1b"
+  b: "us-east-1c"
+  c: "us-east-1d"
 
 amazon_admin_ips:
 
-  a: "10.164.16"
-  b: "10.164.17"
-  c: "10.164.18"
-  d: "10.164.19"
+  a: "52.1.103.195"
+  b: "52.1.226.32"
+  c: "52.5.68.237"
 
 amazon_images:
 
@@ -79,6 +86,11 @@ amazon_instance_types:
 
   admin: "t2.small"
   app: "t2.small"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  app: "no"
 
 kernel_versions:
 
@@ -115,27 +127,27 @@ etcd_credentials:
 
     a:
 
-      peer_certificate: "/authority/production-etcd-peer/issue/X/certificate"
-      peer_private_key: "/authority/production-etcd-peer/issue/X/key"
+      peer_certificate: "/authority/production-etcd-peer/issue/5/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/5/key"
 
-      client_certificate: "/authority/production-etcd-client/issue/X/certificate"
-      client_private_key: "/authority/production-etcd-client/issue/X/key"
+      client_certificate: "/authority/production-etcd-client/issue/5/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/5/key"
 
     b:
 
-      peer_certificate: "/authority/production-etcd-peer/issue/X/certificate"
-      peer_private_key: "/authority/production-etcd-peer/issue/X/key"
+      peer_certificate: "/authority/production-etcd-peer/issue/4/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/4/key"
 
-      client_certificate: "/authority/production-etcd-client/issue/X/certificate"
-      client_private_key: "/authority/production-etcd-client/issue/X/key"
+      client_certificate: "/authority/production-etcd-client/issue/4/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/4/key"
 
     c:
 
-      peer_certificate: "/authority/production-etcd-peer/issue/X/certificate"
-      peer_private_key: "/authority/production-etcd-peer/issue/X/key"
+      peer_certificate: "/authority/production-etcd-peer/issue/3/certificate"
+      peer_private_key: "/authority/production-etcd-peer/issue/3/key"
 
-      client_certificate: "/authority/production-etcd-client/issue/X/certificate"
-      client_private_key: "/authority/production-etcd-client/issue/X/key"
+      client_certificate: "/authority/production-etcd-client/issue/3/certificate"
+      client_private_key: "/authority/production-etcd-client/issue/3/key"
 
 app_certificates:
 

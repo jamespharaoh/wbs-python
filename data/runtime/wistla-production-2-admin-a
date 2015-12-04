@@ -1,0 +1,49 @@
+---
+amazon_instance_type_running: t2.small
+etcd:
+  installed_version: 2.2.2
+  needs_restart: 'no'
+  state: enabled
+etcd_installed_version: 2.2.2
+etcd_needs_restart: 'no'
+etcd_state: enabled
+heka:
+  installed_version: 0.10.0b0
+  needs_restart: 'no'
+  state: enabled
+heka_installed_version: 0.10.0b0
+heka_needs_restart: 'no'
+heka_state: enabled
+instance_id: i-e6989c58
+mysql:
+  needs_restart: 'no'
+  root_password: wfuborcbjrdntftghrrj
+  state: enabled
+mysql_needs_restart: 'no'
+mysql_root_password: wfuborcbjrdntftghrrj
+mysql_state: enabled
+nginx:
+  installed_version: 1.9.7
+  needs_restart: 'no'
+  state: enabled
+nginx_installed_version: 1.9.7
+nginx_needs_restart: 'no'
+nginx_state: enabled
+php:
+  needs_restart: 'no'
+  state: enabled
+php_needs_restart: 'no'
+php_state: enabled
+ssh:
+  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEH3nrZaKpVLdh8QZ7jATp56rpye8UQdj6rQ8XJUyGO12aygSvvualvmfDLOnSRCIK4VNG8CwzQK9VsHhMIBvjo=
+  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYTVOc7USdR+BeOY4kWSr4JXiuN5VKvZjKvSZn6MaF9K+0XfEbW988rhJd4zSU1TWCxVmGmh4XL3uRMzQX3UsGe4UayBAY11tfQY4WEqP4VIKlMpL1t0OzSQLAq2TQTRnXggvSs7dcl/0VJSjHVnv8Ouz4CfMWJAw5Jk1VdjWKy/n5kfXiRD0iPHSGssmYy6p4ES7pnyJFP4t+S6SWCYChJ8pCM61fGvyilj3PfMZ1TQA3AOHWH8QhMDhf9UhfXCKpICfninpjwf+/s86/jX9F0ANK+XcmEmidTBHCHyZ7Y84Cr/0EM5WZNgYo9lvoZNkdzrybT8xsJknCEPgaSqY1
+ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEH3nrZaKpVLdh8QZ7jATp56rpye8UQdj6rQ8XJUyGO12aygSvvualvmfDLOnSRCIK4VNG8CwzQK9VsHhMIBvjo=
+ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYTVOc7USdR+BeOY4kWSr4JXiuN5VKvZjKvSZn6MaF9K+0XfEbW988rhJd4zSU1TWCxVmGmh4XL3uRMzQX3UsGe4UayBAY11tfQY4WEqP4VIKlMpL1t0OzSQLAq2TQTRnXggvSs7dcl/0VJSjHVnv8Ouz4CfMWJAw5Jk1VdjWKy/n5kfXiRD0iPHSGssmYy6p4ES7pnyJFP4t+S6SWCYChJ8pCM61fGvyilj3PfMZ1TQA3AOHWH8QhMDhf9UhfXCKpICfninpjwf+/s86/jX9F0ANK+XcmEmidTBHCHyZ7Y84Cr/0EM5WZNgYo9lvoZNkdzrybT8xsJknCEPgaSqY1
+volume_ids:
+  system: vol-03cd41ec
+volume_ids_system: vol-03cd41ec
+vpn_server:
+  certificate: /authority/ops-vpn/issue/36/certificate
+  private_key: /authority/ops-vpn/issue/36/key
+vpn_server_certificate: /authority/ops-vpn/issue/36/certificate
+vpn_server_private_key: /authority/ops-vpn/issue/36/key

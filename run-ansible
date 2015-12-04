@@ -257,8 +257,14 @@ def update_config ():
 				"# ex: et ts=2 filetype=yaml",
 			]) + "\n")
 
-
 	time.sleep (0.3)
+
+	if CONFIG ["deployment_mode"] == "vagrant":
+
+		subprocess.check_call ([
+			"misc/amazon-auth",
+			"auto",
+		])
 
 	run_playbook ([
 		"playbooks/devops.yml",

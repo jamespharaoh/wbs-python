@@ -35,6 +35,17 @@ deployment_names:
   - "production-a"
   - "production-b"
 
+super_deployment_names:
+
+  - "production"
+
+  - "production-a"
+  - "production-b"
+
+region_code: "eu"
+
+activate_dns: "yes"
+
 # ========== amazon miscellaneous
 
 amazon_account: "production"
@@ -78,6 +89,12 @@ amazon_instance_types:
   admin: "t2.small"
   app: "c4.large"
   data: "m4.large"
+
+amazon_instance_ebs_optimized:
+
+  admin: "no"
+  app: "yes"
+  data: "yes"
 
 kernel_versions:
 
