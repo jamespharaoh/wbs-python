@@ -24,6 +24,14 @@ class OrderedDictYAMLLoader (yaml.Loader):
 			"tag:yaml.org,2002:omap",
 			type (self).construct_yaml_map)
 
+		self.add_constructor (
+			"tag:yaml.org,2002:str",
+			type (self).construct_yaml_str)
+
+	def construct_yaml_str (self, node):
+
+		return self.construct_scalar (node)
+
 	def construct_yaml_map (self, node):
 
 		data = collections.OrderedDict ()
