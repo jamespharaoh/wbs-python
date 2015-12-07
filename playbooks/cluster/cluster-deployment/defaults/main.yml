@@ -40,7 +40,7 @@ cluster_deployment_types:
     config_templates:
 
       - template: "cluster-deployment-wistla-devops-config"
-        target: "wistla-devops/config"
+        target: "wistla-devops/config/overrides.yml"
 
       - template: "cluster-deployment-wistla-devops-accounts"
         target: "wistla-devops/accounts"
@@ -352,7 +352,7 @@ cluster_deployment_types:
         target: "wistla-devops/accounts"
 
       - template: "cluster-deployment-wistla-devops-config"
-        target: "wistla-devops/config"
+        target: "wistla-devops/config/overrides.yml"
 
       # load
 
