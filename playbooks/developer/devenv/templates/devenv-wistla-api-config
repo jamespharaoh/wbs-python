@@ -206,6 +206,19 @@ config.gcm.senderId = '';
 config.gcm.appName = '';
 {% endif %}
 
+if (!config.authentication.google || typeof config.authentication.google !== 'object') {
+	config.authentication.google = {};
+}
+{% if 'dev' in third_parties %}
+config.authentication.google.name = '{{ third_parties.dev.google_auth_name }}';
+config.authentication.google.client_id = '{{ third_parties.dev.google_auth_client_id }}';
+config.authentication.google.client_secret = '{{ third_parties.dev.google_auth_client_secret }}';
+{% else %}
+config.authentication.google.name = '';
+config.authentication.google.client_id = '';
+config.authentication.google.client_secret = '';
+{% endif %}
+
 // facebook app to use
 {% if 'dev' in third_parties %}
 config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
