@@ -25,19 +25,32 @@
       type: "string"
 
     - question: "nullmailer/defaultdomain"
-      value: "wistla.com"
+      value: "{{ deployment.email_domain }}"
       type: "string"
 
     - question: "nullmailer/adminaddr"
       value: ""
       type: "string"
 
-- name: "install nullmailer"
+# TODO mailname needs to be configured later
+
+- name: "configure mailname"
+  sudo: "yes"
   action:
+
+    module: "copy"
+    dest: "/etc/mailname"
+    content: "{{ deployment.email_domain + '\n' }}"
+
+- name: "install nullmailer"
+  with_items:
+
+    - "nullmailer"
+
+  sudo: "yes"
+  action:
+
     module: "apt"
     name: "{{ item }}"
-  sudo: "yes"
-  with_items:
-    - "nullmailer"
 
 # ex: et ts=2 filetype=yaml
