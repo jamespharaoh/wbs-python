@@ -33,6 +33,22 @@ config.facebook.appId = '{{ third_parties.dev.facebook_app_id }}';
 config.facebook.appId = '';
 {% endif %}
 
+if (!config.authentication || typeof config.authentication !== 'object') {
+        config.authentication = {};
+}
+if (!config.authentication.google || typeof config.authentication.google !== 'object') {
+        config.authentication.google = {};
+}
+{% if 'dev' in third_parties %}
+config.authentication.google.name = '{{ third_parties.dev.google_auth_name }}';
+config.authentication.google.client_id = '{{ third_parties.dev.google_auth_client_id }}';
+config.authentication.google.client_secret = '{{ third_parties.dev.google_auth_client_secret }}';
+{% else %}
+config.authentication.google.name = '';
+config.authentication.google.client_id = '';
+config.authentication.google.client_secret = '';
+{% endif %}
+
 module.exports = config;
 
 // ex: noet ts=4 filetype=javascript
