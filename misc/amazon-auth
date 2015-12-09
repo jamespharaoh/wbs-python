@@ -32,7 +32,11 @@ def main ():
 
 		load_credentials ()
 
-	if all_credentials ["timestamp"] + 30 * 60 < current_time:
+	mfa_timestamp = all_credentials.get ("mfa-timestamp", 0)
+	temporary_timestamp = all_credentials.get ("temporary-timestamp", 0)
+
+	if current_time < mfa_timestamp + 24 * 60 * 60 \
+	and temporary_timestamp + 30 * 60 < current_time:
 
 		obtain_temporary_credentials ()
 
@@ -80,7 +84,8 @@ def authenticate_with_mfa ():
 		mfa_token = mfa_token)
 
 	all_credentials = {
-		"timestamp": 0,
+		"mfa-timestamp": current_time,
+		"temporary-timestamp": 0,
 		"admin": {
 			"access_key": admin_credentials.access_key,
 			"secret_key": admin_credentials.secret_key,
@@ -125,7 +130,7 @@ def obtain_temporary_credentials ():
 			"session_token": account_credentials.session_token,
 		}
 
-	all_credentials ["timestamp"] = current_time
+	all_credentials ["temporary-timestamp"] = current_time
 
 	with open ("work/amazon-credentials", "w") as file_handle:
 
