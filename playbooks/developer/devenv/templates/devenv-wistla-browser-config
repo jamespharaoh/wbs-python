@@ -41,6 +41,7 @@ if (!config.authentication.google || typeof config.authentication.google !== 'ob
 }
 {% if 'dev' in third_parties %}
 config.authentication.google.name = '{{ third_parties.dev.google_auth_name }}';
+config.authentication.google.api_key = '{{ third_parties.dev.google_auth_api_key }}';
 config.authentication.google.client_id = '{{ third_parties.dev.google_auth_client_id }}';
 config.authentication.google.client_secret = '{{ third_parties.dev.google_auth_client_secret }}';
 {% else %}
