@@ -34,11 +34,17 @@ config.emailDomain = '{{ deployment.email_domain }}';
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
 config.dbOptions = {
 	replSet: {
+		reconnectWait: 1000,
+		socketOptions: { 
+			connectTimeoutMS : 3000, 
+			socketTimeoutMS: 3000 
+		},
 		rs_name: 'wistla-1-1',
 	},
 	db: {
 		w: 1,
 		j: false,
+		retryMiliSeconds: 2000
 	},
 };
 
