@@ -102,7 +102,10 @@ append_newlines = false
 
 # TODO
 
-{% if inventory_hostname == 'wistla-production-admin-a' %}
+{% if inventory_hostname in [
+	'wistla-production-admin-a',
+	'wistla-staging-admin-a',
+] %}
 
 # ---------- email events
 
