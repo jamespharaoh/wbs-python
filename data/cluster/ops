@@ -128,9 +128,9 @@ etcd_credentials:
 
 admin_certificates:
 
-  - "berk.wistla.com"
+  - "berk.dev.wistla.com"
   - "admin.berk.wistla.com"
-  - "api.berk.wistla.com"
+  - "api.berk.dev.wistla.com"
   - "assets.berk.dev.wistla.com"
   - "berk.dev.wist.la"
 
@@ -146,9 +146,9 @@ admin_certificates:
   - "assets.chuggington.dev.wistla.com"
   - "chuggington.dev.wist.la"
 
-  - "mrbenn.wistla.com"
+  - "mrbenn.dev.wistla.com"
   - "admin.mrbenn.wistla.com"
-  - "api.mrbenn.wistla.com"
+  - "api.mrbenn.dev.wistla.com"
   - "assets.mrbenn.dev.wistla.com"
   - "mrbenn.dev.wist.la"
 
