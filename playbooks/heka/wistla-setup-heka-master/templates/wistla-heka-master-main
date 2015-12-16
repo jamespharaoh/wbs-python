@@ -118,6 +118,22 @@ subject = "Wistla API restart notifications"
 send_interval = 60
 encoder = "encoder-simple"
 
+[output-wistla-fatal]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'(' + [
+		'Fields[Category] == "wistla-api"',
+		'Fields[Category] == "wistla-browser"',
+		'Fields[Category] == "wistla-web"',
+	] | join (' || ') + ')',
+	'Payload =~ /[{,]"level":[6-9][0-9][},]/',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.super_domain }}"
+send_to = [ "notifications.production.warning@wistla.com" ]
+subject = "Wistla fatal logging notifications"
+send_interval = 60
+encoder = "encoder-simple"
+
 {% endif %}
 
 # ex: noet ts=4 filetype=toml
