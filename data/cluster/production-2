@@ -110,7 +110,7 @@ route53_main_domain:
 
   misc_records: []
 
-monitoring: "no"
+monitoring: "yes"
 
 # ========== accounts and security
 
