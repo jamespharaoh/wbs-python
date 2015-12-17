@@ -19,7 +19,19 @@ http {
 	include {{ nginx_target }}/conf/mime.types;
 	default_type application/octet-stream;
 
+	log_format times '{{ [
+		'$time_iso8601',
+		'$status',
+		'$body_bytes_sent',
+		'$request_time',
+		'$request_method',
+		'$scheme://$host$request_uri',
+		'$server_protocol',
+		'$http_x_wistla_client_request_id',
+	] | join (' ') }}';
+
 	access_log /var/log/nginx/access.log;
+	access_log /var/log/nginx/times.log times;
 	error_log /var/log/nginx/error.log;
 
 	gzip on;

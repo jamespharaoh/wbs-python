@@ -38,6 +38,18 @@ type = "ScribbleDecoder"
 	[decode-auth.message_fields]
 	Category = "system"
 
+[input-nginx-times]
+type = "LogstreamerInput"
+log_directory = "/var/log/nginx"
+file_match = "times.log"
+decoder = "decode-nginx-times"
+
+[decode-nginx-times]
+type = "ScribbleDecoder"
+
+	[decode-nginx-times.message_fields]
+	Category = "nginx-times"
+
 # ---------- accept remote connections
 
 [input-socket]
