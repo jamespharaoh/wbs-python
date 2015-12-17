@@ -41,7 +41,7 @@ super_deployment_names:
 
 region_code: "us"
 
-activate_dns: "no"
+activate_dns: "yes"
 
 # ========== amazon miscellaneous
 
