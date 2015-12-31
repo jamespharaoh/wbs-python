@@ -41,7 +41,7 @@
 }
 
 .content table {
-	background: #fcf7f7;
+	background: $table-background;
 	border-spacing: 0;
 }
 
@@ -60,11 +60,11 @@
 }
 
 .content table > tbody > tr:first-child > td {
-	border-top: 0.1px solid #f5ebeb;
+	border-top: 0.1px solid $table-border;
 }
 
 .content table > tbody > tr:last-child > td {
-	border-bottom: 0.1px solid #f5ebeb;
+	border-bottom: 0.1px solid $table-border;
 }
 
 .content table th {
@@ -86,8 +86,8 @@
 	background: $white;
 	padding-left: 0.6rem;
 	text-align: center;
-	border-top: 0.1px solid #f5ebeb;
-	border-bottom: 0.1px solid #f5ebeb;
+	border-top: 0.1px solid $table-border;
+	border-bottom: 0.1px solid $table-border;
 	font-style: italic;
 }
 
