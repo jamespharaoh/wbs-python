@@ -28,6 +28,7 @@
     - "etcd"
     - "mysql"
     - "php"
+    - "python"
 
     - "install-mongodb"
     - "install-tools"

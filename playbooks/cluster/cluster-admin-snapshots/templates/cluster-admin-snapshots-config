@@ -1,0 +1,80 @@
+{%- print '---\n\n', ansible_warning ['#'], '\n\n' -%}
+
+{%- macro do_volume (volume_id, rule) -%}
+
+	{%- print [
+		'- volume-id: "',
+		volume_id,
+		'"\n  rule: "',
+		rule,
+		'"\n',
+	] | join -%}
+
+{%- endmacro -%}
+
+{%- print '# ==================== admin\n' -%}
+
+{%- for host_name in groups ['cluster-' + cluster_name + '-admin'] -%}
+{%- set host = hostvars [host_name] -%}
+{%- if 'volume_ids' in host -%}
+
+	{%- print '\n# ---------- ', host_name, '\n\n' -%}
+
+	{%- print do_volume (host.volume_ids.system, 'low') -%}
+
+{%- endif -%}
+{%- endfor -%}
+
+{%- if 'cluster-' + cluster_name + '-app' in groups -%}
+
+	{%- print '\n# ==================== app\n' -%}
+
+	{%- for host_name in groups ['cluster-' + cluster_name + '-app'] -%}
+	{%- set host = hostvars [host_name] -%}
+	{%- if 'volume_ids' in host -%}
+
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
+
+		{%- print do_volume (host.volume_ids.system, 'minimal') -%}
+		{%- print do_volume (host.volume_ids.data, 'minimal') -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
+{%- endif -%}
+
+{%- if 'cluster-' + cluster_name + '-data' in groups -%}
+
+	{%- print '\n# ==================== data\n' -%}
+
+	{%- for host_name in groups ['cluster-' + cluster_name + '-data'] -%}
+	{%- set host = hostvars [host_name] -%}
+	{%- if 'volume_ids' in host -%}
+
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
+
+		{%- print do_volume (host.volume_ids.system, 'minimal') -%}
+		{%- print do_volume (host.volume_ids.data, 'high') -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
+{%- endif -%}
+
+{%- if 'cluster-' + cluster_name + '-jenkins' in groups -%}
+
+	{%- print '\n# ==================== jenkins\n' -%}
+
+	{%- for host_name in groups ['cluster-' + cluster_name + '-jenkins'] -%}
+	{%- set host = hostvars [host_name] -%}
+
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
+
+		{%- print do_volume (host.volume_ids.system, 'low') -%}
+		{%- print do_volume (host.volume_ids.data, 'high') -%}
+
+	{%- endfor -%}
+
+{%- endif -%}
+
+# ex: noet ts=4 filetype=crontab

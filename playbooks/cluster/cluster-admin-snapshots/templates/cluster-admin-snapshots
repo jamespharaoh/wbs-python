@@ -1,6 +1,7 @@
 {{ ansible_warning ['#'] }}
 
 SHELL="/bin/bash"
+PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
 HOME="/home/ubuntu"
 MAILTO="{{ cluster.cron_email }}"
 
@@ -100,6 +101,17 @@ AWS_DEFAULT_REGION="{{ cluster.amazon_region }}"
 
 {%- endfor -%}
 {%- endif -%}
+
+{%- print '\n# ==================== deletion\n\n' -%}
+{%- print [
+	'30 */3 * * *',
+	'root',
+	'/usr/local/bin/wistla-snapshots-tool',
+	cluster.amazon_region,
+	'/etc/wistla-snapshots-config',
+	'delete',
+] | join (' '), '\n' -%}
+
 {%- endif %}
 
 # ex: noet ts=4 filetype=crontab

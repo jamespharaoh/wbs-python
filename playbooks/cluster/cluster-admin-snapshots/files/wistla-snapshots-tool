@@ -1,0 +1,172 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import boto.ec2
+import collections
+import datetime
+import itertools
+import os
+import sys
+import yaml
+
+data = yaml.load ("""
+
+period-formats:
+
+  year: "%Y"
+  month: "%Y-%m"
+  week: "%YW%U"
+  day: "%Y-%m-%d"
+  hour: "%Y-%m-%dT%H:%M:%S"
+
+rule-definitions:
+
+  high:
+
+    year: 10
+    month: 24
+    week: 13
+    day: 14
+    hour: 48
+    second: 10
+
+  low:
+
+    year: 5
+    month: 6
+    week: 3
+    day: 4
+    hour: 12
+    second: 5
+
+  minimal:
+
+    year: 2
+    month: 1
+    week: 1
+    day: 1
+    hour: 1
+    second: 2
+
+""")
+
+period_formats = data ["period-formats"]
+rule_definitions = data ["rule-definitions"]
+
+def choose_keepers (items, rule):
+
+	# collect first item from each period
+
+	items_by_period = (
+		collections.defaultdict (dict))
+
+	for item_id, item_timestamp in items.items ():
+
+		for period_name, period_format in period_formats.items ():
+
+			items_for_period = (
+				items_by_period [period_name])
+
+			item_period = (
+				item_timestamp.strftime (
+					period_format))
+
+			if not item_period in items_for_period \
+			or item_timestamp < items_for_period [item_period] [1]:
+
+				items_for_period [item_period] = (
+					(item_id, item_timestamp))
+
+	# work out which items to keep
+
+	keep_item_ids = set ()
+
+	for period_name, period_format in period_formats.items ():
+
+		items_for_period = (
+			items_by_period [period_name])
+
+		sorted_periods = (
+			sorted (items_for_period.keys ()))
+
+		periods_to_keep = (
+			sorted_periods [ - rule [period_name] : ])
+
+		ids_to_keep = [
+			items_for_period [period] [0]
+			for period
+			in periods_to_keep]
+
+		keep_item_ids.update (
+			ids_to_keep)
+
+	return keep_item_ids
+
+def parse_timestamp (string):
+
+	return datetime.datetime.strptime (
+		string,
+		"%Y-%m-%dT%H:%M:%S.%fZ")
+
+runtime_data = yaml.load (open (sys.argv [2]))
+
+print ("running in " + sys.argv [3] + " mode")
+
+print ("connect to " + sys.argv [1])
+
+ec2 = boto.ec2.connect_to_region (
+	sys.argv [1],
+	aws_access_key_id = os.environ.get ("AWS_ACCESS_KEY_ID"),
+	aws_secret_access_key = os.environ.get ("AWS_SECRET_ACCESS_KEY"),
+	security_token = os.environ.get ("AWS_SESSION_TOKEN"))
+
+print ("retrieving list of snapshots")
+
+all_snapshots =	sorted (
+	ec2.get_all_snapshots (
+		owner = "self"),
+	key = lambda snapshot: snapshot.volume_id)
+
+snapshots_by_volume_id = dict ([
+	(volume_id, list (snapshots))
+	for volume_id, snapshots \
+	in itertools.groupby (
+		all_snapshots,
+		lambda snapshot: snapshot.volume_id)
+])
+
+for volume_data in runtime_data:
+
+	volume_id = volume_data ["volume-id"]
+	rule = rule_definitions [volume_data ["rule"]]
+	snapshots = snapshots_by_volume_id.get (volume_id, [])
+
+	print (volume_id)
+
+	keep_snapshot_ids = choose_keepers (
+		dict ([
+			(snapshot.id, parse_timestamp (snapshot.start_time))
+			for snapshot in snapshots
+			if snapshot.status == "completed"
+		]),
+		rule)
+
+	for snapshot in snapshots:
+
+		if snapshot.id in keep_snapshot_ids:
+
+			if sys.argv [3] == "show":
+				print ("  keep " + snapshot.id)
+
+			continue
+
+		print ("  remove " + snapshot.id)
+
+		if sys.argv [3] == "delete":
+			snapshot.delete ()
+
+# ex: noet ts=4 filetype=python
