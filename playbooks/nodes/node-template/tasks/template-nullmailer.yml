@@ -36,6 +36,18 @@
 
 # TODO mailname needs to be configured later
 
+- name: "create directories"
+  with_items:
+
+    - directory: "/etc/nullmailer"
+
+  sudo: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+
 - name: "configure mailname"
   with_items:
 
