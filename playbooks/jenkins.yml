@@ -1,6 +1,6 @@
 ---
 
-- hosts: "jenkins"
+- hosts: "wistla-jenkins"
   gather_facts: "no"
   roles: [ "devenv" ]
 
