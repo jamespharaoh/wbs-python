@@ -8,6 +8,8 @@ production:
   enabled: "yes"
   monitoring: "yes"
 
+  default: "yes"
+
   main_domain: "wistla.com"
   short_domain: "wist.la"
   assets_domain: "assets.wistla.com"
@@ -148,6 +150,8 @@ staging:
 
   enabled: "yes"
   monitoring: "yes"
+
+  default: "yes"
 
   main_domain: "staging.wistla.com"
   short_domain: "staging.wist.la"

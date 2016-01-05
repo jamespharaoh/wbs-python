@@ -70,6 +70,28 @@ http {
 {% endif %}
 {% endfor %}
 
+{% if cluster_name == 'test' %}
+
+# ----- default site -----
+
+	server {
+
+		listen 80 default_server;
+		listen 443 ssl http2 default_server;
+
+		server_name {{ inventory_hostname }};
+
+		ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+		ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+		location /hello {
+			return 200;
+		}
+
+	}
+
+{% endif %}
+
 {% macro do_deployment (deployment, deployment_alias, target) %}
 
 	# website redirect naked domain to www
@@ -139,8 +161,13 @@ http {
 
 	server {
 
+{% if deployment.default | default ('no') == 'yes' %}
+		listen 80 default_server;
+		listen 443 ssl http2 default_server;
+{% else %}
 		listen 80;
 		listen 443 ssl http2;
+{% endif %}
 
 		server_name api.{{ deployment.main_domain }};
 

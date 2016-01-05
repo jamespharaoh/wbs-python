@@ -28,8 +28,9 @@
 
     health_check:
 
-      ping_protocol: "tcp"
+      ping_protocol: "http"
       ping_port: "80"
+      ping_path: "/hello"
       response_timeout: "2"
       interval: "10"
       unhealthy_threshold: "2"
