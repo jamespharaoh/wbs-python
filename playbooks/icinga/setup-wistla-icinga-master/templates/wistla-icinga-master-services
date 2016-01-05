@@ -60,6 +60,9 @@ apply Service "procs" {
 
 	command_endpoint = host.vars.endpoint
 
+	vars.procs_warning = host.vars.procs_warning
+	vars.procs_critical = host.vars.procs_critical
+
 	assign where host.vars.stature == "cluster"
 
 }
@@ -108,10 +111,36 @@ apply Service "http" {
 
 	command_endpoint = host.vars.endpoint
 
-	assign where host.vars.type in [
-		"cluster-app",
-		"cluster-admin",
-	]
+	vars.http_uri = "/hello"
+
+	assign where host.vars.type == "cluster-app"
+
+}
+
+apply Service "http" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	assign where host.vars.type == "cluster-admin"
+
+}
+
+apply Service "https" {
+
+	import "generic-service"
+
+	check_command = "http"
+
+	command_endpoint = host.vars.endpoint
+
+	vars.http_ssl = 1
+	vars.http_uri = "/hello"
+
+	assign where host.vars.type == "cluster-app"
 
 }
 
@@ -126,10 +155,8 @@ apply Service "https" {
 	vars.http_ssl = 1
 
 	assign where (
-		host.vars.type == "cluster-app" || (
-			host.vars.type == "cluster-admin"
-			&& host.vars.cluster == "ops"
-		)
+		host.vars.type == "cluster-admin"
+		&& host.vars.cluster == "ops"
 	)
 
 }
@@ -142,7 +169,7 @@ apply Service for (api => config in host.vars.wistla_apis) {
 
 	command_endpoint = host.vars.endpoint
 
-	vars.http_expect = "HTTP/1.1 404 Not Found"
+	vars.http_uri = "/hello"
 
 	vars += config
 
@@ -158,6 +185,7 @@ apply Service for (browser => config in host.vars.wistla_browsers) {
 
 	command_endpoint = host.vars.endpoint
 
+	vars.http_uri = "/s/hello"
 	vars.http_expect = "HTTP/1.1 404 Not Found"
 
 	vars += config
@@ -174,6 +202,8 @@ apply Service for (web => config in host.vars.wistla_webs) {
 
 	command_endpoint = host.vars.endpoint
 
+	vars.http_uri = "/s/hello"
+
 	vars += config
 
 	assign where host.vars.type == "node-web"
@@ -189,7 +219,7 @@ apply Service "wistla load balancer" {
 	command_endpoint = host.vars.endpoint
 
 	vars.http_port = 80
-	vars.http_expect = "HTTP/1.1 404 Not Found"
+	vars.http_uri = "/hello"
 
 	assign where host.vars.type == "node-load"
 
