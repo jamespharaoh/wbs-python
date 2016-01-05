@@ -7,12 +7,12 @@ MAILTO="{{ cluster.cron_email }}"
 
 AWS_DEFAULT_REGION="{{ cluster.amazon_region }}"
 
-{% if instance_zone == 'a' -%}
-
 {%- print '# ==================== admin\n' -%}
+
 {%- for host_name in groups ['cluster-' + cluster_name + '-admin'] -%}
 {%- set host = hostvars [host_name] -%}
-{%- if 'volume_ids' in host -%}
+{%- if host.instance_zone == instance_zone
+	and 'volume_ids' in host -%}
 
 	{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
@@ -27,82 +27,96 @@ AWS_DEFAULT_REGION="{{ cluster.amazon_region }}"
 {%- endfor -%}
 
 {%- if 'cluster-' + cluster_name + '-app' in groups -%}
-{%- print '\n# ==================== app\n' -%}
-{%- for host_name in groups ['cluster-' + cluster_name + '-app'] -%}
-{%- set host = hostvars [host_name] -%}
-{%- if 'volume_ids' in host -%}
 
-	{%- print '\n# ---------- ', host_name, '\n\n' -%}
+	{%- print '\n# ==================== app\n' -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' 0 * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.system,
-	] | join (' '), '\n' -%}
+	{%- for host_name in groups ['cluster-' + cluster_name + '-app'] -%}
+	{%- set host = hostvars [host_name] -%}
+	{%- if host.instance_zone == instance_zone
+		and 'volume_ids' in host -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' * * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.data,
-	] | join (' '), '\n' -%}
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
-{%- endif -%}
-{%- endfor -%}
+		{%- print [
+			(loop.index % 60) | string + ' 0 * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.system,
+		] | join (' '), '\n' -%}
+
+		{%- print [
+			(loop.index % 60) | string + ' * * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.data,
+		] | join (' '), '\n' -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
 {%- endif -%}
 
 {%- if 'cluster-' + cluster_name + '-data' in groups -%}
-{%- print '\n# ==================== data\n' -%}
-{%- for host_name in groups ['cluster-' + cluster_name + '-data'] -%}
-{%- set host = hostvars [host_name] -%}
-{%- if 'volume_ids' in host -%}
 
-	{%- print '\n# ---------- ', host_name, '\n\n' -%}
+	{%- print '\n# ==================== data\n' -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' 0 * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.system,
-	] | join (' '), '\n' -%}
+	{%- for host_name in groups ['cluster-' + cluster_name + '-data'] -%}
+	{%- set host = hostvars [host_name] -%}
+	{%- if host.instance_zone == instance_zone
+		and 'volume_ids' in host -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' * * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.data,
-	] | join (' '), '\n' -%}
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
-{%- endif -%}
-{%- endfor -%}
+		{%- print [
+			(loop.index % 60) | string + ' 0 * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.system,
+		] | join (' '), '\n' -%}
+
+		{%- print [
+			(loop.index % 60) | string + ' * * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.data,
+		] | join (' '), '\n' -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
 {%- endif -%}
 
 {%- if 'cluster-' + cluster_name + '-jenkins' in groups -%}
-{%- print '\n# ==================== jenkins\n' -%}
-{%- for host_name in groups ['cluster-' + cluster_name + '-jenkins'] -%}
-{%- set host = hostvars [host_name] -%}
 
-	{%- print '\n# ---------- ', host_name, '\n\n' -%}
+	{%- print '\n# ==================== jenkins\n' -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' 0 * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.system,
-	] | join (' '), '\n' -%}
+	{%- for host_name in groups ['cluster-' + cluster_name + '-jenkins'] -%}
+	{%- set host = hostvars [host_name] -%}
+	{%- if host.instance_zone == instance_zone -%}
 
-	{%- print [
-		(loop.index % 60) | string + ' * * * *',
-		'root',
-		'aws ec2 create-snapshot',
-		'--volume-id ' + host.volume_ids.data,
-	] | join (' '), '\n' -%}
+		{%- print '\n# ---------- ', host_name, '\n\n' -%}
 
-{%- endfor -%}
+		{%- print [
+			(loop.index % 60) | string + ' 0 * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.system,
+		] | join (' '), '\n' -%}
+
+		{%- print [
+			(loop.index % 60) | string + ' * * * *',
+			'root',
+			'aws ec2 create-snapshot',
+			'--volume-id ' + host.volume_ids.data,
+		] | join (' '), '\n' -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
 {%- endif -%}
 
 {%- print '\n# ==================== deletion\n\n' -%}
+
 {%- print [
 	'30 */3 * * *',
 	'root',
@@ -110,8 +124,6 @@ AWS_DEFAULT_REGION="{{ cluster.amazon_region }}"
 	cluster.amazon_region,
 	'/etc/wistla-snapshots-config',
 	'delete',
-] | join (' '), '\n' -%}
-
-{%- endif %}
+] | join (' '), '\n' %}
 
 # ex: noet ts=4 filetype=crontab
