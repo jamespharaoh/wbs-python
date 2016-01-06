@@ -139,12 +139,12 @@ config.applePush = {
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ bool_javascript [cluster_deployment.apple_push_notifications_production] }},
 	validityInSeconds: 3600,
-	feedbackIntervalInSeconds: 3600
-
+	feedbackIntervalInSeconds: 3600,
+	feedbackEnabled: {{ bool_javascript [cluster_deployment.apple_feedback_service_enabled] }}
 {% else %}
 
 	enabled: false,
-
+	feedbackEnabled: false
 {% endif %}
 };
 
