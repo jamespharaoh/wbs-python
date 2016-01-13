@@ -54,6 +54,7 @@ config.amqpOptions = {
 {% for rabbit_name in groups ['node-rabbit-host'] %}
 {% set rabbit_host = hostvars [rabbit_name] %}
 {% if rabbit_host.node_index < dev_node_count.rabbit | int %}
+{% if 'dev' in third_parties %}
 		'{{ [
 			'amqp://api:',
 			third_parties.dev.rabbit_api_password,
@@ -62,6 +63,14 @@ config.amqpOptions = {
 			'-rabbit-',
 			rabbit_host.node_index,
 		] | join }}',
+{% else %}
+		'{{ [
+			'amqp://api:api-password@',
+			deployment_name,
+			'-rabbit-',
+			rabbit_host.node_index,
+		] | join }}',
+{% endif %}
 {% endif %}
 {% endfor %}
 	],
