@@ -1,0 +1,9 @@
+---
+
+- include: "fixtures-rabbit.yml"
+  tags:
+
+    - "fixtures"
+    - "fixtures-rabbit"
+
+# ex: et ts=2 filetype=yaml
