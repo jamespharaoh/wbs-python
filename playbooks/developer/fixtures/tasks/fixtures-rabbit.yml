@@ -35,11 +35,11 @@
     deployment_name + '-rabbit-0',
     'sudo',
     'rabbitmqctl',
-    'set_user_tags',
+    'set_permissions',
     'api',
-    '''.*''',
-    '''.*''',
-    '''.*''',
+    '.\\*',
+    '.\\*',
+    '.\\*',
   ] | join (' ') }}"
 
 # ex: et ts=2 filetype=yaml

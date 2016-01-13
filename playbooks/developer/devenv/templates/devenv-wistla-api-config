@@ -50,12 +50,6 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-	url: '{{ [
-		'amqp://api:',
-		third_parties.dev.rabbit_api_password,
-		'@',
-		deployment_name, '-rabbit-0',
-	] | join }}',
 	urls: [
 {% for rabbit_name in groups ['node-rabbit-host'] %}
 {% set rabbit_host = hostvars [rabbit_name] %}

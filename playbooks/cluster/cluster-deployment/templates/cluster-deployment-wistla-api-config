@@ -69,7 +69,7 @@ config.amqpOptions = {
 	urls: [
 {%	for zone in cluster.instance_formation.data.zones %}
 {%	for instance in cluster.instance_formation.data.indices %}
-		[
+		'{{ [
 			'amqp://api:',
 			third_parties [cluster_name].rabbit_api_password,
 			'@',
