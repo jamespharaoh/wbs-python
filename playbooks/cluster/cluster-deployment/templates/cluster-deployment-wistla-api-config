@@ -235,6 +235,19 @@ config.gcm.senderId = '';
 config.gcm.appName = '';
 {% endif %}
 
+if (!config.authentication.google || typeof config.authentication.google !== 'object') {
+        config.authentication.google = {};
+}
+{% if cluster_name in third_parties %}
+config.authentication.google.name = '{{ third_parties[cluster_name].google_auth_name }}';
+config.authentication.google.client_id = '{{ third_parties[cluster_name].google_auth_client_id }}';
+config.authentication.google.client_secret = '{{ third_parties[cluster_name].google_auth_client_secret }}';
+{% else %}
+config.authentication.google.name = '';
+config.authentication.google.client_id = '';
+config.authentication.google.client_secret = '';
+{% endif %}
+
 {% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc', 'test-fitzroy' ] %}
 
 {% if cluster_deployment_alias ['name'] == 'test-k2' %}

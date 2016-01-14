@@ -35,9 +35,9 @@ config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
 config.dbOptions = {
 	replSet: {
 		reconnectWait: 1000,
-		socketOptions: { 
-			connectTimeoutMS : 3000, 
-			socketTimeoutMS: 3000 
+		socketOptions: {
+			connectTimeoutMS : 3000,
+			socketTimeoutMS: 3000
 		},
 		rs_name: 'wistla-1-1',
 	},
@@ -181,7 +181,7 @@ config.applePush = {
 	production: {{ 'true' if dev_apple_push_notifications_production == 'yes' else 'false' }},
 	validityInSeconds: 3600,
 	feedbackIntervalInSeconds: 3600,
-        feedbackEnabled: {{ 'true' if dev_apple_feedback_service_enabled == 'yes' else 'false' }}
+    feedbackEnabled: {{ 'true' if dev_apple_feedback_service_enabled == 'yes' else 'false' }}
 {% else %}
 	enabled: false,
 	feedbackEnabled: false
@@ -257,6 +257,19 @@ config.gcm.senderId = '';
 config.gcm.appName = '';
 {% endif %}
 
+if (!config.authentication.google || typeof config.authentication.google !== 'object') {
+	config.authentication.google = {};
+}
+{% if 'dev' in third_parties %}
+config.authentication.google.name = '{{ third_parties.dev.google_auth_name }}';
+config.authentication.google.client_id = '{{ third_parties.dev.google_auth_client_id }}';
+config.authentication.google.client_secret = '{{ third_parties.dev.google_auth_client_secret }}';
+{% else %}
+config.authentication.google.name = '';
+config.authentication.google.client_id = '';
+config.authentication.google.client_secret = '';
+{% endif %}
+
 // facebook app to use
 {% if 'dev' in third_parties %}
 config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
@@ -297,7 +310,6 @@ config.contentEmailAddress = '{{ third_parties.dev.content_email }}';
 {% else %}
 config.contentEmailAddress = '';
 {% endif %}
-
 
 module.exports = config;
 
