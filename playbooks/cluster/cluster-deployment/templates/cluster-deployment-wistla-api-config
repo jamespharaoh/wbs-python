@@ -59,21 +59,53 @@ config.dbOptions = {
 // message exchange
 config.amqpOptions = {
 {% if cluster_name in [ 'production', 'staging' ] %}
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
+	url: '{{ [
+		'amqp://api:',
+		third_parties [cluster_name].rabbit_api_password,
+		'@',
+		cluster_deployment_alias.name,
+		'-rabbit-b-4',
+	] | join }}', // TODO deprecate
 	urls: [
 {%	for zone in cluster.instance_formation.data.zones %}
 {%	for instance in cluster.instance_formation.data.indices %}
-		'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ zone }}-{{ instance }}',
+		'{{ [
+			'amqp://api:',
+			third_parties [cluster_name].rabbit_api_password,
+			'@',
+			cluster_deployment_alias.name,
+			'-rabbit-',
+			zone,
+			'-',
+			instance,
+		] | join }}',
 {%	endfor %}
 {%	endfor %}
 	],
 {% else %}
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4', // TODO deprecate
+	url: '{{ [
+		'amqp://api:',
+		third_parties [cluster_name].rabbit_api_password,
+		'@',
+		cluster_deployment_alias.name,
+		'-rabbit-a-4',
+	] | join }}',
 	urls: [
-		'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4',
+		'{{ [
+			'amqp://api:',
+			third_parties [cluster_name].rabbit_api_password,
+			'@',
+			cluster_deployment_alias.name,
+			'-rabbit-a-4',
+		] | join }}',
 	],
 {% endif %}
 };
+
+
+// rabbit rest api
+config.rabbitRestApi = undefined; // only for test
+
 
 // CORS
 config.CORS = {

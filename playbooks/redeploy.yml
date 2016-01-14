@@ -4,5 +4,6 @@
 - include: "templates.yml"
 - include: "stop.yml"
 - include: "start.yml"
+- include: "fixtures.yml"
 
 # ex: et ts=2 filetype=yaml
