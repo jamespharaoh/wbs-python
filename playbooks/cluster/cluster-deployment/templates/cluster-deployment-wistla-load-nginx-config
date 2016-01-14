@@ -23,8 +23,20 @@ http {
 
 	# logging
 
-	access_log /var/log/nginx/access.log;
-	error_log /var/log/nginx/error.log;
+	log_format times '{{ [
+		'$time_iso8601',
+		'$status',
+		'$body_bytes_sent',
+		'$request_time',
+		'$request_method',
+		'$scheme://$host$request_uri',
+		'$server_protocol',
+		'$http_x_wistla_client_request_id',
+	] | join (' ') }}';
+
+	access_log /shared/log/nginx-access.log;
+	access_log /shared/log/nginx-times.log times;
+	error_log /shared/log/nginx-error.log;
 
 	# compression
 

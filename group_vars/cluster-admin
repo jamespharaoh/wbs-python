@@ -57,8 +57,11 @@ python_packages:
   - name: "awscli"
     version: "1.7.31"
 
-  - name: "mysql-python"
-    version: "1.2.5"
+  - name: "boto"
+    version: "2.38.0"
+
+  - name: "pyyaml"
+    version: "3.11"
 
 icinga_name: "{{ inventory_hostname }}"
 icinga_ticket_salt: "{{ cluster_network.icinga_ticket_salt }}"

@@ -35,7 +35,10 @@ config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla';
 config.dbOptions = {
 	replSet: {
 		reconnectWait: 1000,
-		socketOptions: { connectTimeoutMS : 3000, socketTimeoutMS: 3000 },
+		socketOptions: {
+			connectTimeoutMS : 3000,
+			socketTimeoutMS: 3000
+		},
 		rs_name: 'wistla-1-1',
 	},
 	db: {
@@ -47,16 +50,48 @@ config.dbOptions = {
 
 // message exchange
 config.amqpOptions = {
-	url: 'amqp://{{ deployment_name }}-rabbit-0', // TODO deprecate this
 	urls: [
 {% for rabbit_name in groups ['node-rabbit-host'] %}
 {% set rabbit_host = hostvars [rabbit_name] %}
 {% if rabbit_host.node_index < dev_node_count.rabbit | int %}
-		'amqp://{{ rabbit_name }}',
+{% if 'dev' in third_parties %}
+		'{{ [
+			'amqp://api:',
+			third_parties.dev.rabbit_api_password,
+			'@',
+			deployment_name,
+			'-rabbit-',
+			rabbit_host.node_index,
+		] | join }}',
+{% else %}
+		'{{ [
+			'amqp://api:api-password@',
+			deployment_name,
+			'-rabbit-',
+			rabbit_host.node_index,
+		] | join }}',
+{% endif %}
 {% endif %}
 {% endfor %}
 	],
 };
+
+// rabbitmq rest api
+{% if 'dev' in third_parties %}
+config.rabbitRestApi = '{{ [
+	'http://api:',
+	third_parties.dev.rabbit_api_password,
+	'@',
+	deployment_name,
+	'-rabbit-0:15672',
+] | join }}';
+{% else %}
+config.rabbitRestApi = '{{ [
+	'http://api:api-password@',
+	deployment_name,
+	'-rabbit-0:15672',
+] | join }}';
+{% endif %}
 
 // CORS
 config.CORS = {
@@ -111,6 +146,17 @@ config.mailchimp = {
 };
 {% endif %}
 
+// mandrill
+{% if 'dev' in third_parties %}
+config.mandrill = {
+	apiKey: '{{ third_parties.dev.mandrill_api_key }}'
+};
+{% else %}
+config.mandrill = {
+	apiKey: ''
+};
+{% endif %}
+
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
@@ -134,9 +180,11 @@ config.applePush = {
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ 'true' if dev_apple_push_notifications_production == 'yes' else 'false' }},
 	validityInSeconds: 3600,
-	feedbackIntervalInSeconds: 3600
+	feedbackIntervalInSeconds: 3600,
+    feedbackEnabled: {{ 'true' if dev_apple_feedback_service_enabled == 'yes' else 'false' }}
 {% else %}
 	enabled: false,
+	feedbackEnabled: false
 {% endif %}
 };
 

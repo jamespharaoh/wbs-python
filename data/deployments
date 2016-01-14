@@ -8,6 +8,8 @@ production:
   enabled: "yes"
   monitoring: "yes"
 
+  default: "yes"
+
   main_domain: "wistla.com"
   short_domain: "wist.la"
   assets_domain: "assets.wistla.com"
@@ -73,6 +75,7 @@ production-a:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "yes"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -123,6 +126,7 @@ production-b:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "yes"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -147,7 +151,9 @@ staging:
   type: "shared"
 
   enabled: "yes"
-  monitoring: "no"
+  monitoring: "yes"
+
+  default: "yes"
 
   main_domain: "staging.wistla.com"
   short_domain: "staging.wist.la"
@@ -187,7 +193,7 @@ staging-a:
   name: "staging-a"
   type: "alias"
 
-  enabled: "yes"
+  enabled: "no"
   monitoring: "no"
 
   supercluster: "staging"
@@ -214,6 +220,7 @@ staging-a:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.staging_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -237,8 +244,8 @@ staging-b:
   name: "staging-b"
   type: "alias"
 
-  enabled: "no"
-  monitoring: "no"
+  enabled: "yes"
+  monitoring: "yes"
 
   supercluster: "staging"
   cluster: "staging"
@@ -264,6 +271,7 @@ staging-b:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.staging_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -326,6 +334,7 @@ test-everest:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.t.e_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "yes"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -384,6 +393,7 @@ test-k2:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -442,6 +452,7 @@ test-montblanc:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
   apple_push_notifications_production: "no"
+  apple_feedback_service_enabled: "yes"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -500,6 +511,7 @@ test-erebus:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.t.e_prod_apns"
   apple_push_notifications_production: "yes"
+  apple_feedback_service_enabled: "yes"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -558,6 +570,7 @@ test-fitzroy:
   apple_push_notifications_enabled: "no"
   apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
   apple_push_notifications_production: "no"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -621,13 +634,13 @@ berk:
   supercluster: "dev"
   cluster: "dev"
 
-  main_domain: "berk.wistla.com"
+  main_domain: "berk.dev.wistla.com"
   short_domain: "berk.dev.wist.la"
   assets_domain: "assets.berk.dev.wistla.com"
   assets_origin_domain: "assets-origin.berk.dev.wistla.com"
   admin_domain: "admin.berk.wistla.com"
-  api_domain: "api.berk.wistla.com"
-  web_domain: "www.berk.wistla.com"
+  api_domain: "api.berk.dev.wistla.com"
+  web_domain: "www.berk.dev.wistla.com"
 
   email_domain: "dev.wistla.com"
 
@@ -696,13 +709,13 @@ mrbenn:
   supercluster: "dev"
   cluster: "dev"
 
-  main_domain: "mrbenn.wistla.com"
+  main_domain: "mrbenn.dev.wistla.com"
   short_domain: "mrbenn.dev.wist.la"
   assets_domain: "assets.mrbenn.dev.wistla.com"
   assets_origin_domain: "assets-origin.mrbenn.dev.wistla.com"
   admin_domain: "admin.mrbenn.wistla.com"
-  api_domain: "api.mrbenn.wistla.com"
-  web_domain: "www.mrbenn.wistla.com"
+  api_domain: "api.mrbenn.dev.wistla.com"
+  web_domain: "www.mrbenn.dev.wistla.com"
 
   email_domain: "dev.wistla.com"
 

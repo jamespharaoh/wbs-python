@@ -1,6 +1,23 @@
 ---
 
+- name: "install snapshots tool"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/usr/local/bin/wistla-snapshots-tool"
+    src: "wistla-snapshots-tool"
+    mode: "0755"
+
 - name: "configure snapshots"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/wistla-snapshots-config"
+    src: "cluster-admin-snapshots-config"
+
+- name: "configure snapshots cron"
   notify: "restart cron"
   sudo: "yes"
   action:

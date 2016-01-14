@@ -38,6 +38,18 @@ type = "ScribbleDecoder"
 	[decode-auth.message_fields]
 	Category = "system"
 
+[input-nginx-times]
+type = "LogstreamerInput"
+log_directory = "/var/log/nginx"
+file_match = "times.log"
+decoder = "decode-nginx-times"
+
+[decode-nginx-times]
+type = "ScribbleDecoder"
+
+	[decode-nginx-times.message_fields]
+	Category = "nginx-times"
+
 # ---------- accept remote connections
 
 [input-socket]
@@ -102,7 +114,10 @@ append_newlines = false
 
 # TODO
 
-{% if inventory_hostname == 'wistla-production-admin-a' %}
+{% if inventory_hostname in [
+	'wistla-production-admin-a',
+	'wistla-staging-admin-a',
+] %}
 
 # ---------- email events
 
@@ -115,6 +130,22 @@ message_matcher = '{{ [
 send_from = "heka@{{ cluster.super_domain }}"
 send_to = [ "notifications.production.warning@wistla.com" ]
 subject = "Wistla API restart notifications"
+send_interval = 60
+encoder = "encoder-simple"
+
+[output-wistla-fatal]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'(' + [
+		'Fields[Category] == "wistla-api"',
+		'Fields[Category] == "wistla-browser"',
+		'Fields[Category] == "wistla-web"',
+	] | join (' || ') + ')',
+	'Payload =~ /[{,]"level":[6-9][0-9][},]/',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.super_domain }}"
+send_to = [ "notifications.production.warning@wistla.com" ]
+subject = "Wistla fatal logging notifications"
 send_interval = 60
 encoder = "encoder-simple"
 

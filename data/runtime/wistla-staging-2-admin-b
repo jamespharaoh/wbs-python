@@ -1,5 +1,5 @@
 ---
-amazon_instance_state: stopped
+amazon_instance_state: running
 amazon_instance_type_running: t2.micro
 etcd:
   installed_version: 2.2.2
@@ -44,6 +44,21 @@ php:
   state: enabled
 php_needs_restart: 'no'
 php_state: enabled
+python:
+  installed_version: 2.7.10
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+  state: installed
+python_pip_installed_version: 7.0.3
+python_pip_state: installed
+python_state: installed
 ssh:
   host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDHd+p0qKji5BLruGUUpbkeiWrR+5n5WjDzIafavDVHDlG3G+mL1SwaFVGdZbUGmadpEusznVVyvvAg3NYzO39s=
   host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtFC3cOLxPUcc0zyotna7MT1My2tskE/HHNn34IkzMBnXGvwl7sIK7Qd6h5o4OqbY9i6kunUEI7i/UZtkozMToh7ou7H3HoIT25Su18WtrqXlmvAZgHX0dEeVgL/JlpK1JqpCTYaCE0kSYEzJAadks7bGGqiA9Cwc444iT9yj2plh2mJqg6va2Ph84LCWylEK4y26q9ooLlyo6E5gsdh66sW/TFXEevQRMgHJg+/eWmtbF4j6ZGOcI+GYNYr5YEWAWXLNacefDxH5Ku5xG7MLdJwtFVDEOS01iA6+Wx9qXaMa5WFEgMoTw/dZy0fsJSxi8Q+yRQpiddnzuuUI2ydol

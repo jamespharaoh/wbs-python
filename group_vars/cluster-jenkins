@@ -25,6 +25,9 @@ my_system_packages:
 
   # ----- install
 
+  - name: "build-essential"
+    state: "present"
+
   - name: "colordiff"
     state: "present"
 

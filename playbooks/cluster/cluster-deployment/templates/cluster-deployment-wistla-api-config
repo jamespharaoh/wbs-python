@@ -25,6 +25,7 @@ config.webTest = 'http://{{ cluster_deployment.web_domain }}';
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
 // Database.
+
 {% if cluster_name in [ 'staging', 'production' ] %}
 config.dbUrl = [
 {% for zone in cluster.instance_formation.data.zones %}
@@ -33,6 +34,12 @@ config.dbUrl = [
 {% endfor %}
 {% endfor %}
 ].join (',');
+{% set mongo_write = '2' %}
+{% else %}
+config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla';
+{% set mongo_write = '1' %}
+{% endif %}
+
 config.dbOptions = {
 	replSet: {
 		reconnectWait: 1000,
@@ -43,39 +50,62 @@ config.dbOptions = {
 		rs_name: 'wistla-1-1',
 	},
 	db: {
-		w: 2,
+		w: {{ mongo_write }},
 		j: false,
 		retryMiliSeconds: 2000
 	},
 };
-{% else %}
-config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wistla';
-config.dbOptions = {
-	db: {
-		w: 1,
-		j: false,
-	},
-};
-{% endif %}
 
 // message exchange
 config.amqpOptions = {
 {% if cluster_name in [ 'production', 'staging' ] %}
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-b-4', // TODO deprecate
+	url: '{{ [
+		'amqp://api:',
+		third_parties [cluster_name].rabbit_api_password,
+		'@',
+		cluster_deployment_alias.name,
+		'-rabbit-b-4',
+	] | join }}', // TODO deprecate
 	urls: [
 {%	for zone in cluster.instance_formation.data.zones %}
 {%	for instance in cluster.instance_formation.data.indices %}
-		'amqp://{{ cluster_deployment_alias.name }}-rabbit-{{ zone }}-{{ instance }}',
+		'{{ [
+			'amqp://api:',
+			third_parties [cluster_name].rabbit_api_password,
+			'@',
+			cluster_deployment_alias.name,
+			'-rabbit-',
+			zone,
+			'-',
+			instance,
+		] | join }}',
 {%	endfor %}
 {%	endfor %}
 	],
 {% else %}
-	url: 'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4', // TODO deprecate
+	url: '{{ [
+		'amqp://api:',
+		third_parties [cluster_name].rabbit_api_password,
+		'@',
+		cluster_deployment_alias.name,
+		'-rabbit-a-4',
+	] | join }}',
 	urls: [
-		'amqp://{{ cluster_deployment_alias.name }}-rabbit-a-4',
+		'{{ [
+			'amqp://api:',
+			third_parties [cluster_name].rabbit_api_password,
+			'@',
+			cluster_deployment_alias.name,
+			'-rabbit-a-4',
+		] | join }}',
 	],
 {% endif %}
 };
+
+
+// rabbit rest api
+config.rabbitRestApi = undefined; // only for test
+
 
 // CORS
 config.CORS = {
@@ -123,6 +153,12 @@ config.mailchimp = {
 	apiKey: '{{ third_parties [cluster_name].mailchimp_api_key }}',
 };
 
+// mandrill
+config.mandrill = {
+	apiKey: '{{ third_parties [cluster_name].mandrill_api_key }}'
+};
+
+
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
@@ -141,12 +177,12 @@ config.applePush = {
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ bool_javascript [cluster_deployment.apple_push_notifications_production] }},
 	validityInSeconds: 3600,
-	feedbackIntervalInSeconds: 3600
-
+	feedbackIntervalInSeconds: 3600,
+	feedbackEnabled: {{ bool_javascript [cluster_deployment.apple_feedback_service_enabled] }}
 {% else %}
 
 	enabled: false,
-
+	feedbackEnabled: false
 {% endif %}
 };
 

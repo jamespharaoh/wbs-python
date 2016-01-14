@@ -41,7 +41,7 @@ super_deployment_names:
 
 region_code: "us"
 
-activate_dns: "no"
+activate_dns: "yes"
 
 # ========== amazon miscellaneous
 
@@ -110,7 +110,7 @@ route53_main_domain:
 
   misc_records: []
 
-monitoring: "no"
+monitoring: "yes"
 
 # ========== accounts and security
 

@@ -47,6 +47,21 @@ nginx_state: enabled
 php:
   state: unconfigured
 php_state: unconfigured
+python:
+  installed_version: 2.7.10
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+  state: installed
+python_pip_installed_version: 7.0.3
+python_pip_state: installed
+python_state: installed
 ssh:
   host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGMotUSVBtSkpHjiMry24Lf3kx+e/Qg9wPFcgfEjlt3L6nCiVuWHtyEMgdqganD/cwqjfALbSdjtQJltHWskT/o=
   host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGf5pSOQ1cNcuPKi2nNrL2qreFFm2QiA4LIWpXYwcIpyywv9Lrz+fY9E44m4Gjvjh/6Yf6AaI6Qce+Ewdui2noRVqr9vUAgpjQktlf4Q7jed2fScsYpLNm0YlXQrkql18X1KskaPmmAG88m/OCB6FYGJIkKoTZVx80QjPe1kni8tOx68GM+telgdlbqMI0SaacIZ85SCd7sDMFA3mHDsF0sah/fDA+Qh+e17OuAjcSalWpLnarASj39TxFw70j6kIAVidsgeuQiVFQU0QbiAWaBvni0vWiZuXukikTvOgtV2tXLIHQUKrktgOi2GySen3owJOaa2LIiV+mwp3VftZ/

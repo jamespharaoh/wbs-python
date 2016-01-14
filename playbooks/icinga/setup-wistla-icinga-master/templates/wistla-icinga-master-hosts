@@ -54,12 +54,12 @@ object Host "{{ host_name }}" {
 {%				if instance_type in [ 'jenkins' ] %}
 
 	vars.procs_warning = {{ [
-		200,
+		300,
 		host.jenkins_deployment_names | length * 100,
 	] | sum }}
 
 	vars.procs_critical = {{ [
-		400,
+		500,
 		host.jenkins_deployment_names | length * 100,
 	] | sum }}
 

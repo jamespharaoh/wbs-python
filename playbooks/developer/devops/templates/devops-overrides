@@ -36,6 +36,7 @@ dev_debug: "{{ dev_debug | default (debug | default ('yes')) }}"
 dev_apple_push_notifications_enabled: "{{ dev_apple_push_notifications_enabled | default ('yes') }}"
 dev_apple_push_notifications_name: "{{ dev_apple_push_notifications_name | default ('c.w.w.i.dev_dev_apns') }}"
 dev_apple_push_notifications_production: "{{ dev_apple_push_notifications_production | default ('no') }}"
+dev_apple_feedback_service_enabled: "{{ dev_apple_feedback_service_enabled | default ('no') }}"
 
 dev_node_count:
 

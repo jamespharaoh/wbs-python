@@ -50,7 +50,7 @@ region_code: "us"
 
 activate_dns: "yes"
 
-monitoring: "no"
+monitoring: "yes"
 
 # ========== amazon miscellaneous
 

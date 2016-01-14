@@ -49,6 +49,21 @@ php:
   state: enabled
 php_needs_restart: 'no'
 php_state: enabled
+python:
+  installed_version: 2.7.10
+  state: installed
+python_apt:
+  installed_version: 0.9.3-1
+  state: installed
+python_apt_installed_version: 0.9.3-1
+python_apt_state: installed
+python_installed_version: 2.7.10
+python_pip:
+  installed_version: 7.0.3
+  state: installed
+python_pip_installed_version: 7.0.3
+python_pip_state: installed
+python_state: installed
 ssh:
   host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWWRZ1BMluvsGrWy7VMgZnqrgY=
   host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5RtEA0wMTcsQy2gWOLhErgm/XUfl5ka73K4koV9ZziC6QPYMwkt32mLiWChLFte5OoODOSXWCOzXaBohWaKWDb+pITudlD/GM8GjPPzuOMFIayKHzfynthOZmhqtBWPJ/pEj2nZoBOje8A/v5ZPn9JHNTlCBekOQhGnoWAa4F3nBwujlOT2KNvRDMHDWVt73bStLRRfzVALV++ucVcw3rI9t8Vvo+nkg3D0OS6TDyEh5YF8RDQNcjSwdDgrz8QpdpaO5dpvjfskHA1XOOQlAQ/SXZr6cAV6E924Sb9vTPmbArTTtMJ1C9r5XQSmeflWYJywrEf2N6aes7yixe5gPj
