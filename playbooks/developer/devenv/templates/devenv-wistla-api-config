@@ -146,6 +146,17 @@ config.mailchimp = {
 };
 {% endif %}
 
+// mandrill
+{% if 'dev' in third_parties %}
+config.mandrill = {
+	apiKey: '{{ third_parties.dev.mandrill_api_key }}'
+};
+{% else %}
+config.mandrill = {
+	apiKey: ''
+};
+{% endif %}
+
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',

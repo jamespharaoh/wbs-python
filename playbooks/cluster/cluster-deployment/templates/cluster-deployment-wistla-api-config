@@ -153,6 +153,12 @@ config.mailchimp = {
 	apiKey: '{{ third_parties [cluster_name].mailchimp_api_key }}',
 };
 
+// mandrill
+config.mandrill = {
+	apiKey: '{{ third_parties [cluster_name].mandrill_api_key }}'
+};
+
+
 // test data loader
 config.loadingData = {
 	email: '350477707572-gcc5pqssbhl7n29pbcs923havgbddh1e@developer.gserviceaccount.com',
