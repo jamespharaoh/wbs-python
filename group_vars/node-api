@@ -20,7 +20,7 @@ my_system_packages:
 node_packages:
 
   - name: "node-inspector"
-    version: "0.8.3"
+    version: "0.12.5"
 
 network_route_localnet: "{{
   [ 'eth0' ] if dev_debug | default ('no') == 'yes' else []

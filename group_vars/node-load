@@ -19,7 +19,7 @@ node_load_deploy_projects:
       - "--include /dist"
       - "--include /favicon.ico"
       - "--include /index.html"
-      - "--include /jspm_packages"
+#      - "--include /jspm_packages"
       - "--include /styles"
       - "--exclude /'*'"
 
