@@ -131,6 +131,7 @@ devenv_checkouts_full:
 
     build_steps:
 
+      - "sudo npm i -g node-gyp"
       - "npm install"
 
   - name: "wistla-browser"
@@ -142,6 +143,7 @@ devenv_checkouts_full:
 
     build_steps:
 
+      - "sudo npm i -g node-gyp"
       - "npm install"
 
   - name: "wistla-devops"
@@ -162,6 +164,7 @@ devenv_checkouts_full:
     branch: "master"
     build_steps:
 
+      - "sudo npm i -g node-gyp"
       - "npm install"
 
   - name: "wistla-test-images"

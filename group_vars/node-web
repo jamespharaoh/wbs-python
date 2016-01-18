@@ -12,6 +12,9 @@ web_install_packages:
 
 node_packages:
 
+  - name: "node-gyp"
+    version: "3.2.1"
+
   - name: "node-inspector"
     version: "0.12.5"
 

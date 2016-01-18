@@ -87,6 +87,7 @@ cluster_deployment_types:
         branch: "master"
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-api"
@@ -98,6 +99,7 @@ cluster_deployment_types:
 
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-browser"
@@ -109,6 +111,7 @@ cluster_deployment_types:
 
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-devops"
@@ -121,6 +124,7 @@ cluster_deployment_types:
         branch: "master"
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-test-images"
@@ -257,6 +261,7 @@ cluster_deployment_types:
         branch: "master"
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-api"
@@ -268,6 +273,7 @@ cluster_deployment_types:
 
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-browser"
@@ -279,6 +285,7 @@ cluster_deployment_types:
 
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-devops"
@@ -291,6 +298,7 @@ cluster_deployment_types:
         branch: "master"
         build_steps:
 
+          - "sudo npm i -g node-gyp"
           - "npm install"
 
       - name: "wistla-test-images"

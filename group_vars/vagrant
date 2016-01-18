@@ -144,6 +144,9 @@ node_packages:
   - name: "mocha"
     version: "2.3.4"
 
+  - name: "node-gyp"
+    version: "3.2.1"
+
   - name: "node-inspector"
     version: "0.12.5"
 
