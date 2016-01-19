@@ -180,7 +180,7 @@ config.applePush = {
 	keyFile: ROOT + '/config/apple-push.key',
 	production: {{ 'true' if dev_apple_push_notifications_production == 'yes' else 'false' }},
 	validityInSeconds: 3600,
-	feedbackIntervalInSeconds: 3600,
+	feedbackIntervalInSeconds: 86400,
     feedbackEnabled: {{ 'true' if dev_apple_feedback_service_enabled == 'yes' else 'false' }}
 {% else %}
 	enabled: false,
