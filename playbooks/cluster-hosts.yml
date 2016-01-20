@@ -1,8 +1,8 @@
 ---
 
 - include: "cluster-admin.yml"
-- include: "cluster-app.yml"
 - include: "cluster-data.yml"
+- include: "cluster-app.yml"
 - include: "cluster-jenkins.yml"
 
 # ex: et ts=2 filetype=yaml

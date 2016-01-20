@@ -75,7 +75,7 @@ production-a:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
-  apple_feedback_service_enabled: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -126,7 +126,7 @@ production-b:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
-  apple_feedback_service_enabled: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -334,7 +334,7 @@ test-everest:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.t.e_prod_apns"
   apple_push_notifications_production: "yes"
-  apple_feedback_service_enabled: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -452,7 +452,7 @@ test-montblanc:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
   apple_push_notifications_production: "no"
-  apple_feedback_service_enabled: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -511,7 +511,7 @@ test-erebus:
   apple_push_notifications_enabled: "yes"
   apple_push_notifications_name: "c.w.w.i.t.e_prod_apns"
   apple_push_notifications_production: "yes"
-  apple_feedback_service_enabled: "yes"
+  apple_feedback_service_enabled: "no"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
