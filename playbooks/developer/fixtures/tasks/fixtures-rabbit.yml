@@ -1,45 +1,70 @@
 ---
 
 - name: "enable rabbit management plugin"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-management-plugin"
   shell: "{{ [
-    deployment_name + '-rabbit-0',
-    'sudo',
-    'rabbitmq-plugins',
-    'enable',
-    'rabbitmq_management',
-  ] | join (' ') }}"
+    'sleep 10',
+    [
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmq-plugins',
+      'enable',
+      'rabbitmq_management',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-management-plugin',
+  ] | join (' && ') }}"
 
 - name: "create rabbit api user"
-  ignore_errors: yes
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-api-user"
   shell: "{{ [
-    deployment_name + '-rabbit-0',
-    'sudo',
-    'rabbitmqctl',
-    'add_user',
-    'api',
-    third_parties.dev.rabbit_api_password,
-  ] | join (' ') }}"
+    'sleep 5',
+    [
+      '(',
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'add_user',
+      'api',
+      third_parties.dev.rabbit_api_password,
+      ') || true',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-api-user',
+  ] | join (' && ') }}"
 
 - name: "set rabbit api user tags"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-api-user-tags"
   shell: "{{ [
-    deployment_name + '-rabbit-0',
-    'sudo',
-    'rabbitmqctl',
-    'set_user_tags',
-    'api',
-    'management',
-  ] | join (' ') }}"
+    'sleep 1',
+    [
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'set_user_tags',
+      'api',
+      'management',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-api-user-tags',
+  ] | join (' && ') }}"
 
 - name: "set rabbit api user permissions"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-api-user-permissions"
   shell: "{{ [
-    deployment_name + '-rabbit-0',
-    'sudo',
-    'rabbitmqctl',
-    'set_permissions',
-    'api',
-    '.\\*',
-    '.\\*',
-    '.\\*',
-  ] | join (' ') }}"
+    'sleep 1',
+    [
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'set_permissions',
+      'api',
+      '.\\*',
+      '.\\*',
+      '.\\*',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-api-user-permissions',
+  ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml

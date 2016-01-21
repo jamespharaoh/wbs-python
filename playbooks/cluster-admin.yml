@@ -25,10 +25,10 @@
 
     - "cluster-admin-firewall"
 
+    - "python"
     - "etcd"
     - "mysql"
     - "php"
-    - "python"
 
     - "install-mongodb"
     - "install-tools"

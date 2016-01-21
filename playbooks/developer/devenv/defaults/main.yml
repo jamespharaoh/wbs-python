@@ -111,6 +111,7 @@ devenv_shared_directories:
   - "shared"
   - "shared/audio"
   - "shared/cms-image"
+  - "shared/flags"
   - "shared/image"
   - "shared/log"
   - "shared/user-upload"
