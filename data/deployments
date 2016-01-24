@@ -43,6 +43,8 @@ production:
 
   blob_storage: "amazon"
 
+  nodejs_version: "0.12.7"
+
 production-a:
 
   name: "production-a"
@@ -93,6 +95,8 @@ production-a:
     browser: "1"
     load: "1"
     web: "1"
+
+  nodejs_version: "0.12.7"
 
 production-b:
 
@@ -145,6 +149,8 @@ production-b:
     load: "1"
     web: "1"
 
+  nodejs_version: "0.12.7"
+
 staging:
 
   name: "staging"
@@ -187,6 +193,8 @@ staging:
   assets_certificate_arn: "arn:aws:iam::155823734687:server-certificate/cloudfront/assets.staging.wistla.com"
 
   blob_storage: "amazon"
+
+  nodejs_version: "5.5.0"
 
 staging-a:
 
@@ -239,6 +247,8 @@ staging-a:
     load: "1"
     web: "1"
 
+  nodejs_version: "5.5.0"
+
 staging-b:
 
   name: "staging-b"
@@ -289,6 +299,8 @@ staging-b:
     browser: "1"
     load: "1"
     web: "1"
+
+  nodejs_version: "5.5.0"
 
 test:
 
@@ -362,6 +374,8 @@ test-everest:
 
   blob_storage: "amazon"
 
+  nodejs_version: "5.5.0"
+
 test-k2:
 
   name: "test-k2"
@@ -420,6 +434,8 @@ test-k2:
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.k2.test.wistla.com"
 
   blob_storage: "amazon"
+
+  nodejs_version: "5.5.0"
 
 test-montblanc:
 
@@ -480,6 +496,8 @@ test-montblanc:
 
   blob_storage: "amazon"
 
+  nodejs_version: "5.5.0"
+
 test-erebus:
 
   name: "test-erebus"
@@ -538,6 +556,8 @@ test-erebus:
   assets_certificate_arn: "arn:aws:iam::155092858439:server-certificate/cloudfront/assets.erebus.test.wistla.com"
 
   blob_storage: "amazon"
+
+  nodejs_version: "5.5.0"
 
 test-fitzroy:
 
@@ -598,6 +618,8 @@ test-fitzroy:
 
   blob_storage: "amazon"
 
+  nodejs_version: "5.5.0"
+
 dev:
 
   name: "dev"
@@ -622,6 +644,8 @@ dev:
   bridge_name: "br152"
   bridge_network: "10.152"
   bridge_mac: "aa:bb:0a:98"
+
+  nodejs_version: "5.5.0"
 
 berk:
 
@@ -648,6 +672,8 @@ berk:
   bridge_network: "10.150"
   bridge_mac: "aa:bb:0a:96"
 
+  nodejs_version: "5.5.0"
+
 bruce:
 
   name: "bruce"
@@ -672,6 +698,8 @@ bruce:
   bridge_name: "br154"
   bridge_network: "10.154"
   bridge_mac: "aa:bb:0a:9a"
+
+  nodejs_version: "5.5.0"
 
 chuggington:
 
@@ -698,6 +726,8 @@ chuggington:
   bridge_network: "10.167"
   bridge_mac: "aa:bb:0a:a7"
 
+  nodejs_version: "5.5.0"
+
 mrbenn:
 
   name: "mrbenn"
@@ -722,6 +752,8 @@ mrbenn:
   bridge_name: "br151"
   bridge_network: "10.151"
   bridge_mac: "aa:bb:0a:97"
+
+  nodejs_version: "5.5.0"
 
 7-zark-7:
 
@@ -749,6 +781,8 @@ mrbenn:
   bridge_network: "10.153"
   bridge_mac: "aa:bb:0a:99"
 
+  nodejs_version: "5.5.0"
+
 optimus:
 
   name: "optimus"
@@ -773,6 +807,8 @@ optimus:
   bridge_name: "br161"
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
+
+  nodejs_version: "5.5.0"
 
 smurfette:
 
@@ -799,6 +835,8 @@ smurfette:
   bridge_network: "10.168"
   bridge_mac: "aa:bb:0a:a8"
 
+  nodejs_version: "5.5.0"
+
 jenkins-latest:
 
   name: "jenkins-latest"
@@ -823,5 +861,7 @@ jenkins-latest:
   bridge_name: "br160"
   bridge_network: "10.160"
   bridge_mac: "aa:bb:0a:a0"
+
+  nodejs_version: "5.5.0"
 
 # ex: et ts=2 filetype=yaml
