@@ -20,14 +20,16 @@ need_newline = True
 PROJECTS = [
 	"content-api",
 	"content-browser",
-	"content-iOS",
 	"content-common",
+	"content-iOS",
 	"content-web",
 	"wistla-admin",
+	"wistla-analytics",
 	"wistla-api",
 	"wistla-browser",
 	"wistla-devops",
 	"wistla-iOS",
+	"wistla-scripts",
 	"wistla-test-images",
 	"wistla-web",
 ]
@@ -406,6 +408,8 @@ def warn_upstream ():
 			set_newline ()
 
 	diverged_count = 0
+	branch_count = 0
+	project_status = []
 
 	for project in PROJECTS:
 
@@ -422,32 +426,77 @@ def warn_upstream ():
 
 		base = bases [0]
 
-		if base == project_repo.remotes.origin.refs.master.commit:
-			continue
+		if base != project_repo.remotes.origin.refs.master.commit:
 
-		if diverged_count == 0:
+			if diverged_count == 0:
 
-			write_message ([
-				"##### Diverged from upstream #####\n",
-			])
+				write_message ([
+					"##### Diverged from upstream #####\n",
+				])
 
-			write_message ([
-				"New changes can be merged from master in at least one\n"
-				"project\n",
-			])
+				write_message ([
+					"New changes can be merged from master in at least one\n"
+					"project\n",
+				])
 
-			write_message ([
-				"Try running './run-ansible' --sync to automatically sync\n"
-				"projects in a clean state.\n",
-			])
+				write_message ([
+					"Try running './run-ansible' --sync to automatically sync\n"
+					"projects in a clean state.\n",
+				])
 
-		auto_newline ()
+			diverged_count += 1
 
-		sys.stderr.write ("Diverged project: %s\n" % project)
+			auto_newline ()
 
-		diverged_count += 1
+			if project_repo.active_branch.name == "master":
 
-	if diverged_count > 0:
+				project_status.append (
+					"Diverged from master: %s\n" % project)
+
+			else:
+
+				project_status.append (
+					"Diverged from master: %s (%s)\n" % (
+						project,
+						project_repo.active_branch.name))
+
+			diverged_count += 1
+
+		elif project_repo.head.commit \
+			!= project_repo.remotes.origin.refs.master.commit:
+
+			if project_repo.active_branch.name == "master":
+
+				project_status.append (
+					"Not merged to master: %s\n" % (
+						project))
+
+			else:
+
+				project_status.append (
+					"Not merged to master: %s (%s)\n" % (
+						project,
+						project_repo.active_branch.name))
+
+		elif project_repo.is_dirty ():
+
+			if project_repo.active_branch.name == "master":
+
+				project_status.append (
+					"Uncommitted changes: %s\n" % (
+						project))
+
+			else:
+
+				project_status.append (
+					"Uncommitted changes: %s (%s)\n" % (
+						project,
+						project_repo.active_branch.name))
+
+	if len (project_status) > 0:
+
+		for line in project_status:
+			sys.stderr.write (line)
 
 		set_newline ()
 		should_pause ()
