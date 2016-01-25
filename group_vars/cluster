@@ -16,6 +16,8 @@ amazon_key_name: "{{ cluster.amazon_key_name }}"
 node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
+nodejs_version: "{{ cluster.nodejs_version }}"
+
 # --------- icinga
 
 icinga_web_version: "2.0.0-rc1"

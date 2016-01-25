@@ -48,6 +48,8 @@ activate_dns: "yes"
 
 monitoring: "yes"
 
+nodejs_version: "0.12.7"
+
 # ========== amazon miscellaneous
 
 amazon_account: "production"

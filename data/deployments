@@ -435,7 +435,7 @@ test-k2:
 
   blob_storage: "amazon"
 
-  nodejs_version: "0.12.7"
+  nodejs_version: "5.5.0"
 
 test-montblanc:
 
