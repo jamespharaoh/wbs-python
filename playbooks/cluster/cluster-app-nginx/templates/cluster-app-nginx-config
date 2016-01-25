@@ -63,7 +63,7 @@ http {
 		] | join ('.') }} fail_timeout=60s;
 {% endfor %}
 
-		keepalive 512;
+		keepalive 32;
 
 	}
 
@@ -136,17 +136,26 @@ http {
 		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.main_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /keystone {
+
 			auth_basic "Restricted";
 			auth_basic_user_file {{ nginx_target }}/conf/htpasswd;
+
 			proxy_pass http://deployment-{{ target }}/keystone;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.main_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 {% if cluster_name != 'production' %}
@@ -175,9 +184,13 @@ http {
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/api.{{ deployment_alias.main_domain }}.key;
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "api.{{ deployment.main_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /robots.txt {
@@ -210,9 +223,13 @@ http {
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/admin.{{ deployment_alias.main_domain }}.key;
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "admin.{{ deployment.main_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /robots.txt {
@@ -246,9 +263,13 @@ http {
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.short_domain }}.key;
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.short_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /robots.txt {
@@ -282,9 +303,13 @@ http {
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.assets_domain }}.key;
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /robots.txt {
@@ -302,9 +327,13 @@ http {
 		server_name {{ deployment.assets_origin_domain }};
 
 		location / {
+
 			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_origin_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
 		}
 
 		location /robots.txt {
