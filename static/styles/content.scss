@@ -83,12 +83,28 @@
 }
 
 .content table tr.section td {
+	color: $heading-text;
 	background: $white;
 	padding-left: 0.6rem;
 	text-align: center;
 	border-top: 0.1px solid $table-border;
 	border-bottom: 0.1px solid $table-border;
 	font-style: italic;
+}
+
+.content table tr.total td {
+	color: $heading-text;
+	background: $white;
+	padding-left: 0.6rem;
+	text-align: left;
+	border-top: 0.1px solid $table-border;
+	border-bottom: 0.1px solid $table-border;
+	font-family: montserrat, sans-serif;
+	font-weight: normal;
+}
+
+.content table tr.total td.right {
+	text-align: right;
 }
 
 .content a {
