@@ -158,7 +158,7 @@ http {
 
 		}
 
-{% if cluster_name != 'production' %}
+{% if supercluster_name != 'production' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
