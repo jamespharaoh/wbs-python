@@ -23,6 +23,12 @@ node_load_deploy_projects:
       - "--include /styles"
       - "--exclude /'*'"
 
+  - name: "wistla-browser"
+    filters:
+
+      - "--include /static"
+      - "--exclude /'*'"
+
   - name: "content-api"
     filters:
 

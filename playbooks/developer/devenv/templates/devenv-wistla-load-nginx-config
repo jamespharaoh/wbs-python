@@ -175,6 +175,10 @@ http {
 			return 307 https://{{ deployment.main_domain }}/;
 		}
 
+		location /robots.txt {
+			alias /home/ubuntu/wistla-browser/static/robots.txt;
+		}
+
 		location / {
 			proxy_pass http://browser/in/;
 			proxy_http_version 1.1;
