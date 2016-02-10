@@ -194,7 +194,7 @@ staging:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 staging-a:
 
@@ -247,7 +247,7 @@ staging-a:
     load: "1"
     web: "1"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 staging-b:
 
@@ -300,7 +300,7 @@ staging-b:
     load: "1"
     web: "1"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 test:
 
@@ -374,7 +374,7 @@ test-everest:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 test-k2:
 
@@ -435,7 +435,7 @@ test-k2:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 test-montblanc:
 
@@ -496,7 +496,7 @@ test-montblanc:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 test-erebus:
 
@@ -557,7 +557,7 @@ test-erebus:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 test-fitzroy:
 
@@ -618,7 +618,7 @@ test-fitzroy:
 
   blob_storage: "amazon"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 dev:
 
@@ -645,7 +645,7 @@ dev:
   bridge_network: "10.152"
   bridge_mac: "aa:bb:0a:98"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 berk:
 
@@ -672,7 +672,7 @@ berk:
   bridge_network: "10.150"
   bridge_mac: "aa:bb:0a:96"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 bruce:
 
@@ -699,7 +699,7 @@ bruce:
   bridge_network: "10.154"
   bridge_mac: "aa:bb:0a:9a"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 chuggington:
 
@@ -726,7 +726,7 @@ chuggington:
   bridge_network: "10.167"
   bridge_mac: "aa:bb:0a:a7"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 mrbenn:
 
@@ -753,7 +753,7 @@ mrbenn:
   bridge_network: "10.151"
   bridge_mac: "aa:bb:0a:97"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 7-zark-7:
 
@@ -781,7 +781,7 @@ mrbenn:
   bridge_network: "10.153"
   bridge_mac: "aa:bb:0a:99"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 optimus:
 
@@ -808,7 +808,7 @@ optimus:
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 smurfette:
 
@@ -835,7 +835,7 @@ smurfette:
   bridge_network: "10.168"
   bridge_mac: "aa:bb:0a:a8"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 jenkins-latest:
 
@@ -862,6 +862,6 @@ jenkins-latest:
   bridge_network: "10.160"
   bridge_mac: "aa:bb:0a:a0"
 
-  nodejs_version: "5.5.0"
+  nodejs_version: "5.6.0"
 
 # ex: et ts=2 filetype=yaml

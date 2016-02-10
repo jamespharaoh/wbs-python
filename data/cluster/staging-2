@@ -52,7 +52,7 @@ activate_dns: "yes"
 
 monitoring: "yes"
 
-nodejs_version: "5.5.0"
+nodejs_version: "5.6.0"
 
 # ========== amazon miscellaneous
 
