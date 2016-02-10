@@ -208,6 +208,10 @@ http {
 
 		expires max;
 
+		location /robots.txt {
+			alias /etc/nginx/robots-txt-assets;
+		}
+
 		# per-region api-managed assets
 
 		location /1/images {
