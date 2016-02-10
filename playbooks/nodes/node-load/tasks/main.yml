@@ -31,4 +31,12 @@
     src: "{{ item.source }}"
     force: "yes"
 
+- name: "install special robots.txt"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/nginx/robots-txt-assets"
+    src: "robots-txt-assets"
+
 # ex: et ts=2 filetype=yaml
