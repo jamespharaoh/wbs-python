@@ -27,6 +27,16 @@ class LoginClient (object):
 
 	def before_request (self):
 
+		if "force_email" in self.settings:
+
+			flask.g.user_email = (
+				self.settings ["force_email"])
+
+			flask.g.user_groups = (
+				self.settings ["force_groups"])
+
+			return
+
 		if not self.settings ["cookie"] in flask.request.cookies:
 
 			flask.g.user_email = None
