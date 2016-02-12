@@ -448,17 +448,25 @@ def warn_upstream ():
 
 			auto_newline ()
 
-			if project_repo.active_branch.name == "master":
+			try:
+
+				if project_repo.active_branch.name == "master":
+
+					project_status.append (
+						"Diverged from master: %s\n" % project)
+
+				else:
+
+					project_status.append (
+						"Diverged from master: %s (%s)\n" % (
+							project,
+							project_repo.active_branch.name))
+
+			except:
 
 				project_status.append (
-					"Diverged from master: %s\n" % project)
-
-			else:
-
-				project_status.append (
-					"Diverged from master: %s (%s)\n" % (
-						project,
-						project_repo.active_branch.name))
+					"Not on a branch: %s\n" % (
+						project))
 
 			diverged_count += 1
 
