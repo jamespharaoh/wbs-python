@@ -473,33 +473,49 @@ def warn_upstream ():
 		elif project_repo.head.commit \
 			!= project_repo.remotes.origin.refs.master.commit:
 
-			if project_repo.active_branch.name == "master":
+			try:
+
+				if project_repo.active_branch.name == "master":
+
+					project_status.append (
+						"Not merged to master: %s\n" % (
+							project))
+
+				else:
+
+					project_status.append (
+						"Not merged to master: %s (%s)\n" % (
+							project,
+							project_repo.active_branch.name))
+
+			except:
 
 				project_status.append (
-					"Not merged to master: %s\n" % (
+					"Not on a branch: %s\n" % (
 						project))
-
-			else:
-
-				project_status.append (
-					"Not merged to master: %s (%s)\n" % (
-						project,
-						project_repo.active_branch.name))
 
 		elif project_repo.is_dirty ():
 
-			if project_repo.active_branch.name == "master":
+			try:
+
+				if project_repo.active_branch.name == "master":
+
+					project_status.append (
+						"Uncommitted changes: %s\n" % (
+							project))
+
+				else:
+
+					project_status.append (
+						"Uncommitted changes: %s (%s)\n" % (
+							project,
+							project_repo.active_branch.name))
+
+			except:
 
 				project_status.append (
-					"Uncommitted changes: %s\n" % (
+					"Not on a branch: %s\n" % (
 						project))
-
-			else:
-
-				project_status.append (
-					"Uncommitted changes: %s (%s)\n" % (
-						project,
-						project_repo.active_branch.name))
 
 	if len (project_status) > 0:
 
