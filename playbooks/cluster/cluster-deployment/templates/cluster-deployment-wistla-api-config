@@ -43,10 +43,12 @@ config.dbUrl = 'mongodb://{{ cluster_deployment_alias.name }}-mongo-a-4:27017/wi
 config.dbOptions = {
 	replSet: {
 		reconnectWait: 1000,
+		/*
 		socketOptions: {
 			connectTimeoutMS : 3000,
 			socketTimeoutMS: 3000
 		},
+		*/
 		rs_name: 'wistla-1-1',
 	},
 	db: {
