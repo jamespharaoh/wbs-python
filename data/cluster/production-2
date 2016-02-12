@@ -43,7 +43,7 @@ region_code: "us"
 
 activate_dns: "yes"
 
-nodejs_version: "0.12.7"
+nodejs_version: "5.6.0"
 
 # ========== amazon miscellaneous
 
