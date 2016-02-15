@@ -22,7 +22,7 @@ production:
 
   supercluster: "production"
   cluster: "production"
-  target: "production-a"
+  target: "production-b"
 
   bridge_name: "br162"
   bridge_network: "10.162"
