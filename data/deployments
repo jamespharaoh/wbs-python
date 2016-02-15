@@ -18,6 +18,10 @@ production:
   api_domain: "api.wistla.com"
   web_domain: "www.wistla.com"
 
+  robots_override_main: "yes"
+  robots_override_short: "yes"
+  robots_override_assets: "yes"
+
   email_domain: "wistla.com"
 
   supercluster: "production"

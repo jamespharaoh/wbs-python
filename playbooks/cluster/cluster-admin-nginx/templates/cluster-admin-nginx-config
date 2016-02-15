@@ -264,7 +264,7 @@ http {
 		ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.assets_domain }}.cert;
 		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.assets_domain }}.key;
 
-{% if dev_deployment.robots_override_short | default ('no') != 'yes' %}
+{% if dev_deployment.robots_override_assets | default ('no') != 'yes' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}

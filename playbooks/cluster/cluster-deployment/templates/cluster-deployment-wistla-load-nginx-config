@@ -191,6 +191,10 @@ http {
 			return 307 https://{{ cluster_deployment_alias.main_domain }}/;
 		}
 
+		location /robots.txt {
+			alias /home/ubuntu/wistla-browser/static/robots.txt;
+		}
+
 		location / {
 			proxy_pass http://browser/in/;
 			proxy_http_version 1.1;
@@ -226,6 +230,10 @@ http {
 {% endif %}
 
 		expires max;
+
+		location /robots.txt {
+			alias /etc/nginx/robots-txt-assets;
+		}
 
 {% for location_char in [ '1', '2' ] %}
 
