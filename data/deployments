@@ -50,8 +50,8 @@ production-a:
   name: "production-a"
   type: "alias"
 
-  enabled: "yes"
-  monitoring: "yes"
+  enabled: "no"
+  monitoring: "no"
 
   supercluster: "production"
   cluster: "production"
@@ -103,8 +103,8 @@ production-b:
   name: "production-b"
   type: "alias"
 
-  enabled: "no"
-  monitoring: "no"
+  enabled: "yes"
+  monitoring: "yes"
 
   supercluster: "production"
   cluster: "production"
