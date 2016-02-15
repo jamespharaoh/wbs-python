@@ -43,7 +43,7 @@ production:
 
   blob_storage: "amazon"
 
-  nodejs_version: "0.12.7"
+  nodejs_version: "5.6.0"
 
 production-a:
 
@@ -96,7 +96,7 @@ production-a:
     load: "1"
     web: "1"
 
-  nodejs_version: "0.12.7"
+  nodejs_version: "5.6.0"
 
 production-b:
 
@@ -149,7 +149,7 @@ production-b:
     load: "1"
     web: "1"
 
-  nodejs_version: "0.12.7"
+  nodejs_version: "5.6.0"
 
 staging:
 
