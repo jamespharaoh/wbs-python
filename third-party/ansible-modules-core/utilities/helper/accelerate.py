@@ -63,8 +63,10 @@ options:
     version_added: "1.6"
 notes:
     - See the advanced playbooks chapter for more about using accelerated mode.
-requirements: [ "python-keyczar" ]
-author: James Cammarata
+requirements:
+    - "python >= 2.6"
+    - "python-keyczar"
+author: "James Cammarata (@jimi-c)"
 '''
 
 EXAMPLES = '''
@@ -233,33 +235,34 @@ class LocalSocketThread(Thread):
                 while "\n" not in data:
                     data += conn.recv(2048)
                 try:
-                    new_key = AesKey.Read(data.strip())
-                    found = False
-                    for key in self.server.key_list:
-                        try:
-                            new_key.Decrypt(key.Encrypt("foo"))
-                            found = True
-                            break
-                        except:
-                            pass
-                    if not found:
-                        vv("adding new key to the key list")
-                        self.server.key_list.append(new_key)
-                        conn.sendall("OK\n")
-                    else:
-                        vv("key already exists in the key list, ignoring")
-                        conn.sendall("EXISTS\n")
-
-                    # update the last event time so the server doesn't
-                    # shutdown sooner than expected for new cliets
                     try:
-                        self.server.last_event_lock.acquire()
-                        self.server.last_event = datetime.now()
-                    finally:
-                        self.server.last_event_lock.release()
-                except Exception, e:
-                    vv("key loaded locally was invalid, ignoring (%s)" % e)
-                    conn.sendall("BADKEY\n")
+                        new_key = AesKey.Read(data.strip())
+                        found = False
+                        for key in self.server.key_list:
+                            try:
+                                new_key.Decrypt(key.Encrypt("foo"))
+                                found = True
+                                break
+                            except:
+                                pass
+                        if not found:
+                            vv("adding new key to the key list")
+                            self.server.key_list.append(new_key)
+                            conn.sendall("OK\n")
+                        else:
+                            vv("key already exists in the key list, ignoring")
+                            conn.sendall("EXISTS\n")
+
+                        # update the last event time so the server doesn't
+                        # shutdown sooner than expected for new cliets
+                        try:
+                            self.server.last_event_lock.acquire()
+                            self.server.last_event = datetime.now()
+                        finally:
+                            self.server.last_event_lock.release()
+                    except Exception, e:
+                        vv("key loaded locally was invalid, ignoring (%s)" % e)
+                        conn.sendall("BADKEY\n")
                 finally:
                     try:
                         conn.close()
@@ -269,6 +272,7 @@ class LocalSocketThread(Thread):
                 pass
 
     def terminate(self):
+        super(LocalSocketThread, self).terminate()
         self.terminated = True
         self.s.shutdown(socket.SHUT_RDWR)
         self.s.close()
@@ -308,7 +312,6 @@ class ThreadedTCPServer(SocketServer.ThreadingTCPServer):
         SocketServer.ThreadingTCPServer.__init__(self, server_address, RequestHandlerClass)
 
     def shutdown(self):
-        self.local_thread.terminate()
         self.running = False
         SocketServer.ThreadingTCPServer.shutdown(self)
 
@@ -469,8 +472,6 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def command(self, data):
         if 'cmd' not in data:
             return dict(failed=True, msg='internal error: cmd is required')
-        if 'tmp_path' not in data:
-            return dict(failed=True, msg='internal error: tmp_path is required')
 
         vvvv("executing: %s" % data['cmd'])
 
@@ -586,26 +587,26 @@ def daemonize(module, password, port, timeout, minutes, use_ipv6, pid_file):
 
         def timer_handler(signum, _):
             try:
-                server.last_event_lock.acquire()
-                td = datetime.now() - server.last_event
-                # older python timedelta objects don't have total_seconds(),
-                # so we use the formula from the docs to calculate it
-                total_seconds = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
-                if total_seconds >= minutes * 60:
-                    log("server has been idle longer than the timeout, shutting down")
-                    server.running = False
-                    server.shutdown()
-                else:
-                    # reschedule the check
-                    vvvv("daemon idle for %d seconds (timeout=%d)" % (total_seconds,minutes*60))
-                    signal.alarm(30)
-            except:
-                pass
+                try:
+                    server.last_event_lock.acquire()
+                    td = datetime.now() - server.last_event
+                    # older python timedelta objects don't have total_seconds(),
+                    # so we use the formula from the docs to calculate it
+                    total_seconds = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+                    if total_seconds >= minutes * 60:
+                        log("server has been idle longer than the timeout, shutting down")
+                        server.running = False
+                        server.shutdown()
+                    else:
+                        # reschedule the check
+                        signal.alarm(1)
+                except:
+                    pass
             finally:
                 server.last_event_lock.release()
 
         signal.signal(signal.SIGALRM, timer_handler)
-        signal.alarm(30)
+        signal.alarm(1)
 
         tries = 5
         while tries > 0:
@@ -621,7 +622,7 @@ def daemonize(module, password, port, timeout, minutes, use_ipv6, pid_file):
                 vv("Failed to create the TCP server (tries left = %d) (error: %s) " % (tries,e))
             tries -= 1
             time.sleep(0.2)
-        
+
         if tries == 0:
             vv("Maximum number of attempts to create the TCP server reached, bailing out")
             raise Exception("max # of attempts to serve reached")
@@ -702,14 +703,15 @@ def main():
         # try to connect to the file socket for the daemon if it exists
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
-            s.connect(SOCKET_FILE)
-            s.sendall(password + '\n')
-            data = ""
-            while '\n' not in data:
-                data += s.recv(2048)
-            res = data.strip()
-        except:
-            module.fail_json(msg="failed to connect to the local socket file")
+            try:
+                s.connect(SOCKET_FILE)
+                s.sendall(password + '\n')
+                data = ""
+                while '\n' not in data:
+                    data += s.recv(2048)
+                res = data.strip()
+            except:
+                module.fail_json(msg="failed to connect to the local socket file")
         finally:
             try:
                 s.close()

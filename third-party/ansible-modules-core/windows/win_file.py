@@ -22,9 +22,8 @@
 DOCUMENTATION = '''
 ---
 module: win_file
-version_added: "1.8"
+version_added: "1.9.2"
 short_description: Creates, touches or removes files or directories.
-extends_documentation_fragment: files
 description:
      - Creates (empty) files, updates file modification stamps of existing files,
        and can create or remove directories.

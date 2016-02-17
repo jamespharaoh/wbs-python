@@ -30,34 +30,11 @@ options:
   name:
     description:
       - name of the database to add or remove
+      - name=all May only be provided if I(state) is C(dump) or C(import).
+      - if name=all Works like --all-databases option for mysqldump (Added in 2.0)
     required: true
     default: null
     aliases: [ db ]
-  login_user:
-    description:
-      - The username used to authenticate with
-    required: false
-    default: null
-  login_password:
-    description:
-      - The password used to authenticate with
-    required: false
-    default: null
-  login_host:
-    description:
-      - Host running the database
-    required: false
-    default: localhost
-  login_port:
-    description:
-      - Port of the MySQL server. Requires login_host be defined as other then localhost if login_port is used
-    required: false
-    default: 3306
-  login_unix_socket:
-    description:
-      - The path to a Unix domain socket for local connections
-    required: false
-    default: null
   state:
     description:
       - The database state
@@ -66,7 +43,7 @@ options:
     choices: [ "present", "absent", "dump", "import" ]
   collation:
     description:
-      - Collation mode
+      - Collation mode (sorting). This only applies to new table/databases and does not update existing ones, this is a limitation of MySQL.
     required: false
     default: null
   encoding:
@@ -77,17 +54,10 @@ options:
   target:
     description:
       - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL
-        files (C(.sql)) as well as bzip2 (C(.bz2)) and gzip (C(.gz)) compressed files are supported.
+        files (C(.sql)) as well as bzip2 (C(.bz2)), gzip (C(.gz)) and xz (Added in 2.0) compressed files are supported.
     required: false
-notes:
-   - Requires the MySQLdb Python package on the remote host. For Ubuntu, this
-     is as easy as apt-get install python-mysqldb. (See M(apt).)
-   - Both I(login_password) and I(login_user) are required when you are
-     passing credentials. If none are present, the module will attempt to read
-     the credentials from C(~/.my.cnf), and finally fall back to using the MySQL
-     default login of C(root) with no password.
-requirements: [ ConfigParser ]
-author: Mark Theunissen
+author: "Ansible Core Team"
+extends_documentation_fragment: mysql
 '''
 
 EXAMPLES = '''
@@ -97,12 +67,19 @@ EXAMPLES = '''
 # Copy database dump file to remote host and restore it to database 'my_db'
 - copy: src=dump.sql.bz2 dest=/tmp
 - mysql_db: name=my_db state=import target=/tmp/dump.sql.bz2
+
+# Dumps all databases to hostname.sql
+- mysql_db: state=dump name=all target=/tmp/{{ inventory_hostname }}.sql
+
+# Imports file.sql similiar to mysql -u <username> -p <password> < hostname.sql
+- mysql_db: state=import name=all target=/tmp/{{ inventory_hostname }}.sql
 '''
 
-import ConfigParser
 import os
 import pipes
 import stat
+import subprocess
+
 try:
     import MySQLdb
 except ImportError:
@@ -123,72 +100,98 @@ def db_delete(cursor, db):
     cursor.execute(query)
     return True
 
-def db_dump(module, host, user, password, db_name, target, port, socket=None):
+def db_dump(module, host, user, password, db_name, target, all_databases, port, config_file, socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None):
     cmd = module.get_bin_path('mysqldump', True)
-    cmd += " --quick --user=%s --password=%s" % (pipes.quote(user), pipes.quote(password))
+    # If defined, mysqldump demands --defaults-extra-file be the first option
+    if config_file:
+        cmd += " --defaults-extra-file=%s" % pipes.quote(config_file)
+    cmd += " --quick"
+    if user is not None:
+        cmd += " --user=%s" % pipes.quote(user)
+    if password is not None:
+        cmd += " --password=%s" % pipes.quote(password)
+    if ssl_cert is not None:
+        cmd += " --ssl-cert=%s" % pipes.quote(ssl_cert)
+    if ssl_key is not None:
+        cmd += " --ssl-key=%s" % pipes.quote(ssl_key)
+    if ssl_cert is not None:
+        cmd += " --ssl-ca=%s" % pipes.quote(ssl_ca)
     if socket is not None:
         cmd += " --socket=%s" % pipes.quote(socket)
     else:
         cmd += " --host=%s --port=%i" % (pipes.quote(host), port)
-    cmd += " %s" % pipes.quote(db_name)
+    if all_databases:
+        cmd += " --all-databases"
+    else:
+        cmd += " %s" % pipes.quote(db_name)
+
+    path = None
     if os.path.splitext(target)[-1] == '.gz':
-        cmd = cmd + ' | gzip > ' + pipes.quote(target)
+        path = module.get_bin_path('gzip', True)
     elif os.path.splitext(target)[-1] == '.bz2':
-        cmd = cmd + ' | bzip2 > ' + pipes.quote(target)
+        path = module.get_bin_path('bzip2', True)
+    elif os.path.splitext(target)[-1] == '.xz':
+        path = module.get_bin_path('xz', True)
+
+    if path:
+        cmd = '%s | %s > %s' % (cmd, path, pipes.quote(target))
     else:
         cmd += " > %s" % pipes.quote(target)
+
     rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
     return rc, stdout, stderr
 
-def db_import(module, host, user, password, db_name, target, port, socket=None):
+def db_import(module, host, user, password, db_name, target, all_databases, port, config_file, socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None):
     if not os.path.exists(target):
         return module.fail_json(msg="target %s does not exist on the host" % target)
 
-    cmd = module.get_bin_path('mysql', True)
-    cmd += " --user=%s --password=%s" % (pipes.quote(user), pipes.quote(password))
+    cmd = [module.get_bin_path('mysql', True)]
+    # --defaults-file must go first, or errors out
+    if config_file:
+        cmd.append("--defaults-extra-file=%s" % pipes.quote(config_file))
+    if user:
+        cmd.append("--user=%s" % pipes.quote(user))
+    if password:
+        cmd.append("--password=%s" % pipes.quote(password))
     if socket is not None:
-        cmd += " --socket=%s" % pipes.quote(socket)
+        cmd.append("--socket=%s" % pipes.quote(socket))
+    if ssl_cert is not None:
+        cmd.append("--ssl-cert=%s" % pipes.quote(ssl_cert))
+    if ssl_key is not None:
+        cmd.append("--ssl-key=%s" % pipes.quote(ssl_key))
+    if ssl_cert is not None:
+        cmd.append("--ssl-ca=%s" % pipes.quote(ssl_ca))
     else:
-        cmd += " --host=%s --port=%i" % (pipes.quote(host), port)
-    cmd += " -D %s" % pipes.quote(db_name)
+        cmd.append("--host=%s" % pipes.quote(host))
+        cmd.append("--port=%i" % port)
+    if not all_databases:
+        cmd.append("-D")
+        cmd.append(pipes.quote(db_name))
+
+    comp_prog_path = None
     if os.path.splitext(target)[-1] == '.gz':
-        gzip_path = module.get_bin_path('gzip')
-        if not gzip_path:
-            module.fail_json(msg="gzip command not found")
-        #gzip -d file (uncompress)
-        rc, stdout, stderr = module.run_command('%s -d %s' % (gzip_path, target))
-        if rc != 0:
-            return rc, stdout, stderr
-        #Import sql
-        cmd += " < %s" % pipes.quote(os.path.splitext(target)[0])
-        try:
-            rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
-            if rc != 0:
-                return rc, stdout, stderr
-        finally:
-            #gzip file back up
-            module.run_command('%s %s' % (gzip_path, os.path.splitext(target)[0]))
+        comp_prog_path = module.get_bin_path('gzip', required=True)
     elif os.path.splitext(target)[-1] == '.bz2':
-        bzip2_path = module.get_bin_path('bzip2')
-        if not bzip2_path:
-            module.fail_json(msg="bzip2 command not found")
-        #bzip2 -d file (uncompress)
-        rc, stdout, stderr = module.run_command('%s -d %s' % (bzip2_path, target))
-        if rc != 0:
-            return rc, stdout, stderr
-        #Import sql
-        cmd += " < %s" % pipes.quote(os.path.splitext(target)[0])
-        try:
-            rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
-            if rc != 0:
-                return rc, stdout, stderr
-        finally:
-            #bzip2 file back up
-            rc, stdout, stderr = module.run_command('%s %s' % (bzip2_path, os.path.splitext(target)[0]))
+        comp_prog_path = module.get_bin_path('bzip2', required=True)
+    elif os.path.splitext(target)[-1] == '.xz':
+        comp_prog_path = module.get_bin_path('xz', required=True)
+
+    if comp_prog_path:
+        p1 = subprocess.Popen([comp_prog_path, '-dc', target], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p2 = subprocess.Popen(cmd, stdin=p1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (stdout2, stderr2) = p2.communicate()
+        p1.stdout.close()
+        p1.wait()
+        if p1.returncode != 0:
+            stderr1 = p1.stderr.read()
+            return p1.returncode, '', stderr1
+        else:
+            return p2.returncode, stdout2, stderr2
     else:
+        cmd = ' '.join(cmd)
         cmd += " < %s" % pipes.quote(target)
         rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
-    return rc, stdout, stderr
+        return rc, stdout, stderr
 
 def db_create(cursor, db, encoding, collation):
     query_params = dict(enc=encoding, collate=collation)
@@ -200,61 +203,6 @@ def db_create(cursor, db, encoding, collation):
     query = ' '.join(query)
     res = cursor.execute(query, query_params)
     return True
-
-def strip_quotes(s):
-    """ Remove surrounding single or double quotes
-
-    >>> print strip_quotes('hello')
-    hello
-    >>> print strip_quotes('"hello"')
-    hello
-    >>> print strip_quotes("'hello'")
-    hello
-    >>> print strip_quotes("'hello")
-    'hello
-
-    """
-    single_quote = "'"
-    double_quote = '"'
-
-    if s.startswith(single_quote) and s.endswith(single_quote):
-        s = s.strip(single_quote)
-    elif s.startswith(double_quote) and s.endswith(double_quote):
-        s = s.strip(double_quote)
-    return s
-
-
-def config_get(config, section, option):
-    """ Calls ConfigParser.get and strips quotes
-
-    See: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
-    """
-    return strip_quotes(config.get(section, option))
-
-
-def load_mycnf():
-    config = ConfigParser.RawConfigParser()
-    mycnf = os.path.expanduser('~/.my.cnf')
-    if not os.path.exists(mycnf):
-        return False
-    try:
-        config.readfp(open(mycnf))
-    except (IOError):
-        return False
-    # We support two forms of passwords in .my.cnf, both pass= and password=,
-    # as these are both supported by MySQL.
-    try:
-        passwd = config_get(config, 'client', 'password')
-    except (ConfigParser.NoOptionError):
-        try:
-            passwd = config_get(config, 'client', 'pass')
-        except (ConfigParser.NoOptionError):
-            return False
-    try:
-        creds = dict(user=config_get(config, 'client', 'user'),passwd=passwd)
-    except (ConfigParser.NoOptionError):
-        return False
-    return creds
 
 # ===========================================
 # Module execution.
@@ -273,6 +221,10 @@ def main():
             collation=dict(default=""),
             target=dict(default=None),
             state=dict(default="present", choices=["absent", "present","dump", "import"]),
+            ssl_cert=dict(default=None),
+            ssl_key=dict(default=None),
+            ssl_ca=dict(default=None),
+            config_file=dict(default="~/.my.cnf"),
         )
     )
 
@@ -288,56 +240,41 @@ def main():
     login_port = module.params["login_port"]
     if login_port < 0 or login_port > 65535:
         module.fail_json(msg="login_port must be a valid unix port number (0-65535)")
+    ssl_cert = module.params["ssl_cert"]
+    ssl_key = module.params["ssl_key"]
+    ssl_ca = module.params["ssl_ca"]
+    config_file = module.params['config_file']
+    config_file = os.path.expanduser(os.path.expandvars(config_file))
+    login_password = module.params["login_password"]
+    login_user = module.params["login_user"]
+    login_host = module.params["login_host"]
 
     # make sure the target path is expanded for ~ and $HOME
     if target is not None:
         target = os.path.expandvars(os.path.expanduser(target))
 
-    # Either the caller passes both a username and password with which to connect to
-    # mysql, or they pass neither and allow this module to read the credentials from
-    # ~/.my.cnf.
-    login_password = module.params["login_password"]
-    login_user = module.params["login_user"]
-    if login_user is None and login_password is None:
-        mycnf_creds = load_mycnf()
-        if mycnf_creds is False:
-            login_user = "root"
-            login_password = ""
-        else:
-            login_user = mycnf_creds["user"]
-            login_password = mycnf_creds["passwd"]
-    elif login_password is None or login_user is None:
-        module.fail_json(msg="when supplying login arguments, both login_user and login_password must be provided")
-    login_host = module.params["login_host"]
-
     if state in ['dump','import']:
         if target is None:
             module.fail_json(msg="with state=%s target is required" % (state))
-        connect_to_db = db
+        if db == 'all':
+            db = 'mysql'
+            all_databases = True
+        else:
+            all_databases = False
     else:
-        connect_to_db = ''
+        if db == 'all':
+            module.fail_json(msg="name is not allowed to equal 'all' unless state equals import, or dump.")
     try:
-        if socket:
-            try:
-                socketmode = os.stat(socket).st_mode
-                if not stat.S_ISSOCK(socketmode):
-                    module.fail_json(msg="%s, is not a socket, unable to connect" % socket)
-            except OSError:
-                module.fail_json(msg="%s, does not exist, unable to connect" % socket)
-            db_connection = MySQLdb.connect(host=module.params["login_host"], unix_socket=socket, user=login_user, passwd=login_password, db=connect_to_db)
-        elif login_port != 3306 and module.params["login_host"] == "localhost":
-            module.fail_json(msg="login_host is required when login_port is defined, login_host cannot be localhost when login_port is defined")
-        else:
-            db_connection = MySQLdb.connect(host=module.params["login_host"], port=login_port, user=login_user, passwd=login_password, db=connect_to_db)
-        cursor = db_connection.cursor()
+        cursor = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca)
     except Exception, e:
-        if "Unknown database" in str(e):
-                errno, errstr = e.args
-                module.fail_json(msg="ERROR: %s %s" % (errno, errstr))
+        if os.path.exists(config_file):
+            module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. Exception message: %s" % (config_file, e))
         else:
-                module.fail_json(msg="unable to connect, check login credentials (login_user, and login_password, which can be defined in ~/.my.cnf), check that mysql socket exists and mysql server is running")
+            module.fail_json(msg="unable to find %s. Exception message: %s" % (config_file, e))
 
     changed = False
+    if not os.path.exists(config_file):
+        config_file = None
     if db_exists(cursor, db):
         if state == "absent":
             try:
@@ -345,19 +282,17 @@ def main():
             except Exception, e:
                 module.fail_json(msg="error deleting database: " + str(e))
         elif state == "dump":
-            rc, stdout, stderr = db_dump(module, login_host, login_user, 
-                                        login_password, db, target, 
-                                        port=login_port,
-                                        socket=module.params['login_unix_socket'])
+            rc, stdout, stderr = db_dump(module, login_host, login_user,
+                                        login_password, db, target, all_databases,
+                                        login_port, config_file, socket, ssl_cert, ssl_key, ssl_ca)
             if rc != 0:
                 module.fail_json(msg="%s" % stderr)
             else:
                 module.exit_json(changed=True, db=db, msg=stdout)
         elif state == "import":
-            rc, stdout, stderr = db_import(module, login_host, login_user, 
-                                        login_password, db, target, 
-                                        port=login_port,
-                                        socket=module.params['login_unix_socket'])
+            rc, stdout, stderr = db_import(module, login_host, login_user,
+                                        login_password, db, target, all_databases,
+                                        login_port, config_file, socket, ssl_cert, ssl_key, ssl_ca)
             if rc != 0:
                 module.fail_json(msg="%s" % stderr)
             else:
@@ -374,5 +309,6 @@ def main():
 # import module snippets
 from ansible.module_utils.basic import *
 from ansible.module_utils.database import *
+from ansible.module_utils.mysql import *
 if __name__ == '__main__':
     main()

@@ -68,7 +68,9 @@ options:
       - no
     default: null
     aliases: []
-author: Paul Durivage / Trond Hindenes
+author: 
+    - "Paul Durivage (@angstwad)"
+    - "Trond Hindenes (@trondhindenes)"
 '''
 
 EXAMPLES = '''
@@ -88,7 +90,7 @@ $ ansible -i hosts -m win_feature -a "name=Web-Server,Web-Common-Http" all
     - name: Install IIS
       win_feature:
         name: "Web-Server"
-        state: absent
+        state: present
         restart: yes
         include_sub_features: yes
         include_management_tools: yes

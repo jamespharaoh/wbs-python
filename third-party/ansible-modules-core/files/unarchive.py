@@ -3,6 +3,7 @@
 
 # (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # (c) 2013, Dylan Martin <dmartin@seattlecentral.edu>
+# (c) 2015, Toshio Kuratomi <tkuratomi@ansible.com>
 #
 # This file is part of Ansible
 #
@@ -31,6 +32,7 @@ options:
   src:
     description:
       - If copy=yes (default), local path to archive file to copy to the target server; can be absolute or relative. If copy=no, path on the target server to existing archive file to unpack.
+      - If copy=no and src contains ://, the remote machine will download the file from the url first. (version_added 2.0)
     required: true
     default: null
   dest:
@@ -50,7 +52,14 @@ options:
     required: no
     default: null
     version_added: "1.6"
-author: Dylan Martin
+  list_files:
+    description:
+      - If set to True, return the list of files that are contained in the tarball.
+    required: false
+    choices: [ "yes", "no" ]
+    default: "no"
+    version_added: "2.0"
+author: "Dylan Martin (@pileofrogs)"
 todo:
     - detect changed/unchanged for .zip files
     - handle common unarchive args, like preserve owner/timestamp etc...
@@ -73,10 +82,21 @@ EXAMPLES = '''
 
 # Unarchive a file that is already on the remote machine
 - unarchive: src=/tmp/foo.zip dest=/usr/local/bin copy=no
+
+# Unarchive a file that needs to be downloaded (added in 2.0)
+- unarchive: src=https://example.com/example.zip dest=/usr/local/bin copy=no
 '''
 
+import re
 import os
 from zipfile import ZipFile
+
+# String from tar that shows the tar contents are different from the
+# filesystem
+DIFFERENCE_RE = re.compile(r': (.*) differs$')
+# When downloading an archive, how much of the archive to download before
+# saving to a tempfile (64k)
+BUFSIZE = 65536
 
 class UnarchiveError(Exception):
     pass
@@ -168,9 +188,12 @@ class TgzArchive(object):
 
             # What is different
             changes = set()
-            difference_re = re.compile(r': (.*) differs$')
+            if err:
+                # Assume changes if anything returned on stderr
+                # * Missing files are known to trigger this
+                return dict(unarchived=unarchived, rc=rc, out=out, err=err, cmd=cmd)
             for line in out.splitlines():
-                match = difference_re.search(line)
+                match = DIFFERENCE_RE.search(line)
                 if not match:
                     # Unknown tar output. Assume we have changes
                     return dict(unarchived=unarchived, rc=rc, out=out, err=err, cmd=cmd)
@@ -227,7 +250,7 @@ def pick_handler(src, dest, module):
         obj = handler(src, dest, module)
         if obj.can_handle_archive():
             return obj
-    module.fail_json(msg='Failed to find handler to unarchive. Make sure the required command to extract the file is installed.')
+    module.fail_json(msg='Failed to find handler for "%s". Make sure the required command to extract the file is installed.' % src)
 
 
 def main():
@@ -239,6 +262,7 @@ def main():
             dest              = dict(required=True),
             copy              = dict(default=True, type='bool'),
             creates           = dict(required=False),
+            list_files          = dict(required=False, default=False, type='bool'),
         ),
         add_file_common_args=True,
     )
@@ -252,16 +276,40 @@ def main():
     if not os.path.exists(src):
         if copy:
             module.fail_json(msg="Source '%s' failed to transfer" % src)
+        # If copy=false, and src= contains ://, try and download the file to a temp directory.
+        elif '://' in src:
+            tempdir = os.path.dirname(__file__)
+            package = os.path.join(tempdir, str(src.rsplit('/', 1)[1]))
+            try:
+                rsp, info = fetch_url(module, src)
+                f = open(package, 'w')
+                # Read 1kb at a time to save on ram
+                while True:
+                    data = rsp.read(BUFSIZE)
+
+                    if data == "":
+                        break # End of file, break while loop
+
+                    f.write(data)
+                f.close()
+                src = package
+            except Exception, e:
+                module.fail_json(msg="Failure downloading %s, %s" % (src, e))
         else:
             module.fail_json(msg="Source '%s' does not exist" % src)
     if not os.access(src, os.R_OK):
         module.fail_json(msg="Source '%s' not readable" % src)
 
+    # skip working with 0 size archives
+    try:
+        if os.path.getsize(src) == 0:
+            module.fail_json(msg="Invalid archive '%s', the file is 0 bytes" % src)
+    except Exception, e:
+        module.fail_json(msg="Source '%s' not readable" % src)
+
     # is dest OK to receive tar file?
     if not os.path.isdir(dest):
         module.fail_json(msg="Destination '%s' is not a directory" % dest)
-    if not os.access(dest, os.W_OK):
-        module.fail_json(msg="Destination '%s' not writable" % dest)
 
     handler = pick_handler(src, dest, module)
 
@@ -291,9 +339,13 @@ def main():
         except (IOError, OSError), e:
             module.fail_json(msg="Unexpected error when accessing exploded file: %s" % str(e))
 
+    if module.params['list_files']:
+        res_args['files'] = handler.files_in_archive
+
     module.exit_json(**res_args)
 
 # import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 if __name__ == '__main__':
     main()

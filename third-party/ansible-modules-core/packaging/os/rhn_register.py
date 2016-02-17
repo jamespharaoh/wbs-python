@@ -56,6 +56,12 @@ options:
             - supply an activation key for use with registration
         required: False
         default: null
+    profilename:
+        description:
+            - supply an profilename for use with registration
+        required: False
+        default: null
+        version_added: "2.0"
     channels:
         description:
             - Optionally specify a list of comma-separated channels to subscribe to upon successful registration.
@@ -72,6 +78,9 @@ EXAMPLES = '''
 
 # Register with activationkey (1-222333444) and enable extended update support.
 - rhn_register: state=present activationkey=1-222333444 enable_eus=true
+
+# Register with activationkey (1-222333444) and set a profilename which may differ from the hostname.
+- rhn_register: state=present activationkey=1-222333444 profilename=host.example.com.custom
 
 # Register as user (joe_user) with password (somepass) against a satellite
 # server specified by (server_url).
@@ -209,21 +218,22 @@ class Rhn(RegistrationBase):
         self.update_plugin_conf('rhnplugin', True)
         self.update_plugin_conf('subscription-manager', False)
 
-    def register(self, enable_eus=False, activationkey=None):
+    def register(self, enable_eus=False, activationkey=None, profilename=None):
         '''
             Register system to RHN.  If enable_eus=True, extended update
             support will be requested.
         '''
-        register_cmd = "/usr/sbin/rhnreg_ks --username='%s' --password='%s' --force" % (self.username, self.password)
+        register_cmd = ['/usr/sbin/rhnreg_ks', '--username', self.username, '--password', self.password, '--force']
         if self.module.params.get('server_url', None):
-            register_cmd += " --serverUrl=%s" % self.module.params.get('server_url')
+            register_cmd.extend(['--serverUrl', self.module.params.get('server_url')])
         if enable_eus:
-            register_cmd += " --use-eus-channel"
+            register_cmd.append('--use-eus-channel')
         if activationkey is not None:
-            register_cmd += " --activationkey '%s'" % activationkey
-        # FIXME - support --profilename
+            register_cmd.extend(['--activationkey', activationkey])
+        if profilename is not None:
+            register_cmd.extend(['--profilename', profilename])
         # FIXME - support --systemorgid
-        rc, stdout, stderr = self.module.run_command(register_cmd, check_rc=True, use_unsafe_shell=True)
+        rc, stdout, stderr = self.module.run_command(register_cmd, check_rc=True)
 
     def api(self, method, *args):
         '''
@@ -285,6 +295,7 @@ def main():
                     password = dict(default=None, required=False),
                     server_url = dict(default=rhn.config.get_option('serverURL'), required=False),
                     activationkey = dict(default=None, required=False),
+                    profilename = dict(default=None, required=False),
                     enable_eus = dict(default=False, type='bool'),
                     channels = dict(default=[], type='list'),
                 )
@@ -295,6 +306,7 @@ def main():
     rhn.password = module.params['password']
     rhn.configure(module.params['server_url'])
     activationkey = module.params['activationkey']
+    profilename = module.params['profilename']
     channels = module.params['channels']
     rhn.module = module
 

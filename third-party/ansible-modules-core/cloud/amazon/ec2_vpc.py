@@ -46,22 +46,19 @@ options:
     choices: [ "yes", "no" ]
   subnets:
     description:
-      - 'A dictionary array of subnets to add of the form: { cidr: ..., az: ... , resource_tags: ... }. Where az is the desired availability zone of the subnet, but it is not required. Tags (i.e.: resource_tags) is also optional and use dictionary form: { "Environment":"Dev", "Tier":"Web", ...}. All VPC subnets not in this list will be removed. As of 1.8, if the subnets parameter is not specified, no existing subnets will be modified.'
+      - 'A dictionary array of subnets to add of the form: { cidr: ..., az: ... , resource_tags: ... }. Where az is the desired availability zone of the subnet, but it is not required. Tags (i.e.: resource_tags) is also optional and use dictionary form: { "Environment":"Dev", "Tier":"Web", ...}. All VPC subnets not in this list will be removed as well. As of 1.8, if the subnets parameter is not specified, no existing subnets will be modified.'
     required: false
     default: null
-    aliases: []
+    resource_tags: See resource_tags for VPC below. The main difference is subnet tags not specified here will be deleted. 
   vpc_id:
     description:
       - A VPC id to terminate when state=absent
     required: false
     default: null
-    aliases: []
   resource_tags:
     description:
-      - 'A dictionary array of resource tags of the form: { tag1: value1, tag2: value2 }.  Tags in this list are used in conjunction with CIDR block to uniquely identify a VPC in lieu of vpc_id. Therefore, if CIDR/Tag combination does not exits, a new VPC will be created.  VPC tags not on this list will be ignored. Prior to 1.7, specifying a resource tag was optional.'
+      - 'A dictionary array of resource tags of the form: { tag1: value1, tag2: value2 }.  Tags in this list are used in conjunction with CIDR block to uniquely identify a VPC in lieu of vpc_id. Therefore, if CIDR/Tag combination does not exist, a new VPC will be created.  VPC tags not on this list will be ignored. Prior to 1.7, specifying a resource tag was optional.'
     required: true
-    default: null
-    aliases: []
     version_added: "1.6"
   internet_gateway:
     description:
@@ -69,60 +66,30 @@ options:
     required: false
     default: "no"
     choices: [ "yes", "no" ]
-    aliases: []
   route_tables:
     description:
-      - 'A dictionary array of route tables to add of the form: { subnets: [172.22.2.0/24, 172.22.3.0/24,], routes: [{ dest: 0.0.0.0/0, gw: igw},] }. Where the subnets list is those subnets the route table should be associated with, and the routes list is a list of routes to be in the table.  The special keyword for the gw of igw specifies that you should the route should go through the internet gateway attached to the VPC. gw also accepts instance-ids in addition igw. This module is currently unable to affect the "main" route table due to some limitations in boto, so you must explicitly define the associated subnets or they will be attached to the main table implicitly. As of 1.8, if the route_tables parameter is not specified, no existing routes will be modified.'
+      - 'A dictionary array of route tables to add of the form: { subnets: [172.22.2.0/24, 172.22.3.0/24,], routes: [{ dest: 0.0.0.0/0, gw: igw},], resource_tags: ... }. Where the subnets list is those subnets the route table should be associated with, and the routes list is a list of routes to be in the table.  The special keyword for the gw of igw specifies that you should the route should go through the internet gateway attached to the VPC. gw also accepts instance-ids in addition igw. resource_tags is optional and uses dictionary form: { "Name": "public", ... }. This module is currently unable to affect the "main" route table due to some limitations in boto, so you must explicitly define the associated subnets or they will be attached to the main table implicitly. As of 1.8, if the route_tables parameter is not specified, no existing routes will be modified.'
     required: false
     default: null
-    aliases: []
   wait:
     description:
       - wait for the VPC to be in state 'available' before returning
     required: false
     default: "no"
     choices: [ "yes", "no" ]
-    aliases: []
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
     default: 300
-    aliases: []
   state:
     description:
       - Create or terminate the VPC
     required: true
-    default: present
-    aliases: []
-  region:
-    description:
-      - region in which the resource exists.
-    required: false
-    default: null
-    aliases: ['aws_region', 'ec2_region']
-  aws_secret_key:
-    description:
-      - AWS secret key. If not set then the value of the AWS_SECRET_KEY environment variable is used.
-    required: false
-    default: None
-    aliases: ['ec2_secret_key', 'secret_key' ]
-  aws_access_key:
-    description:
-      - AWS access key. If not set then the value of the AWS_ACCESS_KEY environment variable is used.
-    required: false
-    default: None
-    aliases: ['ec2_access_key', 'access_key' ]
-  validate_certs:
-    description:
-      - When set to "no", SSL certificates will not be validated for boto versions >= 2.6.0.
-    required: false
-    default: "yes"
-    choices: ["yes", "no"]
-    aliases: []
-    version_added: "1.5"
-
-requirements: [ "boto" ]
-author: Carson Gee
+    choices: [ "present", "absent" ]
+author: "Carson Gee (@carsongee)"
+extends_documentation_fragment:
+    - aws
+    - ec2
 '''
 
 EXAMPLES = '''
@@ -177,16 +144,17 @@ the delete will fail until those dependencies are removed.
 '''
 
 
-import sys
 import time
 
 try:
     import boto.ec2
     import boto.vpc
     from boto.exception import EC2ResponseError
+
+    HAS_BOTO = True
 except ImportError:
-    print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    HAS_BOTO = False
+
 
 def get_vpc_info(vpc):
     """
@@ -246,6 +214,100 @@ def find_vpc(module, vpc_conn, vpc_id=None, cidr=None):
         module.fail_json(msg='Found more than one vpc based on the supplied criteria, aborting')
 
     return (found_vpc)
+
+def routes_match(rt_list=None, rt=None, igw=None):
+
+    """
+    Check if the route table has all routes as in given list
+    
+    rt_list      : A list if routes provided in the module 
+    rt           : The Remote route table object
+    igw          : The internet gateway object for this vpc
+
+    Returns:
+        True when there provided routes and remote routes are the same. 
+        False when provided routes and remote routes are diffrent.
+    """
+
+    local_routes = []
+    remote_routes = []
+    for route in rt_list:
+        route_kwargs = {}
+        if route['gw'] == 'igw':
+            route_kwargs['gateway_id'] = igw.id
+            route_kwargs['instance_id'] = None
+            route_kwargs['state'] = 'active'
+        elif route['gw'].startswith('i-'):
+            route_kwargs['instance_id'] = route['gw']
+            route_kwargs['gateway_id'] = None
+            route_kwargs['state'] = 'active'
+        else:
+            route_kwargs['gateway_id'] = route['gw']
+            route_kwargs['instance_id'] = None
+            route_kwargs['state'] = 'active'
+        route_kwargs['destination_cidr_block'] = route['dest']
+        local_routes.append(route_kwargs)
+    for j in rt.routes:
+        remote_routes.append(j.__dict__)
+    match = []
+    for i in local_routes:
+        change = "false"
+        for j in remote_routes:
+            if set(i.items()).issubset(set(j.items())):
+                change = "true"
+        match.append(change)
+    if 'false' in match:
+        return False
+    else:
+        return True
+
+def rtb_changed(route_tables=None, vpc_conn=None, module=None, vpc=None, igw=None):
+    """
+    Checks if the remote routes match the local routes.
+
+    route_tables : Route_tables parameter in the module
+    vpc_conn     : The VPC conection object
+    module       : The module object
+    vpc          : The vpc object for this route table
+    igw          : The internet gateway object for this vpc
+
+    Returns:
+        True when there is diffrence beween the provided routes and remote routes and if subnet assosications are diffrent.
+        False when both routes and subnet associations matched.
+ 
+    """
+    #We add a one for the main table
+    rtb_len = len(route_tables) + 1
+    remote_rtb_len = len(vpc_conn.get_all_route_tables(filters={'vpc_id': vpc.id}))
+    if remote_rtb_len != rtb_len:
+        return True
+    for rt in route_tables:
+        rt_id = None
+        for sn in rt['subnets']:
+            rsn = vpc_conn.get_all_subnets(filters={'cidr': sn, 'vpc_id': vpc.id })
+            if len(rsn) != 1:
+                module.fail_json(
+                    msg='The subnet {0} to associate with route_table {1} ' \
+                    'does not exist, aborting'.format(sn, rt)
+                )
+            nrt  = vpc_conn.get_all_route_tables(filters={'vpc_id': vpc.id, 'association.subnet-id': rsn[0].id})
+            if not nrt:
+                return True
+            else:
+                nrt = nrt[0]
+                if not rt_id:
+                    rt_id = nrt.id
+                    if not routes_match(rt['routes'], nrt, igw):
+                        return True
+                    continue
+                else:
+                    if rt_id == nrt.id:
+                        continue
+                    else:
+                        return True
+            return True
+    return False
+
 
 def create_vpc(module, vpc_conn):
     """
@@ -341,9 +403,39 @@ def create_vpc(module, vpc_conn):
         # First add all new subnets
         for subnet in subnets:
             add_subnet = True
+            subnet_tags_current = True
+            new_subnet_tags = subnet.get('resource_tags', None)
+            subnet_tags_delete = []
+            
             for csn in current_subnets:
                 if subnet['cidr'] == csn.cidr_block:
                     add_subnet = False
+
+                # Check if AWS subnet tags are in playbook subnet tags
+                subnet_tags_extra = (set(csn.tags.items()).issubset(set(new_subnet_tags.items())))
+                # Check if subnet tags in playbook are in AWS subnet tags 
+                subnet_tags_current = (set(new_subnet_tags.items()).issubset(set(csn.tags.items())))
+                if subnet_tags_extra is False:
+                    try:
+                        for item in csn.tags.items():
+                            if item not in new_subnet_tags.items():
+                                subnet_tags_delete.append(item)
+
+                        subnet_tags_delete = [key[0] for key in subnet_tags_delete]
+                        delete_subnet_tag = vpc_conn.delete_tags(csn.id, subnet_tags_delete)
+                        changed = True
+                    except EC2ResponseError, e:
+                        module.fail_json(msg='Unable to delete resource tag, error {0}'.format(e))
+                # Add new subnet tags if not current
+                subnet_tags_current = (set(new_subnet_tags.items()).issubset(set(csn.tags.items())))
+                if subnet_tags_current is not True:
+                    try:
+                        changed = True
+                        create_subnet_tag = vpc_conn.create_tags(csn.id, new_subnet_tags)
+
+                    except EC2ResponseError, e:
+                        module.fail_json(msg='Unable to create resource tag, error: {0}'.format(e))
+
             if add_subnet:
                 try:
                     new_subnet = vpc_conn.create_subnet(vpc.id, subnet['cidr'], subnet.get('az', None))
@@ -377,6 +469,7 @@ def create_vpc(module, vpc_conn):
 
     # Handle Internet gateway (create/delete igw)
     igw = None
+    igw_id = None
     igws = vpc_conn.get_all_internet_gateways(filters={'attachment.vpc-id': vpc.id})
     if len(igws) > 1:
         module.fail_json(msg='EC2 returned more than one Internet Gateway for id %s, aborting' % vpc.id)
@@ -400,6 +493,9 @@ def create_vpc(module, vpc_conn):
             except EC2ResponseError, e:
                 module.fail_json(msg='Unable to delete Internet Gateway, error: {0}'.format(e))
 
+    if igw is not None:
+        igw_id = igw.id
+
     # Handle route tables - this may be worth splitting into a
     # different module but should work fine here. The strategy to stay
     # indempotent is to basically build all the route tables as
@@ -411,6 +507,8 @@ def create_vpc(module, vpc_conn):
     # the replace-route-table API to make this smoother and
     # allow control of the 'main' routing table.
     if route_tables is not None:
+        rtb_needs_change = rtb_changed(route_tables, vpc_conn, module, vpc, igw)
+    if route_tables is not None and rtb_needs_change:
         if not isinstance(route_tables, list):
             module.fail_json(msg='route tables need to be a list of dictionaries')
 
@@ -419,6 +517,9 @@ def create_vpc(module, vpc_conn):
         for rt in route_tables:
             try:
                 new_rt = vpc_conn.create_route_table(vpc.id)
+                new_rt_tags = rt.get('resource_tags', None)
+                if new_rt_tags:
+                    vpc_conn.create_tags(new_rt.id, new_rt_tags)
                 for route in rt['routes']:
                     route_kwargs = {}
                     if route['gw'] == 'igw':
@@ -494,6 +595,7 @@ def create_vpc(module, vpc_conn):
                     module.fail_json(msg='Unable to delete old route table {0}, error: {1}'.format(rt.id, e))
 
     vpc_dict = get_vpc_info(vpc)
+
     created_vpc_id = vpc.id
     returned_subnets = []
     current_subnets = vpc_conn.get_all_subnets(filters={ 'vpc_id': vpc.id })
@@ -516,7 +618,7 @@ def create_vpc(module, vpc_conn):
         subnets_in_play = len(subnets)
         returned_subnets.sort(key=lambda x: order.get(x['cidr'], subnets_in_play))
 
-    return (vpc_dict, created_vpc_id, returned_subnets, changed)
+    return (vpc_dict, created_vpc_id, returned_subnets, igw_id, changed)
 
 def terminate_vpc(module, vpc_conn, vpc_id=None, cidr=None):
     """
@@ -598,23 +700,26 @@ def main():
         argument_spec=argument_spec,
     )
 
+    if not HAS_BOTO:
+        module.fail_json(msg='boto required for this module')
+
     state = module.params.get('state')
 
-    ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     # If we have a region specified, connect to its endpoint.
     if region:
         try:
             vpc_conn = boto.vpc.connect_to_region(
                 region,
-                aws_access_key_id=aws_access_key,
-                aws_secret_access_key=aws_secret_key
+                **aws_connect_kwargs
             )
         except boto.exception.NoAuthHandlerFound, e:
             module.fail_json(msg = str(e))
     else:
         module.fail_json(msg="region must be specified")
 
+    igw_id = None
     if module.params.get('state') == 'absent':
         vpc_id = module.params.get('vpc_id')
         cidr = module.params.get('cidr_block')
@@ -622,9 +727,9 @@ def main():
         subnets_changed = None
     elif module.params.get('state') == 'present':
         # Changed is always set to true when provisioning a new VPC
-        (vpc_dict, new_vpc_id, subnets_changed, changed) = create_vpc(module, vpc_conn)
+        (vpc_dict, new_vpc_id, subnets_changed, igw_id, changed) = create_vpc(module, vpc_conn)
 
-    module.exit_json(changed=changed, vpc_id=new_vpc_id, vpc=vpc_dict, subnets=subnets_changed)
+    module.exit_json(changed=changed, vpc_id=new_vpc_id, vpc=vpc_dict, igw_id=igw_id, subnets=subnets_changed)
 
 # import module snippets
 from ansible.module_utils.basic import *

@@ -25,8 +25,10 @@ import tempfile
 DOCUMENTATION = """
 ---
 module: replace
-author: Evan Kaufman
-extends_documentation_fragment: files
+author: "Evan Kaufman (@EvanK)"
+extends_documentation_fragment:
+    - files
+    - validate
 short_description: Replace all instances of a particular string in a
                    file using a back-referenced regular expression.
 description:
@@ -61,16 +63,17 @@ options:
     description:
       - Create a backup file including the timestamp information so you can
         get the original file back if you somehow clobbered it incorrectly.
-  validate:
-    required: false
-    description:
-      - validation to run before copying into place
-    required: false
-    default: None
   others:
     description:
       - All arguments accepted by the M(file) module also work here.
     required: false
+  follow:
+    required: false
+    default: "no"
+    choices: [ "yes", "no" ]
+    version_added: "1.9"
+    description:
+      - 'This flag indicates that filesystem links, if they exist, should be followed.'
 """
 
 EXAMPLES = r"""
@@ -160,6 +163,7 @@ def main():
     module.exit_json(changed=changed, msg=msg)
 
 # this is magic, see lib/ansible/module_common.py
-#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
+from ansible.module_utils.basic import *
 
-main()
+if __name__ == '__main__':
+    main()

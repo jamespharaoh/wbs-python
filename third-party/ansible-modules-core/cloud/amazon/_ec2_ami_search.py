@@ -21,6 +21,7 @@ DOCUMENTATION = '''
 ---
 module: ec2_ami_search
 short_description: Retrieve AWS AMI information for a given operating system.
+deprecated: "in favor of the ec2_ami_find module"
 version_added: "1.6"
 description:
   - Look up the most recent AMI on AWS for a given operating system.
@@ -28,7 +29,6 @@ description:
   - If there is no AKI or ARI associated with an image, these will be C(null).
   - Only supports images from cloud-images.ubuntu.com
   - 'Example output: C({"ami": "ami-69f5a900", "changed": false, "aki": "aki-88aa75e1", "tag": "release", "ari": null, "serial": "20131024"})'
-version_added: "1.6"
 options:
   distro:
     description: Linux distribution (e.g., C(ubuntu))
@@ -65,7 +65,7 @@ options:
     default: paravirtual
     choices: ["paravirtual", "hvm"]
 
-author: Lorin Hochstein
+author: "Ansible Core Team (deprecated)"
 '''
 
 EXAMPLES = '''
@@ -82,7 +82,6 @@ EXAMPLES = '''
 
 import csv
 import json
-import urllib2
 import urlparse
 
 SUPPORTED_DISTROS = ['ubuntu']
@@ -195,7 +194,6 @@ def main():
 
 
 # this is magic, see lib/ansible/module_common.py
-#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
 from ansible.module_utils.basic import *
 from ansible.module_utils.urls import *
 

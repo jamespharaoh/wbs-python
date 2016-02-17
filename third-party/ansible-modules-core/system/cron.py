@@ -4,6 +4,7 @@
 # (c) 2012, Dane Summers <dsummers@pinedesk.biz>
 # (c) 2013, Mike Grozak  <mike.grozak@gmail.com>
 # (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
+# (c) 2015, Evan Kaufman <evan@digitalflophouse.com>
 #
 # This file is part of Ansible
 #
@@ -44,9 +45,9 @@ version_added: "0.9"
 options:
   name:
     description:
-      - Description of a crontab entry.
+      - Description of a crontab entry. Required if state=absent
     default: null
-    required: true
+    required: false
   user:
     description:
       - The specific user whose crontab should be modified.
@@ -66,14 +67,16 @@ options:
   cron_file:
     description:
       - If specified, uses this file in cron.d instead of an individual user's crontab.
+        To use the C(cron_file) parameter you must specify the C(user) as well.
     required: false
     default: null
   backup:
     description:
       - If set, create a backup of the crontab before it is modified.
-        The location of the backup is returned in the C(backup) variable by this module.
+        The location of the backup is returned in the C(backup_file) variable by this module.
     required: false
-    default: false
+    choices: [ "yes", "no" ]
+    default: no
   minute:
     description:
       - Minute when the job should run ( 0-59, *, */2, etc )
@@ -115,10 +118,19 @@ options:
     required: false
     default: null
     choices: [ "reboot", "yearly", "annually", "monthly", "weekly", "daily", "hourly" ]
+  disabled:
+    description:
+      - If the job should be disabled (commented out) in the crontab. Only has effect if state=present
+    version_added: "2.0"
+    required: false
+    default: false
 requirements:
   - cron
-author: Dane Summers
-updates: [ 'Mike Grozak', 'Patrick Callahan' ]
+author:
+    - "Dane Summers (@dsummersl)"
+    - 'Mike Grozak'
+    - 'Patrick Callahan'
+    - 'Evan Kaufman (@EvanK)'
 """
 
 EXAMPLES = '''
@@ -139,7 +151,7 @@ EXAMPLES = '''
         cron_file=ansible_yum-autoupdate
 
 # Removes a cron file from under /etc/cron.d
-- cron: cron_file=ansible_yum-autoupdate state=absent
+- cron: name="yum autoupdate" cron_file=ansible_yum-autoupdate state=absent
 '''
 
 import os
@@ -166,9 +178,6 @@ class CronTab(object):
         self.root      = (os.getuid() == 0)
         self.lines     = None
         self.ansible   = "#Ansible: "
-
-        # select whether we dump additional debug info through syslog
-        self.syslogging = False
 
         if cron_file:
             self.cron_file = '/etc/cron.d/%s' % cron_file
@@ -207,10 +216,6 @@ class CronTab(object):
                     self.lines.append(l)
                 count += 1
 
-    def log_message(self, message):
-        if self.syslogging:
-            syslog.syslog(syslog.LOG_NOTICE, 'ansible: "%s"' % message)
-
     def is_empty(self):
         if len(self.lines) == 0:
             return True
@@ -227,6 +232,7 @@ class CronTab(object):
             fileh = open(self.cron_file, 'w')
         else:
             filed, path = tempfile.mkstemp(prefix='crontab')
+            os.chmod(path, 0644)
             fileh = os.fdopen(filed, 'w')
 
         fileh.write(self.render())
@@ -289,17 +295,22 @@ class CronTab(object):
 
         return []
 
-    def get_cron_job(self,minute,hour,day,month,weekday,job,special):
+    def get_cron_job(self,minute,hour,day,month,weekday,job,special,disabled):
+        if disabled:
+            disable_prefix = '#'
+        else:
+            disable_prefix = ''
+
         if special:
             if self.cron_file:
-                return "@%s %s %s" % (special, self.user, job)
+                return "%s@%s %s %s" % (disable_prefix, special, self.user, job)
             else:
-                return "@%s %s" % (special, job)
+                return "%s@%s %s" % (disable_prefix, special, job)
         else:
             if self.cron_file:
-                return "%s %s %s %s %s %s %s" % (minute,hour,day,month,weekday,self.user,job)
+                return "%s%s %s %s %s %s %s %s" % (disable_prefix,minute,hour,day,month,weekday,self.user,job)
             else:
-                return "%s %s %s %s %s %s" % (minute,hour,day,month,weekday,job)
+                return "%s%s %s %s %s %s %s" % (disable_prefix,minute,hour,day,month,weekday,job)
 
         return None
 
@@ -372,7 +383,7 @@ class CronTab(object):
                 return "chown %s %s ; su '%s' -c '%s %s'" % (pipes.quote(self.user), pipes.quote(path), pipes.quote(self.user), CRONCMD, pipes.quote(path))
             else:
                 user = '-u %s' % pipes.quote(self.user)
-        return "%s %s %s" % (CRONCMD , user, pipes.quote(path))
+        return "%s %s %s" % (CRONCMD , pipes.quote(path), user)
 
 
 
@@ -397,7 +408,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec = dict(
-            name=dict(required=True),
+            name=dict(required=False),
             user=dict(required=False),
             job=dict(required=False),
             cron_file=dict(required=False),
@@ -412,7 +423,8 @@ def main():
             special_time=dict(required=False,
                               default=None,
                               choices=["reboot", "yearly", "annually", "monthly", "weekly", "daily", "hourly"],
-                              type='str')
+                              type='str'),
+            disabled=dict(default=False, type='bool')
         ),
         supports_check_mode = False,
     )
@@ -430,6 +442,7 @@ def main():
     weekday      = module.params['weekday']
     reboot       = module.params['reboot']
     special_time = module.params['special_time']
+    disabled     = module.params['disabled']
     do_install   = state == 'present'
 
     changed      = False
@@ -439,9 +452,7 @@ def main():
     os.umask(022)
     crontab = CronTab(module, user, cron_file)
 
-    if crontab.syslogging:
-        syslog.openlog('ansible-%s' % os.path.basename(__file__))
-        syslog.syslog(syslog.LOG_NOTICE, 'cron instantiated - name: "%s"' % name)
+    module.debug('cron instantiated - name: "%s"' % name)
 
     # --- user input validation ---
 
@@ -476,11 +487,12 @@ def main():
         (backuph, backup_file) = tempfile.mkstemp(prefix='crontab')
         crontab.write(backup_file)
 
+
     if crontab.cron_file and not name and not do_install:
         changed = crontab.remove_job_file()
         module.exit_json(changed=changed,cron_file=cron_file,state=state)
 
-    job = crontab.get_cron_job(minute, hour, day, month, weekday, job, special_time)
+    job = crontab.get_cron_job(minute, hour, day, month, weekday, job, special_time, disabled)
     old_job = crontab.find_job(name)
 
     if do_install:

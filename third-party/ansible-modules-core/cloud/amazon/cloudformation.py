@@ -17,7 +17,7 @@
 DOCUMENTATION = '''
 ---
 module: cloudformation
-short_description: create a AWS CloudFormation stack
+short_description: Create or delete an AWS CloudFormation stack
 description:
      - Launches an AWS CloudFormation stack and waits for it complete.
 version_added: "1.1"
@@ -26,83 +26,72 @@ options:
     description:
       - name of the cloudformation stack
     required: true
-    default: null
-    aliases: []
   disable_rollback:
     description:
       - If a stacks fails to form, rollback will remove the stack
     required: false
     default: "false"
     choices: [ "true", "false" ]
-    aliases: []
   template_parameters:
     description:
       - a list of hashes of all the template variables for the stack
     required: false
     default: {}
-    aliases: []
-  region:
-    description:
-      - The AWS region to use. If not specified then the value of the EC2_REGION environment variable, if any, is used.
-    required: true
-    default: null
-    aliases: ['aws_region', 'ec2_region']
   state:
     description:
       - If state is "present", stack will be created.  If state is "present" and if stack exists and template has changed, it will be updated.
         If state is "absent", stack will be removed.
     required: true
-    default: null
-    aliases: []
   template:
     description:
-      - the path of the cloudformation template
-    required: true
+      - The local path of the cloudformation template. This parameter is mutually exclusive with 'template_url'. Either one of them is required if "state" parameter is "present"
+        Must give full path to the file, relative to the working directory. If using roles this may look like "roles/cloudformation/files/cloudformation-example.json"
+    required: false
     default: null
-    aliases: []
+  notification_arns:
+    description:
+      - The Simple Notification Service (SNS) topic ARNs to publish stack related events.
+    required: false
+    default: null
+    version_added: "2.0"
   stack_policy:
     description:
       - the path of the cloudformation stack policy
     required: false
     default: null
-    aliases: []
-    version_added: "x.x"
+    version_added: "1.9"
   tags:
     description:
       - Dictionary of tags to associate with stack and it's resources during stack creation. Cannot be updated later.
         Requires at least Boto version 2.6.0.
     required: false
     default: null
-    aliases: []
     version_added: "1.4"
-  aws_secret_key:
-    description:
-      - AWS secret key. If not set then the value of the AWS_SECRET_KEY environment variable is used.
-    required: false
-    default: null
-    aliases: [ 'ec2_secret_key', 'secret_key' ]
-    version_added: "1.5"
-  aws_access_key:
-    description:
-      - AWS access key. If not set then the value of the AWS_ACCESS_KEY environment variable is used.
-    required: false
-    default: null
-    aliases: [ 'ec2_access_key', 'access_key' ]
-    version_added: "1.5"
   region:
     description:
-      - The AWS region to use. If not specified then the value of the EC2_REGION environment variable, if any, is used.
-    required: false
+      - The AWS region to use. If not specified then the value of the AWS_REGION or EC2_REGION environment variable, if any, is used.
+    required: true
     aliases: ['aws_region', 'ec2_region']
     version_added: "1.5"
+  template_url:
+    description:
+      - Location of file containing the template body. The URL must point to a template (max size 307,200 bytes) located in an S3 bucket in the same region as the stack. This parameter is mutually exclusive with 'template'. Either one of them is required if "state" parameter is "present"
+    required: false
+    version_added: "2.0"
+  template_format:
+    description:
+    - For local templates, allows specification of json or yaml format
+    default: json
+    choices: [ json, yaml ]
+    required: false
+    version_added: "2.0"
 
-requirements: [ "boto" ]
-author: James S. Martin
+author: "James S. Martin (@jsmartin)"
+extends_documentation_fragment: aws
 '''
 
 EXAMPLES = '''
 # Basic task example
-tasks:
 - name: launch ansible cloudformation example
   cloudformation:
     stack_name: "ansible-cloudformation" 
@@ -117,10 +106,48 @@ tasks:
       ClusterSize: 3
     tags:
       Stack: "ansible-cloudformation"
+
+# Basic role example
+- name: launch ansible cloudformation example
+  cloudformation:
+    stack_name: "ansible-cloudformation" 
+    state: "present"
+    region: "us-east-1" 
+    disable_rollback: true
+    template: "roles/cloudformation/files/cloudformation-example.json"
+    template_parameters:
+      KeyName: "jmartin"
+      DiskType: "ephemeral"
+      InstanceType: "m1.small"
+      ClusterSize: 3
+    tags:
+      Stack: "ansible-cloudformation"
+
+# Removal example
+- name: tear down old deployment
+  cloudformation:
+    stack_name: "ansible-cloudformation-old"
+    state: "absent"
+
+# Use a template from a URL
+- name: launch ansible cloudformation example
+  cloudformation:
+    stack_name="ansible-cloudformation" state=present
+    region=us-east-1 disable_rollback=true
+    template_url=https://s3.amazonaws.com/my-bucket/cloudformation.template
+  args:
+    template_parameters:
+      KeyName: jmartin
+      DiskType: ephemeral
+      InstanceType: m1.small
+      ClusterSize: 3
+    tags:
+      Stack: ansible-cloudformation
 '''
 
 import json
 import time
+import yaml
 
 try:
     import boto
@@ -160,7 +187,7 @@ def stack_operation(cfn, stack_name, operation):
     operation_complete = False
     while operation_complete == False:
         try:
-            stack = cfn.describe_stacks(stack_name)[0]
+            stack = invoke_with_throttling_retries(cfn.describe_stacks, stack_name)[0]
             existed.append('yes')
         except:
             if 'yes' in existed:
@@ -185,10 +212,28 @@ def stack_operation(cfn, stack_name, operation):
                           events = map(str, list(stack.describe_events())),
                           output = 'Stack %s failed' % operation)
             break
+        elif '%s_ROLLBACK_FAILED' % operation == stack.stack_status:
+            result = dict(changed=True, failed=True,
+                          events = map(str, list(stack.describe_events())),
+                          output = 'Stack %s rollback failed' % operation)
+            break
         else:
             time.sleep(5)
     return result
 
+IGNORE_CODE = 'Throttling'
+MAX_RETRIES=3
+def invoke_with_throttling_retries(function_ref, *argv):
+    retries=0
+    while True:
+        try:
+            retval=function_ref(*argv)
+            return retval
+        except boto.exception.BotoServerError, e:
+            if e.code != IGNORE_CODE or retries==MAX_RETRIES:
+                raise e
+        time.sleep(5 * (2**retries))
+        retries += 1
 
 def main():
     argument_spec = ec2_argument_spec()
@@ -196,31 +241,54 @@ def main():
             stack_name=dict(required=True),
             template_parameters=dict(required=False, type='dict', default={}),
             state=dict(default='present', choices=['present', 'absent']),
-            template=dict(default=None, required=True),
+            template=dict(default=None, required=False, type='path'),
+            notification_arns=dict(default=None, required=False),
             stack_policy=dict(default=None, required=False),
             disable_rollback=dict(default=False, type='bool'),
+            template_url=dict(default=None, required=False),
+            template_format=dict(default='json', choices=['json', 'yaml'], required=False),
             tags=dict(default=None)
         )
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=[['template_url', 'template']],
     )
     if not HAS_BOTO:
         module.fail_json(msg='boto required for this module')
 
     state = module.params['state']
     stack_name = module.params['stack_name']
-    template_body = open(module.params['template'], 'r').read()
+
+    if module.params['template'] is None and module.params['template_url'] is None:
+        if state == 'present':
+            module.fail_json('Module parameter "template" or "template_url" is required if "state" is "present"')
+
+    if module.params['template'] is not None:
+        template_body = open(module.params['template'], 'r').read()
+    else:
+        template_body = None
+
+    if module.params['template_format'] == 'yaml':
+        if template_body is None:
+            module.fail_json(msg='yaml format only supported for local templates')
+        else:
+            template_body = json.dumps(yaml.load(template_body), indent=2)
+
+    notification_arns = module.params['notification_arns']
+
     if module.params['stack_policy'] is not None:
         stack_policy_body = open(module.params['stack_policy'], 'r').read()
     else:
         stack_policy_body = None
+
     disable_rollback = module.params['disable_rollback']
     template_parameters = module.params['template_parameters']
     tags = module.params['tags']
+    template_url = module.params['template_url']
 
-    ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     kwargs = dict()
     if tags is not None:
@@ -236,8 +304,7 @@ def main():
     try:
         cfn = boto.cloudformation.connect_to_region(
                   region,
-                  aws_access_key_id=aws_access_key,
-                  aws_secret_access_key=aws_secret_key,
+                  **aws_connect_kwargs
               )
     except boto.exception.NoAuthHandlerFound, e:
         module.fail_json(msg=str(e))
@@ -251,7 +318,9 @@ def main():
         try:
             cfn.create_stack(stack_name, parameters=template_parameters_tup,
                              template_body=template_body,
+                             notification_arns=notification_arns,
                              stack_policy_body=stack_policy_body,
+                             template_url=template_url,
                              disable_rollback=disable_rollback,
                              capabilities=['CAPABILITY_IAM'],
                              **kwargs)
@@ -272,8 +341,10 @@ def main():
         try:
             cfn.update_stack(stack_name, parameters=template_parameters_tup,
                              template_body=template_body,
+                             notification_arns=notification_arns,
                              stack_policy_body=stack_policy_body,
                              disable_rollback=disable_rollback,
+                             template_url=template_url,
                              capabilities=['CAPABILITY_IAM'])
             operation = 'UPDATE'
         except Exception, err:
@@ -290,10 +361,20 @@ def main():
     # and get the outputs of the stack
 
     if state == 'present' or update:
-        stack = cfn.describe_stacks(stack_name)[0]
+        stack = invoke_with_throttling_retries(cfn.describe_stacks,stack_name)[0]
         for output in stack.outputs:
             stack_outputs[output.key] = output.value
         result['stack_outputs'] = stack_outputs
+        stack_resources = [] 
+        for res in cfn.list_stack_resources(stack_name):
+            stack_resources.append({
+                "last_updated_time": res.last_updated_time,
+                "logical_resource_id": res.logical_resource_id,
+                "physical_resource_id": res.physical_resource_id,
+                "status": res.resource_status,
+                "status_reason": res.resource_status_reason,
+                "resource_type": res.resource_type })
+        result['stack_resources'] = stack_resources
 
     # absent state is different because of the way delete_stack works.
     # problem is it it doesn't give an error if stack isn't found
@@ -301,7 +382,7 @@ def main():
 
     if state == 'absent':
         try:
-            cfn.describe_stacks(stack_name)
+            invoke_with_throttling_retries(cfn.describe_stacks,stack_name)
             operation = 'DELETE'
         except Exception, err:
             error_msg = boto_exception(err)

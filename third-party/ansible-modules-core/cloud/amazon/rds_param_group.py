@@ -61,26 +61,10 @@ options:
     default: null
     aliases: []
     choices: [ 'mysql5.1', 'mysql5.5', 'mysql5.6', 'oracle-ee-11.2', 'oracle-se-11.2', 'oracle-se1-11.2', 'postgres9.3', 'postgres9.4', 'sqlserver-ee-10.5', 'sqlserver-ee-11.0', 'sqlserver-ex-10.5', 'sqlserver-ex-11.0', 'sqlserver-se-10.5', 'sqlserver-se-11.0', 'sqlserver-web-10.5', 'sqlserver-web-11.0']
-  region:
-    description:
-      - The AWS region to use. If not specified then the value of the EC2_REGION environment variable, if any, is used.
-    required: true
-    default: null
-    aliases: [ 'aws_region', 'ec2_region' ]
-  aws_access_key:
-    description:
-      - AWS access key. If not set then the value of the AWS_ACCESS_KEY environment variable is used.
-    required: false
-    default: null
-    aliases: [ 'ec2_access_key', 'access_key' ]
-  aws_secret_key:
-    description:
-      - AWS secret key. If not set then the value of the AWS_SECRET_KEY environment variable is used. 
-    required: false
-    default: null
-    aliases: [ 'ec2_secret_key', 'secret_key' ]
-requirements: [ "boto" ]
-author: Scott Anderson
+author: "Scott Anderson (@tastychutney)"
+extends_documentation_fragment:
+    - aws
+    - ec2
 '''
 
 EXAMPLES = '''
@@ -98,9 +82,6 @@ EXAMPLES = '''
       state: absent
       name: norwegian_blue
 '''
-
-import sys
-import time
 
 VALID_ENGINES = [
     'mysql5.1',
@@ -124,9 +105,10 @@ VALID_ENGINES = [
 try:
     import boto.rds
     from boto.exception import BotoServerError
+    HAS_BOTO = True
 except ImportError:
-    print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    HAS_BOTO = False
+
 
 # returns a tuple: (whether or not a parameter was changed, the remaining parameters that weren't found in this parameter group)
 
@@ -232,6 +214,9 @@ def main():
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
+    if not HAS_BOTO:
+        module.fail_json(msg='boto required for this module')
+
     state                   = module.params.get('state')
     group_name              = module.params.get('name').lower()
     group_engine            = module.params.get('engine')
@@ -249,13 +234,13 @@ def main():
                 module.fail_json(msg = str("Parameter %s not allowed for state='absent'" % not_allowed))
 
     # Retrieve any AWS settings from the environment.
-    ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     if not region:
-        module.fail_json(msg = str("region not specified and unable to determine region from EC2_REGION."))
+        module.fail_json(msg = str("Either region or AWS_REGION or EC2_REGION environment variable or boto config aws_region or ec2_region must be set."))
 
     try:
-        conn = boto.rds.connect_to_region(region, aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
+        conn = boto.rds.connect_to_region(region, **aws_connect_kwargs)
     except boto.exception.BotoServerError, e:
         module.fail_json(msg = e.error_message)
 

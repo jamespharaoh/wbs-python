@@ -59,10 +59,10 @@ options:
     version_added: "1.5"
   ports:
     description:
-      - List containing private to public port mapping specification. Use docker
-      - 'CLI-style syntax: C(8000), C(9000:8000), or C(0.0.0.0:9000:8000)'
-      - where  8000 is a container port, 9000 is a host port, and 0.0.0.0 is
-      - a host interface.
+      - "List containing private to public port mapping specification.
+        Use docker 'CLI-style syntax: C(8000), C(9000:8000), or C(0.0.0.0:9000:8000)'
+        where 8000 is a container port, 9000 is a host port, and 0.0.0.0 is - a host interface.
+        The container ports need to be exposed either in the Dockerfile or via the C(expose) option."
     default: null
     version_added: "1.5"
   expose:
@@ -92,6 +92,37 @@ options:
       - 'alias. Use docker CLI-style syntax: C(redis:myredis).'
     default: null
     version_added: "1.5"
+  log_driver:
+    description:
+      - You can specify a different logging driver for the container than for the daemon.
+        "json-file" Default logging driver for Docker. Writes JSON messages to file.
+        docker logs command is available only for this logging driver.
+        "none" disables any logging for the container.
+        "syslog" Syslog logging driver for Docker. Writes log messages to syslog.
+        docker logs command is not available for this logging driver.
+        "journald" Journald logging driver for Docker. Writes log messages to "journald".
+        "gelf" Graylog Extended Log Format (GELF) logging driver for Docker. Writes log messages to a GELF endpoint likeGraylog or Logstash.
+        "fluentd" Fluentd logging driver for Docker. Writes log messages to "fluentd" (forward input).
+        If not defined explicitly, the Docker daemon's default ("json-file") will apply.
+        Requires docker >= 1.6.0.
+    required: false
+    default: json-file
+    choices:
+      - json-file
+      - none
+      - syslog
+      - journald
+      - gelf
+      - fluentd
+    version_added: "2.0"
+  log_opt:
+    description:
+      - Additional options to pass to the logging driver selected above. See Docker `log-driver 
+        <https://docs.docker.com/reference/logging/overview/>` documentation for more information.
+        Requires docker >=1.7.0.
+    required: false
+    default: null
+    version_added: "2.0"
   memory_limit:
     description:
       - RAM allocated to the container as a number of bytes or as a human-readable
@@ -143,6 +174,12 @@ options:
         specified by docker-py.
     default: docker-py default remote API version
     version_added: "1.8"
+  docker_user:
+    description:
+      - Username or UID to use within the container
+    required: false
+    default: null
+    version_added: "2.0"
   username:
     description:
       - Remote API username.
@@ -174,14 +211,22 @@ options:
     default: null
   detach:
     description:
-      - Enable detached mode to leave the container running in background.
+      - Enable detached mode to leave the container running in background. If
+        disabled, fail unless the process exits cleanly.
     default: true
+  signal:
+    version_added: "2.0"
+    description:
+      - With the state "killed", you can alter the signal sent to the
+        container.
+    required: false
+    default: KILL
   state:
     description:
       - Assert the container's desired state. "present" only asserts that the
         matching containers exist. "started" asserts that the matching
         containers both exist and are running, but takes no action if any
-        configuration has changed. "reloaded" asserts that all matching
+        configuration has changed. "reloaded" (added in Ansible 1.9) asserts that all matching
         containers are running and restarts any that have any images or
         configuration out of date. "restarted" unconditionally restarts (or
         starts) the matching containers. "stopped" and '"killed" stop and kill
@@ -234,6 +279,12 @@ options:
     default: DockerHub
     aliases: []
     version_added: "1.8"
+  read_only:
+    description:
+      - Mount the container's root filesystem as read only
+    default: null
+    aliases: []
+    version_added: "2.0"
   restart_policy:
     description:
       - Container restart policy.
@@ -246,15 +297,52 @@ options:
         retries.
     default: 0
     version_added: "1.9"
+  extra_hosts:
+    version_added: "2.0"
+    description:
+    - Dict of custom host-to-IP mappings to be defined in the container
   insecure_registry:
     description:
       - Use insecure private registry by HTTP instead of HTTPS. Needed for
         docker-py >= 0.5.0.
     default: false
     version_added: "1.9"
-
-author: Cove Schneider, Joshua Conner, Pavel Antonov, Ash Wilson
-requirements: [ "docker-py >= 0.3.0", "docker >= 0.10.0" ]
+  cpu_set:
+    description:
+      - CPUs in which to allow execution. Requires docker-py >= 0.6.0.
+    required: false
+    default: null
+    version_added: "2.0"
+  cap_add:
+    description:
+      - Add capabilities for the container. Requires docker-py >= 0.5.0.
+    required: false
+    default: false
+    version_added: "2.0"
+  cap_drop:
+    description:
+      - Drop capabilities for the container. Requires docker-py >= 0.5.0.
+    required: false
+    default: false
+    aliases: []
+    version_added: "2.0"
+  stop_timeout:
+    description:
+      - How many seconds to wait for the container to stop before killing it.
+    required: false
+    default: 10
+    version_added: "2.0"
+author:
+    - "Cove Schneider (@cove)"
+    - "Joshua Conner (@joshuaconner)"
+    - "Pavel Antonov (@softzilla)"
+    - "Ash Wilson (@smashwilson)"
+    - "Thomas Steinbach (@ThomasSteinbach)"
+    - "Philippe Jandot (@zfil)"
+requirements:
+    - "python >= 2.6"
+    - "docker-py >= 0.3.0"
+    - "The docker server >= 0.10.0"
 '''
 
 EXAMPLES = '''
@@ -349,9 +437,23 @@ EXAMPLES = '''
     name: ohno
     image: someuser/oldandbusted
     state: absent
+
+# Example Syslogging Output
+
+- name: myservice container
+  docker:
+    name: myservice
+    image: someservice/someimage
+    state: reloaded
+    log_driver: syslog
+    log_opt:
+      syslog-address: tcp://my-syslog-server:514
+      syslog-facility: daemon
+      syslog-tag: myservice
 '''
 
 HAS_DOCKER_PY = True
+DEFAULT_DOCKER_API_VERSION = None
 
 import sys
 import json
@@ -394,8 +496,7 @@ def _human_to_bytes(number):
             return int(number[:-len(each)]) * (1024 ** i)
         i = i + 1
 
-    print "failed=True msg='Could not convert %s to integer'" % (number)
-    sys.exit(1)
+    raise ValueError('Could not convert %s to integer' % (number,))
 
 
 def _ansible_facts(container_list):
@@ -422,6 +523,8 @@ def get_split_image_tag(image):
         resource, tag = resource.split(':', 1)
         if registry:
             resource = '/'.join((registry, resource))
+        if tag == "":
+            tag = "latest"
     else:
         tag = "latest"
         resource = image
@@ -501,8 +604,16 @@ class DockerManager(object):
             'dns': ((0, 3, 0), '1.10'),
             'volumes_from': ((0, 3, 0), '1.10'),
             'restart_policy': ((0, 5, 0), '1.14'),
+            'extra_hosts': ((0, 7, 0), '1.3.1'),
             'pid': ((1, 0, 0), '1.17'),
+            'log_driver': ((1, 2, 0), '1.18'),
+            'log_opt': ((1, 2, 0), '1.18'),
             'host_config': ((0, 7, 0), '1.15'),
+            'cpu_set': ((0, 6, 0), '1.14'),
+            'cap_add': ((0, 5, 0), '1.14'),
+            'cap_drop': ((0, 5, 0), '1.14'),
+            'read_only': ((1, 0, 0), '1.17'),
+            'stop_timeout': ((0, 5, 0), '1.0'),
             # Clientside only
             'insecure_registry': ((0, 5, 0), '0.0')
             }
@@ -514,24 +625,26 @@ class DockerManager(object):
         self.volumes = None
         if self.module.params.get('volumes'):
             self.binds = {}
-            self.volumes = {}
+            self.volumes = []
             vols = self.module.params.get('volumes')
             for vol in vols:
                 parts = vol.split(":")
+                # regular volume
+                if len(parts) == 1:
+                    self.volumes.append(parts[0])
                 # host mount (e.g. /mnt:/tmp, bind mounts host's /tmp to /mnt in the container)
-                if len(parts) == 2:
-                    self.volumes[parts[1]] = {}
-                    self.binds[parts[0]] = parts[1]
-                # with bind mode
-                elif len(parts) == 3:
-                    if parts[2] not in ['ro', 'rw']:
-                        self.module.fail_json(msg='bind mode needs to either be "ro" or "rw"')
-                    ro = parts[2] == 'ro'
-                    self.volumes[parts[1]] = {}
-                    self.binds[parts[0]] = {'bind': parts[1], 'ro': ro}
-                # docker mount (e.g. /www, mounts a docker volume /www on the container at the same location)
+                elif 2 <= len(parts) <= 3:
+                    # default to read-write
+                    ro = False
+                    # with supplied bind mode
+                    if len(parts) == 3:
+                        if parts[2] not in ['ro', 'rw']:
+                            self.module.fail_json(msg='bind mode needs to either be "ro" or "rw"')
+                        else:
+                            ro = parts[2] == 'ro'
+                    self.binds[parts[0]] = {'bind': parts[1], 'ro': ro }
                 else:
-                    self.volumes[parts[0]] = {}
+                    self.module.fail_json(msg='volumes support 1 to 3 arguments')
 
         self.lxc_conf = None
         if self.module.params.get('lxc_conf'):
@@ -638,7 +751,7 @@ class DockerManager(object):
 
         self.docker_py_versioninfo = get_docker_py_versioninfo()
 
-    def _check_capabilties(self):
+    def _check_capabilities(self):
         """
         Create a list of available capabilities
         """
@@ -659,7 +772,7 @@ class DockerManager(object):
         we lack the capability.
         """
         if not self._capabilities:
-            self._check_capabilties()
+            self._check_capabilities()
 
         if capability in self._capabilities:
             return True
@@ -726,7 +839,8 @@ class DockerManager(object):
 
         optionals = {}
         for optional_param in ('dns', 'volumes_from', 'restart_policy',
-                'restart_policy_retry', 'pid'):
+                'restart_policy_retry', 'pid', 'extra_hosts', 'log_driver',
+                'cap_add', 'cap_drop', 'read_only', 'log_opt'):
             optionals[optional_param] = self.module.params.get(optional_param)
 
         if optionals['dns'] is not None:
@@ -743,13 +857,42 @@ class DockerManager(object):
             if params['restart_policy']['Name'] == 'on-failure':
                 params['restart_policy']['MaximumRetryCount'] = optionals['restart_policy_retry']
 
+        # docker_py only accepts 'host' or None
+        if 'pid' in optionals and not optionals['pid']:
+            optionals['pid'] = None
+
         if optionals['pid'] is not None:
             self.ensure_capability('pid')
             params['pid_mode'] = optionals['pid']
 
+        if optionals['extra_hosts'] is not None:
+            self.ensure_capability('extra_hosts')
+            params['extra_hosts'] = optionals['extra_hosts']
+
+        if optionals['log_driver'] is not None:
+            self.ensure_capability('log_driver')
+            log_config = docker.utils.LogConfig(type=docker.utils.LogConfig.types.JSON)
+            if optionals['log_opt'] is not None:
+                for k, v in optionals['log_opt'].iteritems():
+                    log_config.set_config_value(k, v)
+            log_config.type = optionals['log_driver']
+            params['log_config'] = log_config
+
+        if optionals['cap_add'] is not None:
+            self.ensure_capability('cap_add')
+            params['cap_add'] = optionals['cap_add']
+
+        if optionals['cap_drop'] is not None:
+            self.ensure_capability('cap_drop')
+            params['cap_drop'] = optionals['cap_drop']
+
+        if optionals['read_only'] is not None:
+            self.ensure_capability('read_only')
+            params['read_only'] = optionals['read_only']
+
         return params
 
-    def get_host_config(self):
+    def create_host_config(self):
         """
         Create HostConfig object
         """
@@ -782,7 +925,7 @@ class DockerManager(object):
             elif p_len == 3:
                 # Bind `container_port` of the container to port `parts[1]` on
                 # IP `parts[0]` of the host machine. If `parts[1]` empty bind
-                # to a dynamically allocacted port of IP `parts[0]`.
+                # to a dynamically allocated port of IP `parts[0]`.
                 bind = (parts[0], int(parts[1])) if parts[1] else (parts[0],)
 
             if container_port in binds:
@@ -891,6 +1034,7 @@ class DockerManager(object):
 
         running = self.get_running_containers()
         current = self.get_inspect_containers(running)
+        defaults = self.client.info()
 
         #Get API version
         api_version = self.client.version()['ApiVersion']
@@ -930,11 +1074,11 @@ class DockerManager(object):
                     continue
 
             # EXPOSED PORTS
-            expected_exposed_ports = set((image['ContainerConfig']['ExposedPorts'] or {}).keys())
+            expected_exposed_ports = set((image['ContainerConfig'].get('ExposedPorts') or {}).keys())
             for p in (self.exposed_ports or []):
                 expected_exposed_ports.add("/".join(p))
 
-            actually_exposed_ports = set((container["Config"]["ExposedPorts"] or {}).keys())
+            actually_exposed_ports = set((container["Config"].get("ExposedPorts") or {}).keys())
 
             if actually_exposed_ports != expected_exposed_ports:
                 self.reload_reasons.append('exposed_ports ({0} => {1})'.format(actually_exposed_ports, expected_exposed_ports))
@@ -945,7 +1089,7 @@ class DockerManager(object):
 
             expected_volume_keys = set((image['ContainerConfig']['Volumes'] or {}).keys())
             if self.volumes:
-                expected_volume_keys.update(self.volumes.keys())
+                expected_volume_keys.update(self.volumes)
 
             actual_volume_keys = set((container['Config']['Volumes'] or {}).keys())
 
@@ -956,10 +1100,13 @@ class DockerManager(object):
 
             # MEM_LIMIT
 
-            expected_mem = _human_to_bytes(self.module.params.get('memory_limit'))
+            try:
+                expected_mem = _human_to_bytes(self.module.params.get('memory_limit'))
+            except ValueError as e:
+                self.module.fail_json(msg=str(e))
 
             #For v1.19 API and above use HostConfig, otherwise use Config
-            if api_version >= 1.19:
+            if docker.utils.compare_version('1.19', api_version) >= 0:
                 actual_mem = container['HostConfig']['Memory']
             else:
                 actual_mem = container['Config']['Memory']
@@ -1088,15 +1235,14 @@ class DockerManager(object):
                 for container_port, config in self.port_bindings.iteritems():
                     if isinstance(container_port, int):
                         container_port = "{0}/tcp".format(container_port)
-                    bind = {}
                     if len(config) == 1:
-                        bind['HostIp'] = "0.0.0.0"
-                        bind['HostPort'] = ""
+                        expected_bound_ports[container_port] = [{'HostIp': "0.0.0.0", 'HostPort': ""}]
+                    elif isinstance(config[0], tuple):
+                        expected_bound_ports[container_port] = []
+                        for hostip, hostport in config:
+                            expected_bound_ports[container_port].append({ 'HostIp': hostip, 'HostPort': str(hostport)})
                     else:
-                        bind['HostIp'] = config[0]
-                        bind['HostPort'] = str(config[1])
-
-                    expected_bound_ports[container_port] = [bind]
+                        expected_bound_ports[container_port] = [{'HostIp': config[0], 'HostPort': str(config[1])}]
 
             actual_bound_ports = container['HostConfig']['PortBindings'] or {}
 
@@ -1133,8 +1279,8 @@ class DockerManager(object):
 
             # NETWORK MODE
 
-            expected_netmode = self.module.params.get('net') or ''
-            actual_netmode = container['HostConfig']['NetworkMode']
+            expected_netmode = self.module.params.get('net') or 'bridge'
+            actual_netmode = container['HostConfig']['NetworkMode'] or 'bridge'
             if actual_netmode != expected_netmode:
                 self.reload_reasons.append('net ({0} => {1})'.format(actual_netmode, expected_netmode))
                 differing.append(container)
@@ -1157,6 +1303,27 @@ class DockerManager(object):
                 self.reload_reasons.append('volumes_from ({0} => {1})'.format(actual_volumes_from, expected_volumes_from))
                 differing.append(container)
 
+            # LOG_DRIVER
+
+            if self.ensure_capability('log_driver', False):
+                expected_log_driver = self.module.params.get('log_driver') or defaults['LoggingDriver']
+                actual_log_driver = container['HostConfig']['LogConfig']['Type']
+                if actual_log_driver != expected_log_driver:
+                    self.reload_reasons.append('log_driver ({0} => {1})'.format(actual_log_driver, expected_log_driver))
+                    differing.append(container)
+                    continue
+
+            if self.ensure_capability('log_opt', False):
+                expected_logging_opts = self.module.params.get('log_opt') or {}
+                actual_log_opts = container['HostConfig']['LogConfig']['Config']
+                if len(set(expected_logging_opts.items()) - set(actual_log_opts.items())) != 0:
+                    log_opt_reasons = {
+                        'added': dict(set(expected_logging_opts.items()) - set(actual_log_opts.items())),
+                        'removed': dict(set(actual_log_opts.items()) - set(expected_logging_opts.items()))
+                    }
+                    self.reload_reasons.append('log_opt ({0})'.format(log_opt_reasons))
+                    differing.append(container)
+
         return differing
 
     def get_deployed_containers(self):
@@ -1165,8 +1332,8 @@ class DockerManager(object):
         """
 
         command = self.module.params.get('command')
-        if command:
-            command = command.strip()
+        if command is not None:
+            command = shlex.split(command)
         name = self.module.params.get('name')
         if name and not name.startswith('/'):
             name = '/' + name
@@ -1193,13 +1360,10 @@ class DockerManager(object):
                 details = _docker_id_quirk(details)
 
                 running_image = normalize_image(details['Config']['Image'])
-                running_command = container['Command'].strip()
 
                 image_matches = running_image in repo_tags
 
-                # if a container has an entrypoint, `command` will actually equal
-                # '{} {}'.format(entrypoint, command)
-                command_matches = (not command or running_command.endswith(command))
+                command_matches = command == details['Config']['Cmd']
 
                 matches = image_matches and command_matches
 
@@ -1237,6 +1401,11 @@ class DockerManager(object):
             changes = list(self.client.pull(image, tag=tag, stream=True, **extra_params))
             try:
                 last = changes[-1]
+                # seems Docker 1.8 puts an empty dict at the end of the
+                # stream; catch that and get the previous instead
+                # https://github.com/ansible/ansible-modules-core/issues/2043
+                if last.strip() == '{}':
+                    last = changes[-2]
             except IndexError:
                 last = '{}'
             status = json.loads(last).get('status', '')
@@ -1271,12 +1440,14 @@ class DockerManager(object):
                   'name':         self.module.params.get('name'),
                   'stdin_open':   self.module.params.get('stdin_open'),
                   'tty':          self.module.params.get('tty'),
+                  'cpuset':       self.module.params.get('cpu_set'),
+                  'user':         self.module.params.get('docker_user'),
                   }
         if self.ensure_capability('host_config', fail=False):
-            params['host_config'] = self.get_host_config()
+            params['host_config'] = self.create_host_config()
 
         #For v1.19 API and above use HostConfig, otherwise use Config
-        if api_version < 1.19:
+        if docker.utils.compare_version('1.19', api_version) < 0:
             params['mem_limit'] = mem_limit
         else:
             params['host_config']['Memory'] = mem_limit
@@ -1309,12 +1480,19 @@ class DockerManager(object):
             params = self.get_start_params()
 
         for i in containers:
-            self.client.start(i['Id'], **params)
+            self.client.start(i)
             self.increment_counter('started')
+
+            if not self.module.params.get('detach'):
+                status = self.client.wait(i['Id'])
+                if status != 0:
+                    output = self.client.logs(i['Id'], stdout=True, stderr=True,
+                                              stream=False, timestamps=False)
+                    self.module.fail_json(status=status, msg=output)
 
     def stop_containers(self, containers):
         for i in containers:
-            self.client.stop(i['Id'])
+            self.client.stop(i['Id'], self.module.params.get('stop_timeout'))
             self.increment_counter('stopped')
 
         return [self.client.wait(i['Id']) for i in containers]
@@ -1326,7 +1504,7 @@ class DockerManager(object):
 
     def kill_containers(self, containers):
         for i in containers:
-            self.client.kill(i['Id'])
+            self.client.kill(i['Id'], self.module.params.get('signal'))
             self.increment_counter('killed')
 
     def restart_containers(self, containers):
@@ -1367,7 +1545,8 @@ def present(manager, containers, count, name):
     delta = count - len(containers.deployed)
 
     if delta > 0:
-        containers.notice_changed(manager.create_containers(delta))
+        created = manager.create_containers(delta)
+        containers.notice_changed(manager.get_inspect_containers(created))
 
     if delta < 0:
         # If both running and stopped containers exist, remove
@@ -1382,8 +1561,8 @@ def present(manager, containers, count, name):
             to_remove.append(c)
 
         manager.stop_containers(to_stop)
+        containers.notice_changed(manager.get_inspect_containers(to_remove))
         manager.remove_containers(to_remove)
-        containers.notice_changed(to_remove)
 
 def started(manager, containers, count, name):
     '''Ensure that exactly `count` matching containers exist and are running.'''
@@ -1399,13 +1578,13 @@ def started(manager, containers, count, name):
 
         created = manager.create_containers(delta)
         manager.start_containers(created)
-        containers.notice_changed(created)
+        containers.notice_changed(manager.get_inspect_containers(created))
 
     if delta < 0:
         excess = containers.running[0:-delta]
+        containers.notice_changed(manager.get_inspect_containers(excess))
         manager.stop_containers(excess)
         manager.remove_containers(excess)
-        containers.notice_changed(excess)
 
 def reloaded(manager, containers, count, name):
     '''
@@ -1430,6 +1609,10 @@ def restarted(manager, containers, count, name):
 
     containers.refresh()
 
+    for container in manager.get_differing_containers():
+        manager.stop_containers([container])
+        manager.remove_containers([container])
+
     manager.restart_containers(containers.running)
     started(manager, containers, count, name)
 
@@ -1439,7 +1622,7 @@ def stopped(manager, containers, count, name):
     containers.refresh()
 
     manager.stop_containers(containers.running)
-    containers.notice_changed(containers.running)
+    containers.notice_changed(manager.get_inspect_containers(containers.running))
 
 def killed(manager, containers, count, name):
     '''Kill any matching containers that are running.'''
@@ -1447,7 +1630,7 @@ def killed(manager, containers, count, name):
     containers.refresh()
 
     manager.kill_containers(containers.running)
-    containers.notice_changed(containers.running)
+    containers.notice_changed(manager.get_inspect_containers(containers.running))
 
 def absent(manager, containers, count, name):
     '''Stop and remove any matching containers.'''
@@ -1455,8 +1638,8 @@ def absent(manager, containers, count, name):
     containers.refresh()
 
     manager.stop_containers(containers.running)
+    containers.notice_changed(manager.get_inspect_containers(containers.deployed))
     manager.remove_containers(containers.deployed)
-    containers.notice_changed(containers.deployed)
 
 def main():
     module = AnsibleModule(
@@ -1480,6 +1663,7 @@ def main():
             tls_ca_cert     = dict(required=False, default=None, type='str'),
             tls_hostname    = dict(required=False, type='str', default=None),
             docker_api_version = dict(required=False, default=DEFAULT_DOCKER_API_VERSION, type='str'),
+            docker_user     = dict(default=None),
             username        = dict(default=None),
             password        = dict(),
             email           = dict(),
@@ -1490,8 +1674,10 @@ def main():
             dns             = dict(),
             detach          = dict(default=True, type='bool'),
             state           = dict(default='started', choices=['present', 'started', 'reloaded', 'restarted', 'stopped', 'killed', 'absent', 'running']),
+            signal          = dict(default=None),
             restart_policy  = dict(default=None, choices=['always', 'on-failure', 'no']),
             restart_policy_retry = dict(default=0, type='int'),
+            extra_hosts     = dict(type='dict'),
             debug           = dict(default=False, type='bool'),
             privileged      = dict(default=False, type='bool'),
             stdin_open      = dict(default=False, type='bool'),
@@ -1501,6 +1687,13 @@ def main():
             net             = dict(default=None),
             pid             = dict(default=None),
             insecure_registry = dict(default=False, type='bool'),
+            log_driver      = dict(default=None, choices=['json-file', 'none', 'syslog', 'journald', 'gelf', 'fluentd']),
+            log_opt         = dict(default=None, type='dict'),
+            cpu_set         = dict(default=None),
+            cap_add         = dict(default=None, type='list'),
+            cap_drop        = dict(default=None, type='list'),
+            read_only       = dict(default=None, type='bool'),
+            stop_timeout    = dict(default=10, type='int'),
         ),
         required_together = (
             ['tls_client_cert', 'tls_client_key'],
@@ -1526,10 +1719,14 @@ def main():
         if count > 1 and name:
             module.fail_json(msg="Count and name must not be used together")
 
-        # Explicitly pull new container images, if requested.
-        # Do this before noticing running and deployed containers so that the image names will differ
-        # if a newer image has been pulled.
-        if pull == "always":
+        # Explicitly pull new container images, if requested. Do this before
+        # noticing running and deployed containers so that the image names
+        # will differ if a newer image has been pulled.
+        # Missing images should be pulled first to avoid downtime when old
+        # container is stopped, but image for new one is now downloaded yet.
+        # It also prevents removal of running container before realizing
+        # that requested image cannot be retrieved.
+        if pull == "always" or (state == 'reloaded' and manager.get_inspect_image() is None):
             manager.pull_image()
 
         containers = ContainerSet(manager)
@@ -1556,7 +1753,6 @@ def main():
         module.exit_json(changed=manager.has_changed(),
                          msg=manager.get_summary_message(),
                          summary=manager.counters,
-                         containers=containers.changed,
                          reload_reasons=manager.get_reload_reason_message(),
                          ansible_facts=_ansible_facts(containers.changed))
 

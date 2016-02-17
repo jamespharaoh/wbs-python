@@ -21,12 +21,9 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
-import traceback
 import os
 import yum
 import rpm
-import syslog
 import platform
 import tempfile
 import shutil
@@ -49,10 +46,16 @@ description:
 options:
   name:
     description:
-      - "Package name, or package specifier with version, like C(name-1.0). When using state=latest, this can be '*' which means run: yum -y update. You can also pass a url or a local path to a rpm file."
+      - "Package name, or package specifier with version, like C(name-1.0). When using state=latest, this can be '*' which means run: yum -y update. You can also pass a url or a local path to a rpm file.  To operate on several packages this can accept a comma separated list of packages or (as of 2.0) a list of packages."
     required: true
     default: null
-    aliases: []
+    aliases: [ 'pkg' ]
+  exclude:
+    description:
+      - "Package name(s) to exclude when state=present, or latest"
+    required: false
+    version_added: "2.0"
+    default: null
   list:
     description:
       - Various (non-idempotent) commands for usage with C(/usr/bin/ansible) and I(not) playbooks. See examples.
@@ -60,9 +63,9 @@ options:
     default: null
   state:
     description:
-      - Whether to install (C(present), C(latest)), or remove (C(absent)) a package.
+      - Whether to install (C(present) or C(installed), C(latest)), or remove (C(absent) or C(removed)) a package.
     required: false
-    choices: [ "present", "latest", "absent" ]
+    choices: [ "present", "installed", "latest", "absent", "removed" ]
     default: "present"
   enablerepo:
     description:
@@ -73,7 +76,7 @@ options:
     version_added: "0.9"
     default: null
     aliases: []
-    
+
   disablerepo:
     description:
       - I(Repoid) of repositories to disable for the install/update operation.
@@ -125,6 +128,15 @@ notes:
     that the other packages come from (such as epel-release) then that package
     needs to be installed in a separate task. This mimics yum's command line
     behaviour.
+  - 'Yum itself has two types of groups.  "Package groups" are specified in the
+    rpm itself while "environment groups" are specified in a separate file
+    (usually by the distribution).  Unfortunately, this division becomes
+    apparent to ansible users because ansible needs to operate on the group
+    of packages in a single transaction and yum requires groups to be specified
+    in different ways when used in that way.  Package groups are specified as
+    "@development-tools" and environment groups are "@^gnome-desktop-environment".
+    Use the "yum group list" command to see which category of group the group
+    you want to install falls into.'
 # informational: requirements for nodes
 requirements: [ yum ]
 author:
@@ -156,25 +168,23 @@ EXAMPLES = '''
 
 - name: install the 'Development tools' package group
   yum: name="@Development tools" state=present
+
+- name: install the 'Gnome desktop' environment group
+  yum: name="@^gnome-desktop-environment" state=present
 '''
 
+# 64k.  Number of bytes to read at a time when manually downloading pkgs via a url
+BUFSIZE = 65536
+
 def_qf = "%{name}-%{version}-%{release}.%{arch}"
-
-repoquery='/usr/bin/repoquery'
-if not os.path.exists(repoquery):
-    repoquery = None
-
-yumbin='/usr/bin/yum'
-
-def log(msg):
-    syslog.openlog('ansible-yum', 0, syslog.LOG_USER)
-    syslog.syslog(syslog.LOG_NOTICE, msg)
+rpmbin = None
 
 def yum_base(conf_file=None):
 
     my = yum.YumBase()
     my.preconf.debuglevel=0
     my.preconf.errorlevel=0
+    my.preconf.plugins = True
     if conf_file and os.path.exists(conf_file):
         my.preconf.fn = conf_file
     if os.geteuid() != 0:
@@ -187,16 +197,17 @@ def yum_base(conf_file=None):
 
     return my
 
-def install_yum_utils(module):
+def ensure_yum_utils(module):
 
-    if not module.check_mode:    
+    repoquerybin = module.get_bin_path('repoquery', required=False)
+
+    if module.params['install_repoquery'] and not repoquerybin and not module.check_mode:
         yum_path = module.get_bin_path('yum')
         if yum_path:
-            rc, so, se = module.run_command('%s -y install yum-utils' % yum_path) 
-            if rc == 0:
-                this_path = module.get_bin_path('repoquery')
-                global repoquery
-                repoquery = this_path
+            rc, so, se = module.run_command('%s -y install yum-utils' % yum_path)
+        repoquerybin = module.get_bin_path('repoquery', required=False)
+
+    return repoquerybin
 
 def po_to_nevra(po):
 
@@ -210,19 +221,19 @@ def is_installed(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, di
         en_repos = []
     if dis_repos is None:
         dis_repos = []
-    if not repoq:
 
+    if not repoq:
         pkgs = []
         try:
             my = yum_base(conf_file)
-            for rid in en_repos:
-                my.repos.enableRepo(rid)
             for rid in dis_repos:
                 my.repos.disableRepo(rid)
-                
+            for rid in en_repos:
+                my.repos.enableRepo(rid)
+
             e, m, u = my.rpmdb.matchPackageNames([pkgspec])
             pkgs = e + m
-            if not pkgs:
+            if not pkgs and not is_pkg:
                 pkgs.extend(my.returnInstalledPackagesByDep(pkgspec))
         except Exception, e:
             module.fail_json(msg="Failure talking to yum: %s" % e)
@@ -230,21 +241,34 @@ def is_installed(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, di
         return [ po_to_nevra(p) for p in pkgs ]
 
     else:
+        global rpmbin
+        if not rpmbin:
+            rpmbin = module.get_bin_path('rpm', required=True)
 
-        cmd = repoq + ["--disablerepo=*", "--pkgnarrow=installed", "--qf", qf, pkgspec]
-        rc, out, err = module.run_command(cmd)
-        if not is_pkg:
-            cmd = repoq + ["--disablerepo=*", "--pkgnarrow=installed", "--qf", qf, "--whatprovides", pkgspec]
-            rc2, out2, err2 = module.run_command(cmd)
+        cmd = [rpmbin, '-q', '--qf', qf, pkgspec]
+        # rpm localizes messages and we're screen scraping so make sure we use
+        # the C locale
+        lang_env = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
+        rc, out, err = module.run_command(cmd, environ_update=lang_env)
+        if rc != 0 and 'is not installed' not in out:
+            module.fail_json(msg='Error from rpm: %s: %s' % (cmd, err))
+        if 'is not installed' in out:
+            out = ''
+
+        pkgs = [p for p in out.replace('(none)', '0').split('\n') if p.strip()]
+        if not pkgs and not is_pkg:
+            cmd = [rpmbin, '-q', '--qf', qf, '--whatprovides', pkgspec]
+            rc2, out2, err2 = module.run_command(cmd, environ_update=lang_env)
         else:
             rc2, out2, err2 = (0, '', '')
-            
-        if rc == 0 and rc2 == 0:
-            out += out2
-            return [p for p in out.split('\n') if p.strip()]
-        else:
-            module.fail_json(msg='Error from repoquery: %s: %s' % (cmd, err + err2))
-            
+
+        if rc2 != 0 and 'no package provides' not in out2:
+            module.fail_json(msg='Error from rpm: %s: %s' % (cmd, err + err2))
+        if 'no package provides' in out2:
+            out2 = ''
+        pkgs += [p for p in out2.replace('(none)', '0').split('\n') if p.strip()]
+        return pkgs
+
     return []
 
 def is_available(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, dis_repos=None):
@@ -258,10 +282,10 @@ def is_available(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, di
         pkgs = []
         try:
             my = yum_base(conf_file)
-            for rid in en_repos:
-                my.repos.enableRepo(rid)
             for rid in dis_repos:
                 my.repos.disableRepo(rid)
+            for rid in en_repos:
+                my.repos.enableRepo(rid)
 
             e,m,u = my.pkgSack.matchPackageNames([pkgspec])
             pkgs = e + m
@@ -304,10 +328,10 @@ def is_update(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, dis_r
 
         try:
             my = yum_base(conf_file)
-            for rid in en_repos:
-                my.repos.enableRepo(rid)
             for rid in dis_repos:
                 my.repos.disableRepo(rid)
+            for rid in en_repos:
+                my.repos.enableRepo(rid)
 
             pkgs = my.returnPackagesByDep(pkgspec) + my.returnInstalledPackagesByDep(pkgspec)
             if not pkgs:
@@ -339,7 +363,7 @@ def is_update(module, repoq, pkgspec, conf_file, qf=def_qf, en_repos=None, dis_r
         else:
             module.fail_json(msg='Error from repoquery: %s: %s' % (cmd, err))
             
-    return []
+    return set()
 
 def what_provides(module, repoq, req_spec, conf_file,  qf=def_qf, en_repos=None, dis_repos=None):
     if en_repos is None:
@@ -352,10 +376,10 @@ def what_provides(module, repoq, req_spec, conf_file,  qf=def_qf, en_repos=None,
         pkgs = []
         try:
             my = yum_base(conf_file)
-            for rid in en_repos:
-                my.repos.enableRepo(rid)
             for rid in dis_repos:
                 my.repos.disableRepo(rid)
+            for rid in en_repos:
+                my.repos.enableRepo(rid)
 
             pkgs = my.returnPackagesByDep(req_spec) + my.returnInstalledPackagesByDep(req_spec)
             if not pkgs:
@@ -391,7 +415,7 @@ def what_provides(module, repoq, req_spec, conf_file,  qf=def_qf, en_repos=None,
         else:
             module.fail_json(msg='Error from repoquery: %s: %s' % (cmd, err + err2))
 
-    return []
+    return set()
 
 def transaction_exists(pkglist):
     """ 
@@ -481,23 +505,25 @@ def repolist(module, repoq, qf="%{repoid}"):
         ret = set([ p for p in out.split('\n') if p.strip() ])
     return ret
 
-def list_stuff(module, conf_file, stuff):
+def list_stuff(module, repoquerybin, conf_file, stuff):
 
     qf = "%{name}|%{epoch}|%{version}|%{release}|%{arch}|%{repoid}"
-    repoq = [repoquery, '--show-duplicates', '--plugins', '--quiet', '-q']
+    # is_installed goes through rpm instead of repoquery so it needs a slightly different format
+    is_installed_qf = "%{name}|%{epoch}|%{version}|%{release}|%{arch}|installed\n"
+    repoq = [repoquerybin, '--show-duplicates', '--plugins', '--quiet']
     if conf_file and os.path.exists(conf_file):
         repoq += ['-c', conf_file]
 
     if stuff == 'installed':
-        return [ pkg_to_dict(p) for p in is_installed(module, repoq, '-a', conf_file, qf=qf) if p.strip() ]
+        return [ pkg_to_dict(p) for p in sorted(is_installed(module, repoq, '-a', conf_file, qf=is_installed_qf)) if p.strip() ]
     elif stuff == 'updates':
-        return [ pkg_to_dict(p) for p in is_update(module, repoq, '-a', conf_file, qf=qf) if p.strip() ]
+        return [ pkg_to_dict(p) for p in sorted(is_update(module, repoq, '-a', conf_file, qf=qf)) if p.strip() ]
     elif stuff == 'available':
-        return [ pkg_to_dict(p) for p in is_available(module, repoq, '-a', conf_file, qf=qf) if p.strip() ]
+        return [ pkg_to_dict(p) for p in sorted(is_available(module, repoq, '-a', conf_file, qf=qf)) if p.strip() ]
     elif stuff == 'repos':
-        return [ dict(repoid=name, state='enabled') for name in repolist(module, repoq) if name.strip() ]
+        return [ dict(repoid=name, state='enabled') for name in sorted(repolist(module, repoq)) if name.strip() ]
     else:
-        return [ pkg_to_dict(p) for p in is_installed(module, repoq, stuff, conf_file, qf=qf) + is_available(module, repoq, stuff, conf_file, qf=qf) if p.strip() ]
+        return [ pkg_to_dict(p) for p in sorted(is_installed(module, repoq, stuff, conf_file, qf=is_installed_qf) + is_available(module, repoq, stuff, conf_file, qf=qf)) if p.strip() ]
 
 def install(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
 
@@ -537,9 +563,11 @@ def install(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
                 package = os.path.join(tempdir, str(pkg.rsplit('/', 1)[1]))
                 try:
                     rsp, info = fetch_url(module, pkg)
-                    data = rsp.read()
                     f = open(package, 'w')
-                    f.write(data)
+                    data = rsp.read(BUFSIZE)
+                    while data:
+                        f.write(data)
+                        data = rsp.read(BUFSIZE)
                     f.close()
                     pkg = package
                 except Exception, e:
@@ -653,8 +681,8 @@ def install(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
         shutil.rmtree(tempdir)
     except Exception, e:
         module.fail_json(msg="Failure deleting temp directory %s, %s" % (tempdir, e))
-  
-    module.exit_json(**res)
+
+    return res
 
 
 def remove(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
@@ -708,8 +736,8 @@ def remove(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
 
         if rc != 0:
             module.fail_json(**res)
-            
-    module.exit_json(**res)
+
+    return res
 
 def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
 
@@ -733,7 +761,7 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
     rc, out, err = module.run_command(yum_basecmd + ['check-update'])
     if rc == 0 and update_all:
         res['results'].append('Nothing to do here, all packages are up to date')
-        module.exit_json(**res)
+        return res
     elif rc == 100:
         available_updates = out.split('\n')
         # build update dictionary
@@ -754,7 +782,11 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
 
     if update_all:
         cmd = yum_basecmd + ['update']
+        will_update = set(updates.keys())
+        will_update_from_other_package = dict()
     else:
+        will_update = set()
+        will_update_from_other_package = dict()
         for spec in items:
             # some guess work involved with groups. update @<group> will install the group if missing
             if spec.startswith('@'):
@@ -778,8 +810,19 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
                     nothing_to_do = False
                     break
 
-            if spec in pkgs['update'] and spec in updates.keys():
-                nothing_to_do = False
+                # this contains the full NVR and spec could contain wildcards
+                # or virtual provides (like "python-*" or "smtp-daemon") while
+                # updates contains name only.
+                this_name_only = '-'.join(this.split('-')[:-2])
+                if spec in pkgs['update'] and this_name_only in updates.keys():
+                    nothing_to_do = False
+                    will_update.add(spec)
+                    # Massage the updates list
+                    if spec != this_name_only:
+                        # For reporting what packages would be updated more
+                        # succinctly
+                        will_update_from_other_package[spec] = this_name_only
+                    break
 
             if nothing_to_do:
                 res['results'].append("All packages providing %s are up to date" % spec)
@@ -792,12 +835,6 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
                 res['msg'] += "The following packages have pending transactions: %s" % ", ".join(conflicts)
                 module.fail_json(**res)
 
-    # list of package updates
-    if update_all:
-        will_update = updates.keys()
-    else:
-        will_update = [u for u in pkgs['update'] if u in updates.keys() or u.startswith('@')]
-
     # check_mode output
     if module.check_mode:
         to_update = []
@@ -805,6 +842,9 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
             if w.startswith('@'):
                 to_update.append((w, None))
                 msg = '%s will be updated' % w
+            elif w not in updates:
+                other_pkg = will_update_from_other_package[w]
+                to_update.append((w, 'because of (at least) %s-%s.%s from %s' % (other_pkg, updates[other_pkg]['version'], updates[other_pkg]['dist'], updates[other_pkg]['repo'])))
             else:
                 to_update.append((w, '%s.%s from %s' % (updates[w]['version'], updates[w]['dist'], updates[w]['repo'])))
 
@@ -813,7 +853,7 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
         if len(will_update) > 0 or len(pkgs['install']) > 0:
             res['changed'] = True
 
-        module.exit_json(**res)
+        return res
 
     # run commands
     if cmd:     # update all
@@ -846,22 +886,14 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
     if rc:
         res['failed'] = True
 
-    module.exit_json(**res)
+    return res
 
-def ensure(module, state, pkgspec, conf_file, enablerepo, disablerepo,
-           disable_gpg_check):
+def ensure(module, state, pkgs, conf_file, enablerepo, disablerepo,
+           disable_gpg_check, exclude, repoq):
 
-    # take multiple args comma separated
-    items = pkgspec.split(',')
-
+    yumbin = module.get_bin_path('yum')
     # need debug level 2 to get 'Nothing to do' for groupinstall.
     yum_basecmd = [yumbin, '-d', '2', '-y']
-
-        
-    if not repoquery:
-        repoq = None
-    else:
-        repoq = [repoquery, '--show-duplicates', '--plugins', '--quiet', '-q']
 
     if conf_file and os.path.exists(conf_file):
         yum_basecmd += ['-c', conf_file]
@@ -878,8 +910,10 @@ def ensure(module, state, pkgspec, conf_file, enablerepo, disablerepo,
         en_repos = enablerepo.split(',')
         r_cmd = ['--enablerepo=%s' % enablerepo]
         yum_basecmd.extend(r_cmd)
-           
 
+    if exclude:
+        e_cmd = ['--exclude=%s' % exclude]
+        yum_basecmd.extend(e_cmd)
 
     if state in ['installed', 'present', 'latest']:
 
@@ -907,16 +941,20 @@ def ensure(module, state, pkgspec, conf_file, enablerepo, disablerepo,
     if state in ['installed', 'present']:
         if disable_gpg_check:
             yum_basecmd.append('--nogpgcheck')
-        install(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
+        res = install(module, pkgs, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
     elif state in ['removed', 'absent']:
-        remove(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
+        res = remove(module, pkgs, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
     elif state == 'latest':
         if disable_gpg_check:
             yum_basecmd.append('--nogpgcheck')
-        latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
+        res = latest(module, pkgs, repoq, yum_basecmd, conf_file, en_repos, dis_repos)
+    else:
+        # should be caught by AnsibleModule argument_spec
+        module.fail_json(msg="we should never get here unless this all"
+                " failed", changed=False, results='', errors='unepected state')
 
-    # should be caught by AnsibleModule argument_spec
-    return dict(changed=False, failed=True, results='', errors='unexpected state')
+    return res
+
 
 def main():
 
@@ -933,7 +971,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec = dict(
-            name=dict(aliases=['pkg']),
+            name=dict(aliases=['pkg'], type="list"),
+            exclude=dict(required=False, default=None),
             # removed==absent, installed==present, these are accepted as aliases
             state=dict(default='installed', choices=['absent','present','installed','removed','latest']),
             enablerepo=dict(),
@@ -950,26 +989,47 @@ def main():
         supports_check_mode = True
     )
 
-    # this should not be needed, but exists as a failsafe
     params = module.params
-    if params['install_repoquery'] and not repoquery and not module.check_mode:
-        install_yum_utils(module)
 
     if params['list']:
-        if not repoquery:
+        repoquerybin = ensure_yum_utils(module)
+        if not repoquerybin:
             module.fail_json(msg="repoquery is required to use list= with this module. Please install the yum-utils package.")
-        results = dict(results=list_stuff(module, params['conf_file'], params['list']))
-        module.exit_json(**results)
+        results = dict(results=list_stuff(module, repoquerybin, params['conf_file'], params['list']))
 
     else:
-        pkg = params['name']
+        # If rhn-plugin is installed and no rhn-certificate is available on
+        # the system then users will see an error message using the yum API.
+        # Use repoquery in those cases.
+
+        my = yum_base(params['conf_file'])
+        # A sideeffect of accessing conf is that the configuration is
+        # loaded and plugins are discovered
+        my.conf
+        repoquery = None
+        try:
+            yum_plugins = my.plugins._plugins
+        except AttributeError:
+            pass
+        else:
+            if 'rhnplugin' in yum_plugins:
+                repoquerybin = ensure_yum_utils(module)
+                if repoquerybin:
+                    repoquery = [repoquerybin, '--show-duplicates', '--plugins', '--quiet']
+
+        pkg = [ p.strip() for p in params['name']]
+        exclude = params['exclude']
         state = params['state']
         enablerepo = params.get('enablerepo', '')
         disablerepo = params.get('disablerepo', '')
         disable_gpg_check = params['disable_gpg_check']
-        res = ensure(module, state, pkg, params['conf_file'], enablerepo,
-                     disablerepo, disable_gpg_check)
-        module.fail_json(msg="we should never get here unless this all failed", **res)
+        results = ensure(module, state, pkg, params['conf_file'], enablerepo,
+                     disablerepo, disable_gpg_check, exclude, repoquery)
+        if repoquery:
+            results['msg'] = '%s %s' % (results.get('msg',''),
+                    'Warning: Due to potential bad behaviour with rhnplugin and certificates, used slower repoquery calls instead of Yum API.')
+
+    module.exit_json(**results)
 
 # import module snippets
 from ansible.module_utils.basic import *

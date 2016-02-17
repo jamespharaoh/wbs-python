@@ -26,7 +26,7 @@ DOCUMENTATION = '''
 module: authorized_key
 short_description: Adds or removes an SSH authorized key
 description:
-     - Adds or removes an SSH authorized key for a user from a remote host.
+    - "Adds or removes SSH authorized keys for particular user accounts"
 version_added: "0.5"
 options:
   user:
@@ -34,7 +34,6 @@ options:
       - The username on the remote host whose authorized_keys file will be modified
     required: true
     default: null
-    aliases: []
   key:
     description:
       - The SSH public key(s), as a string or (since 1.9) url (https://github.com/username.keys)
@@ -72,16 +71,16 @@ options:
     version_added: "1.4"
   exclusive:
     description:
-      - Whether to remove all other non-specified keys from the
-        authorized_keys file. Multiple keys can be specified in a single
-        key= string value by separating them by newlines.
+      - Whether to remove all other non-specified keys from the authorized_keys file. Multiple keys
+        can be specified in a single C(key) string value by separating them by newlines.
+      - This option is not loop aware, so if you use C(with_) , it will be exclusive per iteration
+        of the loop, if you want multiple keys in the file you need to pass them all to C(key) in a
+        single batch as mentioned above.
     required: false
     choices: [ "yes", "no" ]
     default: "no"
     version_added: "1.9"
-description:
-    - "Adds or removes authorized keys for particular user accounts"
-author: Brad Olson
+author: "Ansible Core Team"
 '''
 
 EXAMPLES = '''
@@ -108,11 +107,13 @@ EXAMPLES = '''
 # Using key_options:
 - authorized_key: user=charlie
                   key="{{ lookup('file', '/home/charlie/.ssh/id_rsa.pub') }}"
-                  key_options='no-port-forwarding,host="10.0.1.1"'
+                  key_options='no-port-forwarding,from="10.0.1.1"'
 
 # Set up authorized_keys exclusively with one key
-- authorized_key: user=root key="{{ lookup('file', 'public_keys/doe-jane') }}" state=present
+- authorized_key: user=root key="{{ item }}" state=present
                    exclusive=yes
+  with_file:
+    - public_keys/doe-jane
 '''
 
 # Makes sure the public key line is present or absent in the user's .ssh/authorized_keys.
@@ -138,7 +139,7 @@ import shlex
 class keydict(dict):
 
     """ a dictionary that maintains the order of keys as they are added """
-    
+
     # http://stackoverflow.com/questions/2328235/pythonextend-the-dict-class
 
     def __init__(self, *args, **kw):
@@ -146,7 +147,7 @@ class keydict(dict):
         self.itemlist = super(keydict,self).keys()
     def __setitem__(self, key, value):
         self.itemlist.append(key)
-        super(keydict,self).__setitem__(key, value)        
+        super(keydict,self).__setitem__(key, value)
     def __iter__(self):
         return iter(self.itemlist)
     def keys(self):
@@ -154,7 +155,7 @@ class keydict(dict):
     def values(self):
         return [self[key] for key in self]
     def itervalues(self):
-        return (self[key] for key in self)    
+        return (self[key] for key in self)
 
 def keyfile(module, user, write=False, path=None, manage_dir=True):
     """
@@ -168,9 +169,15 @@ def keyfile(module, user, write=False, path=None, manage_dir=True):
     :return: full path string to authorized_keys for user
     """
 
+    if module.check_mode and path is not None:
+        keysfile = path
+        return keysfile
+
     try:
         user_entry = pwd.getpwnam(user)
     except KeyError, e:
+        if module.check_mode and path is None:
+            module.fail_json(msg="Either user must exist or you must provide full path to key file in check mode")
         module.fail_json(msg="Failed to lookup user %s: %s" % (user, str(e)))
     if path is None:
         homedir    = user_entry.pw_dir
@@ -214,8 +221,8 @@ def keyfile(module, user, write=False, path=None, manage_dir=True):
     return keysfile
 
 def parseoptions(module, options):
-    ''' 
-    reads a string containing ssh-key options 
+    '''
+    reads a string containing ssh-key options
     and returns a dictionary of those options
     '''
     options_dict = keydict() #ordered dict
@@ -246,7 +253,7 @@ def parsekey(module, raw_key):
         'ssh-ed25519',
         'ecdsa-sha2-nistp256',
         'ecdsa-sha2-nistp384',
-        'ecdsa-sha2-nistp521', 
+        'ecdsa-sha2-nistp521',
         'ssh-dss',
         'ssh-rsa',
     ]

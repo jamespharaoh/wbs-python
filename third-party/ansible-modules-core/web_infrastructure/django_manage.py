@@ -30,7 +30,8 @@ options:
   command:
     choices: [ 'cleanup', 'collectstatic', 'flush', 'loaddata', 'migrate', 'runfcgi', 'syncdb', 'test', 'validate', ]
     description:
-      - The name of the Django management command to run. Built in commands are cleanup, collectstatic, flush, loaddata, migrate, runfcgi, syncdb, test, and validate. Other commands can be entered, but will fail if they're unknown to Django.
+      - The name of the Django management command to run. Built in commands are cleanup, collectstatic, flush, loaddata, migrate, runfcgi, syncdb, test, and validate.
+      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may prompt for user input should be run with the I(--noinput) flag.
     required: true
   app_path:
     description:
@@ -89,10 +90,11 @@ notes:
    - I(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter is specified.
    - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already exist at the given location.
    - This module assumes English error messages for the 'createcachetable' command to detect table existence, unfortunately.
-   - To be able to use the migrate command, you must have south installed and added as an app in your settings
-   - To be able to use the collectstatic command, you must have enabled staticfiles in your settings
+   - To be able to use the migrate command with django versions < 1.7, you must have south installed and added as an app in your settings.
+   - To be able to use the collectstatic command, you must have enabled staticfiles in your settings.
+   - As of ansible 2.x, your I(manage.py) application must be executable (rwxr-xr-x), and must have a valid I(shebang), i.e. "#!/usr/bin/env python", for invoking the appropriate Python interpreter.
 requirements: [ "virtualenv", "django" ]
-author: Scott Anderson
+author: "Scott Anderson (@tastychutney)"
 '''
 
 EXAMPLES = """
@@ -102,7 +104,7 @@ EXAMPLES = """
 # Load the initial_data fixture into the application
 - django_manage: command=loaddata app_path={{ django_dir }} fixtures={{ initial_data }}
 
-#Run syncdb on the application
+# Run syncdb on the application
 - django_manage: >
       command=syncdb
       app_path={{ django_dir }}
@@ -110,8 +112,11 @@ EXAMPLES = """
       pythonpath={{ settings_dir }}
       virtualenv={{ virtualenv_dir }}
 
-#Run the SmokeTest test case from the main app. Useful for testing deploys.
-- django_manage: command=test app_path=django_dir apps=main.SmokeTest
+# Run the SmokeTest test case from the main app. Useful for testing deploys.
+- django_manage: command=test app_path={{ django_dir }} apps=main.SmokeTest
+
+# Create an initial superuser.
+- django_manage: command="createsuperuser --noinput --username=admin --email=admin@example.com" app_path={{ django_dir }}
 """
 
 
@@ -159,7 +164,10 @@ def syncdb_filter_output(line):
     return ("Creating table " in line) or ("Installed" in line and "Installed 0 object" not in line)
 
 def migrate_filter_output(line):
-    return ("Migrating forwards " in line) or ("Installed" in line and "Installed 0 object" not in line)
+    return ("Migrating forwards " in line) or ("Installed" in line and "Installed 0 object" not in line) or ("Applying" in line)
+
+def collectstatic_filter_output(line):
+    return "0 static files" not in line
 
 def main():
     command_allowed_param_map = dict(
@@ -171,7 +179,7 @@ def main():
         test=('failfast', 'testrunner', 'liveserver', 'apps', ),
         validate=(),
         migrate=('apps', 'skip', 'merge', 'database',),
-        collectstatic=('link', ),
+        collectstatic=('clear', 'link', ),
         )
 
     command_required_param_map = dict(
@@ -189,11 +197,11 @@ def main():
         )
 
     # These params are allowed for certain commands only
-    specific_params = ('apps', 'database', 'failfast', 'fixtures', 'liveserver', 'testrunner')
+    specific_params = ('apps', 'clear', 'database', 'failfast', 'fixtures', 'liveserver', 'testrunner')
 
     # These params are automatically added to the command if present
     general_params = ('settings', 'pythonpath', 'database',)
-    specific_boolean_params = ('failfast', 'skip', 'merge', 'link')
+    specific_boolean_params = ('clear', 'failfast', 'skip', 'merge', 'link')
     end_of_command_params = ('apps', 'cache_table', 'fixtures')
 
     module = AnsibleModule(
@@ -206,6 +214,7 @@ def main():
 
             apps        = dict(default=None, required=False),
             cache_table = dict(default=None, required=False),
+            clear       = dict(default=None, required=False, type='bool'),
             database    = dict(default=None, required=False),
             failfast    = dict(default='no', required=False, type='bool', aliases=['fail_fast']),
             fixtures    = dict(default=None, required=False),
@@ -218,7 +227,7 @@ def main():
     )
 
     command = module.params['command']
-    app_path = module.params['app_path']
+    app_path = os.path.expanduser(module.params['app_path'])
     virtualenv = module.params['virtualenv']
 
     for param in specific_params:
@@ -232,11 +241,9 @@ def main():
         if not module.params[param]:
             module.fail_json(msg='%s param is required for command=%s' % (param, command))
 
-    venv = module.params['virtualenv']
-
     _ensure_virtualenv(module)
 
-    cmd = "python manage.py %s" % (command, )
+    cmd = "./manage.py %s" % (command, )
 
     if command in noinput_commands:
         cmd = '%s --noinput' % cmd
@@ -254,7 +261,7 @@ def main():
         if module.params[param]:
             cmd = '%s %s' % (cmd, module.params[param])
 
-    rc, out, err = module.run_command(cmd, cwd=app_path)
+    rc, out, err = module.run_command(cmd, cwd=os.path.expanduser(app_path))
     if rc != 0:
         if command == 'createcachetable' and 'table' in err and 'already exists' in err:
             out = 'Already exists.'
