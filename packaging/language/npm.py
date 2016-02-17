@@ -25,7 +25,7 @@ short_description: Manage node.js packages with npm
 description:
   - Manage node.js packages with Node Package Manager (npm)
 version_added: 1.2
-author: Chris Hoffman
+author: "Chris Hoffman (@chrishoffman)"
 options:
   name:
     description:
@@ -250,7 +250,7 @@ def main():
         outdated = npm.list_outdated()
         if len(missing) or len(outdated):
             changed = True
-            npm.install()
+            npm.update()
     else: #absent
         installed, missing = npm.list()
         if name in installed:

@@ -62,11 +62,12 @@ options:
     default: 'tcp'
     description:
       - Transport type for volume
-  brick:
+  bricks:
     required: false
     default: null
     description:
-      - Brick path on servers
+      - Brick paths on servers. Multiple brick paths can be separated by commas
+    aliases: ['brick']
   start_on_create:
     choices: [ 'yes', 'no']
     required: false
@@ -102,19 +103,19 @@ options:
 notes:
   - "Requires cli tools for GlusterFS on servers"
   - "Will add new bricks, but not remove them"
-author: Taneli Leppä
+author: "Taneli Leppä (@rosmo)"
 """
 
 EXAMPLES = """
 - name: create gluster volume
-  gluster_volume: state=present name=test1 brick=/bricks/brick1/g1 rebalance=yes cluster:"{{ play_hosts }}"
+  gluster_volume: state=present name=test1 bricks=/bricks/brick1/g1 rebalance=yes cluster="192.168.1.10,192.168.1.11"
   run_once: true
 
 - name: tune
   gluster_volume: state=present name=test1 options='{performance.cache-size: 256MB}'
 
 - name: start gluster volume
-  gluster_volume: status=started name=test1
+  gluster_volume: state=started name=test1
 
 - name: limit usage
   gluster_volume: state=present name=test1 directory=/foo quota=20.0MB
@@ -124,6 +125,10 @@ EXAMPLES = """
 
 - name: remove gluster volume
   gluster_volume: state=absent name=test1
+
+- name: create gluster volume with multiple bricks
+  gluster_volume: state=present name=test2 bricks="/bricks/brick1/g2,/bricks/brick2/g2" cluster="192.168.1.10,192.168.1.11"
+  run_once: true
 """
 
 import shutil
@@ -242,21 +247,20 @@ def wait_for_peer(host):
         time.sleep(1)
     return False
 
-def probe(host):
+def probe(host, myhostname):
     global module
-    run_gluster([ 'peer', 'probe', host ])
-    if not wait_for_peer(host):
-        module.fail_json(msg='failed to probe peer %s' % host)
+    out = run_gluster([ 'peer', 'probe', host ])
+    if not out.find('localhost') and not wait_for_peer(host):
+        module.fail_json(msg='failed to probe peer %s on %s' % (host, myhostname))
     changed = True
 
 def probe_all_peers(hosts, peers, myhostname):
     for host in hosts:
+        host = host.strip() # Clean up any extra space for exact comparison
         if host not in peers:
-            # dont probe ourselves
-            if myhostname != host:
-                probe(host)
+            probe(host, myhostname)
 
-def create_volume(name, stripe, replica, transport, hosts, brick, force):
+def create_volume(name, stripe, replica, transport, hosts, bricks, force):
     args = [ 'volume', 'create' ]
     args.append(name)
     if stripe:
@@ -267,8 +271,9 @@ def create_volume(name, stripe, replica, transport, hosts, brick, force):
         args.append(str(replica))
     args.append('transport')
     args.append(transport)
-    for host in hosts:
-        args.append(('%s:%s' % (host, brick)))
+    for brick in bricks:
+        for host in hosts:
+            args.append(('%s:%s' % (host, brick)))
     if force:
         args.append('force')
     run_gluster(args)
@@ -282,8 +287,9 @@ def stop_volume(name):
 def set_volume_option(name, option, parameter):
     run_gluster([ 'volume', 'set', name, option, parameter ])
 
-def add_brick(name, brick, force):
-    args = [ 'volume', 'add-brick', name, brick ]
+def add_bricks(name, new_bricks, force):
+    args = [ 'volume', 'add-brick', name ]
+    args.extend(new_bricks)
     if force:
         args.append('force')
     run_gluster(args)
@@ -311,7 +317,7 @@ def main():
             stripes=dict(required=False, default=None, type='int'),
             replicas=dict(required=False, default=None, type='int'),
             transport=dict(required=False, default='tcp', choices=[ 'tcp', 'rdma', 'tcp,rdma' ]),
-            brick=dict(required=False, default=None),
+            bricks=dict(required=False, default=None, aliases=['brick']),
             start_on_create=dict(required=False, default=True, type='bool'),
             rebalance=dict(required=False, default=False, type='bool'),
             options=dict(required=False, default={}, type='dict'),
@@ -329,7 +335,7 @@ def main():
     action = module.params['state']
     volume_name = module.params['name']
     cluster= module.params['cluster']
-    brick_path = module.params['brick']
+    brick_paths = module.params['bricks']
     stripes = module.params['stripes']
     replicas = module.params['replicas']
     transport = module.params['transport']
@@ -340,6 +346,16 @@ def main():
 
     if not myhostname:
         myhostname = socket.gethostname()
+
+    # Clean up if last element is empty. Consider that yml can look like this:
+    #   cluster="{% for host in groups['glusterfs'] %}{{ hostvars[host]['private_ip'] }},{% endfor %}"
+    if cluster != None and cluster[-1] == '':
+        cluster = cluster[0:-1]
+
+    if brick_paths != None and "," in brick_paths:
+        brick_paths = brick_paths.split(",")
+    else:
+        brick_paths = [brick_paths]
 
     options = module.params['options']
     quota = module.params['quota']
@@ -366,7 +382,7 @@ def main():
 
         # create if it doesn't exist
         if volume_name not in volumes:
-            create_volume(volume_name, stripes, replicas, transport, cluster, brick_path, force)
+            create_volume(volume_name, stripes, replicas, transport, cluster, brick_paths, force)
             volumes = get_volumes()
             changed = True
 
@@ -380,18 +396,19 @@ def main():
             removed_bricks = []
             all_bricks = []
             for node in cluster:
-                brick = '%s:%s' % (node, brick_path)
-                all_bricks.append(brick)
-                if brick not in volumes[volume_name]['bricks']:
-                    new_bricks.append(brick)
+                for brick_path in brick_paths:
+                    brick = '%s:%s' % (node, brick_path)
+                    all_bricks.append(brick)
+                    if brick not in volumes[volume_name]['bricks']:
+                        new_bricks.append(brick)
 
             # this module does not yet remove bricks, but we check those anyways
             for brick in volumes[volume_name]['bricks']:
                 if brick not in all_bricks:
                     removed_bricks.append(brick)
 
-            for brick in new_bricks:
-                add_brick(volume_name, brick, force)
+            if new_bricks:
+                add_bricks(volume_name, new_bricks, force)
                 changed = True
 
             # handle quotas
@@ -412,7 +429,7 @@ def main():
         else:
             module.fail_json(msg='failed to create volume %s' % volume_name)
 
-    if volume_name not in volumes:
+    if action != 'delete' and volume_name not in volumes:
         module.fail_json(msg='volume not found %s' % volume_name)
 
     if action == 'started':
