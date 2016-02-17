@@ -1,0 +1,15 @@
+<span class="logo">
+	<a href="{{
+		url_for ('root')
+	}}">
+		<img src="{{
+			url_for (
+				'static',
+				filename = 'images/wbs/wbs-logo-64x48.png')
+		}}">
+	</a>
+</span>
+
+<h1>
+	{{ g.project.title }}
+</h1>
