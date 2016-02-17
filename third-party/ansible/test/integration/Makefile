@@ -3,10 +3,10 @@ VARS_FILE ?= integration_config.yml
 
 # Create a semi-random string for use when testing cloud-based resources
 ifndef CLOUD_RESOURCE_PREFIX
-CLOUD_RESOURCE_PREFIX := $(shell python -c "import string,random; print 'ansible-testing-' + ''.join(random.choice(string.ascii_letters + string.digits) for _ in xrange(8));")
+CLOUD_RESOURCE_PREFIX := $(shell python -c "import string,random; print('ansible-testing-' + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(8)));")
 endif
 
-CREDENTIALS_FILE = credentials.yml
+CREDENTIALS_FILE ?= credentials.yml
 # If credentials.yml exists, use it
 ifneq ("$(wildcard $(CREDENTIALS_FILE))","")
 CREDENTIALS_ARG = -e @$(CREDENTIALS_FILE)
@@ -21,14 +21,10 @@ VAULT_PASSWORD_FILE = vault-password
 
 CONSUL_RUNNING := $(shell python consul_running.py)
 
-all: parsing test_var_precedence unicode test_templating_settings non_destructive destructive includes check_mode test_hash test_handlers test_group_by test_vault test_tags
+all: parsing test_var_precedence unicode test_templating_settings environment non_destructive destructive includes check_mode test_hash test_handlers test_group_by test_vault test_tags test_lookup_paths no_log
 
 parsing:
-	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario1; [ $$? -eq 3 ]
-	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario2; [ $$? -eq 3 ]
-	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario3; [ $$? -eq 3 ]
-	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario4; [ $$? -eq 3 ]
-	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario5; [ $$? -eq 3 ]
+	ansible-playbook bad_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -vvv $(TEST_FLAGS) --tags prepare,common,scenario5
 	ansible-playbook good_parsing.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
 
 includes:
@@ -41,6 +37,9 @@ unicode:
 
 test_templating_settings:
 	ansible-playbook test_templating_settings.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
+
+environment:
+	ansible-playbook test_environment.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) $(TEST_FLAGS)
 
 non_destructive:
 	ansible-playbook non_destructive.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
@@ -55,7 +54,8 @@ test_group_by:
 	ansible-playbook test_group_by.yml -i inventory.group_by -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
 
 test_handlers:
-	ansible-playbook test_handlers.yml -i inventory.handlers -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
+	ansible-playbook test_handlers.yml --tags scenario1 -i inventory.handlers -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
+	[ "$$(ansible-playbook test_handlers.yml --tags scenario2 -l A -i inventory.handlers -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) | grep -Po 'RUNNING HANDLER \[test_handlers : \K[^\]]+')" = "test handler" ]
 	# Not forcing, should only run on successful host
 	[ "$$(ansible-playbook test_force_handlers.yml --tags normal -i inventory.handlers -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) | egrep -o CALLED_HANDLER_. | sort | uniq | xargs)" = "CALLED_HANDLER_B" ]
 	# Forcing from command line
@@ -76,7 +76,7 @@ test_hash:
 	ANSIBLE_HASH_BEHAVIOUR=merge ansible-playbook test_hash.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v -e '{"test_hash":{"extra_args":"this is an extra arg"}}'
 
 test_var_precedence:
-	ansible-playbook test_var_precedence.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v -e 'extra_var=extra_var' -e 'extra_var_override=extra_var_override'
+	ansible-playbook test_var_precedence.yml -i $(INVENTORY) $(CREDENTIALS_ARG) $(TEST_FLAGS) -v -e 'extra_var=extra_var' -e 'extra_var_override=extra_var_override'
 
 test_vault:
 	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --list-tasks
@@ -105,12 +105,15 @@ test_tags:
 	[ "$$(ansible-playbook --list-tasks --skip-tags tag test_tags.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) | fgrep Task_with | xargs)" = "Task_with_always_tag TAGS: [always] Task_without_tag TAGS: []" ]
 
 
-cloud: amazon rackspace
+cloud: amazon rackspace azure
 
 cloud_cleanup: amazon_cleanup rackspace_cleanup
 
 amazon_cleanup:
 	python cleanup_ec2.py -y --match="^$(CLOUD_RESOURCE_PREFIX)"
+
+azure_cleanup:
+	python cleanup_azure.py -y --match="^$(CLOUD_RESOURCE_PREFIX)"
 
 gce_setup:
 	python setup_gce.py "$(CLOUD_RESOURCE_PREFIX)"
@@ -131,6 +134,12 @@ amazon: $(CREDENTIALS_FILE)
     CLOUD_RESOURCE_PREFIX="$(CLOUD_RESOURCE_PREFIX)" make amazon_cleanup ; \
     exit $$RC;
 
+azure: $(CREDENTIALS_FILE)
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook azure.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
+    RC=$$? ; \
+    CLOUD_RESOURCE_PREFIX="$(CLOUD_RESOURCE_PREFIX)" make azure_cleanup ; \
+    exit $$RC;
+
 gce: $(CREDENTIALS_FILE)
 	CLOUD_RESOURCE_PREFIX="$(CLOUD_RESOURCE_PREFIX)" make gce_setup ; \
     ansible-playbook gce.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
@@ -144,21 +153,26 @@ rackspace: $(CREDENTIALS_FILE)
     CLOUD_RESOURCE_PREFIX="$(CLOUD_RESOURCE_PREFIX)" make rackspace_cleanup ; \
     exit $$RC;
 
+cloudstack:
+	ansible-playbook cloudstack.yml -i $(INVENTORY) -e @$(VARS_FILE) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
+	RC=$$? ; \
+	exit $$RC;
+
 $(CONSUL_RUNNING):
 
 consul:
 ifeq ($(CONSUL_RUNNING), True)
 	ansible-playbook -i $(INVENTORY) consul.yml ; \
-	ansible-playbook -i ../../plugins/inventory/consul_io.py consul_inventory.yml
+	ansible-playbook -i ../../contrib/inventory/consul_io.py consul_inventory.yml
 else
 	@echo "Consul agent is not running locally. To run a cluster locally see http://github.com/sgargan/consul-vagrant"
 endif
 
-test_galaxy: test_galaxy_spec test_galaxy_yaml
+test_galaxy: test_galaxy_spec test_galaxy_yaml test_galaxy_git
 
 test_galaxy_spec:
 	mytmpdir=$(MYTMPDIR) ; \
-	ansible-galaxy install -r galaxy_rolesfile -p $$mytmpdir/roles ; \
+	ansible-galaxy install -r galaxy_rolesfile -p $$mytmpdir/roles -vvvv ; \
     cp galaxy_playbook.yml $$mytmpdir ; \
     ansible-playbook -i $(INVENTORY) $$mytmpdir/galaxy_playbook.yml -v $(TEST_FLAGS) ; \
     RC=$$? ; \
@@ -167,9 +181,25 @@ test_galaxy_spec:
 
 test_galaxy_yaml:
 	mytmpdir=$(MYTMPDIR) ; \
-	ansible-galaxy install -r galaxy_roles.yml -p $$mytmpdir/roles ; \
+	ansible-galaxy install -r galaxy_roles.yml -p $$mytmpdir/roles -vvvv; \
     cp galaxy_playbook.yml $$mytmpdir ; \
     ansible-playbook -i $(INVENTORY) $$mytmpdir/galaxy_playbook.yml -v $(TEST_FLAGS) ; \
     RC=$$? ; \
     rm -rf $$mytmpdir ; \
     exit $$RC
+
+test_galaxy_git:
+	mytmpdir=$(MYTMPDIR) ; \
+	ansible-galaxy install git+https://bitbucket.org/willthames/git-ansible-galaxy,v1.6 -p $$mytmpdir/roles -vvvv; \
+    cp galaxy_playbook_git.yml $$mytmpdir ; \
+    ansible-playbook -i $(INVENTORY) $$mytmpdir/galaxy_playbook_git.yml -v $(TEST_FLAGS) ; \
+    RC=$$? ; \
+    rm -rf $$mytmpdir ; \
+    exit $$RC
+
+test_lookup_paths:
+	ansible-playbook lookup_paths/play.yml -i $(INVENTORY) -v $(TEST_FLAGS)
+
+no_log:
+	# This test expects 7 loggable vars and 0 non loggable ones, if either mismatches it fails, run the ansible-playbook command to debug
+	[ "$$(ansible-playbook no_log_local.yml -i $(INVENTORY) -vvvvv | awk --source 'BEGIN { logme = 0; nolog = 0; } /LOG_ME/ { logme += 1;} /DO_NOT_LOG/ { nolog += 1;} END { printf "%d/%d", logme, nolog; }')" = "6/0" ]

@@ -22,7 +22,6 @@ __metaclass__ = type
 import os
 from ansible.errors import AnsibleError
 
-
 # Note, sha1 is the only hash algorithm compatible with python2.4 and with
 # FIPS-140 mode (as of 11-2014)
 try:
@@ -45,6 +44,8 @@ def secure_hash_s(data, hash_func=sha1):
 
     digest = hash_func()
     try:
+        if not isinstance(data, basestring):
+            data = "%s" % data
         digest.update(data)
     except UnicodeEncodeError:
         digest.update(data.encode('utf-8'))
@@ -64,7 +65,7 @@ def secure_hash(filename, hash_func=sha1):
             digest.update(block)
             block = infile.read(blocksize)
         infile.close()
-    except IOError, e:
+    except IOError as e:
         raise AnsibleError("error while accessing the file %s, error was: %s" % (filename, e))
     return digest.hexdigest()
 
