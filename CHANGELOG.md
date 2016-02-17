@@ -1,15 +1,456 @@
 Ansible Changes By Release
 ==========================
 
-## 2.0 "TBD" - ACTIVE DEVELOPMENT
+## 2.1 TBD - ACTIVE DEVELOPMENT
 
-Major Changes:
+####New Modules:
+* cloudstack: cs_volume
 
-New Modules:
+####New Filters:
+* extract
 
-Other Notable Changes:
+## 2.0.1 "Over the Hills and Far Away"
 
-## 1.9.3 "Dancing In the Street" - TBD
+* Fixes a major compatibility break in the synchronize module shipped with
+  2.0.0.x.  That version of synchronize ran sudo on the controller prior to
+  running rsync.  In 1.9.x and previous, sudo was run on the host that rsync
+  connected to.  2.0.1 restores the 1.9.x behaviour.
+* Additionally, several other problems with where synchronize chose to run when
+  combined with delegate_to were fixed.  In particular, if a playbook targetted
+  localhost and then delegated_to a remote host the prior behavior (in 1.9.x
+  and 2.0.0.x) was to copy files between the src and destination directories on
+  the delegated host.  This has now been fixed to copy between localhost and
+  the delegated host.
+* Fix a regression where synchronize was unable to deal with unicode paths.
+* Fix a regression where synchronize deals with inventory hosts that use
+  localhost but with an alternate port.
+* Fixes a regression where the retry files feature was not implemented.
+* Fixes a regression where the any_errors_fatal option was implemented in 2.0
+  incorrectly, and also adds a feature where any_errors_fatal can be set at
+  the block level.
+* Fix tracebacks when playbooks or ansible itself were located in directories
+  with unicode characters.
+* Fix bug when sending unicode characters to an external pager for display.
+* Fix a bug with squashing loops for special modules (mostly package managers).
+  The optimization was squashing when the loop did not apply to the selection
+  of packages.  This has now been fixed.
+* Temp files created when using vault are now "shredded" using the unix shred
+  program which overwrites the file with random data.
+* Some fixes to cloudstack modules for case sensitivity
+* Fix non-newstyle modules (non-python modules and old-style modules) to
+  disabled pipelining.
+* Fix fetch module failing even if fail_on_missing is set to False
+* Fix for cornercase when local connections, sudo, and raw were used together.
+* Fix dnf module to remove dependent packages when state=absent is specified.
+  This was a feature of the 1.9.x version that was left out by mistake when the
+  module was rewritten for 2.0.
+* Fix bugs with non-english locales in yum, git, and apt modules
+* Fix a bug with the dnf module where state=latest could only upgrade, not install.
+
+## 2.0 "Over the Hills and Far Away" - Jan 12, 2016
+
+###Major Changes:
+
+* Releases are now named after Led Zeppelin songs, 1.9 will be the last Van Halen named release.
+* The new block/rescue/always directives allow for making task blocks and exception-like semantics
+* New strategy plugins (e.g. `free`) allow control over the flow of task execution per play. The default (`linear`) will be the same as before.
+* Improved error handling, with more detailed parser messages. General exception handling and display has been revamped.
+* Task includes are now evaluated during execution, allowing more dynamic includes and options. Play includes are unchanged both still use the `include` directive.
+* "with\_<lookup>" loops can now be used with task includes since they are dynamic.
+* Callback, connection, cache and lookup plugin APIs have changed. Existing plugins might require modification to work with the new versions.
+* Callbacks are now shipped in the active directory and don't need to be copied, just whitelisted in ansible.cfg.
+* Many API changes. Those integrating directly with Ansible's API will encounter breaking changes, but the new API is much easier to use and test.
+* Settings are now more inheritable; what you set at play, block or role will be automatically inherited by the contained tasks.
+  This allows for new features to automatically be settable at all levels, previously we had to manually code this.
+* Vars are now settable at play, block, role and task level with the `vars` directive and scoped to the tasks contained.
+* Template code now retains types for bools and numbers instead of turning them into strings.
+  If you need the old behaviour, quote the value and it will get passed around as a string
+* Empty variables and variables set to null in yaml will no longer be converted to empty strings.  They will retain the value of `None`.
+  To go back to the old behaviour, you can override the `null_representation` setting to an empty string in your config file or
+  by setting the `ANSIBLE_NULL_REPRESENTATION` environment variable.
+* Added `meta: refresh_inventory` to force rereading the inventory in a play.
+  This re-executes inventory scripts, but does not force them to ignore any cache they might use.
+* New delegate_facts directive, a boolean that allows you to apply facts to the delegated host (true/yes) instead of the inventory_hostname (no/false) which is the default and previous behaviour.
+* local connections now work with 'su' as a privilege escalation method
+* Ansible 2.0 has deprecated the “ssh” from ansible_ssh_user, ansible_ssh_host, and ansible_ssh_port to become ansible_user, ansible_host, and ansible_port.
+* New ssh configuration variables(`ansible_ssh_common_args`, `ansible_ssh_extra_args`) can be used to configure a
+  per-group or per-host ssh ProxyCommand or set any other ssh options.
+  `ansible_ssh_extra_args` is used to set options that are accepted only by ssh (not sftp or scp, which have their own analogous settings).
+* ansible-pull can now verify the code it runs when using git as a source repository, using git's code signing and verification features.
+* Backslashes used when specifying parameters in jinja2 expressions in YAML dicts sometimes needed to be escaped twice.
+  This has been fixed so that escaping once works. Here's an example of how playbooks need to be modified:
+
+    ```
+    # Syntax in 1.9.x
+    - debug:
+        msg: "{{ 'test1_junk 1\\\\3' | regex_replace('(.*)_junk (.*)', '\\\\1 \\\\2') }}"
+    # Syntax in 2.0.x
+    - debug:
+        msg: "{{ 'test1_junk 1\\3' | regex_replace('(.*)_junk (.*)', '\\1 \\2') }}"
+
+    # Output:
+    "msg": "test1 1\\3"
+    ```
+
+* When a string with a trailing newline was specified in the playbook via yaml
+dict format, the trailing newline was stripped. When specified in key=value
+format the trailing newlines were kept. In v2, both methods of specifying the
+string will keep the trailing newlines. If you relied on the trailing
+newline being stripped you can change your playbook like this:
+
+    ```
+    # Syntax in 1.9.2
+    vars:
+      message: >
+        Testing
+        some things
+    tasks:
+    - debug:
+        msg: "{{ message }}"
+
+    # Syntax in 2.0.x
+    vars:
+      old_message: >
+        Testing
+        some things
+      message: "{{ old_messsage[:-1] }}"
+    - debug:
+        msg: "{{ message }}"
+    # Output
+    "msg": "Testing some things"
+    ```
+
+* In 1.9.x, newlines in templates were converted to Unix EOL conventions.  If
+  someone wanted a templated file to end up with Windows or Mac EOL
+  conventions, this could cause problems for them.  In 2.x newlines now remain
+  as specified in the template file.
+
+* When specifying complex args as a variable, the variable must use the full jinja2
+variable syntax ('{{var_name}}') - bare variable names there are no longer accepted.
+In fact, even specifying args with variables has been deprecated, and will not be
+allowed in future versions:
+
+    ```
+    ---
+    - hosts: localhost
+      connection: local
+      gather_facts: false
+      vars:
+        my_dirs:
+          - { path: /tmp/3a, state: directory, mode: 0755 }
+          - { path: /tmp/3b, state: directory, mode: 0700 }
+      tasks:
+        - file:
+          args: "{{item}}"
+          with_items: my_dirs
+    ```
+
+* The bigip\* networking modules have a new parameter, validate_certs.  When
+  True (the default) the module will validate any hosts it connects to against
+  the TLS certificates it presents when run on new enough python versions.  If
+  the python version is too old to validate certificates or you used certificates
+  that cannot be validated against available CAs you will need to add
+  validate_certs=no to your playbook for those tasks.
+
+###Plugins
+
+* Rewritten dnf module that should be faster and less prone to encountering bugs in cornercases
+* WinRM connection plugin passes all vars named `ansible_winrm_*` to the underlying pywinrm client. This allows, for instance, `ansible_winrm_server_cert_validation=ignore` to be used with newer versions of pywinrm to disable certificate validation on Python 2.7.9+.
+* WinRM connection plugin put_file is significantly faster and no longer has file size limitations. 
+
+####Deprecated Modules (new ones in parens):
+
+* ec2_ami_search (ec2_ami_find)
+* quantum_network (os_network)
+* glance_image
+* nova_compute   (os_server)
+* quantum_floating_ip (os_floating_ip)
+* quantum_router (os_router)
+* quantum_router_gateway (os_router)
+* quantum_router_interface (os_router)
+
+####New Modules:
+
+* amazon: ec2_ami_copy
+* amazon: ec2_ami_find
+* amazon: ec2_elb_facts
+* amazon: ec2_eni
+* amazon: ec2_eni_facts
+* amazon: ec2_remote_facts
+* amazon: ec2_vpc_igw
+* amazon: ec2_vpc_net
+* amazon: ec2_vpc_net_facts
+* amazon: ec2_vpc_route_table
+* amazon: ec2_vpc_route_table_facts
+* amazon: ec2_vpc_subnet
+* amazon: ec2_vpc_subnet_facts
+* amazon: ec2_win_password
+* amazon: ecs_cluster
+* amazon: ecs_task
+* amazon: ecs_taskdefinition
+* amazon: elasticache_subnet_group_facts
+* amazon: iam
+* amazon: iam_cert
+* amazon: iam_policy
+* amazon: route53_facts
+* amazon: route53_health_check
+* amazon: route53_zone
+* amazon: sts_assume_role
+* amazon: s3_bucket
+* amazon: s3_lifecycle
+* amazon: s3_logging
+* amazon: sqs_queue
+* amazon: sns_topic
+* amazon: sts_assume_role
+* apk
+* bigip_gtm_wide_ip
+* bundler
+* centurylink: clc_aa_policy
+* centurylink: clc_alert_policy
+* centurylink: clc_blueprint_package
+* centurylink: clc_firewall_policy
+* centurylink: clc_group
+* centurylink: clc_loadbalancer
+* centurylink: clc_modify_server
+* centurylink: clc_publicip
+* centurylink: clc_server
+* centurylink: clc_server_snapshot
+* circonus_annotation
+* consul
+* consul_acl
+* consul_kv
+* consul_session
+* cloudtrail
+* cloudstack: cs_account
+* cloudstack: cs_affinitygroup
+* cloudstack: cs_domain
+* cloudstack: cs_facts
+* cloudstack: cs_firewall
+* cloudstack: cs_iso
+* cloudstack: cs_instance
+* cloudstack: cs_instancegroup
+* cloudstack: cs_ip_address
+* cloudstack: cs_loadbalancer_rule
+* cloudstack: cs_loadbalancer_rule_member
+* cloudstack: cs_network
+* cloudstack: cs_portforward
+* cloudstack: cs_project
+* cloudstack: cs_sshkeypair
+* cloudstack: cs_securitygroup
+* cloudstack: cs_securitygroup_rule
+* cloudstack: cs_staticnat
+* cloudstack: cs_template
+* cloudstack: cs_user
+* cloudstack: cs_vmsnapshot
+* cronvar
+* datadog_monitor
+* deploy_helper
+* docker: docker_login
+* dpkg_selections
+* elasticsearch_plugin
+* expect
+* find
+* google: gce_tag
+* hall
+* ipify_facts
+* iptables
+* libvirt: virt_net
+* libvirt: virt_pool
+* maven_artifact
+* openstack: os_auth
+* openstack: os_client_config
+* openstack: os_image
+* openstack: os_image_facts
+* openstack: os_floating_ip
+* openstack: os_ironic
+* openstack: os_ironic_node
+* openstack: os_keypair
+* openstack: os_network
+* openstack: os_network_facts
+* openstack: os_nova_flavor
+* openstack: os_object
+* openstack: os_port
+* openstack: os_project
+* openstack: os_router
+* openstack: os_security_group
+* openstack: os_security_group_rule
+* openstack: os_server
+* openstack: os_server_actions
+* openstack: os_server_facts
+* openstack: os_server_volume
+* openstack: os_subnet
+* openstack: os_subnet_facts
+* openstack: os_user
+* openstack: os_user_group
+* openstack: os_volume
+* openvswitch_db.
+* osx_defaults
+* pagerduty_alert
+* pam_limits
+* pear
+* profitbricks: profitbricks
+* profitbricks: profitbricks_datacenter
+* profitbricks: profitbricks_nic
+* profitbricks: profitbricks_volume
+* profitbricks: profitbricks_volume_attachments
+* profitbricks: profitbricks_snapshot
+* proxmox: proxmox
+* proxmox: proxmox_template
+* puppet
+* pushover
+* pushbullet
+* rax: rax_clb_ssl
+* rax: rax_mon_alarm
+* rax: rax_mon_check
+* rax: rax_mon_entity
+* rax: rax_mon_notification
+* rax: rax_mon_notification_plan
+* rabbitmq_binding
+* rabbitmq_exchange
+* rabbitmq_queue
+* selinux_permissive
+* sendgrid
+* sensu_check
+* sensu_subscription
+* seport
+* slackpkg
+* solaris_zone
+* taiga_issue
+* vertica_configuration
+* vertica_facts
+* vertica_role
+* vertica_schema
+* vertica_user
+* vmware: vca_fw
+* vmware: vca_nat
+* vmware: vmware_cluster
+* vmware: vmware_datacenter
+* vmware: vmware_dns_config
+* vmware: vmware_dvs_host
+* vmware: vmware_dvs_portgroup
+* vmware: vmware_dvswitch
+* vmware: vmware_host
+* vmware: vmware_migrate_vmk
+* vmware: vmware_portgroup
+* vmware: vmware_target_canonical_facts
+* vmware: vmware_vm_facts
+* vmware: vmware_vm_vss_dvs_migrate
+* vmware: vmware_vmkernel
+* vmware: vmware_vmkernel_ip_config
+* vmware: vmware_vsan_cluster
+* vmware: vmware_vswitch
+* vmware: vsphere_copy
+* webfaction_app
+* webfaction_db
+* webfaction_domain
+* webfaction_mailbox
+* webfaction_site
+* win_acl
+* win_dotnet_ngen
+* win_environment
+* win_firewall_rule
+* win_iis_virtualdirectory
+* win_iis_webapplication
+* win_iis_webapppool
+* win_iis_webbinding
+* win_iis_website
+* win_lineinfile
+* win_nssm
+* win_package
+* win_regedit
+* win_scheduled_task
+* win_unzip
+* win_updates
+* win_webpicmd
+* xenserver_facts
+* zabbix_host
+* zabbix_hostmacro
+* zabbix_screen
+* znode
+
+####New Inventory scripts:
+
+* cloudstack
+* fleetctl
+* openvz
+* nagios_ndo
+* nsot
+* proxmox
+* rudder
+* serf
+
+####New Lookups:
+
+* credstash
+* hashi_vault
+* ini
+* shelvefile
+
+####New Filters:
+
+* combine
+
+####New Connection:
+
+* docker: for talking to docker containers on the ansible controller machine without using ssh.
+
+####New Callbacks:
+
+* logentries: plugin to send play data to logentries service
+* skippy: same as default but does not display skip messages
+
+###Minor changes:
+
+* Many more tests. The new API makes things more testable and we took advantage of it.
+* big_ip modules now support turning off ssl certificate validation (use only for self-signed certificates).
+* Consolidated code from modules using urllib2 to normalize features, TLS and SNI support.
+* synchronize module's dest_port parameter now takes precedence over the ansible_ssh_port inventory setting.
+* Play output is now dynamically sized to terminal with a minimum of 80 coluumns (old default).
+* vars_prompt and pause are now skipped with a warning if the play is called non interactively (i.e. pull from cron).
+* Support for OpenBSD's 'doas' privilege escalation method.
+* Most vault operations can now be done over multilple files.
+* ansible-vault encrypt/decrypt read from stdin if no other input file is given, and can write to a given ``--output file`` (including stdout, '-').
+  This lets you avoid ever writing sensitive plaintext to disk.
+* ansible-vault rekey accepts the --new-vault-password-file option.
+* ansible-vault now preserves file permissions on edit and rekey and defaults to restrictive permissions for other options.
+* Configuration items defined as paths (local only) now all support shell style interpolations.
+* Many fixes and new options added to modules, too many to list here.
+* Now you can see task file and line number when using verbosity of 3 or above.
+* The ``[x-y]`` host range syntax is no longer supported. Note that ``[0:1]`` matches two hosts, i.e. the range is inclusive of its endpoints.
+* We now recommend the Use `pattern1,pattern2` to combine host matching patterns.
+  * The use of ':' as a separator conflicts with IPv6 addresses and host ranges. It will be deprecated in the future.
+  * The undocumented use of ';' as a separator is now deprecated.
+* modules and callbacks have been extended to support no_log to avoid data disclosure.
+* new managed_syslog option has been added to control output to syslog on managed machines, no_log supercsedes this settings.
+* Lookup, vars and action plugin pathing has been normalized, all now follow the same sequence to find relative files.
+* We do not ignore the explicitly set login user for ssh when it matches the 'current user' anymore, this allows overriding .ssh/config when it is set
+  explicitly. Leaving it unset will still use the same user and respect .ssh/config. This also means ansible_ssh_user can now return a None value.
+* environment variables passed to remote shells now default to 'controller' settings, with fallback to en_us.UTF8 which was the previous default.
+* add_hosts is much stricter about host name and will prevent invalid names from being added.
+* ansible-pull now defaults to doing shallow checkouts with git, use `--full` to return to previous behaviour.
+* random cows are more random
+* when: now gets the registered var after the first iteration, making it possible to break out of item loops
+* Handling of undefined variables has changed.  In most places they will now raise an error instead of silently injecting an empty string.  Use the default filter if you want to approximate the old behaviour:
+
+    ```
+    - debug: msg="The error message was: {{error_code |default('') }}"
+    ```
+
+* The yum module's detection of installed packages has been made more robust by
+  using /usr/bin/rpm in cases where it woud have used repoquery before.
+* The pip module now properly reports changes when packages are coming from a VCS.
+* Fixes for retrieving files over https when a CONNECT-only proxy is in the middle.
+
+## 1.9.4 "Dancing In the Street" - Oct 9, 2015
+
+* Fixes a bug where yum state=latest would error if there were no updates to install.
+* Fixes a bug where yum state=latest did not work with wildcard package names.
+* Fixes a bug in lineinfile relating to escape sequences.
+* Fixes a bug where vars_prompt was not keeping passwords private by default.
+* Fix ansible-galaxy and the hipchat callback plugin to check that the host it
+  is contacting matches its TLS Certificate.
+
+## 1.9.3 "Dancing In the Street" - Sep 3, 2015
 
 * Fixes a bug related to keyczar messing up encodings internally, resulting in decrypted
   messages coming out as empty strings.
@@ -45,7 +486,7 @@ Other Notable Changes:
   Prior to this fix being applied these connection plugins didn't properly
   handle symlinks within the containers which could lead to files intended to
   be written to or read from the container being written to or read from the
-  host system instead. (CVE-2015-6240)
+  host system instead. (CVE pending)
 * Fixed a bug in the service module where init scripts were being incorrectly used instead of upstart/systemd.
 * Fixed a bug where sudo/su settings were not inherited from ansible.cfg correctly.
 * Fixed a bug in the rds module where a traceback may occur due to an unbound variable.
@@ -61,12 +502,6 @@ Other Notable Changes:
 * Fix bug disabling repositories in the yum module.
 * Fix giving yum module a url to install a package from on RHEL/CENTOS5
 * Fix bug in dnf module preventing it from working when yum-utils was not already installed
-* Change yum module to install all packages specified in a single transaction.
-  This fixes problems with dependencies between packages specified by filename
-  or URL.  However, if you are installing packages which install or modify repository
-  information (for instance, epel-release) then you may need to make a separate
-  task to install the package that modifies the repo otherwise the correct
-  repository information may not be available for other packages you are trying to install.
 
 ## 1.9.1 "Dancing In the Street" - Apr 27, 2015
 
@@ -90,7 +525,6 @@ Major changes:
 * Privilege Escalation generalization, new 'Become' system and variables  now will
   handle existing and new methods. Sudo and su have been kept for backwards compatibility.
   New methods pbrun and pfexec in 'alpha' state, planned adding 'runas' for winrm connection plugin.
-  Existing custom connection plugins will need to be updated.
 * Improved ssh connection error reporting, now you get back the specific message from ssh.
 * Added facility to document task module return values for registered vars, both for
   ansible-doc and the docsite. Documented copy, stats and acl modules, the rest must be
@@ -99,11 +533,11 @@ Major changes:
   For some use cases this can lead to dramatic improvements in startup time.
 * Overhaul of the checksum system, now supports more systems and more cases more reliably and uniformly.
 * Fix skipped tasks to not display their parameters if no_log is specified.
-* Many fixes to unicode support, standarized functions to make it easier to add to input/output boundries.
+* Many fixes to unicode support, standarized functions to make it easier to add to input/output boundaries.
 * Added travis integration to github for basic tests, this should speed up ticket triage and merging.
-* environment: directive now can also be applied to play and is inhertited by tasks, which can still overridde it.
+* environment: directive now can also be applied to play and is inhertited by tasks, which can still override it.
 * expanded facts and OS/distribution support for existing facts and improved performance with pypy.
-* new 'wantlist' option to lookups allows for selecting a list typed variable vs a commad delimited string as the return.
+* new 'wantlist' option to lookups allows for selecting a list typed variable vs a comma delimited string as the return.
 * the shared module code for file backups now uses a timestamp resolution of seconds (previouslly minutes).
 * allow for empty inventories, this is now a warning and not an error (for those using localhost and cloud modules).
 * sped up YAML parsing in ansible by up to 25% by switching to CParser loader.
@@ -126,8 +560,8 @@ New Modules:
 
 New Filters:
 
-* ternary: allows for trueval/falseval assignement dependint on conditional
-* cartesian: returns the cartesian product of 2 lists
+* ternary: allows for trueval/falseval assignment dependent on conditional
+* cartesian: returns the Cartesian product of 2 lists
 * to_uuid: given a string it will return an ansible domain specific UUID
 * checksum: uses the ansible internal checksum to return a hash from a string
 * hash: get a hash from a string (md5, sha1, etc)
@@ -139,8 +573,10 @@ Other Notable Changes:
 * New lookup plugins:
   * dig: does dns resolution and returns IPs.
   * url: allows pulling data from a url.
+
 * New callback plugins:
   * syslog_json: allows logging play output to a syslog network server using json format
+
 * Many new enhancements to the amazon web service modules:
   * ec2 now applies all specified security groups when creating a new instance.  Previously it was only applying one
   * ec2_vol gained the ability to specify the EBS volume type
@@ -156,14 +592,14 @@ Other Notable Changes:
   * restart_policy parameters to configure when the container automatically restarts
   * If the docker client or server doesn't support an option, the task will now fail instead of silently ignoring the option
   * Add insecure_registry parameter for connecting to registries via http
-  * New parameter to set a container's domainname
+  * New parameter to set a container's domain name
   * Undeprecated docker_image module until there's replacement functionality
   * Allow setting the container's pid namespace
   * Add a pull parameter that chooses when ansible will look for more recent images in the registry
   * docker module states have been greatly enhanced.  The reworked and new states are:
     * present now creates but does not start containers
     * restarted always restarts a container
-    * reloaded restarts a container if ansible detects that the configuration is different than what is spcified
+    * reloaded restarts a container if ansible detects that the configuration is different than what is specified
       * reloaded accounts for exposed ports, env vars, and volumes
   * Can now connect to the docker server using TLS
 * Several source control modules had force parameters that defaulted to true.
@@ -176,7 +612,7 @@ Other Notable Changes:
     Operations that depend on a clean working tree may fail unless force=yes is
     added.
   * git: When local modifications exist in a checkout, the git module will now
-    fail unless force is explictly specified.  Specifying force=yes will allow
+    fail unless force is explicitly specified.  Specifying force=yes will allow
     the module to revert and overwrite local modifications to make git actions
     succeed.
   * hg: When local modifications exist in a checkout, the hg module used to
@@ -198,7 +634,7 @@ Other Notable Changes:
 * Many fixes for hardlink and softlink handling in file-related modules
 * Implement user, group, mode, and selinux parameters for the unarchive module
 * authorized_keys can now use url as a key source
-* authorized_keys has a new exclusive paameter that determines if keys that weren't specified in the task
+* authorized_keys has a new exclusive parameter that determines if keys that weren't specified in the task
 * The selinux module now sets the current running state to permissive if state='disabled'
 * Can now set accounts to expire via the user module
 * Overhaul of the service module to make code simpler and behave better for systems running several popular init systems
@@ -216,7 +652,7 @@ Other Notable Changes:
 
 ## 1.8.3 "You Really Got Me" - Feb 17, 2015
 
-* Fixing a security bug related to the default permissions set on a tempoary file created when using "ansible-vault view <filename>".
+* Fixing a security bug related to the default permissions set on a temporary file created when using "ansible-vault view <filename>".
 * Many bug fixes, for both core code and core modules.
 
 ## 1.8.2 "You Really Got Me" - Dec 04, 2014
@@ -317,7 +753,7 @@ And various other bug fixes and improvements ...
 - Fixes a bug in vault where the password file option was not being used correctly internally.
 - Improved multi-line parsing when using YAML literal blocks (using > or |).
 - Fixed a bug with the file module and the creation of relative symlinks.
-- Fixed a bug where checkmode was not being honored during the templating of files.
+- Fixed a bug where checkmode was not being honoured during the templating of files.
 - Other various bug fixes.
 
 ## 1.7.1 "Summer Nights" - Aug 14, 2014
@@ -360,7 +796,7 @@ New Modules:
 Other notable changes:
 
 * Security fixes
-  - Prevent the use of lookups when using legaxy "{{ }}" syntax around variables and with_* loops.
+  - Prevent the use of lookups when using legacy "{{ }}" syntax around variables and with_* loops.
   - Remove relative paths in TAR-archived file names used by ansible-galaxy.
 * Inventory speed improvements for very large inventories.
 * Vault password files can now be executable, to support scripts that fetch the vault password.
@@ -504,7 +940,7 @@ Other notable changes:
 ## 1.5.4 "Love Walks In" - April 1, 2014
 
 - Security fix for safe_eval, which further hardens the checking of the evaluation function.
-- Changing order of variable precendence for system facts, to ensure that inventory variables take precedence over any facts that may be set on a host.
+- Changing order of variable precedence for system facts, to ensure that inventory variables take precedence over any facts that may be set on a host.
 
 ## 1.5.3 "Love Walks In" - March 13, 2014
 
@@ -539,7 +975,7 @@ Major features/changes:
 * ec2 module now accepts 'exact_count' and 'count_tag' as a way to enforce a running number of nodes by tags.
 * all ec2 modules that work with Eucalyptus also now support a 'validate_certs' option, which can be set to 'off' for installations using self-signed certs.
 * Start of new integration test infrastructure (WIP, more details TBD)
-* if repoquery is unavailble, the yum module will automatically attempt to install yum-utils
+* if repoquery is unavailable, the yum module will automatically attempt to install yum-utils
 * ansible-vault: a framework for encrypting your playbooks and variable files 
 * added support for privilege escalation via 'su' into bin/ansible and bin/ansible-playbook and associated keywords 'su', 'su_user', 'su_pass' for tasks/plays
 
@@ -1002,7 +1438,7 @@ Bugfixes and Misc Changes:
 * misc fixes to the Riak module
 * make template module slightly more efficient
 * base64encode / decode filters are now available to templates
-* libvirt module can now work with multiple different libvirt connecton URIs
+* libvirt module can now work with multiple different libvirt connection URIs
 * fix for postgresql password escaping
 * unicode fix for shlex.split in some cases
 * apt module upgrade logic improved
@@ -1037,7 +1473,7 @@ the variable is still registered for the host, with the attribute skipped: True.
 * service pattern argument now correctly read for BSD services
 * fetch location can now be controlled more directly via the 'flat' parameter.
 * added basename and dirname as Jinja2 filters available to all templates
-* pip works better when sudoing from unpriveledged users
+* pip works better when sudoing from unprivileged users
 * fix for user creation with groups specification reporting 'changed' incorrectly in some cases
 * fix for some unicode encoding errors in outputing some data in verbose mode
 * improved FreeBSD, NetBSD and Solaris facts
@@ -1207,7 +1643,7 @@ New playbook/language features:
 * task includes can now be of infinite depth
 * when_set and when_unset can take more than one var (when_set: $a and $b and $c)
 * added the with_sequence lookup plugin
-* can override "connection:" on an indvidual task
+* can override "connection:" on an individual task
 * parameterized playbook includes can now define complex variables (not just all on one line)
 * making inventory variables available for use in vars_files paths
 * messages when skipping plays are now more clear
