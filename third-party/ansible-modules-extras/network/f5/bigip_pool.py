@@ -25,7 +25,7 @@ short_description: "Manages F5 BIG-IP LTM pools"
 description:
     - "Manages F5 BIG-IP LTM pools via iControl SOAP API"
 version_added: "1.2"
-author: Matt Hite
+author: "Matt Hite (@mhite)"
 notes:
     - "Requires BIG-IP software version >= 11"
     - "F5 developed module 'bigsuds' required (see http://devcentral.f5.com)"
@@ -54,6 +54,15 @@ options:
         default: null
         choices: []
         aliases: []
+    validate_certs:
+        description:
+            - If C(no), SSL certificates will not be validated. This should only be used
+              on personally controlled sites.  Prior to 2.0, this module would always
+              validate on python >= 2.7.9 and never validate on python <= 2.7.8
+        required: false
+        default: 'yes'
+        choices: ['yes', 'no']
+        version_added: 2.0
     state:
         description:
             - Pool/pool member state
@@ -220,21 +229,6 @@ EXAMPLES = '''
 
 '''
 
-try:
-    import bigsuds
-except ImportError:
-    bigsuds_found = False
-else:
-    bigsuds_found = True
-
-# ===========================================
-# bigip_pool module specific support methods.
-#
-
-def bigip_api(bigip, user, password):
-    api = bigsuds.BIGIP(hostname=bigip, username=user, password=password)
-    return api
-
 def pool_exists(api, pool):
     # hack to determine if pool exists
     result = False
@@ -354,14 +348,9 @@ def main():
 
     service_down_choices = ['none', 'reset', 'drop', 'reselect']
 
-    module = AnsibleModule(
-        argument_spec = dict(
-            server = dict(type='str', required=True),
-            user = dict(type='str', required=True),
-            password = dict(type='str', required=True),
-            state = dict(type='str', default='present', choices=['present', 'absent']),
+    argument_spec=f5_argument_spec();
+    argument_spec.update(dict(
             name = dict(type='str', required=True, aliases=['pool']),
-            partition = dict(type='str', default='Common'),
             lb_method = dict(type='str', choices=lb_method_choices),
             monitor_type = dict(type='str', choices=monitor_type_choices),
             quorum = dict(type='int'),
@@ -370,20 +359,18 @@ def main():
             service_down_action = dict(type='str', choices=service_down_choices),
             host = dict(type='str', aliases=['address']),
             port = dict(type='int')
-        ),
+        )
+    )
+
+    module = AnsibleModule(
+        argument_spec = argument_spec,
         supports_check_mode=True
     )
 
-    if not bigsuds_found:
-        module.fail_json(msg="the python bigsuds module is required")
+    (server,user,password,state,partition,validate_certs) = f5_parse_arguments(module)
 
-    server = module.params['server']
-    user = module.params['user']
-    password = module.params['password']
-    state = module.params['state']
     name = module.params['name']
-    partition = module.params['partition']
-    pool = "/%s/%s" % (partition, name)
+    pool = fq_name(partition,name)
     lb_method = module.params['lb_method']
     if lb_method:
         lb_method = lb_method.lower()
@@ -395,16 +382,13 @@ def main():
     if monitors:
         monitors = []
         for monitor in module.params['monitors']:
-            if "/" not in monitor:
-                monitors.append("/%s/%s" % (partition, monitor))
-            else:
-                monitors.append(monitor)
+                monitors.append(fq_name(partition, monitor))
     slow_ramp_time = module.params['slow_ramp_time']
     service_down_action = module.params['service_down_action']
     if service_down_action:
         service_down_action = service_down_action.lower()
     host = module.params['host']
-    address = "/%s/%s" % (partition, host)
+    address = fq_name(partition,host)
     port = module.params['port']
 
     # sanity check user supplied values
@@ -435,7 +419,7 @@ def main():
         module.fail_json(msg="quorum requires monitors parameter")
 
     try:
-        api = bigip_api(server, user, password)
+        api = bigip_api(server, user, password, validate_certs)
         result = {'changed': False}  # default
 
         if state == 'absent':
@@ -532,5 +516,6 @@ def main():
 
 # import module snippets
 from ansible.module_utils.basic import *
+from ansible.module_utils.f5 import *
 main()
 

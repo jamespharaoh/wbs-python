@@ -30,6 +30,9 @@ description:
     - Manages symbolic links using the 'update-alternatives' tool
     - Useful when multiple programs are installed but provide similar functionality (e.g. different editors).
 version_added: "1.6"
+author:
+    - "David Wittman (@DavidWittman)"
+    - "Gabe Mulley (@mulby)"
 options:
   name:
     description:

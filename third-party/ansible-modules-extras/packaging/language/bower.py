@@ -25,7 +25,7 @@ short_description: Manage bower packages with bower
 description:
   - Manage bower packages with bower
 version_added: 1.9
-author: Michael Warkentin
+author: "Michael Warkentin (@mwarkentin)"
 options:
   name:
     description:
@@ -37,6 +37,13 @@ options:
     required: false
     default: no
     choices: [ "yes", "no" ]
+  production:
+    description:
+      - Install with --production flag
+    required: false
+    default: no
+    choices: [ "yes", "no" ]
+    version_added: "2.0"
   path:
     description:
       - The base path where to install the bower packages
@@ -76,6 +83,7 @@ class Bower(object):
         self.module = module
         self.name = kwargs['name']
         self.offline = kwargs['offline']
+        self.production = kwargs['production']
         self.path = kwargs['path']
         self.version = kwargs['version']
 
@@ -86,13 +94,16 @@ class Bower(object):
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
-            cmd = ["bower"] + args
+            cmd = ["bower"] + args + ['--config.interactive=false', '--allow-root']
 
             if self.name:
                 cmd.append(self.name_version)
 
             if self.offline:
                 cmd.append('--offline')
+
+            if self.production:
+                cmd.append('--production')
 
             # If path is specified, cd into that path and run the command.
             cwd = None
@@ -108,7 +119,7 @@ class Bower(object):
         return ''
 
     def list(self):
-        cmd = ['list', '--json', '--config.interactive=false', '--allow-root']
+        cmd = ['list', '--json']
 
         installed = list()
         missing = list()
@@ -116,11 +127,15 @@ class Bower(object):
         data = json.loads(self._exec(cmd, True, False))
         if 'dependencies' in data:
             for dep in data['dependencies']:
-                if 'missing' in data['dependencies'][dep] and data['dependencies'][dep]['missing']:
+                dep_data = data['dependencies'][dep]
+                if dep_data.get('missing', False):
                     missing.append(dep)
-                elif data['dependencies'][dep]['pkgMeta']['version'] != data['dependencies'][dep]['update']['latest']:
+                elif \
+                  'version' in dep_data['pkgMeta'] and \
+                  'update' in dep_data and \
+                  dep_data['pkgMeta']['version'] != dep_data['update']['latest']:
                     outdated.append(dep)
-                elif 'incompatible' in data['dependencies'][dep] and data['dependencies'][dep]['incompatible']:
+                elif dep_data.get('incompatible', False):
                     outdated.append(dep)
                 else:
                     installed.append(dep)
@@ -144,6 +159,7 @@ def main():
     arg_spec = dict(
         name=dict(default=None),
         offline=dict(default='no', type='bool'),
+        production=dict(default='no', type='bool'),
         path=dict(required=True),
         state=dict(default='present', choices=['present', 'absent', 'latest', ]),
         version=dict(default=None),
@@ -154,14 +170,15 @@ def main():
 
     name = module.params['name']
     offline = module.params['offline']
-    path = module.params['path']
+    production = module.params['production']
+    path = os.path.expanduser(module.params['path'])
     state = module.params['state']
     version = module.params['version']
 
     if state == 'absent' and not name:
         module.fail_json(msg='uninstalling a package is only available for named packages')
 
-    bower = Bower(module, name=name, offline=offline, path=path, version=version)
+    bower = Bower(module, name=name, offline=offline, production=production, path=path, version=version)
 
     changed = False
     if state == 'present':

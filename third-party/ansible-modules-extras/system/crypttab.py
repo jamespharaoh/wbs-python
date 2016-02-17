@@ -29,7 +29,7 @@ options:
   name:
     description:
       - Name of the encrypted block device as it appears in the C(/etc/crypttab) file, or
-        optionaly prefixed with C(/dev/mapper), as it appears in the filesystem. I(/dev/mapper)
+        optionaly prefixed with C(/dev/mapper/), as it appears in the filesystem. I(/dev/mapper/)
         will be stripped from I(name).
     required: true
     default: null
@@ -69,7 +69,7 @@ options:
 
 notes: []
 requirements: []
-author: Steve <yo@groks.org>
+author: "Steve (@groks)"
 '''
 
 EXAMPLES = '''
@@ -96,14 +96,17 @@ def main():
         supports_check_mode = True
     )
 
-    name           = module.params['name'].lstrip('/dev/mapper')
     backing_device = module.params['backing_device']
     password       = module.params['password']
     opts           = module.params['opts']
     state          = module.params['state']
     path           = module.params['path']
+    name           = module.params['name']
+    if name.startswith('/dev/mapper/'):
+        name = name[len('/dev/mapper/'):]
 
-    if backing_device is None and password is None and opts is None:
+
+    if state != 'absent' and backing_device is None and password is None and opts is None:
         module.fail_json(msg="expected one or more of 'backing_device', 'password' or 'opts'",
                          **module.params)
 
@@ -155,9 +158,11 @@ def main():
 
 
     if changed and not module.check_mode:
-        f = open(path, 'wb')
-        f.write(str(crypttab))
-        f.close()
+        try:
+            f = open(path, 'wb')
+            f.write(str(crypttab))
+        finally:
+            f.close()
 
     module.exit_json(changed=changed, msg=reason, **module.params)
 
@@ -173,10 +178,12 @@ class Crypttab(object):
                 os.makedirs(os.path.dirname(path))
             open(path,'a').close()
 
-        f = open(path, 'r')
-        for line in f.readlines():
-            self._lines.append(Line(line))
-        f.close()
+        try:
+            f = open(path, 'r')
+            for line in f.readlines():
+                self._lines.append(Line(line))
+        finally:
+            f.close()
 
     def add(self, line):
         self._lines.append(line)
@@ -245,18 +252,18 @@ class Line(object):
     def _split_line(self, line):
         fields = line.split()
         try:
-            field2 = field[2]
+            field2 = fields[2]
         except IndexError:
             field2 = None
         try:
-            field3 = field[3]
+            field3 = fields[3]
         except IndexError:
             field3 = None
 
         return (fields[0],
                 fields[1],
                 field2,
-                fields3)
+                field3)
 
     def remove(self):
         self.line, self.name, self.backing_device = '', None, None

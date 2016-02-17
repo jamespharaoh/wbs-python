@@ -20,7 +20,9 @@
 
 DOCUMENTATION = '''
 ---
-author: Jeroen Hoekx
+author:
+    - "Jeroen Hoekx (@jhoekx)"
+    - "Alexander Bulimov (@abulimov)"
 module: lvol
 short_description: Configure LVM logical volumes
 description:
@@ -40,7 +42,8 @@ options:
     - The size of the logical volume, according to lvcreate(8) --size, by
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
       according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE];
-      resizing is not supported with percentages.
+      resizing is not supported with percentages. Float values must begin
+      with a digit.
   state:
     choices: [ "present", "absent" ]
     default: present
@@ -55,6 +58,10 @@ options:
     - Shrink or remove operations of volumes requires this switch. Ensures that
       that filesystems get never corrupted/destroyed by mistake.
     required: false
+  opts:
+    version_added: "2.0"
+    description:
+    - Free-form options to be passed to the lvcreate command
 notes:
   - Filesystems on top of the volume are not resized.
 '''
@@ -68,6 +75,9 @@ EXAMPLES = '''
 
 # Create a logical volume the size of all remaining space in the volume group
 - lvol: vg=firefly lv=test size=100%FREE
+
+# Create a logical volume with special options
+- lvol: vg=firefly lv=test size=512g opts="-r 16"
 
 # Extend the logical volume to 1024m.
 - lvol: vg=firefly lv=test size=1024
@@ -83,6 +93,9 @@ import re
 
 decimal_point = re.compile(r"(\.|,)")
 
+def mkversion(major, minor, patch):
+    return (1000 * 1000 * int(major)) + (1000 * int(minor)) + int(patch)
+
 
 def parse_lvs(data):
     lvs = []
@@ -95,25 +108,51 @@ def parse_lvs(data):
     return lvs
 
 
+def get_lvm_version(module):
+    ver_cmd = module.get_bin_path("lvm", required=True)
+    rc, out, err = module.run_command("%s version" % (ver_cmd))
+    if rc != 0:
+        return None
+    m = re.search("LVM version:\s+(\d+)\.(\d+)\.(\d+).*(\d{4}-\d{2}-\d{2})", out)
+    if not m:
+        return None
+    return mkversion(m.group(1), m.group(2), m.group(3))
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             vg=dict(required=True),
             lv=dict(required=True),
-            size=dict(),
+            size=dict(type='str'),
+            opts=dict(type='str'),
             state=dict(choices=["absent", "present"], default='present'),
             force=dict(type='bool', default='no'),
         ),
         supports_check_mode=True,
     )
 
+    # Determine if the "--yes" option should be used
+    version_found = get_lvm_version(module)
+    if version_found == None:
+        module.fail_json(msg="Failed to get LVM version number")
+    version_yesopt = mkversion(2, 2, 99) # First LVM with the "--yes" option
+    if version_found >= version_yesopt:
+        yesopt = "--yes"
+    else:
+        yesopt = ""
+
     vg = module.params['vg']
     lv = module.params['lv']
     size = module.params['size']
+    opts = module.params['opts']
     state = module.params['state']
     force = module.boolean(module.params['force'])
     size_opt = 'L'
     size_unit = 'm'
+
+    if opts is None:
+        opts = ""
 
     if size:
         # LVCREATE(8) -l --extents option with percentage
@@ -130,23 +169,19 @@ def main():
             size_opt = 'l'
             size_unit = ''
 
+        if not '%' in size:
         # LVCREATE(8) -L --size option unit
-        elif size[-1].isalpha():
             if size[-1].lower() in 'bskmgtpe':
-                size_unit = size[-1].lower()
-                if size[0:-1].isdigit():
-                    size = int(size[0:-1])
-                else:
-                    module.fail_json(msg="Bad size specification for unit %s" % size_unit)
-                size_opt = 'L'
-            else:
-                module.fail_json(msg="Size unit should be one of [bBsSkKmMgGtTpPeE]")
-        # when no unit, megabytes by default
-        elif size.isdigit():
-            size = int(size)
-        else:
-            module.fail_json(msg="Bad size specification")
+               size_unit = size[-1].lower()
+               size = size[0:-1]
 
+            try:
+               float(size)
+               if not size[0].isdigit(): raise ValueError()
+            except ValueError:
+               module.fail_json(msg="Bad size specification of '%s'" % size)
+
+    # when no unit, megabytes by default
     if size_opt == 'l':
         unit = 'm'
     else:
@@ -154,7 +189,7 @@ def main():
 
     lvs_cmd = module.get_bin_path("lvs", required=True)
     rc, current_lvs, err = module.run_command(
-        "%s --noheadings -o lv_name,size --units %s --separator ';' %s" % (lvs_cmd, unit, vg))
+        "%s --noheadings --nosuffix -o lv_name,size --units %s --separator ';' %s" % (lvs_cmd, unit, vg))
 
     if rc != 0:
         if state == 'absent':
@@ -187,7 +222,8 @@ def main():
                 changed = True
             else:
                 lvcreate_cmd = module.get_bin_path("lvcreate", required=True)
-                rc, _, err = module.run_command("%s -n %s -%s %s%s %s" % (lvcreate_cmd, lv, size_opt, size, size_unit, vg))
+                cmd = "%s %s -n %s -%s %s%s %s %s" % (lvcreate_cmd, yesopt, lv, size_opt, size, size_unit, opts, vg)
+                rc, _, err = module.run_command(cmd)
                 if rc == 0:
                     changed = True
                 else:

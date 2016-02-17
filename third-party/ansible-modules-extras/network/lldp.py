@@ -19,12 +19,13 @@ import subprocess
 DOCUMENTATION = '''
 ---
 module: lldp
+requirements: [ lldpctl ]
 version_added: 1.6
 short_description: get details reported by lldp
 description:
   - Reads data out of lldpctl
 options: {}
-author: Andy Hill
+author: "Andy Hill (@andyhky)"
 notes:
   - Requires lldpd running and lldp enabled on switches 
 '''
@@ -58,6 +59,8 @@ def gather_lldp():
                 path, value = entry.strip().split("=", 1)
                 path = path.split(".")
                 path_components, final = path[:-1], path[-1]
+            else:
+                value = current_dict[final] + '\n' + entry
 
             current_dict = output_dict
             for path_component in path_components:

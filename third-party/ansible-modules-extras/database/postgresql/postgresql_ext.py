@@ -65,7 +65,7 @@ notes:
    - This module uses I(psycopg2), a Python PostgreSQL database adapter. You must ensure that psycopg2 is installed on
      the host before using this module. If the remote host is the PostgreSQL server (which is the default case), then PostgreSQL must also be installed on the remote host. For Ubuntu-based systems, install the C(postgresql), C(libpq-dev), and C(python-psycopg2) packages on the remote host before using this module.
 requirements: [ psycopg2 ]
-author: Daniel Schep
+author: "Daniel Schep (@dschep)"
 '''
 
 EXAMPLES = '''
@@ -137,7 +137,7 @@ def main():
     state = module.params["state"]
     changed = False
 
-    # To use defaults values, keyword arguments must be absent, so
+    # To use defaults values, keyword arguments must be absent, so 
     # check which values are empty and don't include in the **kw
     # dictionary
     params_map = {
@@ -146,7 +146,7 @@ def main():
         "login_password":"password",
         "port":"port"
     }
-    kw = dict( (params_map[k], v) for (k, v) in module.params.iteritems()
+    kw = dict( (params_map[k], v) for (k, v) in module.params.iteritems() 
               if k in params_map and v != '' )
     try:
         db_connection = psycopg2.connect(database=db, **kw)

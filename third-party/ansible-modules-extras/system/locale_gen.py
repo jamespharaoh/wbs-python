@@ -1,6 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import os.path
 from subprocess import Popen, PIPE, call
@@ -13,6 +27,7 @@ short_description: Creates or removes locales.
 description:
      - Manages locales by editing /etc/locale.gen and invoking locale-gen.
 version_added: "1.6"
+author: "Augustus Kling (@AugustusKling)"
 options:
     name:
         description:
@@ -37,6 +52,13 @@ LOCALE_NORMALIZATION = {
     ".utf8": ".UTF-8",
     ".eucjp": ".EUC-JP",
     ".iso885915": ".ISO-8859-15",
+    ".cp1251": ".CP1251",
+    ".koi8r": ".KOI8-R",
+    ".armscii8": ".ARMSCII-8",
+    ".euckr": ".EUC-KR",
+    ".gbk": ".GBK",
+    ".gb18030": ".GB18030",
+    ".euctw": ".EUC-TW",
 }
 
 # ===========================================
@@ -78,12 +100,16 @@ def fix_case(name):
 
 def replace_line(existing_line, new_line):
     """Replaces lines in /etc/locale.gen"""
-    f = open("/etc/locale.gen", "r")
-    lines = [line.replace(existing_line, new_line) for line in f]
-    f.close()
-    f = open("/etc/locale.gen", "w")
-    f.write("".join(lines))
-    f.close()
+    try:
+        f = open("/etc/locale.gen", "r")
+        lines = [line.replace(existing_line, new_line) for line in f]
+    finally:
+        f.close()
+    try:
+        f = open("/etc/locale.gen", "w")
+        f.write("".join(lines))
+    finally:
+        f.close()
 
 def set_locale(name, enabled=True):
     """ Sets the state of the locale. Defaults to enabled. """
@@ -92,12 +118,16 @@ def set_locale(name, enabled=True):
         new_string = '%s \g<charset>' % (name)
     else:
         new_string = '# %s \g<charset>' % (name)
-    f = open("/etc/locale.gen", "r")
-    lines = [re.sub(search_string, new_string, line) for line in f]
-    f.close()
-    f = open("/etc/locale.gen", "w")
-    f.write("".join(lines))
-    f.close()
+    try:
+        f = open("/etc/locale.gen", "r")
+        lines = [re.sub(search_string, new_string, line) for line in f]
+    finally:
+        f.close()
+    try:
+        f = open("/etc/locale.gen", "w")
+        f.write("".join(lines))
+    finally:
+        f.close()
 
 def apply_change(targetState, name):
     """Create or remove locale.
@@ -130,15 +160,19 @@ def apply_change_ubuntu(targetState, name):
         localeGenExitValue = call(["locale-gen", name])
     else:
         # Delete locale involves discarding the locale from /var/lib/locales/supported.d/local and regenerating all locales.
-        f = open("/var/lib/locales/supported.d/local", "r")
-        content = f.readlines()
-        f.close()
-        f = open("/var/lib/locales/supported.d/local", "w")
-        for line in content:
-            locale, charset = line.split(' ')
-            if locale != name:
-                f.write(line)
-        f.close()
+        try:
+            f = open("/var/lib/locales/supported.d/local", "r")
+            content = f.readlines()
+        finally:
+            f.close()
+        try:
+            f = open("/var/lib/locales/supported.d/local", "w")
+            for line in content:
+                locale, charset = line.split(' ')
+                if locale != name:
+                    f.write(line)
+        finally:
+            f.close()
         # Purge locales and regenerate.
         # Please provide a patch if you know how to avoid regenerating the locales to keep!
         localeGenExitValue = call(["locale-gen", "--purge"])
@@ -163,7 +197,7 @@ def main():
     state = module.params['state']
 
     if not os.path.exists("/etc/locale.gen"):
-        if os.path.exists("/var/lib/locales/supported.d/local"):
+        if os.path.exists("/var/lib/locales/supported.d/"):
             # Ubuntu created its own system to manage locales.
             ubuntuMode = True
         else:
