@@ -57,7 +57,9 @@ notes:
     - If the target host is Windows, you will not currently have the ability to use
       C(fact_path) or C(filter) as this is provided by a simpler implementation of the module.
       Different facts are returned for Windows hosts.
-author: Michael DeHaan
+author:
+    - "Ansible Core Team"
+    - "Michael DeHaan"
 '''
 
 EXAMPLES = """
@@ -121,7 +123,7 @@ def run_setup(module):
             setup_result['ansible_facts'][k] = v
 
     # hack to keep --verbose from showing all the setup module results
-    setup_result['verbose_override'] = True
+    setup_result['_ansible_verbose_override'] = True
 
     return setup_result
 

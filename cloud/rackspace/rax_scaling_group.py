@@ -105,7 +105,19 @@ options:
       - Data to be uploaded to the servers config drive. This option implies
         I(config_drive). Can be a file path or a string
     version_added: 1.8
-author: Matt Martz
+  wait:
+    description:
+      - wait for the scaling group to finish provisioning the minimum amount of
+        servers
+    default: "no"
+    choices:
+      - "yes"
+      - "no"
+  wait_timeout:
+    description:
+      - how long before wait gives up, in seconds
+    default: 300
+author: "Matt Martz (@sivel)"
 extends_documentation_fragment: rackspace
 '''
 
@@ -144,7 +156,7 @@ def rax_asg(module, cooldown=300, disk_config=None, files={}, flavor=None,
             image=None, key_name=None, loadbalancers=[], meta={},
             min_entities=0, max_entities=0, name=None, networks=[],
             server_name=None, state='present', user_data=None,
-            config_drive=False):
+            config_drive=False, wait=True, wait_timeout=300):
     changed = False
 
     au = pyrax.autoscale
@@ -263,7 +275,7 @@ def rax_asg(module, cooldown=300, disk_config=None, files={}, flavor=None,
             lc = sg.get_launch_config()
             lc_args = {}
             if server_name != lc.get('name'):
-                lc_args['name'] = server_name
+                lc_args['server_name'] = server_name
 
             if image != lc.get('image'):
                 lc_args['image'] = image
@@ -273,7 +285,7 @@ def rax_asg(module, cooldown=300, disk_config=None, files={}, flavor=None,
 
             disk_config = disk_config or 'AUTO'
             if ((disk_config or lc.get('disk_config')) and
-                    disk_config != lc.get('disk_config')):
+                    disk_config != lc.get('disk_config', 'AUTO')):
                 lc_args['disk_config'] = disk_config
 
             if (meta or lc.get('meta')) and meta != lc.get('metadata'):
@@ -299,7 +311,7 @@ def rax_asg(module, cooldown=300, disk_config=None, files={}, flavor=None,
             if key_name != lc.get('key_name'):
                 lc_args['key_name'] = key_name
 
-            if config_drive != lc.get('config_drive'):
+            if config_drive != lc.get('config_drive', False):
                 lc_args['config_drive'] = config_drive
 
             if (user_data and
@@ -314,6 +326,16 @@ def rax_asg(module, cooldown=300, disk_config=None, files={}, flavor=None,
                 sg.update_launch_config(**lc_args)
 
             sg.get()
+
+        if wait:
+            end_time = time.time() + wait_timeout
+            infinite = wait_timeout == 0
+            while infinite or time.time() < end_time:
+                state = sg.get_state()
+                if state["pending_capacity"] == 0:
+                    break
+
+                time.sleep(5)
 
         module.exit_json(changed=changed, autoscale_group=rax_to_dict(sg))
 
@@ -350,6 +372,8 @@ def main():
             server_name=dict(required=True),
             state=dict(default='present', choices=['present', 'absent']),
             user_data=dict(no_log=True),
+            wait=dict(default=False, type='bool'),
+            wait_timeout=dict(default=300),
         )
     )
 

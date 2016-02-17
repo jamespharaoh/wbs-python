@@ -30,7 +30,7 @@ version_added: "0.7"
 options:
   name:
     description:
-      - The name of the supervisord program or group to manage.  
+      - The name of the supervisord program or group to manage.
       - The name will be taken as group name when it ends with a colon I(:)
       - Group support is only available in Ansible version 1.6 or later.
     required: true
@@ -64,7 +64,7 @@ options:
       - The desired state of program/group.
     required: true
     default: null
-    choices: [ "present", "started", "stopped", "restarted" ]
+    choices: [ "present", "started", "stopped", "restarted", "absent" ]
   supervisorctl_path:
     description:
       - path to supervisorctl executable
@@ -75,7 +75,9 @@ notes:
   - When C(state) = I(present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
   - When C(state) = I(restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
 requirements: [ "supervisorctl" ]
-author: Matt Wright, Aaron Wang <inetfuture@gmail.com>
+author:
+    - "Matt Wright (@mattupstate)"
+    - "Aaron Wang (@inetfuture) <inetfuture@gmail.com>"
 '''
 
 EXAMPLES = '''
@@ -101,7 +103,7 @@ def main():
         username=dict(required=False),
         password=dict(required=False),
         supervisorctl_path=dict(required=False),
-        state=dict(required=True, choices=['present', 'started', 'restarted', 'stopped'])
+        state=dict(required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent'])
     )
 
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
@@ -120,7 +122,7 @@ def main():
 
     if supervisorctl_path:
         supervisorctl_path = os.path.expanduser(supervisorctl_path)
-        if os.path.exists(supervisorctl_path) and module.is_executable(supervisorctl_path):
+        if os.path.exists(supervisorctl_path) and is_executable(supervisorctl_path):
             supervisorctl_args = [supervisorctl_path]
         else:
             module.fail_json(
@@ -183,18 +185,34 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         for process_name in to_take_action_on:
-            rc, out, err = run_supervisorctl(action, process_name)
+            rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
             if '%s: %s' % (process_name, expected_result) not in out:
                 module.fail_json(msg=out)
 
         module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
 
     if state == 'restarted':
-        rc, out, err = run_supervisorctl('update')
+        rc, out, err = run_supervisorctl('update', check_rc=True)
         processes = get_matched_processes()
+        if len(processes) == 0:
+            module.fail_json(name=name, msg="ERROR (no such process)")
+
         take_action_on_processes(processes, lambda s: True, 'restart', 'started')
 
     processes = get_matched_processes()
+
+    if state == 'absent':
+        if len(processes) == 0:
+            module.exit_json(changed=False, name=name, state=state)
+
+        if module.check_mode:
+            module.exit_json(changed=True)
+        run_supervisorctl('reread', check_rc=True)
+        rc, out, err = run_supervisorctl('remove', name)
+        if '%s: removed process group' % name in out:
+            module.exit_json(changed=True, name=name, state=state)
+        else:
+            module.fail_json(msg=out, name=name, state=state)
 
     if state == 'present':
         if len(processes) > 0:
@@ -210,12 +228,17 @@ def main():
             module.fail_json(msg=out, name=name, state=state)
 
     if state == 'started':
+        if len(processes) == 0:
+            module.fail_json(name=name, msg="ERROR (no such process)")
         take_action_on_processes(processes, lambda s: s not in ('RUNNING', 'STARTING'), 'start', 'started')
 
     if state == 'stopped':
+        if len(processes) == 0:
+            module.fail_json(name=name, msg="ERROR (no such process)")
         take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped')
 
 # import module snippets
 from ansible.module_utils.basic import *
-
-main()
+# is_executable from basic
+if __name__ == '__main__':
+    main()

@@ -1,5 +1,20 @@
 # this is a virtual module that is entirely implemented server side
 
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
 DOCUMENTATION = '''
 ---
 module: fetch
@@ -45,12 +60,14 @@ options:
   flat:
     version_added: "1.2"
     description:
-      - Allows you to override the default behavior of prepending
+      - Allows you to override the default behavior of appending
         hostname/path/to/file to the destination.  If dest ends with '/', it
         will use the basename of the source file, similar to the copy module.
         Obviously this is only handy if the filenames are unique.
 requirements: []
-author: Michael DeHaan
+author: 
+    - "Ansible Core Team"
+    - "Michael DeHaan"
 '''
 
 EXAMPLES = '''

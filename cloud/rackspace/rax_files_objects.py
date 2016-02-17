@@ -92,7 +92,7 @@ options:
       - file
       - meta
     default: file
-author: Paul Durivage
+author: "Paul Durivage (@angstwad)"
 extends_documentation_fragment: rackspace
 '''
 
@@ -271,7 +271,7 @@ def upload(module, cf, container, src, dest, meta, expires):
                 if path != src:
                     prefix = path.split(src)[-1].lstrip('/')
                 filenames = [os.path.join(prefix, name) for name in filenames
-                             if not os.path.isdir(name)]
+                             if not os.path.isdir(os.path.join(path, name))]
                 objs += filenames
 
             _objs = []

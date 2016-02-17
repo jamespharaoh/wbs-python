@@ -22,11 +22,14 @@ description:
   - Will be marked changed when called only if state is changed.
 short_description: Creates or destroys Amazon ELB.
 version_added: "1.5"
-author: Jim Dalton
+author:
+  - "Jim Dalton (@jsdalton)"
+  - "Rick Mendes (@rickmendes)"
 options:
   state:
     description:
       - Create or destroy the ELB
+    choices: ["present", "absent"]
     required: true
   name:
     description:
@@ -56,19 +59,26 @@ options:
     require: false
     default: None
     version_added: "1.6"
-  health_check:
+  security_group_names:
     description:
-      - An associative array of health check configuration settigs (see example)
+      - A list of security group names to apply to the elb
     require: false
     default: None
-  region:
+    version_added: "2.0"
+  health_check:
     description:
-      - The AWS region to use. If not specified then the value of the EC2_REGION environment variable, if any, is used.
-    required: false
-    aliases: ['aws_region', 'ec2_region']
+      - An associative array of health check configuration settings (see example)
+    require: false
+    default: None
+  access_logs:
+    description:
+      - An associative array of access logs configuration settings (see example)
+    require: false
+    default: None
+    version_added: "2.0"
   subnets:
     description:
-      - A list of VPC subnets to use when creating ELB. Zones should be empty if using this. 
+      - A list of VPC subnets to use when creating ELB. Zones should be empty if using this.
     required: false
     default: None
     aliases: []
@@ -77,7 +87,7 @@ options:
     description:
       - Purge existing subnet on ELB that are not found in subnets
     required: false
-    default: false  
+    default: false
     version_added: "1.7"
   scheme:
     description:
@@ -97,18 +107,31 @@ options:
     description:
       - Wait a specified timeout allowing connections to drain before terminating an instance
     required: false
+    default: "None"
     aliases: []
     version_added: "1.8"
+  idle_timeout:
+    description:
+      - ELB connections from clients and to servers are timed out after this amount of time
+    required: false
+    version_added: "2.0"
   cross_az_load_balancing:
     description:
-      - Distribute load across all configured Availablity Zones
+      - Distribute load across all configured Availability Zones
     required: false
     default: "no"
     choices: ["yes", "no"]
     aliases: []
     version_added: "1.8"
+  stickiness:
+    description:
+      - An associative array of stickness policy settings. Policy will be applied to all listeners ( see example )
+    required: false
+    version_added: "2.0"
 
-extends_documentation_fragment: aws
+extends_documentation_fragment:
+    - aws
+    - ec2
 """
 
 EXAMPLES = """
@@ -142,7 +165,7 @@ EXAMPLES = """
     name: "test-vpc"
     scheme: internal
     state: present
-    subnets: 
+    subnets:
       - subnet-abcd1234
       - subnet-1a2b3c4d
     listeners:
@@ -150,7 +173,7 @@ EXAMPLES = """
         load_balancer_port: 80
         instance_port: 80
 
-# Configure a health check
+# Configure a health check and the access logs
 - local_action:
     module: ec2_elb_lb
     name: "test-please-delete"
@@ -169,6 +192,10 @@ EXAMPLES = """
         interval: 30 # seconds
         unhealthy_threshold: 2
         healthy_threshold: 10
+    access_logs:
+        interval: 5 # minutes (defaults to 60)
+        s3_location: "my-bucket" # This value is required if access_logs is set
+        s3_prefix: "logs"
 
 # Ensure ELB is gone
 - local_action:
@@ -193,7 +220,7 @@ EXAMPLES = """
     purge_listeners: no
 
 # Normally, this module will leave availability zones that are enabled
-# on the ELB alone. If purge_zones is true, then any extreneous zones
+# on the ELB alone. If purge_zones is true, then any extraneous zones
 # will be removed
 - local_action:
     module: ec2_elb_lb
@@ -208,7 +235,7 @@ EXAMPLES = """
         instance_port: 80
     purge_zones: yes
 
-# Creates a ELB and assigns a list of subnets to it. 
+# Creates a ELB and assigns a list of subnets to it.
 - local_action:
     module: ec2_elb_lb
     state: present
@@ -222,13 +249,14 @@ EXAMPLES = """
         load_balancer_port: 80
         instance_port: 80
 
-# Create an ELB with connection draining and cross availability
+# Create an ELB with connection draining, increased idle timeout and cross availability
 # zone load balancing
 - local_action:
     module: ec2_elb_lb
     name: "New ELB"
     state: present
     connection_draining_timeout: 60
+    idle_timeout: 300
     cross_az_load_balancing: "yes"
     region: us-east-1
     zones:
@@ -238,10 +266,44 @@ EXAMPLES = """
       - protocols: http
       - load_balancer_port: 80
       - instance_port: 80
-"""
 
-import sys
-import os
+# Create an ELB with load balanacer stickiness enabled
+- local_action:
+    module: ec2_elb_lb
+    name: "New ELB"
+    state: present
+    region: us-east-1
+    zones:
+      - us-east-1a
+      - us-east-1d
+    listeners:
+      - protocols: http
+      - load_balancer_port: 80
+      - instance_port: 80
+    stickiness:
+      type: loadbalancer
+      enabled: yes
+      expiration: 300
+
+# Create an ELB with application stickiness enabled
+- local_action:
+    module: ec2_elb_lb
+    name: "New ELB"
+    state: present
+    region: us-east-1
+    zones:
+      - us-east-1a
+      - us-east-1d
+    listeners:
+      - protocols: http
+      - load_balancer_port: 80
+      - instance_port: 80
+    stickiness:
+      type: application
+      enabled: yes
+      cookie: SESSIONID
+
+"""
 
 try:
     import boto
@@ -249,19 +311,21 @@ try:
     import boto.ec2.elb.attributes
     from boto.ec2.elb.healthcheck import HealthCheck
     from boto.regioninfo import RegionInfo
+    HAS_BOTO = True
 except ImportError:
-    print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    HAS_BOTO = False
 
 
 class ElbManager(object):
     """Handles ELB creation and destruction"""
 
     def __init__(self, module, name, listeners=None, purge_listeners=None,
-                 zones=None, purge_zones=None, security_group_ids=None, 
+                 zones=None, purge_zones=None, security_group_ids=None,
                  health_check=None, subnets=None, purge_subnets=None,
                  scheme="internet-facing", connection_draining_timeout=None,
-                 cross_az_load_balancing=None,  region=None, **aws_connect_params):
+                 idle_timeout=None,
+                 cross_az_load_balancing=None, access_logs=None,
+                 stickiness=None, region=None, **aws_connect_params):
 
         self.module = module
         self.name = name
@@ -275,7 +339,10 @@ class ElbManager(object):
         self.purge_subnets = purge_subnets
         self.scheme = scheme
         self.connection_draining_timeout = connection_draining_timeout
+        self.idle_timeout = idle_timeout
         self.cross_az_load_balancing = cross_az_load_balancing
+        self.access_logs = access_logs
+        self.stickiness = stickiness
 
         self.aws_connect_params = aws_connect_params
         self.region = region
@@ -301,8 +368,14 @@ class ElbManager(object):
         # set them to avoid errors
         if self._check_attribute_support('connection_draining'):
             self._set_connection_draining_timeout()
+        if self._check_attribute_support('connecting_settings'):
+            self._set_idle_timeout()
         if self._check_attribute_support('cross_zone_load_balancing'):
             self._set_cross_az_load_balancing()
+        if self._check_attribute_support('access_log'):
+            self._set_access_log()
+        # add sitcky options
+        self.select_stickiness_policy()
 
     def ensure_gone(self):
         """Destroy the ELB"""
@@ -318,9 +391,19 @@ class ElbManager(object):
         if not check_elb:
             info = {
                 'name': self.name,
-                'status': self.status
+                'status': self.status,
+                'region': self.region
             }
         else:
+            try:
+                lb_cookie_policy = check_elb.policies.lb_cookie_stickiness_policies[0].__dict__['policy_name']
+            except:
+                lb_cookie_policy = None
+            try:
+                app_cookie_policy = check_elb.policies.app_cookie_stickiness_policies[0].__dict__['policy_name']
+            except:
+                app_cookie_policy = None
+
             info = {
                 'name': check_elb.name,
                 'dns_name': check_elb.dns_name,
@@ -330,8 +413,35 @@ class ElbManager(object):
                 'subnets': self.subnets,
                 'scheme': check_elb.scheme,
                 'hosted_zone_name': check_elb.canonical_hosted_zone_name,
-                'hosted_zone_id': check_elb.canonical_hosted_zone_name_id
+                'hosted_zone_id': check_elb.canonical_hosted_zone_name_id,
+                'lb_cookie_policy': lb_cookie_policy,
+                'app_cookie_policy': app_cookie_policy,
+                'instances': [instance.id for instance in check_elb.instances],
+                'out_of_service_count': 0,
+                'in_service_count': 0,
+                'unknown_instance_state_count': 0,
+                'region': self.region
             }
+
+            # status of instances behind the ELB
+            if info['instances']:
+                info['instance_health'] = [ dict(
+                    instance_id = instance_state.instance_id,
+                    reason_code = instance_state.reason_code,
+                    state = instance_state.state
+                ) for instance_state in self.elb_conn.describe_instance_health(self.name)]
+            else:
+                info['instance_health'] = []
+
+            # instance state counts: InService or OutOfService
+            if info['instance_health']:
+              for instance_state in info['instance_health']:
+                  if instance_state['state'] == "InService":
+                    info['in_service_count'] += 1
+                  elif instance_state['state'] == "OutOfService":
+                    info['out_of_service_count'] += 1
+                  else:
+                    info['unknown_instance_state_count'] += 1
 
             if check_elb.health_check:
                 info['health_check'] = {
@@ -357,12 +467,17 @@ class ElbManager(object):
             if self._check_attribute_support('connection_draining'):
                 info['connection_draining_timeout'] = self.elb_conn.get_lb_attribute(self.name, 'ConnectionDraining').timeout
 
+            if self._check_attribute_support('connecting_settings'):
+                info['idle_timeout'] = self.elb_conn.get_lb_attribute(self.name, 'ConnectingSettings').idle_timeout
+
             if self._check_attribute_support('cross_zone_load_balancing'):
                 is_cross_az_lb_enabled = self.elb_conn.get_lb_attribute(self.name, 'CrossZoneLoadBalancing')
                 if is_cross_az_lb_enabled:
                     info['cross_az_load_balancing'] = 'yes'
                 else:
                     info['cross_az_load_balancing'] = 'no'
+
+            # return stickiness info?
 
         return info
 
@@ -431,8 +546,8 @@ class ElbManager(object):
             existing_listener_found = None
             for existing_listener in self.elb.listeners:
                 # Since ELB allows only one listener on each incoming port, a
-                # single match on the incomping port is all we're looking for
-                if existing_listener[0] == listener['load_balancer_port']:
+                # single match on the incoming port is all we're looking for
+                if existing_listener[0] == int(listener['load_balancer_port']):
                     existing_listener_found = self._api_listener_as_tuple(existing_listener)
                     break
 
@@ -440,7 +555,7 @@ class ElbManager(object):
                 # Does it match exactly?
                 if listener_as_tuple != existing_listener_found:
                     # The ports are the same but something else is different,
-                    # so we'll remove the exsiting one and add the new one
+                    # so we'll remove the existing one and add the new one
                     listeners_to_remove.append(existing_listener_found)
                     listeners_to_add.append(listener_as_tuple)
                 else:
@@ -483,8 +598,8 @@ class ElbManager(object):
         # N.B. string manipulations on protocols below (str(), upper()) is to
         # ensure format matches output from ELB API
         listener_list = [
-            listener['load_balancer_port'],
-            listener['instance_port'],
+            int(listener['load_balancer_port']),
+            int(listener['instance_port']),
             str(listener['protocol'].upper()),
         ]
 
@@ -542,7 +657,7 @@ class ElbManager(object):
                 self._attach_subnets(subnets_to_attach)
             if subnets_to_detach:
                 self._detach_subnets(subnets_to_detach)
-                
+
     def _set_zones(self):
         """Determine which zones need to be enabled or disabled on the ELB"""
         if self.zones:
@@ -564,7 +679,7 @@ class ElbManager(object):
     def _set_security_groups(self):
         if self.security_group_ids != None and set(self.elb.security_groups) != set(self.security_group_ids):
             self.elb_conn.apply_security_groups_to_lb(self.name, self.security_group_ids)
-            self.Changed = True
+            self.changed = True
 
     def _set_health_check(self):
         """Set health check values on ELB as needed"""
@@ -602,21 +717,165 @@ class ElbManager(object):
     def _set_cross_az_load_balancing(self):
         attributes = self.elb.get_attributes()
         if self.cross_az_load_balancing:
+            if not attributes.cross_zone_load_balancing.enabled:
+                self.changed = True
             attributes.cross_zone_load_balancing.enabled = True
         else:
+            if attributes.cross_zone_load_balancing.enabled:
+                self.changed = True
             attributes.cross_zone_load_balancing.enabled = False
         self.elb_conn.modify_lb_attribute(self.name, 'CrossZoneLoadBalancing',
                                           attributes.cross_zone_load_balancing.enabled)
 
+    def _set_access_log(self):
+        attributes = self.elb.get_attributes()
+        if self.access_logs:
+            if 's3_location' not in self.access_logs:
+              self.module.fail_json(msg='s3_location information required')
+
+            access_logs_config = {
+                "enabled": True,
+                "s3_bucket_name": self.access_logs['s3_location'],
+                "s3_bucket_prefix": self.access_logs.get('s3_prefix', ''),
+                "emit_interval": self.access_logs.get('interval',  60),
+            }
+
+            update_access_logs_config = False
+            for attr, desired_value in access_logs_config.iteritems():
+              if getattr(attributes.access_log, attr) != desired_value:
+                    setattr(attributes.access_log, attr, desired_value)
+                    update_access_logs_config = True
+            if update_access_logs_config:
+                self.elb_conn.modify_lb_attribute(self.name, 'AccessLog', attributes.access_log)
+                self.changed = True
+        elif attributes.access_log.enabled:
+            attributes.access_log.enabled = False
+            self.changed = True
+            self.elb_conn.modify_lb_attribute(self.name, 'AccessLog', attributes.access_log)
+
     def _set_connection_draining_timeout(self):
         attributes = self.elb.get_attributes()
         if self.connection_draining_timeout is not None:
+            if not attributes.connection_draining.enabled or \
+                    attributes.connection_draining.timeout != self.connection_draining_timeout:
+                self.changed = True
             attributes.connection_draining.enabled = True
             attributes.connection_draining.timeout = self.connection_draining_timeout
             self.elb_conn.modify_lb_attribute(self.name, 'ConnectionDraining', attributes.connection_draining)
         else:
+            if attributes.connection_draining.enabled:
+                self.changed = True
             attributes.connection_draining.enabled = False
             self.elb_conn.modify_lb_attribute(self.name, 'ConnectionDraining', attributes.connection_draining)
+
+    def _set_idle_timeout(self):
+        attributes = self.elb.get_attributes()
+        if self.idle_timeout is not None:
+            if attributes.connecting_settings.idle_timeout != self.idle_timeout:
+                self.changed = True
+            attributes.connecting_settings.idle_timeout = self.idle_timeout
+            self.elb_conn.modify_lb_attribute(self.name, 'ConnectingSettings', attributes.connecting_settings)
+
+    def _policy_name(self, policy_type):
+        return __file__.split('/')[-1].replace('_', '-')  + '-' + policy_type
+
+    def _create_policy(self, policy_param, policy_meth, policy):
+        getattr(self.elb_conn, policy_meth )(policy_param, self.elb.name, policy)
+
+    def _delete_policy(self, elb_name, policy):
+        self.elb_conn.delete_lb_policy(elb_name, policy)
+
+    def _update_policy(self, policy_param, policy_meth, policy_attr, policy):
+        self._delete_policy(self.elb.name, policy)
+        self._create_policy(policy_param, policy_meth, policy)
+
+    def _set_listener_policy(self, listeners_dict, policy=[]):
+        for listener_port in listeners_dict:
+            if listeners_dict[listener_port].startswith('HTTP'):
+                self.elb_conn.set_lb_policies_of_listener(self.elb.name, listener_port, policy)
+
+    def _set_stickiness_policy(self, elb_info, listeners_dict, policy, **policy_attrs):
+        for p in getattr(elb_info.policies, policy_attrs['attr']):
+            if str(p.__dict__['policy_name']) == str(policy[0]):
+                if str(p.__dict__[policy_attrs['dict_key']]) != str(policy_attrs['param_value']):
+                    self._set_listener_policy(listeners_dict)
+                    self._update_policy(policy_attrs['param_value'], policy_attrs['method'], policy_attrs['attr'], policy[0])
+                    self.changed = True
+                break
+        else:
+            self._create_policy(policy_attrs['param_value'], policy_attrs['method'], policy[0])
+            self.changed = True
+
+        self._set_listener_policy(listeners_dict, policy)
+
+    def select_stickiness_policy(self):
+        if self.stickiness:
+
+            if 'cookie' in self.stickiness and 'expiration' in self.stickiness:
+                self.module.fail_json(msg='\'cookie\' and \'expiration\' can not be set at the same time')
+
+            elb_info = self.elb_conn.get_all_load_balancers(self.elb.name)[0]
+            d = {}
+            for listener in elb_info.listeners:
+                d[listener[0]] = listener[2]
+            listeners_dict = d
+
+            if self.stickiness['type'] == 'loadbalancer':
+                policy = []
+                policy_type = 'LBCookieStickinessPolicyType'
+
+                if self.module.boolean(self.stickiness['enabled']) == True:
+
+                    if 'expiration' not in self.stickiness:
+                        self.module.fail_json(msg='expiration must be set when type is loadbalancer')
+
+                    expiration = self.stickiness['expiration'] if self.stickiness['expiration'] is not 0 else None
+
+                    policy_attrs = {
+                        'type': policy_type,
+                        'attr': 'lb_cookie_stickiness_policies',
+                        'method': 'create_lb_cookie_stickiness_policy',
+                        'dict_key': 'cookie_expiration_period',
+                        'param_value': expiration
+                    }
+                    policy.append(self._policy_name(policy_attrs['type']))
+
+                    self._set_stickiness_policy(elb_info, listeners_dict, policy, **policy_attrs)
+                elif self.module.boolean(self.stickiness['enabled']) == False:
+                    if len(elb_info.policies.lb_cookie_stickiness_policies):
+                        if elb_info.policies.lb_cookie_stickiness_policies[0].policy_name == self._policy_name(policy_type):
+                            self.changed = True
+                    else:
+                        self.changed = False
+                    self._set_listener_policy(listeners_dict)
+                    self._delete_policy(self.elb.name, self._policy_name(policy_type))
+
+            elif self.stickiness['type'] == 'application':
+                policy = []
+                policy_type = 'AppCookieStickinessPolicyType'
+                if self.module.boolean(self.stickiness['enabled']) == True:
+
+                    if 'cookie' not in self.stickiness:
+                        self.module.fail_json(msg='cookie must be set when type is application')
+
+                    policy_attrs = {
+                        'type': policy_type,
+                        'attr': 'app_cookie_stickiness_policies',
+                        'method': 'create_app_cookie_stickiness_policy',
+                        'dict_key': 'cookie_name',
+                        'param_value': self.stickiness['cookie']
+                    }
+                    policy.append(self._policy_name(policy_attrs['type']))
+                    self._set_stickiness_policy(elb_info, listeners_dict, policy, **policy_attrs)
+                elif self.module.boolean(self.stickiness['enabled']) == False:
+                    if len(elb_info.policies.app_cookie_stickiness_policies):
+                        if elb_info.policies.app_cookie_stickiness_policies[0].policy_name == self._policy_name(policy_type):
+                            self.changed = True
+                    self._set_listener_policy(listeners_dict)
+                    self._delete_policy(self.elb.name, self._policy_name(policy_type))
+
+            else:
+                self._set_listener_policy(listeners_dict)
 
     def _get_health_check_target(self):
         """Compose target string from healthcheck parameters"""
@@ -639,18 +898,26 @@ def main():
             zones={'default': None, 'required': False, 'type': 'list'},
             purge_zones={'default': False, 'required': False, 'type': 'bool'},
             security_group_ids={'default': None, 'required': False, 'type': 'list'},
+            security_group_names={'default': None, 'required': False, 'type': 'list'},
             health_check={'default': None, 'required': False, 'type': 'dict'},
             subnets={'default': None, 'required': False, 'type': 'list'},
             purge_subnets={'default': False, 'required': False, 'type': 'bool'},
             scheme={'default': 'internet-facing', 'required': False},
             connection_draining_timeout={'default': None, 'required': False},
-            cross_az_load_balancing={'default': None, 'required': False}
+            idle_timeout={'default': None, 'required': False},
+            cross_az_load_balancing={'default': None, 'required': False},
+            stickiness={'default': None, 'required': False, 'type': 'dict'},
+            access_logs={'default': None, 'required': False, 'type': 'dict'}
         )
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive = [['security_group_ids', 'security_group_names']]
     )
+
+    if not HAS_BOTO:
+        module.fail_json(msg='boto required for this module')
 
     region, ec2_url, aws_connect_params = get_aws_connection_info(module)
     if not region:
@@ -663,12 +930,16 @@ def main():
     zones = module.params['zones']
     purge_zones = module.params['purge_zones']
     security_group_ids = module.params['security_group_ids']
+    security_group_names = module.params['security_group_names']
     health_check = module.params['health_check']
+    access_logs = module.params['access_logs']
     subnets = module.params['subnets']
     purge_subnets = module.params['purge_subnets']
     scheme = module.params['scheme']
     connection_draining_timeout = module.params['connection_draining_timeout']
+    idle_timeout = module.params['idle_timeout']
     cross_az_load_balancing = module.params['cross_az_load_balancing']
+    stickiness = module.params['stickiness']
 
     if state == 'present' and not listeners:
         module.fail_json(msg="At least one port is required for ELB creation")
@@ -676,10 +947,27 @@ def main():
     if state == 'present' and not (zones or subnets):
         module.fail_json(msg="At least one availability zone or subnet is required for ELB creation")
 
+    if security_group_names:
+        security_group_ids = []
+        try:
+            ec2 = ec2_connect(module)
+            grp_details = ec2.get_all_security_groups()
+
+            for group_name in security_group_names:
+                if isinstance(group_name, basestring):
+                    group_name = [group_name]
+
+                group_id = [ str(grp.id) for grp in grp_details if str(grp.name) in group_name ]
+                security_group_ids.extend(group_id)
+        except boto.exception.NoAuthHandlerFound, e:
+            module.fail_json(msg = str(e))
+
     elb_man = ElbManager(module, name, listeners, purge_listeners, zones,
                          purge_zones, security_group_ids, health_check,
                          subnets, purge_subnets, scheme,
-                         connection_draining_timeout, cross_az_load_balancing,
+                         connection_draining_timeout, idle_timeout,
+                         cross_az_load_balancing,
+                         access_logs, stickiness,
                          region=region, **aws_connect_params)
 
     # check for unsupported attributes for this version of boto
@@ -688,6 +976,9 @@ def main():
 
     if connection_draining_timeout and not elb_man._check_attribute_support('connection_draining'):
         module.fail_json(msg="You must install boto >= 2.28.0 to use the connection_draining_timeout attribute")
+
+    if idle_timeout and not elb_man._check_attribute_support('connecting_settings'):
+        module.fail_json(msg="You must install boto >= 2.33.0 to use the idle_timeout attribute")
 
     if state == 'present':
         elb_man.ensure_ok()

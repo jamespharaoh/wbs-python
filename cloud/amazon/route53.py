@@ -24,88 +24,117 @@ description:
 options:
   command:
     description:
-      - Specifies the action to take.  
+      - Specifies the action to take.
     required: true
-    default: null
-    aliases: []
     choices: [ 'get', 'create', 'delete' ]
   zone:
     description:
       - The DNS zone to modify
     required: true
+  hosted_zone_id:
+    description:
+      - The Hosted Zone ID of the DNS zone to modify
+    required: false
+    version_added: "2.0"
     default: null
-    aliases: []
   record:
     description:
       - The full DNS record to create or delete
     required: true
-    default: null
-    aliases: []
   ttl:
     description:
       - The TTL to give the new record
     required: false
     default: 3600 (one hour)
-    aliases: []
   type:
     description:
       - The type of DNS record to create
     required: true
-    default: null
-    aliases: []
     choices: [ 'A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS' ]
   alias:
     description:
       - Indicates if this is an alias record.
     required: false
-    version_added: 1.9
+    version_added: "1.9"
     default: False
-    aliases: []
+    choices: [ 'True', 'False' ]
   alias_hosted_zone_id:
     description:
       - The hosted zone identifier.
     required: false
-    version_added: 1.9
+    version_added: "1.9"
     default: null
-    aliases: []
   value:
     description:
       - The new value when creating a DNS record.  Multiple comma-spaced values are allowed for non-alias records.  When deleting a record all values for the record must be specified or Route53 will not delete it.
     required: false
     default: null
-    aliases: []
-  aws_secret_key:
-    description:
-      - AWS secret key. 
-    required: false
-    default: null
-    aliases: ['ec2_secret_key', 'secret_key']
-  aws_access_key:
-    description:
-      - AWS access key. 
-    required: false
-    default: null
-    aliases: ['ec2_access_key', 'access_key']
   overwrite:
     description:
       - Whether an existing record should be overwritten on create if values do not match
     required: false
     default: null
-    aliases: []
   retry_interval:
     description:
       - In the case that route53 is still servicing a prior request, this module will wait and try again after this many seconds. If you have many domain names, the default of 500 seconds may be too long.
     required: false
     default: 500
-    aliases: []
   private_zone:
     description:
       - If set to true, the private zone matching the requested name within the domain will be used if there are both public and private zones. The default is to use the public zone.
     required: false
     default: false
     version_added: "1.9"
-requirements: [ "boto" ]
-author: Bruce Pennypacker
+  identifier:
+    description:
+      - Weighted and latency-based resource record sets only. An identifier
+        that differentiates among multiple resource record sets that have the
+        same combination of DNS name and type.
+    required: false
+    default: null
+    version_added: "2.0"
+  weight:
+    description:
+      - Weighted resource record sets only. Among resource record sets that
+        have the same combination of DNS name and type, a value that
+        determines what portion of traffic for the current resource record set
+        is routed to the associated location.
+    required: false
+    default: null
+    version_added: "2.0"
+  region:
+    description:
+      - Latency-based resource record sets only Among resource record sets
+        that have the same combination of DNS name and type, a value that
+        determines which region this should be associated with for the
+        latency-based routing
+    required: false
+    default: null
+    version_added: "2.0"
+  health_check:
+    description:
+      - Health check to associate with this record
+    required: false
+    default: null
+    version_added: "2.0"
+  failover:
+    description:
+      - Failover resource record sets only. Whether this is the primary or
+        secondary resource record set.
+    required: false
+    default: null
+    version_added: "2.0"
+  vpc_id:
+    description:
+      - "When used in conjunction with private_zone: true, this will only modify records in the private hosted zone attached to this VPC."
+      - This allows you to have multiple private hosted zones, all with the same name, attached to different VPCs.
+    required: false
+    default: null
+    version_added: "2.0"
+author:
+  - "Bruce Pennypacker (@bpennypacker)"
+  - "Mike Buzzetti <mike.buzzetti@gmail.com>"
+extends_documentation_fragment: aws
 '''
 
 # FIXME: the command stuff should have a more state like configuration alias -- MPD
@@ -164,22 +193,80 @@ EXAMPLES = '''
       record=elb.foo.com
       type=A
       value="{{ elb_dns_name }}"
-      alias=yes
+      alias=True
       alias_hosted_zone_id="{{ elb_zone_id }}"
 
+# Add an AAAA record with Hosted Zone ID.  Note that because there are colons in the value
+# that the entire parameter list must be quoted:
+- route53:
+      command: "create"
+      zone: "foo.com"
+      hosted_zone_id: "Z2AABBCCDDEEFF"
+      record: "localhost.foo.com"
+      type: "AAAA"
+      ttl: "7200"
+      value: "::1"
+      
+# Add an AAAA record with Hosted Zone ID.  Note that because there are colons in the value
+# that the entire parameter list must be quoted:
+- route53:
+      command: "create"
+      zone: "foo.com"
+      hosted_zone_id: "Z2AABBCCDDEEFF"
+      record: "localhost.foo.com"
+      type: "AAAA"
+      ttl: "7200"
+      value: "::1"
+      
+# Use a routing policy to distribute traffic:
+- route53:
+      command: "create"
+      zone: "foo.com"
+      record: "www.foo.com"
+      type: "CNAME"
+      value: "host1.foo.com"
+      ttl: 30
+      # Routing policy
+      identifier: "host1@www"
+      weight: 100
+      health_check: "d994b780-3150-49fd-9205-356abdd42e75"
 
 '''
 
-import sys
 import time
 
 try:
     import boto
+    import boto.ec2
     from boto import route53
-    from boto.route53.record import ResourceRecordSets
+    from boto.route53 import Route53Connection
+    from boto.route53.record import Record, ResourceRecordSets
+    HAS_BOTO = True
 except ImportError:
-    print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    HAS_BOTO = False
+
+def get_zone_by_name(conn, module, zone_name, want_private, zone_id, want_vpc_id):
+    """Finds a zone by name or zone_id"""
+    for zone in conn.get_zones():
+        # only save this zone id if the private status of the zone matches
+        # the private_zone_in boolean specified in the params
+        private_zone = module.boolean(zone.config.get('PrivateZone', False))
+        if private_zone == want_private and ((zone.name == zone_name and zone_id == None) or zone.id.replace('/hostedzone/', '') == zone_id):
+            if want_vpc_id:
+                # NOTE: These details aren't available in other boto methods, hence the necessary
+                # extra API call
+                zone_details = conn.get_hosted_zone(zone.id)['GetHostedZoneResponse']
+                # this is to deal with this boto bug: https://github.com/boto/boto/pull/2882
+                if isinstance(zone_details['VPCs'], dict):
+                    if zone_details['VPCs']['VPC']['VPCId'] == want_vpc_id:
+                        return zone
+                else: # Forward compatibility for when boto fixes that bug
+                    if want_vpc_id in [v['VPCId'] for v in zone_details['VPCs']]:
+                        return zone
+            else:
+                return zone
+    return None
+
 
 def commit(changes, retry_interval):
     """Commit changes, but retry PriorRequestNotComplete errors."""
@@ -200,6 +287,7 @@ def main():
     argument_spec.update(dict(
             command              = dict(choices=['get', 'create', 'delete'], required=True),
             zone                 = dict(required=True),
+            hosted_zone_id       = dict(required=False, default=None),
             record               = dict(required=True),
             ttl                  = dict(required=False, type='int', default=3600),
             type                 = dict(choices=['A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS'], required=True),
@@ -209,12 +297,22 @@ def main():
             overwrite            = dict(required=False, type='bool'),
             retry_interval       = dict(required=False, default=500),
             private_zone         = dict(required=False, type='bool', default=False),
+            identifier           = dict(required=False, default=None),
+            weight               = dict(required=False, type='int'),
+            region               = dict(required=False),
+            health_check         = dict(required=False),
+            failover             = dict(required=False),
+            vpc_id               = dict(required=False),
         )
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
+    if not HAS_BOTO:
+        module.fail_json(msg='boto required for this module')
+
     command_in              = module.params.get('command')
     zone_in                 = module.params.get('zone').lower()
+    hosted_zone_id_in       = module.params.get('hosted_zone_id')
     ttl_in                  = module.params.get('ttl')
     record_in               = module.params.get('record').lower()
     type_in                 = module.params.get('type')
@@ -223,14 +321,20 @@ def main():
     alias_hosted_zone_id_in = module.params.get('alias_hosted_zone_id')
     retry_interval_in       = module.params.get('retry_interval')
     private_zone_in         = module.params.get('private_zone')
+    identifier_in           = module.params.get('identifier')
+    weight_in               = module.params.get('weight')
+    region_in               = module.params.get('region')
+    health_check_in         = module.params.get('health_check')
+    failover_in             = module.params.get('failover')
+    vpc_id_in               = module.params.get('vpc_id')
 
-    ec2_url, aws_access_key, aws_secret_key, region = get_ec2_creds(module)
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     value_list = ()
 
     if type(value_in) is str:
         if value_in:
-            value_list = sorted(value_in.split(','))
+            value_list = sorted([s.strip() for s in value_in.split(',')])
     elif type(value_in)  is list:
         value_list = sorted(value_in)
 
@@ -249,38 +353,47 @@ def main():
           elif not alias_hosted_zone_id_in:
               module.fail_json(msg = "parameter 'alias_hosted_zone_id' required for alias create/delete")
 
+    if vpc_id_in and not private_zone_in:
+        module.fail_json(msg="parameter 'private_zone' must be true when specifying parameter"
+            " 'vpc_id'")
+
+
     # connect to the route53 endpoint 
     try:
-        conn = boto.route53.connection.Route53Connection(aws_access_key, aws_secret_key)
+        conn = Route53Connection(**aws_connect_kwargs)
     except boto.exception.BotoServerError, e:
         module.fail_json(msg = e.error_message)
 
-    # Get all the existing hosted zones and save their ID's
-    zones = {}
-    results = conn.get_all_hosted_zones()
-    for r53zone in results['ListHostedZonesResponse']['HostedZones']:
-        # only save this zone id if the private status of the zone matches
-        # the private_zone_in boolean specified in the params
-        if module.boolean(r53zone['Config'].get('PrivateZone', False)) == private_zone_in:
-            zone_id = r53zone['Id'].replace('/hostedzone/', '')
-            zones[r53zone['Name']] = zone_id
+    # Find the named zone ID
+    zone = get_zone_by_name(conn, module, zone_in, private_zone_in, hosted_zone_id_in, vpc_id_in)
 
     # Verify that the requested zone is already defined in Route53
-    if not zone_in in zones:
+    if zone is None:
         errmsg = "Zone %s does not exist in Route53" % zone_in
         module.fail_json(msg = errmsg)
 
     record = {}
     
     found_record = False
-    sets = conn.get_all_rrsets(zones[zone_in])
+    wanted_rset = Record(name=record_in, type=type_in, ttl=ttl_in,
+        identifier=identifier_in, weight=weight_in, region=region_in,
+        health_check=health_check_in, failover=failover_in)
+    for v in value_list:
+        if alias_in:
+            wanted_rset.set_alias(alias_hosted_zone_id_in, v)
+        else:
+            wanted_rset.add_value(v)
+
+    sets = conn.get_all_rrsets(zone.id, name=record_in, type=type_in, identifier=identifier_in)
     for rset in sets:
         # Due to a bug in either AWS or Boto, "special" characters are returned as octals, preventing round
         # tripping of things like * and @.
         decoded_name = rset.name.replace(r'\052', '*')
         decoded_name = decoded_name.replace(r'\100', '@')
+        #Need to save this changes in rset, because of comparing rset.to_xml() == wanted_rset.to_xml() in next block
+	rset.name = decoded_name
 
-        if rset.type == type_in and decoded_name.lower() == record_in.lower():
+        if rset.type == type_in and decoded_name.lower() == record_in.lower() and str(rset.identifier) == str(identifier_in):
             found_record = True
             record['zone'] = zone_in
             record['type'] = rset.type
@@ -288,6 +401,15 @@ def main():
             record['ttl'] = rset.ttl
             record['value'] = ','.join(sorted(rset.resource_records))
             record['values'] = sorted(rset.resource_records)
+            if hosted_zone_id_in:
+                record['hosted_zone_id'] = hosted_zone_id_in
+            record['identifier'] = rset.identifier
+            record['weight'] = rset.weight
+            record['region'] = rset.region
+            record['failover'] = rset.failover
+            record['health_check'] = rset.health_check
+            if hosted_zone_id_in:
+                record['hosted_zone_id'] = hosted_zone_id_in
             if rset.alias_dns_name:
               record['alias'] = True
               record['value'] = rset.alias_dns_name
@@ -297,35 +419,32 @@ def main():
               record['alias'] = False
               record['value'] = ','.join(sorted(rset.resource_records))
               record['values'] = sorted(rset.resource_records)
-            if value_list == sorted(rset.resource_records) and int(record['ttl']) == ttl_in and command_in == 'create':
+            if command_in == 'create' and rset.to_xml() == wanted_rset.to_xml():
                 module.exit_json(changed=False)
+            break
 
     if command_in == 'get':
-        module.exit_json(changed=False, set=record)
+        if type_in == 'NS':
+            ns = record['values']
+        else:
+            # Retrieve name servers associated to the zone.
+            ns = conn.get_zone(zone_in).get_nameservers()
+
+        module.exit_json(changed=False, set=record, nameservers=ns)
 
     if command_in == 'delete' and not found_record:
         module.exit_json(changed=False)
 
-    changes = ResourceRecordSets(conn, zones[zone_in])
-
-    if command_in == 'create' and found_record:
-        if not module.params['overwrite']:
-            module.fail_json(msg = "Record already exists with different value. Set 'overwrite' to replace it")
-        else:
-            change = changes.add_change("DELETE", record_in, type_in, record['ttl'])
-        for v in record['values']:
-            if record['alias']:
-                change.set_alias(record['alias_hosted_zone_id'], v)
-            else:
-                change.add_value(v)
+    changes = ResourceRecordSets(conn, zone.id)
 
     if command_in == 'create' or command_in == 'delete':
-        change = changes.add_change(command_in.upper(), record_in, type_in, ttl_in)
-        for v in value_list:
-            if module.params['alias']:
-                change.set_alias(alias_hosted_zone_id_in, v)
-            else:
-                change.add_value(v)
+        if command_in == 'create' and found_record:
+            if not module.params['overwrite']:
+                module.fail_json(msg = "Record already exists with different value. Set 'overwrite' to replace it")
+            command = 'UPSERT'
+        else:
+            command = command_in.upper()
+        changes.add_change_record(command, wanted_rset)
 
     try:
         result = commit(changes, retry_interval_in)

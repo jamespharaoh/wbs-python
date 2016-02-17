@@ -18,12 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-import socket
-import datetime
-import time
-import sys
-import re
 import binascii
+import datetime
+import math
+import re
+import select
+import socket
+import sys
+import time
 
 HAS_PSUTIL = False
 try:
@@ -38,15 +40,15 @@ DOCUMENTATION = '''
 module: wait_for
 short_description: Waits for a condition before continuing.
 description:
-     - Waiting for a port to become available is useful for when services 
-       are not immediately available after their init scripts return - 
-       which is true of certain Java application servers. It is also 
+     - You can wait for a set amount of time C(timeout), this is the default if nothing is specified.
+     - Waiting for a port to become available is useful for when services
+       are not immediately available after their init scripts return
+       which is true of certain Java application servers. It is also
        useful when starting guests with the M(virt) module and
-       needing to pause until they are ready. 
+       needing to pause until they are ready.
      - This module can also be used to wait for a regex match a string to be present in a file.
-     - In 1.6 and later, this module can 
-       also be used to wait for a file to be available or absent on the 
-       filesystem.
+     - In 1.6 and later, this module can also be used to wait for a file to be available or
+       absent on the filesystem.
      - In 1.8 and later, this module can also be used to wait for active
        connections to be closed before continuing, useful if a node
        is being rotated out of a load balancer pool.
@@ -57,7 +59,6 @@ options:
       - A resolvable hostname or IP address to wait for
     required: false
     default: "127.0.0.1"
-    aliases: []
   timeout:
     description:
       - maximum number of seconds to wait for
@@ -102,7 +103,10 @@ options:
 notes:
   - The ability to use search_regex with a port connection was added in 1.7.
 requirements: []
-author: Jeroen Hoekx, John Jarvis, Andrii Radyk
+author:
+    - "Jeroen Hoekx (@jhoekx)"
+    - "John Jarvis (@jarv)"
+    - "Andrii Radyk (@AnderEnder)"
 '''
 
 EXAMPLES = '''
@@ -123,7 +127,7 @@ EXAMPLES = '''
 - wait_for: path=/tmp/foo search_regex=completed
 
 # wait until the lock file is removed
-- wait_for: path=/var/lock/file.lock state=absent 
+- wait_for: path=/var/lock/file.lock state=absent
 
 # wait until the process is finished and pid was destroyed
 - wait_for: path=/proc/3466/status state=absent
@@ -299,6 +303,30 @@ def _little_endian_convert_32bit(block):
     # which lets us start at the end of the string block and work to the begining
     return "".join([ block[x:x+2] for x in xrange(6, -2, -2) ])
 
+def _create_connection( (host, port), connect_timeout):
+    """
+    Connect to a 2-tuple (host, port) and return
+    the socket object.
+
+    Args:
+        2-tuple (host, port) and connection timeout
+    Returns:
+        Socket object
+    """
+    if sys.version_info < (2, 6):
+        (family, _) = _convert_host_to_ip(host)
+        connect_socket = socket.socket(family, socket.SOCK_STREAM)
+        connect_socket.settimeout(connect_timeout)
+        connect_socket.connect( (host, port) )
+    else:
+        connect_socket = socket.create_connection( (host, port), connect_timeout)
+    return connect_socket
+
+def _timedelta_total_seconds(timedelta):
+    return (
+        timedelta.microseconds + 0.0 +
+        (timedelta.seconds + timedelta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+
 def main():
 
     module = AnsibleModule(
@@ -328,6 +356,10 @@ def main():
     state = params['state']
     path = params['path']
     search_regex = params['search_regex']
+    if search_regex is not None:
+        compiled_search_re = re.compile(search_regex, re.MULTILINE)
+    else:
+        compiled_search_re = None
 
     if port and path:
         module.fail_json(msg="port and path parameter can not both be passed to wait_for")
@@ -360,10 +392,8 @@ def main():
                 except IOError:
                     break
             elif port:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(connect_timeout)
                 try:
-                    s.connect( (host, port) )
+                    s = _create_connection( (host, port), connect_timeout)
                     s.shutdown(socket.SHUT_RDWR)
                     s.close()
                     time.sleep(1)
@@ -385,57 +415,72 @@ def main():
             if path:
                 try:
                     os.stat(path)
-                    if search_regex:
-                        try:
-                            f = open(path)
-                            try:
-                                if re.search(search_regex, f.read(), re.MULTILINE):
-                                    break
-                                else:
-                                    time.sleep(1)
-                            finally:
-                                f.close()
-                        except IOError:
-                            time.sleep(1)
-                            pass
-                    else:
-                        break
                 except OSError, e:
-                    # File not present
-                    if e.errno == 2:
-                        time.sleep(1)
-                    else:
+                    # If anything except file not present, throw an error
+                    if e.errno != 2:
                         elapsed = datetime.datetime.now() - start
                         module.fail_json(msg="Failed to stat %s, %s" % (path, e.strerror), elapsed=elapsed.seconds)
+                    # file doesn't exist yet, so continue
+                else:
+                    # File exists.  Are there additional things to check?
+                    if not compiled_search_re:
+                        # nope, succeed!
+                        break
+                    try:
+                        f = open(path)
+                        try:
+                            if re.search(compiled_search_re, f.read()):
+                                # String found, success!
+                                break
+                        finally:
+                            f.close()
+                    except IOError:
+                        pass
             elif port:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(connect_timeout)
+                alt_connect_timeout = math.ceil(_timedelta_total_seconds(end - datetime.datetime.now()))
                 try:
-                    s.connect( (host, port) )
-                    if search_regex:
+                    s = _create_connection((host, port), min(connect_timeout, alt_connect_timeout))
+                except:
+                    # Failed to connect by connect_timeout. wait and try again
+                    pass
+                else:
+                    # Connected -- are there additional conditions?
+                    if compiled_search_re:
                         data = ''
                         matched = False
-                        while 1:
-                            data += s.recv(1024)
-                            if not data:
+                        while datetime.datetime.now() < end:
+                            max_timeout = math.ceil(_timedelta_total_seconds(end - datetime.datetime.now()))
+                            (readable, w, e) = select.select([s], [], [], max_timeout)
+                            if not readable:
+                                # No new data.  Probably means our timeout
+                                # expired
+                                continue
+                            response = s.recv(1024)
+                            if not response:
+                                # Server shutdown
                                 break
-                            elif re.search(search_regex, data, re.MULTILINE):
+                            data += response
+                            if re.search(compiled_search_re, data):
                                 matched = True
                                 break
+
+                        # Shutdown the client socket
+                        s.shutdown(socket.SHUT_RDWR)
+                        s.close()
                         if matched:
-                            s.shutdown(socket.SHUT_RDWR)
-                            s.close()
+                            # Found our string, success!
                             break
                     else:
+                        # Connection established, success!
                         s.shutdown(socket.SHUT_RDWR)
                         s.close()
                         break
-                except:
-                    time.sleep(1)
-                    pass
-            else:
-                time.sleep(1)
-        else:
+
+            # Conditions not yet met, wait and try again
+            time.sleep(1)
+
+        else:   # while-else
+            # Timeout expired
             elapsed = datetime.datetime.now() - start
             if port:
                 if search_regex:
@@ -468,4 +513,5 @@ def main():
 
 # import module snippets
 from ansible.module_utils.basic import *
-main()
+if __name__ == '__main__':
+    main()

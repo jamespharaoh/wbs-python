@@ -2,6 +2,21 @@
 # it runs the 'command' module with special arguments and it behaves differently.
 # See the command source and the comment "#USE_SHELL".
 
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
 DOCUMENTATION = '''
 ---
 module: shell
@@ -57,7 +72,9 @@ notes:
       "{{ var | quote }}" instead of just "{{ var }}" to make sure they don't include evil things like semicolons.
 
 requirements: [ ]
-author: Michael DeHaan
+author: 
+    - Ansible Core Team
+    - Michael DeHaan
 '''
 
 EXAMPLES = '''
@@ -75,4 +92,10 @@ EXAMPLES = '''
   args:
     chdir: somedir/
     creates: somelog.txt
+
+# Run a command that uses non-posix shell-isms (in this example /bin/sh
+# doesn't handle redirection and wildcards together but bash does)
+- shell: cat < /tmp/*txt
+  args:
+    executable: /bin/bash
 '''

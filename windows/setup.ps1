@@ -25,11 +25,10 @@ $result = New-Object psobject @{
     changed = $false
 };
 
+$win32_os = Get-CimInstance Win32_OperatingSystem
+$win32_cs = Get-CimInstance Win32_ComputerSystem
 $osversion = [Environment]::OSVersion
-$memory = @()
-$memory += Get-WmiObject win32_Physicalmemory
-$capacity = 0
-$memory | foreach {$capacity += $_.Capacity}
+$capacity = $win32_cs.TotalPhysicalMemory # Win32_PhysicalMemory is empty on some virtual platforms
 $netcfg = Get-WmiObject win32_NetworkAdapterConfiguration
 
 $ActiveNetcfg = @(); $ActiveNetcfg+= $netcfg | where {$_.ipaddress -ne $null}
@@ -53,14 +52,30 @@ foreach ($adapter in $ActiveNetcfg)
 
 Set-Attr $result.ansible_facts "ansible_interfaces" $formattednetcfg
 
+Set-Attr $result.ansible_facts "ansible_architecture" $win32_os.OSArchitecture 
+
 Set-Attr $result.ansible_facts "ansible_hostname" $env:COMPUTERNAME;
 Set-Attr $result.ansible_facts "ansible_fqdn" "$([System.Net.Dns]::GetHostByName((hostname)).HostName)"
 Set-Attr $result.ansible_facts "ansible_system" $osversion.Platform.ToString()
 Set-Attr $result.ansible_facts "ansible_os_family" "Windows"
+Set-Attr $result.ansible_facts "ansible_os_name" ($win32_os.Name.Split('|')[0]).Trim()
 Set-Attr $result.ansible_facts "ansible_distribution" $osversion.VersionString
 Set-Attr $result.ansible_facts "ansible_distribution_version" $osversion.Version.ToString()
 
+$date = New-Object psobject
+Set-Attr $date "date" (Get-Date -format d)
+Set-Attr $date "year" (Get-Date -format yyyy)
+Set-Attr $date "month" (Get-Date -format MM)
+Set-Attr $date "day" (Get-Date -format dd)
+Set-Attr $date "hour" (Get-Date -format HH)
+Set-Attr $date "minute" (Get-Date -format mm)
+Set-Attr $date "iso8601" (Get-Date -format s)
+Set-Attr $result.ansible_facts "ansible_date_time" $date
+
 Set-Attr $result.ansible_facts "ansible_totalmem" $capacity
+
+Set-Attr $result.ansible_facts "ansible_lastboot" $win32_os.lastbootuptime.ToString("u")
+Set-Attr $result.ansible_facts "ansible_uptime_seconds" $([System.Convert]::ToInt64($(Get-Date).Subtract($win32_os.lastbootuptime).TotalSeconds))
 
 $ips = @()
 Foreach ($ip in $netcfg.IPAddress) { If ($ip) { $ips += $ip } }
@@ -70,6 +85,10 @@ $psversion = $PSVersionTable.PSVersion.Major
 Set-Attr $result.ansible_facts "ansible_powershell_version" $psversion
 
 $winrm_https_listener_parent_path = Get-ChildItem -Path WSMan:\localhost\Listener -Recurse | Where-Object {$_.PSChildName -eq "Transport" -and $_.Value -eq "HTTPS"} | select PSParentPath
+$winrm_https_listener_path = $null
+$https_listener = $null
+$winrm_cert_thumbprint = $null
+$uppercase_cert_thumbprint = $null
 
 if ($winrm_https_listener_parent_path ) {
     $winrm_https_listener_path = $winrm_https_listener_parent_path.PSParentPath.Substring($winrm_https_listener_parent_path.PSParentPath.LastIndexOf("\"))

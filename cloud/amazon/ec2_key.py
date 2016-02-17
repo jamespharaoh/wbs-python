@@ -1,6 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 DOCUMENTATION = '''
 ---
@@ -18,12 +31,6 @@ options:
     description:
       - Public key material.
     required: false
-  region:
-    description:
-      - the EC2 region to use
-    required: false
-    default: null
-    aliases: []
   state:
     description:
       - create or delete keypair
@@ -45,8 +52,10 @@ options:
     aliases: []
     version_added: "1.6"
 
-extends_documentation_fragment: aws
-author: Vincent Viallet
+extends_documentation_fragment:
+ - aws
+ - ec2
+author: "Vincent Viallet (@zbal)"
 '''
 
 EXAMPLES = '''
@@ -84,9 +93,9 @@ EXAMPLES = '''
 
 try:
     import boto.ec2
+    HAS_BOTO = True
 except ImportError:
-    print "failed=True msg='boto required for this module'"
-    sys.exit(1)
+    HAS_BOTO = False
 
 import random
 import string
@@ -107,6 +116,9 @@ def main():
         supports_check_mode=True,
     )
 
+    if not HAS_BOTO:
+        module.fail_json(msg='boto required for this module')
+
     name = module.params['name']
     state = module.params.get('state')
     key_material = module.params.get('key_material')
@@ -124,25 +136,23 @@ def main():
     if state == 'absent':
         if key:
             '''found a match, delete it'''
-            try:
-                key.delete()
-                if wait:
-                    start = time.time()
-                    action_complete = False
-                    while (time.time() - start) < wait_timeout:
-                        if not ec2.get_key_pair(name):
-                            action_complete = True
-                            break
-                        time.sleep(1)
-                    if not action_complete:
-                        module.fail_json(msg="timed out while waiting for the key to be removed")
-            except Exception, e:
-                module.fail_json(msg="Unable to delete key pair '%s' - %s" % (key, e))
-            else:
-                key = None
-                changed = True
-        else:
-            '''no match found, no changes required'''
+            if not module.check_mode:
+                try:
+                    key.delete()
+                    if wait:
+                        start = time.time()
+                        action_complete = False
+                        while (time.time() - start) < wait_timeout:
+                            if not ec2.get_key_pair(name):
+                                action_complete = True
+                                break
+                            time.sleep(1)
+                        if not action_complete:
+                            module.fail_json(msg="timed out while waiting for the key to be removed")
+                except Exception, e:
+                    module.fail_json(msg="Unable to delete key pair '%s' - %s" % (key, e))
+            key = None
+            changed = True
 
     # Ensure requested key is present
     elif state == 'present':

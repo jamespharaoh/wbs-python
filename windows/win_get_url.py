@@ -27,21 +27,61 @@ module: win_get_url
 version_added: "1.7"
 short_description: Fetches a file from a given URL
 description:
-     - Fetches a file from a URL and saves to locally
+ - Fetches a file from a URL and saves to locally
+author:
+    - "Paul Durivage (@angstwad)"
+    - "Takeshi Kuramochi (tksarah)"
 options:
   url:
     description:
       - The full URL of a file to download
     required: true
     default: null
-    aliases: []
   dest:
     description:
-      - The absolute path of the location to save the file at the URL. Be sure to include a filename and extension as appropriate.
+      - The absolute path of the location to save the file at the URL. Be sure
+        to include a filename and extension as appropriate.
+    required: true
+    default: null
+  force:
+    description:
+      - If C(yes), will always download the file.  If C(no), will only
+        download the file if it does not exist or the remote file has been
+        modified more recently than the local file.
+    version_added: "2.0"
     required: false
+    choices: [ "yes", "no" ]
     default: yes
-    aliases: []
-author: Paul Durivage
+  username:
+    description:
+      - Basic authentication username
+    required: false
+    default: null
+  password:
+    description:
+      - Basic authentication password
+    required: false
+    default: null
+  skip_certificate_validation:
+    description:
+      - Skip SSL certificate validation if true
+    required: false
+    default: false
+  proxy_url:
+    description:
+      - The full URL of the proxy server to download through.
+    version_added: "2.0"
+    required: false
+  proxy_username:
+    description:
+      - Proxy authentication username
+    version_added: "2.0"
+    required: false
+  proxy_password:
+    description:
+      - Proxy authentication password
+    version_added: "2.0"
+    required: false
 '''
 
 EXAMPLES = '''
@@ -54,4 +94,18 @@ $ ansible -i hosts -c winrm -m win_get_url -a "url=http://www.example.com/earthr
   win_get_url:
     url: 'http://www.example.com/earthrise.jpg'
     dest: 'C:\Users\RandomUser\earthrise.jpg'
+
+- name: Download earthrise.jpg to 'C:\Users\RandomUser\earthrise.jpg' only if modified
+  win_get_url:
+    url: 'http://www.example.com/earthrise.jpg'
+    dest: 'C:\Users\RandomUser\earthrise.jpg'
+    force: no
+
+- name: Download earthrise.jpg to 'C:\Users\RandomUser\earthrise.jpg' through a proxy server.
+  win_get_url:
+    url: 'http://www.example.com/earthrise.jpg'
+    dest: 'C:\Users\RandomUser\earthrise.jpg'
+    proxy_url: 'http://10.0.0.1:8080'
+    proxy_username: 'username'
+    proxy_password: 'password'
 '''

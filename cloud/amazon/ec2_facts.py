@@ -29,14 +29,14 @@ options:
         required: false
         default: 'yes'
         choices: ['yes', 'no']
-        version_added: 1.5.1
+        version_added: '1.5.1'
 description:
      - This module fetches data from the metadata servers in ec2 (aws) as per
        http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html.
        The module must be called from within the EC2 instance itself.
 notes:
     - Parameters to filter on ec2_facts may be added later.
-author: "Silviu Dicu <silviudicu@gmail.com>"
+author: "Silviu Dicu (@silviud) <silviudicu@gmail.com>"
 '''
 
 EXAMPLES = '''
