@@ -1,0 +1,15 @@
+*.py[co]
+*.swp
+*~
+/*.egg-info
+/lib/GitPython.egg-info
+cover/
+.coverage
+/build
+/dist
+/doc/_build
+nbproject
+*.sublime-workspace
+.DS_Store
+/*egg-info
+/.tox
