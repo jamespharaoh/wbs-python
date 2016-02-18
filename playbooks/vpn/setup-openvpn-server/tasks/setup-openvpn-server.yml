@@ -119,7 +119,7 @@
 - name: "create openvpn cluster configs"
   with_nested:
 
-    - "cluster.vpn_upstream_clusters"
+    - "{{ cluster.vpn_upstream_clusters }}"
     - [ "a", "b", "c" ]
 
   notify: "restart openvpn"

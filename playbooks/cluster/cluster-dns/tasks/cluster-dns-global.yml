@@ -28,7 +28,7 @@
     security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
 - name: "create main misc records"
-  with_items: "cluster.route53_main_domain.misc_records"
+  with_items: "{{ cluster.route53_main_domain.misc_records }}"
   action:
 
     module: "route53"

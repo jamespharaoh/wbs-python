@@ -1,7 +1,7 @@
 ---
 
 - name: "create wistla heka master directories"
-  with_items: "wistla_heka_master_directories"
+  with_items: "{{ wistla_heka_master_directories }}"
   sudo: "yes"
   action:
 
@@ -14,7 +14,7 @@
     mode: "{{ item.mode }}"
 
 - name: "create wistla heka master templates"
-  with_items: "wistla_heka_master_templates"
+  with_items: "{{ wistla_heka_master_templates }}"
   notify: "set heka.needs_restart to 'yes'"
   sudo: "yes"
   action:

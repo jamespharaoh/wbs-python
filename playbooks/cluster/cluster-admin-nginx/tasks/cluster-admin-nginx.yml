@@ -42,7 +42,7 @@
     mode: "{{ item.mode }}"
 
 - name: "write nginx certificates"
-  with_items: "cluster.admin_certificates | default ([])"
+  with_items: "{{ cluster.admin_certificates | default ([]) }}"
   notify: "restart nginx"
   sudo: "yes"
   action:
@@ -52,7 +52,7 @@
     src: "cluster-admin-ssl-bundle"
 
 - name: "write nginx private keys"
-  with_items: "cluster.admin_certificates | default ([])"
+  with_items: "{{ cluster.admin_certificates | default ([]) }}"
   notify: "restart nginx"
   sudo: "yes"
   action:

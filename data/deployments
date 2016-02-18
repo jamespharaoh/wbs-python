@@ -313,8 +313,11 @@ test:
 
   main_domain: "test.wistla.com"
   short_domain: "test.wist.la"
-
-  email_domain: "test.wistla.com"
+  assets_domain: "assets.test.wistla.com"
+  assets_origin_domain: "assets-origin.test.wistla.com"
+  admin_domain: "admin.test.wistla.com"
+  api_domain: "api.test.wistla.com"
+  web_domain: "www.test.wistla.com"
 
   supercluster: "test"
   cluster: "test"

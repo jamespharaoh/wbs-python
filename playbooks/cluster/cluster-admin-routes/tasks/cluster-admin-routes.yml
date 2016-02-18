@@ -94,7 +94,7 @@
     done;
 
 - name: "create vpn cluster routes"
-  with_dict: "clusters"
+  with_dict: "{{ clusters }}"
   when: "
     item.value.supercluster_name == supercluster_name
     and item.key != cluster_name

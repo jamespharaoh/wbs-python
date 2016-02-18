@@ -1,7 +1,7 @@
 ---
 
 - name: "create security groups"
-  with_items: "amazon_security_groups"
+  with_items: "{{ amazon_security_groups }}"
   register: "create_group"
   action:
 
@@ -27,7 +27,7 @@
     security_group_id_jenkins: "{{ create_group.results.4.group_id }}"
 
 - name: "update security group"
-  with_items: "amazon_security_groups"
+  with_items: "{{ amazon_security_groups }}"
   action:
 
     module: "ec2_group"

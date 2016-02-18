@@ -1,6 +1,11 @@
 ---
 
 - name: "create main deployment records"
+  with_nested:
+
+    - "{{ cluster.super_deployment_names | default ([]) | dict_map (deployments) }}"
+    - "{{ cluster_dns_deployment_keys }}"
+
   action:
 
     module: "route53"
@@ -23,13 +28,18 @@
     aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
     security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
-  #when: "item.0.type in [ 'shared', 'simple' ]"
+- name: "create short deployment records"
   with_nested:
 
-    - "{{ cluster.super_deployment_names | default ([]) | dict_map (deployments) }}"
-    - "cluster_dns_deployment_keys"
+    - "{{
+        cluster.super_deployment_names
+        | default ([])
+        | dict_map (deployments)
+      }}"
 
-- name: "create short deployment records"
+    - - ""
+
+  when: "item.0.short_domain is defined"
   action:
 
     module: "route53"
@@ -51,16 +61,5 @@
     aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
     aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
     security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
-
-  when: "item.0.short_domain is defined"
-  with_nested:
-
-    - "{{
-        cluster.super_deployment_names
-        | default ([])
-        | dict_map (deployments)
-      }}"
-
-    - - ""
 
 # ex: et ts=2 filetype=yaml

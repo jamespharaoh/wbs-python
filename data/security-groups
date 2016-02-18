@@ -46,6 +46,21 @@
     - proto: "tcp"
       from_port: "5665"
       to_port: "5665"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
       cidr_ip: "{{ clusters.staging.amazon_admin_ips.a }}/32"
 
     - proto: "tcp"
@@ -57,6 +72,21 @@
       from_port: "5665"
       to_port: "5665"
       cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "5665"
+      to_port: "5665"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.c }}/32"
 
     - proto: "tcp"
       from_port: "5665"

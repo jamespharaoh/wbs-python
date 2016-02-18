@@ -1,7 +1,7 @@
 ---
 
 - name: "create fileystems"
-  with_items: "cluster_volumes"
+  with_items: "{{ cluster_volumes }}"
   sudo: "yes"
   action:
 
@@ -10,7 +10,7 @@
     fstype: "{{ item.type }}"
 
 - name: "mount filesystems"
-  with_items: "cluster_volumes"
+  with_items: "{{ cluster_volumes }}"
   sudo: "yes"
   action:
 
