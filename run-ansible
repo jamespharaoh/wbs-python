@@ -41,6 +41,7 @@ def main ():
 	basic_setup ()
 	special_cases ()
 	load_state ()
+	build ()
 
 	load_config ()
 	check_deployment_mode ()
@@ -69,6 +70,22 @@ def special_cases ():
 		os.execl (
 			"%s/third-party/ansible/bin/ansible-playbook" % HOME,
 			"--help")
+
+def build ():
+
+	dev_null = (
+		open (
+			os.devnull,
+			"w"))
+
+
+	subprocess.check_call (
+		[
+			"/bin/bash",
+			"%s/third-party/ansible/hacking/env-setup" % HOME,
+		],
+		stdout = dev_null,
+		stderr = dev_null)
 
 def load_state ():
 
