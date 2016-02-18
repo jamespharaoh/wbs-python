@@ -1,9 +1,0 @@
----
-
-- include: "cluster-update.yml"
-  tags:
-
-    - "cluster"
-    - "cluster-update"
-
-# ex: et ts=2 filetype=yaml

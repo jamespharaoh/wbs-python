@@ -3,9 +3,9 @@
 - name: "create public route"
   with_items:
 
-    - "{{ cluster_network ['routes_app_' + instance_zone] | default ('') }}"
-    - "{{ cluster_network ['routes_data_' + instance_zone] | default ('') }}"
-    - "{{ cluster_network ['routes_jenkins_' + instance_zone] | default ('') }}"
+    - "{{ 'routes_app_' + instance_zone }}"
+    - "{{ 'routes_data_' + instance_zone }}"
+    - "{{ 'routes_jenkins_' + instance_zone }}"
 
   delegate_to: "localhost"
   environment:
@@ -26,15 +26,17 @@
 
     set;
 
-    if test "{{ item }}"; then
+    value="{{ cluster_network [item] | default ('') }}";
+
+    if test "$value"; then
 
       aws ec2 delete-route
-        --route-table-id "{{ item }}"
+        --route-table-id "$value"
         --destination-cidr-block "0.0.0.0/0"
       || true;
 
       aws ec2 create-route
-        --route-table-id "{{ item }}"
+        --route-table-id "$value"
         --destination-cidr-block "0.0.0.0/0"
         --instance-id "{{ instance_id }}";
 

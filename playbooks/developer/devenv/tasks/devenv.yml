@@ -1,7 +1,7 @@
 ---
 
 - name: "checkout projects from git"
-  with_items: "devenv_checkouts"
+  with_items: "{{ devenv_checkouts }}"
   when: "deployment_mode == 'vagrant'"
   args:
 
@@ -19,7 +19,7 @@
       --branch {{ item.branch }};
 
 - name: "create project links"
-  with_items: "devenv_checkouts | flatten_hash ('project_links')"
+  with_items: "{{ devenv_checkouts | flatten_hash ('project_links') }}"
   action:
 
     module: "file"
@@ -30,7 +30,7 @@
 
 - name: "run build steps"
   tags: "build"
-  with_items: "devenv_checkouts"
+  with_items: "{{ devenv_checkouts }}"
   args:
 
     executable: "/bin/bash"
@@ -40,7 +40,7 @@
   shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
 
 - name: "create git pre-commit hooks"
-  with_items: "devenv_checkouts"
+  with_items: "{{ devenv_checkouts }}"
   when: "deployment_mode == 'vagrant'"
   action:
 
@@ -50,7 +50,7 @@
     mode: "0755"
 
 - name: "create git post-checkout hooks"
-  with_items: "devenv_checkouts"
+  with_items: "{{ devenv_checkouts }}"
   when: "deployment_mode == 'vagrant'"
   action:
 
@@ -60,7 +60,7 @@
     mode: "0755"
 
 - name: "create shared directories"
-  with_items: "devenv_shared_directories"
+  with_items: "{{ devenv_shared_directories }}"
   action:
 
     module: "file"
@@ -68,7 +68,7 @@
     state: "directory"
 
 - name: "create config directories"
-  with_items: "devenv_config_directories"
+  with_items: "{{ devenv_config_directories }}"
   action:
 
     module: "file"
@@ -76,7 +76,7 @@
     state: "directory"
 
 - name: "create config files"
-  with_items: "devenv_config_templates"
+  with_items: "{{ devenv_config_templates }}"
   sudo: "yes"
   action:
 
@@ -89,7 +89,7 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "stat override config files"
-  with_items: "devenv_override_templates"
+  with_items: "{{ devenv_override_templates }}"
   register: "devenv_stat_override_templates_result"
   action:
 
@@ -97,7 +97,7 @@
     path: "{{ deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
-  with_indexed_items: "devenv_override_templates"
+  with_indexed_items: "{{ devenv_override_templates }}"
   when: "not devenv_stat_override_templates_result.results [item.0].stat.exists"
   action:
 
@@ -106,7 +106,7 @@
     src: "{{ item.1.template }}"
 
 - name: "copy config files"
-  with_items: "devenv_config_files"
+  with_items: "{{ devenv_config_files }}"
   action:
 
     module: "copy"
@@ -115,7 +115,7 @@
     mode: "0644"
 
 - name: "copy config secrets"
-  with_items: "devenv_config_secrets"
+  with_items: "{{ devenv_config_secrets }}"
   when: "'dev' in secrets"
   action:
 
@@ -126,7 +126,7 @@
     mode: "0600"
 
 - name: "create links to config files"
-  with_items: "devenv_config_links"
+  with_items: "{{ devenv_config_links }}"
   action:
 
     module: "file"

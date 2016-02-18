@@ -5,28 +5,20 @@ import collections
 import os
 import yaml
 
-from ansible import utils
-from ansible.runner.return_data import ReturnData
-from ansible.utils import template
+from ansible.plugins.action import ActionBase
 
-class ActionModule (object):
+class ActionModule (ActionBase):
 
 	TRANSFERS_FILES = False
 
-	def __init__ (self, runner):
+	def __init__ (self, * arguments, ** keyword_arguments):
 
-		self.runner = runner
+		ActionBase.__init__ (
+			self,
+			* arguments,
+			** keyword_arguments)
 
-	def run (
-		self,
-		conn,
-		tmp,
-		module_name,
-		module_args,
-		inject,
-		complex_args = {},
-		** kwargs
-	):
+	def run (self, tmp = None, task_vars = dict ()):
 
 		options = {}
 		changed = False
@@ -36,7 +28,7 @@ class ActionModule (object):
 		if not os.path.isdir ("data/runtime"):
 			os.mkdir ("data/runtime")
 
-		filename = "data/runtime/%s" % inject ["inventory_hostname"]
+		filename = "data/runtime/%s" % task_vars.get ("inventory_hostname")
 
 		if os.path.isfile (filename):
 
@@ -47,9 +39,10 @@ class ActionModule (object):
 
 			runtime_data = dict ()
 
-		for key, value in complex_args.items ():
+		for key, value in self._task.args.items ():
 
-			dynamic_key = template.template (self.runner.basedir, key, inject)
+			dynamic_key = self._templar.template (
+				key)
 
 			if "." in dynamic_key:
 
@@ -84,10 +77,8 @@ class ActionModule (object):
 				encoding = "utf-8",
 				allow_unicode = True)
 
-		return ReturnData (
-			conn = conn,
-			result = dict (
-				ansible_facts = options,
-				changed = changed))
+		return dict (
+			ansible_facts = options,
+			changed = changed)
 
 # ex: noet ts=4 filetype=python

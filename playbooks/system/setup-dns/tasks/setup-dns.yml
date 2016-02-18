@@ -18,7 +18,7 @@
   action:
 
     module: "apt"
-    package: "{{ item }}"
+    name: "{{ item }}"
 
 - name: "create dnsmasq config"
   notify: "restart dnsmasq"

@@ -1,40 +1,47 @@
 ---
 
 - name: "create jenkins service config"
-  action:
-    module: "template"
-    src: "cluster-jenkins-default"
-    dest: "/etc/default/jenkins"
-  sudo: "yes"
   notify: "restart jenkins"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/default/jenkins"
+    src: "cluster-jenkins-default"
 
 - name: "install jenkins apt key"
+  sudo: "yes"
   action:
+
     module: "apt_key"
     url: "https://jenkins-ci.org/debian/jenkins-ci.org.key"
-  sudo: "yes"
 
 - name: "install jenkins apt repository"
+  sudo: "yes"
   action:
+
     module: "apt_repository"
     repo: "deb http://pkg.jenkins-ci.org/debian binary/"
     update_cache: "yes"
-  sudo: "yes"
 
 - name: "install jenkins packages"
-  action:
-    module: "apt"
-    package: "{{ item }}"
-  sudo: "yes"
   with_items:
+
     - "jenkins"
 
-- name: "enable jenkins sudo"
+  sudo: "yes"
   action:
+
+    module: "apt"
+    name: "{{ item }}"
+
+- name: "enable jenkins sudo"
+  sudo: "yes"
+  action:
+
     module: "copy"
     dest: "/etc/sudoers.d/jenkins"
     content: "jenkins ALL=(ALL) NOPASSWD: ALL{{ '\n' }}"
-  sudo: "yes"
 
 - meta: "flush_handlers"
 

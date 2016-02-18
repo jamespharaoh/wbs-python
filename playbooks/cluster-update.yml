@@ -3,6 +3,6 @@
 - hosts: "cluster-host"
   roles:
 
-    - "cluster-update"
+    - "update-system-packages"
 
 # ex: et ts=2 filetype=yaml

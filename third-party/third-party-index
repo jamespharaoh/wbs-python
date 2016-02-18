@@ -1,0 +1,38 @@
+---
+
+ansible:
+
+  url: "git@github.com:ansible/ansible.git"
+  version: "stable-2.0"
+
+ansible-modules-core:
+
+  url: "git@github.com:ansible/ansible-modules-core.git"
+  version: "stable-2.0"
+
+ansible-modules-extras:
+
+  url: "git@github.com:ansible/ansible-modules-extras.git"
+  version: "stable-2.0"
+
+gitpython:
+
+  url: "git@github.com:gitpython-developers/GitPython.git"
+  version: "master"
+
+gridlinker:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
+  version: "master"
+
+smmap:
+
+  url: "git@github.com:gitpython-developers/smmap.git"
+  version: "master"
+
+wbs-python:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/wbs-python.git"
+  version: "master"
+
+# ex: et ts=2 filetype=yaml

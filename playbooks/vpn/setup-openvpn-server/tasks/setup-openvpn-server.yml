@@ -77,7 +77,7 @@
     state: "directory"
 
 - name: "create openvpn client configs"
-  with_items: "vpn_clients"
+  with_items: "{{ vpn_clients }}"
   sudo: "yes"
   action:
 
@@ -86,7 +86,7 @@
     src: "openvpn-client-config"
 
 - name: "create openvpn admin client configs"
-  with_items: "groups ['cluster-admin']"
+  with_items: "{{ groups ['cluster-admin'] }}"
   sudo: "yes"
   action:
 
