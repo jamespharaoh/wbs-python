@@ -1,17 +1,20 @@
 ---
 
 - name: "create common groups"
+  sudo: "yes"
+  with_items: "{{ common_users }}"
   action:
+
     module: "group"
     name: "{{ item.name }}"
     gid: "{{ item.gid }}"
     system: "yes"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "common_users"
 
 - name: "create common users"
+  with_items: "{{ common_users }}"
+  sudo: "yes"
   action:
+
     module: "user"
     name: "{{ item.name }}"
     group: "{{ item.name }}"
@@ -20,8 +23,5 @@
     createhome: "no"
     shell: "{{ item.shell }}"
     system: "yes"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "common_users"
 
 # ex: et ts=2 filetype=yaml

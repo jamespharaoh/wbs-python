@@ -2,42 +2,40 @@
 
 - name: "install openvpn ca cert"
   action:
+
     module: "copy"
-    src: "{{ HOME }}/security/wistla-ca.cert"
     dest: "/etc/openvpn/wistla-ca.cert"
-  sudo: "yes"
-  sudo_user: "root"
-  notify: "restart openvpn"
+    src: "{{ HOME }}/security/wistla-ca.cert"
 
 - name: "install openvpn client cert"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/vpn/{{ item }}.cert"
-    dest: "/etc/openvpn/wistla-{{ item }}-vpn.cert"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "vpns"
+  with_items: "{{ vpns }}"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-{{ item }}-vpn.cert"
+    src: "{{ HOME }}/security/vpn/{{ item }}.cert"
 
 - name: "install openvpn client key"
-  action:
-    module: "copy"
-    src: "{{ HOME }}/security/vpn/{{ item }}.key"
-    dest: "/etc/openvpn/wistla-{{ item }}-vpn.key"
-    mode: "0600"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "vpns"
+  with_items: "{{ vpns }}"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/openvpn/wistla-{{ item }}-vpn.key"
+    src: "{{ HOME }}/security/vpn/{{ item }}.key"
+    mode: "0600"
 
 - name: "create openvpn config"
-  action:
-    module: "template"
-    src: "devbox-openvpn-config"
-    dest: "/etc/openvpn/wistla-{{ item }}-vpn.conf"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "vpns"
+  with_items: "{{ vpns }}"
   notify: "restart openvpn"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/wistla-{{ item }}-vpn.conf"
+    src: "devbox-openvpn-config"
 
 # ex: et ts=2 filetype=yaml

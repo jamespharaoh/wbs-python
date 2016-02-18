@@ -1,11 +1,12 @@
 ---
 
 - name: "setup sudo"
-  action:
-    module: "template"
-    src: "devbox-sudoers-ssh-agent"
-    dest: "/etc/sudoers.d/ssh-agent"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/sudoers.d/ssh-agent"
+    src: "devbox-sudoers-ssh-agent"
 
 - name: "install motd"
   sudo: "yes"

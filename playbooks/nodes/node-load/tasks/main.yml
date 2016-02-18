@@ -2,7 +2,7 @@
 
 - name: "deploy projects"
   tags: "quick"
-  with_items: "node_load_deploy_projects"
+  with_items: "{{ node_load_deploy_projects }}"
   changed_when: "deploy_output.stdout != ''"
   register: "deploy_output"
   delegate_to: "localhost"
@@ -22,7 +22,7 @@
       {{ item.filters | join (' ') }};
 
 - name: "link to upstream config"
-  with_items: "node_load_config_links"
+  with_items: "{{ node_load_config_links }}"
   action:
 
     module: "file"

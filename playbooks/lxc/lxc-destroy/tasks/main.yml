@@ -1,7 +1,14 @@
 ---
 
 - name: "destroy lxc container"
+  register: destroy_result
+  changed_when: destroy_result.stdout != 'UNCHANGED'
   delegate_to: "localhost"
+  sudo: "yes"
+  args:
+
+    executable: "/bin/bash"
+
   shell:
 
     set -e;
@@ -16,13 +23,5 @@
 
     lxc-destroy
       --name {{ inventory_hostname }};
-
-  args:
-    executable: "/bin/bash"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-  register: destroy_result
-  changed_when: destroy_result.stdout != 'UNCHANGED'
 
 # ex: et ts=2 filetype=yaml

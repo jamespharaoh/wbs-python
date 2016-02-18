@@ -1,9 +1,16 @@
 ---
 
 - name: "clone lxc container"
+  delegate_to: "localhost"
+  sudo: "yes"
+  args:
+
+    executable: "/bin/bash"
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
+
   shell:
 
-    set -e;
+    set -euf -o pipefail;
 
     source {{ deployment_home }}/wistla-devops/misc/locking ansible;
 
@@ -29,61 +36,55 @@
 
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
 
-  args:
-    executable: "/bin/bash"
-    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-
 - name: "create lxc config"
-  action:
-    module: "template"
-    src: "lxc-config"
-    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
   delegate_to: "localhost"
   sudo: "yes"
-  sudo_user: "root"
+  action:
+
+    module: "template"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
+    src: "lxc-config"
 
 - name: "create shared dir"
+  delegate_to: "localhost"
+  sudo: "yes"
   action:
+
     module: "file"
     path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/shared"
     state: "directory"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
 
 - name: "create host data dir"
+  delegate_to: "localhost"
+  sudo: "yes"
   action:
+
     module: "file"
     path: "{{ deployment_home }}/shared/{{ inventory_hostname }}"
     state: "directory"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
 
 - name: "create host data dirs"
+  with_items: "{{ data_dirs }}"
+  delegate_to: "localhost"
+  sudo: "yes"
   action:
+
     module: "file"
     path: "{{ deployment_home }}/shared/{{ inventory_hostname }}/{{ item.name }}"
     state: "directory"
+
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "data_dirs"
 
 - name: "create container data dirs"
+  with_items: "{{ data_dirs }}"
+  delegate_to: "localhost"
+  sudo: "yes"
   action:
+
     module: "file"
     path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
     state: "directory"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-  with_items: "data_dirs"
 
 # ex: et ts=2 filetype=yaml

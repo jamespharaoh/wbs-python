@@ -2,8 +2,10 @@
 
 - name: "install mongodb"
   args:
+
     executable: "/bin/bash"
     creates: "{{ mongodb_flag }}"
+
   sudo: "yes"
   shell:
 
@@ -24,20 +26,22 @@
     touch {{ mongodb_flag }};
 
 - name: "setup mongodb alternatives"
+  with_items: "{{ mongodb_binaries }}"
+  sudo: "yes"
   action:
+
     module: "alternatives"
     name: "{{ item }}"
     link: "/usr/bin/{{ item }}"
     path: "{{ mongodb_target }}/bin/{{ item }}"
     force: "yes"
-  sudo: "yes"
-  with_items: "mongodb_binaries"
 
 - name: "install mongodb upstart"
-  action:
-    module: "template"
-    src: "mongodb-upstart"
-    dest: "/etc/init/mongodb.conf"
   sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/init/mongodb.conf"
+    src: "mongodb-upstart"
 
 # ex: et ts=2 filetype=yaml

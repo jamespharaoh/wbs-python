@@ -1,12 +1,12 @@
 ---
 
 - name: "deploy projects"
-  delegate_to: "localhost"
-  sudo: "yes"
+  tags: "quick"
+  with_items: "{{ node_deploy_projects }}"
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
-  with_items: "node_deploy_projects"
-  tags: "quick"
+  delegate_to: "localhost"
+  sudo: "yes"
   args:
 
     executable: "/bin/bash"
@@ -31,7 +31,7 @@
       }};
 
 - name: "deploy projects node modules"
-  with_items: "node_deploy_projects"
+  with_items: "{{ node_deploy_projects }}"
   when: "item.type == 'nodejs'"
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
@@ -53,14 +53,9 @@
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item.name }}/node_modules/;
 
 - name: "create init config"
-  action:
-    module: "template"
-    src: "{{ item.1.template }}"
-    dest: "/etc/init/{{ item.0.name }}{{ item.1.target_suffix }}.conf"
-  sudo: "yes"
   with_nested:
 
-    - "node_deploy_projects"
+    - "{{ node_deploy_projects }}"
 
     - - template: "node-nodejs-upstart"
         target_suffix: ""
@@ -68,7 +63,17 @@
       - template: "node-nodejs-instance-upstart"
         target_suffix: "-instance"
 
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/init/{{ item.0.name }}{{ item.1.target_suffix }}.conf"
+    src: "{{ item.1.template }}"
+
 - name: "create links to config"
+  with_items: "{{
+    node_deploy_projects | flatten_hash ('configs')
+  }}"
   action:
 
     module: "file"
@@ -77,11 +82,10 @@
     src: "/config/{{ item.configs }}"
     force: "yes"
 
-  with_items: "{{
-    node_deploy_projects | flatten_hash ('configs')
-  }}"
-
 - name: "create other links"
+  with_items: "{{
+    node_deploy_projects | flatten_hash ('other_links')
+  }}"
   action:
 
     module: "file"
@@ -89,9 +93,5 @@
     state: "link"
     src: "{{ item.other_links.target }}"
     force: "yes"
-
-  with_items: "{{
-    node_deploy_projects | flatten_hash ('other_links')
-  }}"
 
 # ex: et ts=2 filetype=yaml

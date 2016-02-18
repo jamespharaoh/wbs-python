@@ -1,7 +1,10 @@
 ---
 
 - name: "stop lxc container"
+  register: stop_result
+  changed_when: stop_result.stdout != 'UNCHANGED'
   delegate_to: "localhost"
+  sudo: "yes"
   shell:
 
     if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
@@ -25,12 +28,6 @@
     lxc-stop
       --name {{ inventory_hostname }}
       --timeout 10;
-
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-  register: stop_result
-  changed_when: stop_result.stdout != 'UNCHANGED'
 
 - name: "remove container shortcut"
   delegate_to: "localhost"

@@ -24,14 +24,15 @@
     touch {{ iojs_flag }};
 
 - name: "setup iojs alternatives"
+  with_items: "{{ iojs_alternatives }}"
+  when: "iojs_default == 'yes'"
+  sudo: "yes"
   action:
+
     module: "alternatives"
     name: "{{ item.name }}"
     link: "{{ item.link }}"
     path: "{{ item.target }}"
     force: "yes"
-  sudo: "yes"
-  with_items: "iojs_alternatives"
-  when: "iojs_default == 'yes'"
 
 # ex: et ts=2 filetype=yaml
