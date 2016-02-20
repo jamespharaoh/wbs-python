@@ -1,6 +1,8 @@
 ---
 
 - include: "setup-dns.yml"
-  tags: "setup-dns"
+  tags:
+
+    - "setup-dns"
 
 # ex: et ts=2 filetype=yaml

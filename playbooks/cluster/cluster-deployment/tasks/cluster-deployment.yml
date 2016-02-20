@@ -33,7 +33,7 @@
     src: "{{ cluster_deployment_name }}"
 
 - name: "checkout projects from git"
-  with_items: "cluster_deployment_checkouts"
+  with_items: "{{ cluster_deployment_checkouts }}"
   args:
 
     creates: "{{ cluster_deployment_home }}/{{ item.name }}"
@@ -50,7 +50,9 @@
       --branch {{ item.branch }};
 
 - name: "create project links"
-  with_items: "cluster_deployment_checkouts | flatten_hash ('project_links')"
+  with_items: "{{
+    cluster_deployment_checkouts | flatten_hash ('project_links')
+  }}"
   action:
 
     module: "file"
@@ -61,7 +63,7 @@
 
 - name: "run project build steps"
   tags: "build"
-  with_items: "cluster_deployment_checkouts"
+  with_items: "{{ cluster_deployment_checkouts }}"
   args:
 
     chdir: "{{ cluster_deployment_home }}/{{ item.name }}"
@@ -69,7 +71,7 @@
   shell: "{{ item.build_steps | default ([ 'true' ]) | join (' && ') }}"
 
 - name: "create config directory"
-  with_items: "cluster_deployment_shared_directories"
+  with_items: "{{ cluster_deployment_shared_directories }}"
   action:
 
     module: "file"
@@ -77,7 +79,7 @@
     state: "directory"
 
 - name: "create config directories"
-  with_items: "cluster_deployment_config_directories"
+  with_items: "{{ cluster_deployment_config_directories }}"
   action:
 
     module: "file"
@@ -85,7 +87,7 @@
     state: "directory"
 
 - name: "create shared link"
-  when: "cluster_deployment.type == 'alias'"
+  when: "{{ cluster_deployment.type == 'alias' }}"
   action:
 
     module: "file"
@@ -94,7 +96,7 @@
     src: "../{{ cluster_deployment.alias }}/shared"
 
 - name: "create shared directory"
-  with_items: "cluster_deployment_shared_directories"
+  with_items: "{{ cluster_deployment_shared_directories }}"
   when: "cluster_deployment.type != 'alias'"
   action:
 
@@ -103,7 +105,7 @@
     state: "directory"
 
 - name: "create shared directories"
-  with_items: "cluster_deployment_shared_directories"
+  with_items: "{{ cluster_deployment_shared_directories }}"
   when: "cluster_deployment.type != 'alias'"
   action:
 
@@ -112,7 +114,7 @@
     state: "directory"
 
 - name: "create config files"
-  with_items: "cluster_deployment_config_templates"
+  with_items: "{{ cluster_deployment_config_templates }}"
   sudo: "yes"
   action:
 
@@ -125,7 +127,7 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "copy config files"
-  with_items: "cluster_deployment_config_files"
+  with_items: "{{ cluster_deployment_config_files }}"
   action:
 
     module: "copy"
@@ -134,7 +136,7 @@
     mode: "{{ item.mode }}"
 
 - name: "create links to config files"
-  with_items: "cluster_deployment_config_links"
+  with_items: "{{ cluster_deployment_config_links }}"
   action:
 
     module: "file"
@@ -145,7 +147,7 @@
     force: "yes"
 
 - name: "stat override config files"
-  with_items: "cluster_deployment_override_templates"
+  with_items: "{{ cluster_deployment_override_templates }}"
   register: "cluster_deployment_stat_override_templates_result"
   action:
 
@@ -153,7 +155,7 @@
     path: "{{ cluster_deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
-  with_indexed_items: "cluster_deployment_override_templates"
+  with_indexed_items: "{{ cluster_deployment_override_templates }}"
   when: "not cluster_deployment_stat_override_templates_result.results [item.0].stat.exists"
   action:
 
@@ -170,20 +172,23 @@
     src: "cluster-deployment-bridge-interface"
 
 - name: "start deployment network bridge"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+  sudo: "yes"
+  args:
+
+    executable: "/bin/bash"
+
   shell:
 
-    set -e
+    set -euf -o pipefail;
 
     if ifquery --state {{ cluster_deployment.bridge_name }} >/dev/null; then
       echo "UNCHANGED";
       exit;
-    fi
+    fi;
 
     ifup {{ cluster_deployment.bridge_name }};
-
-  sudo: "yes"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
 
 - name: "create logrotate config"
   sudo: "yes"
