@@ -15,6 +15,40 @@ ansible-modules-extras:
   url: "git@github.com:ansible/ansible-modules-extras.git"
   version: "stable-2.0"
 
+aws-cli:
+
+  url: "git@github.com:aws/aws-cli.git"
+  version: "master"
+
+boto:
+
+  url: "git@github.com:boto/boto.git"
+  version: "master"
+
+botocore:
+
+  url: "git@github.com:boto/botocore.git"
+  version: "master"
+
+dateutil:
+
+  url: "git@github.com:dateutil/dateutil.git"
+  version: "master"
+
+docutils:
+
+  url: "git@github.com:qsnake/docutils.git"
+  version: "master"
+
+gitdb:
+
+  url: "git@github.com:gitpython-developers/gitdb.git"
+  version: "master"
+
+  build:
+
+    - "./setup.py build"
+
 gitpython:
 
   url: "git@github.com:gitpython-developers/GitPython.git"
@@ -23,6 +57,51 @@ gitpython:
 gridlinker:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
+  version: "master"
+
+jinja2:
+
+  url: "git@github.com:mitsuhiko/jinja2.git"
+  version: "master"
+
+jmespath:
+
+  url: "git@github.com:jmespath/jmespath.py.git"
+  version: "master"
+
+netaddr:
+
+  url: "git@github.com:drkjam/netaddr.git"
+  version: "rel-0.7.x"
+
+pyasn1:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/pyasn1.git"
+  version: "master"
+
+pythonfutures:
+
+  url: "git@github.com:agronholm/pythonfutures.git"
+  version: "master"
+
+python-rsa:
+
+  url: "git@github.com:sybrenstuvel/python-rsa.git"
+  version: "master"
+
+pyyaml:
+
+  url: "git@github.com:yaml/pyyaml.git"
+  version: "master"
+
+roman:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/python-roman.git"
+  version: "master"
+
+s3transfer:
+
+  url: "git@github.com:boto/s3transfer.git"
   version: "master"
 
 smmap:
