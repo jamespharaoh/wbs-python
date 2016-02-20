@@ -136,6 +136,12 @@ admin_certificates:
   - "assets.berk.dev.wistla.com"
   - "berk.dev.wist.la"
 
+  - "bob.dev.wistla.com"
+  - "admin.bob.dev.wistla.com"
+  - "api.bob.dev.wistla.com"
+  - "assets.bob.dev.wistla.com"
+  - "bob.dev.wist.la"
+
   - "bruce.wistla.com"
   - "admin.bruce.wistla.com"
   - "api.bruce.wistla.com"

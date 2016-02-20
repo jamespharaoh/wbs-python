@@ -1,0 +1,87 @@
+---
+
+- network: "10.140"
+  cluster: "production"
+
+- network: "10.142"
+  cluster: "ops"
+
+- network: "10.144"
+  cluster: "staging"
+
+- network: "10.146"
+  cluster: "test"
+
+- network: "10.148"
+  deployment: "production-a"
+
+- network: "10.149"
+  deployment: "production-b"
+
+- network: "10.150"
+  deployment: "berk"
+
+- network: "10.151"
+  deployment: "mrbenn"
+
+- network: "10.152"
+  deployment: "dev"
+
+- network: "10.153"
+  deployment: "7-zark-7"
+
+- network: "10.154"
+  deployment: "bruce"
+
+- network: "10.155"
+  deployment: "staging-a"
+
+- network: "10.156"
+  deployment: "staging-b"
+
+- network: "10.157"
+  deployment: "everest"
+
+- network: "10.158"
+  deployment: "k2"
+
+- network: "10.159"
+  deployment: "montblanc"
+
+- network: "10.160"
+  deployment: "jenkins-latest"
+
+- network: "10.161"
+  deployment: "optimus"
+
+- network: "10.162"
+  deployment: "production"
+
+- network: "10.163"
+  deployment: "staging"
+
+- network: "10.164"
+  misc: "vpn"
+
+- network: "10.165"
+  deployment: "erebus"
+
+- network: "10.166"
+  deployment: "fitzroy"
+
+- network: "10.167"
+  deployment: "chuggington"
+
+- network: "10.168"
+  deployment: "smurfette"
+
+- network: "10.169"
+  cluster: "production-2"
+
+- network: "10.170"
+  cluster: "staging-2"
+
+- network: "10.171"
+  deployment: "bob"
+
+# ex: et ts=2 filetype=yaml

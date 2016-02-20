@@ -681,6 +681,33 @@ berk:
 
   nodejs_version: "5.6.0"
 
+bob:
+
+  name: "bob"
+  type: "simple"
+
+  enabled: "yes"
+  monitoring: "no"
+
+  supercluster: "dev"
+  cluster: "dev"
+
+  main_domain: "bob.dev.wistla.com"
+  short_domain: "bob.dev.wist.la"
+  assets_domain: "assets.bob.dev.wistla.com"
+  assets_origin_domain: "assets-origin.bob.dev.wistla.com"
+  admin_domain: "admin.bob.dev.wistla.com"
+  api_domain: "api.bob.dev.wistla.com"
+  web_domain: "www.bob.dev.wistla.com"
+
+  email_domain: "dev.wistla.com"
+
+  bridge_name: "br171"
+  bridge_network: "10.171"
+  bridge_mac: "aa:bb:0a:ab"
+
+  nodejs_version: "5.6.0"
+
 bruce:
 
   name: "bruce"

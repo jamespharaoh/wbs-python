@@ -88,6 +88,9 @@ system_packages:
   - name: "ngrep"
     state: "present"
 
+  - name: "ntp"
+    state: "present"
+
   - name: "openvpn"
     state: "present"
 
