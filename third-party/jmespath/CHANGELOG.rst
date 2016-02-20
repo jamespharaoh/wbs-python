@@ -1,0 +1,37 @@
+0.8.0
+=====
+
+* Improve lexing performance (`issue 84 <https://github.com/jmespath/jmespath.py/pull/84>`__)
+* Fix parsing error for multiselect lists (`issue 86 <https://github.com/jmespath/jmespath.py/issues/86>`__)
+* Fix issue with escaping single quotes in literal strings (`issue 85 <https://github.com/jmespath/jmespath.py/issues/85>`__)
+* Add support for providing your own dict cls to support
+  ordered dictionaries (`issue 94 <https://github.com/jmespath/jmespath.py/pull/94>`__)
+* Add map() function (`issue 95 <https://github.com/jmespath/jmespath.py/pull/95>`__)
+
+
+0.7.1
+=====
+
+* Rename ``bin/jp`` to ``bin/jp.py``
+* Fix issue with precedence when parsing wildcard
+  projections
+* Remove ordereddict and simplejson as py2.6 dependencies.
+  These were never actually used in the jmespath code base,
+  only in the unit tests.  Unittests requirements are handled
+  via requirements26.txt.
+
+
+0.7.0
+=====
+
+* Add support for JEP-12, raw string literals
+* Support .whl files
+
+0.6.2
+=====
+
+* Implement JEP-10, slice projections
+* Fix bug with filter projection parsing
+* Add ``to_array`` function
+* Add ``merge`` function
+* Fix error messages for function argument type errors
