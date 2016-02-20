@@ -59,6 +59,11 @@ gridlinker:
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
   version: "master"
 
+ipaddress:
+
+  url: "git@github.com:phihag/ipaddress.git"
+  version: "master"
+
 jinja2:
 
   url: "git@github.com:mitsuhiko/jinja2.git"
@@ -67,6 +72,11 @@ jinja2:
 jmespath:
 
   url: "git@github.com:jmespath/jmespath.py.git"
+  version: "master"
+
+markupsafe:
+
+  url: "git@github.com:mitsuhiko/markupsafe.git"
   version: "master"
 
 netaddr:

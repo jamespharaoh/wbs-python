@@ -118,8 +118,8 @@ system_packages:
   - name: "python-yaml"
     state: "present"
 
-  - name: "rabbitmq-server"
-    state: "present"
+  #- name: "rabbitmq-server"
+  #  state: "present"
 
   - name: "resolvconf"
     state: "present"
