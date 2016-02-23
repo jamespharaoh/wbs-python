@@ -7,6 +7,8 @@ import yaml
 
 from ansible.plugins.action import ActionBase
 
+from wbs import yamlx
+
 class ActionModule (ActionBase):
 
 	TRANSFERS_FILES = False
@@ -28,7 +30,13 @@ class ActionModule (ActionBase):
 		if not os.path.isdir ("data/runtime"):
 			os.mkdir ("data/runtime")
 
-		filename = "data/runtime/%s" % task_vars.get ("inventory_hostname")
+		filename = (
+			"data/runtime/%s" % (
+				task_vars.get ("inventory_hostname")))
+
+		filename_temp = (
+			"data/runtime/.%s.temp" % (
+				task_vars.get ("inventory_hostname")))
 
 		if os.path.isfile (filename):
 
@@ -68,14 +76,21 @@ class ActionModule (ActionBase):
 				runtime_data [dynamic_key] = value
 				options [dynamic_key] = value
 
-		with open (filename, "w") as file_handle:
+		with open (filename_temp, "w") as file_handle:
 
-			file_handle.write ("---\n")
+			file_handle.write (
+				yamlx.encode (
+					None,
+					runtime_data))
 
-			yaml.safe_dump (runtime_data, file_handle,
-				default_flow_style = False,
-				encoding = "utf-8",
-				allow_unicode = True)
+			file_handle.write (
+				"\n")
+
+			file_handle.flush ()
+
+			os.fsync (file_handle.fileno ())
+
+		os.rename (filename_temp, filename)
 
 		return dict (
 			ansible_facts = options,

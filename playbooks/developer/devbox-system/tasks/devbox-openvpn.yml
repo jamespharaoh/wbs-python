@@ -1,6 +1,7 @@
 ---
 
 - name: "install openvpn ca cert"
+  become: "yes"
   action:
 
     module: "copy"
@@ -10,7 +11,7 @@
 - name: "install openvpn client cert"
   with_items: "{{ vpns }}"
   notify: "restart openvpn"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"
@@ -20,7 +21,7 @@
 - name: "install openvpn client key"
   with_items: "{{ vpns }}"
   notify: "restart openvpn"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"
@@ -31,7 +32,7 @@
 - name: "create openvpn config"
   with_items: "{{ vpns }}"
   notify: "restart openvpn"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
