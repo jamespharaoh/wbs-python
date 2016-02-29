@@ -111,11 +111,11 @@ devenv_checkouts_full:
 
   - name: "wistla-admin"
     branch: "master"
-    build_steps:
+    #build_steps:
   
-      - "npm install"
-      - "jspm install -y"
-      - "./build.sh"
+    #  - "npm install"
+    #  - "jspm install -y"
+    #  - "./build.sh"
 
   - name: "wistla-analytics"
     branch: "master"
