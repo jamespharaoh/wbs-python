@@ -1,0 +1,168 @@
+sudo: false
+language: python
+
+cache:
+  directories:
+#    - $HOME/.cache/pip
+    - $HOME/ossl-098
+
+env:
+  global:
+    - LC_ALL=en_US.UTF-8
+
+matrix:
+  include:
+  - language: generic
+    os: osx
+    env: TOXENV=py27 OSX_OPENSSL=homebrew
+  - language: generic
+    os: osx
+    env: TOXENV=py27 OSX_OPENSSL=system
+  - python: "2.6" # these are just to make travis's UI a bit prettier
+    env: TOXENV=py26
+  - python: "2.7"
+    env: TOXENV=py27
+  - python: "3.3"
+    env: TOXENV=py33
+  - python: "3.4"
+    env: TOXENV=py34
+  - python: "3.5"
+    env: TOXENV=py35
+  - python: "pypy"
+    env: TOXENV=pypy
+
+  # Also run the tests against cryptography master.
+  - python: "2.6"
+    env: TOXENV=py26-cryptographyMaster
+  - python: "2.7"
+    env: TOXENV=py27-cryptographyMaster
+  - python: "3.3"
+    env: TOXENV=py33-cryptographyMaster
+  - python: "3.4"
+    env: TOXENV=py34-cryptographyMaster
+  - python: "3.5"
+    env: TOXENV=py35-cryptographyMaster
+  - python: "pypy"
+    env: TOXENV=pypy-cryptographyMaster
+
+  # And older cryptography versions.
+  - python: "2.6"
+    env: TOXENV=py26-cryptography1.1
+  - python: "2.7"
+    env: TOXENV=py27-cryptography1.1
+  - python: "3.3"
+    env: TOXENV=py33-cryptography1.1
+  - python: "3.4"
+    env: TOXENV=py34-cryptography1.1
+  - python: "3.5"
+    env: TOXENV=py35-cryptography1.1
+  - python: "pypy"
+    env: TOXENV=pypy-cryptography1.1
+
+
+  # Make sure we don't break Twisted
+  - python: "2.7"
+    env: TOXENV=py27-twistedMaster
+
+
+  # Also run at least a little bit against an older version of OpenSSL.
+  - python: "2.7"
+    env:
+      OPENSSL=0.9.8 TOXENV=py27
+
+  # Meta
+  - python: "2.7"
+    env: TOXENV=check-manifest
+
+  - python: "2.7"
+    env: TOXENV=pypi-readme
+
+  - python: "2.7"
+    env: TOXENV=flake8
+
+  - python: "2.7"
+    env: TOXENV=docs
+
+  # - Let the cryptography master builds fail because they might be triggered by
+  #   cryptography changes beyond our control.
+  # - Also allow OS X and 0.9.8 to fail at the moment while we fix these new
+  #   build configurations.
+  # - Also allow lint to fail while we fix existing lint.
+  # - We alloy pypy to fail until Travis fixes their infrastructure to a pypy
+  #   with a recent enought CFFI library to run cryptography 1.0+.
+  allow_failures:
+  - language: generic
+    os: osx
+    env: TOXENV=py27 OSX_OPENSSL=homebrew
+  - env: TOXENV=py26-cryptographyMaster
+  - env: TOXENV=py27-cryptographyMaster
+  - env: TOXENV=py33-cryptographyMaster
+  - env: TOXENV=py34-cryptographyMaster
+  - env: TOXENV=py35-cryptographyMaster
+
+install:
+  - |
+    if [[ "$(uname -s)" == 'Darwin' ]]; then
+      brew update
+      brew upgrade openssl
+      curl -O https://bootstrap.pypa.io/get-pip.py
+      python get-pip.py --user
+      pip install --user virtualenv
+    else
+      # install our own pypy. This can be removed if and when Travis gets a reasonably up to date pypy
+      if [[ "${TOXENV}" = pypy* ]]; then
+          git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+          PYENV_ROOT="$HOME/.pyenv"
+          PATH="$PYENV_ROOT/bin:$PATH"
+          eval "$(pyenv init -)"
+          pyenv install pypy-4.0.1
+          pyenv global pypy-4.0.1
+      fi
+      pip install virtualenv
+    fi
+    python -m virtualenv ~/.venv
+    ~/.venv/bin/pip install tox coverage
+
+script:
+  - |
+    if [[ "$(uname -s)" == 'Darwin' && $OSX_OPENSSL == 'homebrew' ]]; then
+      # set our flags to use homebrew openssl
+      export ARCHFLAGS="-arch x86_64"
+      export LDFLAGS="-L/usr/local/opt/openssl/lib"
+      export CFLAGS="-I/usr/local/opt/openssl/include"
+      export PATH="/usr/local/opt/openssl/bin:$PATH"
+    fi
+    # activate the pypy env we installed via our custom pyenv in the install stage
+    if [[ "${TOXENV}" == "pypy" ]]; then
+        PYENV_ROOT="$HOME/.pyenv"
+        PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+    fi
+    # This section potentially downloads, compiles and installs openssl 0.9.8zg
+    if [[ "${OPENSSL}" == "0.9.8" ]]; then
+      # download, compile, and install if it's not already present via travis cache
+      if [[ ! -f "$HOME/ossl-098/bin/openssl" ]]; then
+        curl -O https://www.openssl.org/source/openssl-0.9.8zg.tar.gz
+        tar zxvf openssl-0.9.8zg.tar.gz
+        cd openssl-0.9.8zg
+        echo "OPENSSL_0.9.8ZG_CUSTOM {
+            global:
+              *;
+        };" > openssl.ld
+        ./config -Wl,--version-script=openssl.ld -Wl,-Bsymbolic-functions -fPIC shared --prefix=$HOME/ossl-098 --openssldir=/etc/ssl
+        make install
+        tree $HOME/ossl-098
+      fi
+      export PATH="$HOME/ossl-098/bin:$PATH"
+      export CFLAGS="-I$HOME/ossl-098/include"
+      export LDFLAGS="-L$HOME/ossl-098/lib"
+      export LD_LIBRARY_PATH="$HOME/ossl-098/lib"
+    fi
+    openssl version
+    ~/.venv/bin/tox -v
+
+after_script:
+  - ./.travis/upload_coverage.sh
+
+notifications:
+  email: false
