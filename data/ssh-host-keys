@@ -25,6 +25,12 @@ dev:
     - "BAI2Fhmp+YdgDM98N+BNtS47II2t5dS6SPRDMcCe1ONlx4oK1lRtv1O/Lxxa+uUFyoaOdtUm"
     - "mVQF+kEu+xKLdWY="
 
+  bob:
+
+    - "wistla-bob-dev ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIb"
+    - "mlzdHAyNTYAAABBBGxkeVFgXRNiwYKvOw+KPqR2wYMXFBag1HI2TxZHtWLPwY+NsboD9fWt7"
+    - "b1RLBiV0RwX4jfW/KuTrw5RbV3iVcg="
+
   mrbenn:
 
     - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
