@@ -119,12 +119,27 @@ def setup ():
 						.commit
 						.tree ["third-party"] [project_name])
 
+				git_remote = (
+					git_repo.remotes [
+						project_name])
+
+				if project_data ["version"] in git_remote.refs:
+
+					remote_ref = (
+						git_remote.refs [
+							project_data ["version"]])
+
+					remote_commit = (
+						remote_ref.commit)
+
+				else:
+
+					remote_commit = (
+						git_repo.commit (
+							project_data ["version"]))
+
 				remote_tree = (
-					git_repo
-						.remotes [project_name]
-						.refs [project_data ["version"]]
-						.commit
-						.tree)
+					remote_commit.tree)
 
 				if local_tree == remote_tree:
 					continue
@@ -137,9 +152,14 @@ def setup ():
 					"git",
 					"subtree",
 					"merge",
-					"--prefix", project_path,
-					"%s/%s" % (project_name, project_data ["version"]),
+					"--prefix",
+					project_path,
+					unicode (remote_commit),
 					"--squash",
+					"--message",
+					"update %s to %s" % (
+						project_name,
+						project_data ["version"]),
 				])
 
 	finally:
