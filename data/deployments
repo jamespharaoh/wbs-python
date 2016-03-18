@@ -83,6 +83,8 @@ production-a:
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
 
+  google_project: "production"
+
   emails_enabled: "yes"
   test_routes_enabled: "yes"
 
@@ -135,6 +137,8 @@ production-b:
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
+
+  google_project: "production"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -234,6 +238,8 @@ staging-a:
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
 
+  google_project: "staging"
+
   emails_enabled: "yes"
   test_routes_enabled: "yes"
 
@@ -286,6 +292,8 @@ staging-b:
   apple_push_notifications_name: "c.w.w.i.staging_prod_apns"
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
+
+  google_project: "staging"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -355,6 +363,8 @@ test-everest:
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
 
+  google_project: "test"
+
   emails_enabled: "yes"
   test_routes_enabled: "yes"
 
@@ -415,6 +425,8 @@ test-k2:
   apple_push_notifications_name: "c.w.w.iphone_prod_apns"
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
+
+  google_project: "test"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -477,6 +489,8 @@ test-montblanc:
   apple_push_notifications_production: "no"
   apple_feedback_service_enabled: "no"
 
+  google_project: "test"
+
   emails_enabled: "yes"
   test_routes_enabled: "yes"
 
@@ -538,6 +552,8 @@ test-erebus:
   apple_push_notifications_production: "yes"
   apple_feedback_service_enabled: "no"
 
+  google_project: "test"
+
   emails_enabled: "yes"
   test_routes_enabled: "yes"
 
@@ -598,6 +614,8 @@ test-fitzroy:
   apple_push_notifications_name: "c.w.w.i.dev_dev_apns"
   apple_push_notifications_production: "no"
   apple_feedback_service_enabled: "no"
+
+  google_project: "dev"
 
   emails_enabled: "yes"
   test_routes_enabled: "yes"
@@ -679,6 +697,8 @@ berk:
   bridge_network: "10.150"
   bridge_mac: "aa:bb:0a:96"
 
+  google_project: "dev"
+
   nodejs_version: "5.6.0"
 
 bob:
@@ -733,6 +753,8 @@ bruce:
   bridge_network: "10.154"
   bridge_mac: "aa:bb:0a:9a"
 
+  google_project: "dev"
+
   nodejs_version: "5.6.0"
 
 chuggington:
@@ -759,6 +781,8 @@ chuggington:
   bridge_name: "br167"
   bridge_network: "10.167"
   bridge_mac: "aa:bb:0a:a7"
+
+  google_project: "dev"
 
   nodejs_version: "5.6.0"
 
@@ -815,6 +839,8 @@ mrbenn:
   bridge_network: "10.153"
   bridge_mac: "aa:bb:0a:99"
 
+  google_project: "dev"
+
   nodejs_version: "5.6.0"
 
 optimus:
@@ -841,6 +867,8 @@ optimus:
   bridge_name: "br161"
   bridge_network: "10.161"
   bridge_mac: "aa:bb:0a:a1"
+
+  google_project: "dev"
 
   nodejs_version: "5.6.0"
 
@@ -869,6 +897,8 @@ smurfette:
   bridge_network: "10.168"
   bridge_mac: "aa:bb:0a:a8"
 
+  google_project: "dev"
+
   nodejs_version: "5.6.0"
 
 jenkins-latest:
@@ -895,6 +925,8 @@ jenkins-latest:
   bridge_name: "br160"
   bridge_network: "10.160"
   bridge_mac: "aa:bb:0a:a0"
+
+  google_project: "dev"
 
   nodejs_version: "5.6.0"
 

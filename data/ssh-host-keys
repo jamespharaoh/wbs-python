@@ -27,9 +27,9 @@ dev:
 
   bob:
 
-    - "wistla-bob-dev ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIb"
-    - "mlzdHAyNTYAAABBBGxkeVFgXRNiwYKvOw+KPqR2wYMXFBag1HI2TxZHtWLPwY+NsboD9fWt7"
-    - "b1RLBiV0RwX4jfW/KuTrw5RbV3iVcg="
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BGxkeVFgXRNiwYKvOw+KPqR2wYMXFBag1HI2TxZHtWLPwY+NsboD9fWt7b1RLBiV0RwX4jfW"
+    - "/KuTrw5RbV3iVcg="
 
   mrbenn:
 

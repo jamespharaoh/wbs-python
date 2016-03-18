@@ -225,11 +225,13 @@ config.analytics.provider.google.trackerId = '{{ third_parties[cluster_name].ana
 if (!config.gcm || typeof config.gcm !== 'object') {
     config.gcm = {};
 }
-{% if cluster_name in third_parties %}
+
+{% if deployment.google_project in google_projects %}
+{% set google_project = google_projects [deployment.google_project] %}
 config.gcm.enabled = true;
-config.gcm.apiKey = '{{ third_parties[cluster_name].google_cloud_messaging_api_key }}';
-config.gcm.senderId = '{{ third_parties[cluster_name].google_cloud_messaging_sender_id }}';
-config.gcm.appName = '{{ third_parties[cluster_name].google_cloud_messaging_app_name }}';
+config.gcm.apiKey = '{{ google_project.cloud_messaging_api_key }}';
+config.gcm.senderId = '{{ google_project.cloud_messaging_sender_id }}';
+config.gcm.appName = '{{ google_project.cloud_messaging_app_name }}';
 {% else %}
 config.gcm.enabled = false;
 config.gcm.apiKey = '';
@@ -240,10 +242,12 @@ config.gcm.appName = '';
 if (!config.authentication.google || typeof config.authentication.google !== 'object') {
         config.authentication.google = {};
 }
-{% if cluster_name in third_parties %}
-config.authentication.google.name = '{{ third_parties[cluster_name].google_auth_name }}';
-config.authentication.google.client_id = '{{ third_parties[cluster_name].google_auth_client_id }}';
-config.authentication.google.client_secret = '{{ third_parties[cluster_name].google_auth_client_secret }}';
+
+{% if deployment.google_project in google_projects %}
+{% set google_project = google_projects [deployment.google_project] %}
+config.authentication.google.name = '{{ google_project.auth_name }}';
+config.authentication.google.client_id = '{{ google_project.auth_client_id }}';
+config.authentication.google.client_secret = '{{ google_project.auth_client_secret }}';
 {% else %}
 config.authentication.google.name = '';
 config.authentication.google.client_id = '';
