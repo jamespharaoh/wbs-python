@@ -128,7 +128,8 @@ devenv_checkouts_full:
     project_links:
 
       - link: "node_modules/wistla-analytics"
-        target: "../../wistla-analytics"
+        overlay: "node_modules/.wistla-analytics"
+        target: "{{ deployment_home }}/wistla-analytics"
 
     build_steps:
 
@@ -139,7 +140,8 @@ devenv_checkouts_full:
     project_links:
 
       - link: "node_modules/wistla-analytics"
-        target: "../../wistla-analytics"
+        overlay: "node_modules/.wistla-analytics"
+        target: "{{ deployment_home }}/wistla-analytics"
 
     build_steps:
 

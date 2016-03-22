@@ -20,13 +20,54 @@
 
 - name: "create project links"
   with_items: "{{ devenv_checkouts | flatten_hash ('project_links') }}"
-  action:
+  become: "yes"
+  args:
 
-    module: "file"
-    path: "{{ deployment_home }}/{{ item.outer.name }}/{{ item.project_links.link }}"
-    state: "link"
+    executable: "/bin/bash"
 
-    src: "{{ item.project_links.target }}"
+  shell:
+
+    set -euf -o pipefail;
+
+    link="{{ [
+      deployment_home,
+      item.outer.name,
+      item.project_links.link,
+    ] | join ('/') }}";
+
+    overlay="{{ [
+      deployment_home,
+      item.outer.name,
+      item.project_links.overlay,
+    ] | join ('/') }}";
+
+    target="{{ item.project_links.target }}";
+
+    if ! test -d "$link"; then
+      mkdir "$link";
+      chown root.root "$link";
+      chmod 0000 "$link";
+    fi;
+
+    if ! {
+      cut -d' ' -f 2 </proc/mounts
+        | grep -x "$link";
+    }; then
+
+      if test -d "$overlay"; then
+
+        mount -t aufs -o "br=$overlay:$target" none "$link";
+
+      else
+
+        mkdir "$overlay";
+        chown "{{ deployment_user }}:{{ deployment_user }}" "$overlay";
+        mount -t aufs -o "br=$overlay:$target" none "$link";
+        rm -rf "$link/node_modules";
+
+      fi;
+
+    fi;
 
 - name: "run build steps"
   tags: "build"
