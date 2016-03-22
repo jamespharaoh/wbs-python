@@ -63,7 +63,7 @@
         mkdir "$overlay";
         chown "{{ deployment_user }}:{{ deployment_user }}" "$overlay";
         mount -t aufs -o "br=$overlay:$target" none "$link";
-        rm -rf "$link/node_modules";
+        rm -rf "$link/node_modules" "$link/.git";
 
       fi;
 
