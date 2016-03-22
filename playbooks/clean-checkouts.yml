@@ -45,6 +45,10 @@
           rm -rf "$overlay";
         fi;
 
+        if test -h "$link"; then
+          rm "$link";
+        fi;
+
     - name: "clean checked out projects"
       with_items: "devenv_checkouts"
       args:
