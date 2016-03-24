@@ -3,11 +3,18 @@ from __future__ import division
 from __future__ import unicode_literals
 from __future__ import with_statement
 
-import git
 import os
 import subprocess
 import sys
-import yaml
+
+try:
+
+	import git
+	import yaml
+
+except ImportError:
+
+	pass
 
 import wbs.yamlx as yamlx
 
