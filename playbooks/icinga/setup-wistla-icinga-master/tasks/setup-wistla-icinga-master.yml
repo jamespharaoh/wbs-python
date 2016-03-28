@@ -21,10 +21,22 @@
     icinga.certificate: "{{ wistla_icinga_certificate_result.certificate }}"
     icinga.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
 
-- name: "create wistla icinga configuration"
-  with_items: "wistla_icinga_master_config_templates"
-  notify: "set icinga.needs_restart to 'yes'"
+- name: "create wistla icinga master directories"
+  with_items: "{{ wistla_icinga_master_directories }}"
   sudo: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create wistla icinga configuration"
+  with_items: "{{ wistla_icinga_master_config_templates }}"
+  notify: "set icinga.needs_restart to 'yes'"
+  become: "yes"
   action:
 
     module: "template"
@@ -35,9 +47,9 @@
     mode: "{{ item.mode }}"
 
 - name: "create wistla security configuration"
-  with_items: "wistla_icinga_security_config"
+  with_items: "{{ wistla_icinga_security_config }}"
   notify: "set icinga.needs_restart to 'yes'"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"
@@ -46,6 +58,17 @@
     owner: "{{ item.user }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
+
+- name: "create wistla icinga master links"
+  with_items: "{{ wistla_icinga_master_links }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.link }}"
+    state: "link"
+
+    src: "{{ item.target }}"
 
 - name: "set icinga_state to 'enabled'"
   when: "icinga_state == 'installed'"

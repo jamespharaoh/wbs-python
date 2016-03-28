@@ -1,0 +1,77 @@
+---
+
+# TODO generate this file
+
+- hosts: "cluster-production-app"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "production-a"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "production-a" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "production-b"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "production-b" ]
+
+- hosts: "cluster-production-data"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "production"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "production" ]
+
+- hosts: "cluster-staging-app"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "staging-a"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "staging-a" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "staging-b"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "staging-b" ]
+
+- hosts: "cluster-staging-data"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "staging"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "staging" ]
+
+- hosts: "cluster-test-app"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "test-everest"
+      cluster_deployment_playbook_name: "stop"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "test-everest" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "test-k2"
+      cluster_deployment_playbook_name: "stop"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "test-k2" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "test-montblanc"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "test-montblanc" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "test-erebus"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "test-erebus" ]
+
+    - role: "cluster-deployment-playbook"
+      cluster_deployment_name: "test-fitzroy"
+      cluster_deployment_playbook_name: "stop"
+      tags: [ "cluster-deployment", "test-fitzroy" ]
+
+# ex: et ts=2 filetype=yaml

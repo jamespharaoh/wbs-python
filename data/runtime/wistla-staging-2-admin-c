@@ -1,74 +1,104 @@
 ---
-amazon_instance_state: running
-amazon_instance_type_running: t2.micro
-etcd:
-  installed_version: 2.2.2
-  needs_restart: 'no'
-  state: enabled
-etcd_installed_version: 2.2.2
-etcd_needs_restart: 'no'
-etcd_state: enabled
-heka:
-  installed_version: 0.10.0b0
-  needs_restart: 'no'
-  state: enabled
-heka_installed_version: 0.10.0b0
-heka_needs_restart: 'no'
-heka_state: enabled
-icinga:
-  certificate: /authority/icinga/issue/30/certificate
-  needs_restart: 'no'
-  private_key: /authority/icinga/issue/30/key
-  state: enabled
-icinga_certificate: /authority/icinga/issue/30/certificate
-icinga_needs_restart: 'no'
-icinga_private_key: /authority/icinga/issue/30/key
-icinga_state: enabled
-instance_id: i-92b40a22
-mysql:
-  needs_restart: 'no'
-  root_password: zuojplgtxrahdntvxwua
-  state: enabled
-mysql_needs_restart: 'no'
-mysql_root_password: zuojplgtxrahdntvxwua
-mysql_state: enabled
-nginx:
-  installed_version: 1.9.7
-  needs_restart: 'no'
-  state: enabled
-nginx_installed_version: 1.9.7
-nginx_needs_restart: 'no'
-nginx_state: enabled
-php:
-  needs_restart: 'no'
-  state: enabled
-php_needs_restart: 'no'
-php_state: enabled
-python:
-  installed_version: 2.7.10
-  state: installed
-python_apt:
-  installed_version: 0.9.3-1
-  state: installed
-python_apt_installed_version: 0.9.3-1
-python_apt_state: installed
-python_installed_version: 2.7.10
-python_pip:
-  installed_version: 7.0.3
-  state: installed
-python_pip_installed_version: 7.0.3
-python_pip_state: installed
-python_state: installed
-ssh:
-  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw=
-  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F
-ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw=
-ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F
-volume_ids:
-  system: vol-df49a722
-volume_ids_system: vol-df49a722
-vpn_server:
-  certificate: /authority/ops-vpn/issue/23/certificate
-  private_key: /authority/ops-vpn/issue/23/key
-vpn_server_certificate: /authority/ops-vpn/issue/23/certificate
-vpn_server_private_key: /authority/ops-vpn/issue/23/key
+
+amazon_instance_state: "running"
+amazon_instance_type_running: "t2.micro"
+etcd: 
+  
+  installed_version: "2.2.2"
+  needs_restart: "no"
+  state: "enabled"
+
+etcd_installed_version: "2.2.2"
+etcd_needs_restart: "no"
+etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  certificate: "/authority/icinga/issue/30/certificate"
+  installed_version: "2.4.2-1"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/30/key"
+  state: "enabled"
+
+icinga_certificate: "/authority/icinga/issue/30/certificate"
+icinga_installed_version: "2.4.2-1"
+icinga_needs_restart: "no"
+icinga_private_key: "/authority/icinga/issue/30/key"
+icinga_state: "enabled"
+instance_id: "i-92b40a22"
+mysql: 
+  
+  needs_restart: "no"
+  root_password: "zuojplgtxrahdntvxwua"
+  state: "enabled"
+
+mysql_needs_restart: "no"
+mysql_root_password: "zuojplgtxrahdntvxwua"
+mysql_state: "enabled"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+php: 
+  
+  needs_restart: "no"
+  state: "enabled"
+
+php_needs_restart: "no"
+php_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGrvxkTme+buKFxa02USxGIkVoilfvmeI6XCIkVTEz0/WXCDFcL/qlU6KMOBJk1fu7kgK/D8ELqBtRxTU04uMxw="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyXEVrgvBaZ0LFSm3LkGaTJlZOIzrRhohzXppYxDRakDuAFYVr/0uUFfp6s4wgC4JFyPR7VOx1rki1FXzXb4R6ncsn32XA64SBQLRjqWroJS0NUNBAxBGi4UAzDUWCdzddH5eLMvuzYBUTAp7ckz0PsUlCK2wXbOZKl+zIirW85N0dQRn26F/DLiXvDhidQ4wqA8c1ajIk8HYLOABloRyAWpKQXWunLKnOTTHesmqS+0DqCkAvxUEVizVErIbeyBaGs9kv1mwiV2T0TC/a3hstGHJ9lJiOHGX+WelWGuH/DpBN65ZYwWjLotrrnWZW7DhmnPqcm6TKXTQxhv0RXH3F"
+volume_ids: 
+  
+  system: "vol-df49a722"
+
+volume_ids_system: "vol-df49a722"
+vpn_server: 
+  
+  certificate: "/authority/ops-vpn/issue/23/certificate"
+  private_key: "/authority/ops-vpn/issue/23/key"
+
+vpn_server_certificate: "/authority/ops-vpn/issue/23/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/23/key"
+
+
+# ex: et ts=2 filetype=yaml

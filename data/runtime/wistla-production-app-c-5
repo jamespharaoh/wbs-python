@@ -1,0 +1,67 @@
+---
+
+amazon_instance_type_running: "c4.2xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  installed_version: "2.4.2-1"
+  state: "installed"
+
+icinga_installed_version: "2.4.2-1"
+icinga_state: "installed"
+instance_id: "i-95ef831d"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG8AYQ545kCpgGN+1p0u2Qu2JknmFlnFbnnienxXtWbqCrz8w1b7FjAdarA0oL+B1RvxfaD7EPzLvBzf5Ph6WoM="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDABejyB03EXA+kiFIgBLkrG+BXg/8XyMyRagQNKQCwvugM8Vrz2XeRiseolyKl+9/af65QSXF3qCvQQ0yfkI9pV9yjcwBmFOhUQpnbEyW1Eg97jlr2O6rySnflMMcuXkF5z7yXyLAQRpb2fZmezH8TwE2Lp6vDeTXbEQ1JSJ2gqo3X59pg37tK/pdSXSoxr6LznmzNRSrQx3ROeVDMsB4n68rc9MDjRa1o6eP4ESNQ/8kE/jxpk43rIA30ehPTB7jcjWWMGjsfkPt6jNYWGaHnLAaoWvy4vTRsCl0kenl8PVKRJlwvM0RY5XS+gZblrxyr6mvJCQsDb+t79d8KuvON"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG8AYQ545kCpgGN+1p0u2Qu2JknmFlnFbnnienxXtWbqCrz8w1b7FjAdarA0oL+B1RvxfaD7EPzLvBzf5Ph6WoM="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDABejyB03EXA+kiFIgBLkrG+BXg/8XyMyRagQNKQCwvugM8Vrz2XeRiseolyKl+9/af65QSXF3qCvQQ0yfkI9pV9yjcwBmFOhUQpnbEyW1Eg97jlr2O6rySnflMMcuXkF5z7yXyLAQRpb2fZmezH8TwE2Lp6vDeTXbEQ1JSJ2gqo3X59pg37tK/pdSXSoxr6LznmzNRSrQx3ROeVDMsB4n68rc9MDjRa1o6eP4ESNQ/8kE/jxpk43rIA30ehPTB7jcjWWMGjsfkPt6jNYWGaHnLAaoWvy4vTRsCl0kenl8PVKRJlwvM0RY5XS+gZblrxyr6mvJCQsDb+t79d8KuvON"
+volume_ids: 
+  
+  data: "vol-6ba686a9"
+  system: "vol-eba78729"
+
+volume_ids_data: "vol-6ba686a9"
+volume_ids_system: "vol-eba78729"
+
+
+# ex: et ts=2 filetype=yaml

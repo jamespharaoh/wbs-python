@@ -1,0 +1,15 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+wistla-devops:
+
+  etcd_prefix: "/wistla-devops"
+  etcd_secure: "yes"
+  etcd_servers:
+
+    - "a.admin.ops.wistla.com"
+    - "b.admin.ops.wistla.com"
+    - "c.admin.ops.wistla.com"
+
+# ex: et ts=2 filetype=yaml

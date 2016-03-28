@@ -1,0 +1,67 @@
+---
+
+amazon_instance_type_running: "c4.2xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  installed_version: "2.4.2-1"
+  state: "installed"
+
+icinga_installed_version: "2.4.2-1"
+icinga_state: "installed"
+instance_id: "i-42ef83ca"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKnPGUVF2mpvFGE9vY+dKTb81F6njB8UQyJD2KISJL2tkOhCfNAAvenzxU7dmk/sYW3XMvgb6AqPXkgt2lXL71I="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCylD38xX7H703w+6QEO7GAEflxejs6EApOxDAJ/bd53AsSFJYMZEMnmChcPxH3XJBo5deSfmdkkE7+XuvAdhIHflR3JG+qmn00hxayKcvVCJ49KE9BeKpr887mS+/ly1b3fOsFxa++tSIzN2KO33M9MRoPgNz/BaOUy5Mgkx+2SNiav78k1gb19hIEEuMoiLA9Q4GzhbzZmrG3ayeRqVMgGXSCq4tVJCgS66SJVqNEVT3jdyTG8ysVuVj5jUVfoolbT+aXy3y7pVG6E9RGMBe5C7YbBEobQXyvXrISAJzFSvYQl1a4yaMhwEM2nzRqYBCZnNQPXSGFXzZdUG2JdbhX"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKnPGUVF2mpvFGE9vY+dKTb81F6njB8UQyJD2KISJL2tkOhCfNAAvenzxU7dmk/sYW3XMvgb6AqPXkgt2lXL71I="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCylD38xX7H703w+6QEO7GAEflxejs6EApOxDAJ/bd53AsSFJYMZEMnmChcPxH3XJBo5deSfmdkkE7+XuvAdhIHflR3JG+qmn00hxayKcvVCJ49KE9BeKpr887mS+/ly1b3fOsFxa++tSIzN2KO33M9MRoPgNz/BaOUy5Mgkx+2SNiav78k1gb19hIEEuMoiLA9Q4GzhbzZmrG3ayeRqVMgGXSCq4tVJCgS66SJVqNEVT3jdyTG8ysVuVj5jUVfoolbT+aXy3y7pVG6E9RGMBe5C7YbBEobQXyvXrISAJzFSvYQl1a4yaMhwEM2nzRqYBCZnNQPXSGFXzZdUG2JdbhX"
+volume_ids: 
+  
+  data: "vol-c9a7870b"
+  system: "vol-cea7870c"
+
+volume_ids_data: "vol-c9a7870b"
+volume_ids_system: "vol-cea7870c"
+
+
+# ex: et ts=2 filetype=yaml

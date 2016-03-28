@@ -1,35 +1,43 @@
 ---
-admin_balancer_hosted_zone_name: ops-admin-2037886270.eu-west-1.elb.amazonaws.com
-admin_balancer_hosted_zone_name_id: Z3NF1Z3NOM5OY2
-icinga:
-  database_initialized: 'yes'
-  ticket_salt: migqyvdljzdbdyvddige
-icinga_database_initialized: 'yes'
-icinga_database_password: qqiwmlckafbtaechemji
-icinga_ticket_salt: migqyvdljzdbdyvddige
-icinga_web:
-  admin_password: dahofopovcovfakdxnnx
-  database_password: qreihbrfsdytyyxgmygg
-  main_database_initialized: 'yes'
-icinga_web_admin_password: dahofopovcovfakdxnnx
-icinga_web_database_password: qreihbrfsdytyyxgmygg
-icinga_web_main_database_initialized: 'yes'
-internet_gateway_id: igw-acf814c9
-routes_admin_a: rtb-f6fc3193
-routes_admin_b: rtb-f4fc3191
-routes_admin_c: rtb-f7fc3192
-routes_jenkins_a: rtb-c3fc31a6
-routes_jenkins_b: rtb-c1fc31a4
-routes_jenkins_c: rtb-c0fc31a5
-security_group_id_admin: sg-d8963dbd
-security_group_id_app: sg-a7d96ac2
-security_group_id_balancer: sg-ecc46e89
-security_group_id_data: sg-a80e15cd
-security_group_id_jenkins: sg-efc46e8a
-subnet_admin_a: subnet-6a76e41d
-subnet_admin_b: subnet-94fb4ccd
-subnet_admin_c: subnet-fff09a9a
-subnet_jenkins_a: subnet-4176e436
-subnet_jenkins_b: subnet-befb4ce7
-subnet_jenkins_c: subnet-d0f09ab5
-vpc_id: vpc-147c8471
+
+admin_balancer_hosted_zone_name: "ops-admin-2037886270.eu-west-1.elb.amazonaws.com"
+admin_balancer_hosted_zone_name_id: "Z3NF1Z3NOM5OY2"
+icinga: 
+  
+  database_initialized: "yes"
+  ticket_salt: "migqyvdljzdbdyvddige"
+
+icinga_database_initialized: "yes"
+icinga_database_password: "qqiwmlckafbtaechemji"
+icinga_ticket_salt: "migqyvdljzdbdyvddige"
+icinga_web: 
+  
+  admin_password: "dahofopovcovfakdxnnx"
+  database_password: "qreihbrfsdytyyxgmygg"
+  main_database_initialized: "yes"
+
+icinga_web_admin_password: "dahofopovcovfakdxnnx"
+icinga_web_database_password: "qreihbrfsdytyyxgmygg"
+icinga_web_main_database_initialized: "yes"
+internet_gateway_id: "igw-acf814c9"
+routes_admin_a: "rtb-f6fc3193"
+routes_admin_b: "rtb-f4fc3191"
+routes_admin_c: "rtb-f7fc3192"
+routes_jenkins_a: "rtb-c3fc31a6"
+routes_jenkins_b: "rtb-c1fc31a4"
+routes_jenkins_c: "rtb-c0fc31a5"
+security_group_id_admin: "sg-d8963dbd"
+security_group_id_app: "sg-a7d96ac2"
+security_group_id_balancer: "sg-ecc46e89"
+security_group_id_data: "sg-a80e15cd"
+security_group_id_jenkins: "sg-efc46e8a"
+subnet_admin_a: "subnet-6a76e41d"
+subnet_admin_b: "subnet-94fb4ccd"
+subnet_admin_c: "subnet-fff09a9a"
+subnet_jenkins_a: "subnet-4176e436"
+subnet_jenkins_b: "subnet-befb4ce7"
+subnet_jenkins_c: "subnet-d0f09ab5"
+vpc_id: "vpc-147c8471"
+
+
+# ex: et ts=2 filetype=yaml

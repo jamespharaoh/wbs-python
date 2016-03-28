@@ -19,10 +19,67 @@ wistla_icinga_security_config:
   - target: "/etc/icinga2/pki/{{ inventory_hostname }}.key"
     source: "{{ icinga_private_key }}"
     user: "root"
-    group: "nagios"
+    group: "icinga"
     mode: "0640"
 
 # ==================== icinga master config
+
+wistla_icinga_master_directories:
+
+  - directory: "/etc/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/pki"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/scripts"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/zones.d"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/cache/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/log"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/repository"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/zones"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/log/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
 
 wistla_icinga_master_config_templates:
 
@@ -53,19 +110,19 @@ wistla_icinga_master_config_templates:
   - template: "wistla-icinga-master-secrets"
     target: "/etc/icinga2/secrets.conf"
     user: "root"
-    group: "nagios"
+    group: "icinga"
     mode: "0640"
 
   - template: "wistla-icinga-master-services"
     target: "/etc/icinga2/services.conf"
     user: "root"
-    group: "nagios"
+    group: "icinga"
     mode: "0640"
 
   - template: "wistla-icinga-master-notifications"
     target: "/etc/icinga2/notifications.conf"
     user: "root"
-    group: "nagios"
+    group: "icinga"
     mode: "0640"
 
   - template: "wistla-icinga-master-templates"
@@ -91,6 +148,14 @@ wistla_icinga_master_config_templates:
     user: "root"
     group: "root"
     mode: "0644"
+
+wistla_icinga_master_config_links:
+
+  - link: "{{ icinga_target }}/etc"
+    target: "../../etc"
+
+  - link: "{{ icinga_target }}/var"
+    target: "../../var"
 
 # ==================== icinga slave config
 

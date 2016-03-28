@@ -4,7 +4,7 @@ dependencies:
 
   - "icinga-common"
 
-  - "install-icinga"
+  - "icinga-install-binary"
   - "setup-wistla-icinga-master"
   - "control-icinga"
 

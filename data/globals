@@ -294,4 +294,12 @@ build_target: "/builds/{{ build_name }}"
 
 amazon_credentials: "{{ lookup ('file', HOME + '/work/amazon-credentials') | from_yaml }}"
 
+default:
+
+  dist: "https://dist.ops.wistla.com"
+
+icinga:
+
+  version: "2.4.2-1"
+
 # ex: et ts=2 filetype=yaml

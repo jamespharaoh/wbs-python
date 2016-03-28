@@ -249,6 +249,11 @@ cluster-{{ other_cluster_name }}-network
 				+ cluster_instance_type_indices.admin | int) | string,
 			instance_index,
 		] | join ('.'),
+		'ansible_ssh_host=' + [
+			instance_zone,
+			'admin',
+			other_cluster.local_domain,
+		] | join ('.'),
 	] | join (' ') + '\n' -%}
 
 {%- endfor -%}

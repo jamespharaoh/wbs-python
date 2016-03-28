@@ -1,77 +1,109 @@
 ---
-amazon_instance_state: running
-amazon_instance_type_running: t2.small
-etcd:
-  installed_version: 2.2.2
-  needs_restart: 'no'
-  state: enabled
-etcd_installed_version: 2.2.2
-etcd_needs_restart: 'no'
-etcd_state: enabled
-heka:
-  installed_version: 0.10.0b0
-  needs_restart: 'no'
-  state: enabled
-heka_installed_version: 0.10.0b0
-heka_needs_restart: 'no'
-heka_state: enabled
-icinga:
-  certificate: /authority/icinga/issue/8/certificate
-  needs_restart: 'no'
-  private_key: /authority/icinga/issue/8/key
-  state: enabled
-icinga_certificate: /authority/icinga/issue/8/certificate
-icinga_needs_restart: 'no'
-icinga_private_key: /authority/icinga/issue/8/key
-icinga_state: enabled
-icinga_web:
-  installed_version: 2.0.0-rc1
-  state: installed
-icinga_web_installed_version: 2.0.0-rc1
-icinga_web_state: installed
-instance_id: i-2558b5dc
-mysql:
-  needs_restart: 'no'
-  root_password: cqnbaawgetomjqgfjhyr
-  state: enabled
-mysql_needs_restart: 'no'
-mysql_root_password: cqnbaawgetomjqgfjhyr
-mysql_state: enabled
-nginx:
-  installed_version: 1.9.7
-  needs_restart: 'no'
-  state: enabled
-nginx_installed_version: 1.9.7
-nginx_needs_restart: 'no'
-nginx_state: enabled
-php:
-  state: unconfigured
-php_state: unconfigured
-python:
-  installed_version: 2.7.10
-  state: installed
-python_apt:
-  installed_version: 0.9.3-1
-  state: installed
-python_apt_installed_version: 0.9.3-1
-python_apt_state: installed
-python_installed_version: 2.7.10
-python_pip:
-  installed_version: 7.0.3
-  state: installed
-python_pip_installed_version: 7.0.3
-python_pip_state: installed
-python_state: installed
-ssh:
-  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl55/WYqOUgrOOcO9lpWGx6NeI=
-  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaJjzjj2J93CZZ/UUtxiWF7vRLg3dfhj4Nj7wruPalgc8ey6Vw1goP/7Dd6JOLJFnNrukem5NOGUisv6fRCx59NBQE3dpntcqABHKnbfFPe7j1MOv49b+dtX3IVoVQ6SDVtlBqQiFkbysEw84qgxIkj3ep/b1jUbFNuwkVIKsSSZ2fr/VMIKhJ6K8Uit9hUXEHL2F4jPTUDJjoQ+z5A9prTyq2Y3ZesJ2i5j6J9yWUMkXqiIph1aq5txRWRGE7Ac/UdAtTSmuxyrIPFwD6cKKUQx+MEJjPLcgQYfuGkhBxxqzcF41WkZulDAV+BlmfZdQFAJ4c8Y3U02X3LLhQqisN
-ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl55/WYqOUgrOOcO9lpWGx6NeI=
-ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaJjzjj2J93CZZ/UUtxiWF7vRLg3dfhj4Nj7wruPalgc8ey6Vw1goP/7Dd6JOLJFnNrukem5NOGUisv6fRCx59NBQE3dpntcqABHKnbfFPe7j1MOv49b+dtX3IVoVQ6SDVtlBqQiFkbysEw84qgxIkj3ep/b1jUbFNuwkVIKsSSZ2fr/VMIKhJ6K8Uit9hUXEHL2F4jPTUDJjoQ+z5A9prTyq2Y3ZesJ2i5j6J9yWUMkXqiIph1aq5txRWRGE7Ac/UdAtTSmuxyrIPFwD6cKKUQx+MEJjPLcgQYfuGkhBxxqzcF41WkZulDAV+BlmfZdQFAJ4c8Y3U02X3LLhQqisN
-volume_ids:
-  system: vol-43ea5c5c
-volume_ids_system: vol-43ea5c5c
-vpn_server:
-  certificate: /authority/ops-vpn/issue/34/certificate
-  private_key: /authority/ops-vpn/issue/34/key
-vpn_server_certificate: /authority/ops-vpn/issue/34/certificate
-vpn_server_private_key: /authority/ops-vpn/issue/34/key
+
+amazon_instance_state: "running"
+amazon_instance_type_running: "t2.small"
+etcd: 
+  
+  installed_version: "2.2.2"
+  needs_restart: "no"
+  state: "enabled"
+
+etcd_installed_version: "2.2.2"
+etcd_needs_restart: "no"
+etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  certificate: "/authority/icinga/issue/8/certificate"
+  installed_version: "2.4.2-1"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/8/key"
+  state: "enabled"
+
+icinga_certificate: "/authority/icinga/issue/8/certificate"
+icinga_installed_version: "2.4.2-1"
+icinga_needs_restart: "no"
+icinga_private_key: "/authority/icinga/issue/8/key"
+icinga_state: "enabled"
+icinga_web: 
+  
+  installed_version: "2.0.0-rc1"
+  state: "installed"
+
+icinga_web_installed_version: "2.0.0-rc1"
+icinga_web_state: "installed"
+instance_id: "i-2558b5dc"
+mysql: 
+  
+  needs_restart: "no"
+  root_password: "cqnbaawgetomjqgfjhyr"
+  state: "enabled"
+
+mysql_needs_restart: "no"
+mysql_root_password: "cqnbaawgetomjqgfjhyr"
+mysql_state: "enabled"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+php: 
+  
+  state: "unconfigured"
+
+php_state: "unconfigured"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl55/WYqOUgrOOcO9lpWGx6NeI="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaJjzjj2J93CZZ/UUtxiWF7vRLg3dfhj4Nj7wruPalgc8ey6Vw1goP/7Dd6JOLJFnNrukem5NOGUisv6fRCx59NBQE3dpntcqABHKnbfFPe7j1MOv49b+dtX3IVoVQ6SDVtlBqQiFkbysEw84qgxIkj3ep/b1jUbFNuwkVIKsSSZ2fr/VMIKhJ6K8Uit9hUXEHL2F4jPTUDJjoQ+z5A9prTyq2Y3ZesJ2i5j6J9yWUMkXqiIph1aq5txRWRGE7Ac/UdAtTSmuxyrIPFwD6cKKUQx+MEJjPLcgQYfuGkhBxxqzcF41WkZulDAV+BlmfZdQFAJ4c8Y3U02X3LLhQqisN"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl55/WYqOUgrOOcO9lpWGx6NeI="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaJjzjj2J93CZZ/UUtxiWF7vRLg3dfhj4Nj7wruPalgc8ey6Vw1goP/7Dd6JOLJFnNrukem5NOGUisv6fRCx59NBQE3dpntcqABHKnbfFPe7j1MOv49b+dtX3IVoVQ6SDVtlBqQiFkbysEw84qgxIkj3ep/b1jUbFNuwkVIKsSSZ2fr/VMIKhJ6K8Uit9hUXEHL2F4jPTUDJjoQ+z5A9prTyq2Y3ZesJ2i5j6J9yWUMkXqiIph1aq5txRWRGE7Ac/UdAtTSmuxyrIPFwD6cKKUQx+MEJjPLcgQYfuGkhBxxqzcF41WkZulDAV+BlmfZdQFAJ4c8Y3U02X3LLhQqisN"
+volume_ids: 
+  
+  system: "vol-43ea5c5c"
+
+volume_ids_system: "vol-43ea5c5c"
+vpn_server: 
+  
+  certificate: "/authority/ops-vpn/issue/34/certificate"
+  private_key: "/authority/ops-vpn/issue/34/key"
+
+vpn_server_certificate: "/authority/ops-vpn/issue/34/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/34/key"
+
+
+# ex: et ts=2 filetype=yaml

@@ -1,6 +1,9 @@
 {{ ansible_warning ['#'] }}
 
 {% for cluster_name, cluster in clusters.items () %}
+{% if cluster_name != 'dev' %}
+
+# ---------- cluster {{ cluster_name }}
 
 {% if cluster_name == cluster.supercluster_name %}
 Host wistla-{{ cluster_name }}-*
@@ -14,10 +17,13 @@ ForwardAgent yes
 IdentityFile ~/wistla-devops/security/ssh/wistla-{{ cluster.supercluster_name }}
 User ubuntu
 
+{% endif %}
 {% endfor %}
 
 {% for other_deployment_name in dev_deployment_names %}
 {% set other_deployment = deployments [other_deployment_name] %}
+
+# ---------- deployment {{ other_deployment_name }}
 
 Host wistla-{{ other_deployment_name }}-dev
 ForwardAgent yes
@@ -25,7 +31,7 @@ User vagrant
 
 {% endfor %}
 
-# global config
+# ---------- global config
 
 Host *
 ControlPath ~/.ssh/control_%h_%p_%r

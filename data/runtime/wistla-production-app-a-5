@@ -1,0 +1,67 @@
+---
+
+amazon_instance_type_running: "c4.2xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  installed_version: "2.4.2-1"
+  state: "installed"
+
+icinga_installed_version: "2.4.2-1"
+icinga_state: "installed"
+instance_id: "i-2178c4ab"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCi73ygMayupiAi46zwYJfM7E2zk75ADVU+wStF/3hcTtqiIReS/3orsdMb3aeYUM6O4e6tKegBFBUva8/7yVWE="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDemcYlGqfO94JGHx5fcwjHh7S5e4qb34ZY/C/+rsz2ZsNxUMutpD2JBjKPc9UjFIXfG1hu49qiDddg/sPt7vw20u1rm8iMy3fFriJl2Iv/tjAjVOrbWMcdlQGK59c+rhZOpT5dWMDU3aDXd/g4muJVeAbDIYou+K4QQ6ftRionDkTWWdGXsSNtYR2DyhE25dD69PTwfDSiXvMYjy/xqFyZSJK/4q8PskrzufSHtIJCqlIUaeRzT7UBXDFd/yBqu+T9N8Vq4I4v3Ji8eaPSb+ylU1MllnwDkdq8ja5T3641MwPdLigqbsyhxUC6bTo8RP98VsY9L6A22FiYu0IRw0jT"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCi73ygMayupiAi46zwYJfM7E2zk75ADVU+wStF/3hcTtqiIReS/3orsdMb3aeYUM6O4e6tKegBFBUva8/7yVWE="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDemcYlGqfO94JGHx5fcwjHh7S5e4qb34ZY/C/+rsz2ZsNxUMutpD2JBjKPc9UjFIXfG1hu49qiDddg/sPt7vw20u1rm8iMy3fFriJl2Iv/tjAjVOrbWMcdlQGK59c+rhZOpT5dWMDU3aDXd/g4muJVeAbDIYou+K4QQ6ftRionDkTWWdGXsSNtYR2DyhE25dD69PTwfDSiXvMYjy/xqFyZSJK/4q8PskrzufSHtIJCqlIUaeRzT7UBXDFd/yBqu+T9N8Vq4I4v3Ji8eaPSb+ylU1MllnwDkdq8ja5T3641MwPdLigqbsyhxUC6bTo8RP98VsY9L6A22FiYu0IRw0jT"
+volume_ids: 
+  
+  data: "vol-e1973913"
+  system: "vol-0d9638ff"
+
+volume_ids_data: "vol-e1973913"
+volume_ids_system: "vol-0d9638ff"
+
+
+# ex: et ts=2 filetype=yaml

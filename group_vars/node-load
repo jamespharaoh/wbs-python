@@ -10,18 +10,18 @@ network_route_localnet:
 
 node_load_deploy_projects:
 
-  - name: "wistla-admin"
-    filters:
-
-      - "--exclude /config/config.local.js"
-      - "--include /config"
-      - "--include /config.js"
-      - "--include /dist"
-      - "--include /favicon.ico"
-      - "--include /index.html"
+#  - name: "wistla-admin"
+#    filters:
+#
+#      - "--exclude /config/config.local.js"
+#      - "--include /config"
+#      - "--include /config.js"
+#      - "--include /dist"
+#      - "--include /favicon.ico"
+#      - "--include /index.html"
 #      - "--include /jspm_packages"
-      - "--include /styles"
-      - "--exclude /'*'"
+#      - "--include /styles"
+#      - "--exclude /'*'"
 
   - name: "wistla-browser"
     filters:

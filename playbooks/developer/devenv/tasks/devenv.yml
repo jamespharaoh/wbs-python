@@ -41,7 +41,14 @@
       item.project_links.overlay,
     ] | join ('/') }}";
 
-    target="{{ item.project_links.target }}";
+    target="$(
+      cd "$(dirname "$link")";
+      readlink --canonicalize "{{ item.project_links.target }}";
+    )";
+
+    if test -h "$link"; then
+      rm "$link";
+    fi;
 
     if ! test -d "$link"; then
       mkdir "$link";
@@ -54,18 +61,17 @@
         | grep -x "$link";
     }; then
 
-      if test -d "$overlay"; then
-
-        mount -t aufs -o "br=$overlay:$target" none "$link";
-
-      else
+      if ! test -d "$overlay"; then
 
         mkdir "$overlay";
         chown "{{ deployment_user }}:{{ deployment_user }}" "$overlay";
-        mount -t aufs -o "br=$overlay:$target" none "$link";
-        rm -rf "$link/node_modules" "$link/.git";
 
       fi;
+
+      echo mount -t aufs -o "br=$overlay:$target" none "$link";
+      mount -t aufs -o "br=$overlay:$target" none "$link";
+
+      rm -rf "$link/node_modules" "$link/.git";
 
     fi;
 

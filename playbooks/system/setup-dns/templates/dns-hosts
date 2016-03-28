@@ -212,8 +212,12 @@ and (inventory_hostname in groups.vagrant
 {%- endfor -%}
 
 {%- for other_cluster_name, other_cluster in clusters.items ()
-if inventory_hostname in groups.vagrant
-or other_cluster.supercluster_name == supercluster_name -%}
+if (
+	inventory_hostname in groups.vagrant
+	or other_cluster.supercluster_name == supercluster_name
+) and (
+	'cluster-' + other_cluster_name in groups
+) -%}
 
 	{%- print '\n# ---------- cluster ', other_cluster_name, '\n\n' -%}
 

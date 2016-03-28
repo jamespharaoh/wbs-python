@@ -1,7 +1,7 @@
 ---
 
 amazon_instance_state: "running"
-amazon_instance_type_running: "t2.large"
+amazon_instance_type_running: "m4.large"
 heka: 
   
   installed_version: "0.10.0b0"
@@ -14,11 +14,13 @@ heka_state: "enabled"
 icinga: 
   
   certificate: "/authority/icinga/issue/21/certificate"
+  installed_version: "2.4.2-1"
   needs_restart: "no"
   private_key: "/authority/icinga/issue/21/key"
   state: "enabled"
 
 icinga_certificate: "/authority/icinga/issue/21/certificate"
+icinga_installed_version: "2.4.2-1"
 icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/21/key"
 icinga_state: "enabled"

@@ -42,6 +42,7 @@
     repo: "git@github.com:/wistla/{{ item.name }}"
     refspec: "{{ item.branch }}"
     version: "{{ cluster_deployment.deployed_versions [item.name] }}"
+    force: "yes"
 
 - name: "create project links"
   with_items: "{{ cluster_deployment_checkouts | flatten_hash ('project_links') }}"
@@ -54,43 +55,33 @@
 
     set -euf -o pipefail;
 
-    link="{{ [
-      cluster_deployment_home,
-      item.outer.name,
-      item.project_links.link,
-    ] | join ('/') }}";
-
-    overlay="{{ [
-      cluster_deployment_home,
-      item.outer.name,
-      item.project_links.overlay,
-    ] | join ('/') }}";
+    link="$(
+      readlink --canonicalize "{{ [
+        cluster_deployment_home,
+        item.outer.name,
+        item.project_links.link,
+      ] | join ('/') }}"
+    )";
 
     target="$(
       cd "$(dirname "$link")";
       readlink --canonicalize "{{ item.project_links.target }}";
     )";
 
-    if ! test -d "$link"; then
-      mkdir "$link";
-      chown root.root "$link";
-      chmod 0000 "$link";
-    fi;
-
-    if ! {
+    if {
       cut -d' ' -f 2 </proc/mounts
         | grep -x "$link";
     }; then
-
-      if ! test -d "$overlay"; then
-        mkdir "$overlay";
-        chown "ubuntu:ubuntu" "$overlay";
-      fi;
-
-      mount -t aufs -o "br=$overlay:$target" none "$link";
-      rm -rf "$link/node_modules" "$link/.git";
-
+      umount "$link";
     fi;
+
+    rsync
+      --archive
+      --exclude=/.git
+      --exclude=/node_modules
+      --delete
+      "$target/"
+      "$link/";
 
 - name: "run project build steps"
   tags: "build"

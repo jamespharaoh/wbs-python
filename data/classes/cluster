@@ -10,4 +10,9 @@ class:
   namespace: "cluster"
   parent_namespace: "supercluster"
 
+cluster:
+
+  cluster_name: "{{ identity_name }}"
+  supercluster_name: "{{ identity_parent }}"
+
 # ex: et ts=2 filetype=yaml

@@ -5,60 +5,60 @@
 - hosts: "cluster-production-app"
   roles:
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "production-a"
-      tags: [ "cluster-clean", "production-a" ]
+      tags: [ "cluster-deployment-clean", "production-a" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "production-b"
-      tags: [ "cluster-clean", "production-b" ]
+      tags: [ "cluster-deployment-clean", "production-b" ]
 
 - hosts: "cluster-production-data"
   roles:
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "production"
-      tags: [ "cluster-clean", "production" ]
+      tags: [ "cluster-deployment-clean", "production" ]
 
 - hosts: "cluster-staging-app"
   roles:
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "staging-a"
-      tags: [ "cluster-clean", "staging-a" ]
+      tags: [ "cluster-deployment-clean", "staging-a" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "staging-b"
-      tags: [ "cluster-clean", "staging-b" ]
+      tags: [ "cluster-deployment-clean", "staging-b" ]
 
 - hosts: "cluster-staging-data"
   roles:
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "staging"
-      tags: [ "cluster-clean", "staging" ]
+      tags: [ "cluster-deployment-clean", "staging" ]
 
 - hosts: "cluster-test-app"
   roles:
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "test-everest"
-      tags: [ "cluster-clean", "test-everest" ]
+      tags: [ "cluster-deployment-clean", "test-everest" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "test-k2"
-      tags: [ "cluster-clean", "test-k2" ]
+      tags: [ "cluster-deployment-clean", "test-k2" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "test-montblanc"
-      tags: [ "cluster-clean", "test-montblanc" ]
+      tags: [ "cluster-deployment-clean", "test-montblanc" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "test-erebus"
-      tags: [ "cluster-clean", "test-erebus" ]
+      tags: [ "cluster-deployment-clean", "test-erebus" ]
 
-    - role: "cluster-clean"
+    - role: "cluster-deployment-clean"
       cluster_deployment_name: "test-fitzroy"
-      tags: [ "cluster-clean", "test-fitzroy" ]
+      tags: [ "cluster-deployment-clean", "test-fitzroy" ]
 
 # ex: et ts=2 filetype=yaml

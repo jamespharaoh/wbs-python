@@ -13,6 +13,8 @@
       to_port: "22"
       cidr_ip: "0.0.0.0/0"
 
+    # ---------- icinga
+
     - proto: "tcp"
       from_port: "5665"
       to_port: "5665"
@@ -103,10 +105,106 @@
       to_port: "5665"
       cidr_ip: "{{ clusters.test.amazon_admin_ips.c }}/32"
 
+    # ---------- etcd
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.ops.amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.ops.amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.ops.amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.production.amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.production.amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.production.amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.staging.amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.staging.amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.c }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.a }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.b }}/32"
+
+    - proto: "tcp"
+      from_port: "2379"
+      to_port: "2379"
+      cidr_ip: "{{ clusters.test.amazon_admin_ips.c }}/32"
+
+    # openvpn
+
     - proto: "udp"
       from_port: "1194"
       to_port: "1194"
       cidr_ip: "0.0.0.0/0"
+
+    # others
 
     - proto: "-1"
       group_id: "{{ security_group_id_admin }}"

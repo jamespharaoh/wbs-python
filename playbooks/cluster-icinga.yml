@@ -8,7 +8,7 @@
 
   roles:
 
-    - "install-icinga-master"
+    - "icinga-install-binary"
     #- "install-icinga-classicui"
     - "install-wistla-icinga-plugins"
 
@@ -20,7 +20,7 @@
 
   roles:
 
-    - "install-icinga-agent"
+    - "icinga-install-binary"
     #- "install-icinga-classicui"
     - "install-wistla-icinga-plugins"
 

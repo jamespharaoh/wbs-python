@@ -3,12 +3,14 @@
 ansible:
 
   url: "git@github.com:ansible/ansible.git"
-  version: "stable-2.0"
+  #version: "stable-2.0"
+  version: "2eb59bedcfc127b6b3ea392e654c031e83a6e87d"
 
 ansible-modules-core:
 
   url: "git@github.com:ansible/ansible-modules-core.git"
-  version: "stable-2.0"
+  #version: "stable-2.0"
+  version: "79888f32d12aff1d23764d5560d67ceba0336bd2"
 
 ansible-modules-extras:
 
