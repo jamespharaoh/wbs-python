@@ -70,7 +70,7 @@ node_load_config_links:
   - link: "/etc/nginx/server-environment.conf"
     source: "/config/nginx-server-environment.conf"
 
-  - link: "/home/ubuntu/wistla-admin/config/config.local.js"
-    source: "/config/wistla-admin-config.local.js"
+#  - link: "/home/ubuntu/wistla-admin/config/config.local.js"
+#    source: "/config/wistla-admin-config.local.js"
 
 # ex: et ts=2 filetype=yaml
