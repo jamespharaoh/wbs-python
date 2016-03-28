@@ -2,6 +2,120 @@
 CHANGELOG
 =========
 
+1.10.16
+=======
+
+* feature:``elasticache``: Update command to latest version
+* feature:``rds``: Update command to latest version
+* feature:``storagegateway``: Update command to latest version
+
+
+1.10.15
+=======
+
+* feature:``aws devicefarm``: Add support to pay a flat monthly fee for
+  unlimited testing of your Android and iOS apps with AWS Device Farm device
+  slots
+* feature:``aws rds``: Add support for customizing the order in which Aurora
+  Replicas are promoted to primary instance during a failover
+
+
+1.10.14
+=======
+
+* feature:``meteringmarketplace``: The AWS Marketplace Metering Service enables
+  sellers to price their products along new pricing dimensions. After a
+  integrating their product with the AWS Marketplace Metering Service, that
+  product will emit an hourly record capturing the usage of any single pricing
+  dimension. Buyers can easily subscribe to software priced by this new
+  dimension on the AWS Marketplace website and only pay for what they use.
+* feature:``s3api``: Added support for delete marker and abort multipart upload
+  lifecycle configuration.
+* feature:``iot``: Added support for Amazon Elasticsearch Service and
+  Amazon Cloudwatch actions for the AWS IoT rules engine.
+* feature:``cloudhsm``: Added support for tagging resources.
+
+
+1.10.13
+=======
+
+* feature:``DMS``: Added support for AWS Database Migration Service
+* feature:``SES``: Added support for white-labeling
+* feature:``CodeDeploy``: Added support for BatchGetDeploymentGroups
+* feature:``endpoints``: Updated endpoints to latest version
+* bugfix:``groff``: Fix groff command which was causing issues on some systems
+* bugfix:``shorthand``: Allow ``#`` in keys in the shorthand parser
+
+
+1.10.12
+=======
+
+* feature:``gamelift``: Update command to latest version
+* feature:``iam``: Update command to latest version
+* feature:``redshift``: Update command to latest version
+
+
+1.10.11
+=======
+
+* feature:``acm``: Update ``acm`` command to latest version
+* feature:``codecommit``: Update ``codecommit`` model to latest version
+* feature:``config``: Update ``config`` command to latest version
+* feature:``devicefarm``: Update ``devicefarm`` command to latest version
+* feature:``directconnect``: Update ``directconnect`` command to latest version
+* feature:``events``: Update ``events`` command to latest version
+* bugfix:``aws s3 cp``: Add error checking when attempting
+  recursive copies or syncs with streaming output
+  (`issue 1771 <https://github.com/aws/aws-cli/issues/1771>`__)
+
+
+1.10.10
+=======
+* feature:``aws ec2``: Add support for VPC peering with security groups.
+* feature:``aws ds``: Add support for SNS event notifications.
+* bugfix:``aws s3 rb``: Fix issue where bucket is still attempted to be
+  removed when the preceding delete requests failed.
+  (`issue 1827 <https://github.com/aws/aws-cli/pull/1827>`__)
+* bugfix:``aws storagegateway``: Fix issue in aliasing required args.
+  (`issue 1790 <https://github.com/aws/aws-cli/issues/1790>`__)
+
+
+1.10.9
+======
+* bugfix:``aws s3``: Avoid MD5 checksumming if unavailable.
+  (`issue 1812 <https://github.com/aws/aws-cli/pull/1812>`__)
+* feature:``aws dynamodb``: Add support for describing limits.
+* feature:``aws apigateway``: Add support for testing invoke authorizers and
+  flushing stage authorizers cache.
+* feature:``aws cloudsearchdomain``: Add support for new stat fields.
+
+
+1.10.8
+======
+
+* bugfix:``aws s3``: Disable use of MD5 when SHA256 checksum
+  is already calculated for the body
+  (`botocore issue 804 <https://github.com/boto/botocore/pull/804>`__)
+* bugfix:FIPS: Handle case where MD5 cipher is not available
+  on FIPS compliant systems
+  (`botocore issue 807 <https://github.com/boto/botocore/pull/807>`__)
+* feature:``aws cloudformation``: Update AWS CloudFormation command
+  to the latest version
+* feature:``aws logs``: Update Amazon CloudWatch Logs command to the
+  latest version
+* feature:``aws ses``: Update Amazon SES to the latest version
+* feature:``aws autoscaling``: Update Auto Scaling to the latest version
+
+
+1.10.7
+======
+
+* bug:``aws configure set``: Fix issue when adding entries to
+  an empty profile section
+  (`issue 1806 <https://github.com/aws/aws-cli/pull/1806>`__)
+* feature:``aws route53``: Add suport for SNI health checks
+
+
 1.10.6
 ======
 * feature:``aws storagegateway``: Added support for user-supplied barcodes.
