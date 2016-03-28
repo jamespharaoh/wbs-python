@@ -20,9 +20,7 @@ __metaclass__ = type
 import base64
 import os
 import re
-import random
 import shlex
-import time
 
 from ansible.utils.unicode import to_bytes, to_unicode
 
@@ -54,7 +52,7 @@ class ShellModule(object):
         path = '\\'.join(parts)
         if path.startswith('~'):
             return path
-        return '"%s"' % path
+        return '\'%s\'' % path
 
     # powershell requires that script files end with .ps1
     def get_remote_filename(self, base_name):
