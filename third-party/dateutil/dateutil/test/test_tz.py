@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from ._common import unittest, TZWinContext
 
 from datetime import datetime, timedelta
 from datetime import time as dt_time
@@ -11,12 +12,6 @@ import sys
 import time as _time
 import base64
 IS_WIN = sys.platform.startswith('win')
-
-try:
-    # Needed in Python 2.6 for conditional test skipping
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 
 # dateutil imports
 from dateutil.relativedelta import relativedelta
@@ -126,50 +121,6 @@ TZNAME:EDT
 END:DAYLIGHT
 END:VTIMEZONE
 """
-
-class TZWinContext(object):
-    """ Context manager for changing local time zone on Windows """
-    @classmethod
-    def tz_change_allowed(cls):
-        # Allowing dateutil to change the local TZ is set as a local environment
-        # flag.
-        return bool(os.environ.get('DATEUTIL_MAY_CHANGE_TZ', False))
-
-    def __init__(self, tzname):
-        self.tzname = tzname
-        self._old_tz = None
-
-    def __enter__(self):
-        if not self.tz_change_allowed():
-            raise ValueError('Environment variable DATEUTIL_MAY_CHANGE_TZ ' + 
-                             'must be true.')
-
-        self._old_tz = self.get_current_tz()
-        self.set_current_tz(self.tzname)
-
-    def __exit__(self, type, value, traceback):
-        if self._old_tz is not None:
-            self.set_current_tz(self._old_tz)
-
-    def get_current_tz(self):
-        p = subprocess.Popen(['tzutil', '/g'], stdout=subprocess.PIPE)
-
-        ctzname, err = p.communicate()
-        ctzname = ctzname.decode()     # Popen returns 
-
-        if p.returncode:
-            raise OSError('Failed to get current time zone: ' + err)
-
-        return ctzname
-
-    def set_current_tz(self, tzname):
-        p = subprocess.Popen('tzutil /s "' + tzname + '"')
-
-        out, err = p.communicate()
-
-        if p.returncode:
-            raise OSError('Failed to set current time zone: ' +
-                          (err or 'Unknown error.'))
 
 
 class TZTest(unittest.TestCase):
@@ -346,12 +297,42 @@ class TZTest(unittest.TestCase):
     def testLeapCountDecodesProperly(self):
         # This timezone has leapcnt, and failed to decode until
         # Eugene Oden notified about the issue.
+
+        # As leap information is currently unused (and unstored) by tzfile() we
+        # can only indirectly test this: Take advantage of tzfile() not closing
+        # the input file if handed in as an opened file and assert that the
+        # full file content has been read by tzfile(). Note: For this test to
+        # work NEW_YORK must be in TZif version 1 format i.e. no more data
+        # after TZif v1 header + data has been read
+        fileobj = BytesIO(base64.b64decode(NEW_YORK))
+        tzc = tz.tzfile(fileobj)
+        # we expect no remaining file content now, i.e. zero-length; if there's
+        # still data we haven't read the file format correctly
+        remaining_tzfile_content = fileobj.read()
+        self.assertEqual(len(remaining_tzfile_content), 0)
+
+    def testIsStd(self):
+        # NEW_YORK tzfile contains this isstd information:
+        isstd_expected = (0, 0, 0, 1)
         tzc = tz.tzfile(BytesIO(base64.b64decode(NEW_YORK)))
-        self.assertEqual(datetime(2007, 3, 31, 20, 12).tzname(), None)  # What is the point of this?
+        # gather the actual information as parsed by the tzfile class
+        isstd = []
+        for ttinfo in tzc._ttinfo_list:
+            # ttinfo objects contain boolean values
+            isstd.append(int(ttinfo.isstd))
+        # ttinfo list may contain more entries than isstd file content
+        isstd = tuple(isstd[:len(isstd_expected)])
+        self.assertEqual(
+            isstd_expected, isstd,
+            "isstd UTC/local indicators parsed: %s != tzfile contents: %s"
+            % (isstd, isstd_expected))
 
     def testGettz(self):
         # bug 892569
         str(tz.gettz('UTC'))
+
+    def testGetTzEquality(self):
+        self.assertEqual(tz.gettz('UTC'), tz.gettz('UTC'))
 
     def testBrokenIsDstHandling(self):
         # tzrange._isdst() was using a date() rather than a datetime().
@@ -413,6 +394,7 @@ class TZTest(unittest.TestCase):
         dt = parse('2014-07-20T12:34:56+00:00')
         self.assertEqual(str(dt), '2014-07-20 12:34:56+00:00')
 
+
 @unittest.skipUnless(IS_WIN, "Requires Windows")
 class TzWinTest(unittest.TestCase):
     def testTzResLoadName(self):
@@ -468,6 +450,73 @@ class TzWinTest(unittest.TestCase):
         for t_date, expected in transition_dates:
             self.assertEqual(t_date.replace(tzinfo=tw).tzname(), expected)
 
+    def testTzwinRepr(self):
+        tw = tz.tzwin('Yakutsk Standard Time')
+        self.assertEqual(repr(tw), 'tzwin(' +
+                                   repr('Yakutsk Standard Time') + ')')
+
+    def testTzWinEquality(self):
+        # https://github.com/dateutil/dateutil/issues/151
+        tzwin_names = ('Eastern Standard Time',
+                       'West Pacific Standard Time',
+                       'Yakutsk Standard Time',
+                       'Iran Standard Time',
+                       'UTC')
+
+        for tzwin_name in tzwin_names:
+            # Get two different instances to compare
+            tw1 = tz.tzwin(tzwin_name)
+            tw2 = tz.tzwin(tzwin_name)
+
+            self.assertEqual(tw1, tw2)
+
+    def testTzWinInequality(self):
+        # https://github.com/dateutil/dateutil/issues/151
+        # Note these last two currently differ only in their name.
+        tzwin_names = (('Eastern Standard Time', 'Yakutsk Standard Time'),
+                       ('Greenwich Standard Time', 'GMT Standard Time'),
+                       ('GMT Standard Time', 'UTC'),
+                       ('E. South America Standard Time',
+                        'Argentina Standard Time'))
+
+        for tzwn1, tzwn2 in tzwin_names:
+            # Get two different instances to compare            
+            tw1 = tz.tzwin(tzwn1)
+            tw2 = tz.tzwin(tzwn2)
+
+            self.assertNotEqual(tw1, tw2)
+
+    def testTzwinTimeOnlyDST(self):
+        # For zones with DST, .dst() should return None
+        tw_est = tz.tzwin('Eastern Standard Time')
+        self.assertIs(dt_time(14, 10, tzinfo=tw_est).dst(), None)
+
+        # This zone has no DST, so .dst() can return 0
+        tw_sast = tz.tzwin('South Africa Standard Time')
+        self.assertEqual(dt_time(14, 10, tzinfo=tw_sast).dst(),
+                         timedelta(0))
+
+    def testTzwinTimeOnlyUTCOffset(self):
+        # For zones with DST, .utcoffset() should return None
+        tw_est = tz.tzwin('Eastern Standard Time')
+        self.assertIs(dt_time(14, 10, tzinfo=tw_est).utcoffset(), None)
+
+        # This zone has no DST, so .utcoffset() returns standard offset
+        tw_sast = tz.tzwin('South Africa Standard Time')
+        self.assertEqual(dt_time(14, 10, tzinfo=tw_sast).utcoffset(),
+                         timedelta(hours=2))
+
+    def testTzwinLocalTimeOnlyTZName(self):
+        # For zones with DST, the name defaults to standard time
+        tw_est = tz.tzwin('Eastern Standard Time')
+        self.assertEqual(dt_time(14, 10, tzinfo=tw_est).tzname(),
+                         'Eastern Standard Time')
+
+        # For zones with no DST, this should work normally.
+        tw_sast = tz.tzwin('South Africa Standard Time')
+        self.assertEqual(dt_time(14, 10, tzinfo=tw_sast),
+                         'South Africa Standard Time')
+
     @unittest.skipUnless(TZWinContext.tz_change_allowed(),
         'Skipping unless tz changes are allowed.')
     def testTzwinLocalName(self):
@@ -488,4 +537,90 @@ class TzWinTest(unittest.TestCase):
 
             for t_date, expected in transition_dates:
                 self.assertEqual(t_date.replace(tzinfo=tw).tzname(), expected)
+
+    def testTzWinLocalRepr(self):
+        tw = tz.tzwinlocal()
+        self.assertEqual(repr(tw), 'tzwinlocal()')
+
+    @unittest.skipUnless(TZWinContext.tz_change_allowed(),
+        'Skipping unless tz changes are allowed.')
+    def testTzwinLocalRepr(self):
+        # https://github.com/dateutil/dateutil/issues/143
+        with TZWinContext('Eastern Standard Time'):
+            tw = tz.tzwinlocal()
+
+            self.assertEqual(str(tw), 'tzwinlocal(' +
+                                      repr('Eastern Standard Time') + ')')
+
+        with TZWinContext('Pacific Standard Time'):
+            tw = tz.tzwinlocal()
+
+            self.assertEqual(str(tw), 'tzwinlocal(' + 
+                                      repr('Pacific Standard Time') + ')')
+
+    @unittest.skipUnless(TZWinContext.tz_change_allowed(),
+        'Skipping unless tz changes are allowed.')
+    def testTzwinLocalEquality(self):
+        tw_est = tz.tzwin('Eastern Standard Time')
+        tw_pst = tz.tzwin('Pacific Standard Time')
+
+        with TZWinContext('Eastern Standard Time'):
+            twl1 = tz.tzwinlocal()
+            twl2 = tz.tzwinlocal()
+
+            self.assertEqual(twl1, twl2)
+            self.assertEqual(twl1, tw_est)
+            self.assertNotEqual(twl1, tw_pst)
+
+        with TZWinContext('Pacific Standard Time'):
+            twl1 = tz.tzwinlocal()
+            twl2 = tz.tzwinlocal()
+            tw = tz.tzwin('Pacific Standard Time')
+
+            self.assertEqual(twl1, twl2)
+            self.assertEqual(twl1, tw)
+            self.assertEqual(twl1, tw_pst)
+            self.assertNotEqual(twl1, tw_est)
+
+    @unittest.skipUnless(TZWinContext.tz_change_allowed(),
+        'Skipping unless tz changes are allowed.')
+    def testTzwinLocalTimeOnlyDST(self):
+        # For zones with DST, .dst() should return None
+        with TZWinContext('Eastern Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertIs(dt_time(14, 10, tzinfo=twl).dst(), None)
+
+        # This zone has no DST, so .dst() can return 0
+        with TZWinContext('South Africa Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertEqual(dt_time(14, 10, tzinfo=twl).dst(), timedelta(0))
+
+    @unittest.skipUnless(TZWinContext.tz_change_allowed(),
+        'Skipping unless tz changes are allowed.')
+    def testTzwinLocalTimeOnlyUTCOffset(self):
+        # For zones with DST, .utcoffset() should return None
+        with TZWinContext('Eastern Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertIs(dt_time(14, 10, tzinfo=twl).utcoffset(), None)
+
+        # This zone has no DST, so .utcoffset() returns standard offset
+        with TZWinContext('South Africa Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertEqual(dt_time(14, 10, tzinfo=twl).utcoffset(),
+                             timedelta(hours=2))
+
+    @unittest.skipUnless(TZWinContext.tz_change_allowed(),
+        'Skipping unless tz changes are allowed.')
+    def testTzwinLocalTimeOnlyTZName(self):
+        # For zones with DST, the name defaults to standard time
+        with TZWinContext('Eastern Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertEqual(dt_time(14, 10, tzinfo=twl).tzname(),
+                             'Eastern Standard Time')
+
+        # For zones with no DST, this should work normally.
+        with TZWinContext('South Africa Standard Time'):
+            twl = tz.tzwinlocal()
+            self.assertEqual(dt_time(14, 10, tzinfo=twl).tzname(),
+                             'South Africa Standard Time')
 

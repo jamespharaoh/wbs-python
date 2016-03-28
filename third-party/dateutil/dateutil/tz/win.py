@@ -3,6 +3,7 @@ import datetime
 import struct
 
 from six.moves import winreg
+from six import text_type
 
 try:
     import ctypes
@@ -11,7 +12,7 @@ except ValueError:
     # ValueError is raised on non-Windows systems for some horrible reason.
     raise ImportError("Running tzwin on non-Windows system")
 
-from .__init__ import tzname_in_python2
+from ._common import tzname_in_python2
 
 __all__ = ["tzwin", "tzwinlocal", "tzres"]
 
@@ -110,16 +111,44 @@ class tzres(object):
 
         return self.load_name(offset)
 
+
 class tzwinbase(datetime.tzinfo):
     """tzinfo class based on win32's timezones available in the registry."""
+    def __eq__(self, other):
+        # Compare on all relevant dimensions, including name.
+        return (isinstance(other, tzwinbase) and
+                (self._stdoffset == other._stdoffset and
+                 self._dstoffset == other._dstoffset and
+                 self._stddayofweek == other._stddayofweek and
+                 self._dstdayofweek == other._dstdayofweek and
+                 self._stdweeknumber == other._stdweeknumber and
+                 self._dstweeknumber == other._dstweeknumber and
+                 self._stdhour == other._stdhour and
+                 self._dsthour == other._dsthour and
+                 self._stdminute == other._stdminute and
+                 self._dstminute == other._dstminute and
+                 self._stdname == other._stdname and
+                 self._dstname == other._dstname))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def utcoffset(self, dt):
-        if self._isdst(dt):
+        isdst = self._isdst(dt)
+
+        if isdst is None:
+            return None
+        elif isdst:
             return datetime.timedelta(minutes=self._dstoffset)
         else:
             return datetime.timedelta(minutes=self._stdoffset)
 
     def dst(self, dt):
-        if self._isdst(dt):
+        isdst = self._isdst(dt)
+
+        if isdst is None:
+            return None
+        elif isdst:
             minutes = self._dstoffset - self._stdoffset
             return datetime.timedelta(minutes=minutes)
         else:
@@ -150,6 +179,9 @@ class tzwinbase(datetime.tzinfo):
         if not self._dstmonth:
             # dstmonth == 0 signals the zone has no daylight saving time
             return False
+        elif dt is None:
+            return None
+
         dston = picknthweekday(dt.year, self._dstmonth, self._dstdayofweek,
                                self._dsthour, self._dstminute,
                                self._dstweeknumber)
@@ -169,8 +201,8 @@ class tzwin(tzwinbase):
 
         # multiple contexts only possible in 2.7 and 3.1, we still support 2.6
         with winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE) as handle:
-            with winreg.OpenKey(handle,
-                                "%s\%s" % (TZKEYNAME, name)) as tzkey:
+            tzkeyname = text_type("{kn}\{name}").format(kn=TZKEYNAME, name=name)
+            with winreg.OpenKey(handle, tzkeyname) as tzkey:
                 keydict = valuestodict(tzkey)
 
         self._stdname = keydict["Std"]
@@ -216,8 +248,9 @@ class tzwinlocal(tzwinbase):
             self._dstname = keydict["DaylightName"]
 
             try:
-                with winreg.OpenKey(
-                        handle, "%s\%s" % (TZKEYNAME, self._stdname)) as tzkey:
+                tzkeyname = text_type('{kn}\{sn}').format(kn=TZKEYNAME,
+                                                          sn=self._stdname)
+                with winreg.OpenKey(handle, tzkeyname) as tzkey:
                     _keydict = valuestodict(tzkey)
                     self._display = _keydict["Display"]
             except OSError:
@@ -245,7 +278,14 @@ class tzwinlocal(tzwinbase):
          self._dstminute) = tup[1:5]
 
         self._dstdayofweek = tup[7]
-        
+
+    def __repr__(self):
+        return "tzwinlocal()"
+
+    def __str__(self):
+        # str will return the standard name, not the daylight name.
+        return "tzwinlocal(%s)" % repr(self._stdname)
+
     def __reduce__(self):
         return (self.__class__, ())
 
