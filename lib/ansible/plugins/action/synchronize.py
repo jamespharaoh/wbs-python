@@ -30,18 +30,17 @@ from ansible import constants as C
 class ActionModule(ActionBase):
 
     def _get_absolute_path(self, path):
+        original_path = path
+
         if self._task._role is not None:
-            original_path = path
+            path = self._loader.path_dwim_relative(self._task._role._role_path, 'files', path)
+        else:
+            path = self._loader.path_dwim_relative(self._loader.get_basedir(), 'files', path)
 
-            if self._task._role is not None:
-                path = self._loader.path_dwim_relative(self._task._role._role_path, 'files', path)
-            else:
-                path = self._loader.path_dwim_relative(self._loader.get_basedir(), 'files', path)
-
-            if original_path and original_path[-1] == '/' and path[-1] != '/':
-                # make sure the dwim'd path ends in a trailing "/"
-                # if the original path did
-                path += '/'
+        if original_path and original_path[-1] == '/' and path[-1] != '/':
+            # make sure the dwim'd path ends in a trailing "/"
+            # if the original path did
+            path += '/'
 
         return path
 
@@ -204,8 +203,8 @@ class ActionModule(ActionBase):
             dest_is_local = True
 
         # CHECK FOR NON-DEFAULT SSH PORT
+        inv_port = task_vars.get('ansible_ssh_port', None) or C.DEFAULT_REMOTE_PORT
         if self._task.args.get('dest_port', None) is None:
-            inv_port = task_vars.get('ansible_ssh_port', None) or C.DEFAULT_REMOTE_PORT
             if inv_port is not None:
                 self._task.args['dest_port'] = inv_port
 
@@ -327,6 +326,6 @@ class ActionModule(ActionBase):
         if 'SyntaxError' in result.get('exception', result.get('msg', '')):
             # Emit a warning about using python3 because synchronize is
             # somewhat unique in running on localhost
-            result['traceback'] = result['msg']
+            result['exception'] = result['msg']
             result['msg'] = 'SyntaxError parsing module.  Perhaps invoking "python" on your local (or delegate_to) machine invokes python3.  You can set ansible_python_interpreter for localhost (or the delegate_to machine) to the location of python2 to fix this'
         return result

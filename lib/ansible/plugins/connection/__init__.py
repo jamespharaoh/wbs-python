@@ -23,6 +23,7 @@ __metaclass__ = type
 import fcntl
 import gettext
 import os
+import shlex
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from functools import wraps
@@ -31,6 +32,7 @@ from ansible.compat.six import with_metaclass
 from ansible import constants as C
 from ansible.errors import AnsibleError
 from ansible.plugins import shell_loader
+from ansible.utils.unicode import to_bytes, to_unicode
 
 try:
     from __main__ import display
@@ -118,6 +120,24 @@ class ConnectionBase(with_metaclass(ABCMeta, object)):
         variables which may be used to set those attributes in this method.
         '''
         pass
+
+    @staticmethod
+    def _split_ssh_args(argstring):
+        """
+        Takes a string like '-o Foo=1 -o Bar="foo bar"' and returns a
+        list ['-o', 'Foo=1', '-o', 'Bar=foo bar'] that can be added to
+        the argument list. The list will not contain any empty elements.
+        """
+        try:
+            # Python 2.6.x shlex doesn't handle unicode type so we have to
+            # convert args to byte string for that case.  More efficient to
+            # try without conversion first but python2.6 doesn't throw an
+            # exception, it merely mangles the output:
+            # >>> shlex.split(u't e')
+            # ['t\x00\x00\x00', '\x00\x00\x00e\x00\x00\x00']
+            return [to_unicode(x.strip()) for x in shlex.split(to_bytes(argstring)) if x.strip()]
+        except AttributeError:
+            return [to_unicode(x.strip()) for x in shlex.split(argstring) if x.strip()]
 
     @abstractproperty
     def transport(self):

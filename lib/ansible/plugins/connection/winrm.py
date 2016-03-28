@@ -61,6 +61,7 @@ except ImportError:
 class Connection(ConnectionBase):
     '''WinRM connections over HTTP/HTTPS.'''
 
+    transport = 'winrm'
     module_implementation_preferences = ('.ps1', '')
     become_methods = []
     allow_executable = False
@@ -76,11 +77,6 @@ class Connection(ConnectionBase):
         # TODO: Add runas support
 
         super(Connection, self).__init__(*args, **kwargs)
-
-    @property
-    def transport(self):
-        ''' used to identify this connection object from other classes '''
-        return 'winrm'
 
     def set_host_overrides(self, host):
         '''
@@ -151,7 +147,7 @@ class Connection(ConnectionBase):
                 errors.append(u'%s: %s' % (transport, err_msg))
                 display.vvvvv(u'WINRM CONNECTION ERROR: %s\n%s' % (err_msg, to_unicode(traceback.format_exc())), host=self._winrm_host)
         if errors:
-            raise AnsibleError(to_str(u', '.join((errors))))
+            raise AnsibleError(', '.join(map(to_str, errors)))
         else:
             raise AnsibleError('No transport found for WinRM connection')
 
@@ -274,7 +270,7 @@ class Connection(ConnectionBase):
 
         script_template = u'''
             begin {{
-                $path = "{0}"
+                $path = '{0}'
 
                 $DebugPreference = "Continue"
                 $ErrorActionPreference = "Stop"

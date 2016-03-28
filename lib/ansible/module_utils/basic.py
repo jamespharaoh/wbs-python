@@ -114,6 +114,12 @@ else:
         return d.iteritems()
 
 try:
+    reduce
+except NameError:
+    # Python 3
+    from functools import reduce
+
+try:
     NUMBERTYPES = (int, long, float)
 except NameError:
     # Python 3
@@ -185,7 +191,7 @@ except ImportError:
         pass
 
 try:
-    from ast import literal_eval as _literal_eval
+    from ast import literal_eval
 except ImportError:
     # a replacement for literal_eval that works with python 2.4. from: 
     # https://mail.python.org/pipermail/python-list/2009-September/551880.html
@@ -193,7 +199,7 @@ except ImportError:
     # ast.py
     from compiler import ast, parse
 
-    def _literal_eval(node_or_string):
+    def literal_eval(node_or_string):
         """
         Safely evaluate an expression node or a string containing a Python
         expression.  The string or node provided may only consist of the  following
@@ -223,6 +229,7 @@ except ImportError:
             raise ValueError('malformed string')
         return _convert(node_or_string)
 
+_literal_eval = literal_eval
 
 FILE_COMMON_ARGUMENTS=dict(
     src = dict(),
@@ -518,12 +525,15 @@ class AnsibleModule(object):
         self.no_log = no_log
         self.cleanup_files = []
         self._debug = False
+        self._diff = False
+        self._verbosity = 0
+
         # May be used to set modifications to the environment for any
         # run_command invocation
         self.run_command_environ_update = {}
 
         self.aliases = {}
-        self._legal_inputs = ['_ansible_check_mode', '_ansible_no_log', '_ansible_debug']
+        self._legal_inputs = ['_ansible_check_mode', '_ansible_no_log', '_ansible_debug', '_ansible_diff', '_ansible_verbosity']
 
         if add_file_common_args:
             for k, v in FILE_COMMON_ARGUMENTS.items():
@@ -854,6 +864,10 @@ class AnsibleModule(object):
                                    msg="mode must be in octal or symbolic form",
                                    details=str(e))
 
+                if mode != stat.S_IMODE(mode):
+                    # prevent mode from having extra info orbeing invalid long number
+                    self.fail_json(path=path, msg="Invalid mode supplied, only permission info is allowed", details=mode)
+
         prev_mode = stat.S_IMODE(path_stat.st_mode)
 
         if prev_mode != mode:
@@ -898,7 +912,7 @@ class AnsibleModule(object):
     def _symbolic_mode_to_octal(self, path_stat, symbolic_mode):
         new_mode = stat.S_IMODE(path_stat.st_mode)
 
-        mode_re = re.compile(r'^(?P<users>[ugoa]+)(?P<operator>[-+=])(?P<perms>[rwxXst]*|[ugo])$')
+        mode_re = re.compile(r'^(?P<users>[ugoa]+)(?P<operator>[-+=])(?P<perms>[rwxXst-]*|[ugo])$')
         for mode in symbolic_mode.split(','):
             match = mode_re.match(mode)
             if match:
@@ -1111,8 +1125,18 @@ class AnsibleModule(object):
             elif k == '_ansible_debug':
                 self._debug = self.boolean(v)
 
+            elif k == '_ansible_diff':
+                self._diff = self.boolean(v)
+
+            elif k == '_ansible_verbosity':
+                self._verbosity = v
+
             elif check_invalid_arguments and k not in self._legal_inputs:
                 self.fail_json(msg="unsupported parameter for module: %s" % k)
+
+            #clean up internal params:
+            if k.startswith('_ansible_'):
+                del self.params[k]
 
     def _count_terms(self, check):
         count = 0
@@ -1206,9 +1230,9 @@ class AnsibleModule(object):
         try:
             result = None
             if not locals:
-                result = _literal_eval(str)
+                result = literal_eval(str)
             else:
-                result = _literal_eval(str, None, locals)
+                result = literal_eval(str, None, locals)
             if include_exceptions:
                 return (result, None)
             else:
@@ -1768,7 +1792,7 @@ class AnsibleModule(object):
 
         # expand things like $HOME and ~
         if not shell:
-            args = [ os.path.expandvars(os.path.expanduser(x)) for x in args ]
+            args = [ os.path.expandvars(os.path.expanduser(x)) for x in args if x is not None ]
 
         rc = 0
         msg = None

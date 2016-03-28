@@ -83,6 +83,8 @@ def strip_internal_keys(dirty):
     for k in dirty.keys():
         if isinstance(k, string_types) and k.startswith('_ansible_'):
             del clean[k]
+        elif isinstance(dirty[k], dict):
+            clean[k] = strip_internal_keys(dirty[k])
     return clean
 
 class VariableManager:
@@ -306,12 +308,12 @@ class VariableManager:
 
             if not C.DEFAULT_PRIVATE_ROLE_VARS:
                 for role in play.get_roles():
-                    all_vars = combine_vars(all_vars, role.get_role_params())
                     all_vars = combine_vars(all_vars, role.get_vars(include_params=False))
 
         if task:
             if task._role:
                 all_vars = combine_vars(all_vars, task._role.get_vars())
+                all_vars = combine_vars(all_vars, task._role.get_role_params(task._block._dep_chain))
             all_vars = combine_vars(all_vars, task.get_vars())
 
         if host:
@@ -362,7 +364,7 @@ class VariableManager:
         variables['playbook_dir'] = loader.get_basedir()
 
         if host:
-            variables['group_names'] = [group.name for group in host.get_groups() if group.name != 'all']
+            variables['group_names'] = sorted([group.name for group in host.get_groups() if group.name != 'all'])
 
             if self._inventory is not None:
                 variables['groups']  = dict()
@@ -600,8 +602,10 @@ class VariableManager:
         '''
         Sets a value in the vars_cache for a host.
         '''
-
         host_name = host.get_name()
         if host_name not in self._vars_cache:
             self._vars_cache[host_name] = dict()
-        self._vars_cache[host_name][varname] = value
+        if varname in self._vars_cache[host_name]:
+            self._vars_cache[host_name][varname] = combine_vars(self._vars_cache[host_name][varname], value)
+        else:
+            self._vars_cache[host_name][varname] = value
