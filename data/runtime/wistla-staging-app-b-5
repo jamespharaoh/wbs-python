@@ -1,0 +1,65 @@
+---
+
+amazon_instance_type_running: "t2.large"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  state: "installed"
+
+icinga_state: "installed"
+instance_id: "i-9e452916"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHWDLes65fxFDpPq13WGhPeqN6GLQeTRPG6qjCGJD2rnQDaLYuvLbxdtRk4rGseXgZIuPnekKvkJa/arfwAOEbE="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCseEK7TxmiU5ETUs3UXeDgP7L4SSx3EuGTMUIs1aSrhUzRtEnG5DnleYtDyISKbOPZKxgrb5oQPwaNmFAE8YFnwwcurnSArhuC6sAUjtF0k0smpswLcL7XnoUX5QCj6ySJgNZ/gKwmCD6eIGO5TGlBLuviF4ihyfhxZeEvYdu34zu+qYWYr31iQJDvhI8/1NauNZkhFgXsd/p2vbqUSiRDPwBCqMQsNQEdFmbzXhWWoiinDa+5fW5KNT8lICIFl6mkiaZu60ZLtER840ufet0IxzJuAqPgMtizW5sA/qFLNeRwRKqxurLHX27H1i4zMpcCKtvMRhCc6kqSqsWiwsLL"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHWDLes65fxFDpPq13WGhPeqN6GLQeTRPG6qjCGJD2rnQDaLYuvLbxdtRk4rGseXgZIuPnekKvkJa/arfwAOEbE="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCseEK7TxmiU5ETUs3UXeDgP7L4SSx3EuGTMUIs1aSrhUzRtEnG5DnleYtDyISKbOPZKxgrb5oQPwaNmFAE8YFnwwcurnSArhuC6sAUjtF0k0smpswLcL7XnoUX5QCj6ySJgNZ/gKwmCD6eIGO5TGlBLuviF4ihyfhxZeEvYdu34zu+qYWYr31iQJDvhI8/1NauNZkhFgXsd/p2vbqUSiRDPwBCqMQsNQEdFmbzXhWWoiinDa+5fW5KNT8lICIFl6mkiaZu60ZLtER840ufet0IxzJuAqPgMtizW5sA/qFLNeRwRKqxurLHX27H1i4zMpcCKtvMRhCc6kqSqsWiwsLL"
+volume_ids: 
+  
+  data: "vol-b833137a"
+  system: "vol-6b3313a9"
+
+volume_ids_data: "vol-b833137a"
+volume_ids_system: "vol-6b3313a9"
+
+
+# ex: et ts=2 filetype=yaml

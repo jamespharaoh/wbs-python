@@ -1,0 +1,13 @@
+---
+
+identity:
+
+  type: "class"
+  name: "cluster"
+
+class:
+
+  namespace: "cluster"
+  parent_namespace: "supercluster"
+
+# ex: et ts=2 filetype=yaml

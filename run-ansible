@@ -259,7 +259,7 @@ def run_playbook (args):
 			#"/usr/bin/sudo",
 			"./wistla-devops",
 			"ansible", "playbook", "--",
-			"--inventory-file", "inventory",
+			"--inventory-file", "work/inventory",
 			"--extra-vars", "@config/overrides.yml",
 			"--extra-vars", "HOME=%s" % HOME,
 			"--extra-vars", "DATA=%s/data" % HOME,
@@ -283,14 +283,33 @@ def update_config ():
 		"##### Automatically updating config #####\n",
 	])
 
-	with open ("inventory", "w") as file_handle:
-		file_handle.write ("localhost ansible_connection=local\n")
+	if os.path.isfile ("inventory"):
 
-	time.sleep (0.3)
+		os.unlink (
+			"inventory")
 
 	if not os.path.isdir ("work"):
 
-		os.mkdir ("work")
+		os.mkdir (
+			"work")
+
+	if not os.path.isdir ("work/inventory"):
+
+		os.mkdir (
+			"work/inventory")
+
+	if not os.path.islink ("work/inventory/script"):
+
+		os.symlink (
+			"../../misc/ansible-inventory-script",
+			"work/inventory/script")
+
+	with open ("work/inventory/generated", "w") as file_handle:
+
+		file_handle.write (
+			"localhost ansible_connection=local\n")
+
+	time.sleep (0.3)
 
 	if not os.path.isdir ("work/retry"):
 

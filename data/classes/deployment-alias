@@ -1,0 +1,13 @@
+---
+
+identity:
+
+  type: "class"
+  name: "deployment-alias"
+
+class:
+
+  namespace: "deployment"
+  parent_namespace: "cluster"
+
+# ex: et ts=2 filetype=yaml

@@ -58,13 +58,24 @@ http {
 
 	upstream deployment-{{ deployment_name }} {
 
-{% for zone in [ 'a', 'b', 'c', 'd' ] %}
+{% for zone in cluster.instance_formation.app.zones %}
+{% for index in cluster.instance_formation.app.indices %}
 		server {{ [
-			deployment.bridge_network,
-			instance_index,
-			cluster_zone_indices [zone] * 64
-				+ node_type_indices.load,
-		] | join ('.') }} fail_timeout=60s;
+			[
+				deployment.bridge_network,
+				index,
+				cluster_zone_indices [zone] * 64
+					+ node_type_indices.load,
+			] | join ('.'),
+			'fail_timeout=60s;',
+			'#',
+			[
+				deployment_name,
+				zone,
+				index,
+			],
+		] | join (' ') }}
+{% endfor %}
 {% endfor %}
 
 		keepalive 32;

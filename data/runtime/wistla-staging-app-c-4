@@ -1,0 +1,65 @@
+---
+
+amazon_instance_type_running: "t2.large"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  state: "installed"
+
+icinga_state: "installed"
+instance_id: "i-25c874af"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBJSA2SKd6WRYQSxzNnc+KxkBs1vYu7GPlOweoqALTslVkIVbykkyee375okObZQEdV2wdvF9RZ2rqZBEVHSp/o="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKL69j5kHZsFmMvbTnakOZIl2XIk+c/erBOkEKNg4rMNUtKP4aZ3bIK8FefNDmp99We0VNCYdTts5iYYnSPx2VE7cOOm+HBI1/buXAJi26jyWQTZmfT2ASrdP72UEQS0XI/lv6HfxyQf7K5/YyLxXYkRI8dVHnBtuq2D7ktcjXQ5biY8AX/U2Z5V3cJf8MbpQdj3zQfSgQE8UqxsbvZutPPJVSpCGrXO74KDiy2MJTdxpQ9yvMlaYzw99aQD+pij6YLi1CMM8Zwb3UQe/bgYTFXn8dEcPZ67B+67VIQNZmsN7UNWIZf4wykkGkRhwBSK8cypW5vk5vMOco2riIyNuT"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBJSA2SKd6WRYQSxzNnc+KxkBs1vYu7GPlOweoqALTslVkIVbykkyee375okObZQEdV2wdvF9RZ2rqZBEVHSp/o="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKL69j5kHZsFmMvbTnakOZIl2XIk+c/erBOkEKNg4rMNUtKP4aZ3bIK8FefNDmp99We0VNCYdTts5iYYnSPx2VE7cOOm+HBI1/buXAJi26jyWQTZmfT2ASrdP72UEQS0XI/lv6HfxyQf7K5/YyLxXYkRI8dVHnBtuq2D7ktcjXQ5biY8AX/U2Z5V3cJf8MbpQdj3zQfSgQE8UqxsbvZutPPJVSpCGrXO74KDiy2MJTdxpQ9yvMlaYzw99aQD+pij6YLi1CMM8Zwb3UQe/bgYTFXn8dEcPZ67B+67VIQNZmsN7UNWIZf4wykkGkRhwBSK8cypW5vk5vMOco2riIyNuT"
+volume_ids: 
+  
+  data: "vol-db11be29"
+  system: "vol-d811be2a"
+
+volume_ids_data: "vol-db11be29"
+volume_ids_system: "vol-d811be2a"
+
+
+# ex: et ts=2 filetype=yaml

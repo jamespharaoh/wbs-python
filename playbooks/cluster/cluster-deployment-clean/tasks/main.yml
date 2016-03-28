@@ -1,9 +1,10 @@
 ---
 
-- include: "cluster-deployment.yml"
+- include: "cluster-deployment-clean.yml"
   tags:
 
     - "cluster"
     - "cluster-deployment"
+    - "cluster-deployment-clean"
 
 # ex: et ts=2 filetype=yaml

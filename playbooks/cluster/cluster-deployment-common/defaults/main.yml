@@ -94,6 +94,7 @@ cluster_deployment_types:
         project_links:
 
           - link: "node_modules/wistla-analytics"
+            overlay: "node_modules/.wistla-analytics"
             target: "../../wistla-analytics"
 
         build_steps:
@@ -105,6 +106,7 @@ cluster_deployment_types:
         project_links:
 
           - link: "node_modules/wistla-analytics"
+            overlay: "node_modules/.wistla-analytics"
             target: "../../wistla-analytics"
 
         build_steps:
@@ -113,6 +115,11 @@ cluster_deployment_types:
 
       - name: "wistla-devops"
         branch: "master"
+        configs:
+
+          - "config"
+          - "data/runtime"
+          - "security"
 
       - name: "wistla-scripts"
         branch: "master"
@@ -283,6 +290,11 @@ cluster_deployment_types:
 
       - name: "wistla-devops"
         branch: "master"
+        configs:
+
+          - "config"
+          - "data/runtime"
+          - "security"
 
       - name: "wistla-scripts"
         branch: "master"

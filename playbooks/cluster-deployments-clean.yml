@@ -1,0 +1,64 @@
+---
+
+# TODO generate this file
+
+- hosts: "cluster-production-app"
+  roles:
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "production-a"
+      tags: [ "cluster-clean", "production-a" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "production-b"
+      tags: [ "cluster-clean", "production-b" ]
+
+- hosts: "cluster-production-data"
+  roles:
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "production"
+      tags: [ "cluster-clean", "production" ]
+
+- hosts: "cluster-staging-app"
+  roles:
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "staging-a"
+      tags: [ "cluster-clean", "staging-a" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "staging-b"
+      tags: [ "cluster-clean", "staging-b" ]
+
+- hosts: "cluster-staging-data"
+  roles:
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "staging"
+      tags: [ "cluster-clean", "staging" ]
+
+- hosts: "cluster-test-app"
+  roles:
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "test-everest"
+      tags: [ "cluster-clean", "test-everest" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "test-k2"
+      tags: [ "cluster-clean", "test-k2" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "test-montblanc"
+      tags: [ "cluster-clean", "test-montblanc" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "test-erebus"
+      tags: [ "cluster-clean", "test-erebus" ]
+
+    - role: "cluster-clean"
+      cluster_deployment_name: "test-fitzroy"
+      tags: [ "cluster-clean", "test-fitzroy" ]
+
+# ex: et ts=2 filetype=yaml

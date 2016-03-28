@@ -3,6 +3,10 @@
 project:
 
   name: "wistla-devops"
+  short_name: "wistla"
+
+  title: "Wistla Devops"
+  short_title: "Wistla"
 
 environment:
 
@@ -42,5 +46,10 @@ certificate_data:
   country: "GB"
   locality: "London"
   organization: "Wistla Limited"
+
+resource_data:
+
+  clusters: "cluster.cluster"
+  deployments: "deployment.deployment"
 
 # ex: et ts=2 filetype=yaml

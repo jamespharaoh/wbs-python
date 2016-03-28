@@ -1,45 +1,63 @@
 ---
-amazon_instance_state: running
-amazon_instance_type_running: t2.small
-heka:
-  installed_version: 0.10.0b0
-  needs_restart: 'no'
-  state: enabled
-heka_installed_version: 0.10.0b0
-heka_needs_restart: 'no'
-heka_state: enabled
-icinga:
-  certificate: /authority/icinga/issue/16/certificate
-  needs_restart: 'no'
-  private_key: /authority/icinga/issue/16/key
-  state: enabled
-icinga_certificate: /authority/icinga/issue/16/certificate
-icinga_needs_restart: 'no'
-icinga_private_key: /authority/icinga/issue/16/key
-icinga_state: enabled
-instance_id: i-0a71b5a7
-python:
-  installed_version: 2.7.10
-  pip_state: installed
-  state: installed
-python_apt:
-  installed_version: 0.9.3-1
-  state: installed
-python_apt_installed_version: 0.9.3-1
-python_apt_state: installed
-python_installed_version: 2.7.10
-python_pip:
-  installed_version: 7.0.3
-python_pip_installed_version: 7.0.3
-python_pip_state: installed
-python_state: installed
-ssh:
-  host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOPuwmsMdhzuKCGLjUa5VSWf/+1RCulSVIhIcCJ2kcMErmsXjRHfvHW0poavXWrF1Xcg4L/5CKvDv/Bdv6QX8Wc=
-  host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBNyA0if+GDG8WtAHdf8RICTELCPVFVjvtRTPFa7it0ZYSDh2U6MCvF/OJZl2uQdCKu5O+p1b8BdJbgX0SGsZX/RzcfKD78NFoSiCNYenlCjtkAvw8gfYKhptOrBcO3NC6jK3qgrOZRO6jXKNu2oMIRqLLlZQGLhRGjFSDTNf36WqC0vd46Ki6iUOx7uH13Z7Djl6L2lK7Jnm3CVER8F/YQrq9+u9o3yCnFn5eBTy1M5bTx4MbXxrrPWcOMsm3Hd8isCxbkqaTGRyO+uqvjjBOYnU7nXr6zA0uHnVHE2DE9oiOBUXNBzMNf52yaOqIrjLJtkJHsfth+aKeZUo+zzer
-ssh_host_key_ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOPuwmsMdhzuKCGLjUa5VSWf/+1RCulSVIhIcCJ2kcMErmsXjRHfvHW0poavXWrF1Xcg4L/5CKvDv/Bdv6QX8Wc=
-ssh_host_key_rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBNyA0if+GDG8WtAHdf8RICTELCPVFVjvtRTPFa7it0ZYSDh2U6MCvF/OJZl2uQdCKu5O+p1b8BdJbgX0SGsZX/RzcfKD78NFoSiCNYenlCjtkAvw8gfYKhptOrBcO3NC6jK3qgrOZRO6jXKNu2oMIRqLLlZQGLhRGjFSDTNf36WqC0vd46Ki6iUOx7uH13Z7Djl6L2lK7Jnm3CVER8F/YQrq9+u9o3yCnFn5eBTy1M5bTx4MbXxrrPWcOMsm3Hd8isCxbkqaTGRyO+uqvjjBOYnU7nXr6zA0uHnVHE2DE9oiOBUXNBzMNf52yaOqIrjLJtkJHsfth+aKeZUo+zzer
-volume_ids:
-  data: vol-aedd745e
-  system: vol-b6dd7446
-volume_ids_data: vol-aedd745e
-volume_ids_system: vol-b6dd7446
+
+amazon_instance_state: "running"
+amazon_instance_type_running: "t2.small"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  certificate: "/authority/icinga/issue/16/certificate"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/16/key"
+  state: "enabled"
+
+icinga_certificate: "/authority/icinga/issue/16/certificate"
+icinga_needs_restart: "no"
+icinga_private_key: "/authority/icinga/issue/16/key"
+icinga_state: "enabled"
+instance_id: "i-0a71b5a7"
+python: 
+  
+  installed_version: "2.7.10"
+  pip_state: "installed"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOPuwmsMdhzuKCGLjUa5VSWf/+1RCulSVIhIcCJ2kcMErmsXjRHfvHW0poavXWrF1Xcg4L/5CKvDv/Bdv6QX8Wc="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBNyA0if+GDG8WtAHdf8RICTELCPVFVjvtRTPFa7it0ZYSDh2U6MCvF/OJZl2uQdCKu5O+p1b8BdJbgX0SGsZX/RzcfKD78NFoSiCNYenlCjtkAvw8gfYKhptOrBcO3NC6jK3qgrOZRO6jXKNu2oMIRqLLlZQGLhRGjFSDTNf36WqC0vd46Ki6iUOx7uH13Z7Djl6L2lK7Jnm3CVER8F/YQrq9+u9o3yCnFn5eBTy1M5bTx4MbXxrrPWcOMsm3Hd8isCxbkqaTGRyO+uqvjjBOYnU7nXr6zA0uHnVHE2DE9oiOBUXNBzMNf52yaOqIrjLJtkJHsfth+aKeZUo+zzer"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOPuwmsMdhzuKCGLjUa5VSWf/+1RCulSVIhIcCJ2kcMErmsXjRHfvHW0poavXWrF1Xcg4L/5CKvDv/Bdv6QX8Wc="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBNyA0if+GDG8WtAHdf8RICTELCPVFVjvtRTPFa7it0ZYSDh2U6MCvF/OJZl2uQdCKu5O+p1b8BdJbgX0SGsZX/RzcfKD78NFoSiCNYenlCjtkAvw8gfYKhptOrBcO3NC6jK3qgrOZRO6jXKNu2oMIRqLLlZQGLhRGjFSDTNf36WqC0vd46Ki6iUOx7uH13Z7Djl6L2lK7Jnm3CVER8F/YQrq9+u9o3yCnFn5eBTy1M5bTx4MbXxrrPWcOMsm3Hd8isCxbkqaTGRyO+uqvjjBOYnU7nXr6zA0uHnVHE2DE9oiOBUXNBzMNf52yaOqIrjLJtkJHsfth+aKeZUo+zzer"
+volume_ids: 
+  
+  data: "vol-aedd745e"
+  system: "vol-b6dd7446"
+
+volume_ids_data: "vol-aedd745e"
+volume_ids_system: "vol-b6dd7446"
+
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,65 @@
+---
+
+amazon_instance_type_running: "t2.large"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  state: "installed"
+
+icinga_state: "installed"
+instance_id: "i-4fc975c5"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBKnVE9HGRUCydJJixi3nNtuAohZYiVV4xEF94CAfZmx0Ej6Q6BK2WLvr/h6kOHJNe7iAG2aFDHBZBhmpYrsdpY="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGMMNj0Xt3Kl71KPLsUpx2JqSJeRaaQyBuu50PI5SnvaB6DcyOcfHJ5N/zlUXGWtJynsWsh8I4p/FMV8BsKBa9XwsW6S7T5INtnBFZFPU7IDdvsv034ojUWcIJnYFJCemsXDguahc73k/CfOacuk0WL6rFerZQAiCQ5JietjZ+4IWeUK+8+0OSlV8EEhZWh4PnGTmEIPMSz+d04z6JkUfIF64LxkYvXxeXxlLZ4fqykpxMxIR+joKrs+NOZIqQ+83NMsnsucaALNxwwiMa5TThN5Jps82sgH3N/hmglaq4NCE4KUkgSjqJ14imS2F0gqQ+jzeUImfl99iCUmzpg519"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBKnVE9HGRUCydJJixi3nNtuAohZYiVV4xEF94CAfZmx0Ej6Q6BK2WLvr/h6kOHJNe7iAG2aFDHBZBhmpYrsdpY="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGMMNj0Xt3Kl71KPLsUpx2JqSJeRaaQyBuu50PI5SnvaB6DcyOcfHJ5N/zlUXGWtJynsWsh8I4p/FMV8BsKBa9XwsW6S7T5INtnBFZFPU7IDdvsv034ojUWcIJnYFJCemsXDguahc73k/CfOacuk0WL6rFerZQAiCQ5JietjZ+4IWeUK+8+0OSlV8EEhZWh4PnGTmEIPMSz+d04z6JkUfIF64LxkYvXxeXxlLZ4fqykpxMxIR+joKrs+NOZIqQ+83NMsnsucaALNxwwiMa5TThN5Jps82sgH3N/hmglaq4NCE4KUkgSjqJ14imS2F0gqQ+jzeUImfl99iCUmzpg519"
+volume_ids: 
+  
+  data: "vol-0712bdf5"
+  system: "vol-f011be02"
+
+volume_ids_data: "vol-0712bdf5"
+volume_ids_system: "vol-f011be02"
+
+
+# ex: et ts=2 filetype=yaml

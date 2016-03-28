@@ -58,6 +58,7 @@ gridlinker:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
   version: "master"
+  python: "gridlinker/python"
 
 ipaddress:
 
@@ -123,5 +124,6 @@ wbs-python:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/wbs-python.git"
   version: "master"
+  python: "wbs-python"
 
 # ex: et ts=2 filetype=yaml

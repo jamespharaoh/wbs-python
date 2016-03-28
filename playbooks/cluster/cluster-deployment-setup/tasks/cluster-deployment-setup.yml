@@ -33,33 +33,64 @@
     src: "{{ cluster_deployment_name }}"
 
 - name: "checkout projects from git"
+  tags: "checkout"
   with_items: "{{ cluster_deployment_checkouts }}"
+  action:
+
+    module: "git"
+    dest: "{{ cluster_deployment_home }}/{{ item.name }}"
+    repo: "git@github.com:/wistla/{{ item.name }}"
+    refspec: "{{ item.branch }}"
+    version: "{{ cluster_deployment.deployed_versions [item.name] }}"
+
+- name: "create project links"
+  with_items: "{{ cluster_deployment_checkouts | flatten_hash ('project_links') }}"
+  become: "yes"
   args:
 
-    creates: "{{ cluster_deployment_home }}/{{ item.name }}"
     executable: "/bin/bash"
 
   shell:
 
     set -euf -o pipefail;
 
-    cd {{ cluster_deployment_home }};
+    link="{{ [
+      cluster_deployment_home,
+      item.outer.name,
+      item.project_links.link,
+    ] | join ('/') }}";
 
-    git clone
-      git@github.com:/wistla/{{ item.name }}
-      --branch {{ item.branch }};
+    overlay="{{ [
+      cluster_deployment_home,
+      item.outer.name,
+      item.project_links.overlay,
+    ] | join ('/') }}";
 
-- name: "create project links"
-  with_items: "{{
-    cluster_deployment_checkouts | flatten_hash ('project_links')
-  }}"
-  action:
+    target="$(
+      cd "$(dirname "$link")";
+      readlink --canonicalize "{{ item.project_links.target }}";
+    )";
 
-    module: "file"
-    path: "{{ cluster_deployment_home }}/{{ item.outer.name }}/{{ item.project_links.link }}"
-    state: "link"
+    if ! test -d "$link"; then
+      mkdir "$link";
+      chown root.root "$link";
+      chmod 0000 "$link";
+    fi;
 
-    src: "{{ item.project_links.target }}"
+    if ! {
+      cut -d' ' -f 2 </proc/mounts
+        | grep -x "$link";
+    }; then
+
+      if ! test -d "$overlay"; then
+        mkdir "$overlay";
+        chown "ubuntu:ubuntu" "$overlay";
+      fi;
+
+      mount -t aufs -o "br=$overlay:$target" none "$link";
+      rm -rf "$link/node_modules" "$link/.git";
+
+    fi;
 
 - name: "run project build steps"
   tags: "build"
@@ -85,6 +116,33 @@
     module: "file"
     path: "{{ cluster_deployment_home }}/config/{{ item }}"
     state: "directory"
+
+- name: "create shared link target"
+  with_items:
+
+    - "/data/{{ cluster_deployment.alias }}"
+    - "/data/{{ cluster_deployment.alias }}/shared"
+
+  when: "{{ cluster_deployment.type == 'alias' }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item }}"
+    state: "directory"
+
+    owner: "ubuntu"
+    group: "ubuntu"
+    mode: "0755"
+
+- name: "create main shared link"
+  when: "{{ cluster_deployment.type == 'alias' }}"
+  action:
+
+    module: "file"
+    path: "/home/ubuntu/{{ cluster_deployment.alias }}"
+    state: "link"
+    src: "/data/{{ cluster_deployment.alias }}"
 
 - name: "create shared link"
   when: "{{ cluster_deployment.type == 'alias' }}"

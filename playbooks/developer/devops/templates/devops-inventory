@@ -125,12 +125,18 @@ cluster-host
 
 [cluster-network]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name -%}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
+
 	{%- print [
 		'cluster-' + other_cluster_name + '-network',
 		'cluster_name=' + other_cluster_name,
 	] | join (' ') + '\n' -%}
+
 {%- endfor %}
 
 [cluster-host:children]
@@ -141,8 +147,12 @@ cluster-jenkins
 
 [cluster-admin:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name -%}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
 
 	{%- print 'cluster-', other_cluster_name, '-admin\n' -%}
 
@@ -150,8 +160,12 @@ or other_cluster_name == cluster_name -%}
 
 [cluster-app:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name -%}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
 
 	{%- if other_cluster_name != 'ops' -%}
 		{%- print 'cluster-', other_cluster_name, '-app\n' -%}
@@ -161,8 +175,12 @@ or other_cluster_name == cluster_name -%}
 
 [cluster-data:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name -%}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
 
 	{%- if other_cluster_name not in [ 'ops', 'test' ] -%}
 		{%- print 'cluster-', other_cluster_name, '-data\n' -%}
@@ -172,8 +190,12 @@ or other_cluster_name == cluster_name -%}
 
 [cluster-jenkins:children]
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name -%}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
 
 	{%- if other_cluster_name == 'ops' %}
 		{%- print 'cluster-', other_cluster_name, '-jenkins\n' -%}
@@ -182,8 +204,12 @@ or other_cluster_name == cluster_name -%}
 {%- endfor %}
 
 {% for other_cluster_name, other_cluster in clusters.items ()
-if deployment_mode in [ 'vagrant', 'jenkins' ]
-or other_cluster_name == cluster_name %}
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) %}
 
 # ---------- cluster {{ other_cluster_name }}
 

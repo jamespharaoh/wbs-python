@@ -20,7 +20,7 @@ nodejs_version: "{{ cluster.nodejs_version }}"
 
 # --------- icinga
 
-icinga_web_version: "2.0.0-rc1"
+icinga_web_version: "2.2.0"
 
 icinga_database_type: "mysql"
 icinga_database_hostname: "wistla-ops-admin-a"

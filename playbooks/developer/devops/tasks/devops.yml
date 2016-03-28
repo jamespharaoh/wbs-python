@@ -29,7 +29,7 @@
   action:
 
     module: "template"
-    dest: "{{ deployment_home }}/wistla-devops/inventory"
+    dest: "{{ deployment_home }}/wistla-devops/work/inventory/generated"
     src: "devops-inventory"
 
 # ex: et ts=2 filetype=yaml
