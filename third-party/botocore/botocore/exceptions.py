@@ -28,7 +28,16 @@ class BotoCoreError(Exception):
         self.kwargs = kwargs
 
 
-class UnknownServiceError(BotoCoreError):
+class DataNotFoundError(BotoCoreError):
+    """
+    The data associated with a particular path could not be loaded.
+
+    :ivar path: The data path that the user attempted to load.
+    """
+    fmt = 'Unable to load data for: {data_path}'
+
+
+class UnknownServiceError(DataNotFoundError):
     """Raised when trying to load data for an unknown service.
 
     :ivar service_name: The name of the unknown service.
@@ -37,15 +46,6 @@ class UnknownServiceError(BotoCoreError):
     fmt = (
         "Unknown service: '{service_name}'. Valid service names are: "
         "{known_service_names}")
-
-
-class DataNotFoundError(BotoCoreError):
-    """
-    The data associated with a particular path could not be loaded.
-
-    :ivar path: The data path that the user attempted to load.
-    """
-    fmt = 'Unable to load data for: {data_path}'
 
 
 class ApiVersionNotFoundError(BotoCoreError):
@@ -125,7 +125,7 @@ class NoRegionError(BaseEndpointResolverError):
     fmt = 'You must specify a region.'
 
 
-class UnknownEndpointError(BaseEndpointResolverError):
+class UnknownEndpointError(BaseEndpointResolverError, ValueError):
     """
     Could not construct an endpoint.
 
@@ -238,6 +238,20 @@ class UnknownParameterError(ValidationError):
     fmt = (
         "Unknown parameter '{name}' for operation {operation}.  Must be one "
         "of: {choices}"
+    )
+
+
+class AliasConflictParameterError(ValidationError):
+    """
+    Error when an alias is provided for a parameter as well as the original.
+
+    :ivar original: The name of the original parameter.
+    :ivar alias: The name of the alias
+    :ivar operation: The name of the operation.
+    """
+    fmt = (
+        "Parameter '{original}' and its alias '{alias}' were provided "
+        "for operation {operation}.  Only one of them may be used."
     )
 
 
@@ -357,9 +371,17 @@ class StubResponseError(BotoCoreError):
     fmt = 'Error getting response stub for operation {operation_name}: {reason}'
 
 
+class StubAssertionError(StubResponseError, AssertionError):
+    fmt = 'Error getting response stub for operation {operation_name}: {reason}'
+
+
 class InvalidConfigError(BotoCoreError):
     fmt = '{error_msg}'
 
 
 class RefreshWithMFAUnsupportedError(BotoCoreError):
     fmt = 'Cannot refresh credentials: MFA token required.'
+
+
+class MD5UnavailableError(BotoCoreError):
+    fmt = "This system does not support MD5 generation."
