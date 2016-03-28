@@ -392,6 +392,15 @@ IGNORE_GLACIER_WARNINGS = {
 }
 
 
+FORCE_GLACIER_TRANSFER = {
+    'name': 'force-glacier-transfer', 'action': 'store_true',
+    'help_text': (
+        'Forces a transfer request on all Glacier objects in a sync or '
+        'recursive copy.'
+    )
+}
+
+
 TRANSFER_ARGS = [DRYRUN, QUIET, INCLUDE, EXCLUDE, ACL,
                  FOLLOW_SYMLINKS, NO_FOLLOW_SYMLINKS, NO_GUESS_MIME_TYPE,
                  SSE, SSE_C, SSE_C_KEY, SSE_KMS_KEY_ID, SSE_C_COPY_SOURCE,
@@ -399,7 +408,7 @@ TRANSFER_ARGS = [DRYRUN, QUIET, INCLUDE, EXCLUDE, ACL,
                  WEBSITE_REDIRECT, CONTENT_TYPE, CACHE_CONTROL,
                  CONTENT_DISPOSITION, CONTENT_ENCODING, CONTENT_LANGUAGE,
                  EXPIRES, SOURCE_REGION, ONLY_SHOW_ERRORS,
-                 PAGE_SIZE, IGNORE_GLACIER_WARNINGS]
+                 PAGE_SIZE, IGNORE_GLACIER_WARNINGS, FORCE_GLACIER_TRANSFER]
 
 
 def get_client(session, region, endpoint_url, verify, config=None):
@@ -660,7 +669,11 @@ class S3TransferCommand(S3Command):
                                      ' E.g. s3://%s' % bucket)
                 path = 's3://' + bucket
                 del_objects = RmCommand(self._session)
-                del_objects([path, '--recursive'], parsed_globals)
+                rc = del_objects([path, '--recursive'], parsed_globals)
+                if rc != 0:
+                    raise RuntimeError(
+                        "Unable to delete all objects in the bucket, "
+                        "bucket will not be deleted.")
 
 
 class CpCommand(S3TransferCommand):
@@ -1044,12 +1057,14 @@ class CommandParameters(object):
     def _validate_streaming_paths(self):
         self.parameters['is_stream'] = False
         if self.parameters['src'] == '-' or self.parameters['dest'] == '-':
+            if self.cmd != 'cp' or self.parameters.get('dir_op'):
+                raise ValueError(
+                    "Streaming currently is only compatible with "
+                    "non-recursive cp commands"
+                )
             self.parameters['is_stream'] = True
             self.parameters['dir_op'] = False
             self.parameters['only_show_errors'] = True
-        if self.parameters['is_stream'] and self.cmd != 'cp':
-            raise ValueError("Streaming currently is only compatible with "
-                             "single file cp commands")
 
     def _validate_path_args(self):
         # If we're using a mv command, you can't copy the object onto itself.

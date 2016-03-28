@@ -17,6 +17,7 @@ import sys
 
 import mock
 
+import awscli.customizations.s3.utils
 from awscli.testutils import unittest
 from awscli import EnvironmentVariables
 from awscli.compat import six
@@ -24,7 +25,7 @@ from awscli.customizations.s3.s3handler import S3Handler, S3StreamHandler
 from awscli.customizations.s3.fileinfo import FileInfo
 from awscli.customizations.s3.tasks import CreateMultipartUploadTask, \
     UploadPartTask, CreateLocalFileTask
-from awscli.customizations.s3.utils import MAX_PARTS
+from awscli.customizations.s3.utils import MAX_PARTS, MAX_UPLOAD_SIZE
 from awscli.customizations.s3.transferconfig import RuntimeConfig
 from tests.unit.customizations.s3 import make_loc_files, clean_loc_files, \
     MockStdIn, S3HandlerBaseTest
@@ -193,6 +194,28 @@ class S3HandlerTestUpload(S3HandlerBaseTest):
         ]
         stdout, stderr, rc = self.run_s3_handler(self.s3_handler, tasks)
         self.assertEqual(rc.num_tasks_failed, 1)
+
+    def test_max_size_limit(self):
+        """
+        This test verifies that we're warning on file uploads which are greater
+        than the max upload size (5TB currently).
+        """
+        tasks = [FileInfo(
+            src=self.loc_files[0],
+            dest=self.bucket + '/test1.txt',
+            compare_key=None,
+            src_type='local',
+            dest_type='s3',
+            operation_name='upload',
+            size=MAX_UPLOAD_SIZE+1,
+            last_update=None,
+            client=self.client
+        )]
+        self.parsed_responses = []
+        _, _, rc = self.run_s3_handler(self.s3_handler, tasks)
+        # The task should *warn*, not fail
+        self.assertEqual(rc.num_tasks_failed, 0)
+        self.assertEqual(rc.num_tasks_warned, 1)
 
     def test_multi_upload(self):
         """
@@ -895,7 +918,7 @@ class TestStreams(S3HandlerBaseTest):
         self.assertEqual(submitted_tasks[2][0][0]._payload.read(),
                          b'ar')
 
-    def test_upload_stream_with_expected_size(self):
+    def test_upload_stream_with_expected_parts(self):
         self.params['expected_size'] = 100000
         # With this large of expected size, the chunksize of 2 will have
         # to change.
@@ -913,6 +936,25 @@ class TestStreams(S3HandlerBaseTest):
         changed_chunk_size = submitted_tasks[1][0][0]._chunk_size
         # New chunksize should have a total parts under 1000.
         self.assertTrue(100000 / float(changed_chunk_size) <= MAX_PARTS)
+
+    def test_upload_stream_with_expected_size(self):
+        minimum_chunksize = 10
+        awscli.customizations.s3.utils.MIN_UPLOAD_CHUNKSIZE = minimum_chunksize
+        s3handler = S3StreamHandler(
+            self.session, self.params,
+            runtime_config=runtime_config(
+                multipart_threshold=1, multipart_chunksize=2))
+        s3handler.executor = mock.Mock()
+        fileinfo = FileInfo('filename', operation_name='upload',
+                            is_stream=True)
+        with MockStdIn(b'bar'):
+            s3handler._enqueue_multipart_upload_tasks(fileinfo, b'')
+        submitted_tasks = s3handler.executor.submit.call_args_list
+        # Determine what the chunksize was changed to from one of the
+        # UploadPartTasks.
+        changed_chunk_size = submitted_tasks[1][0][0]._chunk_size
+        # New chunksize should be equal to the minimum
+        self.assertEqual(changed_chunk_size, minimum_chunksize)
 
     def test_upload_stream_enqueue_upload_task(self):
         s3handler = S3StreamHandler(self.session, self.params)

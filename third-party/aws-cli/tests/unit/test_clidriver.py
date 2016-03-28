@@ -95,6 +95,7 @@ GET_DATA = {
 GET_VARIABLE = {
     'provider': 'aws',
     'output': 'json',
+    'api_versions': {}
 }
 
 
@@ -203,9 +204,9 @@ class FakeSession(object):
     def get_config_variable(self, name):
         return GET_VARIABLE[name]
 
-    def get_service_model(self, name):
-        return botocore.model.ServiceModel(MINI_SERVICE,
-                                           service_name='s3')
+    def get_service_model(self, name, api_version=None):
+        return botocore.model.ServiceModel(
+            MINI_SERVICE, service_name='s3')
 
     def user_agent(self):
         return 'user_agent'
@@ -677,8 +678,8 @@ class TestHowClientIsCreated(BaseAWSCommandParamsTest):
         self.assert_params_for_cmd(
             'ec2 describe-instances --region us-west-2',
             expected_rc=0)
-        self.assertEqual(self.create_endpoint.call_args[0],
-                         (mock.ANY, 'us-west-2'))
+        self.assertEqual(
+            self.create_endpoint.call_args[1]['region_name'], 'us-west-2')
 
     def test_aws_with_verify_false(self):
         self.assert_params_for_cmd(
@@ -687,7 +688,6 @@ class TestHowClientIsCreated(BaseAWSCommandParamsTest):
         # Because we used --no-verify-ssl, create_endpoint should be
         # called with verify=False
         call_args = self.create_endpoint.call_args
-        self.assertEqual(call_args[0], (mock.ANY, 'us-east-1'))
         self.assertFalse(call_args[1]['verify'])
 
     def test_aws_with_cacert_env_var(self):
@@ -696,7 +696,6 @@ class TestHowClientIsCreated(BaseAWSCommandParamsTest):
             'ec2 describe-instances --region us-east-1',
             expected_rc=0)
         call_args = self.create_endpoint.call_args
-        self.assertEqual(call_args[0], (mock.ANY, 'us-east-1'))
         self.assertEqual(call_args[1]['verify'], '/path/cacert.pem')
 
     def test_aws_with_read_timeout(self):
