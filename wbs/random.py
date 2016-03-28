@@ -11,6 +11,16 @@ def generate_random (length, characters = string.ascii_lowercase):
 		for _ in range (length)
 	])
 
+def generate_salt (length = 6):
+
+	return generate_random (
+		length,
+		"".join ([
+			string.ascii_letters,
+			string.digits,
+			"./",
+		]))
+
 def generate_mac_address (prefix = ""):
 
 	ret = prefix
