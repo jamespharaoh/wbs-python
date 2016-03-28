@@ -17,7 +17,6 @@ This module contains builtin handlers for events emitted by botocore.
 """
 
 import base64
-import hashlib
 import logging
 import xml.etree.cElementTree
 import copy
@@ -25,13 +24,14 @@ import re
 import warnings
 
 from botocore.compat import urlsplit, urlunsplit, unquote, \
-    json, quote, six, unquote_str
+    json, quote, six, unquote_str, ensure_bytes, get_md5, MD5_AVAILABLE
 from botocore.docs.utils import AutoPopulatedParam
 from botocore.docs.utils import HideParamFromOperations
 from botocore.docs.utils import AppendParamDocumentation
 from botocore.signers import add_generate_presigned_url
 from botocore.signers import add_generate_presigned_post
 from botocore.exceptions import ParamValidationError
+from botocore.exceptions import AliasConflictParameterError
 from botocore.exceptions import UnsupportedTLSVersionWarning
 from botocore.utils import percent_encode, SAFE_CHARS
 
@@ -134,13 +134,13 @@ def calculate_md5(params, **kwargs):
 
 
 def _calculate_md5_from_bytes(body_bytes):
-    md5 = hashlib.md5(body_bytes)
+    md5 = get_md5(body_bytes)
     return md5.digest()
 
 
 def _calculate_md5_from_file(fileobj):
     start_position = fileobj.tell()
-    md5 = hashlib.md5()
+    md5 = get_md5()
     for chunk in iter(lambda: fileobj.read(1024 * 1024), b''):
         md5.update(chunk)
     fileobj.seek(start_position)
@@ -150,7 +150,7 @@ def _calculate_md5_from_file(fileobj):
 def conditionally_calculate_md5(params, **kwargs):
     """Only add a Content-MD5 when not using sigv4"""
     signer = kwargs['request_signer']
-    if signer.signature_version != 'v4':
+    if signer.signature_version not in ['v4', 's3v4'] and MD5_AVAILABLE:
         calculate_md5(params, **kwargs)
 
 
@@ -188,13 +188,14 @@ def copy_source_sse_md5(params, **kwargs):
 def _sse_md5(params, sse_member_prefix='SSECustomer'):
     if not _needs_s3_sse_customization(params, sse_member_prefix):
         return
+
     sse_key_member = sse_member_prefix + 'Key'
     sse_md5_member = sse_member_prefix + 'KeyMD5'
     key_as_bytes = params[sse_key_member]
     if isinstance(key_as_bytes, six.text_type):
         key_as_bytes = key_as_bytes.encode('utf-8')
     key_md5_str = base64.b64encode(
-        hashlib.md5(key_as_bytes).digest()).decode('utf-8')
+        get_md5(key_as_bytes).digest()).decode('utf-8')
     key_b64_encoded = base64.b64encode(key_as_bytes).decode('utf-8')
     params[sse_key_member] = key_b64_encoded
     params[sse_md5_member] = key_md5_str
@@ -441,11 +442,11 @@ def base64_encode_user_data(params, **kwargs):
             params['UserData']).decode('utf-8')
 
 
-def document_base64_encoding():
+def document_base64_encoding(param):
     description = ('**This value will be base64 encoded automatically. Do '
                    'not base64 encode this value prior to performing the '
                    'operation.**')
-    append = AppendParamDocumentation('UserData', description)
+    append = AppendParamDocumentation(param, description)
     return append.append_documentation
 
 
@@ -619,11 +620,105 @@ def decode_list_object(parsed, context, **kwargs):
                 for member in parsed[top_key]:
                     member[child_key] = unquote_str(member[child_key])
 
+
+def convert_body_to_file_like_object(params, **kwargs):
+    if 'Body' in params:
+        if isinstance(params['Body'], six.string_types):
+            params['Body'] = six.BytesIO(ensure_bytes(params['Body']))
+        elif isinstance(params['Body'], six.binary_type):
+            params['Body'] = six.BytesIO(params['Body'])
+
+
+def _add_parameter_aliases(handler_list):
+    # Mapping of original parameter to parameter alias.
+    # The key is <service>.<operation>.parameter
+    # The first part of the key is used for event registration.
+    # The last part is the original parameter name and the value is the
+    # alias to expose in documentation.
+    aliases = {
+        'ec2.*.Filter': 'Filters',
+        'logs.CreateExportTask.from': 'fromTime',
+        'cloudsearchdomain.Search.return': 'returnFields'
+    }
+
+    for original, new_name in aliases.items():
+        event_portion, original_name = original.rsplit('.', 1)
+        parameter_alias = ParameterAlias(original_name, new_name)
+
+        # Add the handlers to the list of handlers.
+        # One handler is to handle when users provide the alias.
+        # The other handler is to update the documentation to show only
+        # the alias.
+        parameter_build_event_handler_tuple = (
+            'before-parameter-build.' + event_portion,
+            parameter_alias.alias_parameter_in_call,
+            REGISTER_FIRST
+        )
+        docs_event_handler_tuple = (
+            'docs.*.' + event_portion + '.complete-section',
+            parameter_alias.alias_parameter_in_documentation)
+        handler_list.append(parameter_build_event_handler_tuple)
+        handler_list.append(docs_event_handler_tuple)
+
+
+class ParameterAlias(object):
+    def __init__(self, original_name, alias_name):
+        self._original_name = original_name
+        self._alias_name = alias_name
+
+    def alias_parameter_in_call(self, params, model, **kwargs):
+        if model.input_shape:
+            # Only consider accepting the alias if it is modeled in the
+            # input shape.
+            if self._original_name in model.input_shape.members:
+                if self._alias_name in params:
+                    if self._original_name in params:
+                        raise AliasConflictParameterError(
+                            original=self._original_name,
+                            alias=self._alias_name,
+                            operation=model.name
+                        )
+                    # Remove the alias parameter value and use the old name
+                    # instead.
+                    params[self._original_name] = params.pop(self._alias_name)
+
+    def alias_parameter_in_documentation(self, event_name, section, **kwargs):
+        if event_name.startswith('docs.request-params'):
+            if self._original_name not in section.available_sections:
+                return
+            # Replace the name for parameter type
+            param_section = section.get_section(self._original_name)
+            param_type_section = param_section.get_section('param-type')
+            self._replace_content(param_type_section)
+
+            # Replace the name for the parameter description
+            param_name_section = param_section.get_section('param-name')
+            self._replace_content(param_name_section)
+        elif event_name.startswith('docs.request-example'):
+            section = section.get_section('structure-value')
+            if self._original_name not in section.available_sections:
+                return
+            # Replace the name for the example
+            param_section = section.get_section(self._original_name)
+            self._replace_content(param_section)
+
+    def _replace_content(self, section):
+        content = section.getvalue().decode('utf-8')
+        updated_content = content.replace(
+            self._original_name, self._alias_name)
+        section.clear_text()
+        section.write(updated_content)
+
+
 # This is a list of (event_name, handler).
 # When a Session is created, everything in this list will be
 # automatically registered with that Session.
 
 BUILTIN_HANDLERS = [
+    ('before-parameter-build.s3.UploadPart',
+     convert_body_to_file_like_object, REGISTER_LAST),
+    ('before-parameter-build.s3.PutObject',
+     convert_body_to_file_like_object, REGISTER_LAST),
     ('creating-client-class', add_generate_presigned_url),
     ('creating-client-class.s3', add_generate_presigned_post),
     ('creating-client-class.iot-data', check_openssl_supports_tls_version_1_2),
@@ -713,9 +808,10 @@ BUILTIN_HANDLERS = [
      document_glacier_tree_hash_checksum()),
 
     # UserData base64 encoding documentation customizations
-    ('docs.*.ec2.RunInstances.complete-section', document_base64_encoding()),
+    ('docs.*.ec2.RunInstances.complete-section',
+     document_base64_encoding('UserData')),
     ('docs.*.autoscaling.CreateLaunchConfiguration.complete-section',
-     document_base64_encoding()),
+     document_base64_encoding('UserData')),
     # EC2 CopySnapshot documentation customizations
     ('docs.*.ec2.CopySnapshot.complete-section',
      AutoPopulatedParam('PresignedUrl').document_auto_populated_param),
@@ -728,6 +824,9 @@ BUILTIN_HANDLERS = [
     ('docs.*.s3.*.complete-section',
      AutoPopulatedParam(
         'CopySourceSSECustomerKeyMD5').document_auto_populated_param),
+    # Add base64 information to Lambda
+    ('docs.*.lambda.UpdateFunctionCode.complete-section',
+     document_base64_encoding('ZipFile')),
     # The following S3 operations cannot actually accept a ContentMD5
     ('docs.*.s3.*.complete-section',
      HideParamFromOperations(
@@ -738,3 +837,4 @@ BUILTIN_HANDLERS = [
           'PutBucketTagging', 'PutBucketVersioning', 'PutBucketWebsite',
           'PutObjectAcl']).hide_param)
 ]
+_add_parameter_aliases(BUILTIN_HANDLERS)

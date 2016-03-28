@@ -11,18 +11,25 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from tests import BaseSessionTest
+from tests import unittest, BaseSessionTest
 
 import base64
 import mock
 import copy
+import os
 
 import botocore
 import botocore.session
-from botocore.exceptions import ParamValidationError
+from botocore.exceptions import ParamValidationError, MD5UnavailableError
+from botocore.exceptions import AliasConflictParameterError
 from botocore.awsrequest import AWSRequest
 from botocore.compat import quote, six
+from botocore.docs.bcdoc.restdoc import DocumentStructure
+from botocore.docs.params import RequestParamsDocumenter
+from botocore.docs.example import RequestExampleDocumenter
+from botocore.hooks import HierarchicalEmitter
 from botocore.model import OperationModel, ServiceModel
+from botocore.model import DenormalizedStructureBuilder
 from botocore.signers import RequestSigner
 from botocore.credentials import Credentials
 from botocore import handlers
@@ -198,45 +205,6 @@ class TestHandlers(BaseSessionTest):
         # object is None.  We need to handle this case.
         handlers.check_for_200_error(None)
 
-    def test_sse_params(self):
-        for op in ('HeadObject', 'GetObject', 'PutObject', 'CopyObject',
-                   'CreateMultipartUpload', 'UploadPart', 'UploadPartCopy'):
-            event = 'before-parameter-build.s3.%s' % op
-            params = {'SSECustomerKey': b'bar',
-                      'SSECustomerAlgorithm': 'AES256'}
-            self.session.emit(event, params=params, model=mock.Mock())
-            self.assertEqual(params['SSECustomerKey'], 'YmFy')
-            self.assertEqual(params['SSECustomerKeyMD5'],
-                             'N7UdGUp1E+RbVvZSTy1R8g==')
-
-    def test_sse_params_as_str(self):
-        event = 'before-parameter-build.s3.PutObject'
-        params = {'SSECustomerKey': 'bar',
-                  'SSECustomerAlgorithm': 'AES256'}
-        self.session.emit(event, params=params, model=mock.Mock())
-        self.assertEqual(params['SSECustomerKey'], 'YmFy')
-        self.assertEqual(params['SSECustomerKeyMD5'],
-                         'N7UdGUp1E+RbVvZSTy1R8g==')
-
-    def test_copy_source_sse_params(self):
-        for op in ['CopyObject', 'UploadPartCopy']:
-            event = 'before-parameter-build.s3.%s' % op
-            params = {'CopySourceSSECustomerKey': b'bar',
-                      'CopySourceSSECustomerAlgorithm': 'AES256'}
-            self.session.emit(event, params=params, model=mock.Mock())
-            self.assertEqual(params['CopySourceSSECustomerKey'], 'YmFy')
-            self.assertEqual(params['CopySourceSSECustomerKeyMD5'],
-                             'N7UdGUp1E+RbVvZSTy1R8g==')
-
-    def test_copy_source_sse_params_as_str(self):
-        event = 'before-parameter-build.s3.CopyObject'
-        params = {'CopySourceSSECustomerKey': 'bar',
-                  'CopySourceSSECustomerAlgorithm': 'AES256'}
-        self.session.emit(event, params=params, model=mock.Mock())
-        self.assertEqual(params['CopySourceSSECustomerKey'], 'YmFy')
-        self.assertEqual(params['CopySourceSSECustomerKeyMD5'],
-                         'N7UdGUp1E+RbVvZSTy1R8g==')
-
     def test_route53_resource_id(self):
         event = 'before-parameter-build.route53.GetHostedZone'
         params = {'Id': '/hostedzone/ABC123',
@@ -313,10 +281,9 @@ class TestHandlers(BaseSessionTest):
     def test_run_instances_userdata(self):
         user_data = 'This is a test'
         b64_user_data = base64.b64encode(six.b(user_data)).decode('utf-8')
-        event = 'before-parameter-build.ec2.RunInstances'
         params = dict(ImageId='img-12345678',
                       MinCount=1, MaxCount=5, UserData=user_data)
-        self.session.emit(event, params=params)
+        handlers.base64_encode_user_data(params=params)
         result = {'ImageId': 'img-12345678',
                   'MinCount': 1,
                   'MaxCount': 5,
@@ -329,10 +296,9 @@ class TestHandlers(BaseSessionTest):
         # user data.
         user_data = b'\xc7\xa9This is a test'
         b64_user_data = base64.b64encode(user_data).decode('utf-8')
-        event = 'before-parameter-build.ec2.RunInstances'
         params = dict(ImageId='img-12345678',
                       MinCount=1, MaxCount=5, UserData=user_data)
-        self.session.emit(event, params=params)
+        handlers.base64_encode_user_data(params=params)
         result = {'ImageId': 'img-12345678',
                   'MinCount': 1,
                   'MaxCount': 5,
@@ -508,48 +474,7 @@ class TestHandlers(BaseSessionTest):
         handlers.switch_host_with_param(request, 'PredictEndpoint')
         self.assertEqual(request.url, new_endpoint)
 
-    def test_does_not_add_md5_when_v4(self):
-        credentials = Credentials('key', 'secret')
-        request_signer = RequestSigner(
-            's3', 'us-east-1', 's3', 'v4', credentials, mock.Mock())
-        request_dict = {'body': b'bar',
-                        'url': 'https://s3.us-east-1.amazonaws.com',
-                        'method': 'PUT',
-                        'headers': {}}
-        handlers.conditionally_calculate_md5(request_dict,
-                                             request_signer=request_signer)
-        self.assertTrue('Content-MD5' not in request_dict['headers'])
 
-    def test_adds_md5_when_not_v4(self):
-        credentials = Credentials('key', 'secret')
-        request_signer = RequestSigner(
-            's3', 'us-east-1', 's3', 's3', credentials, mock.Mock())
-        request_dict = {'body': b'bar',
-                        'url': 'https://s3.us-east-1.amazonaws.com',
-                        'method': 'PUT',
-                        'headers': {}}
-        handlers.conditionally_calculate_md5(request_dict,
-                                             request_signer=request_signer)
-        self.assertTrue('Content-MD5' in request_dict['headers'])
-
-    def test_adds_md5_with_file_like_body(self):
-        request_dict = {
-            'body': six.BytesIO(b'foobar'),
-            'headers': {}
-        }
-        handlers.calculate_md5(request_dict)
-        self.assertEqual(request_dict['headers']['Content-MD5'],
-                         'OFj2IjCsPJFfMAxmQxLGPw==')
-
-    def test_adds_md5_with_bytes_object(self):
-        request_dict = {
-            'body': b'foobar',
-            'headers': {}
-        }
-        handlers.calculate_md5(request_dict)
-        self.assertEqual(
-            request_dict['headers']['Content-MD5'],
-            'OFj2IjCsPJFfMAxmQxLGPw==')
 
     def test_invalid_char_in_bucket_raises_exception(self):
         params = {
@@ -658,6 +583,37 @@ class TestHandlers(BaseSessionTest):
         self.assertEqual(parsed['Delimiter'], u'\xe7\xf6s% asd\x08 c')
 
 
+class TestConvertStringBodyToFileLikeObject(BaseSessionTest):
+    def assert_converts_to_file_like_object_with_bytes(self, body, body_bytes):
+        params = {'Body': body}
+        handlers.convert_body_to_file_like_object(params)
+        self.assertTrue(hasattr(params['Body'], 'read'))
+        contents = params['Body'].read()
+        self.assertIsInstance(contents, six.binary_type)
+        self.assertEqual(contents, body_bytes)
+
+    def test_string(self):
+        self.assert_converts_to_file_like_object_with_bytes('foo', b'foo')
+
+    def test_binary(self):
+        body = os.urandom(500)
+        body_bytes = body
+        self.assert_converts_to_file_like_object_with_bytes(body, body_bytes)
+
+    def test_file(self):
+        body = six.StringIO()
+        params = {'Body': body}
+        handlers.convert_body_to_file_like_object(params)
+        self.assertEqual(params['Body'], body)
+
+    def test_unicode(self):
+        self.assert_converts_to_file_like_object_with_bytes(u'bar', b'bar')
+
+    def test_non_ascii_characters(self):
+        self.assert_converts_to_file_like_object_with_bytes(
+            u'\u2713', b'\xe2\x9c\x93')
+
+
 class TestRetryHandlerOrder(BaseSessionTest):
     def get_handler_names(self, responses):
         names = []
@@ -691,3 +647,247 @@ class TestRetryHandlerOrder(BaseSessionTest):
         self.assertTrue(s3_200_handler < general_retry_handler,
                         "S3 200 error handler was supposed to be before "
                         "the general retry handler, but it was not.")
+
+
+class BaseMD5Test(BaseSessionTest):
+    def setUp(self, **environ):
+        super(BaseMD5Test, self).setUp(**environ)
+        self.md5_object = mock.Mock()
+        self.md5_digest = mock.Mock(return_value=b'foo')
+        self.md5_object.digest = self.md5_digest
+        md5_builder = mock.Mock(return_value=self.md5_object)
+        self.md5_patch = mock.patch('hashlib.md5', md5_builder)
+        self.md5_patch.start()
+        self._md5_available_patch = None
+        self.set_md5_available()
+
+    def tearDown(self):
+        super(BaseMD5Test, self).tearDown()
+        self.md5_patch.stop()
+        if self._md5_available_patch:
+            self._md5_available_patch.stop()
+
+    def set_md5_available(self, is_available=True):
+        if self._md5_available_patch:
+            self._md5_available_patch.stop()
+
+        self._md5_available_patch = \
+            mock.patch('botocore.compat.MD5_AVAILABLE', is_available)
+        self._md5_available_patch.start()
+
+
+class TestSSEMD5(BaseMD5Test):
+    def test_raises_error_when_md5_unavailable(self):
+        self.set_md5_available(False)
+
+        with self.assertRaises(MD5UnavailableError):
+            handlers.sse_md5({'SSECustomerKey': b'foo'})
+
+        with self.assertRaises(MD5UnavailableError):
+            handlers.copy_source_sse_md5({'CopySourceSSECustomerKey': b'foo'})
+
+    def test_sse_params(self):
+        for op in ('HeadObject', 'GetObject', 'PutObject', 'CopyObject',
+                   'CreateMultipartUpload', 'UploadPart', 'UploadPartCopy'):
+            event = 'before-parameter-build.s3.%s' % op
+            params = {'SSECustomerKey': b'bar',
+                      'SSECustomerAlgorithm': 'AES256'}
+            self.session.emit(event, params=params, model=mock.Mock())
+            self.assertEqual(params['SSECustomerKey'], 'YmFy')
+            self.assertEqual(params['SSECustomerKeyMD5'], 'Zm9v')
+
+    def test_sse_params_as_str(self):
+        event = 'before-parameter-build.s3.PutObject'
+        params = {'SSECustomerKey': 'bar',
+                  'SSECustomerAlgorithm': 'AES256'}
+        self.session.emit(event, params=params, model=mock.Mock())
+        self.assertEqual(params['SSECustomerKey'], 'YmFy')
+        self.assertEqual(params['SSECustomerKeyMD5'], 'Zm9v')
+
+    def test_copy_source_sse_params(self):
+        for op in ['CopyObject', 'UploadPartCopy']:
+            event = 'before-parameter-build.s3.%s' % op
+            params = {'CopySourceSSECustomerKey': b'bar',
+                      'CopySourceSSECustomerAlgorithm': 'AES256'}
+            self.session.emit(event, params=params, model=mock.Mock())
+            self.assertEqual(params['CopySourceSSECustomerKey'], 'YmFy')
+            self.assertEqual(params['CopySourceSSECustomerKeyMD5'], 'Zm9v')
+
+    def test_copy_source_sse_params_as_str(self):
+        event = 'before-parameter-build.s3.CopyObject'
+        params = {'CopySourceSSECustomerKey': 'bar',
+                  'CopySourceSSECustomerAlgorithm': 'AES256'}
+        self.session.emit(event, params=params, model=mock.Mock())
+        self.assertEqual(params['CopySourceSSECustomerKey'], 'YmFy')
+        self.assertEqual(params['CopySourceSSECustomerKeyMD5'], 'Zm9v')
+
+
+class TestAddMD5(BaseMD5Test):
+    def test_does_not_add_md5_when_v4(self):
+        credentials = Credentials('key', 'secret')
+        request_signer = RequestSigner(
+            's3', 'us-east-1', 's3', 'v4', credentials, mock.Mock())
+        request_dict = {'body': b'bar',
+                        'url': 'https://s3.us-east-1.amazonaws.com',
+                        'method': 'PUT',
+                        'headers': {}}
+        handlers.conditionally_calculate_md5(request_dict,
+                                             request_signer=request_signer)
+        self.assertTrue('Content-MD5' not in request_dict['headers'])
+
+    def test_does_not_add_md5_when_s3v4(self):
+        credentials = Credentials('key', 'secret')
+        request_signer = RequestSigner(
+            's3', 'us-east-1', 's3', 's3v4', credentials, mock.Mock())
+        request_dict = {'body': b'bar',
+                        'url': 'https://s3.us-east-1.amazonaws.com',
+                        'method': 'PUT',
+                        'headers': {}}
+        handlers.conditionally_calculate_md5(request_dict,
+                                             request_signer=request_signer)
+        self.assertTrue('Content-MD5' not in request_dict['headers'])
+
+    def test_conditional_does_not_add_when_md5_unavailable(self):
+        credentials = Credentials('key', 'secret')
+        request_signer = RequestSigner(
+            's3', 'us-east-1', 's3', 's3', credentials, mock.Mock())
+        request_dict = {'body': b'bar',
+                        'url': 'https://s3.us-east-1.amazonaws.com',
+                        'method': 'PUT',
+                        'headers': {}}
+
+        self.set_md5_available(False)
+        with mock.patch('botocore.handlers.MD5_AVAILABLE', False):
+            handlers.conditionally_calculate_md5(
+                request_dict, request_signer=request_signer)
+            self.assertFalse('Content-MD5' in request_dict['headers'])
+
+    def test_add_md5_raises_error_when_md5_unavailable(self):
+        credentials = Credentials('key', 'secret')
+        request_signer = RequestSigner(
+            's3', 'us-east-1', 's3', 's3', credentials, mock.Mock())
+        request_dict = {'body': b'bar',
+                        'url': 'https://s3.us-east-1.amazonaws.com',
+                        'method': 'PUT',
+                        'headers': {}}
+
+        self.set_md5_available(False)
+        with self.assertRaises(MD5UnavailableError):
+            handlers.calculate_md5(
+                request_dict, request_signer=request_signer)
+
+    def test_adds_md5_when_not_v4(self):
+        credentials = Credentials('key', 'secret')
+        request_signer = RequestSigner(
+            's3', 'us-east-1', 's3', 's3', credentials, mock.Mock())
+        request_dict = {'body': b'bar',
+                        'url': 'https://s3.us-east-1.amazonaws.com',
+                        'method': 'PUT',
+                        'headers': {}}
+        handlers.conditionally_calculate_md5(request_dict,
+                                             request_signer=request_signer)
+        self.assertTrue('Content-MD5' in request_dict['headers'])
+
+    def test_add_md5_with_file_like_body(self):
+        request_dict = {
+            'body': six.BytesIO(b'foobar'),
+            'headers': {}
+        }
+        self.md5_digest.return_value = b'8X\xf6"0\xac<\x91_0\x0cfC\x12\xc6?'
+        handlers.calculate_md5(request_dict)
+        self.assertEqual(request_dict['headers']['Content-MD5'],
+                         'OFj2IjCsPJFfMAxmQxLGPw==')
+
+    def test_add_md5_with_bytes_object(self):
+        request_dict = {
+            'body': b'foobar',
+            'headers': {}
+        }
+        self.md5_digest.return_value = b'8X\xf6"0\xac<\x91_0\x0cfC\x12\xc6?'
+        handlers.calculate_md5(request_dict)
+        self.assertEqual(
+            request_dict['headers']['Content-MD5'],
+            'OFj2IjCsPJFfMAxmQxLGPw==')
+
+
+class TestParameterAlias(unittest.TestCase):
+    def setUp(self):
+        self.original_name = 'original'
+        self.alias_name = 'alias'
+        self.parameter_alias = handlers.ParameterAlias(
+            self.original_name, self.alias_name)
+
+        self.operation_model = mock.Mock()
+        request_shape = DenormalizedStructureBuilder().with_members(
+            {self.original_name: {'type': 'string'}}).build_model()
+        self.operation_model.input_shape = request_shape
+        self.sample_section = DocumentStructure('')
+        self.event_emitter = HierarchicalEmitter()
+
+    def test_alias_parameter_in_call(self):
+        value = 'value'
+        params = {self.alias_name: value}
+        self.parameter_alias.alias_parameter_in_call(
+            params, self.operation_model)
+        self.assertEqual(params, {self.original_name: value})
+
+    def test_alias_parameter_and_original_in_call(self):
+        params = {
+            self.original_name: 'orginal_value',
+            self.alias_name: 'alias_value'
+        }
+        with self.assertRaises(AliasConflictParameterError):
+            self.parameter_alias.alias_parameter_in_call(
+                params, self.operation_model)
+
+    def test_alias_parameter_in_call_does_not_touch_original(self):
+        value = 'value'
+        params = {self.original_name: value}
+        self.parameter_alias.alias_parameter_in_call(
+            params, self.operation_model)
+        self.assertEqual(params, {self.original_name: value})
+
+    def test_does_not_alias_parameter_for_no_input_shape(self):
+        value = 'value'
+        params = {self.alias_name: value}
+        self.operation_model.input_shape = None
+        self.parameter_alias.alias_parameter_in_call(
+            params, self.operation_model)
+        self.assertEqual(params, {self.alias_name: value})
+
+    def test_does_not_alias_parameter_for_not_modeled_member(self):
+        value = 'value'
+        params = {self.alias_name: value}
+
+        request_shape = DenormalizedStructureBuilder().with_members(
+            {'foo': {'type': 'string'}}).build_model()
+        self.operation_model.input_shape = request_shape
+        self.parameter_alias.alias_parameter_in_call(
+            params, self.operation_model)
+        self.assertEqual(params, {self.alias_name: value})
+
+    def test_alias_parameter_in_documentation_request_params(self):
+        RequestParamsDocumenter(
+            'myservice', 'myoperation', self.event_emitter).document_params(
+                self.sample_section, self.operation_model.input_shape)
+        self.parameter_alias.alias_parameter_in_documentation(
+            'docs.request-params.myservice.myoperation.complete-section',
+            self.sample_section
+        )
+        contents = self.sample_section.flush_structure().decode('utf-8')
+        self.assertIn(':type ' + self.alias_name + ':',  contents)
+        self.assertIn(':param ' + self.alias_name + ':',  contents)
+        self.assertNotIn(':type ' + self.original_name + ':',  contents)
+        self.assertNotIn(':param ' + self.original_name + ':',  contents)
+
+    def test_alias_parameter_in_documentation_request_example(self):
+        RequestExampleDocumenter(
+            'myservice', 'myoperation', self.event_emitter).document_example(
+                self.sample_section, self.operation_model.input_shape)
+        self.parameter_alias.alias_parameter_in_documentation(
+            'docs.request-example.myservice.myoperation.complete-section',
+            self.sample_section
+        )
+        contents = self.sample_section.flush_structure().decode('utf-8')
+        self.assertIn(self.alias_name + '=',  contents)
+        self.assertNotIn(self.original_name + '=', contents)
