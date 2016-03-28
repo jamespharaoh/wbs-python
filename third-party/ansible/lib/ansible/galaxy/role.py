@@ -130,11 +130,13 @@ class GalaxyRole(object):
             install_date=datetime.datetime.utcnow().strftime("%c"),
         )
         info_path = os.path.join(self.path, self.META_INSTALL)
-        with open(info_path, 'w+') as f:
-            try:
-                self._install_info = yaml.safe_dump(info, f)
-            except:
-                return False
+        try:
+            f = open(info_path, 'w+')
+            self._install_info = yaml.safe_dump(info, f)
+        except:
+            return False
+        finally:
+            f.close()
 
         return True
 

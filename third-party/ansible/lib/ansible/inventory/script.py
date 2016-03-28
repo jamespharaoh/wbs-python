@@ -31,7 +31,7 @@ from ansible.errors import AnsibleError
 from ansible.inventory.host import Host
 from ansible.inventory.group import Group
 from ansible.module_utils.basic import json_dict_bytes_to_unicode
-from ansible.utils.unicode import to_str, to_unicode
+from ansible.utils.unicode import to_str
 
 
 class InventoryScript:
@@ -58,13 +58,7 @@ class InventoryScript:
         if sp.returncode != 0:
             raise AnsibleError("Inventory script (%s) had an execution error: %s " % (filename,stderr))
 
-        # make sure script output is unicode so that json loader will output
-        # unicode strings itself
-        try:
-            self.data = to_unicode(stdout, errors="strict")
-        except Exception as e:
-            raise AnsibleError("inventory data from {0} contained characters that cannot be interpreted as UTF-8: {1}".format(to_str(self.filename), to_str(e)))
-
+        self.data = stdout
         # see comment about _meta below
         self.host_vars_from_top = None
         self._parse(stderr)
@@ -83,6 +77,8 @@ class InventoryScript:
         if not isinstance(self.raw, Mapping):
             sys.stderr.write(err + "\n")
             raise AnsibleError("failed to parse executable inventory script results from {0}: data needs to be formatted as a json dict".format(to_str(self.filename)))
+
+        self.raw  = json_dict_bytes_to_unicode(self.raw)
 
         group = None
         for (group_name, data) in self.raw.items():
@@ -107,7 +103,7 @@ class InventoryScript:
             if not isinstance(data, dict):
                 data = {'hosts': data}
             # is not those subkeys, then simplified syntax, host with vars
-            elif not any(k in data for k in ('hosts','vars','children')):
+            elif not any(k in data for k in ('hosts','vars')):
                 data = {'hosts': [group_name], 'vars': data}
 
             if 'hosts' in data:
@@ -149,10 +145,7 @@ class InventoryScript:
     def get_host_variables(self, host):
         """ Runs <script> --host <hostname> to determine additional host variables """
         if self.host_vars_from_top is not None:
-            try:
-                got = self.host_vars_from_top.get(host.name, {})
-            except AttributeError as e:
-                raise AnsibleError("Improperly formated host information for %s: %s" % (host.name,to_str(e)))
+            got = self.host_vars_from_top.get(host.name, {})
             return got
 
         cmd = [self.filename, "--host", host.name]

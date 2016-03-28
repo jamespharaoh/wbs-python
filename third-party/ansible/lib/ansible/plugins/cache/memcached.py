@@ -21,7 +21,7 @@ import collections
 import os
 import sys
 import time
-from multiprocessing import Lock
+import threading
 from itertools import chain
 
 from ansible import constants as C
@@ -53,7 +53,7 @@ class ProxyClientPool(object):
         self._num_connections = 0
         self._available_connections = collections.deque(maxlen=self.max_connections)
         self._locked_connections = set()
-        self._lock = Lock()
+        self._lock = threading.Lock()
 
     def _check_safe(self):
         if self.pid != os.getpid():

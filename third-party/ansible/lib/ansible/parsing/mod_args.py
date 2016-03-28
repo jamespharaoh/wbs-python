@@ -222,21 +222,18 @@ class ModuleArgsParser:
         action = None
         args = None
 
-        actions_allowing_raw = ('command', 'shell', 'script', 'raw')
         if isinstance(thing, dict):
             # form is like:  copy: { src: 'a', dest: 'b' } ... common for structured (aka "complex") args
             thing = thing.copy()
             if 'module' in thing:
-                action, module_args = self._split_module_string(thing['module'])
+                action = thing['module']
                 args = thing.copy()
-                check_raw = action in actions_allowing_raw
-                args.update(parse_kv(module_args, check_raw=check_raw))
                 del args['module']
 
         elif isinstance(thing, string_types):
             # form is like:  copy: src=a dest=b ... common shorthand throughout ansible
             (action, args) = self._split_module_string(thing)
-            check_raw = action in actions_allowing_raw
+            check_raw = action in ('command', 'shell', 'script', 'raw')
             args = parse_kv(args, check_raw=check_raw)
 
         else:
@@ -287,7 +284,7 @@ class ModuleArgsParser:
             if item in module_loader or item == 'meta' or item == 'include':
                 # finding more than one module name is a problem
                 if action is not None:
-                    raise AnsibleParserError("conflicting action statements (%s, %s)" % (action, item), obj=self._task_ds)
+                    raise AnsibleParserError("conflicting action statements", obj=self._task_ds)
                 action = item
                 thing = value
                 action, args = self._normalize_parameters(value, action=action, additional_args=additional_args)
@@ -301,7 +298,7 @@ class ModuleArgsParser:
                         obj=self._task_ds)
 
             else:
-                raise AnsibleParserError("no action detected in task. This often indicates a misspelled module name, or incorrect module path.", obj=self._task_ds)
+                raise AnsibleParserError("no action detected in task", obj=self._task_ds)
         elif args.get('_raw_params', '') != '' and action not in RAW_PARAM_MODULES:
             templar = Templar(loader=None)
             raw_params = args.pop('_raw_params')

@@ -25,7 +25,6 @@ from ansible.errors import AnsibleParserError
 from ansible.playbook.play import Play
 from ansible.playbook.playbook_include import PlaybookInclude
 from ansible.plugins import get_all_plugin_loaders
-from ansible import constants as C
 
 try:
     from __main__ import display
@@ -88,7 +87,7 @@ class Playbook:
                 if pb is not None:
                     self._entries.extend(pb._entries)
                 else:
-                    display.display("skipping playbook include '%s' due to conditional test failure" % entry.get('include', entry), color=C.COLOR_SKIP)
+                    display.display("skipping playbook include '%s' due to conditional test failure" % entry.get('include', entry), color='cyan')
             else:
                 entry_obj = Play.load(entry, variable_manager=variable_manager, loader=self._loader)
                 self._entries.append(entry_obj)

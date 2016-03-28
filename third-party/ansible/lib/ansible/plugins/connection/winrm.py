@@ -61,10 +61,8 @@ except ImportError:
 class Connection(ConnectionBase):
     '''WinRM connections over HTTP/HTTPS.'''
 
-    transport = 'winrm'
     module_implementation_preferences = ('.ps1', '')
     become_methods = []
-    allow_executable = False
 
     def __init__(self,  *args, **kwargs):
 
@@ -77,6 +75,11 @@ class Connection(ConnectionBase):
         # TODO: Add runas support
 
         super(Connection, self).__init__(*args, **kwargs)
+
+    @property
+    def transport(self):
+        ''' used to identify this connection object from other classes '''
+        return 'winrm'
 
     def set_host_overrides(self, host):
         '''
@@ -134,20 +137,20 @@ class Connection(ConnectionBase):
                 protocol.send_message('')
                 return protocol
             except Exception as e:
-                err_msg = to_unicode(e).strip()
-                if re.search(to_unicode(r'Operation\s+?timed\s+?out'), err_msg, re.I):
+                err_msg = (str(e) or repr(e)).strip()
+                if re.search(r'Operation\s+?timed\s+?out', err_msg, re.I):
                     raise AnsibleError('the connection attempt timed out')
-                m = re.search(to_unicode(r'Code\s+?(\d{3})'), err_msg)
+                m = re.search(r'Code\s+?(\d{3})', err_msg)
                 if m:
                     code = int(m.groups()[0])
                     if code == 401:
                         err_msg = 'the username/password specified for this server was incorrect'
                     elif code == 411:
                         return protocol
-                errors.append(u'%s: %s' % (transport, err_msg))
-                display.vvvvv(u'WINRM CONNECTION ERROR: %s\n%s' % (err_msg, to_unicode(traceback.format_exc())), host=self._winrm_host)
+                errors.append('%s: %s' % (transport, err_msg))
+                display.vvvvv('WINRM CONNECTION ERROR: %s\n%s' % (err_msg, traceback.format_exc()), host=self._winrm_host)
         if errors:
-            raise AnsibleError(', '.join(map(to_str, errors)))
+            raise AnsibleError(', '.join(errors))
         else:
             raise AnsibleError('No transport found for WinRM connection')
 
@@ -268,9 +271,9 @@ class Connection(ConnectionBase):
         if not os.path.exists(in_path):
             raise AnsibleFileNotFound('file or module does not exist: "%s"' % in_path)
 
-        script_template = u'''
+        script_template = '''
             begin {{
-                $path = '{0}'
+                $path = "{0}"
 
                 $DebugPreference = "Continue"
                 $ErrorActionPreference = "Stop"

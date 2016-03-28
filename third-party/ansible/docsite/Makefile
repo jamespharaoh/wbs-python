@@ -20,8 +20,6 @@ viewdocs: clean staticmin
 htmldocs: staticmin
 	./build-site.py rst
 
-webdocs: htmldocs
-
 clean:
 	-rm -rf htmlout
 	-rm -f .buildinfo

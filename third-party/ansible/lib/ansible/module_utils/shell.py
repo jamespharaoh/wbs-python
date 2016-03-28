@@ -19,11 +19,7 @@
 import re
 import socket
 
-# py2 vs py3; replace with six via ziploader
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from StringIO import StringIO
 
 try:
     import paramiko
@@ -101,7 +97,6 @@ class Shell(object):
 
         self.shell = self.ssh.invoke_shell()
         self.shell.settimeout(10)
-        self.shell.sendall("\n")
         self.receive()
 
     def strip(self, data):
