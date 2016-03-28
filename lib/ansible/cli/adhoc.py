@@ -32,7 +32,6 @@ from ansible.parsing.splitter import parse_kv
 from ansible.playbook.play import Play
 from ansible.plugins import get_all_plugin_loaders
 from ansible.utils.vars import load_extra_vars
-from ansible.utils.unicode import to_unicode
 from ansible.vars import VariableManager
 
 try:
@@ -82,12 +81,11 @@ class AdHocCLI(CLI):
         return True
 
     def _play_ds(self, pattern, async, poll):
-        check_raw = self.options.module_name in ('command', 'shell', 'script', 'raw')
         return dict(
             name = "Ansible Ad-Hoc",
             hosts = pattern,
             gather_facts = 'no',
-            tasks = [ dict(action=dict(module=self.options.module_name, args=parse_kv(self.options.module_args, check_raw=check_raw)), async=async, poll=poll) ]
+            tasks = [ dict(action=dict(module=self.options.module_name, args=parse_kv(self.options.module_args)), async=async, poll=poll) ]
         )
 
     def run(self):
@@ -96,7 +94,7 @@ class AdHocCLI(CLI):
         super(AdHocCLI, self).run()
 
         # only thing left should be host pattern
-        pattern = to_unicode(self.args[0], errors='strict')
+        pattern = self.args[0]
 
         # ignore connection password cause we are local
         if self.options.connection == "local":
@@ -126,17 +124,17 @@ class AdHocCLI(CLI):
         inventory = Inventory(loader=loader, variable_manager=variable_manager, host_list=self.options.inventory)
         variable_manager.set_inventory(inventory)
 
+        hosts = inventory.list_hosts(pattern)
         no_hosts = False
-        if len(inventory.list_hosts(pattern)) == 0:
-            # Empty inventory
+        if len(hosts) == 0:
             display.warning("provided hosts list is empty, only localhost is available")
             no_hosts = True
 
-        inventory.subset(self.options.subset)
-        hosts = inventory.list_hosts(pattern)
-        if len(hosts) == 0 and no_hosts is False:
-            # Invalid limit
-            raise AnsibleError("Specified --limit does not match any hosts")
+        if self.options.subset:
+            inventory.subset(self.options.subset)
+            if len(inventory.list_hosts(pattern)) == 0 and not no_hosts:
+                # Invalid limit
+                raise AnsibleError("Specified --limit does not match any hosts")
 
         if self.options.listhosts:
             display.display('  hosts (%d):' % len(hosts))
@@ -186,7 +184,6 @@ class AdHocCLI(CLI):
                     run_additional_callbacks=C.DEFAULT_LOAD_CALLBACK_PLUGINS,
                     run_tree=run_tree,
                 )
-
             result = self._tqm.run(play)
         finally:
             if self._tqm:

@@ -171,7 +171,7 @@ class LookupModule(LookupBase):
                 else:
                     total_search.append(term)
         else:
-            total_search = self._flatten(terms)
+            total_search = terms
 
         roledir = variables.get('roledir')
         for fn in total_search:

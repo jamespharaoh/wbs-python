@@ -34,12 +34,7 @@ import datetime
 import getpass
 import pwd
 import ConfigParser
-
-# py2 vs py3; replace with six via ziploader
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+import StringIO
 
 from string import maketrans
 
@@ -124,7 +119,6 @@ class Facts(object):
                     ('/etc/gentoo-release', 'Gentoo'),
                     ('/etc/os-release', 'Debian'),
                     ('/etc/lsb-release', 'Mandriva'),
-                    ('/etc/altlinux-release', 'Altlinux'),
                     ('/etc/os-release', 'NA'),
                 )
     SELINUX_MODE_DICT = { 1: 'enforcing', 0: 'permissive', -1: 'disabled' }
@@ -247,7 +241,7 @@ class Facts(object):
                 # load raw ini
                 cp = ConfigParser.ConfigParser()
                 try:
-                    cp.readfp(StringIO(out))
+                    cp.readfp(StringIO.StringIO(out))
                 except ConfigParser.Error:
                     fact = "error loading fact - please check content"
                 else:
@@ -276,10 +270,10 @@ class Facts(object):
             OracleLinux = 'RedHat', OVS = 'RedHat', OEL = 'RedHat', Amazon = 'RedHat',
             XenServer = 'RedHat', Ubuntu = 'Debian', Debian = 'Debian', Raspbian = 'Debian', Slackware = 'Slackware', SLES = 'Suse',
             SLED = 'Suse', openSUSE = 'Suse', SuSE = 'Suse', SLES_SAP = 'Suse', Gentoo = 'Gentoo', Funtoo = 'Gentoo',
-            Archlinux = 'Archlinux', Manjaro = 'Archlinux', Mandriva = 'Mandrake', Mandrake = 'Mandrake', Altlinux = 'Altlinux',
+            Archlinux = 'Archlinux', Manjaro = 'Archlinux', Mandriva = 'Mandrake', Mandrake = 'Mandrake',
             Solaris = 'Solaris', Nexenta = 'Solaris', OmniOS = 'Solaris', OpenIndiana = 'Solaris',
             SmartOS = 'Solaris', AIX = 'AIX', Alpine = 'Alpine', MacOSX = 'Darwin',
-            FreeBSD = 'FreeBSD', HPUX = 'HP-UX', openSUSE_Leap = 'Suse'
+            FreeBSD = 'FreeBSD', HPUX = 'HP-UX'
         )
 
         # TODO: Rewrite this to use the function references in a dict pattern
@@ -329,7 +323,7 @@ class Facts(object):
             for (path, name) in Facts.OSDIST_LIST:
                 if os.path.exists(path):
                     if os.path.getsize(path) > 0:
-                        if self.facts['distribution'] in ('Fedora', 'Altlinux', ):
+                        if self.facts['distribution'] in ('Fedora', ):
                             # Once we determine the value is one of these distros
                             # we trust the values are always correct
                             break
@@ -358,13 +352,6 @@ class Facts(object):
                         elif name == 'RedHat':
                             data = get_file_content(path)
                             if 'Red Hat' in data:
-                                self.facts['distribution'] = name
-                            else:
-                                self.facts['distribution'] = data.split()[0]
-                            break
-                        elif name == 'Altlinux':
-                            data = get_file_content(path)
-                            if 'ALT Linux' in data:
                                 self.facts['distribution'] = name
                             else:
                                 self.facts['distribution'] = data.split()[0]
@@ -443,9 +430,9 @@ class Facts(object):
                                             release = re.search("^PRETTY_NAME=[^(]+ \(?([^)]+?)\)", line)
                                             if release:
                                                 self.facts['distribution_release'] = release.groups()[0]
-                                        elif 'enterprise' in data.lower() and 'VERSION_ID' in line:
+                                        elif 'enterprise' in data.lower():
                                              release = re.search('^VERSION_ID="?[0-9]+\.?([0-9]*)"?', line) # SLES doesn't got funny release names
-                                             if release.group(1):
+                                             if release:
                                                  release = release.group(1)
                                              else:
                                                  release = "0" # no minor number, so it is the first release
@@ -516,9 +503,8 @@ class Facts(object):
             machine_id = machine_id.split('\n')[0]
             self.facts["machine_id"] = machine_id
         self.facts['os_family'] = self.facts['distribution']
-        distro = self.facts['distribution'].replace(' ', '_')
-        if distro in OS_FAMILY:
-            self.facts['os_family'] = OS_FAMILY[distro]
+        if self.facts['distribution'] in OS_FAMILY:
+            self.facts['os_family'] = OS_FAMILY[self.facts['distribution']]
 
     def get_cmdline(self):
         data = get_file_content('/proc/cmdline')
@@ -542,8 +528,6 @@ class Facts(object):
                 keydir = '/etc/ssh'
             else:
                 keydir = '/etc'
-        if self.facts['distribution'] == 'Altlinux':
-            keydir = '/etc/openssh'
         else:
             keydir = '/etc/ssh'
 
@@ -563,21 +547,16 @@ class Facts(object):
                 self.facts['pkg_mgr'] = 'openbsd_pkg'
 
     def get_service_mgr_facts(self):
-        #TODO: detect more custom init setups like bootscripts, dmd, s6, Epoch, runit, etc
+        #TODO: detect more custom init setups like bootscripts, dmd, s6, etc
         # also other OSs other than linux might need to check across several possible candidates
 
         # try various forms of querying pid 1
         proc_1 = get_file_content('/proc/1/comm')
         if proc_1 is None:
             rc, proc_1, err = module.run_command("ps -p 1 -o comm|tail -n 1", use_unsafe_shell=True)
-        else:
-            proc_1 = os.path.basename(proc_1)
 
-        if proc_1 is not None:
-            proc_1 = proc_1.strip()
-
-        if proc_1 == 'init' or proc_1.endswith('sh'):
-            # many systems return init, so this cannot be trusted, if it ends in 'sh' it probalby is a shell in a container
+        if proc_1 in ['init', '/sbin/init', 'bash']:
+            # many systems return init, so this cannot be trusted, bash is from docker
             proc_1 = None
 
         # if not init/None it should be an identifiable or custom init, so we are done!
@@ -591,7 +570,7 @@ class Facts(object):
                 self.facts['service_mgr'] = 'launchd'
             else:
                 self.facts['service_mgr'] = 'systemstarter'
-        elif 'BSD' in self.facts['system'] or self.facts['system'] in ['Bitrig', 'DragonFly']:
+        elif self.facts['system'].endswith('BSD') or self.facts['system'] in ['Bitrig', 'DragonFly']:
             #FIXME: we might want to break out to individual BSDs
             self.facts['service_mgr'] = 'bsdinit'
         elif self.facts['system'] == 'AIX':
@@ -600,11 +579,12 @@ class Facts(object):
             #FIXME: smf?
             self.facts['service_mgr'] = 'svcs'
         elif self.facts['system'] == 'Linux':
+
             if self._check_systemd():
                 self.facts['service_mgr'] = 'systemd'
             elif module.get_bin_path('initctl') and os.path.exists("/etc/init/"):
                 self.facts['service_mgr'] = 'upstart'
-            elif os.path.realpath('/sbin/rc') == '/sbin/openrc':
+            elif module.get_bin_path('rc-service'):
                 self.facts['service_mgr'] = 'openrc'
             elif os.path.exists('/etc/init.d/'):
                 self.facts['service_mgr'] = 'sysvinit'
@@ -619,20 +599,22 @@ class Facts(object):
             rc, out, err = module.run_command([lsb_path, "-a"])
             if rc == 0:
                 self.facts['lsb'] = {}
-                for line in out.split('\n'):
-                    if len(line) < 1 or ':' not in line:
-                        continue
-                    value = line.split(':', 1)[1].strip()
-                    if 'LSB Version:' in line:
-                        self.facts['lsb']['release'] = value
-                    elif 'Distributor ID:' in line:
-                        self.facts['lsb']['id'] = value
-                    elif 'Description:' in line:
-                        self.facts['lsb']['description'] = value
-                    elif 'Release:' in line:
-                        self.facts['lsb']['release'] = value
-                    elif 'Codename:' in line:
-                        self.facts['lsb']['codename'] = value
+            for line in out.split('\n'):
+                if len(line) < 1 or ':' not in line:
+                    continue
+                value = line.split(':', 1)[1].strip()
+                if 'LSB Version:' in line:
+                    self.facts['lsb']['release'] = value
+                elif 'Distributor ID:' in line:
+                    self.facts['lsb']['id'] = value
+                elif 'Description:' in line:
+                    self.facts['lsb']['description'] = value
+                elif 'Release:' in line:
+                    self.facts['lsb']['release'] = value
+                elif 'Codename:' in line:
+                    self.facts['lsb']['codename'] = value
+            if 'lsb' in self.facts and 'release' in self.facts['lsb']:
+                self.facts['lsb']['major_release'] = self.facts['lsb']['release'].split('.')[0]
         elif lsb_path is None and os.path.exists('/etc/lsb-release'):
             self.facts['lsb'] = {}
             for line in get_file_lines('/etc/lsb-release'):
@@ -645,9 +627,12 @@ class Facts(object):
                     self.facts['lsb']['description'] = value
                 elif 'DISTRIB_CODENAME' in line:
                     self.facts['lsb']['codename'] = value
+        else:
+            return self.facts
 
         if 'lsb' in self.facts and 'release' in self.facts['lsb']:
             self.facts['lsb']['major_release'] = self.facts['lsb']['release'].split('.')[0]
+
 
     def get_selinux_facts(self):
         if not HAVE_SELINUX:
@@ -752,13 +737,11 @@ class Facts(object):
             if len(tokens) == 0:
                 continue
             if tokens[0] == 'nameserver':
-                if not 'nameservers' in self.facts['dns']:
-                    self.facts['dns']['nameservers'] = []
+                self.facts['dns']['nameservers'] = []
                 for nameserver in tokens[1:]:
                     self.facts['dns']['nameservers'].append(nameserver)
             elif tokens[0] == 'domain':
-                if len(tokens) > 1:
-                    self.facts['dns']['domain'] = tokens[1]
+                self.facts['dns']['domain'] = tokens[1]
             elif tokens[0] == 'search':
                 self.facts['dns']['search'] = []
                 for suffix in tokens[1:]:
@@ -769,13 +752,12 @@ class Facts(object):
                     self.facts['dns']['sortlist'].append(address)
             elif tokens[0] == 'options':
                 self.facts['dns']['options'] = {}
-                if len(tokens) > 1:
-                    for option in tokens[1:]:
-                        option_tokens = option.split(':', 1)
-                        if len(option_tokens) == 0:
-                            continue
-                        val = len(option_tokens) == 2 and option_tokens[1] or True
-                        self.facts['dns']['options'][option_tokens[0]] = val
+                for option in tokens[1:]:
+                    option_tokens = option.split(':', 1)
+                    if len(option_tokens) == 0:
+                        continue
+                    val = len(option_tokens) == 2 and option_tokens[1] or True
+                    self.facts['dns']['options'][option_tokens[0]] = val
 
 class Hardware(Facts):
     """
@@ -1044,7 +1026,6 @@ class LinuxHardware(Hardware):
 
     @timeout(10)
     def get_mount_facts(self):
-        uuids = dict()
         self.facts['mounts'] = []
         mtab = get_file_content('/etc/mtab', '')
         for line in mtab.split('\n'):
@@ -1060,17 +1041,13 @@ class LinuxHardware(Hardware):
                     except OSError:
                         continue
 
-                    if fields[0] in uuids:
-                        uuid = uuids[fields[0]]
-                    else:
-                        uuid = 'NA'
-                        lsblkPath = module.get_bin_path("lsblk")
-                        if lsblkPath:
-                            rc, out, err = module.run_command("%s -ln --output UUID %s" % (lsblkPath, fields[0]), use_unsafe_shell=True)
+                    uuid = 'NA'
+                    lsblkPath = module.get_bin_path("lsblk")
+                    if lsblkPath:
+                        rc, out, err = module.run_command("%s -ln --output UUID %s" % (lsblkPath, fields[0]), use_unsafe_shell=True)
 
-                            if rc == 0:
-                                uuid = out.strip()
-                                uuids[fields[0]] = uuid
+                        if rc == 0:
+                            uuid = out.strip()
 
                     self.facts['mounts'].append(
                         {'mount': fields[1],
@@ -2997,19 +2974,14 @@ def get_file_content(path, default=None, strip=True):
     data = default
     if os.path.exists(path) and os.access(path, os.R_OK):
         try:
-            try:
-                datafile = open(path)
-                data = datafile.read()
-                if strip:
-                    data = data.strip()
-                if len(data) == 0:
-                    data = default
-            finally:
-                datafile.close()
-        except:
-            # ignore errors as some jails/containers might have readable permissions but not allow reads to proc
-            # done in 2 blocks for 2.4 compat
-            pass
+            datafile = open(path)
+            data = datafile.read()
+            if strip:
+                data = data.strip()
+            if len(data) == 0:
+                data = default
+        finally:
+            datafile.close()
     return data
 
 def get_file_lines(path):

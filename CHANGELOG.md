@@ -1,6 +1,7 @@
 Ansible Changes By Release
 ==========================
 
+## 2.0 "Over the Hills and Far Away" - ACTIVE DEVELOPMENT
 ## 2.1 TBD - ACTIVE DEVELOPMENT
 
 ####New Modules:
@@ -9,86 +10,7 @@ Ansible Changes By Release
 ####New Filters:
 * extract
 
-## 2.0.2 "Over the Hills and Far Away"
-
-* Backport of the 2.1 feature to ensure per-item callbacks are sent as they occur,
-  rather than all at once at the end of the task.
-* Fixed bugs related to the iteration of tasks when certain combinations of roles,
-  blocks, and includes were used, especially when handling errors in rescue/always
-  portions of blocks.
-* Fixed handling of redirects in our helper code, and ported the uri module to use
-  this helper code. This removes the httplib dependency for this module while fixing
-  some bugs related to redirects and SSL certs.
-* Fixed some bugs related to the incorrect creation of extra temp directories for
-  uploading files, which were not cleaned up properly.
-* Improved error reporting in certain situations, to provide more information such as
-  the playbook file/line.
-* Fixed a bug related to the variable precedence of role parameters, especially when
-  a role may be used both as a dependency of a role and directly by itself within the
-  same play.
-* Fixed some bugs in the 2.0 implementation of do/until.
-* Fixed some bugs related to run_once:
-  - Ensure that all hosts are marked as failed if a task marked as run_once fails.
-  - Show a warning when using the free strategy when a run_once task is encountered, as
-    there is no way for the free strategy to guarantee the task is not run more than once.
-* Fixed a bug where the assemble module was not honoring check mode in some situations.
-* Fixed a bug related to delegate_to, where we were incorrectly using variables from
-  the inventory host rather than the delegated-to host.
-* The 'package' meta-module now properly squashes items down to a single execution (as the
-  apt/yum/other package modules do).
-* Fixed a bug related to the ansible-galaxy CLI command dealing with paged results from
-  the Galaxy server.
-* Pipelining support is now available for the local and jail connection plugins, which is
-  useful for users who do not wish to have temp files/directories created when running
-  tasks with these connection types.
-* Improvements in support for additional shell types.
-* Improvements in the code which is used to calculate checksums for remote files.
-* Some speed ups and bug fixes related to the variable merging code.
-* Workaround bug in python subprocess on El Capitan that was making vault fail
-  when attempting to encrypt a file
-
-## 2.0.1 "Over the Hills and Far Away"
-
-* Fixes a major compatibility break in the synchronize module shipped with
-  2.0.0.x.  That version of synchronize ran sudo on the controller prior to
-  running rsync.  In 1.9.x and previous, sudo was run on the host that rsync
-  connected to.  2.0.1 restores the 1.9.x behaviour.
-* Additionally, several other problems with where synchronize chose to run when
-  combined with delegate_to were fixed.  In particular, if a playbook targetted
-  localhost and then delegated_to a remote host the prior behavior (in 1.9.x
-  and 2.0.0.x) was to copy files between the src and destination directories on
-  the delegated host.  This has now been fixed to copy between localhost and
-  the delegated host.
-* Fix a regression where synchronize was unable to deal with unicode paths.
-* Fix a regression where synchronize deals with inventory hosts that use
-  localhost but with an alternate port.
-* Fixes a regression where the retry files feature was not implemented.
-* Fixes a regression where the any_errors_fatal option was implemented in 2.0
-  incorrectly, and also adds a feature where any_errors_fatal can be set at
-  the block level.
-* Fix tracebacks when playbooks or ansible itself were located in directories
-  with unicode characters.
-* Fix bug when sending unicode characters to an external pager for display.
-* Fix a bug with squashing loops for special modules (mostly package managers).
-  The optimization was squashing when the loop did not apply to the selection
-  of packages.  This has now been fixed.
-* Temp files created when using vault are now "shredded" using the unix shred
-  program which overwrites the file with random data.
-* Some fixes to cloudstack modules for case sensitivity
-* Fix non-newstyle modules (non-python modules and old-style modules) to
-  disabled pipelining.
-* Fix fetch module failing even if fail_on_missing is set to False
-* Fix for cornercase when local connections, sudo, and raw were used together.
-* Fix dnf module to remove dependent packages when state=absent is specified.
-  This was a feature of the 1.9.x version that was left out by mistake when the
-  module was rewritten for 2.0.
-* Fix bugs with non-english locales in yum, git, and apt modules
-* Fix a bug with the dnf module where state=latest could only upgrade, not install.
-* Fix to make implicit fact gathering task correctly inherit settings from play,
-  this might cause an error if settings environment on play depending on 'ansible_env'
-  which was previouslly ignored
-
-## 2.0 "Over the Hills and Far Away" - Jan 12, 2016
+## 2.0 "Over the Hills and Far Away"
 
 ###Major Changes:
 
@@ -113,7 +35,6 @@ Ansible Changes By Release
   This re-executes inventory scripts, but does not force them to ignore any cache they might use.
 * New delegate_facts directive, a boolean that allows you to apply facts to the delegated host (true/yes) instead of the inventory_hostname (no/false) which is the default and previous behaviour.
 * local connections now work with 'su' as a privilege escalation method
-* Ansible 2.0 has deprecated the “ssh” from ansible_ssh_user, ansible_ssh_host, and ansible_ssh_port to become ansible_user, ansible_host, and ansible_port.
 * New ssh configuration variables(`ansible_ssh_common_args`, `ansible_ssh_extra_args`) can be used to configure a
   per-group or per-host ssh ProxyCommand or set any other ssh options.
   `ansible_ssh_extra_args` is used to set options that are accepted only by ssh (not sftp or scp, which have their own analogous settings).
@@ -160,11 +81,6 @@ newline being stripped you can change your playbook like this:
     # Output
     "msg": "Testing some things"
     ```
-
-* In 1.9.x, newlines in templates were converted to Unix EOL conventions.  If
-  someone wanted a templated file to end up with Windows or Mac EOL
-  conventions, this could cause problems for them.  In 2.x newlines now remain
-  as specified in the template file.
 
 * When specifying complex args as a variable, the variable must use the full jinja2
 variable syntax ('{{var_name}}') - bare variable names there are no longer accepted.
@@ -220,7 +136,6 @@ allowed in future versions:
 * amazon: ec2_remote_facts
 * amazon: ec2_vpc_igw
 * amazon: ec2_vpc_net
-* amazon: ec2_vpc_net_facts
 * amazon: ec2_vpc_route_table
 * amazon: ec2_vpc_route_table_facts
 * amazon: ec2_vpc_subnet

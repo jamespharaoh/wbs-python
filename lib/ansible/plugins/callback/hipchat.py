@@ -73,7 +73,6 @@ class CallbackModule(CallbackBase):
 
         self.printed_playbook = False
         self.playbook_name = None
-        self.play = None
 
     def send_msg(self, msg, msg_format='text', color='yellow', notify=False):
         """Method for sending a message to HipChat"""
@@ -94,11 +93,9 @@ class CallbackModule(CallbackBase):
             self.display.warning('Could not submit message to hipchat')
 
 
-    def v2_playbook_on_play_start(self, play):
+    def playbook_on_play_start(self, name):
         """Display Playbook and play start messages"""
 
-        self.play = play
-        name = play.name
         # This block sends information about a playbook when it starts
         # The playbook object is not immediately available at
         # playbook_on_start so we grab it via the play

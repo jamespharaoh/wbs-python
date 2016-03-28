@@ -33,19 +33,24 @@ class ActionModule(ActionBase):
 
     TRANSFERS_FILES = True
 
-    def get_checksum(self, dest, all_vars, try_directory=False, source=None, tmp=None):
-        try:
-            dest_stat = self._execute_remote_stat(dest, all_vars=all_vars, follow=False, tmp=tmp)
+    def get_checksum(self, dest, all_vars, try_directory=False, source=None):
+        remote_checksum = self._remote_checksum(dest, all_vars=all_vars)
 
-            if dest_stat['exists'] and dest_stat['isdir'] and try_directory and source:
+        if remote_checksum in ('0', '2', '3', '4'):
+            # Note: 1 means the file is not present which is fine; template
+            # will create it.  3 means directory was specified instead of file
+            if try_directory and remote_checksum == '3' and source:
                 base = os.path.basename(source)
                 dest = os.path.join(dest, base)
-                dest_stat = self._execute_remote_stat(dest, all_vars=all_vars, follow=False, tmp=tmp)
+                remote_checksum = self.get_checksum(dest, all_vars=all_vars, try_directory=False)
+                if remote_checksum not in ('0', '2', '3', '4'):
+                    return remote_checksum
 
-        except Exception as e:
-            return dict(failed=True, msg=to_bytes(e))
+            result = dict(failed=True, msg="failed to checksum remote file."
+                        " Checksum error code: %s" % remote_checksum)
+            return result
 
-        return dest_stat['checksum']
+        return remote_checksum
 
     def run(self, tmp=None, task_vars=None):
         ''' handler for template operations '''
@@ -58,16 +63,14 @@ class ActionModule(ActionBase):
         dest   = self._task.args.get('dest', None)
         faf    = self._task.first_available_file
         force  = boolean(self._task.args.get('force', True))
-        state  = self._task.args.get('state', None)
 
-        if state is not None:
-            result['failed'] = True
-            result['msg'] = "'state' cannot be specified on a template"
-            return result
-        elif (source is None and faf is not None) or dest is None:
+        if (source is None and faf is not None) or dest is None:
             result['failed'] = True
             result['msg'] = "src and dest are required"
             return result
+
+        if tmp is None:
+            tmp = self._make_tmp_path()
 
         if faf:
             source = self._get_first_available_file(faf, task_vars.get('_original_file', None, 'templates'))
@@ -137,13 +140,8 @@ class ActionModule(ActionBase):
             result['msg'] = type(e).__name__ + ": " + str(e)
             return result
 
-        cleanup_remote_tmp = False
-        if not tmp:
-            tmp = self._make_tmp_path()
-            cleanup_remote_tmp = True
-
         local_checksum = checksum_s(resultant)
-        remote_checksum = self.get_checksum(dest, task_vars, not directory_prepended, source=source, tmp=tmp)
+        remote_checksum = self.get_checksum(dest, task_vars, not directory_prepended, source=source)
         if isinstance(remote_checksum, dict):
             # Error from remote_checksum is a dict.  Valid return is a str
             result.update(remote_checksum)
@@ -175,10 +173,12 @@ class ActionModule(ActionBase):
                        follow=True,
                     ),
                 )
-                result.update(self._execute_module(module_name='copy', module_args=new_module_args, task_vars=task_vars, tmp=tmp, delete_remote_tmp=False))
+                result.update(self._execute_module(module_name='copy', module_args=new_module_args, task_vars=task_vars))
 
             if result.get('changed', False) and self._play_context.diff:
                 result['diff'] = diff
+
+            return result
 
         else:
             # when running the file module based on the template data, we do
@@ -194,9 +194,6 @@ class ActionModule(ActionBase):
                     follow=True,
                 ),
             )
-            result.update(self._execute_module(module_name='file', module_args=new_module_args, task_vars=task_vars, tmp=tmp, delete_remote_tmp=False))
 
-        if tmp and cleanup_remote_tmp:
-            self._remove_tmp_path(tmp)
-
-        return result
+            result.update(self._execute_module(module_name='file', module_args=new_module_args, task_vars=task_vars))
+            return result

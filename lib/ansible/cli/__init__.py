@@ -27,13 +27,12 @@ import time
 import yaml
 import re
 import getpass
-import signal
 import subprocess
 
 from ansible import __version__
 from ansible import constants as C
 from ansible.errors import AnsibleError, AnsibleOptionsError
-from ansible.utils.unicode import to_bytes, to_unicode
+from ansible.utils.unicode import to_bytes
 
 try:
     from __main__ import display
@@ -45,7 +44,7 @@ except ImportError:
 class SortedOptParser(optparse.OptionParser):
     '''Optparser which sorts the options by opt before outputting --help'''
 
-    #FIXME: epilog parsing: OptionParser.format_epilog = lambda self, formatter: self.epilog
+    # TODO: epilog parsing: OptionParser.format_epilog = lambda self, formatter: self.epilog
 
     def format_help(self, formatter=None, epilog=None):
         self.option_list.sort(key=operator.methodcaller('get_opt_string'))
@@ -78,20 +77,6 @@ class CLI(object):
         self.action = None
         self.callback = callback
 
-    def _terminate(self, signum=None, framenum=None):
-        if signum == signal.SIGTERM:
-            if hasattr(os, 'getppid'):
-                display.debug("Termination requested in parent, shutting down gracefully")
-                signal.signal(signal.SIGTERM, signal.SIG_DFL)
-            else:
-                display.debug("Term signal in child, harakiri!")
-                signal.signal(signal.SIGTERM, signal.SIG_IGN)
-
-            raise SystemExit
-
-        #NOTE: if ever want to make this immediately kill children use on parent:
-        #os.killpg(os.getpgid(0), signal.SIGTERM)
-
     def set_action(self):
         """
         Get the action the user wants to execute from the sys argv list.
@@ -120,12 +105,9 @@ class CLI(object):
 
         if self.options.verbosity > 0:
             if C.CONFIG_FILE:
-                display.display(u"Using %s as config file" % to_unicode(C.CONFIG_FILE))
+                display.display("Using %s as config file" % C.CONFIG_FILE)
             else:
-                display.display(u"No config file found; using defaults")
-
-        # Manage user interruptions
-        #signal.signal(signal.SIGTERM, self._terminate)
+                display.display("No config file found; using defaults")
 
     @staticmethod
     def ask_vault_passwords(ask_new_vault_pass=False, rekey=False):
@@ -242,7 +224,7 @@ class CLI(object):
 
         if inventory_opts:
             parser.add_option('-i', '--inventory-file', dest='inventory',
-                help="specify inventory host path (default=%s) or comma separated host list." % C.DEFAULT_HOST_LIST,
+                help="specify inventory host path (default=%s) or comma separated host list" % C.DEFAULT_HOST_LIST,
                 default=C.DEFAULT_HOST_LIST, action="callback", callback=CLI.expand_tilde, type=str)
             parser.add_option('--list-hosts', dest='listhosts', action='store_true',
                 help='outputs a list of matching hosts; does not execute anything else')
@@ -477,7 +459,7 @@ class CLI(object):
             os.environ['LESS'] = CLI.LESS_OPTS
         try:
             cmd = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=sys.stdout)
-            cmd.communicate(input=to_bytes(text))
+            cmd.communicate(input=text.encode(sys.stdout.encoding))
         except IOError:
             pass
         except KeyboardInterrupt:

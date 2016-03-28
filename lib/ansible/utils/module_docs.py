@@ -24,7 +24,7 @@ __metaclass__ = type
 import os
 import sys
 import ast
-from ansible.parsing.yaml.loader import AnsibleLoader
+import yaml
 import traceback
 
 from collections import MutableMapping, MutableSet, MutableSequence
@@ -71,7 +71,7 @@ def get_docstring(filename, verbose=False):
                         continue
 
                     if 'DOCUMENTATION' in theid:
-                        doc = AnsibleLoader(child.value.s, file_name=filename).get_single_data()
+                        doc = yaml.safe_load(child.value.s)
                         fragments = doc.get('extends_documentation_fragment', [])
 
                         if isinstance(fragments, basestring):
@@ -91,7 +91,7 @@ def get_docstring(filename, verbose=False):
                             assert fragment_class is not None
 
                             fragment_yaml = getattr(fragment_class, fragment_var, '{}')
-                            fragment = AnsibleLoader(fragment_yaml, file_name=filename).get_single_data()
+                            fragment = yaml.safe_load(fragment_yaml)
 
                             if fragment.has_key('notes'):
                                 notes = fragment.pop('notes')
