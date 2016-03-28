@@ -95,7 +95,10 @@ class SectionConstraint(object):
     """Constrains a ConfigParser to only option commands which are constrained to
     always use the section we have been initialized with.
 
-    It supports all ConfigParser methods that operate on an option"""
+    It supports all ConfigParser methods that operate on an option.
+
+    :note:
+        If used as a context manager, will release the wrapped ConfigParser."""
     __slots__ = ("_config", "_section_name")
     _valid_attrs_ = ("get_value", "set_value", "get", "set", "getint", "getfloat", "getboolean", "has_option",
                      "remove_section", "remove_option", "options")
@@ -129,6 +132,13 @@ class SectionConstraint(object):
         """Equivalent to GitConfigParser.release(), which is called on our underlying parser instance"""
         return self._config.release()
 
+    def __enter__(self):
+        self._config.__enter__()
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self._config.__exit__(exception_type, exception_value, traceback)
+
 
 class GitConfigParser(with_metaclass(MetaParserBuilder, cp.RawConfigParser, object)):
 
@@ -145,7 +155,8 @@ class GitConfigParser(with_metaclass(MetaParserBuilder, cp.RawConfigParser, obje
 
     :note:
         The config is case-sensitive even when queried, hence section and option names
-        must match perfectly."""
+        must match perfectly.
+        If used as a context manager, will release the locked file."""
 
     #{ Configuration
     # The lock type determines the type of lock to use in new configuration readers.
@@ -195,18 +206,23 @@ class GitConfigParser(with_metaclass(MetaParserBuilder, cp.RawConfigParser, obje
         self._is_initialized = False
         self._merge_includes = merge_includes
         self._lock = None
+        self._aquire_lock()
 
-        if not read_only:
-            if isinstance(file_or_files, (tuple, list)):
-                raise ValueError(
-                    "Write-ConfigParsers can operate on a single file only, multiple files have been passed")
-            # END single file check
+    def _aquire_lock(self):
+        if not self._read_only:
+            if not self._lock:
+                if isinstance(self._file_or_files, (tuple, list)):
+                    raise ValueError(
+                        "Write-ConfigParsers can operate on a single file only, multiple files have been passed")
+                # END single file check
 
-            if not isinstance(file_or_files, string_types):
-                file_or_files = file_or_files.name
-            # END get filename from handle/stream
-            # initialize lock base - we want to write
-            self._lock = self.t_lock(file_or_files)
+                file_or_files = self._file_or_files
+                if not isinstance(self._file_or_files, string_types):
+                    file_or_files = self._file_or_files.name
+                # END get filename from handle/stream
+                # initialize lock base - we want to write
+                self._lock = self.t_lock(file_or_files)
+            # END lock check
 
             self._lock._obtain_lock()
         # END read-only check
@@ -214,6 +230,13 @@ class GitConfigParser(with_metaclass(MetaParserBuilder, cp.RawConfigParser, obje
     def __del__(self):
         """Write pending changes if required and release locks"""
         # NOTE: only consistent in PY2
+        self.release()
+
+    def __enter__(self):
+        self._aquire_lock()
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
         self.release()
 
     def release(self):
