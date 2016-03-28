@@ -18,7 +18,7 @@ from setuptools import setup
 
 if __name__ == '__main__':
     setup(name='rsa',
-          version='3.3',
+          version='4.0-alpha',
           description='Pure-Python RSA implementation',
           author='Sybren A. Stuvel',
           author_email='sybren@stuvel.eu',
@@ -35,8 +35,6 @@ if __name__ == '__main__':
               'License :: OSI Approved :: Apache Software License',
               'Operating System :: OS Independent',
               'Programming Language :: Python',
-              'Programming Language :: Python :: 2',
-              'Programming Language :: Python :: 2.6',
               'Programming Language :: Python :: 2.7',
               'Programming Language :: Python :: 3',
               'Programming Language :: Python :: 3.3',
@@ -54,8 +52,6 @@ if __name__ == '__main__':
               'pyrsa-decrypt = rsa.cli:decrypt',
               'pyrsa-sign = rsa.cli:sign',
               'pyrsa-verify = rsa.cli:verify',
-              'pyrsa-encrypt-bigfile = rsa.cli:encrypt_bigfile',
-              'pyrsa-decrypt-bigfile = rsa.cli:decrypt_bigfile',
           ]},
 
           )
