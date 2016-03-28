@@ -647,8 +647,7 @@ def install(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
 
         changed = True
 
-        lang_env = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
-        rc, out, err = module.run_command(cmd, environ_update=lang_env)
+        rc, out, err = module.run_command(cmd)
 
         if (rc == 1):
             for spec in items:
