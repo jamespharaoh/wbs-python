@@ -292,6 +292,10 @@ def update_config ():
 
 		os.mkdir ("work")
 
+	if not os.path.isdir ("work/retry"):
+
+		os.mkdir ("work/retry")
+
 	if not os.path.isfile ("work/amazon-credentials"):
 
 		with open ("work/amazon-credentials", "w") as file_handle:

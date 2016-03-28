@@ -9,6 +9,46 @@
 
         prompt: "WARNING - this will delete ALMOST ALL files not managed by git"
 
+    - name: "remove project links"
+      with_items: "{{ devenv_checkouts | flatten_hash ('project_links') }}"
+      become: "yes"
+      args:
+
+        executable: "/bin/bash"
+
+      shell:
+
+        set -euf -o pipefail;
+
+        link="{{ [
+          deployment_home,
+          item.outer.name,
+          item.project_links.link,
+        ] | join ('/') }}";
+
+        overlay="{{ [
+          deployment_home,
+          item.outer.name,
+          item.project_links.overlay,
+        ] | join ('/') }}";
+
+        target="{{ item.project_links.target }}";
+
+        if {
+          cut -d' ' -f 2 </proc/mounts
+            | grep -x "$link";
+        }; then
+          umount "$link";
+        fi;
+
+        if test -d "$overlay"; then
+          rm -rf "$overlay";
+        fi;
+
+        if test -h "$link"; then
+          rm "$link";
+        fi;
+
     - name: "clean checked out projects"
       with_items: "devenv_checkouts"
       args:
