@@ -519,15 +519,15 @@ class PrivateKey(AbstractKey):
 
         class AsnPrivKey(univ.Sequence):
             componentType = namedtype.NamedTypes(
-                    namedtype.NamedType('version', univ.Integer()),
-                    namedtype.NamedType('modulus', univ.Integer()),
-                    namedtype.NamedType('publicExponent', univ.Integer()),
-                    namedtype.NamedType('privateExponent', univ.Integer()),
-                    namedtype.NamedType('prime1', univ.Integer()),
-                    namedtype.NamedType('prime2', univ.Integer()),
-                    namedtype.NamedType('exponent1', univ.Integer()),
-                    namedtype.NamedType('exponent2', univ.Integer()),
-                    namedtype.NamedType('coefficient', univ.Integer()),
+                namedtype.NamedType('version', univ.Integer()),
+                namedtype.NamedType('modulus', univ.Integer()),
+                namedtype.NamedType('publicExponent', univ.Integer()),
+                namedtype.NamedType('privateExponent', univ.Integer()),
+                namedtype.NamedType('prime1', univ.Integer()),
+                namedtype.NamedType('prime2', univ.Integer()),
+                namedtype.NamedType('exponent1', univ.Integer()),
+                namedtype.NamedType('exponent2', univ.Integer()),
+                namedtype.NamedType('coefficient', univ.Integer()),
             )
 
         # Create the ASN object
@@ -666,9 +666,11 @@ def calculate_keys_custom_exponent(p, q, exponent):
 
     try:
         d = rsa.common.inverse(exponent, phi_n)
-    except ValueError:
-        raise ValueError("e (%d) and phi_n (%d) are not relatively prime" %
-                         (exponent, phi_n))
+    except rsa.common.NotRelativePrimeError as ex:
+        raise rsa.common.NotRelativePrimeError(
+            exponent, phi_n, ex.d,
+            msg="e (%d) and phi_n (%d) are not relatively prime (divider=%i)" %
+                (exponent, phi_n, ex.d))
 
     if (exponent * d) % phi_n != 1:
         raise ValueError("e (%d) and d (%d) are not mult. inv. modulo "
