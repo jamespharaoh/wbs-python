@@ -35,12 +35,17 @@ class LoginClient (object):
 			flask.g.user_groups = (
 				self.settings ["force_groups"])
 
+			flask.g.logout_url = None
+
 			return
 
 		if not self.settings ["cookie"] in flask.request.cookies:
 
 			flask.g.user_email = None
 			flask.g.user_groups = []
+
+			flask.g.login_url = (
+				self.settings ["login-url"])
 
 			return
 
@@ -96,9 +101,16 @@ class LoginClient (object):
 			flask.g.user_groups = (
 				token_data ["groups"])
 
+			flask.g.logout_url = (
+				"%s/log-out" % (
+					self.settings ["login-url"]))
+
 		else:
 
 			flask.g.user_email = None
 			flask.g.user_groups = []
+
+			flask.g.login_url = (
+				self.settings ["login-url"])
 
 # ex: noet ts=4 filetype=python
