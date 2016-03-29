@@ -3,7 +3,6 @@
 - include: "cluster-deployments-clean.yml"
 - include: "cluster-deployments-setup.yml"
 - include: "cluster-deployments-templates.yml"
-- include: "cluster-deployments-stop.yml"
-- include: "cluster-deployments-start.yml"
+- include: "cluster-deployments-restart.yml"
 
 # ex: et ts=2 filetype=yaml
