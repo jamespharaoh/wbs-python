@@ -1,0 +1,28 @@
+---
+
+amazon_instance_type_running: "c4.4xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_state: "enabled"
+instance_id: "i-bee52a32"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMLEXpeESSYEkC/2cRGgT/bYtr7BZ7HTj8xPCr6jKiPzqwPk8cs284MPoJydNcvLPvx55VKqafEGIAbAbAJ+dBk="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDw3szRDuL+k1LemXSF4Vkxe5J7aMne1jo5vIl3QhTUd8Cji45qkBeRsUmA1LXUX7cP1wTeEn2xq5clD+MIMq8hizUmB+JcGWw6KJR0Um02loamuvhRbOlR7JSKphQIXhbwUX2RMHGwSByaalimxoaYodP7xmWPe592MiduUqRedSWrYZ/piLk3/09KNoWQaqVWTFJiSR50dXwjbBvZm+vc9NEeVqrSwlokFGRSQOA6Qpos7i/Y1ba5G7Un3TUx3sxW0COq9fq/OlKOvustBPNEXANu4JgroNuvyBsfG08WsAD3D2qbvjYUjr7ThQNl9Ptd15gdFbPayz0gpcghNTIv"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMLEXpeESSYEkC/2cRGgT/bYtr7BZ7HTj8xPCr6jKiPzqwPk8cs284MPoJydNcvLPvx55VKqafEGIAbAbAJ+dBk="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDw3szRDuL+k1LemXSF4Vkxe5J7aMne1jo5vIl3QhTUd8Cji45qkBeRsUmA1LXUX7cP1wTeEn2xq5clD+MIMq8hizUmB+JcGWw6KJR0Um02loamuvhRbOlR7JSKphQIXhbwUX2RMHGwSByaalimxoaYodP7xmWPe592MiduUqRedSWrYZ/piLk3/09KNoWQaqVWTFJiSR50dXwjbBvZm+vc9NEeVqrSwlokFGRSQOA6Qpos7i/Y1ba5G7Un3TUx3sxW0COq9fq/OlKOvustBPNEXANu4JgroNuvyBsfG08WsAD3D2qbvjYUjr7ThQNl9Ptd15gdFbPayz0gpcghNTIv"
+volume_ids: 
+  
+  data: "vol-d2a2316c"
+  system: "vol-a2a2311c"
+
+volume_ids_data: "vol-d2a2316c"
+volume_ids_system: "vol-a2a2311c"
+
+
+# ex: et ts=2 filetype=yaml

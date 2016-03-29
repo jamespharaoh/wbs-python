@@ -1,0 +1,60 @@
+---
+
+amazon_instance_type_running: "c4.4xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+instance_id: "i-45da15c9"
+nginx: 
+  
+  installed_version: "1.9.7"
+  needs_restart: "no"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_needs_restart: "no"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJYP4QSH4mMFP8AcpMAp4CQ7Vw+bYEkyuosDGas/WzJNifuYTCwHtljqUuMoGdyTWEItmIea6h3YnGz/HCFb3Ok="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0kf9TwPS/yLOlcAYuT78qr8uva/7Q7juQ6P5n1nTsarNXwLN/lhBt/+AaCRiZawQBAhrEzmVFGmx8xr5g6uaEPVBulveOY3Z6+qBhf/gTVgiRqoSO6efRoges6UqXj+XcwYwLe7Xv+MkoDywEtQ7RpFfeKWWSKJC9aGtgSSl6hyIwRLFWUhgFjZlMdvwoa5qntNAT0GRItY9STnd9PdLqMRa5O+wHzR5nHoqpmCqIkX82zRAZJDgn+vL3yz9qxc8rSgkLqlta7EMLZBnk3r6MDce1wRibnT5P39DB1dKGQhCWwO0Bhv5gdc/JTIvVxrFYc1TeoFom4IPcPC/BLYXb"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJYP4QSH4mMFP8AcpMAp4CQ7Vw+bYEkyuosDGas/WzJNifuYTCwHtljqUuMoGdyTWEItmIea6h3YnGz/HCFb3Ok="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0kf9TwPS/yLOlcAYuT78qr8uva/7Q7juQ6P5n1nTsarNXwLN/lhBt/+AaCRiZawQBAhrEzmVFGmx8xr5g6uaEPVBulveOY3Z6+qBhf/gTVgiRqoSO6efRoges6UqXj+XcwYwLe7Xv+MkoDywEtQ7RpFfeKWWSKJC9aGtgSSl6hyIwRLFWUhgFjZlMdvwoa5qntNAT0GRItY9STnd9PdLqMRa5O+wHzR5nHoqpmCqIkX82zRAZJDgn+vL3yz9qxc8rSgkLqlta7EMLZBnk3r6MDce1wRibnT5P39DB1dKGQhCWwO0Bhv5gdc/JTIvVxrFYc1TeoFom4IPcPC/BLYXb"
+volume_ids: 
+  
+  data: "vol-458714fb"
+  system: "vol-d6861568"
+
+volume_ids_data: "vol-458714fb"
+volume_ids_system: "vol-d6861568"
+
+
+# ex: et ts=2 filetype=yaml

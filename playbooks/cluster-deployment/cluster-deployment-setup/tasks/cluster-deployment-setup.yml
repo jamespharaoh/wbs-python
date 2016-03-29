@@ -55,13 +55,15 @@
 
     set -euf -o pipefail;
 
-    link="$(
-      readlink --canonicalize "{{ [
-        cluster_deployment_home,
-        item.outer.name,
-        item.project_links.link,
-      ] | join ('/') }}"
-    )";
+    link="{{ [
+      cluster_deployment_home,
+      item.outer.name,
+      item.project_links.link,
+    ] | join ('/') }}";
+
+    canonical_link="$(
+      readlink --canonicalize "$link"
+    )"
 
     target="$(
       cd "$(dirname "$link")";
@@ -70,9 +72,13 @@
 
     if {
       cut -d' ' -f 2 </proc/mounts
-        | grep -x "$link";
+        | grep -x "$canonical_link";
     }; then
-      umount "$link";
+      umount "$canonical_link";
+    fi;
+
+    if test -h "$link"; then
+      rm "$link";
     fi;
 
     rsync
@@ -248,7 +254,7 @@
     src: "cluster-deployment-wistla-logrotate"
 
 - name: "create routes"
-  connection: "local"
+  tags: "route"
   when: "item != ''"
   with_items:
 
@@ -265,6 +271,7 @@
     - "{{ cluster_network.routes_jenkins_b | default ('') }}"
     - "{{ cluster_network.routes_jenkins_c | default ('') }}"
 
+  connection: "local"
   environment:
 
     AWS_DEFAULT_REGION: "{{ amazon_region_name }}"

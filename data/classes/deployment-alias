@@ -10,4 +10,8 @@ class:
   namespace: "deployment"
   parent_namespace: "cluster"
 
+deployment:
+
+  cluster_name: "{{ identity_parent }}"
+
 # ex: et ts=2 filetype=yaml

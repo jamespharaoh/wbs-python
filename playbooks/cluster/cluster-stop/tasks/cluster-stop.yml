@@ -2,11 +2,16 @@
 
 - name: "stop amazon instance"
   when: "
-    amazon_instance_state == 'stopped'
-    or (
-      amazon_instance_state == 'running'
-      and amazon_instance_type_running != ''
-      and amazon_instance_type != amazon_instance_type_running
+    (
+      amazon_instance_state == 'stopped'
+      or (
+        amazon_instance_state == 'running'
+        and amazon_instance_type_running != ''
+        and amazon_instance_type != amazon_instance_type_running
+      )
+    ) and (
+      cluster_name != 'production'
+      or cluster_production_override == inventory_hostname
     )
   "
   local_action:

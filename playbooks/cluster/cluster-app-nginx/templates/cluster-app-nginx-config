@@ -55,11 +55,12 @@ http {
 {% for deployment_name in cluster.super_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
 {% if deployment.type != 'virtual' %}
+{% set deployment_cluster = clusters [deployment.cluster_name] %}
 
 	upstream deployment-{{ deployment_name }} {
 
-{% for zone in cluster.instance_formation.app.zones %}
-{% for index in cluster.instance_formation.app.indices %}
+{% for zone in deployment_cluster.instance_formation.app.zones %}
+{% for index in deployment_cluster.instance_formation.app.indices %}
 		server {{ [
 			[
 				deployment.bridge_network,
@@ -73,7 +74,7 @@ http {
 				deployment_name,
 				zone,
 				index,
-			],
+			] | join ('-'),
 		] | join (' ') }}
 {% endfor %}
 {% endfor %}

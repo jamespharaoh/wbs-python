@@ -1,6 +1,6 @@
 ---
 
-- name: "run cluster deployment playbook"
+- name: "run cluster deployment playbook {{ cluster_deployment_playbook_name }}"
   args:
 
     executable: "/bin/bash"

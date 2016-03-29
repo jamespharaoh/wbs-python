@@ -1,6 +1,6 @@
 ---
 
-amazon_instance_type_running: "c4.2xlarge"
+amazon_instance_type_running: "c4.4xlarge"
 heka: 
   
   installed_version: "0.10.0b0"

@@ -1,0 +1,58 @@
+---
+
+amazon_instance_type_running: "c4.4xlarge"
+heka: 
+  
+  installed_version: "0.10.0b0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0b0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+instance_id: "i-d55be75f"
+nginx: 
+  
+  installed_version: "1.9.7"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_state: "enabled"
+python: 
+  
+  installed_version: "2.7.10"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.10"
+python_pip: 
+  
+  installed_version: "7.0.3"
+  state: "installed"
+
+python_pip_installed_version: "7.0.3"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOZ/Ct5Mhv6NYuklgwgf9ZzV0U/6k5wlDlZFhPP8x5YtICAZsHDNf7RBa7EF3TJGVUet0W0HHAaX4sYkBZ+q4Nc="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBLpfgBRAVL40PbQIYMLt5JnrQNSHd3nnki24/S5Y1B2oFdiyi81HHvviXLwLGwMHb7MOVB/T7nCqFzm7YiMmPsKhSdx8Xk7bEAMswQG54f6kwvODBFPBEHpQxdtDZrHI2QZ/fHh0qArqepg7It9q2yL+rOqxOWgPVl1JoARrvguvpVL/E0Re+LMJDKHkBFV97SJMCHBA375wCZZPoBFC7jqHxRW880QUHpfNIh/hrdA5rHKfE7iqXpkDXuqFgpEEmnNiwpWJjOOiIzZsr64X8mdk4mrIYcte61TdoDbGmkfbagwWuQ0gjROvsdcsCox945tTLx+7vVygxiqY0qsnr"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOZ/Ct5Mhv6NYuklgwgf9ZzV0U/6k5wlDlZFhPP8x5YtICAZsHDNf7RBa7EF3TJGVUet0W0HHAaX4sYkBZ+q4Nc="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBLpfgBRAVL40PbQIYMLt5JnrQNSHd3nnki24/S5Y1B2oFdiyi81HHvviXLwLGwMHb7MOVB/T7nCqFzm7YiMmPsKhSdx8Xk7bEAMswQG54f6kwvODBFPBEHpQxdtDZrHI2QZ/fHh0qArqepg7It9q2yL+rOqxOWgPVl1JoARrvguvpVL/E0Re+LMJDKHkBFV97SJMCHBA375wCZZPoBFC7jqHxRW880QUHpfNIh/hrdA5rHKfE7iqXpkDXuqFgpEEmnNiwpWJjOOiIzZsr64X8mdk4mrIYcte61TdoDbGmkfbagwWuQ0gjROvsdcsCox945tTLx+7vVygxiqY0qsnr"
+volume_ids: 
+  
+  data: "vol-f35ff101"
+  system: "vol-6d5ef09f"
+
+volume_ids_data: "vol-f35ff101"
+volume_ids_system: "vol-6d5ef09f"
+
+
+# ex: et ts=2 filetype=yaml
