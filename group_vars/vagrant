@@ -47,6 +47,9 @@ system_packages:
   - name: "python3-apport"
     state: "absent"
 
+  - name: "resolvconf"
+    state: "absent"
+
   # ---------- install
 
   - name: "btrfs-tools"
@@ -120,9 +123,6 @@ system_packages:
 
   #- name: "rabbitmq-server"
   #  state: "present"
-
-  - name: "resolvconf"
-    state: "present"
 
   - name: "samba"
     state: "present"
