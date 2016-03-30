@@ -31,6 +31,12 @@ dev:
     - "BGxkeVFgXRNiwYKvOw+KPqR2wYMXFBag1HI2TxZHtWLPwY+NsboD9fWt7b1RLBiV0RwX4jfW"
     - "/KuTrw5RbV3iVcg="
 
+  chuggington:
+
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BBUqb//10fC3kdNGULhhpfxeSQR7iBeJr2UVXJOJzxSlspPXYPm06I/MheWAIJLzshdDM+5E"
+    - "oyO71kPmR+Bm2Ws="
+
   mrbenn:
 
     - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
