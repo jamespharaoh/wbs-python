@@ -13,5 +13,6 @@ class:
 deployment:
 
   cluster_name: "{{ identity_parent }}"
+  description: ""
 
 # ex: et ts=2 filetype=yaml
