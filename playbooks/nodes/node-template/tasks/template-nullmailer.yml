@@ -1,17 +1,25 @@
 ---
 
 - name: "remove postfix"
+  with_items:
+
+    - "postfix"
+
+  become: "yes"
   action:
+
     module: "apt"
     name: "{{ item }}"
     state: "absent"
     purge: "yes"
-  sudo: "yes"
-  with_items:
-    - "postfix"
 
 - name: "configure nullmailer"
+  become: "yes"
   with_items:
+
+    - question: "shared/mailname"
+      value: "{{ deployment.email_domain }}"
+      type: "string"
 
     - question: "nullmailer/relayhost"
       value: "10.255.255.10"
@@ -25,7 +33,6 @@
       value: ""
       type: "string"
 
-  sudo: "yes"
   action:
 
     module: "debconf"
@@ -41,7 +48,7 @@
 
     - directory: "/etc/nullmailer"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -57,7 +64,7 @@
     - target: "/etc/nullmailer/defaultdomain"
       content: "{{ deployment.email_domain + '\n' }}"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"
@@ -69,7 +76,7 @@
 
     - "nullmailer"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "apt"
