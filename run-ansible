@@ -298,11 +298,22 @@ def update_config ():
 		os.mkdir (
 			"work/inventory")
 
-	if not os.path.islink ("work/inventory/script"):
+	if CONFIG ["deployment_mode"] == "vagrant":
 
-		os.symlink (
-			"../../misc/ansible-inventory-script",
-			"work/inventory/script")
+		if not os.path.islink (
+			"work/inventory/script"):
+
+			os.symlink (
+				"../../misc/ansible-inventory-script",
+				"work/inventory/script")
+
+	else:
+
+		if os.path.exists (
+			"work/inventory/script"):
+
+			os.unlink (
+				"work/inventory/script")
 
 	with open ("work/inventory/generated", "w") as file_handle:
 
