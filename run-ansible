@@ -261,6 +261,7 @@ def run_playbook (args):
 			"ansible", "playbook", "--",
 			"--inventory-file", "work/inventory",
 			"--extra-vars", "@config/overrides.yml",
+			"--extra-vars", "@config/local.yml",
 			"--extra-vars", "HOME=%s" % HOME,
 			"--extra-vars", "DATA=%s/data" % HOME,
 		] + args,
@@ -282,6 +283,27 @@ def update_config ():
 	write_message ([
 		"##### Automatically updating config #####\n",
 	])
+
+	if not os.path.isfile ("config/local.yml"):
+
+		write_message ([
+			"Creating config/local.yml",
+		])
+
+		with open ("config/local.yml.temp", "w") as file_handle:
+
+			for line in [
+				"---",
+				"{}",
+				"# ex: et ts=2 filetype=yaml",
+			]:
+
+				file_handle.write (
+					line + "\n")
+
+		os.rename (
+			"config/local.yml.temp",
+			"config/local.yml")
 
 	if os.path.isfile ("inventory"):
 
