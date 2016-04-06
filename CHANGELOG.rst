@@ -2,6 +2,49 @@
 CHANGELOG
 =========
 
+1.4.9 - (2016-03-29)
+--------------------
+* feature:``APIGateway``: Added support for API Import
+* feature:``Route53``: Added support for metric-based health checks and regional
+  health checks.
+* feature:``STS``: Added support for GetCallerIdentity, which returns details
+  about the credentials used to make the API call. The details include name and
+  account, as well as the type of entity making the call, such as an IAM user
+  vs. federated user.
+* feature:``S3``: Added support for VersionId in PutObjectAcl
+  (`issue 856 <https://github.com/boto/botocore/pull/856>`__)
+* bugfix:``S3``: Add validation to enforce S3 metadata only contains ASCII.
+  (`issue 861 <https://github.com/boto/botocore/pull/861>`__)
+* bugfix:Exceptions: Consistently parse errors with no body
+  (`issue 859 <https://github.com/boto/botocore/pull/859>`__)
+* bugfix:Config: Handle case where S3 config key is not a dict
+  (`issue 858 <https://github.com/boto/botocore/pull/858>`__)
+* bugfix:Examples: Account for empty input shape in examples
+  (`issue 855 <https://github.com/boto/botocore/pull/855>`__)
+
+1.4.8 - (2016-03-29)
+--------------------
+* feature:``ACM``: Update client to latest version
+* feature:``CloudFormation``: Update client to latest version
+* feature:``CodeDeploy``: Update client to latest version
+* feature:``DMS``: Update client to latest version
+* feature:``ElastiCache``: Update client to latest version
+* feature:``Elastic Beanstalk``: Update client to latest version
+* feature:``Redshift``: Update client to latest version
+* feature:``WAF``: Update client to latest version
+* bugfix:Pagintor: Fix regression when providing a starting token
+  for a paginator
+  (`issue 849 <https://github.com/boto/botocore/pull/849>`__)
+* bugfix:Response Parsing: Handle case when generic HTML error
+  response is received
+  (`issue 850 <https://github.com/boto/botocore/pull/850>`__)
+* bugfix:Request serialization: Handle case when non str values
+  are provided for header values when using signature version 4
+  (`issue 852 <https://github.com/boto/botocore/pull/852>`__)
+* bugfix:Retry: Retry HTTP responses with status code 502
+  (`issue 853 <https://github.com/boto/botocore/pull/853>`__)
+
+
 1.4.7 - (2016-03-24)
 --------------------
 * feature:``ElastiCache``: Update client to latest version
