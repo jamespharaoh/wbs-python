@@ -62,12 +62,19 @@ def setup ():
 	for project_name, project_data \
 	in third_party_index.items ():
 
+		remote_version = (
+			project_data ["version"])
+
 		sys.stdout.write (
-			"Fetch remote: %s\n" % (
-				project_name))
+			"Fetch remote: %s (%s)\n" % (
+				project_name,
+				remote_version))
 
 		git_repo.remotes [project_name].fetch (
-			project_data ["version"])
+			"%s:refs/%s/%s" % (
+				remote_version,
+				project_name,
+				remote_version))
 
 		sys.stdout.write (
 			"\x1b[1A\x1b[K")
