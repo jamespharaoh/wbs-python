@@ -39,7 +39,9 @@ from ansible.playbook.helpers import load_list_of_blocks
 from ansible.playbook.included_file import IncludedFile
 from ansible.plugins import action_loader, connection_loader, filter_loader, lookup_loader, module_loader, test_loader
 from ansible.template import Templar
+from ansible.utils.unicode import to_unicode
 from ansible.vars.unsafe_proxy import wrap_var
+from ansible.vars import combine_vars
 
 try:
     from __main__ import display
@@ -139,7 +141,6 @@ class StrategyBase:
 
         display.debug("entering _queue_task() for %s/%s" % (host, task))
 
-        task_vars['hostvars'] = self._tqm.hostvars
         # and then queue the new task
         display.debug("%s - putting task (%s) in queue" % (host, task))
         try:
@@ -151,7 +152,7 @@ class StrategyBase:
 
             queued = False
             while True:
-                (worker_prc, main_q, rslt_q) = self._workers[self._cur_worker]
+                (worker_prc, rslt_q) = self._workers[self._cur_worker]
                 if worker_prc is None or not worker_prc.is_alive():
                     worker_prc = WorkerProcess(rslt_q, task_vars, host, task, play_context, self._loader, self._variable_manager, shared_loader_obj)
                     self._workers[self._cur_worker][0] = worker_prc
@@ -208,8 +209,10 @@ class StrategyBase:
                                 [iterator.mark_host_failed(h) for h in self._inventory.get_hosts(iterator._play.hosts) if h.name not in self._tqm._unreachable_hosts]
                             else:
                                 iterator.mark_host_failed(host)
-                            (state, tmp_task) = iterator.get_next_task_for_host(host, peek=True)
-                            if not state or state.run_state != PlayIterator.ITERATING_RESCUE:
+
+                            # only add the host to the failed list officially if it has
+                            # been failed by the iterator
+                            if iterator.is_failed(host):
                                 self._tqm._failed_hosts[host.name] = True
                                 self._tqm._stats.increment('failures', host.name)
                         else:
@@ -308,24 +311,25 @@ class StrategyBase:
                     else:
                         actual_host = host
 
+                    if task.run_once:
+                        host_list = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts]
+                    else:
+                        host_list = [actual_host]
+
                     if result[0] == 'set_host_var':
                         var_name  = result[4]
                         var_value = result[5]
-
-                        if task.run_once:
-                            host_list = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts]
-                        else:
-                            host_list = [actual_host]
-
                         for target_host in host_list:
                             self._variable_manager.set_host_variable(target_host, var_name, var_value)
                     elif result[0] == 'set_host_facts':
                         facts = result[4]
-                        if task.action == 'set_fact':
-                            self._variable_manager.set_nonpersistent_facts(actual_host, facts)
-                        else:
-                            self._variable_manager.set_host_facts(actual_host, facts)
-
+                        for target_host in host_list:
+                            if task.action == 'set_fact':
+                                self._variable_manager.set_nonpersistent_facts(target_host, facts)
+                            else:
+                                self._variable_manager.set_host_facts(target_host, facts)
+                elif result[0].startswith('v2_runner_item') or result[0] == 'v2_runner_retry':
+                    self._tqm.send_callback(result[0], result[1])
                 else:
                     raise AnsibleError("unknown result message received: %s" % result[0])
 
@@ -372,9 +376,8 @@ class StrategyBase:
             allgroup.add_host(new_host)
 
         # Set/update the vars for this host
-        new_vars = host_info.get('host_vars', dict())
-        new_host.vars = self._inventory.get_host_vars(new_host)
-        new_host.vars.update(new_vars)
+        new_host.vars = combine_vars(new_host.vars, self._inventory.get_host_vars(new_host))
+        new_host.vars = combine_vars(new_host.vars,  host_info.get('host_vars', dict()))
 
         new_groups = host_info.get('groups', [])
         for group_name in new_groups:
@@ -449,7 +452,7 @@ class StrategyBase:
             block_list = load_list_of_blocks(
                 data,
                 play=included_file._task._block._play,
-                parent_block=included_file._task._block,
+                parent_block=None,
                 task_include=included_file._task,
                 role=included_file._task._role,
                 use_handlers=is_handler,
@@ -465,7 +468,7 @@ class StrategyBase:
             # mark all of the hosts including this file as failed, send callbacks,
             # and increment the stats for this host
             for host in included_file._hosts:
-                tr = TaskResult(host=host, task=included_file._task, return_data=dict(failed=True, reason=str(e)))
+                tr = TaskResult(host=host, task=included_file._task, return_data=dict(failed=True, reason=to_unicode(e)))
                 iterator.mark_host_failed(host)
                 self._tqm._failed_hosts[host.name] = True
                 self._tqm._stats.increment('failures', host.name)
@@ -475,11 +478,7 @@ class StrategyBase:
         # set the vars for this task from those specified as params to the include
         for b in block_list:
             # first make a copy of the including task, so that each has a unique copy to modify
-            # FIXME: not sure if this is the best way to fix this, as we might be losing
-            #        information in the copy. Previously we assigned the include params to
-            #        the block variables directly, which caused other problems, so we may
-            #        need to figure out a third option if this also presents problems.
-            b._task_include = b._task_include.copy(exclude_block=True)
+            b._task_include = b._task_include.copy()
             # then we create a temporary set of vars to ensure the variable reference is unique
             temp_vars = b._task_include.vars.copy()
             temp_vars.update(included_file._args.copy())
@@ -488,10 +487,10 @@ class StrategyBase:
             # error so that users know not to specify them both ways
             tags = temp_vars.pop('tags', [])
             if isinstance(tags, string_types):
-                tags = [ tags ]
+                tags = tags.split(',')
             if len(tags) > 0:
                 if len(b._task_include.tags) > 0:
-                    raise AnsibleParserError("Include tasks should not specify tags in more than one way (both via args and directly on the task)",
+                    raise AnsibleParserError("Include tasks should not specify tags in more than one way (both via args and directly on the task). Mixing tag specify styles is prohibited for whole import hierarchy, not only for single import statement",
                             obj=included_file._task._ds)
                 display.deprecated("You should not specify tags in the include parameters. All tags should be specified using the task-level option")
                 b._task_include.tags = tags
@@ -544,7 +543,10 @@ class StrategyBase:
         #    self._tqm.send_callback('v2_playbook_on_no_hosts_remaining')
         #    result = False
         #    break
+        saved_name = handler.name
+        handler.name = handler_name
         self._tqm.send_callback('v2_playbook_on_handler_task_start', handler)
+        handler.name = saved_name
 
         if notified_hosts is None:
             notified_hosts = self._notified_handlers[handler_name]

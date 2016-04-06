@@ -42,6 +42,7 @@ from ansible import constants as C
 from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
 from ansible.plugins.connection import ConnectionBase
 from ansible.utils.path import makedirs_safe
+from ansible.utils.unicode import to_bytes
 
 try:
     from __main__ import display
@@ -121,10 +122,7 @@ SFTP_CONNECTION_CACHE = {}
 class Connection(ConnectionBase):
     ''' SSH based connections with Paramiko '''
 
-    @property
-    def transport(self):
-        ''' used to identify this connection object from other classes '''
-        return 'paramiko'
+    transport = 'paramiko'
 
     def _cache_key(self):
         return "%s__%s__" % (self._play_context.remote_addr, self._play_context.remote_user)
@@ -151,11 +149,13 @@ class Connection(ConnectionBase):
         self.keyfile = os.path.expanduser("~/.ssh/known_hosts")
 
         if C.HOST_KEY_CHECKING:
-            try:
-                #TODO: check if we need to look at several possible locations, possible for loop
-                ssh.load_system_host_keys("/etc/ssh/ssh_known_hosts")
-            except IOError:
-                pass # file was not found, but not required to function
+            for ssh_known_hosts in ("/etc/ssh/ssh_known_hosts", "/etc/openssh/ssh_known_hosts"):
+                try:
+                    #TODO: check if we need to look at several possible locations, possible for loop
+                    ssh.load_system_host_keys(ssh_known_hosts)
+                    break
+                except IOError:
+                    pass # file was not found, but not required to function
             ssh.load_system_host_keys()
 
         ssh.set_missing_host_key_policy(MyAddPolicy(self._new_stdin, self))
@@ -220,6 +220,8 @@ class Connection(ConnectionBase):
 
         display.vvv("EXEC %s" % cmd, host=self._play_context.remote_addr)
 
+        cmd = to_bytes(cmd, errors='strict')
+
         no_prompt_out = ''
         no_prompt_err = ''
         become_output = ''
@@ -268,7 +270,7 @@ class Connection(ConnectionBase):
 
         display.vvv("PUT %s TO %s" % (in_path, out_path), host=self._play_context.remote_addr)
 
-        if not os.path.exists(in_path):
+        if not os.path.exists(to_bytes(in_path, errors='strict')):
             raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
 
         try:
@@ -277,7 +279,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("failed to open a SFTP connection (%s)" % e)
 
         try:
-            self.sftp.put(in_path, out_path)
+            self.sftp.put(to_bytes(in_path, errors='strict'), to_bytes(out_path, errors='strict'))
         except IOError:
             raise AnsibleError("failed to transfer file to %s" % out_path)
 
@@ -303,7 +305,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("failed to open a SFTP connection (%s)", e)
 
         try:
-            self.sftp.get(in_path, out_path)
+            self.sftp.get(to_bytes(in_path, errors='strict'), to_bytes(out_path, errors='strict'))
         except IOError:
             raise AnsibleError("failed to transfer file from %s" % in_path)
 

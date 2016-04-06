@@ -39,6 +39,7 @@ from ansible.galaxy.role import GalaxyRole
 from ansible.galaxy.login import GalaxyLogin
 from ansible.galaxy.token import GalaxyToken
 from ansible.playbook.role.requirement import RoleRequirement
+from ansible.utils.unicode import to_unicode
 
 try:
     from __main__ import display
@@ -161,8 +162,8 @@ class GalaxyCLI(CLI):
 
     def _display_role_info(self, role_info):
 
-        text = "\nRole: %s \n" % role_info['name']
-        text += "\tdescription: %s \n" % role_info.get('description', '')
+        text = [u"", u"Role: %s" % to_unicode(role_info['name'])]
+        text.append(u"\tdescription: %s" % role_info.get('description', ''))
 
         for k in sorted(role_info.keys()):
 
@@ -171,14 +172,15 @@ class GalaxyCLI(CLI):
 
             if isinstance(role_info[k], dict):
                 text += "\t%s: \n" % (k)
+                text.append(u"\t%s:" % (k))
                 for key in sorted(role_info[k].keys()):
                     if key in self.SKIP_INFO_KEYS:
                         continue
-                    text += "\t\t%s: %s\n" % (key, role_info[k][key])
+                    text.append(u"\t\t%s: %s" % (key, role_info[k][key]))
             else:
-                text += "\t%s: %s\n" % (k, role_info[k])
+                text.append(u"\t%s: %s" % (k, role_info[k]))
 
-        return text
+        return u'\n'.join(text)
 
 ############################
 # execute actions
@@ -322,9 +324,11 @@ class GalaxyCLI(CLI):
             if role_spec:
                 role_info.update(role_spec)
 
-            data += self._display_role_info(role_info)
+            data = self._display_role_info(role_info)
+            ### FIXME: This is broken in both 1.9 and 2.0 as
+            # _display_role_info() always returns something
             if not data:
-                data += "\n- the role %s was not found" % role
+                data = u"\n- the role %s was not found" % role
 
         self.pager(data)
 
@@ -385,7 +389,8 @@ class GalaxyCLI(CLI):
             # roles were specified directly, so we'll just go out grab them
             # (and their dependencies, unless the user doesn't want us to).
             for rname in self.args:
-                roles_left.append(GalaxyRole(self.galaxy, rname.strip()))
+                role = RoleRequirement.role_yaml_parse(rname.strip())
+                roles_left.append(GalaxyRole(self.galaxy, **role))
 
         for role in roles_left:
             display.vvv('Installing role %s ' % role.name)
@@ -514,27 +519,28 @@ class GalaxyCLI(CLI):
             tags=self.options.tags, author=self.options.author, page_size=page_size)
 
         if response['count'] == 0:
-            display.display("No roles match your search.", color="yellow")
+            display.display("No roles match your search.", color=C.COLOR_ERROR)
             return True
 
-        data = ''
+        data = [u'']
 
         if response['count'] > page_size:
-            data += ("\nFound %d roles matching your search. Showing first %s.\n" % (response['count'], page_size))
+            data.append(u"Found %d roles matching your search. Showing first %s." % (response['count'], page_size))
         else:
-            data += ("\nFound %d roles matching your search:\n" % response['count'])
+            data.append(u"Found %d roles matching your search:" % response['count'])
 
         max_len = []
         for role in response['results']:
             max_len.append(len(role['username'] + '.' + role['name']))
         name_len = max(max_len)
-        format_str = " %%-%ds %%s\n" % name_len
-        data +='\n'
-        data += (format_str % ("Name", "Description"))
-        data += (format_str % ("----", "-----------"))
+        format_str = u" %%-%ds %%s" % name_len
+        data.append(u'')
+        data.append(format_str % (u"Name", u"Description"))
+        data.append(format_str % (u"----", u"-----------"))
         for role in response['results']:
-            data += (format_str % (role['username'] + '.' + role['name'],role['description']))
+            data.append(format_str % (u'%s.%s' % (role['username'], role['name']), role['description']))
 
+        data = u'\n'.join(data)
         self.pager(data)
 
         return True
@@ -570,10 +576,10 @@ class GalaxyCLI(CLI):
 
         colors = {
             'INFO':    'normal',
-            'WARNING': 'yellow',
-            'ERROR':   'red',
-            'SUCCESS': 'green',
-            'FAILED':  'red'
+            'WARNING': C.COLOR_WARN,
+            'ERROR':   C.COLOR_ERROR,
+            'SUCCESS': C.COLOR_OK,
+            'FAILED': C.COLOR_ERROR,
         }
 
         if len(self.args) < 2:
@@ -592,11 +598,10 @@ class GalaxyCLI(CLI):
                 # found multiple roles associated with github_user/github_repo
                 display.display("WARNING: More than one Galaxy role associated with Github repo %s/%s." % (github_user,github_repo),
                     color='yellow')
-                display.display("The following Galaxy roles are being updated:" + u'\n', color='yellow')
+                display.display("The following Galaxy roles are being updated:" + u'\n', color=C.COLOR_CHANGED)
                 for t in task:
-                    display.display('%s.%s' % (t['summary_fields']['role']['namespace'],t['summary_fields']['role']['name']), color='yellow')
-                display.display(u'\n' + "To properly namespace this role, remove each of the above and re-import %s/%s from scratch" % (github_user,github_repo),
-                    color='yellow')
+                    display.display('%s.%s' % (t['summary_fields']['role']['namespace'],t['summary_fields']['role']['name']), color=C.COLOR_CHANGED)
+                display.display(u'\n' + "To properly namespace this role, remove each of the above and re-import %s/%s from scratch" % (github_user,github_repo), color=C.COLOR_CHANGED)
                 return 0
             # found a single role as expected
             display.display("Successfully submitted import request %d" % task[0]['id'])
@@ -633,17 +638,17 @@ class GalaxyCLI(CLI):
                 # None found
                 display.display("No integrations found.")
                 return 0
-            display.display(u'\n' + "ID         Source     Repo", color="green")
-            display.display("---------- ---------- ----------", color="green")
+            display.display(u'\n' + "ID         Source     Repo", color=C.COLOR_OK)
+            display.display("---------- ---------- ----------", color=C.COLOR_OK)
             for secret in secrets:
                 display.display("%-10s %-10s %s/%s" % (secret['id'], secret['source'], secret['github_user'],
-                    secret['github_repo']),color="green")
+                    secret['github_repo']),color=C.COLOR_OK)
             return 0
 
         if self.options.remove_id:
             # Remove a secret
             self.api.remove_secret(self.options.remove_id)
-            display.display("Secret removed. Integrations using this secret will not longer work.", color="green")
+            display.display("Secret removed. Integrations using this secret will not longer work.", color=C.COLOR_OK)
             return 0
 
         if len(self.args) < 4:
@@ -682,4 +687,3 @@ class GalaxyCLI(CLI):
         display.display(resp['status'])
 
         return True
-

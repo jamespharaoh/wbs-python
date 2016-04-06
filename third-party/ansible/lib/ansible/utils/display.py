@@ -48,18 +48,17 @@ except NameError:
 # These are module level as we currently fork and serialize the whole process and locks in the objects don't play well with that
 debug_lock = Lock()
 
+logger = None
 #TODO: make this a logging callback instead
 if C.DEFAULT_LOG_PATH:
     path = C.DEFAULT_LOG_PATH
-    if (os.path.exists(path) and not os.access(path, os.W_OK)) or not os.access(os.path.dirname(path), os.W_OK):
-        print("[WARNING]: log file at %s is not writeable, aborting\n" % path, file=sys.stderr)
-
-    logging.basicConfig(filename=path, level=logging.DEBUG, format='%(asctime)s %(name)s %(message)s')
-    mypid = str(os.getpid())
-    user = getpass.getuser()
-    logger = logging.getLogger("p=%s u=%s | " % (mypid, user))
-else:
-    logger = None
+    if (os.path.exists(path) and os.access(path, os.W_OK)) or os.access(os.path.dirname(path), os.W_OK):
+        logging.basicConfig(filename=path, level=logging.DEBUG, format='%(asctime)s %(name)s %(message)s')
+        mypid = str(os.getpid())
+        user = getpass.getuser()
+        logger = logging.getLogger("p=%s u=%s | " % (mypid, user))
+    else:
+        print("[WARNING]: log file at %s is not writeable and we cannot create it, aborting\n" % path, file=sys.stderr)
 
 
 class Display:
@@ -112,6 +111,7 @@ class Display:
 
         # FIXME: this needs to be implemented
         #msg = utils.sanitize_output(msg)
+        nocolor = msg
         if color:
             msg = stringc(msg, color)
 
@@ -136,7 +136,7 @@ class Display:
                 sys.stderr.flush()
 
         if logger and not screen_only:
-            msg2 = msg.lstrip(u'\n')
+            msg2 = nocolor.lstrip(u'\n')
 
             msg2 = to_bytes(msg2)
             if sys.version_info >= (3,):
@@ -145,7 +145,7 @@ class Display:
                 # characters that are invalid in the user's locale
                 msg2 = to_unicode(msg2, self._output_encoding(stderr=stderr))
 
-            if color == 'red':
+            if color == C.COLOR_ERROR:
                 logger.error(msg2)
             else:
                 logger.info(msg2)
@@ -168,7 +168,7 @@ class Display:
     def debug(self, msg):
         if C.DEFAULT_DEBUG:
             debug_lock.acquire()
-            self.display("%6d %0.5f: %s" % (os.getpid(), time.time(), msg), color='dark gray')
+            self.display("%6d %0.5f: %s" % (os.getpid(), time.time(), msg), color=C.COLOR_DEBUG)
             debug_lock.release()
 
     def verbose(self, msg, host=None, caplevel=2):
@@ -176,9 +176,9 @@ class Display:
         #msg = utils.sanitize_output(msg)
         if self.verbosity > caplevel:
             if host is None:
-                self.display(msg, color='blue')
+                self.display(msg, color=C.COLOR_VERBOSE)
             else:
-                self.display("<%s> %s" % (host, msg), color='blue', screen_only=True)
+                self.display("<%s> %s" % (host, msg), color=C.COLOR_VERBOSE, screen_only=True)
 
     def deprecated(self, msg, version=None, removed=False):
         ''' used to print out a deprecation message.'''
@@ -188,18 +188,18 @@ class Display:
 
         if not removed:
             if version:
-                new_msg = "[DEPRECATION WARNING]: %s. This feature will be removed in version %s." % (msg, version)
+                new_msg = "[DEPRECATION WARNING]: %s.\nThis feature will be removed in version %s." % (msg, version)
             else:
-                new_msg = "[DEPRECATION WARNING]: %s. This feature will be removed in a future release." % (msg)
+                new_msg = "[DEPRECATION WARNING]: %s.\nThis feature will be removed in a future release." % (msg)
             new_msg = new_msg + " Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.\n\n"
         else:
-            raise AnsibleError("[DEPRECATED]: %s.  Please update your playbooks." % msg)
+            raise AnsibleError("[DEPRECATED]: %s.\nPlease update your playbooks." % msg)
 
         wrapped = textwrap.wrap(new_msg, self.columns, replace_whitespace=False, drop_whitespace=False)
         new_msg = "\n".join(wrapped) + "\n"
 
         if new_msg not in self._deprecations:
-            self.display(new_msg.strip(), color='purple', stderr=True)
+            self.display(new_msg.strip(), color=C.COLOR_DEPRECATE, stderr=True)
             self._deprecations[new_msg] = 1
 
     def warning(self, msg):
@@ -207,7 +207,7 @@ class Display:
         wrapped = textwrap.wrap(new_msg, self.columns)
         new_msg = "\n".join(wrapped) + "\n"
         if new_msg not in self._warns:
-            self.display(new_msg, color='bright purple', stderr=True)
+            self.display(new_msg, color=C.COLOR_WARN, stderr=True)
             self._warns[new_msg] = 1
 
     def system_warning(self, msg):
@@ -256,9 +256,9 @@ class Display:
             wrapped = textwrap.wrap(new_msg, self.columns)
             new_msg = u"\n".join(wrapped) + u"\n"
         else:
-            new_msg = msg
+            new_msg = u"ERROR! " + msg
         if new_msg not in self._errors:
-            self.display(new_msg, color='red', stderr=True)
+            self.display(new_msg, color=C.COLOR_ERROR, stderr=True)
             self._errors[new_msg] = 1
 
     @staticmethod
@@ -274,7 +274,6 @@ class Display:
         else:
             return input(prompt_string)
 
-    @classmethod
     def do_var_prompt(self, varname, private=True, prompt=None, encrypt=None, confirm=False, salt_size=None, salt=None, default=None):
 
         result = None
@@ -295,18 +294,20 @@ class Display:
                     second = do_prompt("confirm " + msg, private)
                     if result == second:
                         break
-                    display.display("***** VALUES ENTERED DO NOT MATCH ****")
+                    self.display("***** VALUES ENTERED DO NOT MATCH ****")
             else:
                 result = do_prompt(msg, private)
         else:
             result = None
-            display.warning("Not prompting as we are not in interactive mode")
+            self.warning("Not prompting as we are not in interactive mode")
 
         # if result is false and default is not None
         if not result and default is not None:
             result = default
 
         if encrypt:
+            # Circular import because encrypt needs a display class
+            from ansible.utils.encrypt import do_encrypt
             result = do_encrypt(result, encrypt, salt_size, salt)
 
         # handle utf-8 chars

@@ -76,6 +76,7 @@ class TestStrategyBase(unittest.TestCase):
         for i in range(0, 5):
             mock_host = MagicMock()
             mock_host.name = "host%02d" % (i+1)
+            mock_host.has_hostkey = True
             mock_hosts.append(mock_host)
 
         mock_inventory = MagicMock()
@@ -111,6 +112,7 @@ class TestStrategyBase(unittest.TestCase):
         fake_loader = DictDataLoader()
         mock_var_manager = MagicMock()
         mock_host = MagicMock()
+        mock_host.has_hostkey = True
         mock_inventory = MagicMock()
         mock_options = MagicMock()
         mock_options.module_path = None
@@ -171,6 +173,7 @@ class TestStrategyBase(unittest.TestCase):
         mock_host = MagicMock()
         mock_host.name = 'test01'
         mock_host.vars = dict()
+        mock_host.has_hostkey = True
 
         mock_task = MagicMock()
         mock_task._role = None
@@ -193,6 +196,7 @@ class TestStrategyBase(unittest.TestCase):
         mock_inventory.get_host.side_effect = _get_host
         mock_inventory.get_group.side_effect = _get_group
         mock_inventory.clear_pattern_cache.return_value = None
+        mock_inventory.get_host_vars.return_value = {}
 
         mock_var_mgr = MagicMock()
         mock_var_mgr.set_host_variable.return_value = None
@@ -347,6 +351,7 @@ class TestStrategyBase(unittest.TestCase):
 
         mock_host = MagicMock(Host)
         mock_host.name = "test01"
+        mock_host.has_hostkey = True
 
         mock_inventory = MagicMock()
         mock_inventory.get_hosts.return_value = [mock_host]

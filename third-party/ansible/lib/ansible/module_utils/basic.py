@@ -65,6 +65,7 @@ import grp
 import pwd
 import platform
 import errno
+import datetime
 from itertools import repeat, chain
 
 try:
@@ -111,6 +112,12 @@ else:
     # Python 2
     def iteritems(d):
         return d.iteritems()
+
+try:
+    reduce
+except NameError:
+    # Python 3
+    from functools import reduce
 
 try:
     NUMBERTYPES = (int, long, float)
@@ -184,7 +191,7 @@ except ImportError:
         pass
 
 try:
-    from ast import literal_eval as _literal_eval
+    from ast import literal_eval
 except ImportError:
     # a replacement for literal_eval that works with python 2.4. from: 
     # https://mail.python.org/pipermail/python-list/2009-September/551880.html
@@ -192,7 +199,7 @@ except ImportError:
     # ast.py
     from compiler import ast, parse
 
-    def _literal_eval(node_or_string):
+    def literal_eval(node_or_string):
         """
         Safely evaluate an expression node or a string containing a Python
         expression.  The string or node provided may only consist of the  following
@@ -222,6 +229,7 @@ except ImportError:
             raise ValueError('malformed string')
         return _convert(node_or_string)
 
+_literal_eval = literal_eval
 
 FILE_COMMON_ARGUMENTS=dict(
     src = dict(),
@@ -423,9 +431,12 @@ def remove_values(value, no_log_strings):
         for omit_me in no_log_strings:
             if omit_me in stringy_value:
                 return 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'
+    elif isinstance(value, datetime.datetime):
+        value = value.isoformat()
     else:
         raise TypeError('Value of unknown type: %s, %s' % (type(value), value))
     return value
+
 
 def heuristic_log_sanitize(data, no_log_values=None):
     ''' Remove strings that look like passwords from log messages '''
@@ -514,9 +525,15 @@ class AnsibleModule(object):
         self.no_log = no_log
         self.cleanup_files = []
         self._debug = False
+        self._diff = False
+        self._verbosity = 0
+
+        # May be used to set modifications to the environment for any
+        # run_command invocation
+        self.run_command_environ_update = {}
 
         self.aliases = {}
-        self._legal_inputs = ['_ansible_check_mode', '_ansible_no_log', '_ansible_debug']
+        self._legal_inputs = ['_ansible_check_mode', '_ansible_no_log', '_ansible_debug', '_ansible_diff', '_ansible_verbosity']
 
         if add_file_common_args:
             for k, v in FILE_COMMON_ARGUMENTS.items():
@@ -544,10 +561,9 @@ class AnsibleModule(object):
                 if no_log_object:
                     self.no_log_values.update(return_values(no_log_object))
 
-        # check the locale as set by the current environment, and
-        # reset to LANG=C if it's an invalid/unavailable locale
+        # check the locale as set by the current environment, and reset to
+        # a known valid (LANG=C) if it's an invalid/unavailable locale
         self._check_locale()
-
 
         self._check_arguments(check_invalid_arguments)
 
@@ -848,6 +864,10 @@ class AnsibleModule(object):
                                    msg="mode must be in octal or symbolic form",
                                    details=str(e))
 
+                if mode != stat.S_IMODE(mode):
+                    # prevent mode from having extra info orbeing invalid long number
+                    self.fail_json(path=path, msg="Invalid mode supplied, only permission info is allowed", details=mode)
+
         prev_mode = stat.S_IMODE(path_stat.st_mode)
 
         if prev_mode != mode:
@@ -892,7 +912,7 @@ class AnsibleModule(object):
     def _symbolic_mode_to_octal(self, path_stat, symbolic_mode):
         new_mode = stat.S_IMODE(path_stat.st_mode)
 
-        mode_re = re.compile(r'^(?P<users>[ugoa]+)(?P<operator>[-+=])(?P<perms>[rwxXst]*|[ugo])$')
+        mode_re = re.compile(r'^(?P<users>[ugoa]+)(?P<operator>[-+=])(?P<perms>[rwxXst-]*|[ugo])$')
         for mode in symbolic_mode.split(','):
             match = mode_re.match(mode)
             if match:
@@ -1057,7 +1077,6 @@ class AnsibleModule(object):
             # as it would be returned by locale.getdefaultlocale()
             locale.setlocale(locale.LC_ALL, '')
         except locale.Error:
-            e = get_exception()
             # fallback to the 'C' locale, which may cause unicode
             # issues but is preferable to simply failing because
             # of an unknown locale
@@ -1106,8 +1125,18 @@ class AnsibleModule(object):
             elif k == '_ansible_debug':
                 self._debug = self.boolean(v)
 
+            elif k == '_ansible_diff':
+                self._diff = self.boolean(v)
+
+            elif k == '_ansible_verbosity':
+                self._verbosity = v
+
             elif check_invalid_arguments and k not in self._legal_inputs:
                 self.fail_json(msg="unsupported parameter for module: %s" % k)
+
+            #clean up internal params:
+            if k.startswith('_ansible_'):
+                del self.params[k]
 
     def _count_terms(self, check):
         count = 0
@@ -1201,9 +1230,9 @@ class AnsibleModule(object):
         try:
             result = None
             if not locals:
-                result = _literal_eval(str)
+                result = literal_eval(str)
             else:
-                result = _literal_eval(str, None, locals)
+                result = literal_eval(str, None, locals)
             if include_exceptions:
                 return (result, None)
             else:
@@ -1714,25 +1743,29 @@ class AnsibleModule(object):
             # rename might not preserve context
             self.set_context_if_different(dest, context, False)
 
-    def run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None):
+    def run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None):
         '''
         Execute a command, returns rc, stdout, and stderr.
-        args is the command to run
-        If args is a list, the command will be run with shell=False.
-        If args is a string and use_unsafe_shell=False it will split args to a list and run with shell=False
-        If args is a string and use_unsafe_shell=True it run with shell=True.
-        Other arguments:
-        - check_rc (boolean)    Whether to call fail_json in case of
-                                non zero RC.  Default is False.
-        - close_fds (boolean)   See documentation for subprocess.Popen().
-                                Default is True.
-        - executable (string)   See documentation for subprocess.Popen().
-                                Default is None.
-        - prompt_regex (string) A regex string (not a compiled regex) which
-                                can be used to detect prompts in the stdout
-                                which would otherwise cause the execution
-                                to hang (especially if no input data is
-                                specified)
+
+        :arg args: is the command to run
+            * If args is a list, the command will be run with shell=False.
+            * If args is a string and use_unsafe_shell=False it will split args to a list and run with shell=False
+            * If args is a string and use_unsafe_shell=True it runs with shell=True.
+        :kw check_rc: Whether to call fail_json in case of non zero RC.
+            Default False
+        :kw close_fds: See documentation for subprocess.Popen(). Default True
+        :kw executable: See documentation for subprocess.Popen(). Default None
+        :kw data: If given, information to write to the stdin of the command
+        :kw binary_data: If False, append a newline to the data.  Default False
+        :kw path_prefix: If given, additional path to find the command in.
+            This adds to the PATH environment vairable so helper commands in
+            the same directory can also be found
+        :kw cwd: iIf given, working directory to run the command inside
+        :kw use_unsafe_shell: See `args` parameter.  Default False
+        :kw prompt_regex: Regex string (not a compiled regex) which can be
+            used to detect prompts in the stdout which would otherwise cause
+            the execution to hang (especially if no input data is specified)
+        :kwarg environ_update: dictionary to *update* os.environ with
         '''
 
         shell = False
@@ -1743,7 +1776,9 @@ class AnsibleModule(object):
         elif isinstance(args, basestring) and use_unsafe_shell:
             shell = True
         elif isinstance(args, basestring):
-            args = shlex.split(args.encode('utf-8'))
+            if isinstance(args, unicode):
+                args = args.encode('utf-8')
+            args = shlex.split(args)
         else:
             msg = "Argument 'args' to run_command must be list or string"
             self.fail_json(rc=257, cmd=args, msg=msg)
@@ -1757,16 +1792,25 @@ class AnsibleModule(object):
 
         # expand things like $HOME and ~
         if not shell:
-            args = [ os.path.expandvars(os.path.expanduser(x)) for x in args ]
+            args = [ os.path.expandvars(os.path.expanduser(x)) for x in args if x is not None ]
 
         rc = 0
         msg = None
         st_in = None
 
-        # Set a temporary env path if a prefix is passed
-        env=os.environ
+        # Manipulate the environ we'll send to the new process
+        old_env_vals = {}
+        # We can set this from both an attribute and per call
+        for key, val in self.run_command_environ_update.items():
+            old_env_vals[key] = os.environ.get(key, None)
+            os.environ[key] = val
+        if environ_update:
+            for key, val in environ_update.items():
+                old_env_vals[key] = os.environ.get(key, None)
+                os.environ[key] = val
         if path_prefix:
-            env['PATH']="%s:%s" % (path_prefix, env['PATH'])
+            old_env_vals['PATH'] = os.environ['PATH']
+            os.environ['PATH'] = "%s:%s" % (path_prefix, os.environ['PATH'])
 
         # create a printable version of the command for use
         # in reporting later, which strips out things like
@@ -1808,11 +1852,10 @@ class AnsibleModule(object):
             close_fds=close_fds,
             stdin=st_in,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            env=os.environ,
         )
 
-        if path_prefix:
-            kwargs['env'] = env
         if cwd and os.path.isdir(cwd):
             kwargs['cwd'] = cwd
 
@@ -1835,7 +1878,6 @@ class AnsibleModule(object):
                 else:
                     running = args
                 self.log('Executing: ' + running)
-
             cmd = subprocess.Popen(args, **kwargs)
 
             # the communication logic here is essentially taken from that
@@ -1890,6 +1932,13 @@ class AnsibleModule(object):
             self.fail_json(rc=e.errno, msg=str(e), cmd=clean_args)
         except:
             self.fail_json(rc=257, msg=traceback.format_exc(), cmd=clean_args)
+
+        # Restore env settings
+        for key, val in old_env_vals.items():
+            if val is None:
+                del os.environ[key]
+            else:
+                os.environ[key] = val
 
         if rc != 0 and check_rc:
             msg = heuristic_log_sanitize(stderr.rstrip(), self.no_log_values)
