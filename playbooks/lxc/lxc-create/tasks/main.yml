@@ -1,14 +1,23 @@
 ---
 
 - name: "create lxc container"
+  delegate_to: "localhost"
+  become: "yes"
+  args:
+
+    executable: "/bin/bash"
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
+
   shell:
 
-    set -e;
+    set -euf -o pipefail;
+
+    echo $UID;
 
     source {{ deployment_home }}/wistla-devops/misc/locking ansible;
     exlock;
 
-    if test -f /var/lib/lxc/{{ inventory_hostname }}; then
+    if test -d /var/lib/lxc/{{ inventory_hostname }}; then
       set +e;
       lxc-stop
         --name {{ inventory_hostname }};
@@ -39,13 +48,6 @@
     apt-get install -qqy python;
 
     touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
-
-  args:
-    executable: "/bin/bash"
-    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
 
 - name: "create lxc config"
   action:

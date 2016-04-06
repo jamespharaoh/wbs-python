@@ -1,0 +1,11 @@
+---
+
+- name: "create hosts"
+  become: "yes"
+  action:
+
+    module: "template"
+    src: "node-hosts"
+    dest: "/etc/hosts"
+
+# ex: et ts=2 filetype=yaml

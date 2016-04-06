@@ -8,6 +8,10 @@
       when: "node_active == 'yes'"
       tags: "quick"
 
+    - role: "node-setup"
+      when: "node_active == 'yes'"
+      tags: "quick"
+
     - role: "lxc-start"
       when: "node_active == 'yes'"
       tags: "quick"
