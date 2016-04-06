@@ -40,6 +40,7 @@ type = "ScribbleDecoder"
 
 {% for cluster_deployment_name in cluster.deployment_names | default ([]) %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}
+{% if cluster_deployment.type != 'alias' %}
 {% for log_name in [ 'wistla-api', 'wistla-browser', 'wistla-web' ] %}
 
 [input-{{ cluster_deployment_name }}-{{ log_name }}]
@@ -56,6 +57,7 @@ type = "ScribbleDecoder"
 	Deployment = "{{ cluster_deployment_name }}"
 
 {% endfor %}
+{% endif %}
 {% endfor %}
 
 [input-nginx-times]
