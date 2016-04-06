@@ -42,6 +42,9 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-devops-config"
         target: "wistla-devops/config/overrides.yml"
 
+      - template: "cluster-deployment-wistla-devops-local"
+        target: "wistla-devops/config/local.yml"
+
       - template: "cluster-deployment-wistla-devops-connections"
         target: "wistla-devops/config/connections.yml"
 
@@ -203,6 +206,9 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-devops-config"
         target: "wistla-devops/config/overrides.yml"
+
+      - template: "cluster-deployment-wistla-devops-local"
+        target: "wistla-devops/config/local.yml"
 
       - template: "cluster-deployment-wistla-devops-connections"
         target: "wistla-devops/config/connections.yml"
@@ -371,6 +377,9 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-devops-config"
         target: "wistla-devops/config/overrides.yml"
+
+      - template: "cluster-deployment-wistla-devops-local"
+        target: "wistla-devops/config/local.yml"
 
       - template: "cluster-deployment-wistla-devops-connections"
         target: "wistla-devops/config/connections.yml"

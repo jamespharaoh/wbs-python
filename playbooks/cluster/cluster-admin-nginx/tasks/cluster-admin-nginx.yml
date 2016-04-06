@@ -1,21 +1,82 @@
 ---
 
 - name: "create robots.txt"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
     dest: "{{ nginx_target }}/conf/dev-robots.txt"
     src: "cluster-admin-nginx-robots"
 
-- name: "create nginx config"
-  notify: "restart nginx"
-  sudo: "yes"
+- name: "create nginx directories"
+  with_items:
+
+    - directory: "{{ nginx_target }}/conf"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+    - directory: "{{ nginx_target }}/conf/sites"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create nginx configs"
+  with_items:
+
+    - target: "{{ nginx_target }}/conf/nginx.conf"
+      template: "cluster-admin-nginx-config"
+
+    - target: "{{ nginx_target }}/conf/sites/icinga.conf"
+      template: "cluster-admin-nginx-icinga-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+    - target: "{{ nginx_target }}/conf/sites/jenkins.conf"
+      template: "cluster-admin-nginx-jenkins-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+  when: "{{ item.when | default (True) }}"
+  notify: "set nginx.needs_restart to 'yes'"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+
+- name: "create nginx configs"
+  notify: "set nginx.needs_restart to 'yes'"
+  become: "yes"
   action:
 
     module: "template"
     dest: "{{ nginx_target }}/conf/nginx.conf"
     src: "cluster-admin-nginx-config"
+
+- name: "create nginx dev configs"
+  with_dict: "{{ dev_deployments }}"
+  when: "
+    item.value.type == 'simple'
+    and item.value.main_domain in cluster.admin_certificates
+  "
+  notify: "set nginx.needs_restart to 'yes'"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ nginx_target }}/conf/sites/dev-{{ item.key }}.conf"
+    src: "cluster-admin-nginx-dev-config"
 
 - name: "create nginx directories"
   with_items:
@@ -30,7 +91,7 @@
       group: "adm"
       mode: "0750"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -43,8 +104,8 @@
 
 - name: "write nginx certificates"
   with_items: "{{ cluster.admin_certificates | default ([]) }}"
-  notify: "restart nginx"
-  sudo: "yes"
+  notify: "set nginx.needs_restart to 'yes'"
+  become: "yes"
   action:
 
     module: "template"
@@ -53,8 +114,8 @@
 
 - name: "write nginx private keys"
   with_items: "{{ cluster.admin_certificates | default ([]) }}"
-  notify: "restart nginx"
-  sudo: "yes"
+  notify: "set nginx.needs_restart to 'yes'"
+  become: "yes"
   action:
 
     module: "copy"
@@ -71,7 +132,7 @@
     mode: "0600"
 
 - name: "write nginx htpasswd"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"

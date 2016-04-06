@@ -6,6 +6,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "production-a"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "production-a" ]
@@ -19,6 +20,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "production"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "production" ]
@@ -27,11 +29,13 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging-a"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "staging-a" ]
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging-b"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "staging-b" ]
@@ -40,6 +44,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "staging" ]
@@ -48,28 +53,33 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-everest"
       cluster_deployment_playbook_name: "start"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "test-everest" ]
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-k2"
       cluster_deployment_playbook_name: "start"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "test-k2" ]
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-montblanc"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "test-montblanc" ]
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-erebus"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "test-erebus" ]
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-fitzroy"
       cluster_deployment_playbook_name: "start"
       tags: [ "cluster-deployment", "test-fitzroy" ]

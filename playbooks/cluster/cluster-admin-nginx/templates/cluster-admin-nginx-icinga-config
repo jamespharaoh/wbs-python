@@ -1,0 +1,100 @@
+{{ ansible_warning ['#'] }}
+
+# icinga redirect to ssl
+
+server {
+
+	server_name icinga.ops.wistla.com;
+
+	listen 80;
+
+	return 301 https://icinga.ops.wistla.com$request_uri;
+
+}
+
+# icinga ssl
+
+server {
+
+	server_name icinga.ops.wistla.com;
+
+	listen 443 ssl http2;
+
+	ssl_certificate {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.cert;
+	ssl_certificate_key {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.key;
+
+	# classic ui
+
+	location /icinga/cgi-bin {
+
+		alias /opt/icinga/sbin;
+
+		auth_basic "Restricted";
+		auth_basic_user_file /opt/icinga2/etc/icinga2-classicui/htpasswd.users;
+
+		fastcgi_pass unix:/var/run/fcgiwrap.socket;
+		include {{ nginx_target }}/conf/fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME /opt/icinga/sbin/$fastcgi_script_name;
+		fastcgi_param ICINGA_CGI_CONFIG /opt/icinga2/etc/icinga2-classicui/cgi.cfg;
+		fastcgi_param AUTH_USER $remote_user;
+		fastcgi_param REMOTE_USER $remote_user;
+
+	}
+
+	#location /icinga2-classicui/stylesheets {
+	#	alias /opt/icinga2/etc/icinga2-classicui/stylesheets;
+	#}
+
+	location /icinga {
+
+		alias /opt/icinga/share;
+
+		auth_basic "Restricted";
+		auth_basic_user_file /opt/icinga2/etc/icinga2-classicui/htpasswd.users;
+
+	}
+
+	# icinga web2 proxy to admin-a
+
+	location /icingaweb2 {
+		proxy_pass http://wistla-ops-admin-a;
+		proxy_set_header Host icinga-origin.ops.wistla.com;
+		proxy_set_header X-Real-IP $http_x_real_ip;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Wistla-Entry-Region {{ region_code }};
+	}
+
+}
+
+# icinga web 2
+
+server {
+
+	server_name icinga-origin.ops.wistla.com;
+
+	listen 80;
+
+	location ~ ^/icingaweb2/index\.php(.*)$ {
+
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		include fastcgi_params;
+
+		fastcgi_param SCRIPT_FILENAME /opt/icinga-web-2.0.0-rc1/public/index.php;
+		fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;
+		fastcgi_param REMOTE_USER $remote_user;
+		fastcgi_param HTTPS on;
+
+	}
+
+	location ~ ^/icingaweb2(.+)? {
+
+		alias /opt/icinga-web-2.0.0-rc1/public;
+
+		index index.php;
+		try_files $1 $uri $uri/ /icingaweb2/index.php$is_args$args;
+
+	}
+
+}

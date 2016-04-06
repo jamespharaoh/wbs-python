@@ -10,9 +10,18 @@ class:
   namespace: "deployment"
   parent_namespace: "cluster"
 
+  groups:
+
+    - "deployments"
+    - "{{ identity_parent }}-deployments"
+
 deployment:
 
+  name: "{{ identity_name }}"
+  deployment_name: "{{ identity_name }}"
   cluster_name: "{{ identity_parent }}"
+  supercluster_name: "{{ identity_grandparent }}"
+
   description: ""
 
 # ex: et ts=2 filetype=yaml

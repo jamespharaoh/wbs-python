@@ -1,7 +1,6 @@
 ---
 
-- name: "stop amazon instance"
-  when: "
+- when: "
     (
       amazon_instance_state == 'stopped'
       or (
@@ -14,26 +13,43 @@
       or cluster_production_override == inventory_hostname
     )
   "
-  local_action:
+  block:
 
-    module: "ec2"
-    instance_ids: "{{ instance_id }}"
-    state: "stopped"
+    - name: "remove instance from load balancer"
+      local_action:
 
-    region: "{{ amazon_region_name }}"
+        module: "ec2_elb"
+        instance_id: "{{ instance_id }}"
+        ec2_elbs: "{{ load_balancer_name }}"
+        state: "absent"
 
-    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+        region: "{{ amazon_region_name }}"
 
-- name: "set amazon_instance_type_running to ''"
-  when: "
-    amazon_instance_state == 'running'
-    and amazon_instance_type_running != ''
-    and amazon_instance_type != amazon_instance_type_running
-  "
-  update_resource:
+        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
-    amazon_instance_type_running: ""
+    - name: "stop amazon instance"
+      local_action:
+
+        module: "ec2"
+        instance_ids: "{{ instance_id }}"
+        state: "stopped"
+
+        region: "{{ amazon_region_name }}"
+
+        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+    - name: "set amazon_instance_type_running to ''"
+      when: "
+        amazon_instance_state == 'running'
+        and amazon_instance_type_running != ''
+        and amazon_instance_type != amazon_instance_type_running
+      "
+      update_resource:
+
+        amazon_instance_type_running: ""
 
 # ex: et ts=2 filetype=yaml

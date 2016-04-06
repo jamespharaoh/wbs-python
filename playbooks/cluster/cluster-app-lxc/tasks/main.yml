@@ -1,0 +1,10 @@
+---
+
+- include: "cluster-app-lxc.yml"
+  tags:
+
+    - "cluster"
+    - "cluster-app"
+    - "cluster-app-lxc"
+
+# ex: et ts=2 filetype=yaml

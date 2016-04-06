@@ -51,5 +51,6 @@ resource_data:
 
   clusters: "cluster.cluster"
   deployments: "deployment.deployment"
+  dev_deployments: "dev-deployments.deployment"
 
 # ex: et ts=2 filetype=yaml

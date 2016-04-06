@@ -13,11 +13,19 @@ amazon_image: "{{
 }}"
 
 amazon_instance_type: "{{
-  cluster.amazon_instance_types [instance_type]
+  {
+    'running': cluster.amazon_instance_types [instance_type],
+    'standby': cluster.amazon_instance_types.standby,
+    'stopped': 'none',
+  } [amazon_instance_state]
 }}"
 
 amazon_instance_ebs_optimized: "{{
-  cluster.amazon_instance_ebs_optimized [instance_type]
+  {
+    'running': cluster.amazon_instance_ebs_optimized [instance_type],
+    'standby': cluster.amazon_instance_ebs_optimized.standby,
+    'stopped': 'none',
+  } [amazon_instance_state]
 }}"
 
 amazon_vpc_subnet_id: "{{

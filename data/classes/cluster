@@ -12,6 +12,9 @@ class:
 
 cluster:
 
+  admin_certificates: []
+
+  name: "{{ identity_name }}"
   cluster_name: "{{ identity_name }}"
   supercluster_name: "{{ identity_parent }}"
 

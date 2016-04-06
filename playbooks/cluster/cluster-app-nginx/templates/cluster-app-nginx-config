@@ -43,10 +43,16 @@ http {
 
 	client_max_body_size 16m;
 
-	proxy_connect_timeout 1s;
+	proxy_connect_timeout 250ms;
 	proxy_read_timeout 60s;
 	proxy_send_timeout 60s;
-
+	proxy_next_upstream {{ [
+		'error',
+		'timeout',
+		'http_502',
+		'http_503',
+		'http_504',
+	] | join (' ') }};
 	proxy_http_version 1.1;
 	proxy_set_header Connection "";
 
@@ -59,8 +65,8 @@ http {
 
 	upstream deployment-{{ deployment_name }} {
 
-{% for zone in deployment_cluster.instance_formation.app.zones %}
 {% for index in deployment_cluster.instance_formation.app.indices %}
+{% for zone in deployment_cluster.instance_formation.app.zones %}
 		server {{ [
 			[
 				deployment.bridge_network,
@@ -367,7 +373,7 @@ http {
 {% endmacro %}
 
 {% for deployment_name, deployment in deployments.items ()
-if deployment.supercluster == supercluster_name %}
+if deployment.supercluster_name == supercluster_name %}
 
 {% if deployment.type == 'shared' %}
 

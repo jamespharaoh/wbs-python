@@ -1,23 +1,45 @@
 ---
 
-#- name: "stop cluster instance"
-#  when: "
-#    amazon_instance_state == 'running'
-#    and amazon_instance_type != amazon_instance_type_running
-#  "
-#  local_action:
-#
-#    module: "ec2"
-#    instance_ids: "{{ instance_id }}"
-#    state: "stopped"
-#
-#    region: "{{ amazon_region_name }}"
-#
-#    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-#    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-#    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
-#
-#    wait: "yes"
+- debug: { var: "amazon_instance_type" }
+- debug: { var: "amazon_instance_type_running" }
+
+- when: "
+    amazon_instance_state in [ 'running', 'standby' ]
+    and amazon_instance_type != amazon_instance_type_running
+    and (
+      cluster_name != 'production'
+      or cluster_production_override == inventory_hostname
+    )
+  "
+  block:
+
+    - name: "remove instance from load balancer"
+      local_action:
+
+        module: "ec2_elb"
+        instance_id: "{{ instance_id }}"
+        ec2_elbs: "{{ load_balancer_name }}"
+        state: "absent"
+
+        region: "{{ amazon_region_name }}"
+
+        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+    - name: "stop cluster instance"
+      local_action:
+
+        module: "ec2"
+        instance_ids: "{{ instance_id }}"
+        state: "stopped"
+
+        region: "{{ amazon_region_name }}"
+        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
+        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
+        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+        wait: "yes"
 
 - name: "create cluster instance"
   when: "instance_id is not defined"
@@ -59,7 +81,7 @@
     instance_id: "{{ create_result.tagged_instances.0.id }}"
 
 - name: "start cluster instance"
-  when: "amazon_instance_state == 'running'"
+  when: "amazon_instance_state in [ 'running', 'standby' ]"
   local_action:
 
     module: "ec2"
@@ -77,7 +99,7 @@
 
 - name: "set amazon_instance_type_running"
   when: "
-    amazon_instance_state == 'running'
+    amazon_instance_state in [ 'running', 'standby' ]
     and amazon_instance_type != amazon_instance_type_running
   "
   update_resource:

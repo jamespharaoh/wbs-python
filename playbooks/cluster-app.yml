@@ -36,6 +36,7 @@
     - "cluster-app-nginx"
     - "control-nginx"
 
+    - "cluster-app-lxc"
     - "cluster-app"
 
     - "cluster-activate"

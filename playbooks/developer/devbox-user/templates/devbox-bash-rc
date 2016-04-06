@@ -63,4 +63,8 @@ alias run-redeploy="$HOME/wistla-devops/run-ansible redeploy.yml"
 alias run-clean-data="$HOME/wistla-devops/run-ansible clean-data.yml"
 alias run-devbox="$HOME/wistla-devops/run-ansible devbox.yml"
 
+# useful functions
+
+function comma () { echo "$@" | tr ' ' ,; }
+
 # ex: noet ts=4 filetype=sh
