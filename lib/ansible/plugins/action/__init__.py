@@ -24,6 +24,7 @@ import json
 import os
 import pipes
 import random
+import re
 import stat
 import tempfile
 import time
@@ -90,6 +91,13 @@ class ActionBase(with_metaclass(ABCMeta, object)):
                 module_args = self._task.args,
             )
         return results
+
+    def _remote_file_exists(self, path):
+        cmd = self._connection._shell.exists(path)
+        result = self._low_level_execute_command(cmd=cmd, sudoable=True)
+        if result['rc'] == 0:
+            return True
+        return False
 
     def _configure_module(self, module_name, module_args, task_vars=None):
         '''
@@ -290,28 +298,58 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         res = self._low_level_execute_command(cmd, sudoable=sudoable)
         return res
 
+    def _execute_remote_stat(self, path, all_vars, follow, tmp=None):
+        '''
+        Get information from remote file.
+        '''
+        module_args=dict(
+           path=path,
+           follow=follow,
+           get_md5=False,
+           get_checksum=True,
+           checksum_algo='sha1',
+        )
+        mystat = self._execute_module(module_name='stat', module_args=module_args, task_vars=all_vars, tmp=tmp, delete_remote_tmp=(tmp is None))
+
+        if 'failed' in mystat and mystat['failed']:
+            raise AnsibleError('Failed to get information on remote file (%s): %s' % (path, mystat['msg']))
+
+        if not mystat['stat']['exists']:
+            # empty might be matched, 1 should never match, also backwards compatible
+            mystat['stat']['checksum'] = '1'
+
+        # happens sometimes when it is a dir and not on bsd
+        if not 'checksum' in mystat['stat']:
+            mystat['stat']['checksum'] = ''
+
+        return mystat['stat']
+
     def _remote_checksum(self, path, all_vars):
         '''
-        Takes a remote checksum and returns 1 if no file
+        Produces a remote checksum given a path,
+        Returns a number 0-4 for specific errors instead of checksum, also ensures it is different
+        0 = unknown error
+        1 = file does not exist, this might not be an error
+        2 = permissions issue
+        3 = its a directory, not a file
+        4 = stat module failed, likely due to not finding python
         '''
-
-        python_interp = all_vars.get('ansible_python_interpreter', 'python')
-
-        cmd = self._connection._shell.checksum(path, python_interp)
-        data = self._low_level_execute_command(cmd, sudoable=True)
+        x = "0" # unknown error has occured
         try:
-            data2 = data['stdout'].strip().splitlines()[-1]
-            if data2 == u'':
-                # this may happen if the connection to the remote server
-                # failed, so just return "INVALIDCHECKSUM" to avoid errors
-                return "INVALIDCHECKSUM"
+            remote_stat = self._execute_remote_stat(path, all_vars, follow=False)
+            if remote_stat['exists'] and remote_stat['isdir']:
+                x = "3" # its a directory not a file
             else:
-                return data2.split()[0]
-        except IndexError:
-            display.warning(u"Calculating checksum failed unusually, please report this to "
-                u"the list so it can be fixed\ncommand: %s\n----\noutput: %s\n----\n" % (to_unicode(cmd), data))
-            # this will signal that it changed and allow things to keep going
-            return "INVALIDCHECKSUM"
+                x = remote_stat['checksum'] # if 1, file is missing
+        except AnsibleError as e:
+            errormsg = to_unicode(e)
+            if errormsg.endswith('Permission denied'):
+                x = "2" # cannot read file
+            elif errormsg.endswith('MODULE FAILURE'):
+                x = "4" # python not found or module uncaught exception
+        finally:
+            return x
+
 
     def _remote_expand_user(self, path):
         ''' takes a remote path and performs tilde expansion on the remote host '''
@@ -356,6 +394,14 @@ class ActionBase(with_metaclass(ABCMeta, object)):
 
         return data[idx:]
 
+    def _strip_success_message(self, data):
+        '''
+        Removes the BECOME-SUCCESS message from the data.
+        '''
+        if data.strip().startswith('BECOME-SUCCESS-'):
+            data = re.sub(r'^((\r)?\n)?BECOME-SUCCESS.*(\r)?\n', '', data)
+        return data
+
     def _execute_module(self, module_name=None, module_args=None, tmp=None, task_vars=None, persist_files=False, delete_remote_tmp=True):
         '''
         Transfer and run a module along with its arguments.
@@ -371,22 +417,28 @@ class ActionBase(with_metaclass(ABCMeta, object)):
             module_args = self._task.args
 
         # set check mode in the module arguments, if required
-        if self._play_context.check_mode and not self._task.always_run:
+        if self._play_context.check_mode:
             if not self._supports_check_mode:
                 raise AnsibleError("check mode is not supported for this operation")
             module_args['_ansible_check_mode'] = True
+        else:
+            module_args['_ansible_check_mode'] = False
 
         # set no log in the module arguments, if required
-        if self._play_context.no_log or C.DEFAULT_NO_TARGET_SYSLOG:
-            module_args['_ansible_no_log'] = True
+        module_args['_ansible_no_log'] = self._play_context.no_log or C.DEFAULT_NO_TARGET_SYSLOG
 
         # set debug in the module arguments, if required
-        if C.DEFAULT_DEBUG:
-            module_args['_ansible_debug'] = True
+        module_args['_ansible_debug'] = C.DEFAULT_DEBUG
+
+        # let module know we are in diff mode
+        module_args['_ansible_diff'] = self._play_context.diff
+
+        # let module know our verbosity
+        module_args['_ansible_verbosity'] = self._display.verbosity
 
         (module_style, shebang, module_data) = self._configure_module(module_name=module_name, module_args=module_args, task_vars=task_vars)
         if not shebang:
-            raise AnsibleError("module is missing interpreter line")
+            raise AnsibleError("module (%s) is missing interpreter line" % module_name)
 
         # a remote tmp path may be necessary and not already created
         remote_module_path = None
@@ -420,11 +472,13 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         if tmp and "tmp" in tmp and self._play_context.become and self._play_context.become_user != 'root':
             # deal with possible umask issues once sudo'ed to other user
             self._remote_chmod('a+r', remote_module_path)
+            if args_file_path is not None:
+                self._remote_chmod('a+r', args_file_path)
 
         cmd = ""
         in_data = None
 
-        if self._connection.has_pipelining and self._play_context.pipelining and not C.DEFAULT_KEEP_REMOTE_FILES:
+        if self._connection.has_pipelining and self._play_context.pipelining and not C.DEFAULT_KEEP_REMOTE_FILES and module_style == 'new':
             in_data = module_data
         else:
             if remote_module_path:
@@ -459,13 +513,12 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         except ValueError:
             # not valid json, lets try to capture error
             data = dict(failed=True, parsed=False)
-            if 'stderr' in res and res['stderr'].startswith(u'Traceback'):
-                data['exception'] = res['stderr']
-            else:
-                data['msg'] = "MODULE FAILURE"
-                data['module_stdout'] = res.get('stdout', u'')
-                if 'stderr' in res:
-                    data['module_stderr'] = res['stderr']
+            data['msg'] = "MODULE FAILURE"
+            data['module_stdout'] = res.get('stdout', u'')
+            if 'stderr' in res:
+                data['module_stderr'] = res['stderr']
+                if res['stderr'].startswith(u'Traceback'):
+                    data['exception'] = res['stderr']
 
         # pre-split stdout into lines, if stdout is in the data and there
         # isn't already a stdout_lines value there
@@ -475,8 +528,7 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         display.debug("done with _execute_module (%s, %s)" % (module_name, module_args))
         return data
 
-    def _low_level_execute_command(self, cmd, sudoable=True, in_data=None,
-            executable=None, encoding_errors='replace'):
+    def _low_level_execute_command(self, cmd, sudoable=True, in_data=None, executable=C.DEFAULT_EXECUTABLE, encoding_errors='replace'):
         '''
         This is the function which executes the low level shell command, which
         may be commands to create/remove directories for temporary files, or to
@@ -491,9 +543,6 @@ class ActionBase(with_metaclass(ABCMeta, object)):
             replacement strategy (python3 could use surrogateescape)
         '''
 
-        if executable is not None:
-            cmd = executable + ' -c ' + cmd
-
         display.debug("_low_level_execute_command(): starting")
         if not cmd:
             # this can happen with powershell modules when there is no analog to a Windows command (like chmod)
@@ -505,6 +554,9 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         if sudoable and self._play_context.become and (allow_same_user or not same_user):
             display.debug("_low_level_execute_command(): using become for this command")
             cmd = self._play_context.make_become_cmd(cmd, executable=executable)
+
+        if executable is not None and self._connection.allow_executable:
+            cmd = executable + ' -c ' + pipes.quote(cmd)
 
         display.debug("_low_level_execute_command(): executing: %s" % (cmd,))
         rc, stdout, stderr = self._connection.exec_command(cmd, in_data=in_data, sudoable=sudoable)
@@ -528,8 +580,10 @@ class ActionBase(with_metaclass(ABCMeta, object)):
         if rc is None:
             rc = 0
 
-        display.debug("_low_level_execute_command() done: rc=%d, stdout=%s, stderr=%s" % (rc, stdout, stderr))
+        # be sure to remove the BECOME-SUCCESS message now
+        out = self._strip_success_message(out)
 
+        display.debug("_low_level_execute_command() done: rc=%d, stdout=%s, stderr=%s" % (rc, stdout, stderr))
         return dict(rc=rc, stdout=out, stdout_lines=out.splitlines(), stderr=err)
 
     def _get_first_available_file(self, faf, of=None, searchdir='files'):
@@ -582,23 +636,30 @@ class ActionBase(with_metaclass(ABCMeta, object)):
                     diff['before'] = dest_contents
 
             if source_file:
-                display.debug("Reading local copy of the file %s" % source)
-                try:
-                    src = open(source)
-                    src_contents = src.read(8192)
-                    st = os.stat(source)
-                except Exception as e:
-                    raise AnsibleError("Unexpected error while reading source (%s) for diff: %s " % (source, str(e)))
-                if "\x00" in src_contents:
-                    diff['src_binary'] = 1
-                elif st[stat.ST_SIZE] > C.MAX_FILE_SIZE_FOR_DIFF:
+                st = os.stat(source)
+                if st[stat.ST_SIZE] > C.MAX_FILE_SIZE_FOR_DIFF:
                     diff['src_larger'] = C.MAX_FILE_SIZE_FOR_DIFF
                 else:
-                    diff['after_header'] = source
-                    diff['after'] = src_contents
+                    display.debug("Reading local copy of the file %s" % source)
+                    try:
+                        src = open(source)
+                        src_contents = src.read()
+                    except Exception as e:
+                        raise AnsibleError("Unexpected error while reading source (%s) for diff: %s " % (source, str(e)))
+                    if "\x00" in src_contents:
+                        diff['src_binary'] = 1
+                    else:
+                        diff['after_header'] = source
+                        diff['after'] = src_contents
             else:
                 display.debug("source of file passed in")
                 diff['after_header'] = 'dynamically generated'
                 diff['after'] = source
+
+        if self._play_context.no_log:
+            if 'before' in diff:
+                diff["before"] = ""
+            if 'after' in diff:
+                diff["after"] = " [[ Diff output has been hidden because 'no_log: true' was specified for this result ]]"
 
         return diff

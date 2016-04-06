@@ -41,7 +41,7 @@ import uuid
 import yaml
 from jinja2.filters import environmentfilter
 from distutils.version import LooseVersion, StrictVersion
-from ansible.compat.six import iteritems
+from ansible.compat.six import iteritems, string_types
 
 from ansible import errors
 from ansible.parsing.yaml.dumper import AnsibleDumper
@@ -110,7 +110,7 @@ def bool(a):
     ''' return a bool for the arg '''
     if a is None or type(a) == bool:
         return a
-    if type(a) in types.StringTypes:
+    if isinstance(a, string_types):
         a = a.lower()
     if a in ['yes', 'on', '1', 'true', 1]:
         return True
@@ -225,7 +225,11 @@ def get_encrypted_password(password, hashtype='sha512', salt=None):
     if hashtype in cryptmethod:
         if salt is None:
             r = SystemRandom()
-            salt = ''.join([r.choice(string.ascii_letters + string.digits) for _ in range(16)])
+            if hashtype in ['md5']:
+                saltsize = 8
+            else:
+                saltsize = 16
+            salt = ''.join([r.choice(string.ascii_letters + string.digits) for _ in range(saltsize)])
 
         if not HAS_PASSLIB:
             if sys.platform.startswith('darwin'):

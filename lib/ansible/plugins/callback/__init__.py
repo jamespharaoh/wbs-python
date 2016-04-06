@@ -38,6 +38,11 @@ except ImportError:
 
 __all__ = ["CallbackBase"]
 
+try:
+    from __main__ import cli
+except ImportError:
+    # using API w/o cli 
+    cli = False
 
 class CallbackBase:
 
@@ -52,6 +57,11 @@ class CallbackBase:
             self._display = display
         else:
             self._display = global_display
+
+        if cli:
+            self._options = cli.options
+        else:
+            self._options = None
 
         if self._display.verbosity >= 4:
             name = getattr(self, 'CALLBACK_NAME', 'unnamed')
@@ -95,7 +105,6 @@ class CallbackBase:
             try:
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
-                    ret = []
                     if 'dst_binary' in diff:
                         ret.append("diff skipped: destination file appears to be binary\n")
                     if 'src_binary' in diff:
@@ -117,12 +126,22 @@ class CallbackBase:
                             after_header = "after: %s" % diff['after_header']
                         else:
                             after_header = 'after'
-                        differ = difflib.unified_diff(to_unicode(diff['before']).splitlines(True), to_unicode(diff['after']).splitlines(True), before_header, after_header, '', '', 10)
-                        ret.extend(list(differ))
-                        ret.append('\n')
-                    return u"".join(ret)
+                        differ = difflib.unified_diff(to_unicode(diff['before']).splitlines(True),
+                                                      to_unicode(diff['after']).splitlines(True),
+                                                      fromfile=before_header,
+                                                      tofile=after_header,
+                                                      fromfiledate='',
+                                                      tofiledate='',
+                                                      n=10)
+                        difflines = list(differ)
+                        if difflines:
+                            ret.extend(difflines)
+                            ret.append('\n')
+                    if 'prepared' in diff:
+                        ret.append(to_unicode(diff['prepared']))
             except UnicodeDecodeError:
                 ret.append(">> the files are different, but the diff library cannot compare unicode strings\n\n")
+        return u''.join(ret)
 
     def _get_item(self, result):
         if result.get('_ansible_no_log', False):
@@ -133,16 +152,8 @@ class CallbackBase:
         return item
 
     def _process_items(self, result):
-        for res in result._result['results']:
-            newres = self._copy_result(result)
-            res['item'] = self._get_item(res)
-            newres._result = res
-            if 'failed' in res and res['failed']:
-                self.v2_playbook_item_on_failed(newres)
-            elif 'skipped' in res and res['skipped']:
-                self.v2_playbook_item_on_skipped(newres)
-            else:
-                self.v2_playbook_item_on_ok(newres)
+        # just remove them as now they get handled by individual callbacks
+        del result._result['results']
 
     def _clean_results(self, result, task_name):
         if 'changed' in result and task_name in ['debug']:
@@ -307,23 +318,18 @@ class CallbackBase:
         if 'diff' in result._result:
             self.on_file_diff(host, result._result['diff'])
 
-    def v2_playbook_on_item_ok(self, result):
-        pass # no v1
-
-    def v2_playbook_on_item_failed(self, result):
-        pass # no v1
-
-    def v2_playbook_on_item_skipped(self, result):
-        pass # no v1
-
     def v2_playbook_on_include(self, included_file):
         pass #no v1 correspondance
 
-    def v2_playbook_item_on_ok(self, result):
+    def v2_runner_item_on_ok(self, result):
         pass
 
-    def v2_playbook_item_on_failed(self, result):
+    def v2_runner_item_on_failed(self, result):
         pass
 
-    def v2_playbook_item_on_skipped(self, result):
+    def v2_runner_item_on_skipped(self, result):
         pass
+
+    def v2_runner_retry(self, result):
+        pass
+

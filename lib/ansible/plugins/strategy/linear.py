@@ -29,6 +29,7 @@ from ansible.playbook.task import Task
 from ansible.plugins import action_loader
 from ansible.plugins.strategy import StrategyBase
 from ansible.template import Templar
+from ansible.utils.unicode import to_unicode
 
 try:
     from __main__ import display
@@ -105,7 +106,7 @@ class StrategyModule(StrategyBase):
             rvals = []
             display.debug("starting to advance hosts")
             for host in hosts:
-                host_state_task = host_tasks[host.name]
+                host_state_task = host_tasks.get(host.name)
                 if host_state_task is None:
                     continue
                 (s, t) = host_state_task
@@ -162,7 +163,7 @@ class StrategyModule(StrategyBase):
 
             try:
                 display.debug("getting the remaining hosts for this loop")
-                hosts_left = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts]
+                hosts_left = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts and not iterator.is_failed(host)]
                 display.debug("done getting the remaining hosts for this loop")
 
                 # queue up this task for each host in the inventory
@@ -175,6 +176,9 @@ class StrategyModule(StrategyBase):
                 # skip control
                 skip_rest   = False
                 choose_step = True
+
+                # flag set if task is set to any_errors_fatal
+                any_errors_fatal = False
 
                 results = []
                 for (host, task) in host_tasks:
@@ -193,12 +197,10 @@ class StrategyModule(StrategyBase):
 
                     try:
                         action = action_loader.get(task.action, class_only=True)
-                        if task.run_once or getattr(action, 'BYPASS_HOST_LOOP', False):
-                            run_once = True
                     except KeyError:
                         # we don't care here, because the action may simply not have a
                         # corresponding action plugin
-                        pass
+                        action = None
 
                     # check to see if this task should be skipped, due to it being a member of a
                     # role which has already run (and whether that role allows duplicate execution)
@@ -225,6 +227,11 @@ class StrategyModule(StrategyBase):
                         self.add_tqm_variables(task_vars, play=iterator._play)
                         templar = Templar(loader=self._loader, variables=task_vars)
                         display.debug("done getting variables")
+
+                        run_once = templar.template(task.run_once) or action and getattr(action, 'BYPASS_HOST_LOOP', False)
+
+                        if task.any_errors_fatal or run_once:
+                            any_errors_fatal = True
 
                         if not callback_sent:
                             display.debug("sending task start callback, copying the task so we can template it temporarily")
@@ -279,6 +286,7 @@ class StrategyModule(StrategyBase):
                 except AnsibleError as e:
                     return False
 
+                include_failure = False
                 if len(included_files) > 0:
                     display.debug("we have included files to process")
                     noop_task = Task()
@@ -323,7 +331,8 @@ class StrategyModule(StrategyBase):
                             for host in included_file._hosts:
                                 self._tqm._failed_hosts[host.name] = True
                                 iterator.mark_host_failed(host)
-                            display.error(e, wrap_text=False)
+                            display.error(to_unicode(e), wrap_text=False)
+                            include_failure = True
                             continue
 
                     # finally go through all of the hosts and append the
@@ -337,6 +346,23 @@ class StrategyModule(StrategyBase):
                     display.debug("done processing included files")
 
                 display.debug("results queue empty")
+
+                display.debug("checking for any_errors_fatal")
+                failed_hosts = []
+                for res in results:
+                    if res.is_failed() or res.is_unreachable():
+                        failed_hosts.append(res._host.name)
+
+                # if any_errors_fatal and we had an error, mark all hosts as failed
+                if any_errors_fatal and len(failed_hosts) > 0:
+                    for host in hosts_left:
+                        # don't double-mark hosts, or the iterator will potentially
+                        # fail them out of the rescue/always states
+                        if host.name not in failed_hosts:
+                            self._tqm._failed_hosts[host.name] = True
+                            iterator.mark_host_failed(host)
+                display.debug("done checking for any_errors_fatal")
+
             except (IOError, EOFError) as e:
                 display.debug("got IOError/EOFError in task loop: %s" % e)
                 # most likely an abort, return failed
