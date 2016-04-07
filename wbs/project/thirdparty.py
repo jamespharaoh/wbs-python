@@ -25,84 +25,122 @@ def read_index ():
 
 def setup ():
 
-	third_party_index = (
-		read_index ())
+	third_party_setup = (
+		ThirdPartySetup ())
 
-	git_repo = (
-		git.Repo (
-			"."))
+	third_party_setup.setup ()
 
-	sys.stdout.write (
-		"About to set up third party libraries\n")
+class ThirdPartySetup (object):
 
-	# create remotes
+	def __init__ (self):
 
-	remotes_index = dict ([
-		(remote.name, remote)
-		for remote
-		in git_repo.remotes
-	])
+		self.stashed = False
 
-	for project_name, project_data \
-	in third_party_index.items ():
+	def setup (self):
 
-		if not project_name in remotes_index:
+		self.third_party_index = (
+			read_index ())
 
-			sys.stdout.write (
-				"Create missing remote for %s\n" % (
-					project_name))
-
-			remotes_index [project_name] = (
-				git_repo.create_remote (
-					project_name,
-					project_data ["url"]))
-
-	# fetch remotes
-
-	for project_name, project_data \
-	in third_party_index.items ():
-
-		remote_version = (
-			project_data ["version"])
+		self.git_repo = (
+			git.Repo (
+				"."))
 
 		sys.stdout.write (
-			"Fetch remote: %s (%s)\n" % (
-				project_name,
-				remote_version))
+			"About to set up third party libraries\n")
 
-		git_repo.remotes [project_name].fetch (
-			"%s:refs/%s/%s" % (
-				remote_version,
-				project_name,
-				remote_version))
+		try:
 
-		sys.stdout.write (
-			"\x1b[1A\x1b[K")
+			self.create_remotes ()
+			self.fetch_remotes ()
+			self.stash_changes ()
+			self.update_libraries ()
+			self.build_libraries ()
 
-	sys.stdout.write (
-		"Fetched %s remotes\n" % (
-			len (third_party_index)))
+			print (
+				"All done")
 
-	# stash changes
+		finally:
 
-	if git_repo.is_dirty ():
+			self.unstash_changes ()
 
-		sys.stdout.write (
-			"Stashing local changes\n")
+	def create_remotes (self):
 
-		git_repo.git.stash (
-			"save")
-
-		stashed = True
-
-	else:
-
-		stashed = False
-
-	try:
+		remotes_index = dict ([
+			(remote.name, remote)
+			for remote
+			in self.git_repo.remotes
+		])
 
 		for project_name, project_data \
-		in third_party_index.items ():
+		in self.third_party_index.items ():
+
+			if not project_name in remotes_index:
+
+				sys.stdout.write (
+					"Create missing remote for %s\n" % (
+						project_name))
+
+				remotes_index [project_name] = (
+					self.git_repo.create_remote (
+						project_name,
+						project_data ["url"]))
+
+	def fetch_remotes (self):
+
+		for project_name, project_data \
+		in self.third_party_index.items ():
+
+			remote_version = (
+				project_data ["version"])
+
+			sys.stdout.write (
+				"Fetch remote: %s (%s)\n" % (
+					project_name,
+					remote_version))
+
+			self.git_repo.remotes [project_name].fetch (
+				"%s:refs/%s/%s" % (
+					remote_version,
+					project_name,
+					remote_version))
+
+			sys.stdout.write (
+				"\x1b[1A\x1b[K")
+
+		sys.stdout.write (
+			"Fetched %s remotes\n" % (
+				len (self.third_party_index)))
+
+	def stash_changes (self):
+
+		if self.git_repo.is_dirty ():
+
+			sys.stdout.write (
+				"Stashing local changes\n")
+
+			self.git_repo.git.stash (
+				"save")
+
+			self.stashed = True
+
+		else:
+
+			self.stashed = False
+
+	def unstash_changes (self):
+
+		if self.stashed:
+
+			sys.stdout.write (
+				"Unstashing local changes\n")
+
+			self.git_repo.git.stash (
+				"pop")
+
+	def update_libraries (self):
+
+		for project_name, project_data \
+		in self.third_party_index.items ():
 
 			project_path = (
 				"third-party/%s" % (
@@ -128,13 +166,13 @@ def setup ():
 			else:
 
 				local_tree = (
-					git_repo
+					self.git_repo
 						.head
 						.commit
 						.tree ["third-party"] [project_name])
 
 				git_remote = (
-					git_repo.remotes [
+					self.git_repo.remotes [
 						project_name])
 
 				if project_data ["version"] in git_remote.refs:
@@ -149,7 +187,7 @@ def setup ():
 				else:
 
 					remote_commit = (
-						git_repo.commit (
+						self.git_repo.commit (
 							project_data ["version"]))
 
 				remote_tree = (
@@ -176,17 +214,73 @@ def setup ():
 						project_data ["version"]),
 				])
 
-	finally:
+	def build_libraries (self):
 
-		if stashed:
+		num_built = 0
+		num_failed = 0
+
+		for project_name, project_data \
+		in self.third_party_index.items ():
+
+			if not "build" in project_data:
+				continue
+
+			project_path = (
+				"third-party/%s" % (
+					project_name))
+
+			build_data = (
+				project_data ["build"])
+
+			if isinstance (build_data, unicode):
+
+				build_data = {
+					"command": build_data,
+				}
+
+			build_data.setdefault (
+				"environment",
+				{})
+
+			try:
+
+				sys.stdout.write (
+					"Building library: %s\n" % (
+						project_name))
+
+				build_output = (
+					subprocess.check_output (
+						build_data ["command"],
+						shell = True,
+						stderr = subprocess.STDOUT,
+						cwd = project_path))
+
+				sys.stdout.write (
+					"\x1b[1A\x1b[K")
+
+				num_built += 1
+
+			except:
+
+				sys.stderr.write (
+					"Build failed!\n")
+
+				sys.stderr.write (
+					build_output)
+
+				num_failed += 1
+
+		if num_failed:
 
 			sys.stdout.write (
-				"Unstashing local changes\n")
+				"Built %s remotes with %s failures\n" % (
+					num_built,
+					num_failed))
 
-			git_repo.git.stash (
-				"pop")
+		elif num_built:
 
-	print (
-		"All done")
+			sys.stdout.write (
+				"Built %s remotes\n" % (
+					num_built))
 
 # ex: noet ts=4 filetype=python
