@@ -34,6 +34,9 @@ class ThirdPartySetup (object):
 
 	def __init__ (self):
 
+		self.project_path = (
+			os.path.abspath ("."))
+
 		self.stashed = False
 
 	def setup (self):
@@ -71,37 +74,37 @@ class ThirdPartySetup (object):
 			in self.git_repo.remotes
 		])
 
-		for project_name, project_data \
+		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			if not project_name in remotes_index:
+			if not library_name in remotes_index:
 
 				sys.stdout.write (
 					"Create missing remote for %s\n" % (
-						project_name))
+						library_name))
 
-				remotes_index [project_name] = (
+				remotes_index [library_name] = (
 					self.git_repo.create_remote (
-						project_name,
-						project_data ["url"]))
+						library_name,
+						library_data ["url"]))
 
 	def fetch_remotes (self):
 
-		for project_name, project_data \
+		for library_name, library_data \
 		in self.third_party_index.items ():
 
 			remote_version = (
-				project_data ["version"])
+				library_data ["version"])
 
 			sys.stdout.write (
 				"Fetch remote: %s (%s)\n" % (
-					project_name,
+					library_name,
 					remote_version))
 
-			self.git_repo.remotes [project_name].fetch (
+			self.git_repo.remotes [library_name].fetch (
 				"%s:refs/%s/%s" % (
 					remote_version,
-					project_name,
+					library_name,
 					remote_version))
 
 			sys.stdout.write (
@@ -139,27 +142,33 @@ class ThirdPartySetup (object):
 
 	def update_libraries (self):
 
-		for project_name, project_data \
+		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			project_path = (
+			library_path = (
+				"%s/third-party/%s" % (
+					self.project_path,
+					library_name))
+
+			library_prefix = (
 				"third-party/%s" % (
-					project_name))
+					library_name))
 
 			if not os.path.isdir (
-				project_path):
+				library_path):
 
 				sys.stdout.write (
 					"First time import library: %s\n" % (
-						project_name))
+						library_name))
 
 				subprocess.check_call ([
 					"git",
 					"subtree",
 					"add",
-					"--prefix", project_path,
-					project_data ["url"],
-					project_data ["version"],
+					"--prefix",
+					library_prefix,
+					library_data ["url"],
+					library_data ["version"],
 					"--squash",
 				])
 
@@ -169,17 +178,17 @@ class ThirdPartySetup (object):
 					self.git_repo
 						.head
 						.commit
-						.tree ["third-party"] [project_name])
+						.tree ["third-party"] [library_name])
 
 				git_remote = (
 					self.git_repo.remotes [
-						project_name])
+						library_name])
 
-				if project_data ["version"] in git_remote.refs:
+				if library_data ["version"] in git_remote.refs:
 
 					remote_ref = (
 						git_remote.refs [
-							project_data ["version"]])
+							library_data ["version"]])
 
 					remote_commit = (
 						remote_ref.commit)
@@ -188,7 +197,7 @@ class ThirdPartySetup (object):
 
 					remote_commit = (
 						self.git_repo.commit (
-							project_data ["version"]))
+							library_data ["version"]))
 
 				remote_tree = (
 					remote_commit.tree)
@@ -198,20 +207,19 @@ class ThirdPartySetup (object):
 
 				sys.stdout.write (
 					"Update library: %s\n" % (
-						project_name))
+						library_name))
 
 				subprocess.check_call ([
 					"git",
 					"subtree",
 					"merge",
-					"--prefix",
-					project_path,
+					"--prefix", library_prefix,
 					unicode (remote_commit),
 					"--squash",
 					"--message",
 					"update %s to %s" % (
-						project_name,
-						project_data ["version"]),
+						library_name,
+						library_data ["version"]),
 				])
 
 	def build_libraries (self):
@@ -219,18 +227,45 @@ class ThirdPartySetup (object):
 		num_built = 0
 		num_failed = 0
 
-		for project_name, project_data \
+		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			if not "build" in project_data:
+			library_path = (
+				"%s/third-party/%s" % (
+					self.project_path,
+					library_name))
+
+			# ------ work out build
+
+			if "build" in library_data:
+
+				build_data = (
+					library_data ["build"])
+
+			elif (
+
+				library_data.get ("auto") == "python"
+
+				and os.path.isfile (
+					"%s/setup.py" % library_path)
+
+			):
+
+				build_data = {
+					"command": " ".join ([
+						"python setup.py install",
+						"--prefix %s/work" % self.project_path,
+					]),
+					"environment": {
+						"PYTHONPATH":
+							"%s/work/lib/python2.7/site-packages" % (
+								self.project_path),
+					},
+				}
+
+			else:
+
 				continue
-
-			project_path = (
-				"third-party/%s" % (
-					project_name))
-
-			build_data = (
-				project_data ["build"])
 
 			if isinstance (build_data, unicode):
 
@@ -242,25 +277,30 @@ class ThirdPartySetup (object):
 				"environment",
 				{})
 
+			# ---------- perform build
+
 			try:
 
 				sys.stdout.write (
 					"Building library: %s\n" % (
-						project_name))
+						library_name))
 
 				build_output = (
 					subprocess.check_output (
 						build_data ["command"],
 						shell = True,
 						stderr = subprocess.STDOUT,
-						cwd = project_path))
+						env = dict (
+							os.environ, 
+							** build_data ["environment"]),
+						cwd = library_path))
 
 				sys.stdout.write (
 					"\x1b[1A\x1b[K")
 
 				num_built += 1
 
-			except:
+			except subprocess.CalledProcessError:
 
 				sys.stderr.write (
 					"Build failed!\n")
