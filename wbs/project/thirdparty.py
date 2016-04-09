@@ -285,28 +285,27 @@ class ThirdPartySetup (object):
 					"Building library: %s\n" % (
 						library_name))
 
-				build_output = (
-					subprocess.check_output (
-						build_data ["command"],
-						shell = True,
-						stderr = subprocess.STDOUT,
-						env = dict (
-							os.environ, 
-							** build_data ["environment"]),
-						cwd = library_path))
+				subprocess.check_output (
+					build_data ["command"],
+					shell = True,
+					stderr = subprocess.STDOUT,
+					env = dict (
+						os.environ, 
+						** build_data ["environment"]),
+					cwd = library_path)
 
 				sys.stdout.write (
 					"\x1b[1A\x1b[K")
 
 				num_built += 1
 
-			except subprocess.CalledProcessError:
+			except subprocess.CalledProcessError as error:
 
 				sys.stderr.write (
 					"Build failed!\n")
 
 				sys.stderr.write (
-					build_output)
+					error.output)
 
 				num_failed += 1
 
