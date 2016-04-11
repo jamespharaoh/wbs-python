@@ -243,8 +243,8 @@ if (!config.authentication.google || typeof config.authentication.google !== 'ob
         config.authentication.google = {};
 }
 
-{% if deployment.google_project in google_projects %}
-{% set google_project = google_projects [deployment.google_project] %}
+{% if cluster_deployment.google_project in google_projects %}
+{% set google_project = google_projects [cluster_deployment.google_project] %}
 config.authentication.google.name = '{{ google_project.auth_name }}';
 config.authentication.google.client_id = '{{ google_project.auth_client_id }}';
 config.authentication.google.client_secret = '{{ google_project.auth_client_secret }}';
