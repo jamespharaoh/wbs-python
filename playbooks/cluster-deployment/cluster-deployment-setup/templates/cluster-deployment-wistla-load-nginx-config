@@ -25,6 +25,7 @@ http {
 
 	log_format times '{{ [
 		'$time_iso8601',
+		inventory_hostname,
 		'$status',
 		'$body_bytes_sent',
 		'$request_time',
