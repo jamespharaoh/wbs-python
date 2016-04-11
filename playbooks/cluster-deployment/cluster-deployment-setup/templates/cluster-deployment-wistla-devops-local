@@ -11,16 +11,18 @@ clusters:
   'local_domain',
   'instance_formation',
 ] %}
+{% if key in other_cluster %}
     {{ key }}: {{ other_cluster [key] | to_json }}
+{% endif %}
 {% endfor %}
 {% endif %}
 {% endfor %}
 
 deployments:
 
-{% for deployment_name, deployment in deployments.items () %}
-{% if deployment.supercluster_name == supercluster_name %}
-  {{ deployment_name }}:
+{% for other_deployment_name, other_deployment in deployments.items () %}
+{% if other_deployment.supercluster_name == supercluster_name %}
+  {{ other_deployment_name }}:
 {% for key in [
   'name',
   'bridge_network',
@@ -29,7 +31,9 @@ deployments:
   'node_memory',
   'nodejs_version',
 ] %}
-    {{ key }}: {{ deployment [key] | to_json }}
+{% if key in other_deployment %}
+    {{ key }}: {{ other_deployment [key] | to_json }}
+{% endif %}
 {% endfor %}
 {% endif %}
 {% endfor %}
