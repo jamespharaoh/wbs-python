@@ -4,8 +4,7 @@
 
 # ==================== cluster {{ other_cluster_name }}
 
-{% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] %}
-{% set host = hostvars [host_name] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-admin'] | default ([]) %}
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
@@ -20,7 +19,7 @@ object Endpoint "{{ host_name }}" {
 {% endfor %}
 
 {% if 'cluster-' + other_cluster_name + '-app' in groups %}
-{% for host_name in groups ['cluster-' + other_cluster_name + '-app'] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-app'] | default ([])  %}
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
@@ -34,7 +33,7 @@ object Endpoint "{{ host_name }}" {
 {% endif %}
 
 {% if 'cluster-' + other_cluster_name + '-data' in groups %}
-{% for host_name in groups ['cluster-' + other_cluster_name + '-data'] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-data'] | default ([])  %}
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]
@@ -48,7 +47,7 @@ object Endpoint "{{ host_name }}" {
 {% endif %}
 
 {% if 'cluster-' + other_cluster_name + '-jenkins' in groups %}
-{% for host_name in groups ['cluster-' + other_cluster_name + '-jenkins'] %}
+{% for host_name in groups ['cluster-' + other_cluster_name + '-jenkins'] | default ([])  %}
 
 object Zone "{{ host_name }}" {
 	endpoints = [ "{{ host_name }}" ]

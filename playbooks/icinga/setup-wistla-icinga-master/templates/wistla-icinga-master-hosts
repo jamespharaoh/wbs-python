@@ -81,7 +81,7 @@ object Host "{{ host_name }}" {
 	port_base) %}
 
 {%	set other_deployment = deployments [other_deployment_name] %}
-{%	set other_cluster_name = other_deployment.cluster %}
+{%	set other_cluster_name = other_deployment.cluster_name %}
 {%	set other_cluster = clusters [other_cluster_name] %}
 {%	set instance_formation = other_cluster.instance_formation [parent_instance_type] %}
 
@@ -99,11 +99,14 @@ object Host "{{ host_name }}" {
 
 {%		set parent_name = [
 			'wistla',
-			other_deployment.cluster,
+			other_deployment.cluster_name,
 			parent_instance_type,
 			zone,
 			index,
 		] | join ('-') %}
+
+{%		set parent = hostvars [parent_name] %}
+{%		if parent.amazon_instance_state == 'running' %}
 
 object Host "{{ host_name }}" {
 
@@ -111,7 +114,7 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
-	command_endpoint = "wistla-{{ other_deployment.cluster }}-admin-{{ zone }}"
+	command_endpoint = "wistla-{{ other_deployment.cluster_name }}-admin-{{ zone }}"
 
 	vars.parent = "{{ parent_name }}"
 	vars.endpoint = "{{ parent_name }}"
@@ -120,17 +123,19 @@ object Host "{{ host_name }}" {
 	vars.stature = "node"
 	vars.type = "node-{{ node_type }}"
 
-{%		if port_base %}
-{%			for process_index in range (other_deployment.node_instance_count [node_type] | int) %}
+{%			if port_base %}
+{%				for process_index in range (other_deployment.node_instance_count [node_type] | int) %}
 
 	vars.wistla_{{ node_type }}s ["wistla {{ node_type }} {{ port_base + process_index }}"] = {
 		http_port = {{ port_base + process_index }}
 	}
 
-{%			endfor %}
-{%		endif %}
+{%				endfor %}
+{%			endif %}
 
 }
+
+{%		endif %}
 
 {%	endfor %}
 {%	endfor %}
@@ -186,10 +191,10 @@ object HostGroup "{{ other_cluster_name }}-instances" {
 {##############################################################################}
 
 {% for other_deployment_name, other_deployment in deployments.items () %}
-{% if other_deployment.cluster in clusters
+{% if other_deployment.cluster_name in clusters
 	and other_deployment.type in [ 'simple', 'shared', 'alias' ]
 	and other_deployment.monitoring == 'yes' %}
-{% set other_cluster = clusters [other_deployment.cluster] %}
+{% set other_cluster = clusters [other_deployment.cluster_name] %}
 
 # ==================== deployment {{ other_deployment_name }}
 
@@ -201,7 +206,7 @@ object HostGroup "{{ other_deployment_name }}-nodes" {
 
 }
 
-{%	if other_deployment.cluster == 'test' %}
+{%	if other_deployment.cluster_name == 'test' %}
 {%		set app_instance_type = 'app' %}
 {%		set data_instance_type = 'app' %}
 {%	else %}

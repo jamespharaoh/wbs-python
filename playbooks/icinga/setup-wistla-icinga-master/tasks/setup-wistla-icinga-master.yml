@@ -60,7 +60,7 @@
     mode: "{{ item.mode }}"
 
 - name: "create wistla icinga master links"
-  with_items: "{{ wistla_icinga_master_links }}"
+  with_items: "{{ wistla_icinga_master_config_links }}"
   become: "yes"
   action:
 

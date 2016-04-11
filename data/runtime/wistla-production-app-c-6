@@ -11,6 +11,19 @@ heka:
 heka_installed_version: "0.10.0b0"
 heka_needs_restart: "no"
 heka_state: "enabled"
+icinga: 
+  
+  certificate: "/authority/icinga/issue/48/certificate"
+  installed_version: "2.4.2-1"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/48/key"
+  state: "enabled"
+
+icinga_certificate: "/authority/icinga/issue/48/certificate"
+icinga_installed_version: "2.4.2-1"
+icinga_needs_restart: "no"
+icinga_private_key: "/authority/icinga/issue/48/key"
+icinga_state: "enabled"
 instance_id: "i-b2caa63a"
 nginx: 
   

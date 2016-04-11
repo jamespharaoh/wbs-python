@@ -1,6 +1,7 @@
 ---
 
 - include: "cluster-activate.yml"
+  when: "load_balancer_name is defined"
   tags:
 
     - "cluster"

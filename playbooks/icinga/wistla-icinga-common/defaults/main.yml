@@ -159,6 +159,63 @@ wistla_icinga_master_config_links:
 
 # ==================== icinga slave config
 
+wistla_icinga_slave_directories:
+
+  - directory: "/etc/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/pki"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/scripts"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/zones.d"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/cache/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/log"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/repository"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/zones"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/log/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
 wistla_icinga_slave_config_templates:
 
   - template: "wistla-icinga-slave-main"
@@ -179,7 +236,72 @@ wistla_icinga_slave_config_templates:
     group: "root"
     mode: "0644"
 
+wistla_icinga_slave_config_links:
+
+  - link: "{{ icinga_target }}/etc"
+    target: "../../etc"
+
+  - link: "{{ icinga_target }}/var"
+    target: "../../var"
+
 # ==================== icinga agent config
+
+wistla_icinga_agent_directories:
+
+  - directory: "/etc/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/pki"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/scripts"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/etc/icinga2/zones.d"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/cache/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/log"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/repository"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/lib/icinga2/api/zones"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
+
+  - directory: "/var/log/icinga2"
+    user: "icinga"
+    group: "icinga"
+    mode: "0750"
 
 wistla_icinga_agent_config_templates:
 
@@ -206,6 +328,14 @@ wistla_icinga_agent_config_templates:
     user: "root"
     group: "root"
     mode: "0644"
+
+wistla_icinga_agent_config_links:
+
+  - link: "{{ icinga_target }}/etc"
+    target: "../../etc"
+
+  - link: "{{ icinga_target }}/var"
+    target: "../../var"
 
 # ==================== icinga web config
 
