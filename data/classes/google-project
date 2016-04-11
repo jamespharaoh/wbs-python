@@ -1,0 +1,17 @@
+---
+
+identity:
+
+  type: "class"
+  name: "google-project"
+
+class:
+
+  namespace: "google-project"
+
+google_project:
+
+  name: "{{ identity_name }}"
+  description: ""
+
+# ex: et ts=2 filetype=yaml

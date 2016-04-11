@@ -30,18 +30,4 @@ third_parties:
 {% endif %}
 {% endif %}
 
-{% if not secrets | default ([]) %}
-google_projects: {}
-{% else %}
-google_projects:
-{% if 'dev' in secrets %}
-  dev: {{ lookup ('file', HOME + '/security/google/dev') | from_yaml | to_json }}
-{% endif %}
-{% if 'production' in secrets %}
-  production: {{ lookup ('file', HOME + '/security/google/production') | from_yaml | to_json }}
-  staging: {{ lookup ('file', HOME + '/security/google/staging') | from_yaml | to_json }}
-  test: {{ lookup ('file', HOME + '/security/google/test') | from_yaml | to_json }}
-{% endif %}
-{% endif %}
-
 # ex: et ts=2 filetype=yaml

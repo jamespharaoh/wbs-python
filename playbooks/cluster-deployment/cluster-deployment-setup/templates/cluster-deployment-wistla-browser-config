@@ -55,7 +55,7 @@ if (!config.authentication.google || typeof config.authentication.google !== 'ob
 }
 
 {% if deployment.google_project in google_projects %}
-{% set google_project = google_projects [deployment.google_project] %}
+{% set google_project = google_projects [cluster_deployment.google_project] %}
 config.authentication.google.name = '{{ google_project.auth_name }}';
 config.authentication.google.api_key = '{{ google_project.auth_api_key }}';
 config.authentication.google.client_id = '{{ google_project.auth_client_id }}';

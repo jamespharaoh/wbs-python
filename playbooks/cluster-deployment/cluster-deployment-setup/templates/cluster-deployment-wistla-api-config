@@ -226,8 +226,8 @@ if (!config.gcm || typeof config.gcm !== 'object') {
     config.gcm = {};
 }
 
-{% if deployment.google_project in google_projects %}
-{% set google_project = google_projects [deployment.google_project] %}
+{% if cluster_deployment.google_project in google_projects %}
+{% set google_project = google_projects [cluster_deployment.google_project] %}
 config.gcm.enabled = true;
 config.gcm.apiKey = '{{ google_project.cloud_messaging_api_key }}';
 config.gcm.senderId = '{{ google_project.cloud_messaging_sender_id }}';
