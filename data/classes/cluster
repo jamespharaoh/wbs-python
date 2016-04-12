@@ -17,5 +17,6 @@ cluster:
   name: "{{ identity_name }}"
   cluster_name: "{{ identity_name }}"
   supercluster_name: "{{ identity_parent }}"
+  whitelist_ips: []
 
 # ex: et ts=2 filetype=yaml

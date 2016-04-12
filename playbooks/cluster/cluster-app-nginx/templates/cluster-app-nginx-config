@@ -1,5 +1,14 @@
 {{ ansible_warning ['#'] }}
 
+{% set globals %}
+		location /TEST {
+{% for whitelist_ip in cluster.whitelist_ips %}
+			allow {{ whitelist_ip.ip }}; # {{ whitelist_ip.name }}
+			deny all;
+{% endfor %}
+		}
+{% endset %}
+
 user www-data;
 worker_processes 4;
 pid /run/nginx.pid;
@@ -106,9 +115,7 @@ http {
 			return 200;
 		}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -130,9 +137,7 @@ http {
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -146,9 +151,7 @@ http {
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -194,9 +197,7 @@ http {
 		}
 {% endif %}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -231,9 +232,7 @@ http {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -247,9 +246,7 @@ http {
 
 		return 301 https://admin.{{ deployment.main_domain }}$request_uri;
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -278,9 +275,7 @@ http {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -295,9 +290,7 @@ http {
 
 		return 301 https://{{ deployment.short_domain }}$request_uri;
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -328,9 +321,7 @@ http {
 		}
 {% endif %}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -345,9 +336,7 @@ http {
 
 		return 301 https://{{ deployment.assets_domain }}$request_uri;
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -378,9 +367,7 @@ http {
 		}
 {% endif %}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
@@ -408,9 +395,7 @@ http {
 		}
 {% endif %}
 
-		location /TEST {
-			return 403;
-		}
+{{ globals }}
 
 	}
 
