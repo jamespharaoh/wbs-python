@@ -38,13 +38,13 @@ python:
   
   apt_installed_version: "0.9.3-1"
   apt_state: "installed"
-  installed_version: "2.7.10"
+  installed_version: "2.7.11"
   pip_state: "installed"
   state: "installed"
 
 python_apt_installed_version: "0.9.3-1"
 python_apt_state: "installed"
-python_installed_version: "2.7.10"
+python_installed_version: "2.7.11"
 python_pip: 
   
   installed_version: "7.0.3"

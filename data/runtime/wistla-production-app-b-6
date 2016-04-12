@@ -25,6 +25,13 @@ icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/47/key"
 icinga_state: "enabled"
 instance_id: "i-bee52a32"
+nginx: 
+  
+  installed_version: "1.9.7"
+  state: "enabled"
+
+nginx_installed_version: "1.9.7"
+nginx_state: "enabled"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMLEXpeESSYEkC/2cRGgT/bYtr7BZ7HTj8xPCr6jKiPzqwPk8cs284MPoJydNcvLPvx55VKqafEGIAbAbAJ+dBk="
