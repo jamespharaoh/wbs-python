@@ -177,9 +177,9 @@ class ThirdPartySetup (object):
 		self.stashed_index_tree = (
 			self.git_repo.index.write_tree ())
 
-		self.git_repo.index.add (
-			[ "third-party" ],
-			force = False)
+		self.git_repo.git.add (
+			"--all",
+			"third-party")
 
 		self.stashed_working_tree = (
 			self.git_repo.index.write_tree ())

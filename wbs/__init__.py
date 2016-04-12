@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from wbs.data import *
 from wbs.env import *
 from wbs.error import *
+from wbs.httpclient import *
 from wbs.lazy import *
 from wbs.login import *
 from wbs.project import *
