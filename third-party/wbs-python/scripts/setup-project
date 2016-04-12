@@ -24,6 +24,34 @@ sys.path.append (
 
 import wbs.project
 
-wbs.project.thirdparty.setup ()
+if len (sys.argv) == 1:
+
+	map (
+		lambda line:
+			sys.stderr.write ("".join ([
+				line.format (
+					name = sys.argv [0]),
+				"\n",
+			])),
+		[
+			"",
+			"Syntax:",
+			"",
+			"  {name} pull   Pull all third party libraries",
+			"  {name} build  Build all third party libraries",
+			"",
+		])
+
+elif sys.argv [1] == "pull":
+
+	wbs.project.thirdparty.pull ()
+
+elif sys.argv [1] == "build":
+
+	wbs.project.thirdparty.build ()
+
+else:
+
+	raise Exception ()
 
 # ex: noet ts=4 filetype=python

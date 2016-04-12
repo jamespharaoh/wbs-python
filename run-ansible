@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import site
 import sys
 
 project_path = (
@@ -8,22 +9,14 @@ project_path = (
 		os.path.dirname (
 			__file__)))
 
-python_path = []
+site.addsitedir (
+	"%s/work/lib/python2.7/site-packages" % (
+		project_path))
 
-for third_party_path in [
-	"pyyaml/lib",
-]:
-
-	full_path = (
-		"%s/third-party/%s" % (
-			project_path,
-			third_party_path))
-
-	sys.path.append (
-		full_path)
-
-	python_path.append (
-		full_path)
+python_path = [
+	"%s/work/lib/python2.7/site-packages" % (
+		project_path),
+]
 
 os.environ ["PYTHONPATH"] = (
 	":".join (python_path))
@@ -101,19 +94,43 @@ def special_cases ():
 
 def build ():
 
-	dev_null = (
-		open (
-			os.devnull,
-			"w"))
+	global STATE, HAVE_GIT
 
+	if HAVE_GIT:
+
+		project_repo = (
+			git.Repo (
+				"."))
+
+		current_tree = str (
+			project_repo.head.commit.tree ["third-party"])
+
+		last_tree = (
+			STATE.get ("last_third_party_build_tree"))
+
+		if current_tree == last_tree:
+			return
+
+	else:
+
+		current_tree = None
+
+	if not os.path.isdir (
+		"work/lib/python2.7/site-packages"):
+
+		os.makedirs (
+			"work/lib/python2.7/site-packages")
 
 	subprocess.check_call (
 		[
-			"/bin/bash",
-			"%s/third-party/ansible/hacking/env-setup" % HOME,
-		],
-		stdout = dev_null,
-		stderr = dev_null)
+			"scripts/setup-project",
+			"build",
+		])
+
+	STATE ["last_third_party_build_tree"] = (
+		current_tree)
+
+	write_state ()
 
 def load_state ():
 

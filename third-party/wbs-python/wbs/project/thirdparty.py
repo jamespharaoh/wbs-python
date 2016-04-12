@@ -23,12 +23,21 @@ def read_index ():
 	return yamlx.load_data (
 		"third-party/third-party-index")
 
-def setup ():
+def pull ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
-	third_party_setup.setup ()
+	third_party_setup.load ()
+	third_party_setup.pull ()
+
+def build ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.build ()
 
 class ThirdPartySetup (object):
 
@@ -39,7 +48,7 @@ class ThirdPartySetup (object):
 
 		self.stashed = False
 
-	def setup (self):
+	def load (self):
 
 		self.third_party_index = (
 			read_index ())
@@ -48,8 +57,10 @@ class ThirdPartySetup (object):
 			git.Repo (
 				"."))
 
+	def pull (self):
+
 		sys.stdout.write (
-			"About to set up third party libraries\n")
+			"About to pull third party libraries\n")
 
 		try:
 
@@ -57,7 +68,6 @@ class ThirdPartySetup (object):
 			self.fetch_remotes ()
 			self.stash_changes ()
 			self.update_libraries ()
-			self.build_libraries ()
 
 			print (
 				"All done")
@@ -65,6 +75,16 @@ class ThirdPartySetup (object):
 		finally:
 
 			self.unstash_changes ()
+
+	def build (self):
+
+		sys.stdout.write (
+			"About to build third party libraries\n")
+
+		self.build_libraries ()
+
+		print (
+			"All done")
 
 	def create_remotes (self):
 
@@ -250,6 +270,17 @@ class ThirdPartySetup (object):
 					"%s/setup.py" % library_path)
 
 			):
+
+				build_data = {
+					"command": " ".join ([
+						"python setup.py build",
+					]),
+					"environment": {
+						"PYTHONPATH":
+							"%s/work/lib/python2.7/site-packages" % (
+								self.project_path),
+					},
+				}
 
 				build_data = {
 					"command": " ".join ([
