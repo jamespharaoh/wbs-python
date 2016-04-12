@@ -158,6 +158,9 @@ class ThirdPartySetup (object):
 			self.stashed_working_tree = (
 				self.git_repo.index.write_tree ())
 
+			self.git_repo.index.reset (
+				working_tree = True)
+
 			self.stashed = True
 
 		else:

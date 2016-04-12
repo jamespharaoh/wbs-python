@@ -24,7 +24,21 @@ sys.path.append (
 
 import wbs.project
 
-if len (sys.argv) == 1:
+command = (
+	sys.argv [1]
+) if len (sys.argv) > 1 else (
+	None
+)
+
+if command == "pull":
+
+	wbs.project.thirdparty.pull ()
+
+elif command == "build":
+
+	wbs.project.thirdparty.build ()
+
+else:
 
 	map (
 		lambda line:
@@ -41,17 +55,5 @@ if len (sys.argv) == 1:
 			"  {name} build  Build all third party libraries",
 			"",
 		])
-
-elif sys.argv [1] == "pull":
-
-	wbs.project.thirdparty.pull ()
-
-elif sys.argv [1] == "build":
-
-	wbs.project.thirdparty.build ()
-
-else:
-
-	raise Exception ()
 
 # ex: noet ts=4 filetype=python
