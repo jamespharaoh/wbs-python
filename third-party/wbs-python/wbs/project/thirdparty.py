@@ -25,123 +25,170 @@ def read_index ():
 
 def setup ():
 
-	third_party_index = (
-		read_index ())
+	third_party_setup = (
+		ThirdPartySetup ())
 
-	git_repo = (
-		git.Repo (
-			"."))
+	third_party_setup.setup ()
 
-	sys.stdout.write (
-		"About to set up third party libraries\n")
+class ThirdPartySetup (object):
 
-	# create remotes
+	def __init__ (self):
 
-	remotes_index = dict ([
-		(remote.name, remote)
-		for remote
-		in git_repo.remotes
-	])
+		self.project_path = (
+			os.path.abspath ("."))
 
-	for project_name, project_data \
-	in third_party_index.items ():
+		self.stashed = False
 
-		if not project_name in remotes_index:
+	def setup (self):
+
+		self.third_party_index = (
+			read_index ())
+
+		self.git_repo = (
+			git.Repo (
+				"."))
+
+		sys.stdout.write (
+			"About to set up third party libraries\n")
+
+		try:
+
+			self.create_remotes ()
+			self.fetch_remotes ()
+			self.stash_changes ()
+			self.update_libraries ()
+			self.build_libraries ()
+
+			print (
+				"All done")
+
+		finally:
+
+			self.unstash_changes ()
+
+	def create_remotes (self):
+
+		remotes_index = dict ([
+			(remote.name, remote)
+			for remote
+			in self.git_repo.remotes
+		])
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if not library_name in remotes_index:
+
+				sys.stdout.write (
+					"Create missing remote for %s\n" % (
+						library_name))
+
+				remotes_index [library_name] = (
+					self.git_repo.create_remote (
+						library_name,
+						library_data ["url"]))
+
+	def fetch_remotes (self):
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			remote_version = (
+				library_data ["version"])
 
 			sys.stdout.write (
-				"Create missing remote for %s\n" % (
-					project_name))
+				"Fetch remote: %s (%s)\n" % (
+					library_name,
+					remote_version))
 
-			remotes_index [project_name] = (
-				git_repo.create_remote (
-					project_name,
-					project_data ["url"]))
+			self.git_repo.remotes [library_name].fetch (
+				"%s:refs/%s/%s" % (
+					remote_version,
+					library_name,
+					remote_version))
 
-	# fetch remotes
-
-	for project_name, project_data \
-	in third_party_index.items ():
-
-		remote_version = (
-			project_data ["version"])
+			sys.stdout.write (
+				"\x1b[1A\x1b[K")
 
 		sys.stdout.write (
-			"Fetch remote: %s (%s)\n" % (
-				project_name,
-				remote_version))
+			"Fetched %s remotes\n" % (
+				len (self.third_party_index)))
 
-		git_repo.remotes [project_name].fetch (
-			"%s:refs/%s/%s" % (
-				remote_version,
-				project_name,
-				remote_version))
+	def stash_changes (self):
 
-		sys.stdout.write (
-			"\x1b[1A\x1b[K")
+		if self.git_repo.is_dirty ():
 
-	sys.stdout.write (
-		"Fetched %s remotes\n" % (
-			len (third_party_index)))
+			sys.stdout.write (
+				"Stashing local changes\n")
 
-	# stash changes
+			self.git_repo.git.stash (
+				"save")
 
-	if git_repo.is_dirty ():
+			self.stashed = True
 
-		sys.stdout.write (
-			"Stashing local changes\n")
+		else:
 
-		git_repo.git.stash (
-			"save")
+			self.stashed = False
 
-		stashed = True
+	def unstash_changes (self):
 
-	else:
+		if self.stashed:
 
-		stashed = False
+			sys.stdout.write (
+				"Unstashing local changes\n")
 
-	try:
+			self.git_repo.git.stash (
+				"pop")
 
-		for project_name, project_data \
-		in third_party_index.items ():
+	def update_libraries (self):
 
-			project_path = (
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			library_path = (
+				"%s/third-party/%s" % (
+					self.project_path,
+					library_name))
+
+			library_prefix = (
 				"third-party/%s" % (
-					project_name))
+					library_name))
 
 			if not os.path.isdir (
-				project_path):
+				library_path):
 
 				sys.stdout.write (
 					"First time import library: %s\n" % (
-						project_name))
+						library_name))
 
 				subprocess.check_call ([
 					"git",
 					"subtree",
 					"add",
-					"--prefix", project_path,
-					project_data ["url"],
-					project_data ["version"],
+					"--prefix",
+					library_prefix,
+					library_data ["url"],
+					library_data ["version"],
 					"--squash",
 				])
 
 			else:
 
 				local_tree = (
-					git_repo
+					self.git_repo
 						.head
 						.commit
-						.tree ["third-party"] [project_name])
+						.tree ["third-party"] [library_name])
 
 				git_remote = (
-					git_repo.remotes [
-						project_name])
+					self.git_repo.remotes [
+						library_name])
 
-				if project_data ["version"] in git_remote.refs:
+				if library_data ["version"] in git_remote.refs:
 
 					remote_ref = (
 						git_remote.refs [
-							project_data ["version"]])
+							library_data ["version"]])
 
 					remote_commit = (
 						remote_ref.commit)
@@ -149,8 +196,8 @@ def setup ():
 				else:
 
 					remote_commit = (
-						git_repo.commit (
-							project_data ["version"]))
+						self.git_repo.commit (
+							library_data ["version"]))
 
 				remote_tree = (
 					remote_commit.tree)
@@ -160,33 +207,119 @@ def setup ():
 
 				sys.stdout.write (
 					"Update library: %s\n" % (
-						project_name))
+						library_name))
 
 				subprocess.check_call ([
 					"git",
 					"subtree",
 					"merge",
-					"--prefix",
-					project_path,
+					"--prefix", library_prefix,
 					unicode (remote_commit),
 					"--squash",
 					"--message",
 					"update %s to %s" % (
-						project_name,
-						project_data ["version"]),
+						library_name,
+						library_data ["version"]),
 				])
 
-	finally:
+	def build_libraries (self):
 
-		if stashed:
+		num_built = 0
+		num_failed = 0
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			library_path = (
+				"%s/third-party/%s" % (
+					self.project_path,
+					library_name))
+
+			# ------ work out build
+
+			if "build" in library_data:
+
+				build_data = (
+					library_data ["build"])
+
+			elif (
+
+				library_data.get ("auto") == "python"
+
+				and os.path.isfile (
+					"%s/setup.py" % library_path)
+
+			):
+
+				build_data = {
+					"command": " ".join ([
+						"python setup.py install",
+						"--prefix %s/work" % self.project_path,
+					]),
+					"environment": {
+						"PYTHONPATH":
+							"%s/work/lib/python2.7/site-packages" % (
+								self.project_path),
+					},
+				}
+
+			else:
+
+				continue
+
+			if isinstance (build_data, unicode):
+
+				build_data = {
+					"command": build_data,
+				}
+
+			build_data.setdefault (
+				"environment",
+				{})
+
+			# ---------- perform build
+
+			try:
+
+				sys.stdout.write (
+					"Building library: %s\n" % (
+						library_name))
+
+				subprocess.check_output (
+					build_data ["command"],
+					shell = True,
+					stderr = subprocess.STDOUT,
+					env = dict (
+						os.environ, 
+						** build_data ["environment"]),
+					cwd = library_path)
+
+				sys.stdout.write (
+					"\x1b[1A\x1b[K")
+
+				num_built += 1
+
+			except subprocess.CalledProcessError as error:
+
+				sys.stderr.write (
+					"Build failed!\n")
+
+				sys.stderr.write (
+					error.output)
+
+				num_failed += 1
+
+		if num_failed:
 
 			sys.stdout.write (
-				"Unstashing local changes\n")
+				"Built %s remotes with %s failures\n" % (
+					num_built,
+					num_failed))
 
-			git_repo.git.stash (
-				"pop")
+		elif num_built:
 
-	print (
-		"All done")
+			sys.stdout.write (
+				"Built %s remotes\n" % (
+					num_built))
 
 # ex: noet ts=4 filetype=python
