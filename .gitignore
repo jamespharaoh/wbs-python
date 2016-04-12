@@ -12,6 +12,9 @@
 /inventory
 /security/*-plain
 /security/vpn
+/third-party/*/build
+/third-party/*/dist
+/third-party/roman/src/roman.egg-info/SOURCES.txt
 /vagrant/.vagrant
 /vagrant/apt-sources-list
 /vagrant/config
