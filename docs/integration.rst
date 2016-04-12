@@ -50,7 +50,7 @@ automatically.
    want that behavior you can add ``silent=false`` to the settings and
    exceptions are propagated.
 
-.. _mapping file: http://babel.edgewall.org/wiki/Documentation/messages.html#extraction-method-mapping-and-configuration
+.. _mapping file: http://babel.pocoo.org/en/latest/messages.html#extraction-method-mapping-and-configuration
 
 Pylons
 ------
@@ -81,10 +81,10 @@ snippet and add it into your `config/environment.py`::
 TextMate
 --------
 
-There is a bundle for TextMate that supports syntax highlighting for Jinja1 and Jinja2 for text based
+There is a `bundle for TextMate`_ that supports syntax highlighting for Jinja1 and Jinja2 for text based
 templates as well as HTML.  It also contains a few often used snippets.
 
-.. _TextMate Bundle: https://github.com/mitsuhiko/jinja2-tmbundle
+.. _bundle for TextMate: https://github.com/mitsuhiko/jinja2-tmbundle
 
 Vim
 ---
@@ -97,5 +97,5 @@ The first one for text based templates, the latter for HTML templates.
 
 Copy the files into your `syntax` folder.
 
-.. _Babel: http://babel.edgewall.org/
+.. _Babel: http://babel.pocoo.org/
 .. _Vim: http://www.vim.org/
