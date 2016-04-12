@@ -122,4 +122,16 @@ dev_git_base_url: "{{ dev_git_base_url | default (git_base_url) | default ('git@
 
 dev_wistla_dist_url: "{{ dev_wistla_dist_url | default (wistla_dev_url) | default ('https://dist.ops.wistla.com') }}"
 
+{% if mode is defined %}
+
+#
+# easter eggs
+#
+# stupid shit to amuse christos.
+#
+
+mode: "{{ mode }}"
+
+{% endif %}
+
 # ex: et ts=2 filetype=yaml

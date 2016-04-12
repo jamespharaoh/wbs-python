@@ -159,6 +159,14 @@ def load_config ():
 	except IOError:
 		CONFIG = dict ({ "deployment_mode": "vagrant" })
 
+	if CONFIG.get ("mode") == "evil":
+
+		with open ("misc/.easter-eggs/devil.xterm") \
+		as file_handle:
+
+			sys.stdout.write (
+				file_handle.read ())
+
 def auto_newline ():
 
 	global need_newline
