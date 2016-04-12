@@ -259,15 +259,21 @@ wistla_dist_url: "https://dist.ops.wistla.com"
 
 nginx_build_mirror: "{{ wistla_dist_url }}/nginx"
 
-python_version: "2.7.11"
-python_url: "{{ wistla_dist_url }}/python/{{ python_archive }}"
+python:
 
-python_pip_version: "7.0.3"
-python_pip_archive: "get-pip-{{ python_pip_version }}.py"
-python_pip_url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
+  version: "2.7.11"
+  url: "{{ wistla_dist_url }}/python/{{ python_archive }}"
 
-python_apt_version: "0.9.3-1"
-python_apt_url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
+python_pip:
+
+  version: "7.0.3"
+  archive: "get-pip-{{ python_pip_version }}.py"
+  url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
+
+python_apt:
+
+  version: "0.9.3-1"
+  url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
 
