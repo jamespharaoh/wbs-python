@@ -81,10 +81,17 @@ class ThirdPartySetup (object):
 		sys.stdout.write (
 			"About to build third party libraries\n")
 
-		self.build_libraries ()
+		try:
 
-		print (
-			"All done")
+			self.stash_changes ()
+			self.build_libraries ()
+
+			print (
+				"All done")
+
+		finally:
+
+			self.unstash_changes ()
 
 	def create_remotes (self):
 
@@ -141,8 +148,15 @@ class ThirdPartySetup (object):
 			sys.stdout.write (
 				"Stashing local changes\n")
 
-			self.git_repo.git.stash (
-				"save")
+			self.stashed_index_tree = (
+				self.git_repo.index.write_tree ())
+
+			self.git_repo.index.add (
+				[ "third-party" ],
+				force = False)
+
+			self.stashed_working_tree = (
+				self.git_repo.index.write_tree ())
 
 			self.stashed = True
 
@@ -157,8 +171,12 @@ class ThirdPartySetup (object):
 			sys.stdout.write (
 				"Unstashing local changes\n")
 
-			self.git_repo.git.stash (
-				"pop")
+			self.git_repo.index.reset (
+				self.stashed_working_tree,
+				working_tree = True)
+
+			self.git_repo.index.reset (
+				self.stashed_index_tree)
 
 	def update_libraries (self):
 
