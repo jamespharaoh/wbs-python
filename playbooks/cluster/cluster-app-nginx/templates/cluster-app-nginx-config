@@ -22,6 +22,7 @@ http {
 	log_format times '{{ [
 		'$time_iso8601',
 		inventory_hostname,
+		'$upstream_addr',
 		'$status',
 		'$body_bytes_sent',
 		'$request_time',
@@ -61,7 +62,7 @@ http {
 
 {% for deployment_name in cluster.super_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
-{% if deployment.type != 'virtual' %}
+{% if deployment.type in [ 'simple', 'alias' ] %}
 {% set deployment_cluster = clusters [deployment.cluster_name] %}
 
 	upstream deployment-{{ deployment_name }} {
@@ -70,18 +71,12 @@ http {
 {% for zone in deployment_cluster.instance_formation.app.zones %}
 		server {{ [
 			[
-				deployment.bridge_network,
-				index,
-				cluster_zone_indices [zone] * 64
-					+ node_type_indices.load,
-			] | join ('.'),
-			'fail_timeout=60s;',
-			'#',
-			[
 				deployment_name,
+				'load',
 				zone,
 				index,
 			] | join ('-'),
+			'fail_timeout=60s;',
 		] | join (' ') }}
 {% endfor %}
 {% endfor %}
@@ -111,6 +106,10 @@ http {
 			return 200;
 		}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 {% endif %}
@@ -131,6 +130,10 @@ http {
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# website redirect http to https
@@ -142,6 +145,10 @@ http {
 		server_name www.{{ deployment.main_domain }};
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
+
+		location /TEST {
+			return 403;
+		}
 
 	}
 
@@ -187,6 +194,10 @@ http {
 		}
 {% endif %}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# api
@@ -220,6 +231,10 @@ http {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# admin redirect http to https
@@ -231,6 +246,10 @@ http {
 		server_name admin.{{ deployment.main_domain }};
 
 		return 301 https://admin.{{ deployment.main_domain }}$request_uri;
+
+		location /TEST {
+			return 403;
+		}
 
 	}
 
@@ -259,6 +278,10 @@ http {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# short redirect http to https
@@ -271,6 +294,10 @@ http {
 		server_name www.{{ deployment.short_domain }};
 
 		return 301 https://{{ deployment.short_domain }}$request_uri;
+
+		location /TEST {
+			return 403;
+		}
 
 	}
 
@@ -301,6 +328,10 @@ http {
 		}
 {% endif %}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# assets redirect http to https
@@ -313,6 +344,10 @@ http {
 		server_name www.{{ deployment.assets_domain }};
 
 		return 301 https://{{ deployment.assets_domain }}$request_uri;
+
+		location /TEST {
+			return 403;
+		}
 
 	}
 
@@ -343,6 +378,10 @@ http {
 		}
 {% endif %}
 
+		location /TEST {
+			return 403;
+		}
+
 	}
 
 	# assets origin
@@ -368,6 +407,10 @@ http {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
+
+		location /TEST {
+			return 403;
+		}
 
 	}
 
