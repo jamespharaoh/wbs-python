@@ -50,7 +50,17 @@
         fi;
 
     - name: "clean checked out projects"
-      with_items: "devenv_checkouts"
+      with_items: "
+        (
+          devenv_checkouts
+            | rejectattr ('name', 'equalto', 'wistla-devops')
+            | list
+        ) | union (
+          devenv_checkouts
+            | selectattr ('name', 'equalto', 'wistla-devops')
+            | list
+        )
+      "
       args:
 
         executable: "/bin/bash"
