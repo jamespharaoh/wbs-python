@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from __future__ import with_statement
 
 import os
+import signal
 import subprocess
 import sys
 
@@ -72,6 +73,11 @@ class ThirdPartySetup (object):
 			print (
 				"All done")
 
+		except KeyboardInterrupt:
+
+			print (
+				"Aborting due to user request")
+
 		finally:
 
 			self.unstash_changes ()
@@ -88,6 +94,11 @@ class ThirdPartySetup (object):
 
 			print (
 				"All done")
+
+		except KeyboardInterrupt:
+
+			print (
+				"Aborting due to user request")
 
 		finally:
 
@@ -141,45 +152,66 @@ class ThirdPartySetup (object):
 			"Fetched %s remotes\n" % (
 				len (self.third_party_index)))
 
+	def handle_interrupt (self, * arguments):
+
+		sys.stdout.write (
+			"Aborting...\n")
+
+		self.interrupted = True
+
 	def stash_changes (self):
 
-		if self.git_repo.is_dirty ():
+		if self.stashed:
+			return
 
-			sys.stdout.write (
-				"Stashing local changes\n")
+		self.interrupted = False
 
-			self.stashed_index_tree = (
-				self.git_repo.index.write_tree ())
+		saved_signal = (
+			signal.signal (
+				signal.SIGINT,
+				self.handle_interrupt))
 
-			self.git_repo.index.add (
-				[ "third-party" ],
-				force = False)
+		sys.stdout.write (
+			"Stashing local changes\n")
 
-			self.stashed_working_tree = (
-				self.git_repo.index.write_tree ())
+		self.stashed_index_tree = (
+			self.git_repo.index.write_tree ())
 
-			self.git_repo.index.reset (
-				working_tree = True)
+		self.git_repo.index.add (
+			[ "third-party" ],
+			force = False)
 
-			self.stashed = True
+		self.stashed_working_tree = (
+			self.git_repo.index.write_tree ())
 
-		else:
+		self.git_repo.index.reset (
+			working_tree = True)
 
-			self.stashed = False
+		self.stashed = True
+
+		signal.signal (
+			signal.SIGINT,
+			saved_signal)
+
+		if self.interrupted:
+			raise KeyboardInterrupt ()
 
 	def unstash_changes (self):
 
-		if self.stashed:
+		if not self.stashed:
+			return
 
-			sys.stdout.write (
-				"Unstashing local changes\n")
+		sys.stdout.write (
+			"Unstashing local changes\n")
 
-			self.git_repo.index.reset (
-				self.stashed_working_tree,
-				working_tree = True)
+		self.git_repo.index.reset (
+			self.stashed_working_tree,
+			working_tree = True)
 
-			self.git_repo.index.reset (
-				self.stashed_index_tree)
+		self.git_repo.index.reset (
+			self.stashed_index_tree)
+
+		self.stashed = False
 
 	def update_libraries (self):
 
