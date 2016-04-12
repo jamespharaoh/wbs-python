@@ -7,6 +7,7 @@ server {
 	server_name jenkins.ops.wistla.com;
 
 	listen 80;
+	listen 8080 proxy_protocol;
 
 	return 301 https://jenkins.ops.wistla.com$request_uri;
 
@@ -19,6 +20,7 @@ server {
 	server_name jenkins.ops.wistla.com;
 
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	ssl_certificate {{ nginx_target }}/conf/ssl/jenkins.ops.wistla.com.cert;
 	ssl_certificate_key {{ nginx_target }}/conf/ssl/jenkins.ops.wistla.com.key;

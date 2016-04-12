@@ -18,184 +18,14 @@
     - proto: "tcp"
       from_port: "5665"
       to_port: "5665"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "5665"
-      to_port: "5665"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.c }}/32"
+      cidr_ip: "0.0.0.0/0"
 
     # ---------- etcd
 
     - proto: "tcp"
       from_port: "2379"
       to_port: "2379"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.ops.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.production.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['production-2'].amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.staging.amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters ['staging-2'].amazon_admin_ips.c }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.a }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.b }}/32"
-
-    - proto: "tcp"
-      from_port: "2379"
-      to_port: "2379"
-      cidr_ip: "{{ clusters.test.amazon_admin_ips.c }}/32"
+      cidr_ip: "0.0.0.0/0"
 
     # openvpn
 
@@ -203,6 +33,28 @@
       from_port: "1194"
       to_port: "1194"
       cidr_ip: "0.0.0.0/0"
+
+    # http
+
+    - proto: "tcp"
+      cidr_ip: "0.0.0.0/0"
+      from_port: "80"
+      to_port: "80"
+
+    - proto: "tcp"
+      cidr_ip: "0.0.0.0/0"
+      from_port: "443"
+      to_port: "443"
+
+    - proto: "tcp"
+      cidr_ip: "10.0.0.0/8"
+      from_port: "8080"
+      to_port: "8080"
+
+    - proto: "tcp"
+      cidr_ip: "10.0.0.0/8"
+      from_port: "8443"
+      to_port: "8443"
 
     # others
 
@@ -217,26 +69,6 @@
 
     - proto: "-1"
       cidr_ip: "10.0.0.0/8"
-
-    - proto: "tcp"
-      group_id: "{{ security_group_id_balancer }}"
-      from_port: "80"
-      to_port: "80"
-
-    - proto: "tcp"
-      group_id: "{{ security_group_id_balancer }}"
-      from_port: "443"
-      to_port: "443"
-
-    - proto: "tcp"
-      cidr_ip: "0.0.0.0/0"
-      from_port: "80"
-      to_port: "80"
-
-    - proto: "tcp"
-      cidr_ip: "0.0.0.0/0"
-      from_port: "443"
-      to_port: "443"
 
 - name: "app"
   rules:
@@ -259,6 +91,16 @@
     - proto: "tcp"
       from_port: "443"
       to_port: "443"
+      cidr_ip: "10.0.0.0/8"
+
+    - proto: "tcp"
+      from_port: "8080"
+      to_port: "8080"
+      cidr_ip: "10.0.0.0/8"
+
+    - proto: "tcp"
+      from_port: "8443"
+      to_port: "8443"
       cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"

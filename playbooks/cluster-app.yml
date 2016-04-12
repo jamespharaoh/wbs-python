@@ -28,9 +28,9 @@
 
     - "install-mongodb"
     - "install-tools"
-    - "install-nodejs"
-    - "install-iojs"
-    - "install-node-packages"
+
+    - "nodejs-install"
+    - "nodejs-packages-install"
 
     - "build-nginx"
     - "cluster-app-nginx"

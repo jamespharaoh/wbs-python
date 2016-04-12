@@ -88,7 +88,7 @@ python_packages:
   - name: "pyyaml"
     version: "3.11"
 
-node_packages:
+nodejs_packages:
 
   - name: "bunyan"
     version: "1.5.1"

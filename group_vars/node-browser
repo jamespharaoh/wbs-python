@@ -6,7 +6,7 @@ my_system_packages:
 
   - name: "npm"
 
-node_packages:
+nodejs_packages:
 
   - name: "node-gyp"
     version: "3.2.1"

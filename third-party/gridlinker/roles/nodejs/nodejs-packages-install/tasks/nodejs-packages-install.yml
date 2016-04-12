@@ -1,7 +1,7 @@
 ---
 
-- name: "install node packages"
-  with_items: "{{ node_packages }}"
+- name: "install nodejs packages"
+  with_items: "{{ nodejs_packages }}"
   tags: "update"
   sudo: "yes"
   action:

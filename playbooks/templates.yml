@@ -44,8 +44,8 @@
   roles:
 
     - "node-api"
-    - "install-nodejs"
-    - "install-node-packages"
+    - "nodejs-install"
+    - "nodejs-packages-install"
     - "deploy-nodejs-node"
 
 - hosts: "node-load-template"
@@ -63,8 +63,8 @@
   roles:
 
     - "node-web"
-    - "install-nodejs"
-    - "install-node-packages"
+    - "nodejs-install"
+    - "nodejs-packages-install"
     - "deploy-nodejs-node"
 
 - hosts: "node-rabbit-template"
@@ -76,8 +76,8 @@
   roles:
 
     - "node-browser"
-    - "install-nodejs"
-    - "install-node-packages"
+    - "nodejs-install"
+    - "nodejs-packages-install"
     - "deploy-nodejs-node"
 
 # ex: et ts=2 filetype=yaml

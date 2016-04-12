@@ -19,10 +19,12 @@ upstream {{ dev_deployment_name }}-load {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
 
 	server_name {{ dev_deployment.main_domain }};
 
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	ssl_certificate {{ [
 		nginx_target,
@@ -48,6 +50,7 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
 
 	server_name {{ dev_deployment.web_domain }};
 
@@ -60,6 +63,7 @@ server {
 server {
 
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.main_domain }}.cert;
 	ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.main_domain }}.key;
@@ -95,7 +99,10 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
+
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.api_domain }}.cert;
 	ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.api_domain }}.key;
@@ -119,6 +126,7 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
 
 	server_name {{ dev_deployment.admin_domain }};
 
@@ -131,6 +139,7 @@ server {
 server {
 
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	server_name {{ dev_deployment.admin_domain }};
 
@@ -154,6 +163,7 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
 
 	server_name {{ dev_deployment.short_domain }};
 
@@ -164,6 +174,7 @@ server {
 server {
 
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	ssl_certificate {{ nginx_target }}/conf/ssl/{{ dev_deployment.short_domain }}.cert;
 	ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ dev_deployment.short_domain }}.key;
@@ -191,7 +202,10 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
+
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	server_name {{ dev_deployment.test_domain }};
 
@@ -217,7 +231,10 @@ server {
 server {
 
 	listen 80;
+	listen 8080 proxy_protocol;
+
 	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
 
 	server_name {{ dev_deployment.assets_domain }};
 

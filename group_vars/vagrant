@@ -133,7 +133,7 @@ system_packages:
   - name: "whois"
     state: "present"
 
-node_packages:
+nodejs_packages:
 
   - name: "bunyan"
     version: "1.5.1"

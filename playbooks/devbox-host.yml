@@ -15,11 +15,11 @@
 
     - "devbox-system"
 
-    - "install-nodejs"
-    - "install-iojs"
+    - "nodejs-install"
+    - "nodejs-packages-install"
+
     - "install-mongodb"
     - "install-tools"
-    - "install-node-packages"
 
     - "etcd"
 

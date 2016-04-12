@@ -1,6 +1,6 @@
 ---
 
-- include: "cluster-setup.yml"
+- include: "cluster-network-setup.yml"
   tags:
 
     - "cluster"
@@ -9,21 +9,21 @@
 
 # ---------- vpc
 
-- include: "cluster-vpc.yml"
+- include: "cluster-network-vpc.yml"
   tags:
 
     - "cluster"
     - "cluster-network-vpc"
     - "cluster-network-vpc"
 
-- include: "cluster-admin-subnet.yml"
+- include: "cluster-network-admin-subnet.yml"
   tags:
 
     - "cluster"
     - "cluster-network"
     - "cluster-network-admin-subnet"
 
-- include: "cluster-data-subnet.yml"
+- include: "cluster-network-data-subnet.yml"
   when: "cluster_name != 'ops'"
   tags:
 
@@ -31,7 +31,7 @@
     - "cluster-network"
     - "cluster-network-data-subnet"
 
-- include: "cluster-app-subnet.yml"
+- include: "cluster-network-app-subnet.yml"
   when: "cluster_name != 'ops'"
   tags:
 
@@ -39,7 +39,7 @@
     - "cluster-network"
     - "cluster-network-app-subnet"
 
-- include: "cluster-jenkins-subnet.yml"
+- include: "cluster-network-jenkins-subnet.yml"
   when: "cluster_name == 'ops'"
   tags:
 
@@ -47,7 +47,7 @@
     - "cluster-network"
     - "cluster-network-jenkins-subnet"
 
-- include: "cluster-security-groups.yml"
+- include: "cluster-network-security-groups.yml"
   tags:
 
     - "cluster"
@@ -56,7 +56,7 @@
 
 # ---------- balancers
 
-- include: "cluster-app-balancer.yml"
+- include: "cluster-network-app-balancer.yml"
   when: "cluster_name != 'ops'"
   tags:
 
@@ -64,7 +64,7 @@
     - "cluster-network"
     - "cluster-network-app-balancer"
 
-- include: "cluster-admin-balancer.yml"
+- include: "cluster-network-admin-balancer.yml"
   tags:
 
     - "cluster"

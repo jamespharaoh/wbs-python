@@ -2,9 +2,11 @@
 
 - name: "install node.js"
   args:
+
     executable: "/bin/bash"
     creates: "{{ nodejs_flag }}"
-  sudo: "yes"
+
+  become: "yes"
   shell:
 
     set -euf -o pipefail;
@@ -26,7 +28,7 @@
 - name: "setup nodejs alternatives"
   with_items: "{{ nodejs_alternatives }}"
   when: "nodejs_default == 'yes'"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "alternatives"

@@ -1,12 +1,10 @@
 {{ ansible_warning ['#'] }}
 
-{% set globals %}
-		location /TEST {
+{% set restrictions %}
 {% for whitelist_ip in cluster.whitelist_ips %}
 			allow {{ whitelist_ip.ip }}; # {{ whitelist_ip.name }}
 			deny all;
 {% endfor %}
-		}
 {% endset %}
 
 user www-data;
@@ -32,6 +30,7 @@ http {
 		'$time_iso8601',
 		inventory_hostname,
 		'$upstream_addr',
+		'$remote_addr',
 		'$status',
 		'$body_bytes_sent',
 		'$request_time',
@@ -66,6 +65,10 @@ http {
 	] | join (' ') }};
 	proxy_http_version 1.1;
 	proxy_set_header Connection "";
+
+	set_real_ip_from 10.0.0.0/8;
+	real_ip_header proxy_protocol;
+	real_ip_recursive on;
 
 # ----- upstream servers per deployment -----
 
@@ -104,7 +107,10 @@ http {
 	server {
 
 		listen 80 default_server;
+		listen 8080 proxy_protocol default_server;
+
 		listen 443 ssl http2 default_server;
+		listen 8443 ssl http2 proxy_protocol default_server;
 
 		server_name {{ inventory_hostname }};
 
@@ -114,8 +120,6 @@ http {
 		location /hello {
 			return 200;
 		}
-
-{{ globals }}
 
 	}
 
@@ -128,7 +132,10 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
+
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 
 		server_name {{ deployment.main_domain }};
 
@@ -137,8 +144,6 @@ http {
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
-{{ globals }}
-
 	}
 
 	# website redirect http to https
@@ -146,12 +151,11 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
 
 		server_name www.{{ deployment.main_domain }};
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
-
-{{ globals }}
 
 	}
 
@@ -160,6 +164,7 @@ http {
 	server {
 
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 
 		server_name www.{{ deployment.main_domain }};
 
@@ -191,13 +196,23 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 {% if deployment.robots_override_main | default ('no') != 'yes' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
-
-{{ globals }}
 
 	}
 
@@ -207,10 +222,16 @@ http {
 
 {% if deployment.default | default ('no') == 'yes' %}
 		listen 80 default_server;
+		listen 8080 proxy_protocol default_server;
+
 		listen 443 ssl http2 default_server;
+		listen 8443 ssl http2 proxy_protocol default_server;
 {% else %}
 		listen 80;
+		listen 8080 proxy_protocol;
+
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 {% endif %}
 
 		server_name api.{{ deployment.main_domain }};
@@ -228,11 +249,21 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "api.{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
-
-{{ globals }}
 
 	}
 
@@ -241,12 +272,11 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
 
 		server_name admin.{{ deployment.main_domain }};
 
 		return 301 https://admin.{{ deployment.main_domain }}$request_uri;
-
-{{ globals }}
 
 	}
 
@@ -255,6 +285,7 @@ http {
 	server {
 
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 
 		server_name admin.{{ deployment.main_domain }};
 
@@ -271,11 +302,21 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "admin.{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
-
-{{ globals }}
 
 	}
 
@@ -284,13 +325,12 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
 
 		server_name {{ deployment.short_domain }};
 		server_name www.{{ deployment.short_domain }};
 
 		return 301 https://{{ deployment.short_domain }}$request_uri;
-
-{{ globals }}
 
 	}
 
@@ -299,6 +339,7 @@ http {
 	server {
 
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 
 		server_name {{ deployment.short_domain }};
 
@@ -315,13 +356,23 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "{{ deployment.short_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 {% if deployment.robots_override_short | default ('no') != 'yes' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
-
-{{ globals }}
 
 	}
 
@@ -330,13 +381,12 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
 
 		server_name {{ deployment.assets_domain }};
 		server_name www.{{ deployment.assets_domain }};
 
 		return 301 https://{{ deployment.assets_domain }}$request_uri;
-
-{{ globals }}
 
 	}
 
@@ -345,6 +395,7 @@ http {
 	server {
 
 		listen 443 ssl http2;
+		listen 8443 ssl http2 proxy_protocol;
 
 		server_name {{ deployment.assets_domain }};
 
@@ -361,13 +412,23 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "{{ deployment.assets_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 {% if deployment.robots_override_assets | default ('no') != 'yes' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
-
-{{ globals }}
 
 	}
 
@@ -376,6 +437,7 @@ http {
 	server {
 
 		listen 80;
+		listen 8080 proxy_protocol;
 
 		server_name {{ deployment.assets_origin_domain }};
 
@@ -389,13 +451,23 @@ http {
 
 		}
 
+		location /TEST {
+
+			proxy_pass http://deployment-{{ target }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "{{ deployment.assets_origin_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+{{ restrictions }}
+
+		}
+
 {% if deployment.robots_override_assets | default ('no') != 'yes' %}
 		location /robots.txt {
 			alias {{ nginx_target }}/conf/dev-robots.txt;
 		}
 {% endif %}
-
-{{ globals }}
 
 	}
 
