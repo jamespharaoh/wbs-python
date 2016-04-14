@@ -21,6 +21,9 @@ config.assetsTest = 'http://{{ cluster_deployment_alias.assets_domain }}';
 config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
 config.webTest = 'http://{{ cluster_deployment.web_domain }}';
 
+// private urls
+config.apiPrivate = 'http://api.{{ cluster_deployment_name }}-load-{{ instance_zone }}-{{ instance_index }}';
+
 // email
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
