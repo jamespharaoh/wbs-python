@@ -15,11 +15,17 @@ config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
 // test urls
-config.adminTest = 'http://{{ cluster_deployment_alias.admin_domain }}';
-config.apiTest = 'http://{{ cluster_deployment.api_domain }}';
-config.assetsTest = 'http://{{ cluster_deployment_alias.assets_domain }}';
-config.shortTest = 'http://{{ cluster_deployment.short_domain }}';
-config.webTest = 'http://{{ cluster_deployment.web_domain }}';
+{% set load_hostname = [
+	cluster_deployment_name,
+	'load',
+	instance_zone,
+	instance_index,
+] | join ('-') %}
+config.adminTest = 'http://admin.{{ load_hostname }}';
+config.apiTest = 'http://api.{{ load_hostname }}';
+config.assetsTest = 'http://assets.{{ load_hostname }}';
+config.shortTest = 'http://short.{{ load_hostname }}';
+config.webTest = 'http://web.{{ load_hostname }}';
 
 // email
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
