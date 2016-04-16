@@ -38,6 +38,10 @@ elif command == "build":
 
 	wbs.project.thirdparty.build ()
 
+elif command == "merge":
+
+	wbs.project.thirdparty.merge ()
+
 else:
 
 	map (
