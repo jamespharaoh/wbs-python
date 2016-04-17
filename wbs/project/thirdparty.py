@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
-from __future__ import with_statement
 
 import os
 import signal
@@ -540,6 +540,88 @@ class ThirdPartySetup (object):
 							self.git_repo.head.commit.tree [
 								source_path])
 
+						output.notice (
+							"SOURCE TREE: " + unicode (source_tree))
+
+						def expand_parents (item):
+
+							parts = item.rsplit ("/", 1)
+
+							if len (parts) == 2:
+								return ([]
+									+ expand_parents (parts [0])
+									+ ["/" + parts [1]]
+								)
+
+							else:
+								return parts
+
+						includes = set (map (
+							lambda include: "third-party/%s%s%s" % (
+								library_name,
+								library_merge ["source"],
+								include),
+							[
+								item2
+								for item1 in library_merge.get ("include", [])
+								for item2 in expand_parents (item1)
+							]))
+
+						excludes = set (map (
+							lambda exclude: "third-party/%s%s%s" % (
+								library_name,
+								library_merge ["source"],
+								exclude),
+							library_merge.get ("exclude", [])))
+
+						map (
+							lambda p: print ("INC: %s" % p),
+							includes)
+
+						map (
+							lambda p: print ("EXC: %s" % p),
+							excludes)
+
+						if includes or excludes:
+
+							source_index = (
+								git.IndexFile.from_tree (
+									self.git_repo,
+									"4b825dc642cb6eb9a060e54bf8d69288fbee4904"))
+
+							def predicate (item, depth):
+								return not excludes \
+								or item not in excludes
+
+							def prune (item, depth):
+								return (
+									includes
+									and item.path not in includes
+								) or (
+									excludes
+									and item.path in excludes
+								)
+
+							source_prune_length = len (
+								"third-party/%s%s/" % (
+									library_name,
+									library_merge ["source"]))
+
+							for item in source_tree.traverse (
+									predicate = lambda i, d: True,
+									prune = prune):
+
+								source_index.add (
+									[ git.Blob (
+										self.git_repo,
+										item.binsha,
+										item.mode,
+										item.path [source_prune_length : ]),
+									])
+
+							source_tree = (
+								source_index.write_tree ())
+
 						merged_index = (
 							git.IndexFile.from_tree (
 								self.git_repo,
@@ -577,11 +659,13 @@ class ThirdPartySetup (object):
 							"INDEX TREE: " + unicode (
 								self.git_repo.index.write_tree ()))
 
-				self.git_repo.index.commit (
-					"Auto-merge changes from %s" % (
-						library_name))
+				if len (self.git_repo.index.diff ()):
 
-				num_merged += 1
+					self.git_repo.index.commit (
+						"Auto-merge changes from %s" % (
+							library_name))
+
+					num_merged += 1
 
 			except subprocess.CalledProcessError as error:
 
