@@ -18,7 +18,7 @@ except ImportError:
 	pass
 
 import wbs.yamlx as yamlx
-import wbs.output as log
+from wbs.output import log
 
 def read_index ():
 

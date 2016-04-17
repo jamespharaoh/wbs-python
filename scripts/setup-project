@@ -41,6 +41,11 @@ if command in [
 
 else:
 
+	if command != "help":
+
+		sys.stderr.write (
+			"\nUsage error\n")
+
 	map (
 		lambda line:
 			sys.stderr.write ("".join ([

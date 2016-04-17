@@ -5,10 +5,96 @@ from __future__ import unicode_literals
 
 import sys
 
-current_status = None
-temporary_status = True
+class ConsoleLog (object):
+
+	def __init__ (
+			self,
+			stream = sys.stderr,
+			temporary_status = True):
+
+		self.current_status = None
+		self.stream = stream
+		self.temporary_status = temporary_status
+
+	def status (self, value):
+
+		if "\n" in value:
+			raise Exception ()
+
+		if self.current_status:
+			raise Exception ()
+
+		self.current_status = value
+
+		self.stream.write (
+			"%s ...\n" % self.current_status)
+
+		return WithStatus ()
+
+	def keep_status (self):
+
+		if not self.current_status:
+			raise Exception ()
+
+		self.current_status = None
+
+	def clear_status (self):
+
+		if not self.current_status:
+			return
+
+		if self.temporary_status:
+
+			self.stream.write (
+				"\x1b[1A\x1b[K")
+
+		self.current_status = None
+
+	def notice (self, value):
+
+		if "\n" in value:
+			raise Exception ()
+
+		if self.current_status \
+		and self.temporary_status:
+
+			self.stream.write (
+				"\x1b[1A\x1b[K")
+
+		self.stream.write (
+			"%s\n" % value)
+
+		if self.current_status \
+		and self.temporary_status:
+
+			self.stream.write (
+				"%s\n" % self.current_status)
+
+	def output (self, value):
+
+		if len (value) and value [-1] != "\n":
+			raise Exception ()
+
+		if self.current_status \
+		and self.temporary_status:
+
+			self.stream.write (
+				"\x1b[1A\x1b[K")
+
+		self.stream.write (
+			value)
+
+		if self.current_status \
+		and self.temporary_status:
+
+			self.stream.write (
+				"%s\n" % self.current_status)
 
 class WithStatus (object):
+
+	def __init (self, log):
+
+		self.log = log
 
 	def __enter__ (self):
 
@@ -18,86 +104,12 @@ class WithStatus (object):
 
 		if exception_value:
 
-			keep_status ()
+			log.keep_status ()
 
 		else:
 
-			clear_status ()
+			log.clear_status ()
 
-def status (value):
-
-	if "\n" in value:
-		raise Exception ()
-
-	global current_status
-
-	if current_status:
-		raise Exception ()
-
-	current_status = value
-
-	sys.stderr.write (
-		"%s ...\n" % current_status)
-
-	return WithStatus ()
-
-def keep_status ():
-
-	global current_status
-
-	if not current_status:
-		raise Exception ()
-
-	current_status = None
-
-def clear_status ():
-
-	global current_status
-
-	if not current_status:
-		return
-
-	if temporary_status:
-
-		sys.stderr.write (
-			"\x1b[1A\x1b[K")
-
-	current_status = None
-
-def notice (value):
-
-	if "\n" in value:
-		raise Exception ()
-
-	if current_status and temporary_status:
-
-		sys.stderr.write (
-			"\x1b[1A\x1b[K")
-
-	sys.stderr.write (
-		"%s\n" % value)
-
-	if current_status and temporary_status:
-
-		sys.stderr.write (
-			"%s\n" % current_status)
-
-def output (value):
-
-	if len (value) and value [-1] != "\n":
-		raise Exception ()
-
-	if current_status and temporary_status:
-
-		sys.stderr.write (
-			"\x1b[1A\x1b[K")
-
-	sys.stderr.write (
-		value)
-
-	if current_status and temporary_status:
-
-		sys.stderr.write (
-			"%s\n" % current_status)
+log = ConsoleLog ()
 
 # ex: noet ts=4 filetype=pyton
