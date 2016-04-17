@@ -18,12 +18,28 @@ except ImportError:
 	pass
 
 import wbs.yamlx as yamlx
-import wbs.output as output
+import wbs.output as log
 
 def read_index ():
 
 	return yamlx.load_data (
 		"third-party/third-party-index")
+
+def fetch ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.fetch ()
+
+def update ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.update ()
 
 def pull ():
 
@@ -67,9 +83,49 @@ class ThirdPartySetup (object):
 			git.Repo (
 				"."))
 
+	def fetch (self):
+
+		log.notice (
+			"About to fetch third party libraries")
+
+		try:
+
+			self.create_remotes ()
+			self.fetch_remotes ()
+
+			log.notice (
+				"All done")
+
+		except KeyboardInterrupt:
+
+			log.notice (
+				"Aborting due to user request")
+
+	def update (self):
+
+		log.notice (
+			"About to update third party libraries")
+
+		try:
+
+			self.stash_changes ()
+			self.update_libraries ()
+
+			log.notice (
+				"All done")
+
+		except KeyboardInterrupt:
+
+			log.notice (
+				"Aborting due to user request")
+
+		finally:
+
+			self.unstash_changes ()
+
 	def pull (self):
 
-		output.notice (
+		log.notice (
 			"About to pull third party libraries")
 
 		try:
@@ -79,12 +135,12 @@ class ThirdPartySetup (object):
 			self.stash_changes ()
 			self.update_libraries ()
 
-			output.notice (
+			log.notice (
 				"All done")
 
 		except KeyboardInterrupt:
 
-			output.notice (
+			log.notice (
 				"Aborting due to user request")
 
 		finally:
@@ -93,7 +149,7 @@ class ThirdPartySetup (object):
 
 	def build (self):
 
-		output.notice (
+		log.notice (
 			"About to build third party libraries")
 
 		try:
@@ -101,12 +157,12 @@ class ThirdPartySetup (object):
 			self.stash_changes ()
 			self.build_libraries ()
 
-			output.notice (
+			log.notice (
 				"All done")
 
 		except KeyboardInterrupt:
 
-			output.notice (
+			log.notice (
 				"Aborting due to user request")
 
 		finally:
@@ -115,7 +171,7 @@ class ThirdPartySetup (object):
 
 	def merge (self):
 
-		output.notice (
+		log.notice (
 			"About to merge third party libraries")
 
 		try:
@@ -123,12 +179,12 @@ class ThirdPartySetup (object):
 			self.stash_changes ()
 			self.merge_libraries ()
 
-			output.notice (
+			log.notice (
 				"All done")
 
 		except KeyboardInterrupt:
 
-			output.notice (
+			log.notice (
 				"Aborting due to user request")
 
 		finally:
@@ -148,7 +204,7 @@ class ThirdPartySetup (object):
 
 			if not library_name in remotes_index:
 
-				output.status (
+				log.status (
 					"Create missing remote for %s" % (
 						library_name))
 
@@ -164,7 +220,7 @@ class ThirdPartySetup (object):
 
 			if "version" in library_data:
 
-				with output.status (
+				with log.status (
 					"Fetch remote: %s (%s)" % (
 						library_name,
 						library_data ["version"])):
@@ -177,8 +233,8 @@ class ThirdPartySetup (object):
 
 			elif "branch" in library_data:
 
-				with sys.stdout.write (
-					"Fetch remote: %s (%s)\n" % (
+				with log.status (
+					"Fetch remote: %s (%s)" % (
 						library_name,
 						library_data ["branch"])):
 
@@ -192,13 +248,13 @@ class ThirdPartySetup (object):
 
 				raise Exception ()
 
-		output.notice (
+		log.notice (
 			"Fetched %s remotes" % (
 				len (self.third_party_index)))
 
 	def handle_interrupt (self, * arguments):
 
-		output.notice (
+		log.notice (
 			"Aborting...")
 
 		self.interrupted = True
@@ -215,7 +271,7 @@ class ThirdPartySetup (object):
 				signal.SIGINT,
 				self.handle_interrupt))
 
-		output.notice (
+		log.notice (
 			"Stashing local changes")
 
 		self.stashed_head_tree = (
@@ -248,7 +304,7 @@ class ThirdPartySetup (object):
 		if not self.stashed:
 			return
 
-		output.notice (
+		log.notice (
 			"Unstashing local changes")
 
 		merged_working_index = (
@@ -279,85 +335,131 @@ class ThirdPartySetup (object):
 		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			library_path = (
-				"%s/third-party/%s" % (
-					self.project_path,
+			self.update_library (
+				library_name,
+				library_data)
+
+	def update_library (self, library_name, library_data):
+
+		library_path = (
+			"%s/third-party/%s" % (
+				self.project_path,
+				library_name))
+
+		library_prefix = (
+			"third-party/%s" % (
+				library_name))
+
+		if not os.path.isdir (
+			library_path):
+
+			log.notice (
+				"First time import library: %s" % (
 					library_name))
 
-			library_prefix = (
-				"third-party/%s" % (
-					library_name))
+			subprocess.check_call ([
+				"git",
+				"subtree",
+				"add",
+				"--prefix",
+				library_prefix,
+				library_data ["url"],
+				library_data ["version"],
+				"--squash",
+			])
 
-			if not os.path.isdir (
-				library_path):
+		else:
 
-				output.notice (
-					"First time import library: %s" % (
-						library_name))
+			local_tree = (
+				self.git_repo
+					.head
+					.commit
+					.tree ["third-party"] [library_name])
 
-				subprocess.check_call ([
-					"git",
-					"subtree",
-					"add",
-					"--prefix",
-					library_prefix,
-					library_data ["url"],
-					library_data ["version"],
-					"--squash",
-				])
+			git_remote = (
+				self.git_repo.remotes [
+					library_name])
 
-			else:
+			if "version" in library_data:
 
-				local_tree = (
-					self.git_repo
-						.head
-						.commit
-						.tree ["third-party"] [library_name])
+				remote_ref = (
+					git_remote.refs [
+						library_data ["version"]])
 
-				git_remote = (
-					self.git_repo.remotes [
-						library_name])
+				remote_commit = (
+					remote_ref.commit)
 
-				if "version" in library_data:
+			elif "branch" in library_data:
 
-					remote_ref = (
-						git_remote.refs [
-							library_data ["version"]])
+				remote_ref = (
+					git_remote.refs [
+						library_data ["branch"]])
 
-					remote_commit = (
-						remote_ref.commit)
+				remote_commit = (
+					remote_ref.commit)
 
-				elif "branch" in library_data:
+			remote_tree = (
+				remote_commit.tree)
 
-					remote_ref = (
-						git_remote.refs [
-							library_data ["branch"]])
+			if local_tree == remote_tree:
+				return
 
-					remote_commit = (
-						remote_ref.commit)
+			library_version = (
+				library_data.get (
+					"version",
+					library_data ["branch"]))
 
-				remote_tree = (
-					remote_commit.tree)
+			self.update_library_version (
+				library_name,
+				library_data,
+				library_prefix,
+				library_version,
+				remote_commit)
 
-				if local_tree == remote_tree:
-					continue
+	def update_library_version (
+			self,
+			library_name,
+			library_data,
+			library_prefix,
+			library_version,
+			remote_commit):
 
-				with output.status (
-					"Update library: %s" % (
-						library_name)):
+		try:
 
-					subprocess.check_call ([
-						"git",
-						"subtree",
-						"merge",
-						"--prefix", library_prefix,
-						unicode (remote_commit),
-						"--squash",
-						"--message",
-						"update %s to %s" % (
-							library_name,
-							library_data ["version"]),
-					])
+			with log.status (
+				"Update library: %s" % (
+					library_name)):
+
+				output = (
+					subprocess.check_output (
+						[
+							"git",
+							"subtree",
+							"merge",
+							"--prefix", library_prefix,
+							unicode (remote_commit),
+							"--squash",
+							"--message",
+							"update %s to %s" % (
+								library_name,
+								library_version),
+						],
+						stderr = subprocess.STDOUT))
+
+				if len (output):
+
+					log.keep_status ()
+
+					log.output (
+						output)
+
+		except subprocess.CalledProcessError as error:
+
+			log.notice (
+				"Update failed!")
+
+			log.output (
+				error.output)
 
 	def build_libraries (self):
 
@@ -429,7 +531,7 @@ class ThirdPartySetup (object):
 
 			try:
 
-				with output.status (
+				with log.status (
 					"Building library: %s" % (
 						library_name)):
 
@@ -446,24 +548,24 @@ class ThirdPartySetup (object):
 
 			except subprocess.CalledProcessError as error:
 
-				output.notice (
+				log.notice (
 					"Build failed!")
 
-				output.output (
+				log.output (
 					error.output)
 
 				num_failed += 1
 
 		if num_failed:
 
-			output.notice (
+			log.notice (
 				"Built %s remotes with %s failures" % (
 					num_built,
 					num_failed))
 
 		elif num_built:
 
-			output.notice (
+			log.notice (
 				"Built %s remotes" % (
 					num_built))
 
@@ -487,7 +589,7 @@ class ThirdPartySetup (object):
 
 				for library_merge in library_data ["merge"]:
 
-					with output.status (
+					with log.status (
 						"Merging library: %s (%s -> %s)" % (
 							library_name,
 							library_merge ["source"],
@@ -540,7 +642,7 @@ class ThirdPartySetup (object):
 							self.git_repo.head.commit.tree [
 								source_path])
 
-						output.notice (
+						log.notice (
 							"SOURCE TREE: " + unicode (source_tree))
 
 						def expand_parents (item):
@@ -573,14 +675,6 @@ class ThirdPartySetup (object):
 								library_merge ["source"],
 								exclude),
 							library_merge.get ("exclude", [])))
-
-						map (
-							lambda p: print ("INC: %s" % p),
-							includes)
-
-						map (
-							lambda p: print ("EXC: %s" % p),
-							excludes)
 
 						if includes or excludes:
 
@@ -632,7 +726,7 @@ class ThirdPartySetup (object):
 						merged_tree = (
 							merged_index.write_tree ())
 
-						output.notice (
+						log.notice (
 							"MERGED TREE: " + unicode (merged_tree))
 
 						if os.path.exists (
@@ -655,7 +749,7 @@ class ThirdPartySetup (object):
 							"--prefix",
 							unmerged_path)
 
-						output.notice (
+						log.notice (
 							"INDEX TREE: " + unicode (
 								self.git_repo.index.write_tree ()))
 
@@ -669,24 +763,24 @@ class ThirdPartySetup (object):
 
 			except subprocess.CalledProcessError as error:
 
-				output.notice (
+				log.notice (
 					"Merge failed!")
 
-				output.output (
+				log.output (
 					error.output)
 
 				num_failed += 1
 
 		if num_failed:
 
-			output.notice (
+			log.notice (
 				"Merged %s libraries with %s failures" % (
 					num_merged,
 					num_failed))
 
 		elif num_merged:
 
-			output.notice (
+			log.notice (
 				"Merged %s libraries" % (
 					num_merged))
 
