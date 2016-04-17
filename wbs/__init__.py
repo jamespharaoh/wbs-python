@@ -6,6 +6,7 @@ from wbs.env import *
 from wbs.error import *
 from wbs.lazy import *
 from wbs.login import *
+from wbs.output import *
 from wbs.project import *
 from wbs.random import *
 from wbs.schema import *

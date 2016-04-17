@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
-from __future__ import with_statement
 
 import os
 import signal
@@ -18,6 +18,7 @@ except ImportError:
 	pass
 
 import wbs.yamlx as yamlx
+import wbs.output as output
 
 def read_index ():
 
@@ -40,6 +41,14 @@ def build ():
 	third_party_setup.load ()
 	third_party_setup.build ()
 
+def merge ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.merge ()
+
 class ThirdPartySetup (object):
 
 	def __init__ (self):
@@ -60,8 +69,8 @@ class ThirdPartySetup (object):
 
 	def pull (self):
 
-		sys.stdout.write (
-			"About to pull third party libraries\n")
+		output.notice (
+			"About to pull third party libraries")
 
 		try:
 
@@ -70,12 +79,12 @@ class ThirdPartySetup (object):
 			self.stash_changes ()
 			self.update_libraries ()
 
-			print (
+			output.notice (
 				"All done")
 
 		except KeyboardInterrupt:
 
-			print (
+			output.notice (
 				"Aborting due to user request")
 
 		finally:
@@ -84,20 +93,42 @@ class ThirdPartySetup (object):
 
 	def build (self):
 
-		sys.stdout.write (
-			"About to build third party libraries\n")
+		output.notice (
+			"About to build third party libraries")
 
 		try:
 
 			self.stash_changes ()
 			self.build_libraries ()
 
-			print (
+			output.notice (
 				"All done")
 
 		except KeyboardInterrupt:
 
-			print (
+			output.notice (
+				"Aborting due to user request")
+
+		finally:
+
+			self.unstash_changes ()
+
+	def merge (self):
+
+		output.notice (
+			"About to merge third party libraries")
+
+		try:
+
+			self.stash_changes ()
+			self.merge_libraries ()
+
+			output.notice (
+				"All done")
+
+		except KeyboardInterrupt:
+
+			output.notice (
 				"Aborting due to user request")
 
 		finally:
@@ -117,8 +148,8 @@ class ThirdPartySetup (object):
 
 			if not library_name in remotes_index:
 
-				sys.stdout.write (
-					"Create missing remote for %s\n" % (
+				output.status (
+					"Create missing remote for %s" % (
 						library_name))
 
 				remotes_index [library_name] = (
@@ -131,31 +162,44 @@ class ThirdPartySetup (object):
 		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			remote_version = (
-				library_data ["version"])
+			if "version" in library_data:
 
-			sys.stdout.write (
-				"Fetch remote: %s (%s)\n" % (
-					library_name,
-					remote_version))
+				with output.status (
+					"Fetch remote: %s (%s)" % (
+						library_name,
+						library_data ["version"])):
 
-			self.git_repo.remotes [library_name].fetch (
-				"%s:refs/%s/%s" % (
-					remote_version,
-					library_name,
-					remote_version))
+					self.git_repo.remotes [library_name].fetch (
+						"refs/tags/%s:refs/remotes/%s/%s" % (
+							library_data ["version"],
+							library_name,
+							library_data ["version"]))
 
-			sys.stdout.write (
-				"\x1b[1A\x1b[K")
+			elif "branch" in library_data:
 
-		sys.stdout.write (
-			"Fetched %s remotes\n" % (
+				with sys.stdout.write (
+					"Fetch remote: %s (%s)\n" % (
+						library_name,
+						library_data ["branch"])):
+
+					self.git_repo.remotes [library_name].fetch (
+						"%s:refs/%s/%s" % (
+							library_data ["branch"],
+							library_name,
+							library_data ["branch"]))
+
+			else:
+
+				raise Exception ()
+
+		output.notice (
+			"Fetched %s remotes" % (
 				len (self.third_party_index)))
 
 	def handle_interrupt (self, * arguments):
 
-		sys.stdout.write (
-			"Aborting...\n")
+		output.notice (
+			"Aborting...")
 
 		self.interrupted = True
 
@@ -171,8 +215,11 @@ class ThirdPartySetup (object):
 				signal.SIGINT,
 				self.handle_interrupt))
 
-		sys.stdout.write (
-			"Stashing local changes\n")
+		output.notice (
+			"Stashing local changes")
+
+		self.stashed_head_tree = (
+			self.git_repo.head.commit.tree)
 
 		self.stashed_index_tree = (
 			self.git_repo.index.write_tree ())
@@ -201,15 +248,29 @@ class ThirdPartySetup (object):
 		if not self.stashed:
 			return
 
-		sys.stdout.write (
-			"Unstashing local changes\n")
+		output.notice (
+			"Unstashing local changes")
+
+		merged_working_index = (
+			git.IndexFile.from_tree (
+				self.git_repo,
+				self.stashed_head_tree,
+				self.stashed_working_tree,
+				self.git_repo.head.commit.tree))
 
 		self.git_repo.index.reset (
-			self.stashed_working_tree,
+			merged_working_index.write_tree (),
 			working_tree = True)
 
+		merged_index = (
+			git.IndexFile.from_tree (
+				self.git_repo,
+				self.stashed_head_tree,
+				self.stashed_index_tree,
+				self.git_repo.head.commit.tree))
+
 		self.git_repo.index.reset (
-			self.stashed_index_tree)
+			merged_index.write_tree ())
 
 		self.stashed = False
 
@@ -230,8 +291,8 @@ class ThirdPartySetup (object):
 			if not os.path.isdir (
 				library_path):
 
-				sys.stdout.write (
-					"First time import library: %s\n" % (
+				output.notice (
+					"First time import library: %s" % (
 						library_name))
 
 				subprocess.check_call ([
@@ -257,7 +318,7 @@ class ThirdPartySetup (object):
 					self.git_repo.remotes [
 						library_name])
 
-				if library_data ["version"] in git_remote.refs:
+				if "version" in library_data:
 
 					remote_ref = (
 						git_remote.refs [
@@ -266,11 +327,14 @@ class ThirdPartySetup (object):
 					remote_commit = (
 						remote_ref.commit)
 
-				else:
+				elif "branch" in library_data:
+
+					remote_ref = (
+						git_remote.refs [
+							library_data ["branch"]])
 
 					remote_commit = (
-						self.git_repo.commit (
-							library_data ["version"]))
+						remote_ref.commit)
 
 				remote_tree = (
 					remote_commit.tree)
@@ -278,22 +342,22 @@ class ThirdPartySetup (object):
 				if local_tree == remote_tree:
 					continue
 
-				sys.stdout.write (
-					"Update library: %s\n" % (
-						library_name))
+				with output.status (
+					"Update library: %s" % (
+						library_name)):
 
-				subprocess.check_call ([
-					"git",
-					"subtree",
-					"merge",
-					"--prefix", library_prefix,
-					unicode (remote_commit),
-					"--squash",
-					"--message",
-					"update %s to %s" % (
-						library_name,
-						library_data ["version"]),
-				])
+					subprocess.check_call ([
+						"git",
+						"subtree",
+						"merge",
+						"--prefix", library_prefix,
+						unicode (remote_commit),
+						"--squash",
+						"--message",
+						"update %s to %s" % (
+							library_name,
+							library_data ["version"]),
+					])
 
 	def build_libraries (self):
 
@@ -365,45 +429,265 @@ class ThirdPartySetup (object):
 
 			try:
 
-				sys.stdout.write (
-					"Building library: %s\n" % (
-						library_name))
+				with output.status (
+					"Building library: %s" % (
+						library_name)):
 
-				subprocess.check_output (
-					build_data ["command"],
-					shell = True,
-					stderr = subprocess.STDOUT,
-					env = dict (
-						os.environ, 
-						** build_data ["environment"]),
-					cwd = library_path)
-
-				sys.stdout.write (
-					"\x1b[1A\x1b[K")
+					subprocess.check_output (
+						build_data ["command"],
+						shell = True,
+						stderr = subprocess.STDOUT,
+						env = dict (
+							os.environ,
+							** build_data ["environment"]),
+						cwd = library_path)
 
 				num_built += 1
 
 			except subprocess.CalledProcessError as error:
 
-				sys.stderr.write (
-					"Build failed!\n")
+				output.notice (
+					"Build failed!")
 
-				sys.stderr.write (
+				output.output (
 					error.output)
 
 				num_failed += 1
 
 		if num_failed:
 
-			sys.stdout.write (
-				"Built %s remotes with %s failures\n" % (
+			output.notice (
+				"Built %s remotes with %s failures" % (
 					num_built,
 					num_failed))
 
 		elif num_built:
 
-			sys.stdout.write (
-				"Built %s remotes\n" % (
+			output.notice (
+				"Built %s remotes" % (
 					num_built))
+
+	def merge_libraries (self):
+
+		num_merged = 0
+		num_failed = 0
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if not "merge" in library_data:
+				continue
+
+			library_path = (
+				"%s/third-party/%s" % (
+					self.project_path,
+					library_name))
+
+			try:
+
+				for library_merge in library_data ["merge"]:
+
+					with output.status (
+						"Merging library: %s (%s -> %s)" % (
+							library_name,
+							library_merge ["source"],
+							library_merge ["target"])):
+
+						unmerged_path = (
+							".merged/%s" % (
+								library_merge ["target"]))
+
+						if os.path.exists (
+							"%s/%s" % (
+								self.project_path,
+								unmerged_path)):
+
+							unmerged_tree = (
+								self.git_repo.head.commit.tree [
+									unmerged_path])
+
+						else:
+
+							unmerged_tree = (
+								self.git_repo.tree (
+									"4b825dc642cb6eb9a060e54bf8d69288fbee4904"))
+
+						target_path = (
+							"%s" % (
+								library_merge ["target"] [1:]))
+
+						if os.path.exists (
+							"%s/%s" % (
+								self.project_path,
+								target_path)):
+
+							target_tree = (
+								self.git_repo.head.commit.tree [
+									target_path])
+
+						else:
+
+							target_tree = (
+								self.git_repo.tree (
+									"4b825dc642cb6eb9a060e54bf8d69288fbee4904"))
+
+						source_path = (
+							"third-party/%s%s" % (
+								library_name,
+								library_merge ["source"]))
+
+						source_tree = (
+							self.git_repo.head.commit.tree [
+								source_path])
+
+						output.notice (
+							"SOURCE TREE: " + unicode (source_tree))
+
+						def expand_parents (item):
+
+							parts = item.rsplit ("/", 1)
+
+							if len (parts) == 2:
+								return ([]
+									+ expand_parents (parts [0])
+									+ ["/" + parts [1]]
+								)
+
+							else:
+								return parts
+
+						includes = set (map (
+							lambda include: "third-party/%s%s%s" % (
+								library_name,
+								library_merge ["source"],
+								include),
+							[
+								item2
+								for item1 in library_merge.get ("include", [])
+								for item2 in expand_parents (item1)
+							]))
+
+						excludes = set (map (
+							lambda exclude: "third-party/%s%s%s" % (
+								library_name,
+								library_merge ["source"],
+								exclude),
+							library_merge.get ("exclude", [])))
+
+						map (
+							lambda p: print ("INC: %s" % p),
+							includes)
+
+						map (
+							lambda p: print ("EXC: %s" % p),
+							excludes)
+
+						if includes or excludes:
+
+							source_index = (
+								git.IndexFile.from_tree (
+									self.git_repo,
+									"4b825dc642cb6eb9a060e54bf8d69288fbee4904"))
+
+							def predicate (item, depth):
+								return not excludes \
+								or item not in excludes
+
+							def prune (item, depth):
+								return (
+									includes
+									and item.path not in includes
+								) or (
+									excludes
+									and item.path in excludes
+								)
+
+							source_prune_length = len (
+								"third-party/%s%s/" % (
+									library_name,
+									library_merge ["source"]))
+
+							for item in source_tree.traverse (
+									predicate = lambda i, d: True,
+									prune = prune):
+
+								source_index.add (
+									[ git.Blob (
+										self.git_repo,
+										item.binsha,
+										item.mode,
+										item.path [source_prune_length : ]),
+									])
+
+							source_tree = (
+								source_index.write_tree ())
+
+						merged_index = (
+							git.IndexFile.from_tree (
+								self.git_repo,
+								unmerged_tree,
+								target_tree,
+								source_tree))
+
+						merged_tree = (
+							merged_index.write_tree ())
+
+						output.notice (
+							"MERGED TREE: " + unicode (merged_tree))
+
+						if os.path.exists (
+							"%s/%s" % (
+								self.project_path,
+								target_path)):
+
+							self.git_repo.git.rm (
+								"--force",
+								"-r",
+								target_path)
+
+						self.git_repo.git.read_tree (
+							unicode (merged_tree),
+							"--prefix",
+							target_path)
+
+						self.git_repo.git.read_tree (
+							unicode (source_tree),
+							"--prefix",
+							unmerged_path)
+
+						output.notice (
+							"INDEX TREE: " + unicode (
+								self.git_repo.index.write_tree ()))
+
+				if len (self.git_repo.index.diff ()):
+
+					self.git_repo.index.commit (
+						"Auto-merge changes from %s" % (
+							library_name))
+
+					num_merged += 1
+
+			except subprocess.CalledProcessError as error:
+
+				output.notice (
+					"Merge failed!")
+
+				output.output (
+					error.output)
+
+				num_failed += 1
+
+		if num_failed:
+
+			output.notice (
+				"Merged %s libraries with %s failures" % (
+					num_merged,
+					num_failed))
+
+		elif num_merged:
+
+			output.notice (
+				"Merged %s libraries" % (
+					num_merged))
 
 # ex: noet ts=4 filetype=python
