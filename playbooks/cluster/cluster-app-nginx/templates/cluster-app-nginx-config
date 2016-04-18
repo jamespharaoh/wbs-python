@@ -3,8 +3,8 @@
 {% set restrictions %}
 {% for whitelist_ip in cluster.whitelist_ips %}
 			allow {{ whitelist_ip.ip }}; # {{ whitelist_ip.name }}
-			deny all;
 {% endfor %}
+			deny all;
 {% endset %}
 
 user www-data;
