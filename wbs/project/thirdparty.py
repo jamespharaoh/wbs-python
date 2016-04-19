@@ -407,7 +407,7 @@ class ThirdPartySetup (object):
 			library_version = (
 				library_data.get (
 					"version",
-					library_data ["branch"]))
+					library_data.get ("branch")))
 
 			self.update_library_version (
 				library_name,
