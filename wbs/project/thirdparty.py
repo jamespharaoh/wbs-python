@@ -131,10 +131,10 @@ class ThirdPartySetup (object):
 
 		try:
 
-			self.create_remotes ()
-			self.fetch_remotes ()
+			self.create_remotes (* names)
+			self.fetch_remotes (* names)
 			self.stash_changes ()
-			self.update_libraries ()
+			self.update_libraries (* names)
 
 			log.notice (
 				"All done")
@@ -203,6 +203,9 @@ class ThirdPartySetup (object):
 		for library_name, library_data \
 		in self.third_party_index.items ():
 
+			if names and library_name not in names:
+				continue
+
 			if library_name in remotes_index:
 				continue
 
@@ -219,6 +222,9 @@ class ThirdPartySetup (object):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			if "version" in library_data:
 
@@ -283,12 +289,30 @@ class ThirdPartySetup (object):
 		self.stashed_index_tree = (
 			self.git_repo.index.write_tree ())
 
+		self.stashed_index_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_index_tree,
+				"Stashed index",
+				[ self.git_repo.head.commit ]))
+
+		print (self.stashed_index_commit)
+
 		self.git_repo.git.add (
 			"--all",
-			"third-party")
+			".")
 
 		self.stashed_working_tree = (
 			self.git_repo.index.write_tree ())
+
+		self.stashed_working_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_working_tree,
+				"Stashed working tree",
+				[ self.git_repo.head.commit ]))
+
+		print (self.stashed_working_commit)
 
 		self.git_repo.index.reset (
 			working_tree = True)
@@ -337,6 +361,9 @@ class ThirdPartySetup (object):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			self.update_library (
 				library_name,
@@ -502,21 +529,14 @@ class ThirdPartySetup (object):
 
 				build_data = {
 					"command": " ".join ([
-						"python setup.py build",
-					]),
-					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
-					},
-				}
-
-				build_data = {
-					"command": " ".join ([
 						"python setup.py install",
 						"--prefix %s/work" % self.project_path,
 					]),
 					"environment": {
+						"PATH":
+							"%s/work/bin:%s" % (
+								self.project_path,
+								os.environ ["PATH"]),
 						"PYTHONPATH":
 							"%s/work/lib/python2.7/site-packages" % (
 								self.project_path),
