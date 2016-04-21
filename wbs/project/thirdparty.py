@@ -244,7 +244,8 @@ class ThirdPartySetup (object):
 						"%s:refs/%s/%s" % (
 							library_data ["branch"],
 							library_name,
-							library_data ["branch"]))
+							library_data ["branch"]),
+						no_tags = True)
 
 			else:
 
@@ -412,7 +413,8 @@ class ThirdPartySetup (object):
 			library_version = (
 				library_data.get (
 					"version",
-					library_data ["branch"]))
+					library_data.get (
+						"branch")))
 
 			self.update_library_version (
 				library_name,
