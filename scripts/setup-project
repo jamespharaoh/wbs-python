@@ -7,23 +7,60 @@ from __future__ import with_statement
 
 import sys
 
-sys.path.append (
-	"third-party/gitdb")
-
-sys.path.append (
-	"third-party/gitpython")
-
-sys.path.append (
-	"third-party/pyyaml/lib")
-
-sys.path.append (
-	"third-party/smmap")
-
-sys.path.append (
-	"third-party/wbs-python")
+map (
+	sys.path.append,
+	[
+		"third-party/gitdb",
+		"third-party/gitpython",
+		"third-party/pyyaml/lib",
+		"third-party/smmap",
+		"third-party/wbs-python",
+	])
 
 import wbs.project
 
-wbs.project.thirdparty.setup ()
+command = (
+	sys.argv [1]
+) if len (sys.argv) > 1 else (
+	None
+)
+
+if command in [
+	"build",
+	"fetch",
+	"merge",
+	"pull",
+	"update",
+]:
+
+	function = getattr (
+		wbs.project.thirdparty,
+		command)
+
+	function ()
+
+else:
+
+	if command != "help":
+
+		sys.stderr.write (
+			"\nUsage error\n")
+
+	map (
+		lambda line:
+			sys.stderr.write ("".join ([
+				line.format (
+					name = sys.argv [0]),
+				"\n",
+			])),
+		[
+			"",
+			"Syntax:",
+			"",
+			"  {name} build  Build third party libraries",
+			"  {name} merge  Merge third party libraries",
+			"  {name} pull   Pull third party libraries",
+			"",
+		])
 
 # ex: noet ts=4 filetype=python
