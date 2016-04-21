@@ -50,6 +50,16 @@ from io import BytesIO
 from nose import SkipTest
 
 
+def iter_flatten(lol):
+    for items in lol:
+        for item in items:
+            yield item
+
+
+def flatten(lol):
+    return list(iter_flatten(lol))
+
+
 class TestRepo(TestBase):
 
     @raises(InvalidGitRepositoryError)
@@ -322,6 +332,27 @@ class TestRepo(TestBase):
         # END for each item to traverse
         assert c, "Should have executed at least one blame command"
         assert nml, "There should at least be one blame commit that contains multiple lines"
+
+    @patch.object(Git, '_call_process')
+    def test_blame_incremental(self, git):
+        git.return_value = fixture('blame_incremental')
+        blame_output = self.rorepo.blame_incremental('9debf6b0aafb6f7781ea9d1383c86939a1aacde3', 'AUTHORS')
+        blame_output = list(blame_output)
+        assert len(blame_output) == 5
+
+        # Check all outputted line numbers
+        ranges = flatten([entry.linenos for entry in blame_output])
+        assert ranges == flatten([range(2, 3), range(14, 15), range(1, 2), range(3, 14), range(15, 17)]), str(ranges)
+
+        commits = [entry.commit.hexsha[:7] for entry in blame_output]
+        assert commits == ['82b8902', '82b8902', 'c76852d', 'c76852d', 'c76852d'], str(commits)
+
+        # Original filenames
+        assert all([entry.orig_path == u'AUTHORS' for entry in blame_output])
+
+        # Original line numbers
+        orig_ranges = flatten([entry.orig_linenos for entry in blame_output])
+        assert orig_ranges == flatten([range(2, 3), range(14, 15), range(1, 2), range(2, 13), range(13, 15)]), str(orig_ranges)  # noqa
 
     @patch.object(Git, '_call_process')
     def test_blame_complex_revision(self, git):

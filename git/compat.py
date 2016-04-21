@@ -33,6 +33,7 @@ if PY3:
         return bytes([n])
     def mviter(d):
         return d.values()
+    range = xrange
     unicode = str
 else:
     FileType = file
@@ -43,8 +44,18 @@ else:
     byte_ord = ord
     bchr = chr
     unicode = unicode
+    range = xrange
     def mviter(d):
         return d.itervalues()
+
+
+def safe_decode(s):
+    """Safely decodes a binary string to unicode"""
+    if isinstance(s, unicode):
+        return s
+    elif isinstance(s, bytes):
+        return s.decode(defenc, errors='replace')
+    raise TypeError('Expected bytes or text, but got %r' % (s,))
 
 
 def with_metaclass(meta, *bases):

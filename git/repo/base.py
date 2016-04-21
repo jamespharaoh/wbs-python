@@ -52,17 +52,22 @@ from .fun import (
 from git.compat import (
     text_type,
     defenc,
-    PY3
+    PY3,
+    safe_decode,
+    range,
 )
 
 import os
 import sys
 import re
+from collections import namedtuple
 
 DefaultDBType = GitCmdObjectDB
 if sys.version_info[:2] < (2, 5):     # python 2.4 compatiblity
     DefaultDBType = GitCmdObjectDB
 # END handle python 2.4
+
+BlameEntry = namedtuple('BlameEntry', ['commit', 'linenos', 'orig_path', 'orig_linenos'])
 
 
 __all__ = ('Repo', )
@@ -655,7 +660,71 @@ class Repo(object):
         :return: Head to the active branch"""
         return self.head.reference
 
-    def blame(self, rev, file):
+    def blame_incremental(self, rev, file, **kwargs):
+        """Iterator for blame information for the given file at the given revision.
+
+        Unlike .blame(), this does not return the actual file's contents, only
+        a stream of BlameEntry tuples.
+
+        :parm rev: revision specifier, see git-rev-parse for viable options.
+        :return: lazy iterator of BlameEntry tuples, where the commit
+                 indicates the commit to blame for the line, and range
+                 indicates a span of line numbers in the resulting file.
+
+        If you combine all line number ranges outputted by this command, you
+        should get a continuous range spanning all line numbers in the file.
+        """
+        data = self.git.blame(rev, '--', file, p=True, incremental=True, stdout_as_string=False, **kwargs)
+        commits = dict()
+
+        stream = iter(data.splitlines())
+        while True:
+            line = next(stream)  # when exhausted, casues a StopIteration, terminating this function
+
+            hexsha, orig_lineno, lineno, num_lines = line.split()
+            lineno = int(lineno)
+            num_lines = int(num_lines)
+            orig_lineno = int(orig_lineno)
+            if hexsha not in commits:
+                # Now read the next few lines and build up a dict of properties
+                # for this commit
+                props = dict()
+                while True:
+                    line = next(stream)
+                    if line == b'boundary':
+                        # "boundary" indicates a root commit and occurs
+                        # instead of the "previous" tag
+                        continue
+
+                    tag, value = line.split(b' ', 1)
+                    props[tag] = value
+                    if tag == b'filename':
+                        # "filename" formally terminates the entry for --incremental
+                        orig_filename = value
+                        break
+
+                c = Commit(self, hex_to_bin(hexsha),
+                           author=Actor(safe_decode(props[b'author']),
+                                        safe_decode(props[b'author-mail'].lstrip(b'<').rstrip(b'>'))),
+                           authored_date=int(props[b'author-time']),
+                           committer=Actor(safe_decode(props[b'committer']),
+                                           safe_decode(props[b'committer-mail'].lstrip(b'<').rstrip(b'>'))),
+                           committed_date=int(props[b'committer-time']),
+                           message=safe_decode(props[b'summary']))
+                commits[hexsha] = c
+            else:
+                # Discard the next line (it's a filename end tag)
+                line = next(stream)
+                tag, value = line.split(b' ', 1)
+                assert tag == b'filename', 'Unexpected git blame output'
+                orig_filename = value
+
+            yield BlameEntry(commits[hexsha],
+                             range(lineno, lineno + num_lines),
+                             safe_decode(orig_filename),
+                             range(orig_lineno, orig_lineno + num_lines))
+
+    def blame(self, rev, file, incremental=False, **kwargs):
         """The blame information for the given file at the given revision.
 
         :parm rev: revision specifier, see git-rev-parse for viable options.
@@ -664,7 +733,10 @@ class Repo(object):
             A list of tuples associating a Commit object with a list of lines that
             changed within the given commit. The Commit objects will be given in order
             of appearance."""
-        data = self.git.blame(rev, '--', file, p=True, stdout_as_string=False)
+        if incremental:
+            return self.blame_incremental(rev, file, **kwargs)
+
+        data = self.git.blame(rev, '--', file, p=True, stdout_as_string=False, **kwargs)
         commits = dict()
         blames = list()
         info = None

@@ -16,7 +16,27 @@ from git.compat import (
 )
 
 
-__all__ = ('Diffable', 'DiffIndex', 'Diff')
+__all__ = ('Diffable', 'DiffIndex', 'Diff', 'NULL_TREE')
+
+# Special object to compare against the empty tree in diffs
+NULL_TREE = object()
+
+
+def decode_path(path, has_ab_prefix=True):
+    if path == b'/dev/null':
+        return None
+
+    if path.startswith(b'"') and path.endswith(b'"'):
+        path = (path[1:-1].replace(b'\\n', b'\n')
+                          .replace(b'\\t', b'\t')
+                          .replace(b'\\"', b'"')
+                          .replace(b'\\\\', b'\\'))
+
+    if has_ab_prefix:
+        assert path.startswith(b'a/') or path.startswith(b'b/')
+        path = path[2:]
+
+    return path
 
 
 class Diffable(object):
@@ -49,6 +69,7 @@ class Diffable(object):
             If None, we will be compared to the working tree.
             If Treeish, it will be compared against the respective tree
             If Index ( type ), it will be compared against the index.
+            If git.NULL_TREE, it will compare against the empty tree.
             It defaults to Index to assure the method will not by-default fail
             on bare repositories.
 
@@ -87,10 +108,17 @@ class Diffable(object):
         if paths is not None and not isinstance(paths, (tuple, list)):
             paths = [paths]
 
-        if other is not None and other is not self.Index:
-            args.insert(0, other)
+        diff_cmd = self.repo.git.diff
         if other is self.Index:
-            args.insert(0, "--cached")
+            args.insert(0, '--cached')
+        elif other is NULL_TREE:
+            args.insert(0, '-r')  # recursive diff-tree
+            args.insert(0, '--root')
+            diff_cmd = self.repo.git.diff_tree
+        elif other is not None:
+            args.insert(0, '-r')  # recursive diff-tree
+            args.insert(0, other)
+            diff_cmd = self.repo.git.diff_tree
 
         args.insert(0, self)
 
@@ -101,7 +129,7 @@ class Diffable(object):
         # END paths handling
 
         kwargs['as_process'] = True
-        proc = self.repo.git.diff(*self._process_diff_args(args), **kwargs)
+        proc = diff_cmd(*self._process_diff_args(args), **kwargs)
 
         diff_method = Diff._index_from_raw_format
         if create_patch:
@@ -185,19 +213,21 @@ class Diff(object):
         be different to the version in the index or tree, and hence has been modified."""
 
     # precompiled regex
-    re_header = re.compile(r"""
+    re_header = re.compile(br"""
                                 ^diff[ ]--git
-                                    [ ](?:a/)?(?P<a_path>.+?)[ ](?:b/)?(?P<b_path>.+?)\n
-                                (?:^similarity[ ]index[ ](?P<similarity_index>\d+)%\n
-                                   ^rename[ ]from[ ](?P<rename_from>\S+)\n
-                                   ^rename[ ]to[ ](?P<rename_to>\S+)(?:\n|$))?
+                                    [ ](?P<a_path_fallback>"?a/.+?"?)[ ](?P<b_path_fallback>"?b/.+?"?)\n
                                 (?:^old[ ]mode[ ](?P<old_mode>\d+)\n
                                    ^new[ ]mode[ ](?P<new_mode>\d+)(?:\n|$))?
+                                (?:^similarity[ ]index[ ]\d+%\n
+                                   ^rename[ ]from[ ](?P<rename_from>.*)\n
+                                   ^rename[ ]to[ ](?P<rename_to>.*)(?:\n|$))?
                                 (?:^new[ ]file[ ]mode[ ](?P<new_file_mode>.+)(?:\n|$))?
                                 (?:^deleted[ ]file[ ]mode[ ](?P<deleted_file_mode>.+)(?:\n|$))?
                                 (?:^index[ ](?P<a_blob_id>[0-9A-Fa-f]+)
                                     \.\.(?P<b_blob_id>[0-9A-Fa-f]+)[ ]?(?P<b_mode>.+)?(?:\n|$))?
-                            """.encode('ascii'), re.VERBOSE | re.MULTILINE)
+                                (?:^---[ ](?P<a_path>[^\t\n\r\f\v]*)[\t\r\f\v]*(?:\n|$))?
+                                (?:^\+\+\+[ ](?P<b_path>[^\t\n\r\f\v]*)[\t\r\f\v]*(?:\n|$))?
+                            """, re.VERBOSE | re.MULTILINE)
     # can be used for comparisons
     NULL_HEX_SHA = "0" * 40
     NULL_BIN_SHA = b"\0" * 20
@@ -220,15 +250,14 @@ class Diff(object):
         if self.b_mode:
             self.b_mode = mode_str_to_int(self.b_mode)
 
-        if a_blob_id is None:
+        if a_blob_id is None or a_blob_id == self.NULL_HEX_SHA:
             self.a_blob = None
         else:
-            assert self.a_mode is not None
             self.a_blob = Blob(repo, hex_to_bin(a_blob_id), mode=self.a_mode, path=a_path)
-        if b_blob_id is None:
+
+        if b_blob_id is None or b_blob_id == self.NULL_HEX_SHA:
             self.b_blob = None
         else:
-            assert self.b_mode is not None
             self.b_blob = Blob(repo, hex_to_bin(b_blob_id), mode=self.b_mode, path=b_path)
 
         self.new_file = new_file
@@ -308,6 +337,19 @@ class Diff(object):
         return self.rename_from != self.rename_to
 
     @classmethod
+    def _pick_best_path(cls, path_match, rename_match, path_fallback_match):
+        if path_match:
+            return decode_path(path_match)
+
+        if rename_match:
+            return decode_path(rename_match, has_ab_prefix=False)
+
+        if path_fallback_match:
+            return decode_path(path_fallback_match)
+
+        return None
+
+    @classmethod
     def _index_from_patch_format(cls, repo, stream):
         """Create a new DiffIndex from the given text which must be in patch format
         :param repo: is the repository we are operating on - it is required
@@ -318,10 +360,16 @@ class Diff(object):
         index = DiffIndex()
         previous_header = None
         for header in cls.re_header.finditer(text):
-            a_path, b_path, similarity_index, rename_from, rename_to, \
-                old_mode, new_mode, new_file_mode, deleted_file_mode, \
-                a_blob_id, b_blob_id, b_mode = header.groups()
+            a_path_fallback, b_path_fallback, \
+                old_mode, new_mode, \
+                rename_from, rename_to, \
+                new_file_mode, deleted_file_mode, \
+                a_blob_id, b_blob_id, b_mode, \
+                a_path, b_path = header.groups()
             new_file, deleted_file = bool(new_file_mode), bool(deleted_file_mode)
+
+            a_path = cls._pick_best_path(a_path, rename_from, a_path_fallback)
+            b_path = cls._pick_best_path(b_path, rename_to, b_path_fallback)
 
             # Our only means to find the actual text is to see what has not been matched by our regex,
             # and then retro-actively assin it to our index
