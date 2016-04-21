@@ -3,143 +3,143 @@
 ansible:
 
   url: "git@github.com:ansible/ansible.git"
-  version: "stable-2.0"
+  branch: "stable-2.0"
   auto: "python"
 
 ansible-modules-core:
 
   url: "git@github.com:ansible/ansible-modules-core.git"
-  version: "stable-2.0"
+  branch: "stable-2.0"
 
 ansible-modules-extras:
 
   url: "git@github.com:ansible/ansible-modules-extras.git"
-  version: "stable-2.0"
+  branch: "stable-2.0"
 
 aws-cli:
 
   url: "git@github.com:aws/aws-cli.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 boto:
 
   url: "git@github.com:boto/boto.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 botocore:
 
   url: "git@github.com:boto/botocore.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 dateutil:
 
   url: "git@github.com:dateutil/dateutil.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 docutils:
 
   url: "git@github.com:qsnake/docutils.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 gitdb:
 
   url: "git@github.com:gitpython-developers/gitdb.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 gitpython:
 
   url: "git@github.com:gitpython-developers/GitPython.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 gridlinker:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
-  version: "master"
+  branch: "master"
   python: "third-party/gridlinker/python"
 
 ipaddress:
 
   url: "git@github.com:phihag/ipaddress.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 jinja2:
 
   url: "git@github.com:mitsuhiko/jinja2.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 jmespath:
 
   url: "git@github.com:jmespath/jmespath.py.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 markupsafe:
 
   url: "git@github.com:mitsuhiko/markupsafe.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 netaddr:
 
   url: "git@github.com:drkjam/netaddr.git"
-  version: "rel-0.7.x"
+  branch: "rel-0.7.x"
   auto: "python"
 
 pyasn1:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/pyasn1.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 pythonfutures:
 
   url: "git@github.com:agronholm/pythonfutures.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 python-rsa:
 
   url: "git@github.com:sybrenstuvel/python-rsa.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 pyyaml:
 
   url: "git@github.com:yaml/pyyaml.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 roman:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/python-roman.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 s3transfer:
 
   url: "git@github.com:boto/s3transfer.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 smmap:
 
   url: "git@github.com:gitpython-developers/smmap.git"
-  version: "master"
+  branch: "master"
   auto: "python"
 
 wbs-python:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/wbs-python.git"
-  version: "master"
+  branch: "master"
   python: "third-party/wbs-python"
 
 # ex: et ts=2 filetype=yaml
