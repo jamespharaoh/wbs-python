@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -282,12 +281,38 @@ class ThirdPartySetup (object):
 		self.stashed_index_tree = (
 			self.git_repo.index.write_tree ())
 
+		self.stashed_index_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_index_tree,
+				"Stashed index"))
+
+		self.stashed_index_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-index",
+				self.stashed_index_commit,
+				force = True))
+
 		self.git_repo.git.add (
 			"--all",
 			"third-party")
 
 		self.stashed_working_tree = (
 			self.git_repo.index.write_tree ())
+
+		self.stashed_working_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_working_tree,
+				"Stashed working tree"))
+
+		self.stashed_working_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-working",
+				self.stashed_working_commit,
+				force = True))
 
 		self.git_repo.index.reset (
 			working_tree = True)
