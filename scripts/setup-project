@@ -25,6 +25,9 @@ command = (
 	None
 )
 
+command_arguments = (
+	sys.argv [2:])
+
 if command in [
 	"build",
 	"fetch",
@@ -37,7 +40,8 @@ if command in [
 		wbs.project.thirdparty,
 		command)
 
-	function ()
+	function (
+		* command_arguments)
 
 else:
 
