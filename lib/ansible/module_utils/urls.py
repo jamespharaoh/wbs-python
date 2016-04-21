@@ -732,6 +732,15 @@ def open_url(url, data=None, headers=None, method=None, use_proxy=True,
         proxyhandler = urllib2.ProxyHandler({})
         handlers.append(proxyhandler)
 
+    if HAS_SSLCONTEXT and not validate_certs:
+        # In 2.7.9, the default context validates certificates
+        context = SSLContext(ssl.PROTOCOL_SSLv23)
+        context.options |= ssl.OP_NO_SSLv2
+        context.options |= ssl.OP_NO_SSLv3
+        context.verify_mode = ssl.CERT_NONE
+        context.check_hostname = False
+        handlers.append(urllib2.HTTPSHandler(context=context))
+
     # pre-2.6 versions of python cannot use the custom https
     # handler, since the socket class is lacking create_connection.
     # Some python builds lack HTTPS support.
@@ -774,15 +783,6 @@ def open_url(url, data=None, headers=None, method=None, use_proxy=True,
         # urlopen in python prior to 2.6.0 did not
         # have a timeout parameter
         urlopen_args.append(timeout)
-
-    if HAS_SSLCONTEXT and not validate_certs:
-        # In 2.7.9, the default context validates certificates
-        context = SSLContext(ssl.PROTOCOL_SSLv23)
-        context.options |= ssl.OP_NO_SSLv2
-        context.options |= ssl.OP_NO_SSLv3
-        context.verify_mode = ssl.CERT_NONE
-        context.check_hostname = False
-        urlopen_args += (None, None, None, context)
 
     r = urllib2.urlopen(*urlopen_args)
     return r
@@ -838,8 +838,7 @@ def fetch_url(module, url, data=None, headers=None, method=None,
                      url_password=password, http_agent=http_agent, force_basic_auth=force_basic_auth,
                      follow_redirects=follow_redirects)
         info.update(r.info())
-        info['url'] = r.geturl()  # The URL goes in too, because of redirects.
-        info.update(dict(msg="OK (%s bytes)" % r.headers.get('Content-Length', 'unknown'), status=200))
+        info.update(dict(msg="OK (%s bytes)" % r.headers.get('Content-Length', 'unknown'), url=r.geturl(), status=r.getcode()))
     except NoSSLError, e:
         distribution = get_distribution()
         if distribution is not None and distribution.lower() == 'redhat':
