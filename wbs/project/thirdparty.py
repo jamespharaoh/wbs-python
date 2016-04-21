@@ -1,3 +1,4 @@
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -202,11 +203,12 @@ class ThirdPartySetup (object):
 		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			if not library_name in remotes_index:
+			if library_name in remotes_index:
+				continue
 
-				log.status (
-					"Create missing remote for %s" % (
-						library_name))
+			with log.status (
+				"Create missing remote for %s" % (
+					library_name)):
 
 				remotes_index [library_name] = (
 					self.git_repo.create_remote (
@@ -350,6 +352,20 @@ class ThirdPartySetup (object):
 			"third-party/%s" % (
 				library_name))
 
+		if "version" in library_data:
+
+			library_version = (
+				library_data ["version"])
+
+		elif "branch" in library_data:
+
+			library_version = (
+				library_data ["branch"])
+
+		else:
+
+			raise Exception ()
+
 		if not os.path.isdir (
 			library_path):
 
@@ -364,7 +380,7 @@ class ThirdPartySetup (object):
 				"--prefix",
 				library_prefix,
 				library_data ["url"],
-				library_data ["version"],
+				library_version,
 				"--squash",
 			])
 
@@ -380,23 +396,12 @@ class ThirdPartySetup (object):
 				self.git_repo.remotes [
 					library_name])
 
-			if "version" in library_data:
+			remote_ref = (
+				git_remote.refs [
+					library_version])
 
-				remote_ref = (
-					git_remote.refs [
-						library_data ["version"]])
-
-				remote_commit = (
-					remote_ref.commit)
-
-			elif "branch" in library_data:
-
-				remote_ref = (
-					git_remote.refs [
-						library_data ["branch"]])
-
-				remote_commit = (
-					remote_ref.commit)
+			remote_commit = (
+				remote_ref.commit)
 
 			remote_tree = (
 				remote_commit.tree)

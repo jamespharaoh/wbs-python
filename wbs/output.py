@@ -19,10 +19,14 @@ class ConsoleLog (object):
 	def status (self, value):
 
 		if "\n" in value:
-			raise Exception ()
+
+			raise Exception (
+				"Status contains newline")
 
 		if self.current_status:
-			raise Exception ()
+
+			raise Exception (
+				"Status sent without being cleaderd")
 
 		self.current_status = value
 
