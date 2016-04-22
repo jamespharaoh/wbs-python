@@ -36,9 +36,9 @@
     - "nodejs-install"
     - "nodejs-packages-install"
 
-    - "build-nginx"
+    - "nginx-install"
     - "cluster-admin-nginx"
-    - "control-nginx"
+    - "nginx-control"
 
     - "setup-openvpn-server"
     - "cluster-admin-routes"

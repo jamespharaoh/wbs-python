@@ -16,7 +16,7 @@ http {
 	keepalive_timeout 65;
 	types_hash_max_size 2048;
 
-	include {{ nginx_target }}/conf/mime.types;
+	include {{ nginx_config }}/mime.types;
 	default_type application/octet-stream;
 
 	log_format times '{{ [
@@ -57,7 +57,7 @@ http {
 
 		server_name {{ inventory_hostname }};
 
-		root {{ nginx_target }}/html;
+		root /usr/share/nginx/html;
 
 	}
 

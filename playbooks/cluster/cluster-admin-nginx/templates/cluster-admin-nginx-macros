@@ -1,0 +1,20 @@
+{% macro ssl_certificate (name) %}
+	ssl_certificate {{ nginx_config }}/ssl/{{ name }}.cert;
+	ssl_certificate_key {{ nginx_config }}/ssl/{{ name }}.key;
+{% endmacro %}
+
+{% macro listen_http () %}
+	listen 80;
+	listen 8080 proxy_protocol;
+{% endmacro %}
+
+{% macro listen_https () %}
+	listen 443 ssl http2;
+	listen 8443 ssl http2 proxy_protocol;
+{% endmacro %}
+
+{% macro dev_robots () %}
+	location /robots.txt {
+		alias {{ nginx_config }}/dev-robots.txt;
+	}
+{% endmacro %}

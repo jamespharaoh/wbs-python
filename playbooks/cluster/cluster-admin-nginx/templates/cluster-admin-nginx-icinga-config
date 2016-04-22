@@ -1,13 +1,14 @@
 {{ ansible_warning ['#'] }}
 
+{% import 'cluster-admin-nginx-macros' as macros with context %}
+
 # icinga redirect to ssl
 
 server {
 
 	server_name icinga.ops.wistla.com;
 
-	listen 80;
-	listen 8080 proxy_protocol;
+{{ macros.listen_http () }}
 
 	return 301 https://icinga.ops.wistla.com$request_uri;
 
@@ -19,11 +20,9 @@ server {
 
 	server_name icinga.ops.wistla.com;
 
-	listen 443 ssl http2;
-	listen 8443 ssl http2 proxy_protocol;
+{{ macros.listen_https () }}
 
-	ssl_certificate {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.cert;
-	ssl_certificate_key {{ nginx_target }}/conf/ssl/icinga.ops.wistla.com.key;
+{{ macros.ssl_certificate ('icinga.ops.wistla.com') }}
 
 	# classic ui
 
@@ -35,7 +34,7 @@ server {
 		auth_basic_user_file /opt/icinga2/etc/icinga2-classicui/htpasswd.users;
 
 		fastcgi_pass unix:/var/run/fcgiwrap.socket;
-		include {{ nginx_target }}/conf/fastcgi_params;
+		include {{ nginx_config }}/fastcgi_params;
 		fastcgi_param SCRIPT_FILENAME /opt/icinga/sbin/$fastcgi_script_name;
 		fastcgi_param ICINGA_CGI_CONFIG /opt/icinga2/etc/icinga2-classicui/cgi.cfg;
 		fastcgi_param AUTH_USER $remote_user;
@@ -75,8 +74,7 @@ server {
 
 	server_name icinga-origin.ops.wistla.com;
 
-	listen 80;
-	listen 8080 proxy_protocol;
+{{ macros.listen_http () }}
 
 	location ~ ^/icingaweb2/index\.php(.*)$ {
 

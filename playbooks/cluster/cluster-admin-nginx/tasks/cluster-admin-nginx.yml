@@ -1,22 +1,14 @@
 ---
 
-- name: "create robots.txt"
-  become: "yes"
-  action:
-
-    module: "template"
-    dest: "{{ nginx_target }}/conf/dev-robots.txt"
-    src: "cluster-admin-nginx-robots"
-
 - name: "create nginx directories"
   with_items:
 
-    - directory: "{{ nginx_target }}/conf"
+    - directory: "{{ nginx_config }}"
       user: "root"
       group: "root"
       mode: "0755"
 
-    - directory: "{{ nginx_target }}/conf/sites"
+    - directory: "{{ nginx_config }}/sites"
       user: "root"
       group: "root"
       mode: "0755"
@@ -35,14 +27,21 @@
 - name: "create nginx configs"
   with_items:
 
-    - target: "{{ nginx_target }}/conf/nginx.conf"
+    - target: "{{ nginx_config }}/dev-robots.txt"
+      template: "cluster-admin-nginx-robots"
+
+    - target: "{{ nginx_config }}/nginx.conf"
       template: "cluster-admin-nginx-config"
 
-    - target: "{{ nginx_target }}/conf/sites/icinga.conf"
+    - target: "{{ nginx_config }}/sites/docs.conf"
+      template: "cluster-admin-nginx-docs-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+    - target: "{{ nginx_config }}/sites/icinga.conf"
       template: "cluster-admin-nginx-icinga-config"
       when: "{{ cluster_name == 'ops' }}"
 
-    - target: "{{ nginx_target }}/conf/sites/jenkins.conf"
+    - target: "{{ nginx_config }}/sites/jenkins.conf"
       template: "cluster-admin-nginx-jenkins-config"
       when: "{{ cluster_name == 'ops' }}"
 
@@ -61,7 +60,7 @@
   action:
 
     module: "template"
-    dest: "{{ nginx_target }}/conf/nginx.conf"
+    dest: "{{ nginx_config }}/nginx.conf"
     src: "cluster-admin-nginx-config"
 
 - name: "create nginx dev configs"
@@ -75,13 +74,13 @@
   action:
 
     module: "template"
-    dest: "{{ nginx_target }}/conf/sites/dev-{{ item.key }}.conf"
+    dest: "{{ nginx_config }}/sites/dev-{{ item.key }}.conf"
     src: "cluster-admin-nginx-dev-config"
 
 - name: "create nginx directories"
   with_items:
 
-    - directory: "{{ nginx_target }}/conf/ssl"
+    - directory: "{{ nginx_config }}/ssl"
       user: "root"
       group: "root"
       mode: "0755"
@@ -109,7 +108,7 @@
   action:
 
     module: "template"
-    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.cert"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.cert"
     src: "cluster-admin-ssl-bundle"
 
 - name: "write nginx private keys"
@@ -119,7 +118,7 @@
   action:
 
     module: "copy"
-    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.key"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.key"
 
     content: "{{ lookup ('etcd', [
       '/certificate/',
@@ -136,7 +135,7 @@
   action:
 
     module: "copy"
-    dest: "{{ nginx_target }}/conf/htpasswd"
+    dest: "{{ nginx_config }}/htpasswd"
     src: "{{ HOME }}/security/htpasswd"
 
     group: "www-data"

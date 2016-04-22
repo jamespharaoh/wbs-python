@@ -1,0 +1,27 @@
+{{ ansible_warning ['#'] }}
+
+{% import 'cluster-admin-nginx-macros' as macros with context %}
+
+# docs
+
+server {
+
+	server_name docs.ops.wistla.com;
+
+{{ macros.listen_https () }}
+
+{{ macros.ssl_certificate ('docs.ops.wistla.com') }}
+
+}
+
+# docs redirect to ssl
+
+server {
+
+{{ macros.listen_http () }}
+
+	server_name docs.ops.wistla.com;
+
+	return 301 https://docs.ops.wistla.com$request_uri;
+
+}
