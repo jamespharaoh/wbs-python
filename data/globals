@@ -197,15 +197,19 @@ zone_colours:
 
 ubuntu_mirror: "http:/"
 
-kernel_mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
+kernel:
 
-kernel_branch: "{{ kernel_versions [kernel_version].branch }}"
-kernel_version_zero: "{{ kernel_versions [kernel_version].version_zero }}"
-kernel_build: "{{ kernel_versions [kernel_version].build }}"
-kernel_type: "{{ kernel_versions [kernel_version].type }}"
-kernel_arch: "{{ kernel_versions [kernel_version].arch }}"
+  mirror: "http://kernel.ubuntu.com/~kernel-ppa/mainline"
+  branch: "{{ kernel_versions [kernel_version].branch }}"
+  version_zero: "{{ kernel_versions [kernel_version].version_zero }}"
+  build: "{{ kernel_versions [kernel_version].build }}"
+  type: "{{ kernel_versions [kernel_version].type }}"
+  arch: "{{ kernel_versions [kernel_version].arch }}"
 
-system_reboot_on_error: "yes"
+system:
+
+  init: "upstart"
+  reboot_on_error: "yes"
 
 ansible_warning_lines:
 
