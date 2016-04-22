@@ -11,7 +11,7 @@ import yaml
 
 class WbsDocsContent ():
 
-	def __init__ (self, master):
+	def __init__ (self, master, content_path):
 
 		self.master = master
 
@@ -22,14 +22,17 @@ class WbsDocsContent ():
 				"meta",
 			])
 
-		self.content = self.load_section (
-			None,
-			"%s/content" % self.master.home,
-			"")
+		self.content = (
+			self.load_section (
+				None,
+				content_path,
+				""))
 
 	def load_section (self, section_parent, section_path, section_name):
 
 		# load section index
+
+		print ("LOAD SECTION: " + section_path)
 
 		index_path = "%s/index" % section_path
 
