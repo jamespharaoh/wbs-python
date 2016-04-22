@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import with_statement
+
+import os
+import site
+import sys
+
+SCRIPT = (
+	os.path.abspath (
+		sys.argv [0]))
+
+HOME = (
+	os.path.abspath (
+		"%s/.." % (
+			os.path.dirname (
+				SCRIPT))))
+
+site.addsitedir (
+	"%s/work/lib/python2.7/site-packages" % (
+		HOME))
+
+sys.path.append (
+	"%s/third-party/pyyaml/lib" % (
+		HOME))
+
+import yaml
+
+with open ("%s/third-party/third-party-index" % HOME) as file_handle:
+
+	third_party_index = (
+		yaml.load (
+			file_handle))
+
+for third_party_name, third_party_data \
+in third_party_index.items ():
+
+	if not "python" in third_party_data:
+		continue
+
+	if third_party_name == "pyyaml":
+		continue
+
+	sys.path.append (
+		"%s/%s" % (
+			HOME,
+			third_party_data ["python"]))
+
+from wbs.docs import *
+
+class WistlaDocsMaster ():
+
+	def __init__ (self, project_home):
+
+		self.home = (
+			"%s/docs" % (
+				project_home))
+
+	def run (self):
+
+		self.content = (
+			WbsDocsContent (
+				self,
+				"%s/content" % self.home))
+
+		self.settings = {
+			"server": {
+				"debug": "yes",
+				"hostname": "docs.local.wistla.com:8080",
+				"listen-address": "172.28.128.3",
+				"listen-port": "8080",
+			},
+			"security": {
+				"force-email": "user@wistla.com",
+				"force-groups": [],
+			},
+		}
+
+		self.server = (
+			WbsDocsServer (
+				self,
+				self.content,
+				self.settings))
+
+		self.server.run ()
+
+master = WistlaDocsMaster (HOME)
+master.run ()
+
+def main ():
+
+	wbs_documentation = WbsDocumentation (HOME)
+
+	wbs_documentation.load ()
+	wbs_documentation.run ()
+
+class WbsDocumentation ():
+
+	def __init__ (self, home):
+
+		self.home = home
+
+	def load (self):
+
+		self.content = (
+			WbsDocsContent (
+				self.home))
+
+	def run (self):
+
+		self.flask.run ()
+
+	def route_styles (self, name):
+
+		styles_path = "/".join ([
+			HOME,
+			"styles",
+			name,
+		])
+
+		with open (styles_path) as file_handle:
+			styles_source = file_handle.read ()
+
+		styles_data = list (yaml.load (styles_source))
+
+		styles_css = ""
+
+		for style_data in styles_data:
+
+			styles_css += (
+				"%s {\n" % (
+					style_data ["match"]))
+
+			for rule_name, rule_data in style_data ["rules"].items ():
+
+				styles_css += (
+					"\t%s: %s;\n" % (
+						rule_name,
+						rule_data))
+
+			styles_css += (
+				"}\n");
+
+		return (
+			styles_css,
+			"200",
+			dict ({
+				"content-type": "text/css",
+			}),
+		)
+
+	def route_content (self, path):
+
+		entry = self.content.find_entry (path)
+
+		page_html = flask.render_template (
+			"page",
+			content = self.content,
+			entry = entry)
+
+		return page_html
+
+main ()
+
+# ex: noet ts=4 filetype=python

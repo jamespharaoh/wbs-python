@@ -1,0 +1,34 @@
+{% macro do_navigation (parent_entry, selected_entry, entry_chain, path) %}
+<ul>
+{% for child_entry_name, child_entry in parent_entry.children.items () %}
+{% if child_entry.can_view (g.user_groups) %}
+{% if child_entry == selected_entry %}
+<li class="{{ 'current context' if selected_entry == entry else 'context' }}">
+	<a href="{{ path }}/{{ child_entry.name }}">
+		{{ child_entry.short_title }}
+	</a>
+	{{ do_navigation (
+		selected_entry,
+		entry_chain [0],
+		entry_chain [1:],
+		path + '/' + selected_entry.name) }}
+</li>
+{% else %}
+<li>
+	<a href="{{ path }}/{{ child_entry.name }}">
+		{{ child_entry.short_title }}
+	</a>
+</li>
+{% endif %}
+{% endif %}
+{% endfor %}
+</ul>
+{% endmacro %}
+
+{% set entry_chain = entry.chain () %}
+
+{{ do_navigation (
+	entry_chain [0],
+	entry_chain [1],
+	entry_chain [2:],
+	'') }}

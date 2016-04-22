@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+{% block head %}
+
+	{% assets "scss_all" %}
+	<link
+		rel="stylesheet"
+		href="{{
+			url_for (
+				'static',
+				filename = 'styles/all.css')
+		}}">
+	{% endassets %}
+
+	<link
+		rel="icon"
+		href="{{
+			url_for (
+				'static',
+				filename = 'images/wbs/wbs-logo-16x16.png')
+		}}"
+		type="image/png"
+		sizes="16x16">
+
+	<title>{{ title }} &mdash; {{ g.project.title }}</title>
+
+{% endblock %}
+</head>
+<body>
+
+	<header>
+	{% include "header.html" %}
+	</header>
+
+	<div class="navigation-background">
+	</div>
+
+	<nav>
+	{% include "navigation.html" %}
+	</nav>
+
+	<article class="content">
+
+		<h1>{{ title }}</h1>
+
+		{% block content %}
+		{% endblock %}
+
+	</article>
+
+	<footer>
+	{% include "footer.html" %}
+	</footer>
+
+</body>
+</html>

@@ -9,12 +9,14 @@
 !/data/runtime/wistla-staging-*
 !/data/runtime/wistla-test-*
 !/data/runtime/cluster-*
-/inventory
+/docs/static/.webassets-cache/
+/docs/static/styles/all.css
 /security/*-plain
 /security/vpn
 /third-party/*/build
 /third-party/*/dist
-/third-party/roman/src/roman.egg-info/SOURCES.txt
+/third-party/roman/src/roman.egg-info/
+/third-party/python-gfm/py_gfm.egg-info/
 /vagrant/.vagrant
 /vagrant/apt-sources-list
 /vagrant/config
@@ -23,7 +25,6 @@
 /wistla-web
 /group_vars/all
 /work
-
 .DS_Store
 .localized
 .idea
