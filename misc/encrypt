@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import hashlib
+import sys
+
+from Crypto.Cipher import AES
+
+easter_egg_key = (
+	hashlib
+		.sha1 (
+			"fzgwfrpzzoohfasdvaoo-%s" % (
+				sys.argv [1]))
+		.hexdigest () [0:16])
+
+easter_egg_path = (
+	"misc/.easter-eggs/%s.xterm" % (
+		hashlib
+			.sha1 (
+				"mlruvkjwvhxlpwwdiaql-%s" % (
+					sys.argv [1]))
+			.hexdigest ()))
+
+aes = (
+	AES.new (
+		easter_egg_key,
+		AES.MODE_CBC,
+		"lsgbmctjehryfnuc"))
+
+with open (easter_egg_path, "w") \
+as file_handle:
+
+	source = (
+		sys.stdin.read ())
+
+	source += (
+		"\0" * ((16 - len (source) % 16) % 16))
+
+	file_handle.write (
+		aes.encrypt (
+			source))
+
+# ex: noet ts=4 filetype=python

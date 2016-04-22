@@ -23,6 +23,7 @@ os.environ ["PYTHONPATH"] = (
 
 print (os.environ ["PYTHONPATH"])
 
+import hashlib
 import pipes
 import socket
 import subprocess
@@ -159,13 +160,53 @@ def load_config ():
 	except IOError:
 		CONFIG = dict ({ "deployment_mode": "vagrant" })
 
-	if CONFIG.get ("mode") == "evil":
+	try:
 
-		with open ("misc/.easter-eggs/devil.xterm") \
+		if CONFIG.get ("mode"):
+
+			easter_egg (
+				CONFIG ["mode"])
+
+	except:
+
+		pass
+
+def easter_egg (name):
+
+	easter_egg_key = (
+		hashlib
+			.sha1 (
+				"fzgwfrpzzoohfasdvaoo-%s" % (
+					name))
+			.hexdigest () [0:16])
+
+	easter_egg_path = (
+		"misc/.easter-eggs/%s.xterm" % (
+			hashlib
+				.sha1 (
+					"mlruvkjwvhxlpwwdiaql-%s" % (
+						name))
+				.hexdigest ()))
+
+	if os.path.exists (
+		easter_egg_path):
+
+		from Crypto.Cipher import AES
+
+		aes = (
+			AES.new (
+				easter_egg_key,
+				AES.MODE_CBC,
+				"lsgbmctjehryfnuc"))
+
+		sys.stdout.write ("\n")
+
+		with open (easter_egg_path, "r") \
 		as file_handle:
 
 			sys.stdout.write (
-				file_handle.read ())
+				aes.decrypt (
+					file_handle.read ()))
 
 def auto_newline ():
 
