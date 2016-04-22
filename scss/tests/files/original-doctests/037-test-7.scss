@@ -1,0 +1,8 @@
+@option style:legacy, short_colors:yes, reverse_colors:yes;
+#fake-links .link {@extend a}
+
+a {
+  color: blue;
+  &:after {display: block}
+  &:hover {text-decoration: underline}
+}

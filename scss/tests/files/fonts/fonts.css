@@ -1,0 +1,28 @@
+@font-face {
+  font-family: 'FontSheet';
+  src: url(static/assets/fontsheet-g7MrCA_HKKgVf2zD68L54g.eot);
+  src: url(static/assets/fontsheet-g7MrCA_HKKgVf2zD68L54g.svg?#iefix&#fontsheet) format('svg'),
+    url(static/assets/fontsheet-g7MrCA_HKKgVf2zD68L54g.woff) format('woff'),
+    url(static/assets/fontsheet-g7MrCA_HKKgVf2zD68L54g.ttf) format('truetype'),
+    url(static/assets/fontsheet-g7MrCA_HKKgVf2zD68L54g.eot) format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon {
+  display: inline-block;
+  font-family: FontSheet;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-doctor:before {
+  content: "";
+}
+
+.icon-donative:before {
+  content: "";
+}
