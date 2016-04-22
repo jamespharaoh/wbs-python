@@ -1,0 +1,25 @@
+$font: font-sheet("fontsheet/*.svg", $cache-buster: false);
+
+@font-face {
+	font-family: 'FontSheet';
+	src: font-url($font, 'eot', $cache-buster: false);
+	src: $font;
+	font-weight: normal;
+	font-style: normal;
+}
+
+.icon {
+  display: inline-block;
+  font-family: FontSheet;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@each $glyph in glyphs($font) {
+    .icon-#{$glyph}:before {
+        content: glyph-code($font, $glyph);
+    }
+}
