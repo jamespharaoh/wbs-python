@@ -1,5 +1,6 @@
 Short-Title: SSL certificates
 Long-Title: SSL certificates
+Description: Management of SSL certificates
 
 Wistla has a policy of using encryption wherever appropriate to protect private
 data, including both our own intellectual property and customer information.
