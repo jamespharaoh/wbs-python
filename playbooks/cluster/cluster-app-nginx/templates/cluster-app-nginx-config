@@ -23,7 +23,7 @@ http {
 	keepalive_timeout 65;
 	types_hash_max_size 2048;
 
-	include {{ nginx_target }}/conf/mime.types;
+	include {{ nginx_config }}/mime.types;
 	default_type application/octet-stream;
 
 	log_format times '{{ [
@@ -139,8 +139,8 @@ http {
 
 		server_name {{ deployment.main_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/{{ deployment_alias.main_domain }}.key;
 
 		return 301 https://www.{{ deployment.main_domain }}$request_uri;
 
@@ -168,8 +168,8 @@ http {
 
 		server_name www.{{ deployment.main_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/{{ deployment_alias.main_domain }}.key;
 
 		add_header Strict-Transport-Security "max-age={{ 60 * 60 * 24 * 365 }}";
 
@@ -186,7 +186,7 @@ http {
 		location /keystone {
 
 			auth_basic "Restricted";
-			auth_basic_user_file {{ nginx_target }}/conf/htpasswd;
+			auth_basic_user_file {{ nginx_config }}/htpasswd;
 
 			proxy_pass http://deployment-{{ target }}/keystone;
 			proxy_http_version 1.1;
@@ -210,7 +210,7 @@ http {
 
 {% if deployment.robots_override_main | default ('no') != 'yes' %}
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 {% endif %}
 
@@ -236,8 +236,8 @@ http {
 
 		server_name api.{{ deployment.main_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/api.{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/api.{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/api.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/api.{{ deployment_alias.main_domain }}.key;
 
 		location / {
 
@@ -262,7 +262,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 
 	}
@@ -289,8 +289,8 @@ http {
 
 		server_name admin.{{ deployment.main_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/admin.{{ deployment_alias.main_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/admin.{{ deployment_alias.main_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/admin.{{ deployment_alias.main_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/admin.{{ deployment_alias.main_domain }}.key;
 
 		location / {
 
@@ -315,7 +315,7 @@ http {
 		}
 
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 
 	}
@@ -343,8 +343,8 @@ http {
 
 		server_name {{ deployment.short_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.short_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.short_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/{{ deployment_alias.short_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/{{ deployment_alias.short_domain }}.key;
 
 		location / {
 
@@ -370,7 +370,7 @@ http {
 
 {% if deployment.robots_override_short | default ('no') != 'yes' %}
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 {% endif %}
 
@@ -399,8 +399,8 @@ http {
 
 		server_name {{ deployment.assets_domain }};
 
-		ssl_certificate {{ nginx_target }}/conf/ssl/{{ deployment_alias.assets_domain }}.cert;
-		ssl_certificate_key {{ nginx_target }}/conf/ssl/{{ deployment_alias.assets_domain }}.key;
+		ssl_certificate {{ nginx_config }}/ssl/{{ deployment_alias.assets_domain }}.cert;
+		ssl_certificate_key {{ nginx_config }}/ssl/{{ deployment_alias.assets_domain }}.key;
 
 		location / {
 
@@ -426,7 +426,7 @@ http {
 
 {% if deployment.robots_override_assets | default ('no') != 'yes' %}
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 {% endif %}
 
@@ -465,7 +465,7 @@ http {
 
 {% if deployment.robots_override_assets | default ('no') != 'yes' %}
 		location /robots.txt {
-			alias {{ nginx_target }}/conf/dev-robots.txt;
+			alias {{ nginx_config }}/dev-robots.txt;
 		}
 {% endif %}
 

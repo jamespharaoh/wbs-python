@@ -32,9 +32,9 @@
     - "nodejs-install"
     - "nodejs-packages-install"
 
-    - "build-nginx"
+    - "nginx-install"
     - "cluster-app-nginx"
-    - "control-nginx"
+    - "nginx-control"
 
     - "cluster-app-lxc"
     - "cluster-app"

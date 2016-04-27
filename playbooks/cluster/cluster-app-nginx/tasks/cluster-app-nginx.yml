@@ -1,26 +1,14 @@
 ---
 
-- name: "create dev robots.txt"
-  sudo: "yes"
-  action:
-
-    module: "template"
-    dest: "{{ nginx_target }}/conf/dev-robots.txt"
-    src: "cluster-app-dev-robots-txt"
-
-- name: "create nginx config"
-  notify: "restart nginx"
-  sudo: "yes"
-  action:
-
-    module: "template"
-    dest: "{{ nginx_target }}/conf/nginx.conf"
-    src: "cluster-app-nginx-config"
-
 - name: "create nginx directories"
   with_items:
 
-    - directory: "{{ nginx_target }}/conf/ssl"
+    - directory: "{{ nginx_config }}"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+    - directory: "{{ nginx_config }}/ssl"
       user: "root"
       group: "root"
       mode: "0755"
@@ -41,6 +29,23 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
+- name: "create dev robots.txt"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ nginx_config }}/dev-robots.txt"
+    src: "cluster-app-dev-robots-txt"
+
+- name: "create nginx config"
+  notify: "restart nginx"
+  sudo: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ nginx_config }}/nginx.conf"
+    src: "cluster-app-nginx-config"
+
 - name: "write nginx certificates"
   with_items: "{{ cluster.app_certificates | default ([]) }}"
   notify: "restart nginx"
@@ -48,7 +53,7 @@
   action:
 
     module: "template"
-    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.cert"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.cert"
     src: "cluster-app-ssl-bundle"
 
 - name: "write nginx private keys"
@@ -58,7 +63,7 @@
   action:
 
     module: "copy"
-    dest: "{{ nginx_target }}/conf/ssl/{{ item }}.key"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.key"
 
     content: "{{ lookup ('etcd', [
       '/certificate/',
@@ -75,7 +80,7 @@
   action:
 
     module: "copy"
-    dest: "{{ nginx_target }}/conf/htpasswd"
+    dest: "{{ nginx_config }}/htpasswd"
     src: "{{ HOME }}/security/htpasswd"
 
     group: "www-data"
