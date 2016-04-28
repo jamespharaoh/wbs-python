@@ -1,0 +1,38 @@
+Short-title: Package distribution
+Long-title: Wistla package distribution
+Description: Wistla's private repository for package distribution
+
+Wistla uses a lot of third party code, and we also distribute our own code, for
+example builds of the client apps. All of this is hosted on our own system,
+which drastically reduces the frequency of build problems caused by errors or
+downtime of third-party systems.
+
+This is implemented as an AWS S3 bucket, with a cloudfront distribution in front
+of it. The cloudfront distribution is required, because S3 does not support
+HTTPs natively, which is an important requirement. This is hosted in this way,
+rather than on our servers, since this means that it could be used to rebuild
+our servers if they weren't available.
+
+## Accessing the repository
+
+The repository is available on the following URL:
+
+* https://dist.ops.wistla.com/
+
+This should show a 403, since directory listing is not permitted! All of the
+objects in the S3 bucket, however, should be available on the appropriate path.
+
+## Uploading packages to the distribution
+
+Uploading packages is as simple as logging into the AWS console, switching to
+the `ops` account, accessing the S3 service, selecting the `dist.ops.wistla.com`
+bucket, and uploading the relevant files.
+
+Please note that there are properties which can be used to affect the caching of
+these items. By default the caching is set to, and limited to, 60 seconds,
+although previously this was much higher, causing various annoying problems.
+
+## iPhone enterprise builds
+
+**TODO** These are hosted via this service. I do not know the details of this,
+can someone please fill in any relevant information when they have a chance?

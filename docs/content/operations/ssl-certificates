@@ -1,6 +1,6 @@
 Short-Title: SSL certificates
 Long-Title: SSL certificates
-Description: Management of SSL certificates
+Description: How to obtain, manage and deploy SSL certificates
 
 Wistla has a policy of using encryption wherever appropriate to protect private
 data, including both our own intellectual property and customer information.
@@ -146,7 +146,7 @@ For ops:
 ```
 ./run-ansible playbooks/cluster-admin.yml \
    --limit cluster-ops \
-   --tags cluster-admin-nginx
+   --tags nginx
 ```
 
 For test:
@@ -154,7 +154,7 @@ For test:
 ```
 ./run-ansible playbooks/cluster-app.yml \
    --limit cluster-test \
-   --tags cluster-app-nginx
+   --tags nginx
 ```
 
 For staging:
@@ -162,7 +162,7 @@ For staging:
 ```
 ./run-ansible playbooks/cluster-app.yml \
    --limit $(comma cluster-staging{,-2} \
-   --tags cluster-app-nginx
+   --tags nginx
 ```
 
 Please be careful when deploying to production, because an error in the
@@ -171,20 +171,84 @@ avoid this, we would always deploy first to a single server. If one server goes
 offline, the load balancers should automatically route traffic to the other
 servers, so this is not an issue.
 
-```
+```bash
 ./run-ansible playbooks/cluster-app.yml \
     --limit wistla-production-app-a-4 \
-    --tags cluster-app-nginx
+    --tags nginx
 ```
 
 Once you are confident that the deployment has completed successfully, you can
 deploy to the rest of the production servers:
 
-```
+```bash
 ./run-ansible playbooks/cluster-app.yml \
    --limit $(comma cluster-production{,-2} \
-   --tags cluster-app-nginx
+   --tags nginx
 ```
 
 Finally, check the new certificate has been correctly installed, by accessing
 the appropriate URL from a web browser.
+
+### Manual deployment to cloudfront
+
+This applies to the domain `dist.ops.wistla.com`, and possibly to others. This
+needs to be done using the `aws` command line tool. You must correctly authorise
+access to the relevant AWS account:
+
+```bash
+account="xxx"
+
+misc/amazon-auth
+eval $(misc/amazon-auth $account)
+```
+
+You need to export all of the certificate data from the database:
+
+```bash
+database="yyy"
+common_name="zzz.wistla.com"
+
+./wistla-devops certificate database export \
+    --database "$database" \
+    --common-name "$common_name" \
+    --certificate "$common_name.cert" \
+    --certificate-chain "$common_name-chain.cert" \
+    --rsa-private-key "$common_name.rkey"
+```
+
+Note that we use the RSA private key instead of the regular one. Amazon's
+servers use this similar but slightly different keyfile format, which is
+specific to RSA keys, whereas in most cases we deal with private keys stored in
+a more general format. This is a common cause of frustration when uploading keys
+to Amazon.
+
+```
+aws iam upload-server-certificate \
+    --path /cloudfront/ \
+    --server-certificate-name "$common_name-$(date +'%Y-%m-%d')" \
+    --certificate-body "file://$common_name.cert" \
+    --certificate-chain "file://$common_name-chain.cert" \
+    --private-key "file://$common_name.rkey"
+```
+
+You should then access the cloudfront distribution, via the AWS console, and
+update it to use the new certificate. This will take a few minutes (maybe 20)
+to fully deploy, so please take that into account when checking it.
+
+### Verification of a certificate from a web browser
+
+In this case I'm using Firefox, since this is my browser of choice, but the
+process should be very similar in any other mainstream browser.
+
+First you need to access the site. Ensure that you are using https, and that you
+are not redirected to another domain name. You should see the green padlock
+appear next to the domain name in the address bar, and you can click on it and
+access information about the security of the connection:
+
+![](/static/images/operations/ssl-verify-firefox-1.png)
+
+Click on the `View certificate` button and you can view specific information
+about the certificate, including the expiry date, which should be the
+appropriate number of years in the future:
+
+![](/static/images/operations/ssl-verify-firefox-2.png)
