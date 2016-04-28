@@ -167,6 +167,6 @@ nodejs_packages:
   - name: "request"
     version: "2.67.0"
 
-nginx_version: "1.9.7"
+nginx_version: "1.10.0"
 
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

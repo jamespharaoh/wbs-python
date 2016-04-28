@@ -168,6 +168,6 @@ cluster_create_volumes:
     device_type: "gp2"
     delete_on_termination: "no"
 
-nginx_version: "1.9.7"
+nginx_version: "1.10.0"
 
 # ex: et ts=2 filetype=yaml

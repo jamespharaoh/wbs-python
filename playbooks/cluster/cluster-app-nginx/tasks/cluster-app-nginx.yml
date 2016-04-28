@@ -1,54 +1,35 @@
 ---
 
 - name: "create nginx directories"
-  with_items:
-
-    - directory: "{{ nginx_config }}"
-      user: "root"
-      group: "root"
-      mode: "0755"
-
-    - directory: "{{ nginx_config }}/ssl"
-      user: "root"
-      group: "root"
-      mode: "0755"
-
-    - directory: "/var/log/nginx"
-      user: "www-data"
-      group: "adm"
-      mode: "0750"
-
-  sudo: "yes"
+  with_items: "{{ nginx_config_directories }}"
+  become: "yes"
   action:
 
     module: "file"
-    name: "{{ item.directory }}"
+    path: "{{ item.directory }}"
     state: "directory"
-
     owner: "{{ item.user }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
-- name: "create dev robots.txt"
-  sudo: "yes"
+- name: "cluster app nginx config"
+  with_items:
+
+    - target: "{{ nginx_config }}/dev-robots.txt"
+      template: "cluster-app-dev-robots-txt"
+
+    - target: "{{ nginx_config }}/nginx.conf"
+      template: "cluster-app-nginx-config"
+
+  become: "yes"
   action:
 
     module: "template"
-    dest: "{{ nginx_config }}/dev-robots.txt"
-    src: "cluster-app-dev-robots-txt"
-
-- name: "create nginx config"
-  notify: "restart nginx"
-  sudo: "yes"
-  action:
-
-    module: "template"
-    dest: "{{ nginx_config }}/nginx.conf"
-    src: "cluster-app-nginx-config"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
 
 - name: "write nginx certificates"
   with_items: "{{ cluster.app_certificates | default ([]) }}"
-  notify: "restart nginx"
   sudo: "yes"
   action:
 
@@ -58,7 +39,6 @@
 
 - name: "write nginx private keys"
   with_items: "{{ cluster.app_certificates | default ([]) }}"
-  notify: "restart nginx"
   sudo: "yes"
   action:
 
@@ -85,8 +65,6 @@
 
     group: "www-data"
     mode: "0640"
-
-- meta: "flush_handlers"
 
 - name: "set nginx.state to 'enabled'"
   when: "nginx_state == 'installed'"

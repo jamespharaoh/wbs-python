@@ -43,46 +43,60 @@ icinga_web_state: "installed"
 instance_id: "i-20c527d9"
 mysql: 
   
+  installed_from: "distro"
   needs_restart: "no"
   root_password: "vilplgoaadbgaaaxioyt"
   state: "enabled"
 
+mysql_installed_from: "distro"
 mysql_needs_restart: "no"
 mysql_root_password: "vilplgoaadbgaaaxioyt"
 mysql_state: "enabled"
 nginx: 
   
-  installed_version: "1.9.7"
-  needs_restart: "no"
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.10.0"
+  installed_version: "1.10.0"
+  needs_restart: "yes"
   state: "enabled"
 
-nginx_installed_version: "1.9.7"
-nginx_needs_restart: "no"
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.10.0"
+nginx_installed_version: "1.10.0"
+nginx_needs_restart: "yes"
 nginx_state: "enabled"
 php: 
   
+  fpm_socket: "/var/run/php/php7.0-fpm.sock"
+  installed_from: "ppa"
+  installed_service: "php7.0-fpm"
+  installed_version: "7.0"
   state: "unconfigured"
 
+php_fpm_socket: "/var/run/php/php7.0-fpm.sock"
+php_installed_from: "ppa"
+php_installed_service: "php7.0-fpm"
+php_installed_version: "7.0"
 php_state: "unconfigured"
 python: 
   
-  installed_version: "2.7.10"
+  installed_version: "2.7.11"
   state: "installed"
 
 python_apt: 
   
-  installed_version: "0.9.3-1"
+  installed_version: "2.7.11/0.9.3-1"
   state: "installed"
 
-python_apt_installed_version: "0.9.3-1"
+python_apt_installed_version: "2.7.11/0.9.3-1"
 python_apt_state: "installed"
-python_installed_version: "2.7.10"
+python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "7.0.3"
+  installed_version: "2.7.11/8.1.1"
   state: "installed"
 
-python_pip_installed_version: "7.0.3"
+python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
 ssh: 
