@@ -1,0 +1,72 @@
+Short-title: Environment state
+Long-title: Wistla environment state operations
+Description: Operational documentation to manage the state of Wistla's various
+	environments
+
+This document contains various operational documentation for management of
+Wistla's environments.
+
+## Clear an environment
+
+This script is used regularly during testing in order to remove all data from
+a database. This may be requested by the QA team, or one of the client
+development teams if they are using one of our test environments, often before
+they load a dataset, which they have access to do themselves.
+
+```bash
+environment="test-xxx"
+
+(
+    set -e;
+    grep -qv production <<<"$HOSTNAME"
+    cd ~/$environment/wistla-api
+    ./scripts/clearDatabase.js
+)
+```
+
+## Load anonymised production data into an environment
+
+This is often used during testing, especially when we are trying to recreate a
+bug which has been found in production, run performance tests against a
+realistic environment, or run a dress-rehearsal modification in staging before
+doing the same work in production.
+
+This presupposes that the anonymsed data has been provided and uploaded to the
+appropriate server.
+
+TODO this is too rough.
+
+```
+(
+
+    set -e
+
+    # stop the cluster
+    ./run-ansible playbooks/stop.yml \
+        --limit "node-api" \
+        --tags "quick"
+
+    # check we are not running on production
+    grep -qv production <<<"$HOSTNAME"
+
+    # extract the compressed version of the data
+    tar --extract --gzip \
+        --file "$(date -I)_production_db_dump_for_STAGING_testing.tar"
+
+    # remove the compressed version of the data
+    #rm -rf "$(date -I)_production_db_dump_for_STAGING_testing.tar"
+
+    # drop the existing database
+    echo "db.dropDatabase ();" | mongo staging-mongo-c-4/wistla
+
+    # import the anonymised data
+    mongorestore -h staging-mongo-c-4 -d wistla \
+        "$(date -I)_production_db_dump_for_STAGING_testing/wistla/"
+
+    # start the cluster
+    ./run-ansible playbooks/stop.yml \
+        --limit "node-api" \
+        --tags "quick"
+
+)
+```
