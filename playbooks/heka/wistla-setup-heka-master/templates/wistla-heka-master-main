@@ -38,17 +38,21 @@ type = "ScribbleDecoder"
 	[decode-auth.message_fields]
 	Category = "system"
 
-[input-nginx-times]
+{% for nginx_log_type in [ 'access', 'error', 'times' ] %}
+
+[input-nginx-{{ nginx_log_type }}]
 type = "LogstreamerInput"
 log_directory = "/var/log/nginx"
-file_match = "times.log"
-decoder = "decode-nginx-times"
+file_match = "{{ nginx_log_type }}.log"
+decoder = "decode-nginx-{{ nginx_log_type }}"
 
-[decode-nginx-times]
+[decode-nginx-{{ nginx_log_type }}]
 type = "ScribbleDecoder"
 
-	[decode-nginx-times.message_fields]
-	Category = "nginx-times"
+	[decode-nginx-{{ nginx_log_type }}.message_fields]
+	Category = "nginx-{{ nginx_log_type }}"
+
+{% endfor %}
 
 # ---------- accept remote connections
 
@@ -100,11 +104,15 @@ path = "/var/log/cluster-wistla-web.log"
 message_matcher = 'Fields[Category] == "wistla-web"'
 encoder = "encoder-simple"
 
-[output-nginx-times-log]
+{% for nginx_log_type in [ 'access', 'error', 'times' ] %}
+
+[output-nginx-{{ nginx_log_type }}-log]
 type = "FileOutput"
-path = "/var/log/cluster-nginx-times.log"
-message_matcher = 'Fields[Category] == "nginx-times"'
+path = "/var/log/cluster-nginx-{{ nginx_log_type }}.log"
+message_matcher = 'Fields[Category] == "nginx-{{ nginx_log_type }}"'
 encoder = "encoder-simple"
+
+{% endfor %}
 
 [encoder-simple]
 type = "PayloadEncoder"
@@ -116,7 +124,7 @@ append_newlines = false
 
 {% if inventory_hostname in [
 	'wistla-production-admin-a',
-	'wistla-staging-admin-a',
+	'wistla-staging-admin-a-DISABLED',
 ] %}
 
 # ---------- email events

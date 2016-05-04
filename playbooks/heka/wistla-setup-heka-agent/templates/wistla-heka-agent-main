@@ -60,17 +60,21 @@ type = "ScribbleDecoder"
 {% endif %}
 {% endfor %}
 
-[input-nginx-times]
+{% for nginx_log_type in [ 'access', 'error', 'times' ] %}
+
+[input-nginx-{{ nginx_log_type }}]
 type = "LogstreamerInput"
 log_directory = "/var/log/nginx"
-file_match = "times.log"
-decoder = "decode-nginx-times"
+file_match = "{{ nginx_log_type }}.log"
+decoder = "decode-nginx-{{ nginx_log_type }}"
 
-[decode-nginx-times]
+[decode-nginx-{{ nginx_log_type }}]
 type = "ScribbleDecoder"
 
-	[decode-nginx-times.message_fields]
-	Category = "nginx-times"
+	[decode-nginx-{{ nginx_log_type }}.message_fields]
+	Category = "nginx-{{ nginx_log_type }}"
+
+{% endfor %}
 
 # ---------- forward to master servers
 
