@@ -3,6 +3,7 @@
 cluster: "{{ clusters [cluster_name] }}"
 
 supercluster_name: "{{ cluster.supercluster_name }}"
+supercluster: "{{ hostvars ['supercluster/' + supercluster_name].supercluster }}"
 
 cluster_network_name: "cluster-{{ cluster_name }}-network"
 cluster_network: "{{ hostvars [cluster_network_name] }}"

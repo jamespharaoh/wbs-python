@@ -12,7 +12,7 @@ worker_processes 4;
 pid /run/nginx.pid;
 
 events {
-	worker_connections 768;
+	worker_connections 2048;
 }
 
 http {
@@ -20,7 +20,10 @@ http {
 	sendfile on;
 	tcp_nopush on;
 	tcp_nodelay on;
-	keepalive_timeout 65;
+
+	keepalive_timeout 10m;
+	keepalive_requests 1000;
+
 	types_hash_max_size 2048;
 
 	include {{ nginx_config }}/mime.types;

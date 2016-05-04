@@ -167,6 +167,8 @@ nodejs_packages:
   - name: "request"
     version: "2.67.0"
 
-nginx_version: "1.10.0"
+nginx_version: "{{ supercluster.admin_nginx_version }}"
+
+mysql_root_password: "{{ supercluster.admin_mysql_root_password }}"
 
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml
