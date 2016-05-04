@@ -45,24 +45,22 @@ mysql:
   
   installed_from: "distro"
   needs_restart: "no"
-  root_password: "dlovtrhhtpoorbehmwhn"
   state: "enabled"
 
 mysql_installed_from: "distro"
 mysql_needs_restart: "no"
-mysql_root_password: "dlovtrhhtpoorbehmwhn"
 mysql_state: "enabled"
 nginx: 
   
   installed_from: "source"
-  installed_prefix: "/opt/nginx-1.10.0"
-  installed_version: "1.10.0"
+  installed_prefix: "/opt/nginx-1.9.14"
+  installed_version: "1.9.14"
   needs_restart: "yes"
   state: "enabled"
 
 nginx_installed_from: "source"
-nginx_installed_prefix: "/opt/nginx-1.10.0"
-nginx_installed_version: "1.10.0"
+nginx_installed_prefix: "/opt/nginx-1.9.14"
+nginx_installed_version: "1.9.14"
 nginx_needs_restart: "yes"
 nginx_state: "enabled"
 php: 

@@ -28,14 +28,14 @@ instance_id: "i-42ef83ca"
 nginx: 
   
   installed_from: "source"
-  installed_prefix: "/opt/nginx-1.10.0"
-  installed_version: "1.10.0"
+  installed_prefix: "/opt/nginx-1.9.7"
+  installed_version: "1.9.7"
   needs_restart: "yes"
   state: "enabled"
 
 nginx_installed_from: "source"
-nginx_installed_prefix: "/opt/nginx-1.10.0"
-nginx_installed_version: "1.10.0"
+nginx_installed_prefix: "/opt/nginx-1.9.7"
+nginx_installed_version: "1.9.7"
 nginx_needs_restart: "yes"
 nginx_state: "enabled"
 python: 

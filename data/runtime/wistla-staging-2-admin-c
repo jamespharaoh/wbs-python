@@ -45,12 +45,16 @@ mysql_root_password: "zuojplgtxrahdntvxwua"
 mysql_state: "enabled"
 nginx: 
   
-  installed_version: "1.9.7"
-  needs_restart: "no"
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.9.14"
+  installed_version: "1.9.14"
+  needs_restart: "yes"
   state: "enabled"
 
-nginx_installed_version: "1.9.7"
-nginx_needs_restart: "no"
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.9.14"
+nginx_installed_version: "1.9.14"
+nginx_needs_restart: "yes"
 nginx_state: "enabled"
 php: 
   
