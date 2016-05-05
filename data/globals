@@ -98,6 +98,7 @@ devenv_checkouts_full:
     branch: "master"
     build_steps:
 
+      - "scripts/setup-project build"
       - "npm install"
 
   - name: "content-browser"
