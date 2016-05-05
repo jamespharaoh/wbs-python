@@ -68,6 +68,17 @@ You can watch me fix issues or implement new features [live on Twitch][twitch-ch
     * The encountered stack-trace, if applicable
     * Enough information to allow reproducing the issue
 
+### How to make a new release
+
+* Update/verify the version in the `VERSION` file
+* Update/verify that the changelog has been updated
+* Commit everything
+* Run `git tag <version>` to tag the version in Git
+* Run `make release`
+* Finally, set the upcoming version in the `VERSION` file, usually be
+  incrementing the patch level, and possibly by appending `-dev`. Probably you
+  want to `git push` once more.
+  
 ### LICENSE
 
 New BSD License.  See the LICENSE file.
