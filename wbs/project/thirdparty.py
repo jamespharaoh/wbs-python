@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -26,45 +25,45 @@ def read_index ():
 	return yamlx.load_data (
 		"third-party/third-party-index")
 
-def fetch (* names):
+def fetch ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.fetch (* names)
+	third_party_setup.fetch ()
 
-def update (* names):
-
-	third_party_setup = (
-		ThirdPartySetup ())
-
-	third_party_setup.load ()
-	third_party_setup.update (* names)
-
-def pull (* names):
+def update ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.pull (* names)
+	third_party_setup.update ()
 
-def build (* names):
-
-	third_party_setup = (
-		ThirdPartySetup ())
-
-	third_party_setup.load ()
-	third_party_setup.build (* names)
-
-def merge (* names):
+def pull ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.merge (* names)
+	third_party_setup.pull ()
+
+def build ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.build ()
+
+def merge ():
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.merge ()
 
 class ThirdPartySetup (object):
 
@@ -84,15 +83,15 @@ class ThirdPartySetup (object):
 			git.Repo (
 				"."))
 
-	def fetch (self, * names):
+	def fetch (self):
 
 		log.notice (
 			"About to fetch third party libraries")
 
 		try:
 
-			self.create_remotes (* names)
-			self.fetch_remotes (* names)
+			self.create_remotes ()
+			self.fetch_remotes ()
 
 			log.notice (
 				"All done")
@@ -102,7 +101,7 @@ class ThirdPartySetup (object):
 			log.notice (
 				"Aborting due to user request")
 
-	def update (self, * names):
+	def update (self):
 
 		log.notice (
 			"About to update third party libraries")
@@ -110,7 +109,7 @@ class ThirdPartySetup (object):
 		try:
 
 			self.stash_changes ()
-			self.update_libraries (* names)
+			self.update_libraries ()
 
 			log.notice (
 				"All done")
@@ -124,17 +123,17 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def pull (self, * names):
+	def pull (self):
 
 		log.notice (
 			"About to pull third party libraries")
 
 		try:
 
-			self.create_remotes (* names)
-			self.fetch_remotes (* names)
+			self.create_remotes ()
+			self.fetch_remotes ()
 			self.stash_changes ()
-			self.update_libraries (* names)
+			self.update_libraries ()
 
 			log.notice (
 				"All done")
@@ -148,15 +147,17 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def build (self, * names):
+	def build (self):
 
 		log.notice (
 			"About to build third party libraries")
 
+		self.pre_build_libraries ()
+
 		try:
 
 			self.stash_changes ()
-			self.build_libraries (* names)
+			self.build_libraries ()
 
 			log.notice (
 				"All done")
@@ -170,7 +171,7 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def merge (self,  * names):
+	def merge (self):
 
 		log.notice (
 			"About to merge third party libraries")
@@ -178,7 +179,7 @@ class ThirdPartySetup (object):
 		try:
 
 			self.stash_changes ()
-			self.merge_libraries ( * names)
+			self.merge_libraries ()
 
 			log.notice (
 				"All done")
@@ -192,7 +193,7 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def create_remotes (self, * names):
+	def create_remotes (self):
 
 		remotes_index = dict ([
 			(remote.name, remote)
@@ -202,9 +203,6 @@ class ThirdPartySetup (object):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
-
-			if names and library_name not in names:
-				continue
 
 			if library_name in remotes_index:
 				continue
@@ -218,13 +216,10 @@ class ThirdPartySetup (object):
 						library_name,
 						library_data ["url"]))
 
-	def fetch_remotes (self, * names):
+	def fetch_remotes (self):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
-
-			if names and library_name not in names:
-				continue
 
 			if "version" in library_data:
 
@@ -293,14 +288,18 @@ class ThirdPartySetup (object):
 			git.Commit.create_from_tree (
 				self.git_repo,
 				self.stashed_index_tree,
-				"Stashed index",
-				[ self.git_repo.head.commit ]))
+				"Stashed index"))
 
-		print (self.stashed_index_commit)
+		self.stashed_index_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-index",
+				self.stashed_index_commit,
+				force = True))
 
 		self.git_repo.git.add (
 			"--all",
-			".")
+			"third-party")
 
 		self.stashed_working_tree = (
 			self.git_repo.index.write_tree ())
@@ -309,10 +308,14 @@ class ThirdPartySetup (object):
 			git.Commit.create_from_tree (
 				self.git_repo,
 				self.stashed_working_tree,
-				"Stashed working tree",
-				[ self.git_repo.head.commit ]))
+				"Stashed working tree"))
 
-		print (self.stashed_working_commit)
+		self.stashed_working_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-working",
+				self.stashed_working_commit,
+				force = True))
 
 		self.git_repo.index.reset (
 			working_tree = True)
@@ -357,13 +360,10 @@ class ThirdPartySetup (object):
 
 		self.stashed = False
 
-	def update_libraries (self, * names):
+	def update_libraries (self):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
-
-			if names and library_name not in names:
-				continue
 
 			self.update_library (
 				library_name,
@@ -495,16 +495,48 @@ class ThirdPartySetup (object):
 			log.output (
 				error.output)
 
-	def build_libraries (self, * names):
+	def pre_build_libraries (self):
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if not "symlink" in library_data:
+				continue
+
+			symlink_path = (
+				"%s/%s" % (
+					self.project_path,
+					library_data ["symlink"]))
+
+			if os.path.exists (symlink_path):
+				continue
+
+			symlink_directory_path = (
+				os.path.dirname (
+					symlink_path))
+
+			if not os.path.lexists (
+				symlink_directory_path):
+
+				os.makedirs (
+					symlink_directory_path)
+
+			symlink_target = (
+				"%sthird-party/%s" % (
+					"../" * (library_data ["symlink"].count ("/")),
+					library_name))
+
+			os.symlink (
+				symlink_target,
+				symlink_path)
+
+	def build_libraries (self):
 
 		num_built = 0
 		num_failed = 0
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
-
-			if names and library_name not in names:
-				continue
 
 			library_path = (
 				"%s/third-party/%s" % (
@@ -529,14 +561,21 @@ class ThirdPartySetup (object):
 
 				build_data = {
 					"command": " ".join ([
+						"python setup.py build",
+					]),
+					"environment": {
+						"PYTHONPATH":
+							"%s/work/lib/python2.7/site-packages" % (
+								self.project_path),
+					},
+				}
+
+				build_data = {
+					"command": " ".join ([
 						"python setup.py install",
 						"--prefix %s/work" % self.project_path,
 					]),
 					"environment": {
-						"PATH":
-							"%s/work/bin:%s" % (
-								self.project_path,
-								os.environ ["PATH"]),
 						"PYTHONPATH":
 							"%s/work/lib/python2.7/site-packages" % (
 								self.project_path),

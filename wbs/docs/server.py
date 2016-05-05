@@ -14,12 +14,11 @@ from wbs import *
 
 class WbsDocsServer ():
 
-	def __init__ (self, master, content):
+	def __init__ (self, master, content, settings):
 
 		self.master = master
 		self.content = content
-
-		self.load_settings ()
+		self.settings = settings
 
 		self.init_project ()
 		self.init_login ()
@@ -28,16 +27,11 @@ class WbsDocsServer ():
 		self.init_styles ()
 		self.init_routes ()
 
-	def load_settings (self):
-
-		self.settings = (
-			yamlx.load_data (
-				"config/settings"))
-
 	def init_project (self):
 
-		self.project = wbs.Project (
-			title = "WBS Documentation")
+		self.project = (
+			wbs.Project (
+				title = "WBS Documentation"))
 
 	def init_login (self):
 
@@ -49,7 +43,14 @@ class WbsDocsServer ():
 
 		self.flask = (
 			flask.Flask (
-				"wbs-documentation"))
+				"wbs-documentation",
+				static_folder = "%s/static" % (
+					self.master.home),
+				template_folder = "%s/templates" % (
+					self.master.home)))
+
+		self.flask.config ["APPLICATION_ROOT"] = (
+			self.master.home)
 
 		self.flask.config ["DEBUG"] = (
 			self.settings ["server"] ["debug"] == "yes")
@@ -69,15 +70,11 @@ class WbsDocsServer ():
 		self.assets.url = (
 			self.flask.static_url_path)
 
-		self.scss = flask.ext.assets.Bundle (
-			"styles/wbs/main.scss",
-			"styles/wbs/fonts.scss",
-			"styles/wbs/header.scss",
-			"styles/wbs/navigation.scss",
-			"styles/wbs/content.scss",
-			"styles/wbs/syntax.scss",
-			filters = "pyscss",
-			output = "styles/all.css")
+		self.scss = (
+			flask.ext.assets.Bundle (
+				"styles/all.scss",
+				filters = "pyscss",
+				output = "styles/all.css"))
 
 		self.assets.register (
 			"scss_all",
