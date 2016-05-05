@@ -152,6 +152,8 @@ class ThirdPartySetup (object):
 		log.notice (
 			"About to build third party libraries")
 
+		self.pre_build_libraries ()
+
 		try:
 
 			self.stash_changes ()
@@ -492,6 +494,41 @@ class ThirdPartySetup (object):
 
 			log.output (
 				error.output)
+
+	def pre_build_libraries (self):
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if not "symlink" in library_data:
+				continue
+
+			symlink_path = (
+				"%s/%s" % (
+					self.project_path,
+					library_data ["symlink"]))
+
+			if os.path.exists (symlink_path):
+				continue
+
+			symlink_directory_path = (
+				os.path.dirname (
+					symlink_path))
+
+			if not os.path.lexists (
+				symlink_directory_path):
+
+				os.makedirs (
+					symlink_directory_path)
+
+			symlink_target = (
+				"%sthird-party/%s" % (
+					"../" * (library_data ["symlink"].count ("/")),
+					library_name))
+
+			os.symlink (
+				symlink_target,
+				symlink_path)
 
 	def build_libraries (self):
 
