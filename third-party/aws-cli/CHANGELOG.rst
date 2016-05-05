@@ -2,6 +2,32 @@
 CHANGELOG
 =========
 
+1.10.25
+=======
+
+* feature:``inspector``: Update inspector command to latest version
+* feature:``codepipeline``: Update codepipeline command to latest version
+* bugfix:Configure: Fix issue causing prompts not to display on mintty. Fixes `#1925 <https://github.com/aws/aws-cli/issues/1925>`__
+* feature:``elasticbeanstalk``: Update elasticbeanstalk command to latest version
+
+
+1.10.24
+=======
+
+* feature:``route53domains``: Update route53domains command to latest version
+* feature:``opsworks``: Update opsworks command to latest version
+
+
+1.10.23
+=======
+
+* feature:``ecr``: Update ecr command to latest version
+* feature:``acm``: Update acm command to latest version
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``sts``: Update sts command to latest version
+* feature:``cognito-idp``: Update cognito-idp command to latest version
+
+
 1.10.22
 =======
 
