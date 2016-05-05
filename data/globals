@@ -84,12 +84,6 @@ global_system_packages:
 
   - name: "whois"
 
-nodejs_version: "5.6.0"
-nodejs_default: "yes"
-
-iojs_version: "2.0.1"
-iojs_default: "no"
-
 mongodb_version: "3.0.3"
 
 devenv_checkouts_full:

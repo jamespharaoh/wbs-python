@@ -2,6 +2,7 @@ CHANGES.txt
 MANIFEST.in
 bootstrap.py
 buildout.cfg
+setup.cfg
 setup.py
 tox.ini
 src/roman.py
