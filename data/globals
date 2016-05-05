@@ -94,6 +94,12 @@ mongodb_version: "3.0.3"
 
 devenv_checkouts_full:
 
+  - name: "api-server"
+    branch: "master"
+    build_steps:
+
+      - "npm install"
+
   - name: "content-browser"
     branch: "master"
 
@@ -107,6 +113,18 @@ devenv_checkouts_full:
     branch: "master"
 
   - name: "content-web"
+    branch: "master"
+
+  - name: "data-import"
+    branch: "master"
+
+  - name: "data-export"
+    branch: "master"
+
+  - name: "raml-api"
+    branch: "master"
+
+  - name: "raml-server"
     branch: "master"
 
   - name: "wistla-admin"
