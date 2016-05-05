@@ -154,6 +154,12 @@ pyyaml:
   branch: "master"
   auto: "python"
 
+ramlfications:
+
+  url: "git@github.com:spotify/ramlfications.git"
+  branch: "master"
+  auto: "python"
+
 roman:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/python-roman.git"
