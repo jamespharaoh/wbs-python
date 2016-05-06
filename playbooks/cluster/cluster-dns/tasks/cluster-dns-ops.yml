@@ -20,16 +20,20 @@
     aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
     security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
 
-  when: "'.dev.wistla.com' in item.0 [item.1]"
+  when: "
+    item.1 in item.0
+    and '.dev.wistla.com' in item.0 [item.1]
+  "
 
   with_nested:
 
     - "{{ dev_deployment_names | default ([]) | dict_map (deployments) }}"
 
-    - - "main_domain"
-      - "admin_domain"
+    - - "admin_domain"
       - "api_domain"
       - "assets_domain"
+      - "main_domain"
+      - "test_domain"
       - "web_domain"
 
 - name: "create short dev deployment records"
