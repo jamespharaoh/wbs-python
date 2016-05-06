@@ -12,4 +12,10 @@
   home: "/var/lib/rabbitmq"
   shell: "/bin/false"
 
+- name: "postgres"
+  uid: "202"
+  gid: "202"
+  home: "/var/lib/postgresql"
+  shell: "/bin/bash"
+
 # ex: et ts=2 filetype=yaml

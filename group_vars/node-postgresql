@@ -1,0 +1,16 @@
+---
+
+data_dirs:
+
+  - name: "postgresql-data"
+    path: "var/lib/postgresql"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0755"
+
+my_system_packages:
+
+  - name: "postgresql-9.5"
+    state: "present"
+
+# ex: et ts=2 filetype=yaml

@@ -18,6 +18,7 @@ devops_inventory_deployment_modes:
       - "browser"
       - "load"
       - "mongo"
+      - "postgresql"
       - "rabbit"
       - "web"
 

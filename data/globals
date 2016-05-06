@@ -22,6 +22,7 @@ node_type_indices:
   # data_instance: 17
   mongo: 18
   rabbit: 19
+  postgresql: 20
 
 cluster_zone_indices:
 
