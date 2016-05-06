@@ -201,4 +201,6 @@ wistla_dist_url: "{{ dev_wistla_dist_url }}"
 nodejs_version: "6.0.0"
 nodejs_default: "yes"
 
+nginx_version: "1.9.14"
+
 # ex: et ts=2 filetype=yaml
