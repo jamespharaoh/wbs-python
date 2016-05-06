@@ -96,6 +96,13 @@ devenv_checkouts_full:
       - "scripts/setup-project build"
       - "npm install"
 
+  - name: "api-stub-server"
+    branch: "master"
+    build_steps:
+
+      - "scripts/setup-project build"
+      - "npm install"
+
   - name: "content-browser"
     branch: "master"
 
