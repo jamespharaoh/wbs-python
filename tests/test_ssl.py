@@ -2,8 +2,11 @@
 # See LICENSE for details.
 
 """
-Unit tests for :py:obj:`OpenSSL.SSL`.
+Unit tests for :mod:`OpenSSL.SSL`.
 """
+
+import datetime
+import uuid
 
 from gc import collect, get_referrers
 from errno import ECONNREFUSED, EINPROGRESS, EWOULDBLOCK, EPIPE, ESHUTDOWN
@@ -17,7 +20,15 @@ from warnings import catch_warnings, simplefilter
 
 import pytest
 
-from six import PY3, text_type, u
+from six import PY3, text_type
+
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
+
 
 from OpenSSL.crypto import TYPE_RSA, FILETYPE_PEM
 from OpenSSL.crypto import PKey, X509, X509Extension, X509Store
@@ -44,6 +55,7 @@ from OpenSSL.SSL import (
     Error, SysCallError, WantReadError, WantWriteError, ZeroReturnError)
 from OpenSSL.SSL import (
     Context, ContextType, Session, Connection, ConnectionType, SSLeay_version)
+from OpenSSL.SSL import _make_requires
 
 from OpenSSL._util import lib as _lib
 
@@ -347,9 +359,150 @@ class VersionTests(TestCase):
         self.assertEqual(len(versions), 5)
 
 
+@pytest.fixture
+def ca_file(tmpdir):
+    """
+    Create a valid PEM file with CA certificates and return the path.
+    """
+    key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    public_key = key.public_key()
+
+    builder = x509.CertificateBuilder()
+    builder = builder.subject_name(x509.Name([
+        x509.NameAttribute(NameOID.COMMON_NAME, u"pyopenssl.org"),
+    ]))
+    builder = builder.issuer_name(x509.Name([
+        x509.NameAttribute(NameOID.COMMON_NAME, u"pyopenssl.org"),
+    ]))
+    one_day = datetime.timedelta(1, 0, 0)
+    builder = builder.not_valid_before(datetime.datetime.today() - one_day)
+    builder = builder.not_valid_after(datetime.datetime.today() + one_day)
+    builder = builder.serial_number(int(uuid.uuid4()))
+    builder = builder.public_key(public_key)
+    builder = builder.add_extension(
+        x509.BasicConstraints(ca=True, path_length=None), critical=True,
+    )
+
+    certificate = builder.sign(
+        private_key=key, algorithm=hashes.SHA256(),
+        backend=default_backend()
+    )
+
+    ca_file = tmpdir.join("test.pem")
+    ca_file.write_binary(
+        certificate.public_bytes(
+            encoding=serialization.Encoding.PEM,
+        )
+    )
+
+    return str(ca_file).encode("ascii")
+
+
+@pytest.fixture
+def context():
+    """
+    A simple TLS 1.0 context.
+    """
+    return Context(TLSv1_METHOD)
+
+
+class TestContext(object):
+    """
+    py.test-based tests for :class:`OpenSSL.SSL.Context`.
+
+    If possible, add new tests here.
+    """
+    @pytest.mark.parametrize("cipher_string", [
+        b"hello world:AES128-SHA",
+        u"hello world:AES128-SHA",
+    ])
+    def test_set_cipher_list(self, context, cipher_string):
+        """
+        :meth:`Context.set_cipher_list` accepts both byte and unicode strings
+        for naming the ciphers which connections created with the context
+        object will be able to choose from.
+        """
+        context.set_cipher_list(cipher_string)
+        conn = Connection(context, None)
+
+        assert "AES128-SHA" in conn.get_cipher_list()
+
+    @pytest.mark.parametrize("cipher_list,error", [
+        (object(), TypeError),
+        ("imaginary-cipher", Error),
+    ])
+    def test_set_cipher_list_wrong_args(self, context, cipher_list, error):
+        """
+        :meth:`Context.set_cipher_list` raises :exc:`TypeError` when passed a
+        non-string argument and raises :exc:`OpenSSL.SSL.Error` when passed an
+        incorrect cipher list string.
+        """
+        with pytest.raises(error):
+            context.set_cipher_list(cipher_list)
+
+    def test_load_client_ca(self, context, ca_file):
+        """
+        :meth:`Context.load_client_ca` works as far as we can tell.
+        """
+        context.load_client_ca(ca_file)
+
+    def test_load_client_ca_invalid(self, context, tmpdir):
+        """
+        :meth:`Context.load_client_ca` raises an Error if the ca file is
+        invalid.
+        """
+        ca_file = tmpdir.join("test.pem")
+        ca_file.write("")
+
+        with pytest.raises(Error) as e:
+            context.load_client_ca(str(ca_file).encode("ascii"))
+
+        assert "PEM routines" == e.value.args[0][0][0]
+
+    def test_load_client_ca_unicode(self, context, ca_file):
+        """
+        Passing the path as unicode raises a warning but works.
+        """
+        pytest.deprecated_call(
+            context.load_client_ca, ca_file.decode("ascii")
+        )
+
+    def test_set_session_id(self, context):
+        """
+        :meth:`Context.set_session_id` works as far as we can tell.
+        """
+        context.set_session_id(b"abc")
+
+    def test_set_session_id_fail(self, context):
+        """
+        :meth:`Context.set_session_id` errors are propagated.
+        """
+        with pytest.raises(Error) as e:
+            context.set_session_id(b"abc" * 1000)
+
+        assert [
+            ("SSL routines",
+             "SSL_CTX_set_session_id_context",
+             "ssl session id context too long")
+        ] == e.value.args[0]
+
+    def test_set_session_id_unicode(self, context):
+        """
+        :meth:`Context.set_session_id` raises a warning if a unicode string is
+        passed.
+        """
+        pytest.deprecated_call(context.set_session_id, u"abc")
+
+
 class ContextTests(TestCase, _LoopbackMixin):
     """
-    Unit tests for :py:obj:`OpenSSL.SSL.Context`.
+    Unit tests for :class:`OpenSSL.SSL.Context`.
+
+    If possible, add new tests to :class:`TestContext` above.
     """
     def test_method(self):
         """
@@ -1165,9 +1318,10 @@ class ContextTests(TestCase, _LoopbackMixin):
             raise Exception("silly verify failure")
         clientContext.set_verify(VERIFY_PEER, verify_callback)
 
-        exc = self.assertRaises(
-            Exception, self._handshake_test, serverContext, clientContext)
-        self.assertEqual("silly verify failure", str(exc))
+        with pytest.raises(Exception) as exc:
+            self._handshake_test(serverContext, clientContext)
+
+        self.assertEqual("silly verify failure", str(exc.value))
 
     def test_add_extra_chain_cert(self):
         """
@@ -1293,9 +1447,6 @@ class ContextTests(TestCase, _LoopbackMixin):
             Error, context.use_certificate_chain_file, self.mktemp()
         )
 
-    # XXX load_client_ca
-    # XXX set_session_id
-
     def test_get_verify_mode_wrong_args(self):
         """
         :py:obj:`Context.get_verify_mode` raises :py:obj:`TypeError` if called
@@ -1393,44 +1544,6 @@ class ContextTests(TestCase, _LoopbackMixin):
             # The only easily "assertable" thing is that it does not raise an
             # exception.
             context.set_tmp_ecdh(curve)
-
-    def test_set_cipher_list_bytes(self):
-        """
-        :py:obj:`Context.set_cipher_list` accepts a :py:obj:`bytes` naming the
-        ciphers which connections created with the context object will be able
-        to choose from.
-        """
-        context = Context(TLSv1_METHOD)
-        context.set_cipher_list(b"hello world:EXP-RC4-MD5")
-        conn = Connection(context, None)
-        self.assertEquals(conn.get_cipher_list(), ["EXP-RC4-MD5"])
-
-    def test_set_cipher_list_text(self):
-        """
-        :py:obj:`Context.set_cipher_list` accepts a :py:obj:`unicode` naming
-        the ciphers which connections created with the context object will be
-        able to choose from.
-        """
-        context = Context(TLSv1_METHOD)
-        context.set_cipher_list(u("hello world:EXP-RC4-MD5"))
-        conn = Connection(context, None)
-        self.assertEquals(conn.get_cipher_list(), ["EXP-RC4-MD5"])
-
-    def test_set_cipher_list_wrong_args(self):
-        """
-        :py:obj:`Context.set_cipher_list` raises :py:obj:`TypeError` when
-        passed zero arguments or more than one argument or when passed a
-        non-string single argument and raises :py:obj:`OpenSSL.SSL.Error` when
-        passed an incorrect cipher list string.
-        """
-        context = Context(TLSv1_METHOD)
-        self.assertRaises(TypeError, context.set_cipher_list)
-        self.assertRaises(TypeError, context.set_cipher_list, object())
-        self.assertRaises(
-            TypeError, context.set_cipher_list, b"EXP-RC4-MD5", object()
-        )
-
-        self.assertRaises(Error, context.set_cipher_list, "imaginary-cipher")
 
     def test_set_session_cache_mode_wrong_args(self):
         """
@@ -2016,7 +2129,7 @@ class SessionTests(TestCase):
 
 class ConnectionTests(TestCase, _LoopbackMixin):
     """
-    Unit tests for :py:obj:`OpenSSL.SSL.Connection`.
+    Unit tests for :class:`OpenSSL.SSL.Connection`.
     """
     # XXX get_peer_certificate -> None
     # XXX sock_shutdown
@@ -2026,7 +2139,6 @@ class ConnectionTests(TestCase, _LoopbackMixin):
     # XXX connect_ex -> TypeError
     # XXX set_connect_state -> TypeError
     # XXX set_accept_state -> TypeError
-    # XXX renegotiate_pending
     # XXX do_handshake -> TypeError
     # XXX bio_read -> TypeError
     # XXX recv -> TypeError
@@ -2346,8 +2458,8 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         server = self._loopbackServerFactory(server)
         client = self._loopbackClientFactory(client)
 
-        assert b"before/accept initialization" == server.state_string()
-        assert b"before/connect initialization" == client.state_string()
+        assert b"before/accept initialization" == server.get_state_string()
+        assert b"before/connect initialization" == client.get_state_string()
 
     def test_app_data_wrong_args(self):
         """
@@ -3129,24 +3241,32 @@ class ConnectionRenegotiateTests(TestCase, _LoopbackMixin):
         connection = Connection(Context(TLSv1_METHOD), None)
         self.assertEquals(connection.total_renegotiations(), 0)
 
-#     def test_renegotiate(self):
-#         """
-#         """
-#         server, client = self._loopback()
+    def test_renegotiate(self):
+        """
+        Go through a complete renegotiation cycle.
+        """
+        server, client = self._loopback()
 
-#         server.send("hello world")
-#         self.assertEquals(client.recv(len("hello world")), "hello world")
+        server.send(b"hello world")
 
-#         self.assertEquals(server.total_renegotiations(), 0)
-#         self.assertTrue(server.renegotiate())
+        assert b"hello world" == client.recv(len(b"hello world"))
 
-#         server.setblocking(False)
-#         client.setblocking(False)
-#         while server.renegotiate_pending():
-#             client.do_handshake()
-#             server.do_handshake()
+        assert 0 == server.total_renegotiations()
+        assert False is server.renegotiate_pending()
 
-#         self.assertEquals(server.total_renegotiations(), 1)
+        assert True is server.renegotiate()
+
+        assert True is server.renegotiate_pending()
+
+        server.setblocking(False)
+        client.setblocking(False)
+
+        client.do_handshake()
+        server.do_handshake()
+
+        assert 1 == server.total_renegotiations()
+        while False is server.renegotiate_pending():
+            pass
 
 
 class ErrorTests(TestCase):
@@ -3734,6 +3854,47 @@ class InfoConstantTests(TestCase):
             SSL_CB_HANDSHAKE_START, SSL_CB_HANDSHAKE_DONE
         ]:
             self.assertTrue(isinstance(const, int))
+
+
+class TestRequires(object):
+    """
+    Tests for the decorator factory used to conditionally raise
+    NotImplementedError when older OpenSSLs are used.
+    """
+    def test_available(self):
+        """
+        When the OpenSSL functionality is available the decorated functions
+        work appropriately.
+        """
+        feature_guard = _make_requires(True, "Error text")
+        results = []
+
+        @feature_guard
+        def inner():
+            results.append(True)
+            return True
+
+        assert inner() is True
+        assert [True] == results
+
+    def test_unavailable(self):
+        """
+        When the OpenSSL functionality is not available the decorated function
+        does not execute and NotImplementedError is raised.
+        """
+        feature_guard = _make_requires(False, "Error text")
+        results = []
+
+        @feature_guard
+        def inner():
+            results.append(True)
+            return True
+
+        with pytest.raises(NotImplementedError) as e:
+            inner()
+
+        assert "Error text" in str(e.value)
+        assert results == []
 
 
 if __name__ == '__main__':

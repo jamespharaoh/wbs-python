@@ -5,19 +5,19 @@ from itertools import count, chain
 from weakref import WeakValueDictionary
 from errno import errorcode
 
-from six import text_type as _text_type
 from six import binary_type as _binary_type
 from six import integer_types as integer_types
 from six import int2byte, indexbytes
 
 from OpenSSL._util import (
+    UNSPECIFIED as _UNSPECIFIED,
+    exception_from_error_queue as _exception_from_error_queue,
     ffi as _ffi,
     lib as _lib,
-    exception_from_error_queue as _exception_from_error_queue,
+    make_assert as _make_assert,
     native as _native,
-    text_to_bytes_and_warn as _text_to_bytes_and_warn,
     path_string as _path_string,
-    UNSPECIFIED as _UNSPECIFIED,
+    text_to_bytes_and_warn as _text_to_bytes_and_warn,
 )
 
 from OpenSSL.crypto import (
@@ -148,6 +148,7 @@ class Error(Exception):
 
 
 _raise_current_error = partial(_exception_from_error_queue, Error)
+_openssl_assert = _make_assert(Error)
 
 
 class WantReadError(Error):
@@ -405,34 +406,41 @@ def SSLeay_version(type):
     return _ffi.string(_lib.SSLeay_version(type))
 
 
-def _requires_npn(func):
+def _make_requires(flag, error):
     """
-    Wraps any function that requires NPN support in OpenSSL, ensuring that
-    NotImplementedError is raised if NPN is not present.
+    Builds a decorator that ensures that functions that rely on OpenSSL
+    functions that are not present in this build raise NotImplementedError,
+    rather than AttributeError coming out of cryptography.
+
+    :param flag: A cryptography flag that guards the functions, e.g.
+        ``Cryptography_HAS_NEXTPROTONEG``.
+    :param error: The string to be used in the exception if the flag is false.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if not _lib.Cryptography_HAS_NEXTPROTONEG:
-            raise NotImplementedError("NPN not available.")
+    def _requires_decorator(func):
+        if not flag:
+            @wraps(func)
+            def explode(*args, **kwargs):
+                raise NotImplementedError(error)
+            return explode
+        else:
+            return func
 
-        return func(*args, **kwargs)
-
-    return wrapper
+    return _requires_decorator
 
 
-def _requires_alpn(func):
-    """
-    Wraps any function that requires ALPN support in OpenSSL, ensuring that
-    NotImplementedError is raised if ALPN support is not present.
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if not _lib.Cryptography_HAS_ALPN:
-            raise NotImplementedError("ALPN not available.")
+_requires_npn = _make_requires(
+    _lib.Cryptography_HAS_NEXTPROTONEG, "NPN not available"
+)
 
-        return func(*args, **kwargs)
 
-    return wrapper
+_requires_alpn = _make_requires(
+    _lib.Cryptography_HAS_ALPN, "ALPN not available"
+)
+
+
+_requires_sni = _make_requires(
+    _lib.Cryptography_HAS_TLSEXT_HOSTNAME, "SNI not available"
+)
 
 
 class Session(object):
@@ -441,7 +449,7 @@ class Session(object):
 
 class Context(object):
     """
-    :py:obj:`OpenSSL.SSL.Context` instances define the parameters for setting
+    :class:`OpenSSL.SSL.Context` instances define the parameters for setting
     up new SSL connections.
     """
     _methods = {
@@ -688,23 +696,39 @@ class Context(object):
 
     def load_client_ca(self, cafile):
         """
-        Load the trusted certificates that will be sent to the client
-        (basically telling the client "These are the guys I trust").  Does not
-        actually imply any of the certificates are trusted; that must be
+        Load the trusted certificates that will be sent to the client.  Does
+        not actually imply any of the certificates are trusted; that must be
         configured separately.
 
-        :param cafile: The name of the certificates file
+        :param bytes cafile: The path to a certificates file in PEM format.
         :return: None
         """
+        ca_list = _lib.SSL_load_client_CA_file(
+            _text_to_bytes_and_warn("cafile", cafile)
+        )
+        _openssl_assert(ca_list != _ffi.NULL)
+        # SSL_CTX_set_client_CA_list doesn't return anything.
+        _lib.SSL_CTX_set_client_CA_list(self._context, ca_list)
 
     def set_session_id(self, buf):
         """
-        Set the session identifier.  This is needed if you want to do session
-        resumption.
+        Set the session id to *buf* within which a session can be reused for
+        this Context object.  This is needed when doing session resumption,
+        because there is no way for a stored session to know which Context
+        object it is associated with.
 
-        :param buf: A Python object that can be safely converted to a string
+        :param bytes buf: The session id.
+
         :returns: None
         """
+        buf = _text_to_bytes_and_warn("buf", buf)
+        _openssl_assert(
+            _lib.SSL_CTX_set_session_id_context(
+                self._context,
+                buf,
+                len(buf),
+            ) == 1
+        )
 
     def set_session_cache_mode(self, mode):
         """
@@ -808,20 +832,22 @@ class Context(object):
 
     def set_cipher_list(self, cipher_list):
         """
-        Change the cipher list
+        Set the list of ciphers to be used in this context.
 
-        :param cipher_list: A cipher list, see ciphers(1)
+        See the OpenSSL manual for more information (e.g.
+        :manpage:`ciphers(1)`).
+
+        :param bytes cipher_list: An OpenSSL cipher string.
         :return: None
         """
-        if isinstance(cipher_list, _text_type):
-            cipher_list = cipher_list.encode("ascii")
+        cipher_list = _text_to_bytes_and_warn("cipher_list", cipher_list)
 
         if not isinstance(cipher_list, bytes):
-            raise TypeError("cipher_list must be bytes or unicode")
+            raise TypeError("cipher_list must be a byte string.")
 
-        result = _lib.SSL_CTX_set_cipher_list(self._context, cipher_list)
-        if not result:
-            _raise_current_error()
+        _openssl_assert(
+            _lib.SSL_CTX_set_cipher_list(self._context, cipher_list) == 1
+        )
 
     def set_client_ca_list(self, certificate_authorities):
         """
@@ -972,6 +998,7 @@ class Context(object):
 
         return _lib.SSL_CTX_set_mode(self._context, mode)
 
+    @_requires_sni
     def set_tlsext_servername_callback(self, callback):
         """
         Specify a callback function to be called when clients specify a server
@@ -1190,6 +1217,7 @@ class Connection(object):
         _lib.SSL_set_SSL_CTX(self._ssl, context._context)
         self._context = context
 
+    @_requires_sni
     def get_servername(self):
         """
         Retrieve the servername extension value if provided in the client hello
@@ -1205,6 +1233,7 @@ class Connection(object):
 
         return _ffi.string(name)
 
+    @_requires_sni
     def set_tlsext_host_name(self, name):
         """
         Set the value of the servername extension to send in the client hello.
@@ -1403,10 +1432,15 @@ class Connection(object):
 
     def renegotiate(self):
         """
-        Renegotiate the session
+        Renegotiate the session.
 
-        :return: True if the renegotiation can be started, false otherwise
+        :return: True if the renegotiation can be started, False otherwise
+        :rtype: bool
         """
+        if not self.renegotiate_pending():
+            _openssl_assert(_lib.SSL_renegotiate(self._ssl) == 1)
+            return True
+        return False
 
     def do_handshake(self):
         """
@@ -1420,17 +1454,20 @@ class Connection(object):
 
     def renegotiate_pending(self):
         """
-        Check if there's a renegotiation in progress, it will return false once
+        Check if there's a renegotiation in progress, it will return False once
         a renegotiation is finished.
 
         :return: Whether there's a renegotiation in progress
+        :rtype: bool
         """
+        return _lib.SSL_renegotiate_pending(self._ssl) == 1
 
     def total_renegotiations(self):
         """
         Find out the total number of renegotiations.
 
         :return: The number of renegotiations.
+        :rtype: int
         """
         return _lib.SSL_total_renegotiations(self._ssl)
 
@@ -1498,9 +1535,9 @@ class Connection(object):
 
     def get_cipher_list(self):
         """
-        Get the session cipher list
+        Retrieve the list of ciphers used by the Connection object.
 
-        :return: A list of cipher strings
+        :return: A list of native cipher strings.
         """
         ciphers = []
         for i in count():
@@ -1587,11 +1624,12 @@ class Connection(object):
 
         _lib.SSL_set_shutdown(self._ssl, state)
 
-    def state_string(self):
+    def get_state_string(self):
         """
-        Get a verbose state description
+        Retrieve a verbose string detailing the state of the Connection.
 
         :return: A string representing the state
+        :rtype: bytes
         """
         return _ffi.string(_lib.SSL_state_string_long(self._ssl))
 

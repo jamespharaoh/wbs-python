@@ -217,15 +217,22 @@ class PKey(object):
                 _raise_current_error()
 
         elif type == TYPE_DSA:
-            dsa = _lib.DSA_generate_parameters(
-                bits, _ffi.NULL, 0, _ffi.NULL, _ffi.NULL, _ffi.NULL, _ffi.NULL)
+            dsa = _lib.DSA_new()
             if dsa == _ffi.NULL:
+                # TODO: This is untested.
+                _raise_current_error()
+
+            dsa = _ffi.gc(dsa, _lib.DSA_free)
+            res = _lib.DSA_generate_parameters_ex(
+                dsa, bits, _ffi.NULL, 0, _ffi.NULL, _ffi.NULL, _ffi.NULL
+            )
+            if not res == 1:
                 # TODO: This is untested.
                 _raise_current_error()
             if not _lib.DSA_generate_key(dsa):
                 # TODO: This is untested.
                 _raise_current_error()
-            if not _lib.EVP_PKEY_assign_DSA(self._pkey, dsa):
+            if not _lib.EVP_PKEY_set1_DSA(self._pkey, dsa):
                 # TODO: This is untested.
                 _raise_current_error()
         else:
@@ -263,12 +270,7 @@ class PKey(object):
 
         :return: The type of the key.
         """
-        try:
-            # cryptography 1.2+
-            return _lib.Cryptography_EVP_PKEY_id(self._pkey)
-        except AttributeError:
-            # Older releases of cryptography.
-            return self._pkey.type
+        return _lib.Cryptography_EVP_PKEY_id(self._pkey)
 
     def bits(self):
         """
@@ -633,8 +635,7 @@ class X509Extension(object):
         """
         Initializes an X509 extension.
 
-        :param type_name: The name of the type of extension to create. See
-            http://openssl.org/docs/apps/x509v3_config.html#STANDARD_EXTENSIONS
+        :param type_name: The name of the type of extension_ to create.
         :type type_name: :py:data:`bytes`
 
         :param bool critical: A flag indicating whether this is a critical
@@ -648,6 +649,9 @@ class X509Extension(object):
 
         :param issuer: Optional X509 certificate to use as issuer.
         :type issuer: :py:class:`X509`
+
+        .. _extension: https://openssl.org/docs/manmaster/apps/
+            x509v3_config.html#STANDARD-EXTENSIONS
         """
         ctx = _ffi.new("X509V3_CTX*")
 
@@ -690,7 +694,9 @@ class X509Extension(object):
 
     @property
     def _nid(self):
-        return _lib.OBJ_obj2nid(self._extension.object)
+        return _lib.OBJ_obj2nid(
+            _lib.X509_EXTENSION_get_object(self._extension)
+        )
 
     _prefixes = {
         _lib.GEN_EMAIL: "email",
@@ -703,8 +709,9 @@ class X509Extension(object):
         if method == _ffi.NULL:
             # TODO: This is untested.
             _raise_current_error()
-        payload = self._extension.value.data
-        length = self._extension.value.length
+        ext_data = _lib.X509_EXTENSION_get_data(self._extension)
+        payload = ext_data.data
+        length = ext_data.length
 
         payloadptr = _ffi.new("unsigned char**")
         payloadptr[0] = payload
@@ -1707,32 +1714,6 @@ def dump_privatekey(type, pkey, cipher=None, passphrase=None):
     return _bio_to_string(bio)
 
 
-def _X509_REVOKED_dup(original):
-    copy = _lib.X509_REVOKED_new()
-    if copy == _ffi.NULL:
-        # TODO: This is untested.
-        _raise_current_error()
-
-    if original.serialNumber != _ffi.NULL:
-        _lib.ASN1_INTEGER_free(copy.serialNumber)
-        copy.serialNumber = _lib.ASN1_INTEGER_dup(original.serialNumber)
-
-    if original.revocationDate != _ffi.NULL:
-        _lib.ASN1_TIME_free(copy.revocationDate)
-        copy.revocationDate = _lib.M_ASN1_TIME_dup(original.revocationDate)
-
-    if original.extensions != _ffi.NULL:
-        extension_stack = _lib.sk_X509_EXTENSION_new_null()
-        for i in range(_lib.sk_X509_EXTENSION_num(original.extensions)):
-            original_ext = _lib.sk_X509_EXTENSION_value(original.extensions, i)
-            copy_ext = _lib.X509_EXTENSION_dup(original_ext)
-            _lib.sk_X509_EXTENSION_push(extension_stack, copy_ext)
-        copy.extensions = extension_stack
-
-    copy.sequence = original.sequence
-    return copy
-
-
 class Revoked(object):
     """
     A certificate revocation.
@@ -1803,7 +1784,8 @@ class Revoked(object):
         stack = self._revoked.extensions
         for i in range(_lib.sk_X509_EXTENSION_num(stack)):
             ext = _lib.sk_X509_EXTENSION_value(stack, i)
-            if _lib.OBJ_obj2nid(ext.object) == _lib.NID_crl_reason:
+            obj = _lib.X509_EXTENSION_get_object(ext)
+            if _lib.OBJ_obj2nid(obj) == _lib.NID_crl_reason:
                 _lib.X509_EXTENSION_free(ext)
                 _lib.sk_X509_EXTENSION_delete(stack, i)
                 break
@@ -1853,7 +1835,7 @@ class Revoked(object):
 
     def get_reason(self):
         """
-        Set the reason of this revocation.
+        Get the reason of this revocation.
 
         :return: The reason, or :py:const:`None` if there is none.
         :rtype: :py:class:`bytes` or :py:class:`NoneType`
@@ -1866,13 +1848,14 @@ class Revoked(object):
         extensions = self._revoked.extensions
         for i in range(_lib.sk_X509_EXTENSION_num(extensions)):
             ext = _lib.sk_X509_EXTENSION_value(extensions, i)
-            if _lib.OBJ_obj2nid(ext.object) == _lib.NID_crl_reason:
+            obj = _lib.X509_EXTENSION_get_object(ext)
+            if _lib.OBJ_obj2nid(obj) == _lib.NID_crl_reason:
                 bio = _new_mem_buf()
 
                 print_result = _lib.X509V3_EXT_print(bio, ext, 0, 0)
                 if not print_result:
                     print_result = _lib.M_ASN1_OCTET_STRING_print(
-                        bio, ext.value
+                        bio, _lib.X509_EXTENSION_get_data(ext)
                     )
                     if print_result == 0:
                         # TODO: This is untested.
@@ -1938,7 +1921,7 @@ class CRL(object):
         revoked_stack = self._crl.crl.revoked
         for i in range(_lib.sk_X509_REVOKED_num(revoked_stack)):
             revoked = _lib.sk_X509_REVOKED_value(revoked_stack, i)
-            revoked_copy = _X509_REVOKED_dup(revoked)
+            revoked_copy = _lib.Cryptography_X509_REVOKED_dup(revoked)
             pyrev = Revoked.__new__(Revoked)
             pyrev._revoked = _ffi.gc(revoked_copy, _lib.X509_REVOKED_free)
             results.append(pyrev)
@@ -1958,7 +1941,7 @@ class CRL(object):
 
         :return: :py:const:`None`
         """
-        copy = _X509_REVOKED_dup(revoked._revoked)
+        copy = _lib.Cryptography_X509_REVOKED_dup(revoked._revoked)
         if copy == _ffi.NULL:
             # TODO: This is untested.
             _raise_current_error()
@@ -2337,7 +2320,7 @@ class NetscapeSPKI(object):
         """
         encoded = _lib.NETSCAPE_SPKI_b64_encode(self._spki)
         result = _ffi.string(encoded)
-        _lib.CRYPTO_free(encoded)
+        _lib.OPENSSL_free(encoded)
         return result
 
     def get_pubkey(self):

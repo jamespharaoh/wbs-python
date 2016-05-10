@@ -274,10 +274,7 @@ Context objects have the following methods:
     Retrieve the Context object's verify mode, as set by :py:meth:`set_verify`.
 
 
-.. py:method:: Context.load_client_ca(pemfile)
-
-    Read a file with PEM-formatted certificates that will be sent to the client
-    when requesting a client certificate.
+.. automethod:: Context.load_client_ca
 
 
 .. py:method:: Context.set_client_ca_list(certificate_authorities)
@@ -333,11 +330,7 @@ Context objects have the following methods:
     later using the :py:meth:`get_app_data` method.
 
 
-.. py:method:: Context.set_cipher_list(ciphers)
-
-    Set the list of ciphers to be used in this context. See the OpenSSL manual for
-    more information (e.g. :manpage:`ciphers(1)`)
-
+.. automethod:: Context.set_cipher_list
 
 .. py:method:: Context.set_info_callback(callback)
 
@@ -391,12 +384,7 @@ Context objects have the following methods:
     .. versionadded:: 0.14
 
 
-.. py:method:: Context.set_session_id(name)
-
-    Set the context *name* within which a session can be reused for this
-    Context object. This is needed when doing session resumption, because there is
-    no way for a stored session to know which Context object it is associated with.
-    *name* may be any binary data.
+.. automethod:: Context.set_session_id
 
 
 .. py:method:: Context.set_timeout(timeout)
@@ -592,11 +580,7 @@ Connection objects have the following methods:
     Retrieve application data as set by :py:meth:`set_app_data`.
 
 
-.. py:method:: Connection.get_cipher_list()
-
-    Retrieve the list of ciphers used by the Connection object. WARNING: This API
-    has changed. It used to take an optional parameter and just return a string,
-    but now it returns the entire list in one go.
+.. automethod:: Connection.get_cipher_list
 
 
 .. py:method:: Connection.get_protocol_version()
@@ -610,7 +594,7 @@ Connection objects have the following methods:
 
     Retrieve the version of the SSL or TLS protocol used by the Connection as
     a unicode string. For example, it will return ``TLSv1`` for connections
-    made over TLS version 1, or ``Unknown`` for connections that were not 
+    made over TLS version 1, or ``Unknown`` for connections that were not
     successfully established.
 
 
@@ -692,11 +676,11 @@ Connection objects have the following methods:
     bytes (for example, in response to a call to :py:meth:`recv`).
 
 
-.. py:method:: Connection.renegotiate()
+.. automethod:: Connection.renegotiate
 
-    Renegotiate the SSL session. Call this if you wish to change cipher suites or
-    anything like that.
+.. automethod:: Connection.renegotiate_pending
 
+.. automethod:: Connection.total_renegotiations
 
 .. py:method:: Connection.send(string)
 
@@ -778,10 +762,7 @@ Connection objects have the following methods:
     BIO.
 
 
-.. py:method:: Connection.state_string()
-
-    Retrieve a verbose string detailing the state of the Connection.
-
+.. automethod:: Connection.get_state_string
 
 .. py:method:: Connection.client_random()
 
