@@ -1,5 +1,8 @@
 ---
 
+- include: "devbox-fuse.yml"
+  tags: "devbox-fuse"
+
 - include: "devbox-system.yml"
   tags: "devbox-system"
 
@@ -20,9 +23,6 @@
 
 - include: "devbox-samba.yml"
   tags: "devbox-samba"
-
-- include: "devbox-fuse.yml"
-  tags: "devbox-fuse"
 
 - include: "devbox-openvpn.yml"
   tags: "devbox-openvpn"

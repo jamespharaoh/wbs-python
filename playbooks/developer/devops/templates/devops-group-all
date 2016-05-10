@@ -15,18 +15,27 @@ ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys') | from_yaml | to_json
 ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys') | from_yaml | to_json }}
 amazon_accounts: {{ lookup ('file', DATA + '/amazon-accounts') | from_yaml | to_json }}
 
+{% macro do_secrets (name) %}
+{% set filename = lookup ('fileglob', HOME + '/security/third-parties/' + name) %}
+{% if filename %}
+  {{ name }}: {{ lookup ('file', filename) | from_yaml | to_json }}
+{% else %}
+  {{ name }}: {}
+{% endif %}
+{% endmacro %}
+
 {% if not secrets | default ([]) %}
 third_parties: {}
 {% else %}
 third_parties:
 {% if 'dev' in secrets %}
-  dev: {{ lookup ('file', HOME + '/security/third-parties/dev') | from_yaml | to_json }}
+{{ do_secrets ('dev') }}
 {% endif %}
 {% if 'production' in secrets %}
-  production: {{ lookup ('file', HOME + '/security/third-parties/production') | from_yaml | to_json }}
-  staging: {{ lookup ('file', HOME + '/security/third-parties/staging') | from_yaml | to_json }}
-  test: {{ lookup ('file', HOME + '/security/third-parties/test') | from_yaml | to_json }}
-  ops: {{ lookup ('file', HOME + '/security/third-parties/ops') | from_yaml | to_json }}
+{{ do_secrets ('production') }}
+{{ do_secrets ('staging') }}
+{{ do_secrets ('test') }}
+{{ do_secrets ('ops') }}
 {% endif %}
 {% endif %}
 
