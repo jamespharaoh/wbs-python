@@ -66,7 +66,7 @@ When introducing new functionality, please remember to write documentation.
 
   .. code-block:: rst
 
-     - Added :func:`OpenSSL.crypto.some_func` to do something awesome.
+     - Added ``OpenSSL.crypto.some_func()`` to do something awesome.
        [`#1 <https://github.com/pyca/pyopenssl/pull/1>`_]
 
 
@@ -93,7 +93,8 @@ Finding Help
 If you need any help with the contribution process, you'll find us hanging out at ``#cryptography-dev`` on Freenode_ IRC.
 You can also ask questions on our `mailing list`_.
 
-Wherever we interact, we strive to follow the `Python Community Code of Conduct`_.
+Please note that this project is released with a Contributor `Code of Conduct`_.
+By participating in this project you agree to abide by its terms.
 
 
 Security
@@ -106,7 +107,7 @@ Feel free to cross-check this information with Keybase_.
 
 
 .. _GitHub issue tracker: https://github.com/pyca/pyopenssl/issues
-.. _GPG: http://en.wikipedia.org/wiki/GNU_Privacy_Guard
+.. _GPG: https://en.wikipedia.org/wiki/GNU_Privacy_Guard
 .. _Keybase: https://keybase.io/hynek
 .. _pyca/pyopenssl: https://github.com/pyca/pyopenssl
 .. _PEP 8: https://www.python.org/dev/peps/pep-0008/
@@ -114,8 +115,8 @@ Feel free to cross-check this information with Keybase_.
 .. _cryptography code review process: https://cryptography.io/en/latest/development/reviewing-patches/
 .. _freenode: https://freenode.net
 .. _mailing list: https://mail.python.org/mailman/listinfo/cryptography-dev
-.. _Python Community Code of Conduct: https://www.python.org/psf/codeofconduct/
 .. _members of PyCA: https://github.com/orgs/pyca/people
 .. _semantic newlines: http://rhodesmill.org/brandon/2012/one-sentence-per-line/
-.. _reStructuredText: http://sphinx-doc.org/rest.htm
+.. _reStructuredText: http://sphinx-doc.org/rest.html
 .. _CHANGELOG.rst: https://github.com/pyca/pyopenssl/blob/master/CHANGELOG.rst
+.. _`Code of Conduct`: https://github.com/pyca/pyopenssl/blob/master/CODE_OF_CONDUCT.rst

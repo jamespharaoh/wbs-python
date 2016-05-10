@@ -45,24 +45,26 @@ matrix:
   - python: "pypy"
     env: TOXENV=pypy-cryptographyMaster
 
-  # And older cryptography versions.
+  # And current minimum cryptography version.
   - python: "2.6"
-    env: TOXENV=py26-cryptography1.1
+    env: TOXENV=py26-cryptographyMinimum
   - python: "2.7"
-    env: TOXENV=py27-cryptography1.1
+    env: TOXENV=py27-cryptographyMinimum
   - python: "3.3"
-    env: TOXENV=py33-cryptography1.1
+    env: TOXENV=py33-cryptographyMinimum
   - python: "3.4"
-    env: TOXENV=py34-cryptography1.1
+    env: TOXENV=py34-cryptographyMinimum
   - python: "3.5"
-    env: TOXENV=py35-cryptography1.1
+    env: TOXENV=py35-cryptographyMinimum
   - python: "pypy"
-    env: TOXENV=pypy-cryptography1.1
+    env: TOXENV=pypy-cryptographyMinimum
 
 
-  # Make sure we don't break Twisted
+  # Make sure we don't break Twisted or urllib3
   - python: "2.7"
     env: TOXENV=py27-twistedMaster
+  - python: "3.5"
+    env: TOXENV=py35-urllib3Master
 
 
   # Also run at least a little bit against an older version of OpenSSL.
@@ -83,22 +85,15 @@ matrix:
   - python: "2.7"
     env: TOXENV=docs
 
-  # - Let the cryptography master builds fail because they might be triggered by
-  #   cryptography changes beyond our control.
-  # - Also allow OS X and 0.9.8 to fail at the moment while we fix these new
-  #   build configurations.
-  # - Also allow lint to fail while we fix existing lint.
-  # - We alloy pypy to fail until Travis fixes their infrastructure to a pypy
-  #   with a recent enought CFFI library to run cryptography 1.0+.
+  # Let the cryptography master builds fail because they might be caused by
+  # cryptography changes that are beyond our control.
   allow_failures:
-  - language: generic
-    os: osx
-    env: TOXENV=py27 OSX_OPENSSL=homebrew
   - env: TOXENV=py26-cryptographyMaster
   - env: TOXENV=py27-cryptographyMaster
   - env: TOXENV=py33-cryptographyMaster
   - env: TOXENV=py34-cryptographyMaster
   - env: TOXENV=py35-cryptographyMaster
+  - env: TOXENV=pypy-cryptographyMaster
 
 install:
   - |
@@ -115,8 +110,8 @@ install:
           PYENV_ROOT="$HOME/.pyenv"
           PATH="$PYENV_ROOT/bin:$PATH"
           eval "$(pyenv init -)"
-          pyenv install pypy-4.0.1
-          pyenv global pypy-4.0.1
+          pyenv install pypy-5.0.0
+          pyenv global pypy-5.0.0
       fi
       pip install virtualenv
     fi
