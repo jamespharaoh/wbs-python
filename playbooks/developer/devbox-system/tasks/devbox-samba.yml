@@ -13,11 +13,12 @@
   args:
 
     creates: "/etc/samba/vagrant-password-flag"
+    executable: "/bin/bash"
 
   become: "yes"
-  action: shell
+  shell:
 
-    set -e;
+    set -euf -o pipefail;
 
     printf "vagrant\nvagrant\n" | smbpasswd -a {{ vagrant_user }} -s;
 

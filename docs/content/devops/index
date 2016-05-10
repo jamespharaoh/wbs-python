@@ -1,0 +1,6 @@
+Short-title: Devops
+Long-title: Wistla devops
+Description: Wistla devops and automation systems
+
+This section describes the automated infrastructure management, which roughly
+corresponds to the functionality of the `wistla-devops` project.

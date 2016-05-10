@@ -99,13 +99,6 @@ mongodb_version: "3.0.3"
 
 devenv_checkouts_full:
 
-  - name: "api-server"
-    branch: "master"
-    build_steps:
-
-      - "scripts/setup-project build"
-      - "npm install"
-
   - name: "api-stub-server"
     branch: "master"
     build_steps:
@@ -128,16 +121,16 @@ devenv_checkouts_full:
   - name: "content-web"
     branch: "master"
 
-  - name: "data-import"
+  - name: "wistla-data-import"
     branch: "master"
 
-  - name: "data-export"
+  - name: "wistla-data-export"
     branch: "master"
 
-  - name: "raml-api"
+  - name: "wistla-raml-api"
     branch: "master"
 
-  - name: "raml-server"
+  - name: "wistla-raml-server"
     branch: "master"
 
   - name: "wistla-admin"
@@ -156,6 +149,7 @@ devenv_checkouts_full:
 
   - name: "wistla-api"
     branch: "master"
+    nodejs_version: "legacy"
     project_links:
 
       - link: "node_modules/wistla-analytics"
@@ -166,8 +160,16 @@ devenv_checkouts_full:
 
       - "npm install"
 
+  - name: "wistla-api-server"
+    branch: "master"
+    build_steps:
+
+      - "scripts/setup-project build"
+      - "npm install"
+
   - name: "wistla-browser"
     branch: "master"
+    nodejs_version: "legacy"
     project_links:
 
       - link: "node_modules/wistla-analytics"
@@ -176,6 +178,13 @@ devenv_checkouts_full:
 
     build_steps:
 
+      - "npm install"
+
+  - name: "wistla-data-process"
+    branch: "master"
+    build_steps:
+
+      - "scripts/setup-project build"
       - "npm install"
 
   - name: "wistla-devops"
@@ -194,6 +203,7 @@ devenv_checkouts_full:
 
   - name: "wistla-web"
     branch: "master"
+    nodejs_version: "legacy"
     build_steps:
 
         - "npm install"
@@ -227,6 +237,8 @@ zone_colours:
   c: "105"
 
 ubuntu_mirror: "http:/"
+
+my_system_packages: []
 
 ubuntu_system_packages: "{{ []
   | union (global_system_packages)

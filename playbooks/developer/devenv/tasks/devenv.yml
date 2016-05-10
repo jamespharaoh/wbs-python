@@ -75,6 +75,27 @@
 
     fi;
 
+- name: "create nodejs links"
+  with_items: "{{ devenv_checkouts }}"
+  when: "item.nodejs_version | default ('') == 'legacy'"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/{{ item.name }}/.nodejs-stub-target"
+    state: "link"
+    src: "/opt/node-v{{ nodejs_version_legacy }}-linux-x64"
+
+- name: "delete nodejs links"
+  with_items: "{{ devenv_checkouts }}"
+  when: "item.nodejs_version | default ('') != 'legacy'"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/{{ item.name }}/.nodejs-stub-target"
+    state: "absent"
+
 - name: "run build steps"
   tags: "build"
   with_items: "{{ devenv_checkouts }}"

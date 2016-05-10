@@ -18,6 +18,15 @@
     - "nodejs-install"
     - "nodejs-packages-install"
 
+    - role: "nodejs-install"
+      nodejs_version: "{{ nodejs_version_legacy }}"
+
+    - role: "nodejs-packages-install"
+      nodejs_version: "{{ nodejs_version_legacy }}"
+      nodejs_packages: "{{ nodejs_packages_legacy }}"
+
+    - "nodejs-stubs"
+
     - "install-mongodb"
     - "install-tools"
 

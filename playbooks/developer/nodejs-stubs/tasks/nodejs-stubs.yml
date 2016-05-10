@@ -1,0 +1,98 @@
+---
+
+- name: "install nodejs-stub"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "/usr/local/bin/nodejs-stub"
+    src: "nodejs-stub"
+
+    mode: "0755"
+
+- name: "create stubs for nodejs bins"
+  register: "nodejs_stubs_result"
+  changed_when: "nodejs_stubs_result.stdout != 'UNCHANGED'"
+  become: "yes"
+  args:
+
+    executable: "/bin/bash"
+    chdir: "/opt/node-v{{ nodejs_version }}-linux-x64/bin"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    changed="";
+
+    while read filename; do
+
+      if ! test -x "$filename"; then
+        continue;
+      fi;
+
+      link="/usr/local/bin/$filename"
+      target="nodejs-stub"
+
+      if test -h "$link" -a "$(readlink "$link")" = "$target"; then
+        continue;
+      fi;
+
+      changed="yes";
+
+      ln --no-dereference --force --symbolic "$target" "$link";
+
+    done < <(ls);
+
+    if ! test "$changed"; then
+      echo "UNCHANGED";
+    fi;
+
+- name: "create stubs for nodejs legacy bins"
+  register: "nodejs_legacy_stubs_result"
+  changed_when: "nodejs_legacy_stubs_result.stdout != 'UNCHANGED'"
+  become: "yes"
+  args:
+
+    executable: "/bin/bash"
+    chdir: "/opt/node-v{{ nodejs_version_legacy }}-linux-x64/bin"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    changed="";
+
+    while read filename; do
+
+      if ! test -x "$filename"; then
+        continue;
+      fi;
+
+      link="/usr/local/bin/$filename"
+      target="nodejs-stub"
+
+      if test -h "$link" -a "$(readlink "$link")" = "$target"; then
+        continue;
+      fi;
+
+      changed="yes";
+
+      ln --no-dereference --force --symbolic "$target" "$link";
+
+    done < <(ls);
+
+    if ! test "$changed"; then
+      echo "UNCHANGED";
+    fi;
+
+- name: "create nodejs default link"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/opt/node-default"
+    state: "link"
+    src: "node-v{{ nodejs_version }}-linux-x64"
+
+# ex: et ts=2 filetype=yaml

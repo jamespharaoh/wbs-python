@@ -373,15 +373,27 @@ def update_config ():
 
 	if os.path.isfile ("inventory"):
 
+		write_message ([
+			"Removing legacy inventory",
+		])
+
 		os.unlink (
 			"inventory")
 
 	if not os.path.isdir ("work"):
 
+		write_message ([
+			"Creating work directory",
+		])
+
 		os.mkdir (
 			"work")
 
 	if not os.path.isdir ("work/inventory"):
+
+		write_message ([
+			"Creating work/inventory directory",
+		])
 
 		os.mkdir (
 			"work/inventory")
@@ -391,6 +403,10 @@ def update_config ():
 		if not os.path.islink (
 			"work/inventory/script"):
 
+			write_message ([
+				"Creating work/inventory/script link",
+			])
+
 			os.symlink (
 				"../../misc/ansible-inventory-script",
 				"work/inventory/script")
@@ -399,6 +415,10 @@ def update_config ():
 
 		if os.path.exists (
 			"work/inventory/script"):
+
+			write_message ([
+				"Removing work/inventory/script link",
+			])
 
 			os.unlink (
 				"work/inventory/script")
@@ -412,9 +432,17 @@ def update_config ():
 
 	if not os.path.isdir ("work/retry"):
 
+		write_message ([
+			"Creating work/retry directory",
+		])
+
 		os.mkdir ("work/retry")
 
 	if not os.path.isfile ("work/amazon-credentials"):
+
+		write_message ([
+			"Creating work/amazon-credentials",
+		])
 
 		with open ("work/amazon-credentials", "w") as file_handle:
 
@@ -434,6 +462,8 @@ def update_config ():
 			"misc/amazon-auth",
 			"auto",
 		])
+
+	auto_newline ()
 
 	run_playbook ([
 		"playbooks/devops.yml",

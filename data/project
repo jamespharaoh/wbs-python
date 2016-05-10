@@ -33,9 +33,9 @@ etcd:
     wistla-devops:
 
       etcd_servers:
-        - "wistla-ops-admin-a"
-        - "wistla-ops-admin-b"
-        - "wistla-ops-admin-c"
+        - "a.admin.ops.wistla.com"
+        - "b.admin.ops.wistla.com"
+        - "c.admin.ops.wistla.com"
 
       etcd_secure: "yes"
 
