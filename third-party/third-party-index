@@ -124,6 +124,12 @@ pyasn1:
   branch: "master"
   auto: "python"
 
+pyopenssl:
+
+  url: "git@github.com:pyca/pyopenssl.git"
+  branch: "master"
+  auto: "python"
+
 python-gfm:
 
   url: "git@github.com:google/py-gfm.git"
