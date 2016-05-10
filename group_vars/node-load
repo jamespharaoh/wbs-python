@@ -3,6 +3,7 @@
 my_system_packages:
 
   - name: "nginx"
+    state: "present"
 
 network_route_localnet:
 

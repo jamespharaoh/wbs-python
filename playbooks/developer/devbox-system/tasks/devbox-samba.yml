@@ -1,22 +1,26 @@
 ---
 
 - name: "create samba config"
-  action:
-    module: "template"
-    src: "devbox-samba-config"
-    dest: "/etc/samba/smb.conf"
-  sudo: "yes"
-  sudo_user: "root"
   notify: "restart samba"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/samba/smb.conf"
+    src: "devbox-samba-config"
 
 - name: "set samba password"
-  action: shell
-    set -e;
-    printf "vagrant\nvagrant\n" | smbpasswd -a {{ vagrant_user }} -s;
-    touch /etc/samba/vagrant-password-flag;
   args:
+
     creates: "/etc/samba/vagrant-password-flag"
-  sudo: "yes"
-  sudo_user: "root"
+
+  become: "yes"
+  action: shell
+
+    set -e;
+
+    printf "vagrant\nvagrant\n" | smbpasswd -a {{ vagrant_user }} -s;
+
+    touch /etc/samba/vagrant-password-flag;
 
 # ex: et ts=2 filetype=yaml

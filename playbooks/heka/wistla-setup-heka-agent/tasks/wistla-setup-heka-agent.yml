@@ -2,7 +2,7 @@
 
 - name: "create wistla heka agent directories"
   with_items: "{{ wistla_heka_agent_directories }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -16,7 +16,7 @@
 - name: "create wistla heka agent templates"
   with_items: "{{ wistla_heka_agent_templates }}"
   notify: "set heka.needs_restart to 'yes'"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

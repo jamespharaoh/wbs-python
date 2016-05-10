@@ -1,0 +1,25 @@
+---
+
+- name: "create firewall rules"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/network/firewall-rules"
+    src: "cluster-admin-firewall-rules"
+    mode: "0755"
+
+- name: "reload firewall rules"
+  become: "yes"
+  command: "/etc/network/firewall-rules"
+
+- name: "run firewall rules on if-up"
+  become: "yes"
+  action:
+
+    module: "file"
+    state: "link"
+    path: "/etc/network/if-up.d/firewall-rules"
+    src: "/etc/network/firewall-rules"
+
+# ex: et ts=2 filetype=yaml

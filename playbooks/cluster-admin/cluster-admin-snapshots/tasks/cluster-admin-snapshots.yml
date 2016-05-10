@@ -1,0 +1,36 @@
+---
+
+- name: "install snapshots tool"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "/usr/local/bin/wistla-snapshots-tool"
+    src: "wistla-snapshots-tool"
+    mode: "0755"
+
+- name: "configure snapshots"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/wistla-snapshots-config"
+    src: "cluster-admin-snapshots-config"
+
+- name: "configure snapshots cron"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/cron.d/wistla-snapshots"
+    src: "cluster-admin-snapshots"
+
+- name: "reload cron"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "cron"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

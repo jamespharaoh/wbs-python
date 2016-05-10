@@ -1,9 +1,0 @@
----
-
-- include: "install-iojs.yml"
-  tags:
-
-    - "nodejs"
-    - "install-iojs"
-
-# ex: et ts=2 filetype=yaml

@@ -1,22 +1,23 @@
 ---
 
 - name: "restart postfix"
+  become: "yes"
   action:
+
     module: "service"
     name: "postfix"
     state: "restarted"
-  sudo: "yes"
 
 - name: "rehash sasl passwords"
+  become: "yes"
   shell: "postmap hash:/etc/postfix/sasl_passwd"
-  sudo: "yes"
 
 - name: "rehash relayhost map"
+  become: "yes"
   shell: "postmap hash:/etc/postfix/relayhost_map"
-  sudo: "yes"
 
 - name: "rehash aliases"
+  become: "yes"
   shell: "postalias /etc/aliases"
-  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml

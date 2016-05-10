@@ -1,5 +1,11 @@
 ---
 
+- include: "fixtures-postgresql.yml"
+  tags:
+
+    - "fixtures"
+    - "fixtures-postgresql"
+
 - include: "fixtures-rabbit.yml"
   tags:
 

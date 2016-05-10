@@ -17,12 +17,14 @@ node_type_indices:
   browser: 3
   load: 4
   web: 5
+  api2: 6
 
   # data_network: 16
   # data_instance: 17
   mongo: 18
   rabbit: 19
   postgresql: 20
+  kafka: 21
 
 cluster_zone_indices:
 
@@ -70,20 +72,28 @@ global_system_packages:
     state: "absent"
 
   - name: "btrfs-tools"
+    state: "present"
 
   - name: "curl"
+    state: "present"
 
   - name: "git"
+    state: "present"
 
   - name: "ngrep"
+    state: "present"
 
   - name: "super"
+    state: "present"
 
   - name: "telnet"
+    state: "present"
 
   - name: "wget"
+    state: "present"
 
   - name: "whois"
+    state: "present"
 
 mongodb_version: "3.0.3"
 
@@ -217,6 +227,11 @@ zone_colours:
   c: "105"
 
 ubuntu_mirror: "http:/"
+
+ubuntu_system_packages: "{{ []
+  | union (global_system_packages)
+  | union (my_system_packages)
+}}"
 
 kernel:
 

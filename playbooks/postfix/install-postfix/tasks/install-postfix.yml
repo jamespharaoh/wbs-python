@@ -3,47 +3,54 @@
 - include_vars: "{{ HOME }}/security/amazon/{{ supercluster_name }}.yml"
 
 - name: "install postfix"
-  action:
-    module: "apt"
-    name: "{{ item }}"
-  sudo: "yes"
   with_items:
+
     - "postfix"
 
-- name: "create postfix main config"
+  become: "yes"
   action:
-    module: "template"
-    src: "install-postfix-main"
-    dest: "/etc/postfix/main.cf"
-  sudo: "yes"
+
+    module: "apt"
+    name: "{{ item }}"
+
+- name: "create postfix main config"
   notify: "restart postfix"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/postfix/main.cf"
+    src: "install-postfix-main"
 
 - name: "create postfix sasl passwords"
-  action:
-    module: "template"
-    src: "install-postfix-sasl-passwd"
-    dest: "/etc/postfix/sasl_passwd"
-    mode: "0600"
-  sudo: "yes"
   notify: "rehash sasl passwords"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/postfix/sasl_passwd"
+    src: "install-postfix-sasl-passwd"
+    mode: "0600"
 
 - name: "create postfix relayhost map"
-  action:
-    module: "template"
-    src: "install-postfix-relayhost-map"
-    dest: "/etc/postfix/relayhost_map"
-    mode: "0644"
-  sudo: "yes"
+  become: "yes"
   notify: "rehash relayhost map"
+  action:
+
+    module: "template"
+    dest: "/etc/postfix/relayhost_map"
+    src: "install-postfix-relayhost-map"
+    mode: "0644"
 
 - name: "create postfix aliases"
-  action:
-    module: "template"
-    src: "install-postfix-aliases"
-    dest: "/etc/aliases"
-    mode: "0644"
-  sudo: "yes"
+  become: "yes"
   notify: "rehash aliases"
+  action:
+
+    module: "template"
+    dest: "/etc/aliases"
+    src: "install-postfix-aliases"
+    mode: "0644"
 
 - meta: "flush_handlers"
 

@@ -11,6 +11,7 @@
 
     - "lxc-create"
 
+    - "setup-apt"
     - "setup-system"
     - "install-system-packages"
     - "setup-common-users"
@@ -30,6 +31,7 @@
 
     - "lxc-clone"
 
+    - "setup-apt"
     - "setup-system"
     - "install-system-packages"
     - "setup-common-users"
@@ -44,9 +46,27 @@
   roles:
 
     - "node-api"
-    - "nodejs-install"
-    - "nodejs-packages-install"
+    - "nodejs"
     - "deploy-nodejs-node"
+
+- hosts: "node-api2-template"
+  roles:
+
+    - "node-api2"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+- hosts: "node-browser-template"
+  roles:
+
+    - "node-browser"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+- hosts: "node-kafka-template"
+  roles:
+
+    - "node-kafka"
 
 - hosts: "node-load-template"
   roles:
@@ -59,25 +79,21 @@
     - "node-mongo"
     - "install-mongodb"
 
-- hosts: "node-web-template"
+- hosts: "node-postgresql-template"
   roles:
 
-    - "node-web"
-    - "nodejs-install"
-    - "nodejs-packages-install"
-    - "deploy-nodejs-node"
+    - "node-postgresql"
 
 - hosts: "node-rabbit-template"
   roles:
 
     - "node-rabbit"
 
-- hosts: "node-browser-template"
+- hosts: "node-web-template"
   roles:
 
-    - "node-browser"
-    - "nodejs-install"
-    - "nodejs-packages-install"
+    - "node-web"
+    - "nodejs"
     - "deploy-nodejs-node"
 
 # ex: et ts=2 filetype=yaml

@@ -45,6 +45,36 @@ lxc_memory_hard: "{{ node_memory [node_type] | int * 1.5 }}"
 ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
 ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
 
+ubuntu_sources_default:
+
+  - url: "{{ ubuntu_main_url }}"
+    source: "trusty"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ ubuntu_main_url }}"
+    source: "trusty-updates"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ ubuntu_security_url }}"
+    source: "trusty-security"
+    repositories:
+
+      - "main"
+      - "universe"
+
+ubuntu_sources_extra: []
+
+ubuntu_sources: "{{ []
+  | union (ubuntu_sources_default)
+  | union (ubuntu_sources_extra)
+}}"
+
 python_pip_packages_url: "{{ dev_python_pip_packages_url }}"
 python_pip_trusted_host: "{{ dev_python_pip_trusted_host }}"
 

@@ -1,0 +1,75 @@
+---
+
+- name: "create nginx directories"
+  with_items: "{{ nginx_config_directories }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "cluster app nginx config"
+  with_items:
+
+    - target: "{{ nginx_config }}/dev-robots.txt"
+      template: "cluster-app-dev-robots-txt"
+
+    - target: "{{ nginx_config }}/nginx.conf"
+      template: "cluster-app-nginx-config"
+
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+
+- name: "write nginx certificates"
+  with_items: "{{ cluster.app_certificates | default ([]) }}"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.cert"
+    src: "cluster-app-ssl-bundle"
+
+- name: "write nginx private keys"
+  with_items: "{{ cluster.app_certificates | default ([]) }}"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "{{ nginx_config }}/ssl/{{ item }}.key"
+
+    content: "{{ lookup ('etcd', [
+      '/certificate/',
+      supercluster_name,
+      '-ssl/subjects/',
+      item,
+      '/current/key',
+    ] | join ('')) + '\n' }}"
+
+    mode: "0600"
+
+- name: "write nginx htpasswd"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "{{ nginx_config }}/htpasswd"
+    src: "{{ HOME }}/security/htpasswd"
+
+    group: "www-data"
+    mode: "0640"
+
+- name: "set nginx.state to 'enabled'"
+  when: "nginx_state == 'installed'"
+  update_resource:
+
+    nginx.state: "enabled"
+
+# ex: et ts=2 filetype=yaml

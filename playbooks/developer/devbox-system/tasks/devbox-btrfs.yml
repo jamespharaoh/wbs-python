@@ -1,36 +1,40 @@
 ---
 
 - name: "create btrfs disk"
-  action: shell
-    truncate --size 32GiB /btrfs-image
   args:
+
     creates: "/btrfs-image"
-  sudo: "yes"
-  sudo_user: "root"
+
+  become: "yes"
+  command: "truncate --size 32GiB /btrfs-image"
 
 - name: "create btrfs file system"
-  action: shell
-    mkfs.btrfs /btrfs-image
-    && touch /etc/btrfs-flag
   args:
+
+    executable: "/bin/bash"
     creates: "/etc/btrfs-flag"
-  sudo: "yes"
-  sudo_user: "root"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    mkfs.btrfs /btrfs-image;
+
+    touch /etc/btrfs-flag;
 
 - name: "create fstab"
+  become: "yes"
   action:
+
     module: "template"
-    src: "devbox-fstab"
     dest: "/etc/fstab"
-  sudo: "yes"
-  sudo_user: "root"
+    src: "devbox-fstab"
 
 - name: "mount all filesystems"
-  action: shell
-    mount -a
-  sudo: "yes"
-  sudo_user: "root"
   register: "mount_result"
   changed_when: "mount_result.stdout != ''"
+  become: "yes"
+  command: "mount -a"
 
 # ex: et ts=2 filetype=yaml

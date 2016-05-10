@@ -1,7 +1,7 @@
 ---
 
 - name: "create deployment directory"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -170,7 +170,7 @@
 
 - name: "create config files"
   with_items: "{{ cluster_deployment_config_templates }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -219,7 +219,7 @@
     src: "{{ item.1.template }}"
 
 - name: "create deployment bridge network interface"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -229,7 +229,7 @@
 - name: "start deployment network bridge"
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
@@ -246,7 +246,7 @@
     ifup {{ cluster_deployment.bridge_name }};
 
 - name: "create logrotate config"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

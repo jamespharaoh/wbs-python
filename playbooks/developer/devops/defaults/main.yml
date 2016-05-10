@@ -15,7 +15,9 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
+      - "api2"
       - "browser"
+      - "kafka"
       - "load"
       - "mongo"
       - "postgresql"
@@ -27,9 +29,12 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
+      - "api2"
       - "browser"
+      - "kafka"
       - "load"
       - "mongo"
+      - "postgresql"
       - "rabbit"
       - "web"
 
@@ -37,7 +42,9 @@ devops_inventory_deployment_modes:
 
     node_types:
 
+      - "kafka"
       - "mongo"
+      - "postgresql"
       - "rabbit"
 
   cluster-alias:
@@ -45,6 +52,7 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
+      - "api2"
       - "browser"
       - "load"
       - "web"
@@ -54,9 +62,12 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
+      - "api2"
       - "browser"
+      - "kafka"
       - "load"
       - "mongo"
+      - "postgresql"
       - "rabbit"
       - "web"
 

@@ -26,6 +26,8 @@
 
     - "python"
 
+    - "cluster-app-network"
+
     - "install-mongodb"
     - "install-tools"
 
@@ -37,7 +39,7 @@
     - "nginx-control"
 
     - "cluster-app-lxc"
-    - "cluster-app"
+    - "cluster-app-cron"
 
     - "cluster-activate"
 

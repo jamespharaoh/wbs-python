@@ -1,0 +1,51 @@
+---
+
+- name: "create dummy network interface"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/network/interfaces.d/dummy0.cfg"
+    src: "cluster-app-interface-dummy"
+
+- name: "start network dummy"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    if ifquery --state dummy0 >/dev/null; then
+      echo "UNCHANGED";
+      exit;
+    fi
+
+    ifup dummy0;
+
+- name: "create firewall rules"
+  notify: "reload firewall rules"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/network/firewall-rules"
+    src: "cluster-app-firewall-rules"
+    mode: "0755"
+
+- name: "run firewall rules on if-up"
+  become: "yes"
+  action:
+
+    module: "file"
+    state: "link"
+    path: "/etc/network/if-up.d/firewall-rules"
+    src: "/etc/network/firewall-rules"
+
+- meta: "flush_handlers"
+
+# ex: et ts=2 filetype=yaml

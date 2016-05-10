@@ -1,33 +1,36 @@
 ---
 
 - name: "create firewall rules"
+  become: "yes"
+  notify: "reload firewall rules"
   action:
+
     module: "template"
     src: "devbox-firewall-rules"
     dest: "/etc/network/firewall-rules"
     mode: "0755"
-  sudo: "yes"
-  sudo_user: "root"
-  notify: "reload firewall rules"
 
 - name: "activate firewall rules automatically"
+  become: "yes"
   action:
+
     module: "file"
     path: "/etc/network/if-up.d/firewall-rules"
     state: "link"
     src: "../firewall-rules"
-  sudo: "yes"
-  sudo_user: "root"
 
 - name: "create dummy network interface"
+  become: "yes"
   action:
+
     module: "template"
-    src: "devbox-interface-dummy"
     dest: "/etc/network/interfaces.d/dummy0.cfg"
-  sudo: "yes"
-  sudo_user: "root"
+    src: "devbox-interface-dummy"
 
 - name: "start network dummy"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+  become: "yes"
   shell:
 
     set -e
@@ -38,10 +41,5 @@
     fi
 
     ifup dummy0;
-
-  sudo: "yes"
-  sudo_user: "root"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
 
 # ex: et ts=2 filetype=yaml

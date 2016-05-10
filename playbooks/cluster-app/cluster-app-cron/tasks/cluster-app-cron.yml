@@ -1,0 +1,20 @@
+---
+
+- name: "install wistla cron"
+  notify: "restart cron"
+  become: "yes"
+  action:
+
+    module: "template"
+    src: "cluster-app-wistla-cron"
+    dest: "/etc/cron.d/wistla-cron"
+
+- name: "reload cron"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "cron"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

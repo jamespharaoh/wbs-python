@@ -27,7 +27,7 @@
   command: "halt --poweroff"
 
 - name: "setup sudo"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -35,7 +35,7 @@
     src: "devbox-sudoers-ssh-agent"
 
 - name: "install motd"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"
@@ -51,7 +51,7 @@
     - "98-cloudguest"
     - "98-fsck-at-reboot"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"

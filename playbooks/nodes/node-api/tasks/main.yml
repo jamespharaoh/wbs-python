@@ -1,19 +1,21 @@
 ---
 
 - name: "install firewall rules"
+  become: "yes"
   action:
+
     module: "template"
-    src: "node-api-firewall-rules"
     dest: "/etc/network/firewall-rules"
+    src: "node-api-firewall-rules"
     mode: "0755"
-  sudo: "yes"
 
 - name: "run firewall rules automatically"
+  become: "yes"
   action:
+
     module: "file"
     path: "/etc/network/if-up.d/firewall-rules"
     state: "link"
     src: "../firewall-rules"
-  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml

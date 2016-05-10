@@ -3,8 +3,10 @@
 my_system_packages:
 
   - name: "iptables"
+    state: "present"
 
   - name: "npm"
+    state: "present"
 
 nodejs_packages:
 

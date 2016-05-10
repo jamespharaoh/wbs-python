@@ -4,9 +4,12 @@ devenv_config_directories:
 
   - "config"
   - "config/api"
+  - "config/api2"
   - "config/browser"
+  - "config/kafka"
   - "config/load"
   - "config/mongo"
+  - "config/postgresql"
   - "config/rabbit"
   - "config/web"
 

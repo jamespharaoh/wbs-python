@@ -1,0 +1,41 @@
+---
+
+- name: "create postgresql data"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-data"
+
+  shell: "{{ [
+    'sleep 1',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo',
+      '-u postgres',
+      '/usr/lib/postgresql/9.5/bin/initdb',
+      '--pgdata',
+      '/var/lib/postgresql/9.5/main',
+    ] | join (' '),
+    'sleep 1',
+    'sudo service postgresql start',
+    'touch ' + deployment_home + '/shared/flags/postgresql-data',
+  ] | join (' && ') }}"
+
+- name: "create postgresql user"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user"
+
+  shell: "{{ [
+    'sleep 5',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'ubuntu',
+      '--superuser',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-user',
+  ] | join (' && ') }}"
+
+# ex: et ts=2 filetype=yaml

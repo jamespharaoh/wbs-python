@@ -21,7 +21,7 @@
   tasks:
 
     - name: "remove shared directory"
-      sudo: "yes"
+      become: "yes"
       shell:
 
         rm -rf {{ deployment_home }}/shared/*;

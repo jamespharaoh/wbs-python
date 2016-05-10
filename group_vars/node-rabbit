@@ -3,6 +3,7 @@
 my_system_packages:
 
   - name: "rabbitmq-server"
+    state: "present"
 
 data_dirs:
 

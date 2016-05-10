@@ -1,12 +1,19 @@
 ---
 
 - name: "create exports"
+  become: "yes"
   action:
+
     module: "template"
     src: "devbox-nfs-exports"
     dest: "/etc/exports"
-  sudo: "yes"
-  sudo_user: "root"
-  notify: "reload nfs server"
+
+- name: "reload nfs server"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "nfs-kernel-server"
+    state: "reloaded"
 
 # ex: et ts=2 filetype=yaml

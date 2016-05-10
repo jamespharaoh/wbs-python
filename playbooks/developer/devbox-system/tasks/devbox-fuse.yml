@@ -1,20 +1,20 @@
 ---
 
 - name: "create fuse config"
+  become: "yes"
   action:
+
     module: "template"
-    src: "devbox-fuse-config"
     dest: "/etc/fuse.conf"
-  sudo: "yes"
-  sudo_user: "root"
+    src: "devbox-fuse-config"
 
 - name: "add {{ vagrant_user }} to fuse group"
+  become: "yes"
   action:
+
     module: "user"
     name: "{{ vagrant_user }}"
     groups: "fuse"
     append: "yes"
-  sudo: "yes"
-  sudo_user: "root"
 
 # ex: et ts=2 filetype=yaml

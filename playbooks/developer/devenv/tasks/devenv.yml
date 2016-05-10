@@ -124,7 +124,7 @@
 
 - name: "create config files"
   with_items: "{{ devenv_config_templates }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -194,7 +194,7 @@
 
 - name: "create bridge network interface"
   register: "devenv_bridge_create_result"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -205,7 +205,7 @@
   when: "devenv_bridge_create_result | changed"
   register: "devenv_bridge_stop_result"
   changed_when: "devenv_bridge_stop_result.stdout != 'UNCHANGED'"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
@@ -224,7 +224,7 @@
 - name: "start network bridge"
   register: "devenv_bridge_start_result"
   changed_when: "devenv_bridge_start_result.stdout != 'UNCHANGED'"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
