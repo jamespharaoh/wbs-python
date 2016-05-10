@@ -79,9 +79,14 @@ class ThirdPartySetup (object):
 		self.third_party_index = (
 			read_index ())
 
-		self.git_repo = (
-			git.Repo (
-				"."))
+		if os.path.exists (".git"):
+
+			self.git_repo = (
+				git.Repo ("."))
+
+		else:
+
+			self.git_repo = None
 
 	def fetch (self):
 
@@ -265,6 +270,9 @@ class ThirdPartySetup (object):
 
 	def stash_changes (self):
 
+		if not self.git_repo:
+			return
+
 		if self.stashed:
 			return
 
@@ -330,6 +338,9 @@ class ThirdPartySetup (object):
 			raise KeyboardInterrupt ()
 
 	def unstash_changes (self):
+
+		if not self.git_repo:
+			return
 
 		if not self.stashed:
 			return
