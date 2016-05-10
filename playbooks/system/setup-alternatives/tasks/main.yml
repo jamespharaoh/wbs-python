@@ -1,12 +1,13 @@
 ---
 
 - name: "setup alternatives"
+  with_items: "alternatives"
+  become: "yes"
   action:
+
     module: "alternatives"
     name: "{{ item.name }}"
     link: "{{ item.link }}"
     path: "{{ item.target }}"
-  sudo: "yes"
-  with_items: "alternatives"
 
 # ex: et ts=2 filetype=yaml

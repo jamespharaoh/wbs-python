@@ -2,7 +2,7 @@
 
 - name: "create hosts file"
   notify: "restart dnsmasq"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -14,7 +14,7 @@
 
     - "dnsmasq"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "apt"
@@ -22,7 +22,7 @@
 
 - name: "create dnsmasq config"
   notify: "restart dnsmasq"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -31,7 +31,7 @@
 
 - name: "create dnsmasq default"
   notify: "restart dnsmasq"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

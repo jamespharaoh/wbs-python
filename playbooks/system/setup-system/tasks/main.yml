@@ -1,47 +1,9 @@
 ---
 
-- name: "install system packages"
-  action:
-    module: "apt"
-    name: "{{ item }}"
-  sudo: "yes"
-  with_items:
-    - "procps"
-    - "sysfsutils"
+- include: "setup-system.yml"
+  tags:
 
-- name: "disable service startup"
-  action:
-    module: "copy"
-    dest: "/usr/sbin/policy-rc.d"
-    content: "{{ '#!/bin/sh\n' + 'exit 101\n' }}"
-    mode: "0755"
-  sudo: "yes"
-  when: "is_template | default ('no') == 'yes'"
-
-- name: "enable service startup"
-  action:
-    module: "file"
-    path: "/usr/sbin/policy-rc.d"
-    state: "absent"
-  sudo: "yes"
-  when: "is_template | default ('no') == 'no'"
-
-- name: "install sysctl config"
-  action:
-    module: "template"
-    src: "sysctl-config"
-    dest: "/etc/sysctl.conf"
-  sudo: "yes"
-  notify: "reload sysctl"
-
-- name: "install sysfs config"
-  action:
-    module: "template"
-    src: "sysfs-config"
-    dest: "/etc/sysfs.conf"
-  sudo: "yes"
-  notify: "reload sysfs"
-
-- meta: "flush_handlers"
+    - "system"
+    - "setup-system"
 
 # ex: et ts=2 filetype=yaml

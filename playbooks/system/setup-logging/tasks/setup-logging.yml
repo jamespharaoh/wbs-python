@@ -6,7 +6,7 @@
     - "reload upstart config"
     - "restart vmstat"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -14,7 +14,7 @@
     src: "logging-vmstat-upstart"
 
 - name: "install vmstat logrotate"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

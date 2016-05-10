@@ -1,11 +1,11 @@
 ---
 
 - name: "reload upstart config"
-  sudo: "yes"
-  shell: "initctl reload-configuration"
+  become: "yes"
+  command: "initctl reload-configuration"
 
 - name: "restart vmstat"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "service"

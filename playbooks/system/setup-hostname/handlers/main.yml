@@ -1,7 +1,0 @@
----
-
-- name: "set hostname"
-  shell: "hostname {{ inventory_hostname }}"
-  sudo: "yes"
-
-# ex: et ts=2 filetype=yaml
