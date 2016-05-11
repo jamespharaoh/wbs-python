@@ -2,8 +2,10 @@
 
 - name: "add authorized keys"
   action:
+
     module: "authorized_key"
     user: "ubuntu"
+
     key: "{{ [
       ssh_user_keys [amazon_key_name].type,
       ssh_user_keys [amazon_key_name].data | join (''),
@@ -12,24 +14,27 @@
 
 - name: "remove authorized keys"
   action:
+
     module: "authorized_key"
     user: "ubuntu"
     state: "absent"
+
     key: "{{ [
       ssh_user_keys [amazon_key_name + '-old'].type,
       ssh_user_keys [amazon_key_name + '-old'].data | join (''),
     ] | join (' ') }}"
 
 - name: "create ssh known hosts"
+  become: "yes"
   action:
+
     module: "template"
-    src: "cluster-ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
+    src: "cluster-ssh-known-hosts"
+
     owner: "root"
     group: "root"
     mode: "0644"
-  sudo: "yes"
-  sudo_user: "root"
 
 # TODO use exclusive option in ansible 1.9 when available
 

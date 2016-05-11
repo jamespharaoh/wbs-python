@@ -1,31 +1,35 @@
 ---
 
 - name: "create resolv.conf"
+  become: "yes"
   action:
+
     module: "template"
-    src: "template-resolv-conf"
     dest: "/etc/resolv.conf"
-  sudo: "yes"
+    src: "template-resolv-conf"
 
 - name: "create network interfaces"
+  become: "yes"
   action:
+
     module: "template"
-    src: "template-network-interfaces"
     dest: "/etc/network/interfaces"
-  sudo: "yes"
+    src: "template-network-interfaces"
 
 - name: "install ssh known hosts"
+  become: "yes"
   action:
+
     module: "template"
-    src: "template-ssh-known-hosts"
     dest: "/etc/ssh/ssh_known_hosts"
-  sudo: "yes"
+    src: "template-ssh-known-hosts"
 
 - name: "create sudoers"
+  become: "yes"
   action:
+
     module: "template"
-    src: "template-sudoers"
     dest: "/etc/sudoers"
-  sudo: "yes"
+    src: "template-sudoers"
 
 # ex: et ts=2 filetype=yaml

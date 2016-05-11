@@ -2,7 +2,7 @@
 
 - name: "create fileystems"
   with_items: "{{ cluster_volumes }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "filesystem"
@@ -11,7 +11,7 @@
 
 - name: "mount filesystems"
   with_items: "{{ cluster_volumes }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "mount"
@@ -23,7 +23,7 @@
 - name: "record system volume id"
   register: "system_volume_id_result"
   delegate_to: "wistla-{{ cluster_name }}-admin-a"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
@@ -52,7 +52,7 @@
   when: "instance_type in [ 'app', 'data', 'jenkins' ]"
   register: "data_volume_id_result"
   delegate_to: "wistla-{{ cluster_name }}-admin-a"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"

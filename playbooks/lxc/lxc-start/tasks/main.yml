@@ -1,39 +1,9 @@
 ---
 
-- name: "start lxc container"
-  shell:
+- include: "lxc-start.yml"
+  tags:
 
-    state=$(
-      lxc-info
-        --name {{ inventory_hostname }}
-        --state
-        --no-humanize
-      | head --lines 1
-    );
-
-    if test "$state" = "RUNNING"; then
-      echo "UNCHANGED";
-      return;
-    fi;
-
-    lxc-start
-      --name {{ inventory_hostname }}
-      --daemon;
-
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
-  register: start_result
-  changed_when: start_result.stdout != 'UNCHANGED'
-
-- name: "create container shortcut"
-  delegate_to: "localhost"
-  sudo: "yes"
-  action:
-
-    module: "template"
-    src: "lxc-shortcut"
-    dest: "/usr/local/bin/{{ inventory_hostname }}"
-    mode: "0755"
+    - "lxc"
+    - "lxc-start"
 
 # ex: et ts=2 filetype=yaml

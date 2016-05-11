@@ -3,8 +3,10 @@
 - hosts: "cluster-network"
   roles:
 
-    - "cluster-network"
+    - "cluster-network-setup"
+    - "cluster-network-vpc"
+    - "cluster-network-dns"
+
     - "cluster-assets"
-    - "cluster-dns"
 
 # ex: et ts=2 filetype=yaml

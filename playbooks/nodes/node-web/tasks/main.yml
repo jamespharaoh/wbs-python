@@ -1,19 +1,9 @@
 ---
 
-- name: "install firewall rules"
-  action:
-    module: "template"
-    src: "node-web-firewall-rules"
-    dest: "/etc/network/firewall-rules"
-    mode: "0755"
-  sudo: "yes"
+- include: "node-web.yml"
+  tags:
 
-- name: "run firewall rules automatically"
-  action:
-    module: "file"
-    path: "/etc/network/if-up.d/firewall-rules"
-    state: "link"
-    src: "../firewall-rules"
-  sudo: "yes"
+    - "node"
+    - "node-web"
 
 # ex: et ts=2 filetype=yaml

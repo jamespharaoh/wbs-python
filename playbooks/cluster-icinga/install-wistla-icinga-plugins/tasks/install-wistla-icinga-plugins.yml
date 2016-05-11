@@ -1,7 +1,7 @@
 ---
 
 - name: "create wistla icinga plugins directory"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -9,8 +9,8 @@
     state: "directory"
 
 - name: "install wistla icinga plugins"
-  with_items: "wistla_icinga_plugins"
-  sudo: "yes"
+  with_items: "{{ wistla_icinga_plugins }}"
+  become: "yes"
   action:
 
     module: "copy"

@@ -2,7 +2,7 @@
 
 - name: "create jenkins service config"
   notify: "restart jenkins"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -10,14 +10,14 @@
     src: "cluster-jenkins-default"
 
 - name: "install jenkins apt key"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "apt_key"
     url: "https://jenkins-ci.org/debian/jenkins-ci.org.key"
 
 - name: "install jenkins apt repository"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "apt_repository"
@@ -29,14 +29,14 @@
 
     - "jenkins"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "apt"
     name: "{{ item }}"
 
 - name: "enable jenkins sudo"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"

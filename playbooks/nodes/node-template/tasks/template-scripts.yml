@@ -2,7 +2,6 @@
 
 - name: "deploy scripts"
   delegate_to: "localhost"
-  sudo: "yes"
   register: "deploy_scripts_output"
   changed_when: "deploy_scripts_output.stdout != ''"
   tags: "quick"
@@ -10,6 +9,7 @@
 
     executable: "/bin/bash"
 
+  become: "yes"
   shell:
 
     set -euf -o pipefail;

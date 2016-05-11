@@ -1,41 +1,9 @@
 ---
 
-- name: "stop lxc container"
-  register: stop_result
-  changed_when: stop_result.stdout != 'UNCHANGED'
-  delegate_to: "localhost"
-  sudo: "yes"
-  shell:
+- include: "lxc-stop.yml"
+  tags:
 
-    if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
-      echo "UNCHANGED";
-      return;
-    fi;
-
-    state=$(
-      lxc-info
-        --name {{ inventory_hostname }}
-        --state
-        --no-humanize
-      | head --lines 1
-    );
-
-    if test "$state" != "RUNNING"; then
-      echo "UNCHANGED";
-      return;
-    fi;
-
-    lxc-stop
-      --name {{ inventory_hostname }}
-      --timeout 10;
-
-- name: "remove container shortcut"
-  delegate_to: "localhost"
-  sudo: "yes"
-  action:
-
-    module: "file"
-    path: "/usr/local/bin/{{ inventory_hostname }}"
-    state: "absent"
+    - "lxc"
+    - "lxc-stop"
 
 # ex: et ts=2 filetype=yaml

@@ -1,51 +1,50 @@
 ---
 
-- include: "cluster-network-setup.yml"
-  tags:
-
-    - "cluster"
-    - "cluster-network"
-    - "cluster-network-setup"
-
-# ---------- vpc
-
 - include: "cluster-network-vpc.yml"
   tags:
 
     - "cluster"
+    - "cluster-network"
     - "cluster-network-vpc"
-    - "cluster-network-vpc"
 
-- include: "cluster-network-admin-subnet.yml"
+- include: "cluster-network-subnet.yml"
+  subnet_name: "admin"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-admin-subnet"
+    - "cluster-network-subnet"
+    - "cluster-network-subnet-admin"
 
-- include: "cluster-network-data-subnet.yml"
+- include: "cluster-network-subnet.yml"
   when: "cluster_name != 'ops'"
+  subnet_name: "app"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-data-subnet"
+    - "cluster-network-subnet"
+    - "cluster-network-subnet-app"
 
-- include: "cluster-network-app-subnet.yml"
+- include: "cluster-network-subnet.yml"
   when: "cluster_name != 'ops'"
+  subnet_name: "data"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-app-subnet"
+    - "cluster-network-subnet"
+    - "cluster-network-subnet-data"
 
-- include: "cluster-network-jenkins-subnet.yml"
+- include: "cluster-network-subnet.yml"
   when: "cluster_name == 'ops'"
+  subnet_name: "data"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-jenkins-subnet"
+    - "cluster-network-subnet"
+    - "cluster-network-subnet-data"
 
 - include: "cluster-network-security-groups.yml"
   tags:
@@ -54,21 +53,21 @@
     - "cluster-network"
     - "cluster-network-security-groups"
 
-# ---------- balancers
-
 - include: "cluster-network-app-balancer.yml"
   when: "cluster_name != 'ops'"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-app-balancer"
+    - "cluster-network-balancer"
+    - "cluster-network-balancer-app"
 
-- include: "cluster-network-admin-balancer.yml"
+- include: "cluster-network-balancer-admin.yml"
   tags:
 
     - "cluster"
     - "cluster-network"
-    - "cluster-network-admin-balancer"
+    - "cluster-network-balancer"
+    - "cluster-network-balancer-admin"
 
 # ex: et ts=2 filetype=yaml

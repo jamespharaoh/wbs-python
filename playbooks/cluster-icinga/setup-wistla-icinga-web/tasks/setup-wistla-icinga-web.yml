@@ -2,7 +2,7 @@
 
 - name: "create wistla icinga web configuration"
   with_items: "wistla_icinga_web_config_templates"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -14,7 +14,7 @@
 
 - name: "enable wistla icinga web modules"
   with_items: "wistla_icinga_web_enabled_modules"
-  sudo: "yes"
+  become: "yes"
   args:
 
     creates: "/etc/icingaweb2/enabledModules/{{ item }}"

@@ -1,41 +1,53 @@
 ---
 
 - name: "create bridge network interface"
+  with_items: "{{ jenkins_deployment_names }}"
+  become: "yes"
   action:
+
     module: "template"
-    src: "cluster-jenkins-interface-bridge"
     dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
-  sudo: "yes"
-  with_items: "jenkins_deployment_names"
+    src: "cluster-jenkins-interface-bridge"
 
 - name: "start network bridge"
+  with_items: "{{ jenkins_deployment_names }}"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
   shell:
 
-    set -e
+    set -euf -o pipefail;
 
     if ifquery --state {{ deployments [item].bridge_name }} >/dev/null; then
       echo "UNCHANGED";
       exit;
-    fi
+    fi;
 
     ifup {{ deployments [item].bridge_name }};
 
-  sudo: "yes"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  with_items: "jenkins_deployment_names"
-
 - name: "create dummy network interface"
+  become: "yes"
   action:
+
     module: "template"
-    src: "cluster-jenkins-interface-dummy"
     dest: "/etc/network/interfaces.d/dummy0.cfg"
-  sudo: "yes"
+    src: "cluster-jenkins-interface-dummy"
 
 - name: "start network dummy"
+  register: "ifup_result"
+  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
   shell:
 
-    set -e
+    set -euf -o pipefail;
 
     if ifquery --state dummy0 >/dev/null; then
       echo "UNCHANGED";
@@ -43,9 +55,5 @@
     fi
 
     ifup dummy0;
-
-  sudo: "yes"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
 
 # ex: et ts=2 filetype=yaml

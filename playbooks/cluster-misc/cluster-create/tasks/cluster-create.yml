@@ -1,8 +1,5 @@
 ---
 
-- debug: { var: "amazon_instance_type" }
-- debug: { var: "amazon_instance_type_running" }
-
 - when: "
     amazon_instance_state in [ 'running', 'standby' ]
     and amazon_instance_type != amazon_instance_type_running

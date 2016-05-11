@@ -6,7 +6,7 @@
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
   delegate_to: "localhost"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
@@ -36,7 +36,7 @@
   register: "deploy_output"
   changed_when: "deploy_output.stdout != ''"
   delegate_to: "localhost"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"
@@ -63,7 +63,7 @@
       - template: "node-nodejs-instance-upstart"
         target_suffix: "-instance"
 
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

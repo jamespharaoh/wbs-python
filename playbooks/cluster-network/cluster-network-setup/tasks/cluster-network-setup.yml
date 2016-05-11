@@ -1,12 +1,15 @@
 ---
 
 - name: "create work dirs"
+  with_items:
+
+    - "/home/vagrant/work"
+    - "/home/vagrant/work/{{ cluster_name }}"
+
   action:
+
     module: "file"
     path: "{{ item }}"
     state: "directory"
-  with_items:
-    - "/home/vagrant/work"
-    - "/home/vagrant/work/{{ cluster_name }}"
 
 # ex: et ts=2 filetype=yaml

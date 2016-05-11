@@ -1,24 +1,27 @@
 ---
 
 - name: "restart nginx"
+  become: "yes"
   action:
+
     module: "service"
     name: "nginx"
     state: "restarted"
-  sudo: "yes"
 
 - name: "restart dnsmasq"
+  become: "yes"
   action:
+
     module: "service"
     name: "dnsmasq"
     state: "restarted"
-  sudo: "yes"
 
 - name: "restart jenkins"
+  become: "yes"
   action:
+
     module: "service"
     name: "jenkins"
     state: "restarted"
-  sudo: "yes"
 
 # ex: et ts=2 filetype=yaml

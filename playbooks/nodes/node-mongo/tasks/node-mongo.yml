@@ -1,22 +1,14 @@
 ---
 
 - name: "create mongo.conf"
+  become: "yes"
   action:
+
     module: "template"
-    src: "mongo-conf"
     dest: "/etc/mongodb.conf"
-  sudo: "yes"
-  sudo_user: "root"
+    src: "mongo-conf"
 
 - name: "create mongodb directories"
-  action:
-    module: "file"
-    path: "{{ item.directory }}"
-    state: "directory"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
-    mode: "{{ item.mode }}"
-  sudo: "yes"
   with_items:
 
     - directory: "/var/log/mongodb"
@@ -28,5 +20,16 @@
       owner: "mongodb"
       group: "adm"
       mode: "0750"
+
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
 
 # ex: et ts=2 filetype=yaml

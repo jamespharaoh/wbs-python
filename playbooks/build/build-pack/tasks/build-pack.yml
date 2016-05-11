@@ -11,7 +11,7 @@
 
 - name: "create package"
   delegate_to: "localhost"
-  sudo: "yes"
+  become: "yes"
   args:
 
     creates: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"

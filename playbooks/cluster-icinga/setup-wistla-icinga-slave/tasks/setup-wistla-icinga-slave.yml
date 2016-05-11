@@ -20,7 +20,7 @@
 
 - name: "create wistla icinga slave directories"
   with_items: "{{ wistla_icinga_slave_directories }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"
@@ -33,7 +33,7 @@
 - name: "create wistla icinga configuration"
   with_items: "wistla_icinga_slave_config_templates"
   notify: "set icinga.needs_restart to 'yes'"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"
@@ -46,7 +46,7 @@
 - name: "create wistla security configuration"
   with_items: "wistla_icinga_security_config"
   notify: "set icinga.needs_restart to 'yes'"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "copy"

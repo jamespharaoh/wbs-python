@@ -2,7 +2,7 @@
 
 - name: "unpack build"
   delegate_to: "localhost"
-  sudo: "yes"
+  become: "yes"
   args:
 
     executable: "/bin/bash"

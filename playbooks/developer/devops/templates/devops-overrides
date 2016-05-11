@@ -31,12 +31,16 @@ developer_profile: "{{ developer_profile | default ('full') }}"
 # NB - this debug option causes other node.js options to be disabled, including
 # memory limits and garbage collection.
 
-dev_debug: "{{ dev_debug | default (debug | default ('yes')) }}"
-
-dev_apple_push_notifications_enabled: "{{ dev_apple_push_notifications_enabled | default ('yes') }}"
-dev_apple_push_notifications_name: "{{ dev_apple_push_notifications_name | default ('c.w.w.i.dev_dev_apns') }}"
-dev_apple_push_notifications_production: "{{ dev_apple_push_notifications_production | default ('no') }}"
-dev_apple_feedback_service_enabled: "{{ dev_apple_feedback_service_enabled | default ('no') }}"
+dev_debug: "{{
+  dev_debug | default (debug | default ('yes')) }}"
+dev_apple_push_notifications_enabled: "{{
+  dev_apple_push_notifications_enabled | default ('yes') }}"
+dev_apple_push_notifications_name: "{{
+  dev_apple_push_notifications_name | default ('c.w.w.i.dev_dev_apns') }}"
+dev_apple_push_notifications_production: "{{
+  dev_apple_push_notifications_production | default ('no') }}"
+dev_apple_feedback_service_enabled: "{{
+  dev_apple_feedback_service_enabled | default ('no') }}"
 
 dev_node_count:
 
@@ -119,8 +123,10 @@ github_access_token: "{{ github_access_token | default ('') }}"
 # change these to a local mirror for faster deployments.
 #
 
-dev_ubuntu_main_url: "{{ dev_ubuntu_main_url | default (ubuntu_main_url) }}"
-dev_ubuntu_security_url: "{{ dev_ubuntu_security_url | default (ubuntu_security_url) }}"
+dev_ubuntu_main_url: "{{
+  dev_ubuntu_main_url | default (ubuntu_main_url) }}"
+dev_ubuntu_security_url: "{{
+  dev_ubuntu_security_url | default (ubuntu_security_url) }}"
 
 dev_python_pip_packages_url: "{{ dev_python_pip_packages_url | default (python_pip_packages_url) | default ('https://pypi.python.org/simple') }}"
 dev_python_pip_trusted_host: "{{ dev_python_pip_trusted_host | default (python_pip_trusted_host) | default ('no') }}"

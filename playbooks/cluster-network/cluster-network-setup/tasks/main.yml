@@ -1,0 +1,10 @@
+---
+
+- include: "cluster-network-setup.yml"
+  tags:
+
+    - "cluster"
+    - "cluster-network"
+    - "cluster-network-setup"
+
+# ex: et ts=2 filetype=yaml

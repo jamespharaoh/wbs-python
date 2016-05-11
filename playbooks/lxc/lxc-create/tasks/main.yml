@@ -1,61 +1,9 @@
 ---
 
-- name: "create lxc container"
-  delegate_to: "localhost"
-  become: "yes"
-  args:
+- include: "lxc-create.yml"
+  tags:
 
-    executable: "/bin/bash"
-    creates: "/var/lib/lxc/{{ inventory_hostname }}/create-flag"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    echo $UID;
-
-    source {{ deployment_home }}/wistla-devops/misc/locking ansible;
-    exlock;
-
-    if test -d /var/lib/lxc/{{ inventory_hostname }}; then
-      set +e;
-      lxc-stop
-        --name {{ inventory_hostname }};
-      lxc-destroy
-        --name {{ inventory_hostname }};
-      rm -rf /var/lib/lxc/{{ inventory_hostname }};
-      btrfs subvolume delete /var/lib/lxc/{{ inventory_hostname }}/rootfs;
-      set -e;
-    fi;
-
-    lxc-create
-      --template ubuntu
-      --name {{ inventory_hostname }}
-      --bdev btrfs
-      --
-      --mirror {{ ubuntu_main_url }}
-      --security-mirror {{ ubuntu_security_url }}
-      --release trusty
-      --arch amd64;
-
-    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get update -qqy;
-
-    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get dist-upgrade -qqy;
-
-    chroot /var/lib/lxc/{{ inventory_hostname }}/rootfs
-    apt-get install -qqy python;
-
-    touch /var/lib/lxc/{{ inventory_hostname }}/create-flag;
-
-- name: "create lxc config"
-  action:
-    module: "template"
-    src: "lxc-config"
-    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
-  delegate_to: "localhost"
-  sudo: "yes"
-  sudo_user: "root"
+    - "lxc"
+    - "lxc-create"
 
 # ex: et ts=2 filetype=yaml

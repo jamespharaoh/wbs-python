@@ -6,7 +6,7 @@
     executable: "/bin/bash"
     creates: "{{ mongodb_flag }}"
 
-  sudo: "yes"
+  become: "yes"
   shell:
 
     set -euf -o pipefail;
@@ -27,7 +27,7 @@
 
 - name: "setup mongodb alternatives"
   with_items: "{{ mongodb_binaries }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "alternatives"
@@ -37,7 +37,7 @@
     force: "yes"
 
 - name: "install mongodb upstart"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "template"

@@ -1,0 +1,27 @@
+---
+
+- name: "destroy lxc container"
+  register: destroy_result
+  changed_when: destroy_result.stdout != 'UNCHANGED'
+  delegate_to: "localhost"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    source {{ deployment_home }}/wistla-devops/misc/locking ansible;
+    exlock;
+
+    if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
+      echo "UNCHANGED";
+      exit;
+    fi;
+
+    lxc-destroy
+      --name {{ inventory_hostname }};
+
+# ex: et ts=2 filetype=yaml

@@ -11,7 +11,7 @@
 
     - name: "stop icinga"
       tags: "stop"
-      sudo: "yes"
+      become: "yes"
       action:
 
         module: "service"
@@ -26,7 +26,7 @@
 
     - name: "kill icinga"
       tags: "kill"
-      sudo: "yes"
+      become: "yes"
       shell:
 
         killall --signal SIGKILL icinga2 || true;
@@ -39,7 +39,7 @@
 
     - name: "delete files"
       tags: "files"
-      sudo: "yes"
+      become: "yes"
       shell:
 
         rm -rf
@@ -73,7 +73,7 @@
     - name: "start icinga on one host"
       when: "inventory_hostname == icinga_database_delegate"
       tags: "start-one"
-      sudo: "yes"
+      become: "yes"
       action:
 
         module: "service"
@@ -88,7 +88,7 @@
 
     - name: "start icinga on all hosts"
       tags: "start-all"
-      sudo: "yes"
+      become: "yes"
       action:
 
         module: "service"

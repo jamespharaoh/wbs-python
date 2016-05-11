@@ -4,7 +4,7 @@
   action:
 
     module: "template"
-    src: "cluster-vpc-stack"
+    src: "cluster-network-vpc-stack"
     dest: "/home/vagrant/work/{{ cluster_name }}/vpc-stack.yaml"
 
 - name: "create vpc stack"

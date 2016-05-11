@@ -23,7 +23,7 @@
 
 - name: "create wistla icinga master directories"
   with_items: "{{ wistla_icinga_master_directories }}"
-  sudo: "yes"
+  become: "yes"
   action:
 
     module: "file"

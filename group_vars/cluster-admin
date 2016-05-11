@@ -33,6 +33,7 @@ my_system_packages:
     state: "present"
 
   - name: "libmysqlclient-dev"
+    state: "present"
 
   - name: "lxc"
     state: "present"
@@ -134,6 +135,9 @@ etcd_peer_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].peer_p
 etcd_client_ca_certificate: "{{ cluster.etcd_credentials.client_ca_certificate }}"
 etcd_client_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].client_certificate }}"
 etcd_client_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].client_private_key }}"
+
+php_install_from: "distro"
+php_version: "5"
 
 php_packages:
 

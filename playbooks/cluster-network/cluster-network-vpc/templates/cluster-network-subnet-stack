@@ -3,7 +3,7 @@
 {{ ansible_warning ['#'] }}
 
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Wistla subnet {{ subnet }}"
+Description: "Wistla subnet {{ subnet_name }}"
 
 Resources:
 
@@ -16,11 +16,11 @@ Resources:
     Properties:
       VpcId: "{{ vpc_id }}"
       Tags:
-        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet_name }}-{{ zone }}" }
         - { Key: "Cluster", Value: "{{ cluster_name }}" }
-        - { Key: "Class", Value: "{{ subnet }}" }
+        - { Key: "Class", Value: "{{ subnet_name }}" }
 
-{% if subnet == 'admin' %}
+{% if subnet_name == 'admin' %}
 
   RoutePublic{{ zone | capitalize }}:
     Type: "AWS::EC2::Route"
@@ -46,16 +46,16 @@ Resources:
       CidrBlock: "{{ [
         cluster.cluster_network,
         (cluster_zone_indices [zone] | int * 64
-          + cluster_instance_type_indices [subnet] | int) | string,
+          + cluster_instance_type_indices [subnet_name] | int) | string,
         '0',
       ] | join ('.') }}/24"
 
       VpcId: "{{ vpc_id }}"
 
       Tags:
-        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet }}-{{ zone }}" }
+        - { Key: "Name", Value: "{{ cluster_name }}-{{ subnet_name }}-{{ zone }}" }
         - { Key: "Cluster", Value: "{{ cluster_name }}" }
-        - { Key: "Class", Value: "{{ subnet }}" }
+        - { Key: "Class", Value: "{{ subnet_name }}" }
         - { Key: "Zone", Value: "{{ zone }}" }
 
 {% endfor %}

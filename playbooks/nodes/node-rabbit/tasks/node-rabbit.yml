@@ -1,0 +1,34 @@
+---
+
+- name: "disable rabbit mq sysv init scripts"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "rabbitmq-server"
+    enabled: "no"
+
+- name: "install rabbitmq upstart script"
+  become: "yes"
+  action:
+
+    module: "template"
+    src: "node-rabbit-rabbitmq-upstart"
+    dest: "/etc/init/rabbitmq.conf"
+
+- name: "link to rabbitmq erlang cookie"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/var/lib/rabbitmq/.erlang.cookie"
+    state: "link"
+
+    src: "/config/erlang-cookie"
+    force: "yes"
+
+    owner: "rabbitmq"
+    group: "root"
+    mode: "0400"
+
+# ex: et ts=2 filetype=yaml
