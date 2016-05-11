@@ -39,23 +39,6 @@ except ImportError:
 
 need_newline = True
 
-PROJECTS = [
-	"content-api",
-	"content-browser",
-	"content-common",
-	"content-iOS",
-	"content-web",
-	"wistla-admin",
-	"wistla-analytics",
-	"wistla-api",
-	"wistla-browser",
-	"wistla-devops",
-	"wistla-iOS",
-	"wistla-scripts",
-	"wistla-test-images",
-	"wistla-web",
-]
-
 NEED_PAUSE = False
 
 def main ():
@@ -154,6 +137,13 @@ def write_state ():
 def load_config ():
 
 	global CONFIG
+	global PROJECTS
+
+	PROJECTS = [
+		project ["name"]
+		for project
+		in yaml.load (file ("data/project-details"))
+	]
 
 	try:
 		CONFIG = yaml.load (file ("config/overrides.yml"))

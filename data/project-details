@@ -1,0 +1,89 @@
+---
+
+- name: "api-stub-server"
+  build_steps:
+
+    - "scripts/setup-project build"
+    - "npm install"
+
+- name: "content-browser"
+
+- name: "content-iOS"
+
+- name: "content-api"
+
+- name: "content-common"
+
+- name: "content-web"
+
+- name: "wistla-data-import"
+
+- name: "wistla-data-export"
+
+- name: "wistla-raml-api"
+
+- name: "wistla-raml-server"
+
+- name: "wistla-admin"
+
+- name: "wistla-analytics"
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-api"
+  nodejs_version: "legacy"
+  project_links:
+
+    - link: "node_modules/wistla-analytics"
+      overlay: "node_modules/.wistla-analytics"
+      target: "{{ deployment_home }}/wistla-analytics"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-api-server"
+  build_steps:
+
+    - "scripts/setup-project build"
+    - "npm install"
+
+- name: "wistla-browser"
+  nodejs_version: "legacy"
+  project_links:
+
+    - link: "node_modules/wistla-analytics"
+      overlay: "node_modules/.wistla-analytics"
+      target: "{{ deployment_home }}/wistla-analytics"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-data-process"
+  build_steps:
+
+    - "scripts/setup-project build"
+    - "npm install"
+
+- name: "wistla-devops"
+  configs:
+
+    - "config"
+    - "data/runtime"
+    - "security"
+
+- name: "wistla-iOS"
+
+- name: "wistla-scripts"
+
+- name: "wistla-web"
+  nodejs_version: "legacy"
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-test-images"
+
+# ex: et ts=2 filetype=yaml

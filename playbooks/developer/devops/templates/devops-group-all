@@ -7,13 +7,32 @@
 {{ key }}: {{ value | to_json }}
 {% endfor %}
 
-vpn_clients: {{ lookup ('file', DATA + '/vpn-clients') | from_yaml | to_json }}
-common_users: {{ lookup ('file', DATA + '/common-users') | from_yaml | to_json }}
-kernel_versions: {{ lookup ('file', DATA + '/kernel-versions') | from_yaml | to_json }}
-amazon_security_groups: {{ lookup ('file', DATA + '/security-groups') | from_yaml | to_json }}
-ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys') | from_yaml | to_json }}
-ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys') | from_yaml | to_json }}
-amazon_accounts: {{ lookup ('file', DATA + '/amazon-accounts') | from_yaml | to_json }}
+amazon_accounts: {{ lookup ('file', DATA + '/amazon-accounts')
+  | from_yaml | to_json }}
+
+amazon_security_groups: {{ lookup ('file', DATA + '/security-groups')
+  | from_yaml | to_json }}
+
+checkout_profiles: {{ lookup ('file', DATA + '/checkout-profiles')
+  | from_yaml | to_json }}
+
+common_users: {{ lookup ('file', DATA + '/common-users')
+  | from_yaml | to_json }}
+
+kernel_versions: {{ lookup ('file', DATA + '/kernel-versions')
+  | from_yaml | to_json }}
+
+project_details: {{ lookup ('file', DATA + '/project-details')
+  | from_yaml | index_by ('name') | to_json }}
+
+ssh_host_keys: {{ lookup ('file', DATA + '/ssh-host-keys')
+  | from_yaml | to_json }}
+
+ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys')
+  | from_yaml | to_json }}
+
+vpn_clients: {{ lookup ('file', DATA + '/vpn-clients')
+  | from_yaml | to_json }}
 
 {% macro do_secrets (name) %}
 {% set filename = lookup ('fileglob', HOME + '/security/third-parties/' + name) %}
@@ -37,6 +56,22 @@ third_parties:
 {{ do_secrets ('test') }}
 {{ do_secrets ('ops') }}
 {% endif %}
+{% endif %}
+
+{% if deployment_mode == 'vagrant'
+   and checkout_profiles is defined %}
+devenv_checkouts:
+{% for project_reference in checkout_profiles ['developer_' + developer_profile] %}
+{% set project_detail = project_details [project_reference.name] %}
+
+  - name: {{ project_reference.name | to_json }}
+    branch: {{ project_reference.branch | to_json }}
+    build_steps: {{ project_detail.build_steps | default ([]) | to_json }}
+    configs: {{ project_detail.configs | default ([]) | to_json }}
+    nodejs_version: {{ project_detail.nodejs_version | default ('normal') | to_json }}
+    project_links: {{ project_detail.project_links | default ([]) | to_json }}
+
+{% endfor %}
 {% endif %}
 
 # ex: et ts=2 filetype=yaml
