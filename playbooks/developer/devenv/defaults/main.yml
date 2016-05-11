@@ -35,9 +35,7 @@ devenv_config_secrets:
 
 devenv_config_templates:
 
-  - template: "devenv-wistla-admin-config"
-    type: "load"
-    target: "wistla-admin-config.local.js"
+  # ---------- api
 
   - template: "devenv-wistla-api-config"
     type: "api"
@@ -47,6 +45,18 @@ devenv_config_templates:
     type: "api"
     target: "environment"
 
+  # ---------- api2
+
+  - template: "devenv-wistla-api2-config"
+    type: "api2"
+    target: "local.yaml"
+
+  - template: "devenv-wistla-api2-environment"
+    type: "api2"
+    target: "environment"
+
+  # ---------- browser
+
   - template: "devenv-wistla-browser-config"
     type: "browser"
     target: "config.local.js"
@@ -55,12 +65,42 @@ devenv_config_templates:
     type: "browser"
     target: "environment"
 
+  # ---------- load
+
+  - template: "devenv-wistla-admin-config"
+    type: "load"
+    target: "wistla-admin-config.local.js"
+
+  - template: "devenv-wistla-load-nginx-config"
+    type: "load"
+    target: "nginx-config"
+
+  # ---------- postgresql
+
+  - template: "devenv-postgresql-config"
+    type: "postgresql"
+    target: "postgresql.conf"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0644"
+
+  - template: "devenv-postgresql-hba-config"
+    type: "postgresql"
+    target: "postgresql-hba.conf"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0640"
+
+  # ---------- rabbit
+
   - template: "devenv-wistla-rabbit-erlang-cookie"
     type: "rabbit"
     target: "erlang-cookie"
     owner: "rabbitmq"
     group: "root"
     mode: "0400"
+
+  # ---------- web
 
   - template: "devenv-wistla-web-config"
     type: "web"
@@ -69,10 +109,6 @@ devenv_config_templates:
   - template: "devenv-wistla-web-environment"
     type: "web"
     target: "environment"
-
-  - template: "devenv-wistla-load-nginx-config"
-    type: "load"
-    target: "nginx-config"
 
 devenv_config_links:
 
@@ -93,6 +129,9 @@ devenv_config_links:
 
   - src: "../../config/api/google-service-account.key"
     dest: "wistla-api/config/google-service-account.key"
+
+  - src: "../../config/api2/local.yaml"
+    dest: "wistla-api-server/config/local.yaml"
 
   - src: "../../config/browser/config.local.js"
     dest: "wistla-browser/config/config.local.js"

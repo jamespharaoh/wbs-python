@@ -67,4 +67,8 @@ alias run-devbox="$HOME/wistla-devops/run-ansible devbox.yml"
 
 function comma () { echo "$@" | tr ' ' ,; }
 
+# configure psql
+
+export PGHOST="{{ deployment_name }}-postgresql-0"
+
 # ex: noet ts=4 filetype=sh

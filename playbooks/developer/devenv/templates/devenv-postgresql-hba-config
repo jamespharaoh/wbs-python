@@ -1,0 +1,17 @@
+local all all trust
+
+host all all {{ deployment.bridge_network }}.0.1/32 trust
+
+{% for index in [ 0, 1, 2, 3, 4 ] %}
+{% print [
+	'host',
+	'all',
+	'all',
+	[
+		deployment.bridge_network,
+		index,
+		node_type_indices.api2,
+	] | join ('.') + '/32',
+	'trust',
+] | join (' '), '\n' %}
+{% endfor %}

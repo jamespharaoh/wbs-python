@@ -4,6 +4,7 @@
   roles:
 
     - "setup-common-users"
+    - "setup-apt"
     - "setup-system"
     - "setup-hostname"
     - "setup-dns"

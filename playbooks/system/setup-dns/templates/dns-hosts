@@ -52,9 +52,11 @@ and (inventory_hostname in groups.vagrant
 
 		{%- for node_type in [
 			'api',
+			'api2',
 			'browser',
 			'load',
 			'mongo',
+			'postgresql',
 			'rabbit',
 			'web',
 		] -%}
@@ -128,6 +130,7 @@ and (inventory_hostname in groups.vagrant
 
 		{%- for node_type in [
 			'mongo',
+			'postgresql',
 			'rabbit',
 		] -%}
 		{%- for node_zone in [ 'a', 'b', 'c' ] -%}
@@ -160,6 +163,7 @@ and (inventory_hostname in groups.vagrant
 
 		{%- for node_type in [
 			'api',
+			'api2',
 			'browser',
 			'load',
 			'web',
@@ -215,9 +219,11 @@ and (inventory_hostname in groups.vagrant
 
 		{%- for node_type in [
 			'api',
+			'api2',
 			'browser',
 			'load',
 			'mongo',
+			'postgresql',
 			'rabbit',
 			'web',
 		] -%}

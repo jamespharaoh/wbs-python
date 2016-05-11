@@ -30,10 +30,16 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-data',
   ] | join (' && ') }}"
 
-- name: "create postgresql user"
+- shell: "
+    test ! -f '{{ deployment_home }}/shared/flags/postgresql-user' ||
+    mv '{{ deployment_home }}/shared/flags/postgresql-user'
+      '{{ deployment_home }}/shared/flags/postgresql-user-ubuntu'
+  "
+
+- name: "create postgresql user ubuntu"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user-ubuntu"
 
   shell: "{{ [
     'sleep 2',
@@ -45,7 +51,25 @@
       'ubuntu',
       '--superuser',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-user',
+    'touch ' + deployment_home + '/shared/flags/postgresql-user-ubuntu',
+  ] | join (' && ') }}"
+
+- name: "create postgresql user vagrant"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'vagrant',
+      '--superuser',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
   ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml

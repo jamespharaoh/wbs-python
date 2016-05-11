@@ -1,0 +1,14 @@
+---
+
+  db:
+
+    pg:
+
+      url: "postgres://{{ deployment_name }}-postgresql-0/wistla"
+
+  log:
+
+    level: "trace"
+    time_level: "trace"
+
+# ex: et ts=2 filetype=yaml

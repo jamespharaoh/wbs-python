@@ -7,6 +7,39 @@ vagrant_home: "/home/vagrant"
 
 devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
 
+ubuntu_sources:
+
+  - url: "{{ dev_ubuntu_main_url }}"
+    source: "trusty"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ dev_ubuntu_main_url }}"
+    source: "trusty-updates"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ dev_ubuntu_security_url }}"
+    source: "trusty-security"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "http://apt.postgresql.org/pub/repos/apt/"
+    source: "trusty-pgdg"
+    repositories:
+
+      - "main"
+
+ubuntu_keys_extra:
+
+  - url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+
 ubuntu_system_packages:
 
   # ---------- remove
@@ -98,6 +131,12 @@ ubuntu_system_packages:
     state: "present"
 
   - name: "parted"
+    state: "present"
+
+  - name: "postgresql-client-9.5"
+    state: "present"
+
+  - name: "postgresql-doc-9.5"
     state: "present"
 
   - name: "python-boto"
@@ -199,8 +238,8 @@ etcd_clustered: "no"
 
 postfix_always_bcc: "james+noise@wellbehavedsoftware.com"
 
-ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
-ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
+#ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
+#ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
 
 python_pip_packages_url: "{{ dev_python_pip_packages_url }}"
 python_pip_trusted_host: "{{ dev_python_pip_trusted_host }}"

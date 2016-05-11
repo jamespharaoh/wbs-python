@@ -1,6 +1,22 @@
 ---
 
-- debug:
-    msg: "TODO"
+- name: "link to postgresql configs"
+  with_items:
+
+    - link: "/etc/postgresql/9.5/main/postgresql.conf"
+      target: "/config/postgresql.conf"
+
+    - link: "/etc/postgresql/9.5/main/pg_hba.conf"
+      target: "/config/postgresql-hba.conf"
+
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.link }}"
+    state: "link"
+
+    src: "{{ item.target }}"
+    force: "yes"
 
 # ex: et ts=2 filetype=yaml

@@ -35,4 +35,11 @@
     src: "devbox-netrc"
     dest: "{{ vagrant_home }}/.netrc"
 
+- name: "create psql rc"
+  action:
+
+    module: "template"
+    src: "devbox-psql-rc"
+    dest: "{{ vagrant_home }}/.psqlrc"
+
 # ex: et ts=2 filetype=yaml
