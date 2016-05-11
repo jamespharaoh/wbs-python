@@ -6,17 +6,27 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-data"
 
   shell: "{{ [
-    'sleep 1',
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo service postgresql stop',
+    ] | join (' '),
+    [
+      deployment_name + '-postgresql-0',
+      'sudo rm -rf /var/lib/postgresql/9.5/main',
+    ] | join (' '),
     [
       deployment_name + '-postgresql-0',
       'sudo',
-      '-u postgres',
+      '-H -u postgres',
       '/usr/lib/postgresql/9.5/bin/initdb',
       '--pgdata',
       '/var/lib/postgresql/9.5/main',
     ] | join (' '),
-    'sleep 1',
-    'sudo service postgresql start',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo service postgresql start',
+    ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/postgresql-data',
   ] | join (' && ') }}"
 
@@ -26,7 +36,7 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-user"
 
   shell: "{{ [
-    'sleep 5',
+    'sleep 2',
     [
       deployment_name + '-postgresql-0',
       'sudo',
