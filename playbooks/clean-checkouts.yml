@@ -50,7 +50,7 @@
         fi;
 
     - name: "clean checked out projects"
-      with_items: "
+      with_items: "{{
         (
           devenv_checkouts
             | rejectattr ('name', 'equalto', 'wistla-devops')
@@ -60,7 +60,7 @@
             | selectattr ('name', 'equalto', 'wistla-devops')
             | list
         )
-      "
+      }}"
       args:
 
         executable: "/bin/bash"
@@ -68,6 +68,10 @@
       shell:
 
         set -euf -o pipefail;
+
+        if ! test -d "{{ deployment_home }}/{{ item.name }}"; then
+          exit 0;
+        fi;
 
         cd "{{ deployment_home }}/{{ item.name }}";
 
