@@ -66,10 +66,11 @@ devenv_checkouts:
 
   - name: {{ project_reference.name | to_json }}
     branch: {{ project_reference.branch | to_json }}
-    build_steps: {{ project_detail.build_steps | default ([]) | to_json }}
-    configs: {{ project_detail.configs | default ([]) | to_json }}
-    nodejs_version: {{ project_detail.nodejs_version | default ('normal') | to_json }}
-    project_links: {{ project_detail.project_links | default ([]) | to_json }}
+{% for key in [ 'build_steps', 'configs', 'nodejs_version', 'project_links' ] %}
+{% if key in project_detail %}
+    {{ key }}: {{ project_detail [key] | to_json }}
+{% endif %}
+{% endfor %}
 
 {% endfor %}
 {% endif %}
