@@ -13,6 +13,16 @@
       group: "root"
       mode: "0755"
 
+    - directory: "{{ nginx_config }}/ssl"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+    - directory: "/var/log/nginx"
+      user: "www-data"
+      group: "adm"
+      mode: "2750"
+
   become: "yes"
   action:
 
@@ -76,30 +86,6 @@
     module: "template"
     dest: "{{ nginx_config }}/sites/dev-{{ item.key }}.conf"
     src: "cluster-admin-nginx-dev-config"
-
-- name: "create nginx directories"
-  with_items:
-
-    - directory: "{{ nginx_config }}/ssl"
-      user: "root"
-      group: "root"
-      mode: "0755"
-
-    - directory: "/var/log/nginx"
-      user: "www-data"
-      group: "adm"
-      mode: "0750"
-
-  become: "yes"
-  action:
-
-    module: "file"
-    name: "{{ item.directory }}"
-    state: "directory"
-
-    owner: "{{ item.user }}"
-    group: "{{ item.group }}"
-    mode: "{{ item.mode }}"
 
 - name: "write nginx certificates"
   with_items: "{{ cluster.admin_certificates | default ([]) }}"

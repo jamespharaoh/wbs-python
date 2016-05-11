@@ -425,6 +425,9 @@ cluster_deployment_types:
       - source: "../../config/web/config.overrides.js"
         target: "wistla-web/config/config.overrides.js"
 
+      - source: "/opt/node-v{{ cluster_deployment.nodejs_version }}-linux-x64"
+        target: ".nodejs-stub-target"
+
     shared_directories:
 
       - "audio"
