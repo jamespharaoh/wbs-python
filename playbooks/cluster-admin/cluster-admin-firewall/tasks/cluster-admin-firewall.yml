@@ -1,6 +1,7 @@
 ---
 
 - name: "create firewall rules"
+  register: "create_firewall_rules_result"
   become: "yes"
   action:
 
@@ -10,6 +11,7 @@
     mode: "0755"
 
 - name: "reload firewall rules"
+  changed_when: "create_firewall_rules_result | changed"
   become: "yes"
   command: "/etc/network/firewall-rules"
 

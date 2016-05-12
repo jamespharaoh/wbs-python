@@ -61,27 +61,32 @@
     fi;
 
     aws elb create-load-balancer-policy
+      --region {{ amazon_region_name }}
       --load-balancer-name {{ cluster_name }}-app
       --policy-name proxy-protocol
       --policy-type-name ProxyProtocolPolicyType
       --policy-attributes AttributeName=ProxyProtocol,AttributeValue=true;
 
     aws elb set-load-balancer-policies-for-backend-server
+      --region {{ amazon_region_name }}
       --load-balancer-name {{ cluster_name }}-app
       --instance-port 80
       --policy-names "[]";
 
     aws elb set-load-balancer-policies-for-backend-server
+      --region {{ amazon_region_name }}
       --load-balancer-name {{ cluster_name }}-app
       --instance-port 443
       --policy-names "[]";
 
     aws elb set-load-balancer-policies-for-backend-server
+      --region {{ amazon_region_name }}
       --load-balancer-name {{ cluster_name }}-app
       --instance-port 8080
       --policy-names proxy-protocol;
 
     aws elb set-load-balancer-policies-for-backend-server
+      --region {{ amazon_region_name }}
       --load-balancer-name {{ cluster_name }}-app
       --instance-port 8443
       --policy-names proxy-protocol;

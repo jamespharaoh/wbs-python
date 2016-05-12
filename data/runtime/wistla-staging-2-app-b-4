@@ -4,11 +4,11 @@ amazon_instance_state: "running"
 amazon_instance_type_running: "t2.micro"
 heka: 
   
-  installed_version: "0.10.0b0"
+  installed_version: "0.10.0"
   needs_restart: "no"
   state: "enabled"
 
-heka_installed_version: "0.10.0b0"
+heka_installed_version: "0.10.0"
 heka_needs_restart: "no"
 heka_state: "enabled"
 icinga: 
@@ -40,23 +40,23 @@ nginx_needs_restart: "yes"
 nginx_state: "enabled"
 python: 
   
-  installed_version: "2.7.10"
+  installed_version: "2.7.11"
   state: "installed"
 
 python_apt: 
   
-  installed_version: "0.9.3-1"
+  installed_version: "2.7.11/0.9.3-1"
   state: "installed"
 
-python_apt_installed_version: "0.9.3-1"
+python_apt_installed_version: "2.7.11/0.9.3-1"
 python_apt_state: "installed"
-python_installed_version: "2.7.10"
+python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "7.0.3"
+  installed_version: "2.7.11/8.1.1"
   state: "installed"
 
-python_pip_installed_version: "7.0.3"
+python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
 ssh: 

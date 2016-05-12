@@ -5,9 +5,7 @@ cluster_deployment: "{{ deployments [cluster_deployment_name] }}"
 cluster_deployment_home: "/data/{{ cluster_deployment_name }}"
 
 cluster_deployment_alias: "{{
-  deployments [cluster_deployment.alias]
-  if cluster_deployment.type == 'alias'
-  else cluster_deployment
+  deployments [cluster_deployment.alias | default (cluster_deployment_name)]
 }}"
 
 cluster_deployment_type: "{{ cluster_deployment_types [cluster_deployment.type] }}"

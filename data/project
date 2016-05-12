@@ -50,6 +50,7 @@ certificate_data:
 resource_data:
 
   clusters: "cluster.cluster"
+  superclusters: "supercluster.supercluster"
   deployments: "deployment.deployment"
   dev_deployments: "dev-deployments.deployment"
   google_projects: "google-project.google_project"

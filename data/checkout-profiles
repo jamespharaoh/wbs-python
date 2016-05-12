@@ -65,6 +65,71 @@ developer_full:
   - name: "wistla-test-images"
     branch: "master"
 
+developer_full:
+
+  - name: "api-stub-server"
+    branch: "master"
+
+  - name: "content-browser"
+    branch: "master"
+
+  - name: "content-iOS"
+    branch: "master"
+
+  - name: "content-api"
+    branch: "master"
+
+  - name: "content-common"
+    branch: "master"
+
+  - name: "content-web"
+    branch: "master"
+
+  - name: "wistla-data-import"
+    branch: "master"
+
+  - name: "wistla-data-export"
+    branch: "master"
+
+  - name: "wistla-raml-api"
+    branch: "master"
+
+  - name: "wistla-raml-server"
+    branch: "master"
+
+  - name: "wistla-admin"
+    branch: "master"
+
+  - name: "wistla-analytics"
+    branch: "master"
+
+  - name: "wistla-api"
+    branch: "master"
+
+  - name: "wistla-api-server"
+    branch: "master"
+
+  - name: "wistla-browser"
+    branch: "master"
+
+  - name: "wistla-data-process"
+    branch: "master"
+
+  - name: "wistla-devops"
+    branch: "master"
+
+  - name: "wistla-iOS"
+    branch: "master"
+
+  - name: "wistla-scripts"
+    branch: "master"
+
+  - name: "wistla-web"
+    branch: "master"
+
+  - name: "wistla-test-images"
+    branch: "master"
+
 developer_devops:
 
   - name: "wistla-devops"
