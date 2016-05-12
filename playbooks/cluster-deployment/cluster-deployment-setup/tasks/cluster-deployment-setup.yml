@@ -125,41 +125,41 @@
     path: "{{ cluster_deployment_home }}/config/{{ item }}"
     state: "directory"
 
-- name: "create shared link target"
-  with_items:
+- when: "{{ cluster_deployment.type == 'alias' }}"
+  block:
 
-    - "/data/{{ cluster_deployment.alias }}"
-    - "/data/{{ cluster_deployment.alias }}/shared"
+    - name: "create shared link target"
+      with_items:
 
-  when: "{{ cluster_deployment.type == 'alias' }}"
-  become: "yes"
-  action:
+        - "/data/{{ cluster_deployment.alias }}"
+        - "/data/{{ cluster_deployment.alias }}/shared"
 
-    module: "file"
-    path: "{{ item }}"
-    state: "directory"
+      become: "yes"
+      action:
 
-    owner: "ubuntu"
-    group: "ubuntu"
-    mode: "0755"
+        module: "file"
+        path: "{{ item }}"
+        state: "directory"
 
-- name: "create main shared link"
-  when: "{{ cluster_deployment.type == 'alias' }}"
-  action:
+        owner: "ubuntu"
+        group: "ubuntu"
+        mode: "0755"
 
-    module: "file"
-    path: "/home/ubuntu/{{ cluster_deployment.alias }}"
-    state: "link"
-    src: "/data/{{ cluster_deployment.alias }}"
+    - name: "create main shared link"
+      action:
 
-- name: "create shared link"
-  when: "{{ cluster_deployment.type == 'alias' }}"
-  action:
+        module: "file"
+        path: "/home/ubuntu/{{ cluster_deployment.alias }}"
+        state: "link"
+        src: "/data/{{ cluster_deployment.alias }}"
 
-    module: "file"
-    path: "{{ cluster_deployment_home }}/shared"
-    state: "link"
-    src: "../{{ cluster_deployment.alias }}/shared"
+    - name: "create shared link"
+      action:
+
+        module: "file"
+        path: "{{ cluster_deployment_home }}/shared"
+        state: "link"
+        src: "../{{ cluster_deployment.alias }}/shared"
 
 - name: "create shared directory"
   with_items: "{{ cluster_deployment_shared_directories }}"

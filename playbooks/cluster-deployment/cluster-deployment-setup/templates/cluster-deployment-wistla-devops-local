@@ -1,5 +1,16 @@
 ---
 
+superclusters:
+
+  {{ supercluster_name }}:
+{% for key in [
+  'name',
+] %}
+{% if key in supercluster %}
+    {{ key }}: {{ supercluster [key] | to_json }}
+{% endif %}
+{% endfor %}
+
 clusters:
 
 {% for other_cluster_name, other_cluster in clusters.items () %}
@@ -8,8 +19,9 @@ clusters:
 {% for key in [
   'name',
   'cluster_network',
-  'local_domain',
   'instance_formation',
+  'local_domain',
+  'supercluster_name',
 ] %}
 {% if key in other_cluster %}
     {{ key }}: {{ other_cluster [key] | to_json }}

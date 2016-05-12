@@ -13,11 +13,11 @@ etcd_needs_restart: "no"
 etcd_state: "enabled"
 heka: 
   
-  installed_version: "0.10.0b0"
+  installed_version: "0.10.0"
   needs_restart: "no"
   state: "enabled"
 
-heka_installed_version: "0.10.0b0"
+heka_installed_version: "0.10.0"
 heka_needs_restart: "no"
 heka_state: "enabled"
 icinga: 
