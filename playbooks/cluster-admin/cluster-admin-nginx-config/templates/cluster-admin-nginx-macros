@@ -1,6 +1,6 @@
 {% macro ssl_certificate (name) %}
-	ssl_certificate {{ nginx_config }}/ssl/{{ name }}.cert;
-	ssl_certificate_key {{ nginx_config }}/ssl/{{ name }}.key;
+	ssl_certificate /etc/nginx/ssl/{{ name }}.cert;
+	ssl_certificate_key /etc/nginx/ssl/{{ name }}.key;
 {% endmacro %}
 
 {% macro listen_http () %}
@@ -15,6 +15,6 @@
 
 {% macro dev_robots () %}
 	location /robots.txt {
-		alias {{ nginx_config }}/dev-robots.txt;
+		alias /etc/nginx/dev-robots.txt;
 	}
 {% endmacro %}

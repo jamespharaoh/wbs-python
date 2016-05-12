@@ -1,0 +1,96 @@
+---
+
+- name: "create nginx config directories"
+  with_items:
+
+    - ""
+    - "/ssl"
+    - "/sites"
+
+  action:
+
+    module: "file"
+    path: "{{ WORK }}/cluster/{{ cluster_name }}/nginx{{ item }}"
+    state: "directory"
+
+    mode: "0755"
+
+- name: "create nginx configs"
+  with_items:
+
+    - target: "/dev-robots.txt"
+      template: "cluster-admin-nginx-robots"
+
+    - target: "/nginx.conf"
+      template: "cluster-admin-nginx-config"
+
+    - target: "/sites/docs.conf"
+      template: "cluster-admin-nginx-docs-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+    - target: "/sites/icinga.conf"
+      template: "cluster-admin-nginx-icinga-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+    - target: "/sites/jenkins.conf"
+      template: "cluster-admin-nginx-jenkins-config"
+      when: "{{ cluster_name == 'ops' }}"
+
+  when: "{{ item.when | default (True) }}"
+  action:
+
+    module: "template"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx{{ item.target }}"
+    src: "{{ item.template }}"
+
+- name: "create nginx dev configs"
+  with_dict: "{{ dev_deployments }}"
+  when: "
+    item.value.type == 'simple'
+    and item.value.main_domain in cluster.admin_certificates
+  "
+  action:
+
+    module: "template"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/sites/dev-{{ item.key }}.conf"
+    src: "cluster-admin-nginx-dev-config"
+
+    mode: "0644"
+
+- name: "write nginx certificates"
+  with_items: "{{ cluster.admin_certificates | default ([]) }}"
+  action:
+
+    module: "template"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/ssl/{{ item }}.cert"
+    src: "cluster-admin-ssl-bundle"
+
+    mode: "0640"
+
+- name: "write nginx private keys"
+  with_items: "{{ cluster.admin_certificates | default ([]) }}"
+  action:
+
+    module: "copy"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/ssl/{{ item }}.key"
+
+    content: "{{ lookup ('etcd', [
+      '/certificate/',
+      cluster_name,
+      '-ssl/subjects/',
+      item,
+      '/current/key',
+    ] | join ('')) + '\n' }}"
+
+    mode: "0600"
+
+- name: "write nginx htpasswd"
+  action:
+
+    module: "copy"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/htpasswd"
+    src: "{{ HOME }}/security/htpasswd"
+
+    mode: "0640"
+
+# ex: et ts=2 filetype=yaml

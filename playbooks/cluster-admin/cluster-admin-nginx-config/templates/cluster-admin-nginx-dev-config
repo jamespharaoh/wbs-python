@@ -67,7 +67,7 @@ server {
 
 	location /keystone {
 		auth_basic "Restricted";
-		auth_basic_user_file {{ nginx_config }}/htpasswd;
+		auth_basic_user_file {{ nginx_config_server }}/htpasswd;
 		proxy_pass http://{{ dev_deployment_name }}-load/keystone;
 		proxy_set_header Host $host;
 		proxy_set_header X-Wistla-Entry-Region {{ region_code }};

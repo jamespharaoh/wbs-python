@@ -37,7 +37,7 @@
     - "nodejs-packages-install"
 
     - "nginx-install"
-    - "cluster-admin-nginx"
+    - "cluster-admin-nginx-setup"
     - "nginx-control"
 
     - "setup-openvpn-server"

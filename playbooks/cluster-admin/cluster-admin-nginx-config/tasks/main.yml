@@ -1,0 +1,14 @@
+---
+
+- include: "cluster-admin-nginx-config.yml"
+  tags:
+
+    - "cluster"
+    - "cluster-admin"
+    - "cluster-admin-nginx"
+    - "cluster-admin-nginx-config"
+
+    - "nginx-config"
+    - "nginx"
+
+# ex: et ts=2 filetype=yaml

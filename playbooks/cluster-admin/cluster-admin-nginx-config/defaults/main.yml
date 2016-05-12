@@ -1,0 +1,6 @@
+---
+
+nginx_config_local: "{{ WORK }}/cluster/{{ cluster_name }}/nginx"
+nginx_config_server: "/etc/nginx"
+
+# ex: et ts=2 filetype=yaml

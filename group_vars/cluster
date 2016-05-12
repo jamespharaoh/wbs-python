@@ -20,6 +20,10 @@ node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 nodejs_version: "{{ cluster.nodejs_version }}"
 nodejs_version_legacy: "{{ cluster.nodejs_version_legacy }}"
 
+region_code: "{{ cluster.region_code }}"
+
+postfix_always_bcc: "{{ cluster.bcc_email }}"
+
 # --------- icinga
 
 icinga_web_version: "2.2.0"

@@ -52,15 +52,11 @@ amazon_instance_create_count_tag:
   "Zone": "{{ instance_zone }}"
   "Index": "{{ instance_index }}"
 
-region_code: "{{ cluster.region_code }}"
-
 mongodb_enabled: "no"
 
 amazon_instance_state: "running"
 amazon_instance_type_running: ""
 
 cluster_production_override: ""
-
-postfix_always_bcc: "{{ cluster.bcc_email }}"
 
 # ex: et ts=2 filetype=yaml

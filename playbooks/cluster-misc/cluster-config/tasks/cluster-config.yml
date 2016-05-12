@@ -1,0 +1,15 @@
+---
+
+- name: "create cluster config directories"
+  with_items:
+
+    - "cluster"
+    - "cluster/{{ cluster_name }}"
+
+  action:
+
+    module: "file"
+    path: "{{ WORK }}{{ item }}"
+    state: "directory"
+
+# ex: et ts=2 filetype=yaml

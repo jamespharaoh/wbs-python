@@ -1,0 +1,50 @@
+---
+
+- name: "create nginx directories"
+  with_items:
+
+    - directory: "{{ nginx_config }}"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
+    - directory: "/var/log/nginx"
+      user: "www-data"
+      group: "adm"
+      mode: "2750"
+
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.directory }}"
+    state: "directory"
+
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "upload nginx admin config"
+  args:
+
+    executable: "/bin/bash"
+
+  connection: "local"
+  shell:
+
+    set -euf -o pipefail;
+
+    rsync
+      --perms
+      --recursive
+      --rsync-path "sudo rsync"
+      "{{ WORK }}/cluster/{{ cluster_name }}/nginx/"
+      "{{ inventory_hostname }}:{{ nginx_config }}/";
+
+- name: "set nginx.state to 'enabled'"
+  when: "nginx_state == 'installed'"
+  update_resource:
+
+    nginx.state: "enabled"
+
+# ex: et ts=2 filetype=yaml

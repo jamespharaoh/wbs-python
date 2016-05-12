@@ -1,5 +1,6 @@
 ---
 
+- include: "cluster-config.yml"
 - include: "cluster-network.yml"
 - include: "cluster-hosts.yml"
 - include: "cluster-deployments-setup.yml"
