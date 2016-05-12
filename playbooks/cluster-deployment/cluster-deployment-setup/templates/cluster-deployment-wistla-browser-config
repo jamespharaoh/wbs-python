@@ -16,7 +16,7 @@ config.apiPrivate = 'http://api.{{ cluster_deployment.name }}-load-{{ instance_z
 // email
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
-{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-montblanc' ] %}
+{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-fitzroy', 'test-montblanc' ] %}
 
 {% if cluster_deployment_alias ['name'] == 'test-k2' %}
 // Deep link url scheme for use in sending out emails.
@@ -24,6 +24,13 @@ config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
 
 // Facebook AppId.
 config.facebook.appId = '{{ third_parties ['production'].facebook_app_id }}';
+
+// android config
+config.android = {
+	appId: '{{ third_parties ['production'].android_app_id }}',
+	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['production'].android_app_id }}',
+	appStoreUrlMobile: 'market://details?id={{ third_parties ['production'].android_app_id }}'
+};
 
 {% endif %}
 
@@ -34,6 +41,29 @@ config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
 // Facebook AppId.
 config.facebook.appId = '{{ third_parties ['dev'].facebook_app_id }}';
 
+// android config
+config.android = {
+	appId: '{{ third_parties ['dev'].android_app_id }}',
+	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['dev'].android_app_id }}',
+	appStoreUrlMobile: 'market://details?id={{ third_parties ['dev'].android_app_id }}'
+};
+
+{% endif %}
+
+{% if cluster_deployment_alias ['name'] == 'test-fitzroy' %}
+// Deep link url scheme for use in sending out emails.
+config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
+
+// Facebook AppId.
+config.facebook.appId = '{{ third_parties ['dev'].facebook_app_id }}';
+
+// android config
+config.android = {
+	appId: '{{ third_parties ['dev'].android_app_id }}',
+	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['dev'].android_app_id }}',
+	appStoreUrlMobile: 'market://details?id={{ third_parties ['dev'].android_app_id }}'
+};
+
 {% endif %}
 
 {% else %}
@@ -43,6 +73,13 @@ config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
 
 // Facebook AppId.
 config.facebook.appId = '{{ third_parties [cluster_name].facebook_app_id }}';
+
+// android config
+config.android = {
+	appId: '{{ third_parties [cluster_name].android_app_id }}',
+	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties [cluster_name].android_app_id }}',
+	appStoreUrlMobile: 'market://details?id={{ third_parties [cluster_name].android_app_id }}'
+};
 
 {% endif %}
 

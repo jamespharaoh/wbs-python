@@ -33,6 +33,16 @@ config.facebook.appId = '{{ third_parties.dev.facebook_app_id }}';
 config.facebook.appId = '';
 {% endif %}
 
+// facebook app configuration options
+{% if 'dev' in third_parties %}
+// android config
+config.android = {
+	appId: '{{ third_parties.dev.android_app_id }}',
+	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties.dev.android_app_id }}',
+	appStoreUrlMobile: 'market://details?id={{ third_parties.dev.android_app_id }}'
+};
+{% endif %}
+
 if (!config.authentication || typeof config.authentication !== 'object') {
         config.authentication = {};
 }
