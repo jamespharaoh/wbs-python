@@ -53,7 +53,7 @@
     - "cluster-network"
     - "cluster-network-security-groups"
 
-- include: "cluster-network-app-balancer.yml"
+- include: "cluster-network-balancer-app.yml"
   when: "cluster_name != 'ops'"
   tags:
 
