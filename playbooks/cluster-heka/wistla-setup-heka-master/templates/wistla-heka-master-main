@@ -4,6 +4,7 @@
 
 [hekad]
 maxprocs = 4
+poolsize = 8192
 base_dir = "{{ heka_target }}/var/cache"
 share_dir = "{{ heka_target }}/share/heka"
 
@@ -72,7 +73,7 @@ type = "TcpOutput"
 address = "wistla-{{ cluster_name }}-admin-{{ zone }}:5565"
 keep_alive = true
 keep_alive_period = 60
-use_buffering = false
+use_buffering = true
 message_matcher = 'Hostname == "{{ inventory_hostname }}"'
 
 {% endif %}
