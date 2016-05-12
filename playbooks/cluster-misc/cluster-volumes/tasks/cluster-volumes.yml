@@ -22,6 +22,10 @@
 
 - name: "record system volume id"
   register: "system_volume_id_result"
+  changed_when: "
+    volume_ids.system is not defined
+    or system_volume_id_result.stdout != volume_ids.system
+  "
   delegate_to: "wistla-{{ cluster_name }}-admin-a"
   become: "yes"
   args:

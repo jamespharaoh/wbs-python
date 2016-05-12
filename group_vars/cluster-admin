@@ -41,6 +41,9 @@ my_system_packages:
   - name: "mailutils"
     state: "present"
 
+  - name: "nagios-plugins"
+    state: "present"
+
   - name: "ngrep"
     state: "present"
 
@@ -148,28 +151,18 @@ php_packages:
 nodejs_packages:
 
   - name: "bunyan"
-    version: "1.5.1"
-
-  - name: "gulp"
-    version: "3.9.0"
-
-#  - name: "jspm"
-#    version: "0.15.3"
-
-  - name: "mocha"
-    version: "2.3.4"
-
-  - name: "node-gyp"
-    version: "3.2.1"
-
-  - name: "node-inspector"
-    version: "0.12.5"
+    version: "1.8.1"
 
   - name: "prettyjson"
     version: "1.1.3"
 
-  - name: "request"
-    version: "2.67.0"
+nodejs_packages_legacy:
+
+  - name: "bunyan"
+    version: "1.8.1"
+
+  - name: "prettyjson"
+    version: "1.1.3"
 
 nginx_version: "{{ supercluster.admin_nginx_version }}"
 

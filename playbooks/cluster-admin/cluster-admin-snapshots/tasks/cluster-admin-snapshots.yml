@@ -18,6 +18,7 @@
     src: "cluster-admin-snapshots-config"
 
 - name: "configure snapshots cron"
+  register: "configure_snapshots_cron_result"
   become: "yes"
   action:
 
@@ -26,6 +27,7 @@
     src: "cluster-admin-snapshots"
 
 - name: "reload cron"
+  changed_when: "configure_snapshots_cron_result | changed"
   become: "yes"
   action:
 

@@ -1,7 +1,7 @@
 ---
 
 amazon_instance_state: "running"
-amazon_instance_type_running: "t2.micro"
+amazon_instance_type_running: "m3.medium"
 etcd: 
   
   installed_version: "2.2.2"
@@ -71,14 +71,14 @@ php:
   installed_from: "distro"
   installed_service: "php5-fpm"
   installed_version: "5"
-  needs_restart: "no"
+  needs_restart: "yes"
   state: "enabled"
 
 php_fpm_socket: "/var/run/php5-fpm.sock"
 php_installed_from: "distro"
 php_installed_service: "php5-fpm"
 php_installed_version: "5"
-php_needs_restart: "no"
+php_needs_restart: "yes"
 php_state: "enabled"
 python: 
   

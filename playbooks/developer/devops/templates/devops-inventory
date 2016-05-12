@@ -203,6 +203,33 @@ if (
 
 {%- endfor %}
 
+{% for other_supercluster_name, other_supercluster in superclusters.items ()
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_supercluster_name == supercluster_name
+) and (
+	other_supercluster_name != 'dev'
+) %}
+
+# ---------- supercluster {{ other_supercluster_name }}
+
+[supercluster-{{ other_supercluster_name }}:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if (
+	other_cluster.supercluster_name == other_supercluster_name
+) and (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) -%}
+
+	{%- print 'cluster-', other_cluster_name, '\n' -%}
+
+{%- endfor %}
+
+{% endfor %}
+
 {% for other_cluster_name, other_cluster in clusters.items ()
 if (
 	deployment_mode in [ 'vagrant', 'jenkins' ]

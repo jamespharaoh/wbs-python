@@ -32,6 +32,7 @@
     state: "absent"
 
 - name: "install sysctl config"
+  register: "install_sysctl_config_result"
   become: "yes"
   action:
 
@@ -41,10 +42,12 @@
 
 - name: "reload sysctl"
   when: "is_template | default ('no') == 'no'"
+  changed_when: "install_sysctl_config_result | changed"
   become: "yes"
   command: "sysctl --load"
 
 - name: "install sysfs config"
+  register: "install_sysfs_config_result"
   become: "yes"
   action:
 
@@ -54,6 +57,7 @@
 
 - name: "reload sysfs"
   when: "is_template | default ('no') == 'no'"
+  changed_when: "install_sysfs_config_result | changed"
   become: "yes"
   command: "service sysfsutils force-reload"
 

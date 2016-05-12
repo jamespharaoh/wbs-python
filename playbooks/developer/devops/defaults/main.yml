@@ -62,6 +62,17 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+  cluster-simple-v2:
+
+    node_types:
+
+      - "api"
       - "api2"
       - "browser"
       - "kafka"
