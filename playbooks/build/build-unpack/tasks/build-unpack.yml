@@ -7,8 +7,6 @@
     build_source: "{{ [
       deployment_home,
       '/builds/backups/',
-      build_deployment_name,
-      '-',
       node_type,
       '-',
       build_id,
