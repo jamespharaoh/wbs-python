@@ -99,7 +99,7 @@ config.CORS = {
 		'https://{{ cluster_deployment_alias.api_domain }}',
 		'https://{{ cluster_deployment_alias.main_domain }}',
 		'https://{{ cluster_deployment_alias.short_domain }}',
-s		'https://{{ cluster_deployment_alias.web_domain }}',
+		'https://{{ cluster_deployment_alias.web_domain }}',
 {% endif %}
 	],
 	credentials: true
