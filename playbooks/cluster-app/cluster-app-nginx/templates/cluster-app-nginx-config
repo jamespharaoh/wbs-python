@@ -73,7 +73,11 @@ http {
 	real_ip_header proxy_protocol;
 	real_ip_recursive on;
 
-# ----- upstream servers per deployment -----
+#==============================================================================#
+
+#
+# upstream servers per deployment
+#
 
 {% for deployment_name in cluster.super_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
@@ -105,7 +109,11 @@ http {
 
 {% if cluster_name == 'test' %}
 
-# ----- default site -----
+#==============================================================================#
+
+#
+# default site
+#
 
 	server {
 
@@ -481,7 +489,10 @@ if deployment.supercluster_name == supercluster_name %}
 
 {% if deployment.type == 'shared' %}
 
-# ----- shared deployment {{ deployment.name }} -----
+#==============================================================================#
+
+#
+# shared deployment {{ deployment.name }}
 #
 # main domain: {{ deployment.main_domain }}
 # short domain: {{ deployment.short_domain }}
@@ -496,7 +507,10 @@ if deployment.supercluster_name == supercluster_name %}
 {% elif deployment.type == 'alias' %}
 {% set deployment_alias = deployments [deployment.alias] %}
 
-# ----- deployment alias {{ deployment_name }} -----
+#==============================================================================#
+
+#
+# deployment alias {{ deployment_name }}
 #
 # main domain: {{ deployment.main_domain }}
 # short domain: {{ deployment.short_domain }}
@@ -513,7 +527,10 @@ if deployment.supercluster_name == supercluster_name %}
 
 {% elif deployment.type == 'simple' %}
 
-# ----- simple deployment {{ deployment_name }} -----
+#==============================================================================#
+
+#
+# simple deployment {{ deployment_name }}
 #
 # main domain: {{ deployment.main_domain }}
 # short domain: {{ deployment.short_domain }}
