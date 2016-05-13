@@ -5,6 +5,7 @@
 
     executable: "/bin/bash"
 
+  delegate_to: "localhost"
   shell:
 
     set -euf -o pipefail;
