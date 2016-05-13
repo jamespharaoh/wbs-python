@@ -27,13 +27,13 @@
 
     if test -e "$build_target"; then
 
-      btrfs subvolume delete "$build_target";
+      sudo btrfs subvolume delete "$build_target";
 
       sleep 2;
 
     fi;
 
-    btrfs subvolume create "$build_target";
+    sudo btrfs subvolume create "$build_target";
 
     {
       zbackup restore "$build_source.temp"
