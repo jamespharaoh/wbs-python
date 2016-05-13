@@ -14,7 +14,7 @@
     fi;
 
     aws s3 sync
-      "$HOME/builds"
+      "{{ deployment_home }}/builds"
       "s3://wistla-builds/zbackup";
 
 # ex: et ts=2 filetype=yaml
