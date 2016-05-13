@@ -52,7 +52,6 @@ devops_inventory_deployment_modes:
     node_types:
 
       - "api"
-      - "api2"
       - "browser"
       - "load"
       - "web"
