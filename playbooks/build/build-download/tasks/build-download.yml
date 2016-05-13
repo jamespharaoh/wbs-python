@@ -1,6 +1,6 @@
 ---
 
-- name: "upload builds"
+- name: "download builds"
   args:
 
     executable: "/bin/bash"
