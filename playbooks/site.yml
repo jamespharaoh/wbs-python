@@ -2,9 +2,10 @@
 
 - include: "devbox.yml"
 
-- include: "templates.yml"
+- include: "node-templates.yml"
+- include: "node-start.yml"
 
-- include: "start.yml"
+- include: "fixtures.yml"
 
 - include: "cluster.yml"
 

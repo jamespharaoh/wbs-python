@@ -7,8 +7,8 @@
 - include: "clean-templates.yml"
 - include: "clean-data.yml"
 
-- include: "templates.yml"
-- include: "start.yml"
+- include: "node-templates.yml"
+- include: "node-start.yml"
 
 - include: "fixtures.yml"
 

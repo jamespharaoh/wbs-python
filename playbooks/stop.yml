@@ -1,13 +1,14 @@
 ---
 
-- hosts: "node-host"
-  gather_facts: "no"
-  roles:
+- hosts: "localhost"
+  tasks:
 
-    - role: "lxc-stop"
-      tags: "quick"
+    - debug:
+        msg: "the playbook stop.yml has been renamed to node-stop.yml"
 
-    - role: "lxc-destroy"
-      tags: "quick"
+    - pause:
+        seconds: "20"
+
+- include: "node-stop.yml"
 
 # ex: et ts=2 filetype=yaml

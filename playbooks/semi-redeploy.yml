@@ -1,8 +1,14 @@
 ---
 
-- include: "devbox-deployment.yml"
-- include: "templates.yml"
-- include: "stop.yml"
-- include: "start.yml"
+- hosts: "localhost"
+  tasks:
+
+    - debug:
+        msg: "the playbook semi-redeploy.yml has been renamed to node-redeploy-quick.yml"
+
+    - pause:
+        seconds: "20"
+
+- include: "node-redeploy-quick.yml"
 
 # ex: et ts=2 filetype=yaml

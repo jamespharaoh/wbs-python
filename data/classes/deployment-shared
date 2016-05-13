@@ -17,6 +17,7 @@ deployment:
   cluster_name: "{{ identity_parent }}"
   supercluster_name: "{{ identity_grandparent }}"
 
+  enabled: "yes"
   description: ""
 
 # ex: et ts=2 filetype=yaml

@@ -1,12 +1,14 @@
 ---
 
-- hosts:
+- hosts: "localhost"
+  tasks:
 
-    - "node-template-generic"
-    - "node-template-concrete"
+    - debug:
+        msg: "the playbook templates-update.yml has been renamed to node-templates-update.yml"
 
-  roles:
+    - pause:
+        seconds: "20"
 
-    - "node-update"
+- include: "node-templates-update.yml"
 
 # ex: et ts=2 filetype=yaml

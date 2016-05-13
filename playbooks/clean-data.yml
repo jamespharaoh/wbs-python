@@ -15,7 +15,7 @@
 
         prompt: "WARNING - this will delete all runtime data"
 
-- include: "stop.yml"
+- include: "node-stop.yml"
 
 - hosts: "localhost"
   tasks:

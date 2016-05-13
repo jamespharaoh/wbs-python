@@ -1,0 +1,99 @@
+---
+
+# ========== generic
+
+# First create the generic template. This is the common base for all the other
+# templates, and doing it this way reduces disk space and speeds the process up
+# because the common steps are done once and cloned cheaply.
+
+- hosts: "node-template-generic"
+  roles:
+
+    - "lxc-create"
+
+    - "setup-apt"
+    - "setup-system"
+    - "install-system-packages"
+    - "setup-common-users"
+    - "node-template"
+
+# ========== concrete
+
+# Next we create the concrete templates, by which we mean each one of the actual
+# templates which correspond to the container types. We run the common steps
+# again here because the clone operation is a no-op if the container already
+# exists, and so we won't see changes made to the generic template. Ansible is
+# already going to quickly skip any tasks which are already complete, so this is
+# not inefficient.
+
+- hosts: "node-template-concrete"
+  roles:
+
+    - "lxc-clone"
+
+    - "setup-apt"
+    - "setup-system"
+    - "install-system-packages"
+    - "setup-common-users"
+    - "node-template"
+
+# ========== specific
+
+# Finally we apply specific configuration to each of the concrete templates.
+# This has to run in series, since that's how ansible works.
+
+- hosts: "node-api-template"
+  roles:
+
+    - "node-api"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+- hosts: "node-api2-template"
+  roles:
+
+    - "node-api2"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+- hosts: "node-browser-template"
+  roles:
+
+    - "node-browser"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+- hosts: "node-kafka-template"
+  roles:
+
+    - "node-kafka"
+
+- hosts: "node-load-template"
+  roles:
+
+    - "node-load"
+
+- hosts: "node-mongo-template"
+  roles:
+
+    - "node-mongo"
+    - "install-mongodb"
+
+- hosts: "node-postgresql-template"
+  roles:
+
+    - "node-postgresql"
+
+- hosts: "node-rabbit-template"
+  roles:
+
+    - "node-rabbit"
+
+- hosts: "node-web-template"
+  roles:
+
+    - "node-web"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
+# ex: et ts=2 filetype=yaml

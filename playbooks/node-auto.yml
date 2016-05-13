@@ -1,0 +1,30 @@
+---
+
+- hosts: "node-host"
+  roles:
+
+    # ---------- stop
+
+    - role: "lxc-stop"
+      when: "node_active == 'no'"
+      tags: "quick"
+
+    - role: "lxc-destroy"
+      when: "node_active == 'no'"
+      tags: "quick"
+
+    # ---------- start
+
+    - role: "lxc-clone"
+      when: "node_active == 'yes'"
+      tags: "quick"
+
+    - role: "node-setup"
+      when: "node_active == 'yes'"
+      tags: "quick"
+
+    - role: "lxc-start"
+      when: "node_active == 'yes'"
+      tags: "quick"
+
+# ex: et ts=2 filetype=yaml

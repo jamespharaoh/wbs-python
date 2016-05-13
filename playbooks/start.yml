@@ -1,19 +1,14 @@
 ---
 
-- hosts: "node-host"
-  gather_facts: "no"
-  roles:
+- hosts: "localhost"
+  tasks:
 
-    - role: "lxc-clone"
-      when: "node_active == 'yes'"
-      tags: "quick"
+    - debug:
+        msg: "the playbook start.yml has been renamed to node-start.yml"
 
-    - role: "node-setup"
-      when: "node_active == 'yes'"
-      tags: "quick"
+    - pause:
+        seconds: "20"
 
-    - role: "lxc-start"
-      when: "node_active == 'yes'"
-      tags: "quick"
+- include: "node-start.yml"
 
 # ex: et ts=2 filetype=yaml

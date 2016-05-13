@@ -1,0 +1,13 @@
+---
+
+- hosts: "node-host"
+  gather_facts: "no"
+  roles:
+
+    - role: "lxc-stop"
+      tags: "quick"
+
+    - role: "lxc-destroy"
+      tags: "quick"
+
+# ex: et ts=2 filetype=yaml
