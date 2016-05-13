@@ -20,28 +20,23 @@ config.emailDomain = '{{ deployment.email_domain }}';
 config.dbUrl = 'mongodb://{{ deployment_name }}-mongo-0:27017/wistla-browser';
 
 // Deep link url scheme for use in sending out emails.
-{% if 'dev' in third_parties %}
-config.urlScheme = '{{ third_parties.dev.url_scheme }}';
-{% else %}
-config.urlScheme = '';
-{% endif %}
+config.urlScheme = '{{ deployment.url_scheme }}';
 
 // facebook app configuration options
-{% if 'dev' in third_parties %}
-config.facebook.appId = '{{ third_parties.dev.facebook_app_id }}';
-{% else %}
-config.facebook.appId = '';
-{% endif %}
 
-// facebook app configuration options
-{% if 'dev' in third_parties %}
-// android config
+{% set facebook_app = facebook_apps [deployment.facebook_app] %}
+
+config.facebook.appId = '{{ facebook_app.app_name }}';
+
+// android app
+
+{% set android_app = android_apps [deployment.android_app] %}
+
 config.android = {
-	appId: '{{ third_parties.dev.android_app_id }}',
-	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties.dev.android_app_id }}',
-	appStoreUrlMobile: 'market://details?id={{ third_parties.dev.android_app_id }}'
+	appId: '{{ android_app.app_id }}',
+	appStoreUrlWeb: '{{ android_app.app_store_url_web }}',
+	appStoreUrlMobile: '{{ android_app.app_store_url_mobile }}',
 };
-{% endif %}
 
 if (!config.authentication || typeof config.authentication !== 'object') {
         config.authentication = {};
@@ -49,17 +44,14 @@ if (!config.authentication || typeof config.authentication !== 'object') {
 if (!config.authentication.google || typeof config.authentication.google !== 'object') {
         config.authentication.google = {};
 }
-{% if deployment.google_project in google_projects %}
+// google project
+
 {% set google_project = google_projects [deployment.google_project] %}
+
 config.authentication.google.name = '{{ google_project.auth_name }}';
 config.authentication.google.api_key = '{{ google_project.auth_api_key }}';
 config.authentication.google.client_id = '{{ google_project.auth_client_id }}';
 config.authentication.google.client_secret = '{{ google_project.auth_client_secret }}';
-{% else %}
-config.authentication.google.name = '';
-config.authentication.google.client_id = '';
-config.authentication.google.client_secret = '';
-{% endif %}
 
 module.exports = config;
 

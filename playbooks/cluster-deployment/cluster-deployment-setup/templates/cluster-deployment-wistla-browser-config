@@ -4,6 +4,7 @@ var ROOT = process.env.HOME + '/wistla-browser';
 var config = require(ROOT + '/config/config.global');
 
 // public urls
+
 config.adminUrl = 'https://{{ cluster_deployment_alias.admin_domain }}';
 config.apiUrl = 'https://{{ cluster_deployment_alias.api_domain }}';
 config.assetsUrl = 'https://{{ cluster_deployment_alias.assets_domain }}';
@@ -11,97 +12,56 @@ config.shortUrl = 'https://{{ cluster_deployment_alias.short_domain }}';
 config.webUrl = 'https://{{ cluster_deployment_alias.web_domain }}';
 
 // private urls
-config.apiPrivate = 'http://api.{{ cluster_deployment.name }}-load-{{ instance_zone }}-{{ instance_index }}';
+
+config.apiPrivate = '{{ [
+	'http://api.',
+	cluster_deployment.name,
+	'-load-',
+	instance_zone,
+	'-',
+	instance_index,
+] | join }}';
 
 // email
+
 config.emailDomain = '{{ cluster_deployment.email_domain }}';
 
-{% if cluster_deployment_alias ['name'] in [ 'test-k2', 'test-fitzroy', 'test-montblanc' ] %}
-
-{% if cluster_deployment_alias ['name'] == 'test-k2' %}
 // Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties ['production'].url_scheme }}';
 
-// Facebook AppId.
-config.facebook.appId = '{{ third_parties ['production'].facebook_app_id }}';
+config.urlScheme = '{{ cluster_deployment.url_scheme }}';
+
+// facebook config
+
+{% set facebook_app = facebook_apps [cluster_deployment.facebook_app] %}
+
+config.facebook.appId = '{{ facebook_app.app_id }}';
 
 // android config
+
+{% set android_app = android_apps [cluster_deployment.android_app] %}
+
 config.android = {
-	appId: '{{ third_parties ['production'].android_app_id }}',
-	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['production'].android_app_id }}',
-	appStoreUrlMobile: 'market://details?id={{ third_parties ['production'].android_app_id }}'
+	appId: '{{ android_app.app_id }}',
+	appStoreUrlWeb: '{{ android_app.app_store_url_web }}',
+	appStoreUrlMobile: '{{ android_app.app_store_url_mobile }}',
 };
 
-{% endif %}
+// google config
 
-{% if cluster_deployment_alias ['name'] == 'test-montblanc' %}
-// Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
-
-// Facebook AppId.
-config.facebook.appId = '{{ third_parties ['dev'].facebook_app_id }}';
-
-// android config
-config.android = {
-	appId: '{{ third_parties ['dev'].android_app_id }}',
-	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['dev'].android_app_id }}',
-	appStoreUrlMobile: 'market://details?id={{ third_parties ['dev'].android_app_id }}'
-};
-
-{% endif %}
-
-{% if cluster_deployment_alias ['name'] == 'test-fitzroy' %}
-// Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties ['dev'].url_scheme }}';
-
-// Facebook AppId.
-config.facebook.appId = '{{ third_parties ['dev'].facebook_app_id }}';
-
-// android config
-config.android = {
-	appId: '{{ third_parties ['dev'].android_app_id }}',
-	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties ['dev'].android_app_id }}',
-	appStoreUrlMobile: 'market://details?id={{ third_parties ['dev'].android_app_id }}'
-};
-
-{% endif %}
-
-{% else %}
-
-// Deep link url scheme for use in sending out emails.
-config.urlScheme = '{{ third_parties [cluster_name].url_scheme }}';
-
-// Facebook AppId.
-config.facebook.appId = '{{ third_parties [cluster_name].facebook_app_id }}';
-
-// android config
-config.android = {
-	appId: '{{ third_parties [cluster_name].android_app_id }}',
-	appStoreUrlWeb: 'https://play.google.com/store/apps/details?id={{ third_parties [cluster_name].android_app_id }}',
-	appStoreUrlMobile: 'market://details?id={{ third_parties [cluster_name].android_app_id }}'
-};
-
-{% endif %}
-
-if (!config.authentication || typeof config.authentication !== 'object') {
-        config.authentication = {};
-}
-
-if (!config.authentication.google || typeof config.authentication.google !== 'object') {
-        config.authentication.google = {};
-}
-
-{% if deployment.google_project in google_projects %}
 {% set google_project = google_projects [cluster_deployment.google_project] %}
+
+if (! config.authentication || typeof config.authentication !== 'object') {
+	config.authentication = {};
+}
+
+if (! config.authentication.google || typeof config.authentication.google !== 'object') {
+	config.authentication.google = {};
+}
+
 config.authentication.google.name = '{{ google_project.auth_name }}';
 config.authentication.google.api_key = '{{ google_project.auth_api_key }}';
 config.authentication.google.client_id = '{{ google_project.auth_client_id }}';
 config.authentication.google.client_secret = '{{ google_project.auth_client_secret }}';
-{% else %}
-config.authentication.google.name = '';
-config.authentication.google.client_id = '';
-config.authentication.google.client_secret = '';
-{% endif %}
 
 module.exports = config;
 

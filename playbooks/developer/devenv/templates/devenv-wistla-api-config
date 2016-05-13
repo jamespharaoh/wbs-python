@@ -191,11 +191,7 @@ config.applePush = {
 };
 
 // Deep link url scheme for use in sending out emails.
-{% if 'dev' in third_parties %}
-config.urlScheme = '{{ third_parties.dev.url_scheme }}';
-{% else %}
-config.urlScheme = '';
-{% endif %}
+config.urlScheme = '{{ deployment.url_scheme }}';
 
 // Analytics
 
@@ -247,62 +243,35 @@ config.analytics.provider.google.trackerId = '';
 if (!config.gcm || typeof config.gcm !== 'object') {
     config.gcm = {};
 }
-{% if deployment.google_project in google_projects %}
+
 {% set google_project = google_projects [deployment.google_project] %}
+
 config.gcm.enabled = true;
 config.gcm.apiKey = '{{ google_project.cloud_messaging_api_key }}';
 config.gcm.senderId = '{{ google_project.cloud_messaging_sender_id }}';
 config.gcm.appName = '{{ google_project.cloud_messaging_app_name }}';
-{% else %}
-config.gcm.enabled = false;
-config.gcm.apiKey = '';
-config.gcm.senderId = '';
-config.gcm.appName = '';
-{% endif %}
 
 if (!config.authentication.google || typeof config.authentication.google !== 'object') {
 	config.authentication.google = {};
 }
 
-{% if deployment.google_project in google_projects %}
-{% set google_project = google_projects [deployment.google_project] %}
 config.authentication.google.name = '{{ google_project.auth_name }}';
 config.authentication.google.client_id = '{{ google_project.auth_client_id }}';
 config.authentication.google.client_secret = '{{ google_project.auth_client_secret }}';
-{% else %}
-config.authentication.google.name = '';
-config.authentication.google.client_id = '';
-config.authentication.google.client_secret = '';
-{% endif %}
 
 // facebook app to use
-{% if 'dev' in third_parties %}
-config.authentication.facebook.appToUse = '{{ third_parties.dev.facebook_app_to_use }}';
-{% else %}
-config.authentication.facebook.appToUse = 'wistlaDev';
-{% endif %}
+
+{% set facebook_app = facebook_apps [deployment.facebook_app] %}
+config.authentication.facebook.appToUse = '{{ facebook_app.app_name }}';
 
 // facebook app configuration options
 config.authentication.facebook.apps = {
-{% for key, cluster_name in {
-	'wistla': 'production',
-	'wistlaStaging': 'staging',
-	'wistlaTest': 'test',
-	'wistlaDev': 'dev',
-}.items () %}
-{% if 'dev' in third_parties %}
-	{{ key }}: {
-		appId: '{{ third_parties [cluster_name].facebook_app_id }}',
-		appSecret: '{{ third_parties [cluster_name].facebook_app_secret }}',
-		appAccessToken: '{{ third_parties [cluster_name].facebook_app_access_token }}'
+{% for facebook_app in facebook_apps.values () %}
+	{{ facebook_app.app_name }}: {
+		appId: '{{ facebook_app.app_id }}',
+		appSecret: '{{ facebook_app.app_secret }}',
+		appAccessToken: '{{ facebook_app.access_token }}'
 	},
-{% else %}
-	{{ key }}: {
-		appId: '',
-		appSecret: '',
-		appAccessToken: ''
-	},
-{% endif %}
 {% endfor %}
 };
 

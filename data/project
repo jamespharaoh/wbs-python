@@ -53,6 +53,9 @@ resource_data:
   superclusters: "supercluster.supercluster"
   deployments: "deployment.deployment"
   dev_deployments: "dev-deployments.deployment"
+
+  android_apps: "android-app.android_app"
+  facebook_apps: "facebook-app.facebook_app"
   google_projects: "google-project.google_project"
 
 # ex: et ts=2 filetype=yaml
