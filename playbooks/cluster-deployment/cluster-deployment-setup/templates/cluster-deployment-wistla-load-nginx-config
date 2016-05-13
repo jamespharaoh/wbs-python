@@ -56,6 +56,10 @@ http {
 		'http_504',
 	] | join (' ') }};
 
+	add_header X-Wistla-Load-Host $hostname;
+	add_header X-Wistla-Load-Port $server_port;
+	# TODO: add always (requires nginx 1.7.5)
+
 	# upstream servers
 
 	{%- macro upstream (name, port) -%}

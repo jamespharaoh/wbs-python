@@ -59,6 +59,9 @@ http {
 
 {% endif %}
 
+	add_header X-Wistla-Load-Host $hostname always;
+	add_header X-Wistla-Load-Port $server_port always;
+
 	{%- macro upstream (name, port) -%}
 
 		{%- print '\tupstream ', name, ' {\n' -%}

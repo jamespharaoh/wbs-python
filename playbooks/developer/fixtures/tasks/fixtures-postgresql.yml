@@ -57,7 +57,7 @@
 - name: "create postgresql user vagrant"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user-vagrant"
 
   shell: "{{ [
     'sleep 2',

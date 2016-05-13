@@ -125,6 +125,8 @@ apply Service "http" {
 
 	command_endpoint = host.vars.endpoint
 
+	vars.http_uri = "/hello"
+
 	assign where host.vars.type == "cluster-admin"
 
 }

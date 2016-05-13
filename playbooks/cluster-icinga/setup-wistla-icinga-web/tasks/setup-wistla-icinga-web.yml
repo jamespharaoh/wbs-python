@@ -1,7 +1,7 @@
 ---
 
 - name: "create wistla icinga web configuration"
-  with_items: "wistla_icinga_web_config_templates"
+  with_items: "{{ wistla_icinga_web_config_templates }}"
   become: "yes"
   action:
 
@@ -13,7 +13,7 @@
     mode: "{{ item.mode }}"
 
 - name: "enable wistla icinga web modules"
-  with_items: "wistla_icinga_web_enabled_modules"
+  with_items: "{{ wistla_icinga_web_enabled_modules }}"
   become: "yes"
   args:
 

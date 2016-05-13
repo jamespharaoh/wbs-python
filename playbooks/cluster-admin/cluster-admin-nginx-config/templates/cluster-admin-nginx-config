@@ -22,7 +22,7 @@ http {
 	log_format times '{{ [
 		'$time_iso8601',
 		inventory_hostname,
-		'$upstream_addr',
+		'$http_x_wistla_endpoint',
 		'$status',
 		'$body_bytes_sent',
 		'$request_time',
@@ -52,12 +52,16 @@ http {
 
 	server {
 
-		listen 80;
-		listen 8080 proxy_protocol;
+		listen 80 default_server;
+		listen 8080 proxy_protocol default_server;
 
 		server_name $hostname;
 
 		root /usr/share/nginx/html;
+
+		location /hello {
+			return 200;
+		}
 
 	}
 
