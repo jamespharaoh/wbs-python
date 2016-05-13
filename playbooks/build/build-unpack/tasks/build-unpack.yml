@@ -12,7 +12,7 @@
       node_type,
       '-',
       build_id,
-      '.tar.gz',
+      '.tar',
     ] | join }}"
 
     build_target: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
@@ -36,7 +36,7 @@
     sudo btrfs subvolume create "$build_target";
 
     {
-      zbackup restore "$build_source.temp"
+      zbackup restore "$build_source"
         --password-file "/vagrant/secret/wistla-build-secret"
         --silent;
     } | {

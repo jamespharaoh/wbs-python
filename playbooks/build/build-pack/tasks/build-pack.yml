@@ -23,7 +23,7 @@
       node_type,
       '-',
       build_id,
-      '.tar.gz',
+      '.tar',
     ] | join }}"
 
   args:
@@ -36,7 +36,7 @@
       node_type,
       '-',
       build_id,
-      '.tar.gz',
+      '.tar',
     ] | join }}"
 
     executable: "/bin/bash"
