@@ -1,7 +1,7 @@
 ---
 
 - name: "unpack build"
-  connection: "local"
+  delegate_to: "localhost"
   environment:
 
     build_source: "{{ [
