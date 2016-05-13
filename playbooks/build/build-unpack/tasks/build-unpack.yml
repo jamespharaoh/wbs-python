@@ -26,11 +26,6 @@
 
     cd "{{ deployment_home }}/work/build";
 
-    tar
-      --extract
-      --gzip
-      --file "{{ node_type }}-{{ build_id }}.tar.gz"
-      --directory "/var/lib/lxc/{{ inventory_hostname }}"
-      rootfs;
+    false;
 
 # ex: et ts=2 filetype=yaml

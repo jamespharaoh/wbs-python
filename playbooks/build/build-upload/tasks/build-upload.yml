@@ -9,7 +9,9 @@
 
     set -euf -o pipefail;
 
-    eval $(misc/amazon-auth ops);
+    if test "{{ deployment_mode }}" = "vagrant"; then
+      eval $(misc/amazon-auth ops);
+    fi;
 
     aws s3 sync
       "$HOME/builds"
