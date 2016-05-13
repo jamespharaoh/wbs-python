@@ -1,5 +1,20 @@
 ---
 
+- name: "clean templates"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    cd "{{ cluster_deployment_home }}/wistla-devops";
+
+    ./run-ansible || true;
+
+    ./run-ansible playbooks/clean-templates.yml;
+
 - name: "remove project links"
   with_items: "{{ cluster_deployment_checkouts | flatten_hash ('project_links') }}"
   become: "yes"
@@ -59,20 +74,5 @@
         | prepend_list ('--exclude ')
         | join (' ')
       }};
-
-- name: "clean templates"
-  args:
-
-    executable: "/bin/bash"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    cd "{{ cluster_deployment_home }}/wistla-devops";
-
-    ./run-ansible || true;
-
-    ./run-ansible playbooks/clean-templates.yml;
 
 # ex: et ts=2 filetype=yaml

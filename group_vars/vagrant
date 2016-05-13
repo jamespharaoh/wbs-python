@@ -166,6 +166,9 @@ ubuntu_system_packages:
   - name: "whois"
     state: "present"
 
+  - name: "zbackup"
+    state: "present"
+
 nodejs_packages:
 
   - name: "bunyan"

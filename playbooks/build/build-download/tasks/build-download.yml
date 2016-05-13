@@ -1,18 +1,18 @@
 ---
 
-- name: "download package"
-  delegate_to: "localhost"
-  action:
+- name: "upload builds"
+  args:
 
-    module: "s3"
-    mode: "get"
+    executable: "/bin/bash"
 
-    bucket: "{{ build_bucket }}"
-    object: "{{ build_target }}/{{ node_type }}-{{ build_id }}.tar.gz"
-    dest: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
+  shell:
 
-    region: "{{ devops_region }}"
-    aws_access_key: "{{ amazon_accounts.ops.access_key }}"
-    aws_secret_key: "{{ amazon_accounts.ops.secret_key }}"
+    set -euf -o pipefail;
 
-# ex: et ts=4 filetype=yaml
+    eval $(misc/amazon-auth ops);
+
+    aws s3 sync
+      "s3://wistla-builds/zbackup"
+      "$HOME/builds";
+
+# ex: et ts=2 filetype=yaml

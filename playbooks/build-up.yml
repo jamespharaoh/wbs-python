@@ -1,9 +1,19 @@
 ---
 
+- hosts: "localhost"
+  roles:
+
+    - "build-download"
+
 - hosts: "node-template-concrete"
+  serial: "1"
   roles:
 
     - "build-pack"
+
+- hosts: "localhost"
+  roles:
+
     - "build-upload"
 
 # ex: et ts=2 filetype=yaml

@@ -11,31 +11,51 @@
 
 - name: "create package"
   delegate_to: "localhost"
-  become: "yes"
+  environment:
+
+    build_source: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
+
+    build_target: "{{ [
+      deployment_home,
+      '/builds/backups/',
+      deployment_name,
+      '-',
+      node_type,
+      '-',
+      build_id,
+      '.tar.gz',
+    ] | join }}"
+
   args:
 
-    creates: "{{ deployment_home }}/work/build/{{ node_type }}-{{ build_id }}.tar.gz"
+    creates: "{{ [
+      deployment_home,
+      '/builds/backups/',
+      deployment_name,
+      '-',
+      node_type,
+      '-',
+      build_id,
+      '.tar.gz',
+    ] | join }}"
+
     executable: "/bin/bash"
 
   shell:
 
     set -euf -o pipefail;
 
-    cd "{{ deployment_home }}/work/build";
+    {
+      sudo tar
+        --create
+        --directory "$build_source"
+        ".";
+    } | {
+      zbackup backup "$build_target.temp"
+        --password-file "/vagrant/secret/wistla-build-secret"
+        --silent;
+    };
 
-    tar
-      --create
-      --gzip
-      --file "{{ node_type }}-{{ build_id }}.tar.gz.temp"
-      --directory "/var/lib/lxc/{{ inventory_hostname }}"
-      rootfs;
-
-    chown
-      "{{ deployment_user }}:{{ deployment_user }}"
-      "{{ node_type }}-{{ build_id }}.tar.gz.temp";
-
-    mv
-      "{{ node_type }}-{{ build_id }}.tar.gz.temp"
-      "{{ node_type }}-{{ build_id }}.tar.gz";
+    mv "$build_target.temp" "$build_target";
 
 # ex: et ts=2 filetype=yaml
