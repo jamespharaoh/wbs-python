@@ -3,6 +3,21 @@
 - name: "unpack build"
   delegate_to: "localhost"
   become: "yes"
+  environment:
+
+    build_source: "{{ [
+      deployment_home,
+      '/builds/backups/',
+      deployment_name,
+      '-',
+      node_type,
+      '-',
+      build_id,
+      '.tar.gz',
+    ] | join }}"
+
+    build_target: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
+
   args:
 
     executable: "/bin/bash"
@@ -11,21 +26,25 @@
 
     set -euf -o pipefail;
 
-    if test -e "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
-    then
+    if test -e "$build_target"; then
 
-      btrfs subvolume delete
-        "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+      btrfs subvolume delete "$build_target";
 
       sleep 2;
 
     fi;
 
-    btrfs subvolume create
-      "/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+    btrfs subvolume create "$build_target";
 
-    cd "{{ deployment_home }}/work/build";
-
-    false;
+    {
+      zbackup restore "$build_source.temp"
+        --password-file "/vagrant/secret/wistla-build-secret"
+        --silent;
+    } | {
+      sudo tar
+        --extract
+        --directory "$build_source"
+        ".";
+    };
 
 # ex: et ts=2 filetype=yaml
