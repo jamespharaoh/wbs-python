@@ -18,8 +18,6 @@
     build_target: "{{ [
       deployment_home,
       '/builds/backups/',
-      deployment_name,
-      '-',
       node_type,
       '-',
       build_id,
@@ -31,8 +29,6 @@
     creates: "{{ [
       deployment_home,
       '/builds/backups/',
-      deployment_name,
-      '-',
       node_type,
       '-',
       build_id,
