@@ -1,0 +1,18 @@
+---
+
+identity:
+
+  type: "class"
+  name: "facebook-app"
+
+class:
+
+  namespace: "facebook-app"
+
+facebook_app:
+
+  name: "{{ identity_name }}"
+  description: ""
+  access_token: "{{ facebook_app.app_id }}|{{ facebook_app.app_secret }}"
+
+# ex: et ts=2 filetype=yaml
