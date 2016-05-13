@@ -32,7 +32,7 @@ http {
 	log_format times '{{ [
 		'$time_iso8601',
 		inventory_hostname,
-		'$upstream_addr',
+		'$upstream_http_x_wistla_load_host',
 		'$remote_addr',
 		'$status',
 		'$body_bytes_sent',
