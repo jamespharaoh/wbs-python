@@ -42,8 +42,7 @@
     } | {
       sudo tar
         --extract
-        --directory "$build_source"
-        ".";
+        --directory "$build_source";
     };
 
 # ex: et ts=2 filetype=yaml
