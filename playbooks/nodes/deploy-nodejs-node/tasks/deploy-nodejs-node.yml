@@ -23,6 +23,7 @@
       /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item.name }}/
       --exclude /.git
       --exclude /node_modules
+      --exclude /third-party
       {{
         item.excludes
         | default ([])
@@ -49,8 +50,11 @@
       --archive
       --delete
       --itemize-changes
-      {{ deployment_home }}/{{ item.name }}/node_modules/
-      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item.name }}/node_modules/;
+      --include /node_modules
+      --include /third-party
+      --exclude /*
+      {{ deployment_home }}/{{ item.name }}/
+      /var/lib/lxc/{{ inventory_hostname }}/rootfs/home/ubuntu/{{ item.name }}/;
 
 - name: "create init config"
   with_nested:

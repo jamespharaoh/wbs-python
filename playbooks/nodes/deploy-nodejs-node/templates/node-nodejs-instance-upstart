@@ -2,7 +2,7 @@
 
 {% set node_var = 'WISTLA_' + node_type | upper %}
 
-description "wistla {{ node_type }} instance"
+description "{{ item.0.name }} instance"
 
 instance ${{ node_var }}_INDEX
 
@@ -21,15 +21,15 @@ pre-start script
 	mkdir --parents /shared/log
 
 	setuid ubuntu \
-	touch /shared/log/wistla-{{ node_type }}.log
+	touch /shared/log/{{ item.0.name }}.log
 
-	exec >> /shared/log/wistla-{{ node_type }}.log
-	exec 2>> /shared/log/wistla-{{ node_type }}.log
+	exec >> /shared/log/{{ item.0.name }}.log
+	exec 2>> /shared/log/{{ item.0.name }}.log
 
-	echo "$(date --iso-8601=seconds) $(hostname) %% CONTAINER-PROCESS-CONTROL %% START %% wistla-{{ node_type }}[${{ node_var }}_INDEX]"
+	echo "$(date --iso-8601=seconds) $(hostname) %% CONTAINER-PROCESS-CONTROL %% START %% {{ item.0.name }}[${{ node_var }}_INDEX]"
 
 	START_TIME="$(date +"%s")"
-	echo "$START_TIME" > "/var/run/wistla-{{ node_type }}-${{ node_var }}_INDEX-start"
+	echo "$START_TIME" > "/var/run/{{ item.0.name }}-${{ node_var }}_INDEX-start"
 
 end script
 
@@ -37,10 +37,10 @@ script
 
 	. /config/environment
 
-	exec >> /shared/log/wistla-{{ node_type }}.log
-	exec 2>> /shared/log/wistla-{{ node_type }}.log
+	exec >> /shared/log/{{ item.0.name }}.log
+	exec 2>> /shared/log/{{ item.0.name }}.log
 
-	cd /home/ubuntu/wistla-{{ node_type }}
+	cd /home/ubuntu/{{ item.0.name }}
 
 	if test "${{ node_var }}_INDEX" = "0" \
 		-a "${{ node_var }}_DEBUG" = "yes"
@@ -53,15 +53,14 @@ script
 		 #}
 
 		exec setuid ubuntu \
-		node-debug --nodejs --harmony \
-		--debug-brk=0 \
+		{{ node_nodejs_debug }} \
 		{{ node_nodejs_main }}
 
 	else
 
 		exec setuid ubuntu \
 		stdbuf -oL -eL \
-		node --harmony \
+		{{ node_nodejs_interpreter }} \
 		--trace_gc \
 		--expose_gc \
 		--min_semi_space_size=${{ node_var }}_MIN_SEMI_SPACE_SIZE \
@@ -82,16 +81,16 @@ post-stop script
 	mkdir --parents /shared/log
 
 	setuid ubuntu \
-	touch /shared/log/wistla-{{ node_type }}.log
+	touch /shared/log/{{ item.0.name }}.log
 
-	exec >> /shared/log/wistla-{{ node_type }}.log
-	exec 2>> /shared/log/wistla-{{ node_type }}.log
+	exec >> /shared/log/{{ item.0.name }}.log
+	exec 2>> /shared/log/{{ item.0.name }}.log
 
-	START_TIME="$(cat "/var/run/wistla-{{ node_type }}-${{ node_var }}_INDEX-start")"
+	START_TIME="$(cat "/var/run/{{ item.0.name }}-${{ node_var }}_INDEX-start")"
 	END_TIME="$(date +"%s")"
 	DURATION="$((END_TIME - START_TIME))"
 
-	echo "$(date --iso-8601=seconds) $(hostname) %% CONTAINER-PROCESS-CONTROL %% STOP %% wistla-{{ node_type }}[${{ node_var }}_INDEX] (after $DURATION seconds)"
+	echo "$(date --iso-8601=seconds) $(hostname) %% CONTAINER-PROCESS-CONTROL %% STOP %% {{ item.0.name }}[${{ node_var }}_INDEX] (after $DURATION seconds)"
 
 	exec sleep 2
 

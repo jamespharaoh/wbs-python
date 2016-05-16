@@ -4,30 +4,21 @@ node_deploy_projects:
 
   - name: "wistla-api-server"
     type: "nodejs"
-    excludes: []
+    excludes:
 
-#      - "/config/config.local.js"
-#      - "/config/config.overrides.js"
-#      - "/config/google-service-account.key"
-#      - "/config/apple-ca.cert"
-#      - "/config/apple-push.cert"
-#      - "/config/apple-push.key"
+      - "/config/local.yaml"
 
-    configs: []
+    configs:
 
-#      - "apple-ca.cert"
-#      - "apple-push.cert"
-#      - "apple-push.key"
-#      - "config.local.js"
-#      - "config.overrides.js"
-#      - "google-service-account.key"
+      - "local.yaml"
 
-#  - name: "content-common"
-#    type: "content"
+node_nodejs_main: "index.js"
 
-#  - name: "wistla-analytics"
-#    type: "nodejs"
+node_nodejs_interpreter: "node --harmony"
+node_nodejs_debug: "node debug --debug-brk=5005 --harmony"
 
-node_nodejs_main: "TODO"
+nodejs_version: "{{ deployment.nodejs_version }}"
+
+nodejs_packages: []
 
 # ex: et ts=2 filetype=yaml

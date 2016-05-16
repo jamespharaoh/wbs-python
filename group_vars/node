@@ -82,6 +82,4 @@ git_base_url: "{{ dev_git_base_url }}"
 
 wistla_dist_url: "{{ dev_wistla_dist_url }}"
 
-nodejs_version: "{{ deployment.nodejs_version }}"
-
 # ex: et ts=2 filetype=yaml

@@ -12,7 +12,7 @@ script
 	. /config/environment
 
 	for index in $(seq 0 $((WISTLA_{{ node_type | upper }}_COUNT - 1))); do
-		start wistla-{{ node_type }}-instance WISTLA_{{ node_type | upper }}_INDEX=$index
+		start {{ item.0.name }}-instance WISTLA_{{ node_type | upper }}_INDEX=$index
 	done
 
 end script
