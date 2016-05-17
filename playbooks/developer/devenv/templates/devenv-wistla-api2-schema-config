@@ -3,7 +3,7 @@
 db:
 
   database: "wistla"
-  host: "postgres://{{ deployment_name }}-postgresql-0/wistla"
+  host: "{{ deployment_name }}-postgresql-0"
   port: ""
   user_name: ""
   password: ""
