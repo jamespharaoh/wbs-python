@@ -72,4 +72,21 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
   ] | join (' && ') }}"
 
+- name: "create postgresql user wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user-wistla"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'wistla',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-user-wistla',
+  ] | join (' && ') }}"
+
 # ex: et ts=2 filetype=yaml

@@ -47,9 +47,13 @@ devenv_config_templates:
 
   # ---------- api2
 
-  - template: "devenv-wistla-api2-config"
+  - template: "devenv-wistla-api2-schema-config"
     type: "api2"
-    target: "local.yaml"
+    target: "wistla-db-schema-local.yaml"
+
+  - template: "devenv-wistla-api2-server-config"
+    type: "api2"
+    target: "wistla-api-server-local.yaml"
 
   - template: "devenv-wistla-api2-environment"
     type: "api2"
@@ -112,41 +116,44 @@ devenv_config_templates:
 
 devenv_config_links:
 
-  - src: "../../config/api/apple-ca.cert"
-    dest: "wistla-api/config/apple-ca.cert"
+  - dest: "wistla-admin/config/config.local.js"
+    src: "../../config/load/wistla-admin-config.local.js"
 
-  - src: "../../config/api/apple-push.cert"
-    dest: "wistla-api/config/apple-push.cert"
+  - dest: "wistla-api/config/apple-ca.cert"
+    src: "../../config/api/apple-ca.cert"
 
-  - src: "../../config/api/apple-push.key"
-    dest: "wistla-api/config/apple-push.key"
+  - dest: "wistla-api/config/apple-push.cert"
+    src: "../../config/api/apple-push.cert"
 
-  - src: "../../config/api/config.local.js"
-    dest: "wistla-api/config/config.local.js"
+  - dest: "wistla-api/config/apple-push.key"
+    src: "../../config/api/apple-push.key"
 
-  - src: "../../config/api/config.overrides.js"
-    dest: "wistla-api/config/config.overrides.js"
+  - dest: "wistla-api/config/config.local.js"
+    src: "../../config/api/config.local.js"
 
-  - src: "../../config/api/google-service-account.key"
-    dest: "wistla-api/config/google-service-account.key"
+  - dest: "wistla-api/config/config.overrides.js"
+    src: "../../config/api/config.overrides.js"
 
-  - src: "../../config/api2/local.yaml"
-    dest: "wistla-api-server/config/local.yaml"
+  - dest: "wistla-api/config/google-service-account.key"
+    src: "../../config/api/google-service-account.key"
 
-  - src: "../../config/browser/config.local.js"
-    dest: "wistla-browser/config/config.local.js"
+  - dest: "wistla-api-server/config/local.yaml"
+    src: "../../config/api2/wistla-api-server-local.yaml"
 
-  - src: "../../config/browser/config.overrides.js"
-    dest: "wistla-browser/config/config.overrides.js"
+  - dest: "wistla-browser/config/config.local.js"
+    src: "../../config/browser/config.local.js"
 
-  - src: "../../config/load/wistla-admin-config.local.js"
-    dest: "wistla-admin/config/config.local.js"
+  - dest: "wistla-browser/config/config.overrides.js"
+    src: "../../config/browser/config.overrides.js"
 
-  - src: "../../config/web/config.local.js"
-    dest: "wistla-web/config/config.local.js"
+  - dest: "wistla-db-schema/config/local.yaml"
+    src: "../../config/api2/wistla-db-schema-local.yaml"
 
-  - src: "../../config/web/config.overrides.js"
-    dest: "wistla-web/config/config.overrides.js"
+  - dest: "wistla-web/config/config.local.js"
+    src: "../../config/web/config.local.js"
+
+  - dest: "wistla-web/config/config.overrides.js"
+    src: "../../config/web/config.overrides.js"
 
 devenv_shared_directories:
 

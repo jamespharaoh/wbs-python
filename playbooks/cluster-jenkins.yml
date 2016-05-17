@@ -25,11 +25,9 @@
     - "wistla-heka-agent"
 
     - "python"
+    - "nodejs"
 
     - "install-mongodb"
     - "install-tools"
-
-    - "nodejs-install"
-    - "nodejs-packages-install"
 
 # ex: et ts=2 filetype=yaml

@@ -35,6 +35,7 @@
 
     - "nodejs-install"
     - "nodejs-packages-install"
+    - "nodejs-stubs"
 
     - "nginx-install"
     - "cluster-admin-nginx-setup"

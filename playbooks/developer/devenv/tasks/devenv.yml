@@ -3,6 +3,7 @@
 - name: "checkout projects from git"
   with_items: "{{ devenv_checkouts }}"
   when: "deployment_mode == 'vagrant'"
+  tags: "checkout"
   args:
 
     executable: "/bin/bash"
