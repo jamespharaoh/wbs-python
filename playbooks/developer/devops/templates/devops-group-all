@@ -2,10 +2,14 @@
 
 {{ (ansible_warning | default ({ '#': '' })) ['#'] }}
 
+# ---------------------------------------- globals
+
 {% set globals = lookup ('file', DATA + '/globals') | from_yaml %}
 {% for key, value in globals.items () %}
 {{ key }}: {{ value | to_json }}
 {% endfor %}
+
+# ---------------------------------------- data from files
 
 amazon_accounts: {{ lookup ('file', DATA + '/amazon-accounts')
   | from_yaml | to_json }}
@@ -34,6 +38,8 @@ ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys')
 vpn_clients: {{ lookup ('file', DATA + '/vpn-clients')
   | from_yaml | to_json }}
 
+# ---------------------------------------- secrets
+
 {% macro do_secrets (name) %}
 {% set filename = lookup ('fileglob', HOME + '/security/third-parties/' + name) %}
 {% if filename %}
@@ -42,6 +48,8 @@ vpn_clients: {{ lookup ('file', DATA + '/vpn-clients')
   {{ name }}: {}
 {% endif %}
 {% endmacro %}
+
+# ---------------------------------------- third parties
 
 {% if not secrets | default ([]) %}
 third_parties: {}
@@ -60,9 +68,13 @@ third_parties:
 
 {% if deployment_mode == 'vagrant'
    and checkout_profiles is defined %}
+
+# ---------------------------------------- devenv checkouts
+
 devenv_checkouts:
+
 {% for project_reference in checkout_profiles ['developer_' + developer_profile] %}
-{% set project_detail = project_details [project_reference.name] %}
+{% set project_detail = project_details [project_reference.name] | default ({}) %}
 
   - name: {{ project_reference.name | to_json }}
     branch: {{ project_reference.branch | to_json }}
