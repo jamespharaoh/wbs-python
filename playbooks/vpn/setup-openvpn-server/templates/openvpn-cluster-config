@@ -3,18 +3,22 @@
 {% set other_cluster_name = item.0 %}
 {% set other_cluster = clusters [other_cluster_name] %}
 
-{% set other_host = hostvars [
-	'wistla-' + other_cluster_name + '-admin-' + item.1] %}
+{% set other_host_name = [
+	'wistla-',
+	other_cluster_name,
+	'-admin-',
+	item.1.
+] | join %}
 
 # ---------- client
 
 client
 resolv-retry infinite
 nobind
-remote {{ other_host.instance_zone }}.vpn.{{ other_cluster.local_domain }} 1194
+remote {{ hostvars [other_host_name].instance_zone }}.vpn.{{ other_cluster.local_domain }} 1194
 proto udp
 keepalive 5 20
-status /var/log/vpn-{{ other_host.inventory_hostname }}.log
+status /var/log/vpn-{{ other_host_name }}.log
 
 # ---------- network
 
@@ -25,7 +29,7 @@ persist-tun
 
 max-routes 1024
 
-route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [other_host.instance_zone] * 64 }}.0 255.255.192.0
+route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [hostvars [other_host_name].instance_zone] * 64 }}.0 255.255.192.0
 
 {% for other_cluster_deployment_name in other_cluster.deployment_names %}
 {% set other_cluster_deployment = deployments [other_cluster_deployment_name] %}
@@ -36,7 +40,7 @@ route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [other_host.in
 route {{ [
 	other_cluster_deployment.bridge_network,
 	index,
-	cluster_zone_indices [other_host.instance_zone] * 64,
+	cluster_zone_indices [hostvars [other_host_name].instance_zone] * 64,
 ] | join ('.') }} 255.255.255.192
 {% endfor %}
 {% endfor %}

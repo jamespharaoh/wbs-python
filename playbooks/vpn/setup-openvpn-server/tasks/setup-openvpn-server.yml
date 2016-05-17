@@ -10,6 +10,7 @@
     common_name: "{{ inventory_hostname }}"
     usage: "mixed"
     alt_dns:
+
       - "{{ inventory_hostname }}"
       - "{{ inventory_hostname }}.{{ cluster.local_domain }}"
       - "vpn.{{ cluster.local_domain }}"
