@@ -50,6 +50,9 @@ developer_full:
   - name: "wistla-data-process"
     branch: "master"
 
+  - name: "wistla-db-schema"
+    branch: "master"
+
   - name: "wistla-devops"
     branch: "master"
 
@@ -113,6 +116,9 @@ developer_full:
     branch: "master"
 
   - name: "wistla-data-process"
+    branch: "master"
+
+  - name: "wistla-db-schema"
     branch: "master"
 
   - name: "wistla-devops"
