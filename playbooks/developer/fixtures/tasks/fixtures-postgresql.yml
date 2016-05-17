@@ -9,7 +9,7 @@
     'sleep 2',
     [
       deployment_name + '-postgresql-0',
-      'sudo service postgresql stop',
+      'sudo service postgresql stop || true',
     ] | join (' '),
     [
       deployment_name + '-postgresql-0',
