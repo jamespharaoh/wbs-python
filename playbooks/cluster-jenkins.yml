@@ -30,4 +30,6 @@
     - "install-mongodb"
     - "install-tools"
 
+    - "cluster-jenkins"
+
 # ex: et ts=2 filetype=yaml

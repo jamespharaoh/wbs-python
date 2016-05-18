@@ -4,6 +4,7 @@ NAME="jenkins"
 
 JAVA="/usr/bin/java"
 JAVA_ARGS=""
+JAVA_ARGS="-Xmx2048m"
 JAVA_ARGS="$JAVA_ARGS -Djava.awt.headless=true"
 JAVA_ARGS="$JAVA_ARGS -Dfile.encoding=UTF8"
 
