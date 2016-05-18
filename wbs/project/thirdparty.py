@@ -79,9 +79,14 @@ class ThirdPartySetup (object):
 		self.third_party_index = (
 			read_index ())
 
-		self.git_repo = (
-			git.Repo (
-				"."))
+		if os.path.exists (".git"):
+
+			self.git_repo = (
+				git.Repo ("."))
+
+		else:
+
+			self.git_repo = None
 
 	def fetch (self):
 
@@ -265,6 +270,9 @@ class ThirdPartySetup (object):
 
 	def stash_changes (self):
 
+		if not self.git_repo:
+			return
+
 		if self.stashed:
 			return
 
@@ -330,6 +338,9 @@ class ThirdPartySetup (object):
 			raise KeyboardInterrupt ()
 
 	def unstash_changes (self):
+
+		if not self.git_repo:
+			return
 
 		if not self.stashed:
 			return
@@ -559,16 +570,15 @@ class ThirdPartySetup (object):
 
 			):
 
-				build_data = {
-					"command": " ".join ([
-						"python setup.py build",
-					]),
-					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
-					},
-				}
+				python_site_packages = (
+					"%s/work/lib/python2.7/site-packages" % (
+						self.project_path))
+
+				if not os.path.isdir (
+					python_site_packages):
+
+					os.makedirs (
+						python_site_packages)
 
 				build_data = {
 					"command": " ".join ([
@@ -576,9 +586,7 @@ class ThirdPartySetup (object):
 						"--prefix %s/work" % self.project_path,
 					]),
 					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
+						"PYTHONPATH": python_site_packages,
 					},
 				}
 
