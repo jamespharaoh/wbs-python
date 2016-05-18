@@ -4,11 +4,11 @@
   tasks:
 
     - debug:
-        msg: "the playbook semi-redeploy.yml has been renamed to node-redeploy-quick.yml"
+        msg: "the playbook semi-redeploy.yml has been renamed to node-redeploy.yml"
 
     - pause:
         seconds: "20"
 
-- include: "node-redeploy-quick.yml"
+- include: "node-redeploy.yml"
 
 # ex: et ts=2 filetype=yaml

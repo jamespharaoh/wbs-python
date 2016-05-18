@@ -31,8 +31,11 @@ node_deploy_projects:
 
     configs:
 
-      - "config.local.js"
-      - "config.overrides.js"
+      - target: "config.local.js"
+        source: "config.local.js"
+
+      - target: "config.overrides.js"
+        source: "config.overrides.js"
 
   - name: "wistla-analytics"
     type: "nodejs"

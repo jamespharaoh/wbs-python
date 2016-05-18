@@ -44,12 +44,23 @@ node_deploy_projects:
 
     configs:
 
-      - "apple-ca.cert"
-      - "apple-push.cert"
-      - "apple-push.key"
-      - "config.local.js"
-      - "config.overrides.js"
-      - "google-service-account.key"
+      - target: "apple-ca.cert"
+        source: "apple-ca.cert"
+
+      - target: "apple-push.cert"
+        source: "apple-push.cert"
+
+      - target: "apple-push.key"
+        source: "apple-push.key"
+
+      - target: "config.local.js"
+        source: "config.local.js"
+
+      - target: "config.overrides.js"
+        source: "config.overrides.js"
+
+      - target: "google-service-account.key"
+        source: "google-service-account.key"
 
   - name: "content-common"
     type: "content"

@@ -1,6 +1,7 @@
 ---
 
 - name: "create exports"
+  register: "devbox_nfs_exports_result"
   become: "yes"
   action:
 
@@ -9,6 +10,7 @@
     dest: "/etc/exports"
 
 - name: "reload nfs server"
+  changed_when: "devbox_nfs_exports_result | changed"
   become: "yes"
   action:
 

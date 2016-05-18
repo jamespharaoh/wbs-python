@@ -81,9 +81,9 @@
   action:
 
     module: "file"
-    path: "/home/ubuntu/{{ item.outer.name }}/config/{{ item.configs }}"
+    path: "/home/ubuntu/{{ item.outer.name }}/config/{{ item.configs.target }}"
     state: "link"
-    src: "/config/{{ item.configs }}"
+    src: "/config/{{ item.configs.source }}"
     force: "yes"
 
 - name: "create other links"

@@ -6,11 +6,12 @@ node_deploy_projects:
     type: "nodejs"
     excludes:
 
-      - "/config/local.yaml"
+      - "/config/wistla-api-server-local.yaml"
 
     configs:
 
-      - "local.yaml"
+      - target: "local.yaml"
+        source: "wistla-api-server-local.yaml"
 
 node_nodejs_main: "index.js"
 
