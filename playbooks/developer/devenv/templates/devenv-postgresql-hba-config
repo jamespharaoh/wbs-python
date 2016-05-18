@@ -1,7 +1,15 @@
 local all all trust
 
-host all all {{ deployment.bridge_network }}.0.1/32 trust
+# this vagrant's host machine
+host all all 172.28.128.1/32 trust
 
+# other vagrant boxes
+{% for other_deployment_name in dev_deployment_names %}
+{% set other_deployment = deployments [other_deployment_name] %}
+host all all {{ other_deployment.bridge_network }}.0.1/32 trust
+{% endfor %}
+
+# local api2 nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
 {% print [
 	'host',
