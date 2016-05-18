@@ -2,6 +2,36 @@
 CHANGELOG
 =========
 
+1.10.29
+=======
+
+* feature:``dynamodb``: Update dynamodb command to latest version
+* bugfix:Shorthand: Remove back-compat shorthand features from new services.
+* bugfix:Paginator: Print a better error when pagination params are supplied along with no-paginate.
+* bugfix:ec2: Sets MaxResults to default value of 1000.
+* feature:``workspaces``: Update workspaces command to latest version
+* feature:``discovery``: Update discovery command to latest version
+
+
+1.10.28
+=======
+
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``ssm``: Update ssm command to latest version
+* feature:``discovery``: Update discovery command to latest version
+* feature:``cloudformation``: Update cloudformation command to latest version
+
+
+1.10.27
+=======
+
+* feature:``storagegateway``: Update storagegateway command to latest version
+* feature:``directconnect``: Update directconnect command to latest version
+* feature:``emr``: Update emr command to latest version
+* feature:``sqs``: Update sqs command to latest version
+* feature:``iam``: Update iam command to latest version
+
+
 1.10.26
 =======
 
