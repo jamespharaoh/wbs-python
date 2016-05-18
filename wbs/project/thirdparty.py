@@ -242,7 +242,7 @@ class ThirdPartySetup (object):
 						library_data ["branch"])):
 
 					self.git_repo.remotes [library_name].fetch (
-						"%s:refs/%s/%s" % (
+						"refs/heads/%s:refs/%s/%s" % (
 							library_data ["branch"],
 							library_name,
 							library_data ["branch"]),
