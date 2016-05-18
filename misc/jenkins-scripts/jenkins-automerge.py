@@ -18,9 +18,6 @@ new_merged = (
 old_master = (
 	git_repo.refs ["origin/master"].commit)
 
-old_merged = (
-	git_repo.refs ["origin/automerge"].commit)
-
 if new_merged == old_master:
 
 	if "origin/automerge" in git_repo.refs:
