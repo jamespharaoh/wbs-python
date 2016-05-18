@@ -209,6 +209,7 @@ def do_inventory_list (context):
 						inventory.resources [resource_name] [section],
 					)
 					for resource_name in inventory.group_members [group]
+					if section in inventory.resources [resource_name]
 				])
 
 			elif group in inventory.namespaces:
@@ -273,4 +274,4 @@ def print_json (data):
 		indent = 4,
 		separators = (", ", ": "))
 
-# ex: noet ts=4 filetype=yaml
+# ex: noet ts=4 filetype=python
