@@ -2,6 +2,36 @@
 CHANGELOG
 =========
 
+1.4.20
+======
+
+* feature:``dynamodb``: Update dynamodb client to latest version
+* bugfix:Waiters: Fix ``JMESPathTypeError`` exception being raised (`#906 <https://github.com/boto/botocore/issues/906>`__, `#907 <https://github.com/boto/botocore/issues/907>`__)
+* feature:``workspaces``: Update workspaces client to latest version
+* feature:s3: Add paginator for ListObjectsV2
+* feature:``discovery``: Update discovery client to latest version
+* feature:iam: Add missing paginators. Fixes `#919 <https://github.com/boto/botocore/issues/919>`__.
+
+
+1.4.19
+======
+
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``ssm``: Update ssm client to latest version
+* feature:``discovery``: Update discovery client to latest version
+* feature:``cloudformation``: Update cloudformation client to latest version
+
+
+1.4.18
+======
+
+* feature:``storagegateway``: Update storagegateway client to latest version
+* feature:``directconnect``: Update directconnect client to latest version
+* feature:``emr``: Update emr client to latest version
+* feature:``sqs``: Update sqs client to latest version
+* feature:``iam``: Update iam client to latest version
+
+
 1.4.17
 ======
 
