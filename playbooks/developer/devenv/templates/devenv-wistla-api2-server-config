@@ -4,7 +4,7 @@
 
     pg:
 
-      url: "postgres://{{ deployment_name }}-postgresql-0/wistla"
+      url: "postgres://wistla-api-server@{{ deployment_name }}-postgresql-0/wistla"
 
   log:
 
