@@ -166,6 +166,38 @@ devenv_shared_directories:
   - "shared/user-upload"
   - "shared/video"
 
+devenv_shared_logfiles:
+
+  - log: "shared/log/content-common.log"
+    user: "root"
+
+  - log: "shared/log/nginx-access.log"
+    user: "root"
+
+  - log: "shared/log/nginx-error.log"
+    user: "root"
+
+  - log: "shared/log/nginx-times.log"
+    user: "root"
+
+  - log: "shared/log/postgresql.log"
+    user: "postgres"
+
+  - log: "shared/log/wistla-analytics.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-api-server.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-api.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-browser.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-web.log"
+    user: "vagrant"
+
 devenv_override_templates:
 
   - template: "devenv-wistla-api-overrides"

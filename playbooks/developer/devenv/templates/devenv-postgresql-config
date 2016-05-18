@@ -20,6 +20,9 @@ dynamic_shared_memory_type = sysv
 
 # ----------- logging
 
+logging_collector = 'on'
+log_directory = '/shared/log'
+log_filename = 'postgresql.log'
 log_line_prefix = '%t [%p-%l] %q%u@%d '
 log_timezone = 'UTC'
 

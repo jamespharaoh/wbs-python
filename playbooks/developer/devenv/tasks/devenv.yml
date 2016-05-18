@@ -144,6 +144,19 @@
     path: "{{ deployment_home }}/{{ item }}"
     state: "directory"
 
+- name: "create shared logfiles"
+  with_items: "{{ devenv_shared_logfiles }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/{{ item.log }}"
+    state: "touch"
+
+    owner: "{{ item.user }}"
+    group: "{{ deployment_user }}"
+    mode: "0640"
+
 - name: "create config files"
   with_items: "{{ devenv_config_templates }}"
   become: "yes"
