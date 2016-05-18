@@ -14,10 +14,10 @@ from wbs import *
 
 class WbsDocsServer ():
 
-	def __init__ (self, master, content, settings):
+	def __init__ (self, content, config, settings):
 
-		self.master = master
 		self.content = content
+		self.config = config
 		self.settings = settings
 
 		self.init_project ()
@@ -44,13 +44,11 @@ class WbsDocsServer ():
 		self.flask = (
 			flask.Flask (
 				"wbs-documentation",
-				static_folder = "%s/static" % (
-					self.master.home),
-				template_folder = "%s/templates" % (
-					self.master.home)))
+				static_folder = self.config ["static-path"],
+				template_folder = self.config ["template-path"]))
 
 		self.flask.config ["APPLICATION_ROOT"] = (
-			self.master.home)
+			self.config ["project-path"])
 
 		self.flask.config ["DEBUG"] = (
 			self.settings ["server"] ["debug"] == "yes")
@@ -72,7 +70,8 @@ class WbsDocsServer ():
 
 		self.scss = (
 			flask.ext.assets.Bundle (
-				"styles/all.scss",
+				"%s/styles/all.scss" % (
+					self.config ["static-path"]),
 				filters = "pyscss",
 				output = "styles/all.css"))
 
@@ -151,11 +150,10 @@ class WbsDocsServer ():
 
 	def route_styles (self, name):
 
-		styles_path = "/".join ([
-			self.master.home,
-			"styles",
-			name,
-		])
+		styles_path = (
+			"%s/styles/%s" % (
+				self.config ["static-path"],
+				name))
 
 		with open (styles_path) as file_handle:
 			styles_source = file_handle.read ()
