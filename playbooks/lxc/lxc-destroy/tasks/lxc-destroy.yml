@@ -18,7 +18,7 @@
 
     if ! test -d /var/lib/lxc/{{ inventory_hostname }}; then
       echo "UNCHANGED";
-      exit;
+      exit 0;
     fi;
 
     lxc-destroy

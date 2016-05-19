@@ -22,7 +22,7 @@
 
     if test "$state" != "RUNNING"; then
       echo "UNCHANGED";
-      return;
+      exit 0;
     fi;
 
     lxc-stop
