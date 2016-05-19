@@ -4,6 +4,6 @@
   tags:
 
     - "icinga"
-    - "setup-wistla-icinga.agent"
+    - "setup-wistla-icinga-agent"
 
 # ex: et ts=2 filetype=yaml

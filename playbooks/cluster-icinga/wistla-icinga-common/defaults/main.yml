@@ -329,6 +329,12 @@ wistla_icinga_agent_config_templates:
     group: "root"
     mode: "0644"
 
+  - template: "wistla-icinga-agent-sudoers"
+    target: "/etc/sudoers.d/icinga"
+    user: "root"
+    group: "root"
+    mode: "0644"
+
 wistla_icinga_agent_config_links:
 
   - link: "{{ icinga_target }}/etc"

@@ -14,7 +14,7 @@
 
 {%		for host_name in groups [group_name] %}
 {%			set host = hostvars [host_name] %}
-{%			if host.amazon_instance_state == 'running' %}
+{%			if host.amazon_instance_state in [ 'running', 'standby' ] %}
 
 object Host "{{ host_name }}" {
 
@@ -106,7 +106,11 @@ object Host "{{ host_name }}" {
 		] | join ('-') %}
 
 {%		set parent = hostvars [parent_name] %}
-{%		if parent.amazon_instance_state == 'running' %}
+{%		if parent.amazon_instance_state in [ 'running', 'standby' ] %}
+
+{%			set enabled =
+				parent.amazon_instance_state == 'running'
+				and other_deployment.enabled == 'yes' %}
 
 object Host "{{ host_name }}" {
 
@@ -114,7 +118,19 @@ object Host "{{ host_name }}" {
 
 	address = "{{ host_name }}"
 
+{%			if enabled %}
+
 	command_endpoint = "wistla-{{ other_deployment.cluster_name }}-admin-{{ zone }}"
+
+{%			else %}
+
+	check_command = "check-lxc-container"
+	command_endpoint = "{{ parent_name }}"
+
+	vars.lxc_container_name = "{{ host_name }}"
+	vars.lxc_critical_state = "present"
+
+{%			endif %}
 
 	vars.parent = "{{ parent_name }}"
 	vars.endpoint = "{{ parent_name }}"
@@ -122,15 +138,17 @@ object Host "{{ host_name }}" {
 	vars.deployment = "{{ other_deployment_name }}"
 	vars.stature = "node"
 	vars.type = "node-{{ node_type }}"
+	vars.deployment_enabled = "{{ other_deployment.enabled }}"
 
 {%			if port_base %}
-{%				for process_index in range (other_deployment.node_instance_count [node_type] | int) %}
+{%			for process_index in range (
+				other_deployment.node_instance_count [node_type] | int) %}
 
 	vars.wistla_{{ node_type }}s ["wistla {{ node_type }} {{ port_base + process_index }}"] = {
 		http_port = {{ port_base + process_index }}
 	}
 
-{%				endfor %}
+{%			endfor %}
 {%			endif %}
 
 }

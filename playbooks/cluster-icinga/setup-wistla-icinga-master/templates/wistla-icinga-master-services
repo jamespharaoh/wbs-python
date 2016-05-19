@@ -175,7 +175,11 @@ apply Service for (api => config in host.vars.wistla_apis) {
 
 	vars += config
 
-	assign where host.vars.type == "node-api"
+	assign where (
+		host.vars.type == "node-api"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }
 
@@ -192,7 +196,11 @@ apply Service for (browser => config in host.vars.wistla_browsers) {
 
 	vars += config
 
-	assign where host.vars.type == "node-browser"
+	assign where (
+		host.vars.type == "node-browser"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }
 
@@ -208,7 +216,11 @@ apply Service for (web => config in host.vars.wistla_webs) {
 
 	vars += config
 
-	assign where host.vars.type == "node-web"
+	assign where (
+		host.vars.type == "node-web"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }
 
@@ -223,7 +235,11 @@ apply Service "wistla load balancer" {
 	vars.http_port = 80
 	vars.http_uri = "/hello"
 
-	assign where host.vars.type == "node-load"
+	assign where (
+		host.vars.type == "node-load"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }
 
@@ -237,7 +253,11 @@ apply Service "wistla mongo" {
 
 	vars.tcp_port = 27017
 
-	assign where host.vars.type == "node-mongo"
+	assign where (
+		host.vars.type == "node-mongo"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }
 
@@ -251,6 +271,10 @@ apply Service "wistla rabbit" {
 
 	vars.tcp_port = 5672
 
-	assign where host.vars.type == "node-rabbit"
+	assign where (
+		host.vars.type == "node-rabbit"
+		&& host.vars.instance_state == "running"
+		&& host.vars.deployment_enabled == "yes"
+	)
 
 }

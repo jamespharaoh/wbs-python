@@ -15,3 +15,19 @@ object CheckCommand "postfix-mail-queue" {
 	vars.mailq_critical = 5
 
 }
+
+object CheckCommand "check-lxc-container" {
+
+	import "plugin-check-command"
+
+	command = [
+		"sudo",
+		"/opt/wbs-monitoring/check_lxc_container",
+	]
+
+	arguments = {
+		"--container-name" = "$lxc_container_name$",
+		"--critical-state" = "$lxc_critical_state$",
+	}
+
+}
