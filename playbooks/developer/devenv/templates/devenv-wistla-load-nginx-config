@@ -137,7 +137,7 @@ http {
 		client_max_body_size 16m;
 
 		location / {
-			proxy_pass http://web;
+			proxy_pass {{ deployment.web_upstream }};
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
@@ -155,6 +155,26 @@ http {
 		}
 
 	}
+
+{% if web_all_domain in deployment %}
+
+	# web all
+
+	server {
+
+		server_name {{ deployment.web_all_domain }};
+
+		client_max_body_size 16m;
+
+		location / {
+			proxy_pass {{ deployment.web_all_upstream }};
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+	}
+
+{% endif %}
 
 	# admin
 
