@@ -2,6 +2,21 @@
 CHANGELOG
 =========
 
+1.4.22
+======
+
+* feature:``firehose``: Update firehose client to latest version
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``ecs``: Update ecs client to latest version
+
+
+1.4.21
+======
+
+* feature:``application-autoscaling``: Adds support for Application Auto Scaling. Application Auto Scaling is a general purpose Auto Scaling service for supported elastic AWS resources. With Application Auto Scaling, you can automatically scale your AWS resources, with an experience similar to that of Auto Scaling.
+* feature:endpoints: Updated endpoints.json to latest.
+
+
 1.4.20
 ======
 
