@@ -2,6 +2,21 @@
 CHANGELOG
 =========
 
+1.10.32
+=======
+
+* feature:``firehose``: Update firehose command to latest version
+* bugfix:Table: Fix rendering of tables with double-width characters.
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``ecs``: Update ecs command to latest version
+
+
+1.10.31
+=======
+
+* feature:``application-autoscaling``: Adds support for Application Auto Scaling. Application Auto Scaling is a general purpose Auto Scaling service for supported elastic AWS resources. With Application Auto Scaling, you can automatically scale your AWS resources, with an experience similar to that of Auto Scaling.
+
+
 1.10.29
 =======
 
