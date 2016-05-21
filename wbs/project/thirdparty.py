@@ -281,7 +281,7 @@ class ThirdPartySetup (object):
 						library_data ["branch"])):
 
 					self.git_repo.remotes [library_name].fetch (
-						"%s:refs/%s/%s" % (
+						"refs/heads/%s:refs/%s/%s" % (
 							library_data ["branch"],
 							library_name,
 							library_data ["branch"]),
@@ -688,16 +688,15 @@ class ThirdPartySetup (object):
 
 			):
 
-				build_data = {
-					"command": " ".join ([
-						"python setup.py build",
-					]),
-					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
-					},
-				}
+				python_site_packages = (
+					"%s/work/lib/python2.7/site-packages" % (
+						self.project_path))
+
+				if not os.path.isdir (
+					python_site_packages):
+
+					os.makedirs (
+						python_site_packages)
 
 				build_data = {
 					"command": " ".join ([
@@ -705,9 +704,7 @@ class ThirdPartySetup (object):
 						"--prefix %s/work" % self.project_path,
 					]),
 					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
+						"PYTHONPATH": python_site_packages,
 					},
 				}
 
