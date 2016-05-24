@@ -156,7 +156,7 @@ http {
 
 	}
 
-{% if web_all_domain in deployment %}
+{% if 'web_all_domain' in deployment %}
 
 	# web all
 
