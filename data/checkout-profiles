@@ -2,8 +2,57 @@
 
 developer_full:
 
+  # ---------- devops
+
+  - name: "wistla-devops"
+    branch: "development"
+
+  # ---------- integration
+
+  - name: "wistla-integration"
+    branch: "development"
+
+  # ---------- modules
+
   - name: "api-stub-server"
+    branch: "development"
+
+  - name: "wistla-api-server"
+    branch: "development"
+
+  - name: "wistla-data-export"
+    branch: "development"
+
+  - name: "wistla-data-import"
+    branch: "development"
+
+  - name: "wistla-data-process"
+    branch: "development"
+
+  - name: "wistla-db"
+    branch: "development"
+
+  - name: "wistla-db-schema"
+    branch: "development"
+
+  - name: "wistla-raml-api"
+    branch: "development"
+
+  - name: "wistla-raml-server"
+    branch: "development"
+
+  - name: "wistla-raml-to-api"
+    branch: "development"
+
+  # ----------- misc
+
+  - name: "wistla-iOS"
     branch: "master"
+
+  - name: "wistla-scripts"
+    branch: "master"
+
+  # ---------- content
 
   - name: "content-api"
     branch: "master"
@@ -20,6 +69,11 @@ developer_full:
   - name: "content-web"
     branch: "master"
 
+  - name: "wistla-test-images"
+    branch: "master"
+
+  # ---------- legacy
+
   - name: "wistla-admin"
     branch: "master"
 
@@ -29,54 +83,12 @@ developer_full:
   - name: "wistla-api"
     branch: "master"
 
-  - name: "wistla-api-server"
-    branch: "master"
-
   - name: "wistla-browser"
-    branch: "master"
-
-  - name: "wistla-data-export"
-    branch: "master"
-
-  - name: "wistla-data-import"
-    branch: "master"
-
-  - name: "wistla-data-process"
-    branch: "master"
-
-  - name: "wistla-db"
-    branch: "master"
-
-  - name: "wistla-db-schema"
-    branch: "master"
-
-  - name: "wistla-devops"
-    branch: "master"
-
-  - name: "wistla-iOS"
-    branch: "master"
-
-  - name: "wistla-raml-api"
-    branch: "master"
-
-  - name: "wistla-raml-server"
-    branch: "master"
-
-  - name: "wistla-raml-to-api"
-    branch: "master"
-
-  - name: "wistla-scripts"
-    branch: "master"
-
-  - name: "wistla-test-images"
-    branch: "master"
-
-  - name: "wistla-web"
     branch: "master"
 
 developer_devops:
 
   - name: "wistla-devops"
-    branch: "master"
+    branch: "development"
 
 # ex: et ts=2 filetype=yaml
