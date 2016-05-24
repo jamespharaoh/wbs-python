@@ -19,30 +19,35 @@ map (
 
 import wbs.project
 
-command = (
-	sys.argv [1]
-) if len (sys.argv) > 1 else (
-	None
-)
+if len (sys.argv) == 1:
 
-if command in [
+	command_name = "help"
+	command_arguments = []
+
+else:
+
+	command_name = sys.argv [1]
+	command_arguments = sys.argv [2 : ]
+
+if command_name in [
 	"build",
 	"fetch",
 	"merge",
 	"pull",
-	"push",
 	"update",
 ]:
 
-	function = getattr (
-		wbs.project.thirdparty,
-		command)
+	command_function = (
+		getattr (
+			wbs.project.thirdparty,
+			command_name))
 
-	function ()
+	command_function (
+		* command_arguments)
 
 else:
 
-	if command != "help":
+	if command_name != "help":
 
 		sys.stderr.write (
 			"\nUsage error\n")
@@ -58,9 +63,10 @@ else:
 			"",
 			"Syntax:",
 			"",
+			"  {name} pull   Pull remote changes down from server",
 			"  {name} build  Build third party libraries",
 			"  {name} merge  Merge third party libraries",
-			"  {name} pull   Pull third party libraries",
+			"  {name} push   Push local changes up to server",
 			"",
 		])
 
