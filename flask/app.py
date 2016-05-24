@@ -120,7 +120,7 @@ class Flask(_PackageBoundObject):
        The `instance_path` and `instance_relative_config` parameters were
        added.
 
-    .. versionadded:: 1.0
+    .. versionadded:: 0.11
        The `root_path` parameter was added.
 
     :param import_name: the name of the application package
@@ -159,7 +159,7 @@ class Flask(_PackageBoundObject):
 
     #: The class that is used for the Jinja environment.
     #:
-    #: .. versionadded:: 1.0
+    #: .. versionadded:: 0.11
     jinja_environment = Environment
 
     #: The class that is used for the :data:`~flask.g` instance.
@@ -198,7 +198,7 @@ class Flask(_PackageBoundObject):
     #: 1. Default values for certain config options.
     #: 2. Access to config values through attributes in addition to keys.
     #:
-    #: .. versionadded:: 1.0
+    #: .. versionadded:: 0.11
     config_class = Config
 
     #: The debug flag.  Set this to ``True`` to enable debugging of the
@@ -481,7 +481,7 @@ class Flask(_PackageBoundObject):
         #: A list of shell context processor functions that should be run
         #: when a shell context is created.
         #:
-        #: .. versionadded:: 1.0
+        #: .. versionadded:: 0.11
         self.shell_context_processors = []
 
         #: all the attached blueprints in a dictionary by name.  Blueprints
@@ -683,7 +683,7 @@ class Flask(_PackageBoundObject):
         this function to customize the behavior.
 
         .. versionadded:: 0.5
-        .. versionchanged:: 1.0
+        .. versionchanged:: 0.11
            ``Environment.auto_reload`` set in accordance with
            ``TEMPLATES_AUTO_RELOAD`` configuration option.
         """
@@ -772,7 +772,7 @@ class Flask(_PackageBoundObject):
         application.  This runs all the registered shell context
         processors.
 
-        .. versionadded:: 1.0
+        .. versionadded:: 0.11
         """
         rv = {'app': self, 'g': g}
         for processor in self.shell_context_processors:
@@ -893,7 +893,7 @@ class Flask(_PackageBoundObject):
            to override the client to be used by setting the
            :attr:`test_client_class` attribute.
 
-        .. versionchanged:: 1.0
+        .. versionchanged:: 0.11
            Added `**kwargs` to support passing additional keyword arguments to
            the constructor of :attr:`test_client_class`.
         """
@@ -934,7 +934,22 @@ class Flask(_PackageBoundObject):
 
     @setupmethod
     def register_blueprint(self, blueprint, **options):
-        """Registers a blueprint on the application.
+        """Register a blueprint on the application. For information about 
+        blueprints head over to :ref:`blueprints`.
+
+        The blueprint name is passed in as the first argument.	
+        Options are passed as additional keyword arguments and forwarded to 
+        `blueprints` in an "options" dictionary.
+
+        :param subdomain: set a subdomain for the blueprint
+        :param url_prefix: set the prefix for all URLs defined on the blueprint.
+                            ``(url_prefix='/<lang code>')``
+        :param url_defaults: a dictionary with URL defaults that is added to 
+                            each and every URL defined with this blueprint
+        :param static_folder: add a static folder to urls in this blueprint
+        :param static_url_path: add a static url path to urls in this blueprint
+        :param template_folder: set an alternate template folder
+        :param root_path: set an alternate root path for this blueprint
 
         .. versionadded:: 0.7
         """
@@ -954,7 +969,7 @@ class Flask(_PackageBoundObject):
     def iter_blueprints(self):
         """Iterates over all blueprints by the order they were registered.
 
-        .. versionadded:: 1.0
+        .. versionadded:: 0.11
         """
         return iter(self._blueprint_order)
 
@@ -1403,7 +1418,7 @@ class Flask(_PackageBoundObject):
     def shell_context_processor(self, f):
         """Registers a shell context processor function.
 
-        .. versionadded:: 1.0
+        .. versionadded:: 0.11
         """
         self.shell_context_processors.append(f)
         return f
