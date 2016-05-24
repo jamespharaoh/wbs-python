@@ -25,6 +25,14 @@ def read_index ():
 	return yamlx.load_data (
 		"third-party/third-party-index")
 
+def build (* names):
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.build (* names)
+
 def fetch ():
 
 	third_party_setup = (
@@ -33,13 +41,13 @@ def fetch ():
 	third_party_setup.load ()
 	third_party_setup.fetch (* names)
 
-def update (* names):
+def merge ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.update (* names)
+	third_party_setup.merge (* names)
 
 def pull (* names):
 
@@ -49,21 +57,21 @@ def pull (* names):
 	third_party_setup.load ()
 	third_party_setup.pull (* names)
 
-def build (* names):
+def push (* names):
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.build (* names)
+	third_party_setup.push (* names)
 
-def merge ():
+def update (* names):
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.merge ()
+	third_party_setup.update (* names)
 
 class ThirdPartySetup (object):
 
@@ -71,6 +79,10 @@ class ThirdPartySetup (object):
 
 		self.project_path = (
 			os.path.abspath ("."))
+
+		self.project_name = (
+			os.path.basename (
+				self.project_path))
 
 		self.stashed = False
 
@@ -139,6 +151,28 @@ class ThirdPartySetup (object):
 			self.fetch_remotes (* names)
 			self.stash_changes ()
 			self.update_libraries (* names)
+
+			log.notice (
+				"All done")
+
+		except KeyboardInterrupt:
+
+			log.notice (
+				"Aborting due to user request")
+
+		finally:
+
+			self.unstash_changes ()
+
+	def push (self, * names):
+
+		log.notice (
+			"About to push third party libraries")
+
+		try:
+
+			self.stash_changes ()
+			self.push_remotes (* names)
 
 			log.notice (
 				"All done")
@@ -266,6 +300,93 @@ class ThirdPartySetup (object):
 		log.notice (
 			"Fetched %s remotes" % (
 				len (self.third_party_index)))
+
+	def push_remotes (self, * names):
+
+		num_pushed = 0
+		num_failed = 0
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
+
+			if "push" not in library_data:
+				continue
+
+			library_prefix = (
+				"third-party/%s" % (
+					library_name))
+
+			try:
+
+				with log.status (
+					"Pushing changes for %s" % (
+						library_name)):
+
+					if library_data ["push"] == "simple":
+
+						subprocess.check_call (
+							[
+								"git",
+								"subtree",
+								"push",
+								"--prefix",
+								library_prefix,
+								library_name,
+								library_data ["branch"],
+								"--squash",
+								"--message",
+								"push changes from %s" % (
+									self.project_name),
+							],
+							stderr = subprocess.STDOUT)
+
+						subprocess.check_call (
+							[
+								"git",
+								"subtree",
+								"pull",
+								"--prefix",
+								library_prefix,
+								library_name,
+								library_data ["branch"],
+								"--squash",
+								"--message",
+								"pull for push of %s" % (
+									library_name),
+							],
+							stderr = subprocess.STDOUT)
+
+					else:
+
+						raise Exception ()
+
+				num_pushed += 1
+
+			except subprocess.CalledProcessError as error:
+
+				log.notice (
+					"Push failed!")
+
+				log.output (
+					error.output)
+
+				num_failed += 1
+
+		if num_failed:
+
+			print (
+				"Pushed %s libraries with %s failures" % (
+					num_pushed + num_failed,
+					num_failed))
+
+		elif num_pushed:
+
+			print (
+				"Pushed %s libraries" % (
+					num_pushed))
 
 	def handle_interrupt (self, * arguments):
 

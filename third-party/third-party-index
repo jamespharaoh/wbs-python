@@ -1,5 +1,23 @@
 ---
 
+# ---------- internal
+
+gridlinker:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
+  branch: "master"
+  python: "third-party/gridlinker/python"
+  push: "simple"
+
+wbs-python:
+
+  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/wbs-python.git"
+  branch: "master"
+  python: "third-party/wbs-python"
+  push: "simple"
+
+# ---------- python
+
 ansible:
 
   url: "git@github.com:ansible/ansible.git"
@@ -75,12 +93,6 @@ gitpython:
   url: "git@github.com:gitpython-developers/GitPython.git"
   branch: "master"
   auto: "python"
-
-gridlinker:
-
-  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/gridlinker.git"
-  branch: "master"
-  python: "third-party/gridlinker/python"
 
 httplib2:
 
@@ -189,11 +201,5 @@ smmap:
   url: "git@github.com:gitpython-developers/smmap.git"
   branch: "master"
   auto: "python"
-
-wbs-python:
-
-  url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/wbs-python.git"
-  branch: "master"
-  python: "third-party/wbs-python"
 
 # ex: et ts=2 filetype=yaml
