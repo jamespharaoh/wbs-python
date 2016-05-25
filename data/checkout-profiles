@@ -9,8 +9,8 @@ developer_full:
 
   # ---------- integration
 
-  - name: "wistla-integration"
-    branch: "development"
+  #- name: "wistla-integration"
+  #  branch: "development"
 
   # ---------- modules
 
@@ -66,16 +66,16 @@ developer_full:
   - name: "content-iOS"
     branch: "master"
 
-  - name: "content-web"
-    branch: "master"
+  #- name: "content-web"
+  #  branch: "master"
 
-  - name: "wistla-test-images"
-    branch: "master"
+  #- name: "wistla-test-images"
+  #  branch: "master"
 
   # ---------- legacy
 
-  - name: "wistla-admin"
-    branch: "master"
+  #- name: "wistla-admin"
+  #  branch: "master"
 
   - name: "wistla-analytics"
     branch: "master"

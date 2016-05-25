@@ -97,6 +97,42 @@
     path: "{{ deployment_home }}/{{ item.name }}/.nodejs-stub-target"
     state: "absent"
 
+- name: "create npm project links"
+  with_items: "{{ devenv_checkouts | flatten_hash ('depends') }}"
+  when: "{{ 'npm_name' in project_details [item.depends] }}"
+  action:
+
+    module: "file"
+    path: "{{ [
+      deployment_home,
+      item.outer.name,
+      'node_modules',
+      project_details [item.depends].npm_name,
+    ] | join ('/') | dirname }}"
+    state: "directory"
+
+- name: "create npm project links"
+  with_items: "{{ devenv_checkouts | flatten_hash ('depends') }}"
+  when: "{{ 'npm_name' in project_details [item.depends] }}"
+  action:
+
+    module: "file"
+    path: "{{ [
+      deployment_home,
+      item.outer.name,
+      'node_modules',
+      project_details [item.depends].npm_name,
+    ] | join ('/') }}"
+    state: "link"
+
+    src: "{{ [
+      '../' * (project_details [item.depends].npm_name.split ('/') | length + 1),
+      item.depends,
+    ] | join }}"
+
+- fail:
+    msg: "TODO"
+
 - name: "run build steps"
   tags: "build"
   with_items: "{{ devenv_checkouts }}"
