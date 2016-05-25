@@ -11,7 +11,6 @@ devenv_config_directories:
   - "config/mongo"
   - "config/postgresql"
   - "config/rabbit"
-  - "config/web"
 
 devenv_config_files:
 
@@ -104,20 +103,7 @@ devenv_config_templates:
     group: "root"
     mode: "0400"
 
-  # ---------- web
-
-  - template: "devenv-wistla-web-config"
-    type: "web"
-    target: "config.local.js"
-
-  - template: "devenv-wistla-web-environment"
-    type: "web"
-    target: "environment"
-
 devenv_config_links:
-
-  - dest: "wistla-admin/config/config.local.js"
-    src: "../../config/load/wistla-admin-config.local.js"
 
   - dest: "wistla-api/config/apple-ca.cert"
     src: "../../config/api/apple-ca.cert"
@@ -148,12 +134,6 @@ devenv_config_links:
 
   - dest: "wistla-db-schema/config/local.yaml"
     src: "../../config/api2/wistla-db-schema-local.yaml"
-
-  - dest: "wistla-web/config/config.local.js"
-    src: "../../config/web/config.local.js"
-
-  - dest: "wistla-web/config/config.overrides.js"
-    src: "../../config/web/config.overrides.js"
 
 devenv_shared_directories:
 
@@ -195,9 +175,6 @@ devenv_shared_logfiles:
   - log: "shared/log/wistla-browser.log"
     user: "vagrant"
 
-  - log: "shared/log/wistla-web.log"
-    user: "vagrant"
-
 devenv_override_templates:
 
   - template: "devenv-wistla-api-overrides"
@@ -205,8 +182,5 @@ devenv_override_templates:
 
   - template: "devenv-wistla-browser-overrides"
     target: "config/browser/config.overrides.js"
-
-  - template: "devenv-wistla-web-overrides"
-    target: "config/web/config.overrides.js"
 
 # ex: et ts=2 filetype=yaml
