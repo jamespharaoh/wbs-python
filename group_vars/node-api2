@@ -13,6 +13,21 @@ node_deploy_projects:
       - target: "local.yaml"
         source: "wistla-api-server-local.yaml"
 
+  - name: "wistla-raml-api"
+    type: "nodejs"
+
+  - name: "wistla-raml-server"
+    type: "nodejs"
+
+  - name: "wistla-raml-to-api"
+    type: "nodejs"
+
+  - name: "wistla-data-process"
+    type: "nodejs"
+
+  - name: "wistla-db"
+    type: "nodejs"
+
 node_nodejs_main: "index.js"
 
 node_nodejs_interpreter: "node --harmony"
