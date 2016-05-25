@@ -76,7 +76,7 @@
 
     fi;
 
-- name: "create nodejs links"
+- name: "create per-project nodejs version links"
   with_items: "{{ devenv_checkouts }}"
   when: "item.nodejs_version | default ('') == 'legacy'"
   become: "yes"
@@ -87,7 +87,7 @@
     state: "link"
     src: "/opt/node-v{{ nodejs_version_legacy }}-linux-x64"
 
-- name: "delete nodejs links"
+- name: "delete per-project nodejs version links"
   with_items: "{{ devenv_checkouts }}"
   when: "item.nodejs_version | default ('') != 'legacy'"
   become: "yes"
@@ -130,12 +130,9 @@
       item.depends,
     ] | join }}"
 
-- fail:
-    msg: "TODO"
-
 - name: "run build steps"
   tags: "build"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | order_by_depends }}"
   args:
 
     executable: "/bin/bash"

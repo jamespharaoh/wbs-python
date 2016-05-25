@@ -66,6 +66,81 @@ def dict_map (keys, mapping):
 		for key in keys
 	])
 
+def order_by_depends (projects):
+
+	# sanity check
+
+	all_project_names = set ([
+		project ["name"]
+		for project in projects
+	])
+
+	all_depends = set ([
+		depends
+		for project in projects
+		for depends in project.get ("depends", [])
+	])
+
+	missing_depends = (
+		all_depends - all_project_names)
+
+	if missing_depends:
+
+		raise Exception (
+			"Missing dependent projects: %s" % (
+				", ".join (missing_depends)))
+
+	# sort by dependencies
+
+	unordered_projects = (
+		list (projects))
+
+	ordered_projects = (
+		list ())
+
+	satisfied_projects = (
+		set ())
+
+	while unordered_projects:
+
+		progress = False
+
+		next_unordered_projects = (
+			list ())
+
+		for project in unordered_projects:
+
+			if set (project.get ("depends", [])) \
+				- satisfied_projects:
+
+				next_unordered_projects.append (
+					project)
+
+			else:
+
+				ordered_projects.append (
+					project)
+
+				satisfied_projects.add (
+					project ["name"])
+
+				progress = True
+
+		if not progress:
+
+			raise Exception (
+				"Circular dependency between: %s" % (
+					", ".join ([
+						project ["name"]
+						for project
+						in unordered_projects
+					])))
+
+		unordered_projects = (
+			next_unordered_projects)
+
+	return ordered_projects
+
 class FilterModule (object):
 
 	def filters (self):
@@ -75,6 +150,7 @@ class FilterModule (object):
 			"flatten_hash": flatten_hash,
 			"list_to_map": list_to_map,
 			"dict_map": dict_map,
+			"order_by_depends": order_by_depends,
 
 	}
 

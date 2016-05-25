@@ -50,6 +50,10 @@
 
     - "wistla-db"
 
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-data-import"
   short: "import legacy json into postgres"
   npm_name: "@wistla/wistla-data-import"
@@ -60,6 +64,10 @@
   depends:
 
     - "wistla-db"
+
+  build_steps:
+
+    - "npm install"
 
 - name: "wistla-data-process"
   short: "transform sql resultset into json for api"
@@ -81,6 +89,10 @@
 
     lower level module that handles connecting to mongo/postgres
 
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-db-schema"
   short: "sql schema definitions"
   npm_name: "@wistla/wistla-db-schema"
@@ -89,12 +101,20 @@
     the postgres db schema and helper scripts to import/export and
     assemble/split the schema
 
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-raml-api"
   short: "wistla api definition in raml"
   npm_name: "@wistla/raml-api"
   description:
 
     the wistla v2 API defined in RAML 1.0 format
+
+  build_steps:
+
+    - "npm install"
 
 - name: "wistla-raml-server"
   short: "generate api code from json api definition"
@@ -108,6 +128,10 @@
 
     - "wistla-raml-to-api"
 
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-raml-to-api"
   short: "general json api definition from raml"
   npm_name: "@wistla/raml-to-api"
@@ -115,6 +139,10 @@
 
     module to convert RAML 1.0 markup into JSON that can be used to generate API
     endpoints and HTTP server(s); as well as the data transforms
+
+  build_steps:
+
+    - "npm install"
 
 # ---------- content
 
@@ -142,12 +170,11 @@
 
 - name: "wistla-api"
   short: "legacy api server and logic"
+  npm_name: "wistla-api"
   nodejs_version: "legacy"
-  project_links:
+  depends:
 
-    - link: "node_modules/wistla-analytics"
-      overlay: "node_modules/.wistla-analytics"
-      target: "{{ deployment_home }}/wistla-analytics"
+    - "wistla-analytics"
 
   build_steps:
 
@@ -155,18 +182,18 @@
 
 - name: "wistla-analytics"
   short: "legacy analytics client library"
+  npm_name: "wistla-analytics"
   build_steps:
 
     - "npm install"
 
 - name: "wistla-browser"
   short: "legacy api client for web browser access"
+  npm_name: "wistla-browser"
   nodejs_version: "legacy"
-  project_links:
+  depends:
 
-    - link: "node_modules/wistla-analytics"
-      overlay: "node_modules/.wistla-analytics"
-      target: "{{ deployment_home }}/wistla-analytics"
+    - "wistla-analytics"
 
   build_steps:
 

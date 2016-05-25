@@ -78,13 +78,13 @@ developer_full:
   #  branch: "master"
 
   - name: "wistla-analytics"
-    branch: "master"
+    branch: "development"
 
   - name: "wistla-api"
-    branch: "master"
+    branch: "development"
 
   - name: "wistla-browser"
-    branch: "master"
+    branch: "development"
 
 developer_devops:
 
