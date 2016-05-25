@@ -97,7 +97,7 @@
     path: "{{ deployment_home }}/{{ item.name }}/.nodejs-stub-target"
     state: "absent"
 
-- name: "create npm project links"
+- name: "create npm project link directories"
   with_items: "{{ devenv_checkouts | flatten_hash ('depends') }}"
   when: "{{ 'npm_name' in project_details [item.depends] }}"
   action:
