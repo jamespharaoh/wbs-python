@@ -137,7 +137,6 @@
 
     executable: "/bin/bash"
     chdir: "{{ deployment_home }}/{{ item.name }}"
-    creates: "{{ deployment_home }}/{{ item }}/node_modules"
 
   shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
 
