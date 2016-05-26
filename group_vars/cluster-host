@@ -59,4 +59,6 @@ amazon_instance_type_running: ""
 
 cluster_production_override: ""
 
+ubuntu_apt_proxy_url: "http://wistla-{{ cluster_name }}-admin-{{ instance_zone }}:3142"
+
 # ex: et ts=2 filetype=yaml

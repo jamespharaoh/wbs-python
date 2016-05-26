@@ -48,7 +48,7 @@ ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
 ubuntu_apt_proxy_url: "{{ (
   'http://' + deployment.bridge_network + '.0.1:3142'
 ) if deployment_mode in [ 'vagrant', 'jenkins' ] else (
-  ''
+  'http://' + 'wistla-' + cluster_name + '-admin-' + instance_zone + ':3142'
 ) }}"
 
 ubuntu_sources_default:

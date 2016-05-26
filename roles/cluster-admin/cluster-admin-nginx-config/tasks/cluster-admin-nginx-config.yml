@@ -36,6 +36,9 @@
       template: "cluster-admin-nginx-jenkins-config"
       when: "{{ cluster_name == 'ops' }}"
 
+    - target: "/sites/proxy.conf"
+      template: "cluster-admin-nginx-proxy-config"
+
   when: "{{ item.when | default (True) }}"
   action:
 
@@ -44,15 +47,15 @@
     src: "{{ item.template }}"
 
 - name: "create nginx dev configs"
-  with_dict: "{{ dev_deployments }}"
+  with_items: "{{ dev_deployments }}"
   when: "
-    item.value.type == 'simple'
-    and item.value.main_domain in cluster.admin_certificates
+    item.type == 'simple'
+    and item.main_domain in cluster.admin_certificates
   "
   action:
 
     module: "template"
-    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/sites/dev-{{ item.key }}.conf"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/sites/dev-{{ item.name }}.conf"
     src: "cluster-admin-nginx-dev-config"
 
     mode: "0644"

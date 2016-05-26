@@ -10,6 +10,7 @@
     - "wait-for-ssh"
     - "scan-ssh-key"
 
+    - "setup-apt"
     - "setup-common-users"
     - "setup-hostname"
     - "setup-system"
