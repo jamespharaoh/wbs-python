@@ -76,6 +76,15 @@ dev_node_memory:
 dev_api_use_s3: "{{ dev_api_use_s3 | default ('no') }}"
 dev_web_use_s3: "{{ dev_web_use_s3 | default ('no') }}"
 
+dev_nfs_clients:
+
+  - "172.28.128.1"
+{% for client in dev_nfs_clients | default ([]) %}
+{% if client != '172.28.128.1' %}
+  - "{{ client }}"
+{% endif %}
+{% endfor %}
+
 #
 # security and networking
 #
