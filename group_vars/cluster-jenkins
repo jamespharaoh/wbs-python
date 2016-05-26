@@ -4,6 +4,8 @@ cluster_type: "jenkins"
 
 instance_type_colour: "197"
 
+ubuntu_apt_proxy_url: "http://localhost:3142"
+
 my_system_packages:
 
   # ----- remove
@@ -24,6 +26,9 @@ my_system_packages:
     state: "absent"
 
   # ----- install
+
+  - name: "apt-cacher-ng"
+    state: "present"
 
   - name: "build-essential"
     state: "present"

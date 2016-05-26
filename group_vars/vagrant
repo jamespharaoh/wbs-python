@@ -96,6 +96,9 @@ ubuntu_system_packages:
   - name: "colordiff"
     state: "present"
 
+  - name: "debootstrap"
+    state: "present"
+
   - name: "encfs"
     state: "present"
 

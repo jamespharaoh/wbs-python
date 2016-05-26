@@ -1,7 +1,7 @@
 ---
 
 amazon_instance_state: "running"
-amazon_instance_type_running: "c4.large"
+amazon_instance_type_running: "c4.xlarge"
 heka: 
   
   installed_version: "0.10.0"

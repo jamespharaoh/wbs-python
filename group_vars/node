@@ -45,6 +45,12 @@ lxc_memory_hard: "{{ node_memory [node_type] | int * 1.5 }}"
 ubuntu_main_url: "{{ dev_ubuntu_main_url }}"
 ubuntu_security_url: "{{ dev_ubuntu_security_url }}"
 
+ubuntu_apt_proxy_url: "{{ (
+  'http://' + deployment.bridge_network + '.0.1:3142'
+) if deployment_mode in [ 'vagrant', 'jenkins' ] else (
+  ''
+) }}"
+
 ubuntu_sources_default:
 
   - url: "{{ ubuntu_main_url }}"
