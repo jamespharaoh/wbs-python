@@ -719,7 +719,7 @@ def warn_redeploy ():
 	if CONFIG ["deployment_mode"] != "vagrant":
 		return
 
-	if sys.argv [1:] == [ "redeploy.yml" ]:
+	if sys.argv [1:] == [ "playbooks/devbox-redeploy.yml" ]:
 		return
 
 	if not "last_redeploy" in STATE:
@@ -855,7 +855,7 @@ def run_given_playbook ():
 
 		my_exit (1)
 
-	if sys.argv [1:] == [ "redeploy.yml" ]:
+	if sys.argv [1:] == [ "playbooks/devbox-redeploy.yml" ]:
 
 		STATE ["last_redeploy"] = time.time ()
 		write_state ()
