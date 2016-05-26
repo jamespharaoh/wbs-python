@@ -2,6 +2,8 @@
 
 instance_type_colour: "196"
 
+ubuntu_apt_proxy_url: "http://localhost:3142"
+
 my_system_packages:
 
   # ---------- to remove
@@ -19,6 +21,9 @@ my_system_packages:
     state: "absent"
 
   # ---------- to install
+
+  - name: "apt-cacher-ng"
+    state: "present"
 
   - name: "awscli"
     state: "present"
