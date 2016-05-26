@@ -11,19 +11,6 @@ network_route_localnet:
 
 node_load_deploy_projects:
 
-#  - name: "wistla-admin"
-#    filters:
-#
-#      - "--exclude /config/config.local.js"
-#      - "--include /config"
-#      - "--include /config.js"
-#      - "--include /dist"
-#      - "--include /favicon.ico"
-#      - "--include /index.html"
-#      - "--include /jspm_packages"
-#      - "--include /styles"
-#      - "--exclude /'*'"
-
   - name: "wistla-browser"
     filters:
 
@@ -52,14 +39,6 @@ node_load_deploy_projects:
       - "--include /favicon"
       - "--exclude /'*'"
 
-  - name: "content-web"
-    filters:
-
-      - "--include /assets"
-      - "--include /videos"
-      - "--include /fonts"
-      - "--exclude /'*'"
-
 node_load_config_links:
 
   - link: "/etc/nginx/nginx.conf"
@@ -70,8 +49,5 @@ node_load_config_links:
 
   - link: "/etc/nginx/server-environment.conf"
     source: "/config/nginx-server-environment.conf"
-
-#  - link: "/home/ubuntu/wistla-admin/config/config.local.js"
-#    source: "/config/wistla-admin-config.local.js"
 
 # ex: et ts=2 filetype=yaml
