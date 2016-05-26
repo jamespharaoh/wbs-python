@@ -49,6 +49,12 @@ dev:
     - "BCOQvp4gmUPkD1SznsWeEaI3xEC2beq7b8S8jQ1EPTdxkGTt+EhVOMx/IG2FcOMNGe+QrrHa"
     - "y/vzCpV1M/uWDzc="
 
+  panda:
+
+    - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABB"
+    - "BJSLwAw1MbIGe+FoSRMWVR0/vNaQb7YKxKS+EOC9Pid2GNp2uEtz8JH65o4WzJdAOgKI4ec/"
+    - "PDkcFTyfQ9Sbu10="
+
 ops:
 
   admin:
