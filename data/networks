@@ -84,4 +84,7 @@
 - network: "10.171"
   deployment: "bob"
 
+- network: "10.172"
+  deployment: "panda"
+
 # ex: et ts=2 filetype=yaml

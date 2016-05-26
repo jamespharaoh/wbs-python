@@ -1,0 +1,69 @@
+---
+
+vagrant:
+
+  node_types:
+
+    - "api"
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql"
+    - "rabbit"
+
+jenkins:
+
+  node_types:
+
+    - "api"
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql"
+    - "rabbit"
+
+cluster-shared:
+
+  node_types:
+
+    - "kafka"
+    - "mongo"
+    - "postgresql"
+    - "rabbit"
+
+cluster-alias:
+
+  node_types:
+
+    - "api"
+    - "browser"
+    - "load"
+
+cluster-simple:
+
+  node_types:
+
+    - "api"
+    - "browser"
+    - "load"
+    - "mongo"
+    - "rabbit"
+
+cluster-simple-v2:
+
+  node_types:
+
+    - "api"
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql"
+    - "rabbit"
+
+# ex: et ts=2 filetype=yaml

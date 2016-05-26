@@ -44,15 +44,23 @@ deployment_alias: "{{
   else deployment
 }}"
 
-dev_deployment_names:
+deployments_by_cluster: "{{
+  deployments
+  | values
+  | selectattr ('cluster', 'defined')
+  | groupby ('cluster')
+  | to_dict
+}}"
 
-  - "7-zark-7"
-  - "berk"
-  - "bob"
-  - "bruce"
-  - "chuggington"
-  - "mrbenn"
-  - "optimus"
+dev_deployments: "{{
+  deployments_by_cluster.dev
+}}"
+
+dev_deployment_names: "{{
+  dev_deployments
+  | map (attribute = 'name')
+  | list
+}}"
 
 global_system_packages:
 
