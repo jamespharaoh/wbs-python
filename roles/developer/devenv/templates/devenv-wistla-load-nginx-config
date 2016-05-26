@@ -102,7 +102,6 @@ http {
 
 	{%- print upstream ('api', 7000) + '\n' -%}
 	{%- print upstream ('api2', 3000) + '\n' -%}
-	{%- print upstream ('web', 3000) + '\n' -%}
 	{%- print upstream ('browser', 3000) + '\n' -%}
 
 	# api
@@ -298,18 +297,6 @@ http {
 
 		location /common/favicon {
 			alias /home/ubuntu/content-common/favicon;
-		}
-
-		location /web/assets {
-			alias /home/ubuntu/content-web/assets;
-		}
-
-		location /web/videos {
-			alias /home/ubuntu/content-web/videos;
-		}
-
-		location /web/fonts {
-			alias /home/ubuntu/content-web/fonts;
 		}
 
 	}
