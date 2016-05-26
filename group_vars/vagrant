@@ -7,6 +7,8 @@ vagrant_home: "/home/vagrant"
 
 devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
 
+ubuntu_apt_proxy_url: "http://localhost:3142"
+
 ubuntu_sources:
 
   - url: "{{ dev_ubuntu_main_url }}"
@@ -84,6 +86,9 @@ ubuntu_system_packages:
     state: "absent"
 
   # ---------- install
+
+  - name: "apt-cacher-ng"
+    state: "present"
 
   - name: "btrfs-tools"
     state: "present"
