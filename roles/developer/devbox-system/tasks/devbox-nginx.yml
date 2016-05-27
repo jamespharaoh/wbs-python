@@ -1,0 +1,19 @@
+---
+
+- name: "configure nginx proxy"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/nginx/sites/proxy.conf"
+    src: "devbox-http-proxy"
+
+- name: "reload nginx"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "nginx"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

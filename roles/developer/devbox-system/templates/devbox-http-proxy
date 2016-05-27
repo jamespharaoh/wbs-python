@@ -1,0 +1,61 @@
+server {
+
+	listen 8080 default_server;
+
+	location / {
+		proxy_pass http://$http_host$uri$is_args$args;
+	}
+
+	error_page 500 502 503 504 /50x.html;
+
+	location = /50x.html {
+		root /usr/share/nginx/html;
+	}
+
+}
+
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=npm:16m inactive=1y max_size=4G;
+
+upstream registry_npm {
+	server registry.npmjs.org;
+	server registry.npmjs.org;
+	server registry.npmjs.org;
+	keepalive 16;
+}
+
+server {
+
+	listen 8081 default_server;
+
+	root /usr/share/nginx/html;
+
+	proxy_cache npm;
+	proxy_cache_key $uri;
+	proxy_cache_lock on;
+	proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+
+	proxy_http_version 1.1;
+	proxy_pass_request_headers off;
+	proxy_set_header Host registry.npmjs.org;
+
+	location / {
+
+		proxy_cache_valid any 5m;
+
+		add_header X-Cache $upstream_cache_status;
+
+		proxy_pass http://registry_npm;
+
+	}
+
+	location ~ ^/.+/-/.+ {
+
+		proxy_cache_valid any 1M;
+
+		add_header X-Cache $upstream_cache_status;
+
+		proxy_pass http://registry_npm;
+
+	}
+
+}

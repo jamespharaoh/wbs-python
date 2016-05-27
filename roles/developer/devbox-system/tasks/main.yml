@@ -1,5 +1,11 @@
 ---
 
+- include: "devbox-nginx.yml"
+  tags: "devbox-nginx"
+
+- include: "devbox-npm.yml"
+  tags: "devbox-npm"
+
 - include: "devbox-fuse.yml"
   tags: "devbox-fuse"
 
