@@ -65,6 +65,12 @@
 
     - "wistla-db"
 
+- name: "wistla-raml-api"
+  short: "api definitions in raml format"
+  description:
+
+    the wistla v2 API defined in RAML 1.0 format
+
   build_steps:
 
     - "npm install"
