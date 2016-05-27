@@ -3,6 +3,7 @@
 # ---------- devops
 
 - name: "wistla-devops"
+  default_branch: "development"
   configs:
 
     - "config"
@@ -17,6 +18,7 @@
 
 - name: "api-stub-server"
   short: "stub server for basic testing"
+  default_branch: "development"
   npm_name: "@wistla/api-stub-server"
   depends:
 
@@ -27,6 +29,7 @@
     - "npm install"
 
 - name: "wistla-api-server"
+  default_branch: "development"
   npm_name: "@wistla/api-server"
   depends:
 
@@ -41,6 +44,7 @@
 
 - name: "wistla-data-export"
   short: "export legacy mongo to json files"
+  default_branch: "development"
   npm_name: "@wistla/wistla-data-export"
   description:
 
@@ -56,6 +60,7 @@
 
 - name: "wistla-data-import"
   short: "import legacy json into postgres"
+  default_branch: "development"
   npm_name: "@wistla/wistla-data-import"
   description:
 
@@ -67,6 +72,7 @@
 
 - name: "wistla-raml-api"
   short: "api definitions in raml format"
+  default_branch: "development"
   description:
 
     the wistla v2 API defined in RAML 1.0 format
@@ -77,6 +83,7 @@
 
 - name: "wistla-data-process"
   short: "transform sql resultset into json for api"
+  default_branch: "development"
   npm_name: "@wistla/wistla-data-process"
   depends:
 
@@ -90,6 +97,7 @@
 
 - name: "wistla-db"
   short: "database connection abstractions for mongo and postgres"
+  default_branch: "development"
   npm_name: "@wistla/wistla-db"
   description:
 
@@ -101,6 +109,7 @@
 
 - name: "wistla-db-schema"
   short: "sql schema definitions"
+  default_branch: "development"
   npm_name: "@wistla/wistla-db-schema"
   description:
 
@@ -113,6 +122,7 @@
 
 - name: "wistla-raml-api"
   short: "wistla api definition in raml"
+  default_branch: "development"
   npm_name: "@wistla/raml-api"
   description:
 
@@ -124,6 +134,7 @@
 
 - name: "wistla-raml-server"
   short: "generate api code from json api definition"
+  default_branch: "development"
   npm_name: "@wistla/raml-server"
   description:
 
@@ -140,6 +151,7 @@
 
 - name: "wistla-raml-to-api"
   short: "general json api definition from raml"
+  default_branch: "development"
   npm_name: "@wistla/raml-to-api"
   description:
 
@@ -154,28 +166,35 @@
 
 - name: "content-browser"
   short: "content for legacy wistla-browser project"
+  default_branch: "master"
 
 - name: "content-iOS"
   short: "content for ios client"
+  default_branch: "master"
 
 - name: "content-api"
   short: "content for legacy wistla-api project"
+  default_branch: "master"
 
 - name: "content-common"
   short: "shared content"
+  default_branch: "master"
 
 # ---------- miscellaneous
 
 - name: "wistla-iOS"
   short: "ios client"
+  default_branch: "master"
 
 - name: "wistla-scripts"
   short: "shared scripts"
+  default_branch: "master"
 
 # ---------- legacy
 
 - name: "wistla-api"
   short: "legacy api server and logic"
+  default_branch: "master"
   npm_name: "wistla-api"
   nodejs_version: "legacy"
   depends:
@@ -188,6 +207,7 @@
 
 - name: "wistla-analytics"
   short: "legacy analytics client library"
+  default_branch: "master"
   npm_name: "wistla-analytics"
   build_steps:
 
@@ -195,6 +215,7 @@
 
 - name: "wistla-browser"
   short: "legacy api client for web browser access"
+  default_branch: "master"
   npm_name: "wistla-browser"
   nodejs_version: "legacy"
   depends:

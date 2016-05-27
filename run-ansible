@@ -139,16 +139,23 @@ def load_config ():
 	global CONFIG
 	global PROJECTS
 
-	PROJECTS = [
-		project ["name"]
-		for project
-		in yaml.load (file ("data/project-details"))
-	]
+	PROJECTS = (
+		yaml.load (
+			file (
+				"data/project-details")))
 
 	try:
-		CONFIG = yaml.load (file ("config/overrides.yml"))
+
+		CONFIG = (
+			yaml.load (
+				file (
+					"config/overrides.yml")))
+
 	except IOError:
-		CONFIG = dict ({ "deployment_mode": "vagrant" })
+
+		CONFIG = {
+			"deployment_mode": "vagrant"
+		}
 
 	try:
 
@@ -505,9 +512,10 @@ def fetch_upstream ():
 
 	for project in PROJECTS:
 
-		thread = threading.Thread (
-			target = fetch_one_upstream,
-			args = [ project, errors ])
+		thread = (
+			threading.Thread (
+				target = fetch_one_upstream,
+				args = [ project, errors ]))
 
 		thread.start ()
 
@@ -531,18 +539,23 @@ def fetch_one_upstream (project, errors):
 
 	try:
 
-		project_repo = git.Repo (
-			"/home/vagrant/%s" % project)
+		project_repo = (
+			git.Repo (
+				"/home/vagrant/%s" % (
+					project ["name"])))
 
 		project_repo.remotes.origin.fetch ()
 
 		auto_newline ()
 
-		sys.stderr.write ("Synced %s\n" % project)
+		sys.stderr.write (
+			"Synced %s\n" % (
+				project ["name"]))
 
 	except Exception as exception:
 
-		errors [project] = exception
+		errors [project ["name"]] = (
+			exception)
 
 def warn_upstream ():
 
@@ -560,23 +573,36 @@ def warn_upstream ():
 
 		for project in PROJECTS:
 
-			repo_path = "/home/vagrant/%s" % project
+			repo_path = (
+				"/home/vagrant/%s" % (
+					project ["name"]))
 
 			if not os.path.isdir (repo_path):
 				continue
 
-			project_repo = git.Repo (repo_path)
+			project_repo = (
+				git.Repo (
+					repo_path))
 
-			bases = project_repo.merge_base (
-				project_repo.head,
-				project_repo.remotes.origin.refs.master)
+			project_origin = (
+				project_repo.remotes.origin)
+
+			project_origin_branch = (
+				project_origin.refs [
+					project ["default_branch"]])
+
+			bases = (
+				project_repo.merge_base (
+					project_repo.head,
+					project_repo.remotes.origin.refs [
+						project ["default_branch"]]))
 
 			base = bases [0]
 
-			if base == project_repo.remotes.origin.refs.master.commit:
+			if base == project_origin_branch.commit:
 				continue
 
-			if project_repo.active_branch.name != "master":
+			if project_repo.active_branch.name != project ["default_branch"]:
 				continue
 
 			if project_repo.is_dirty ():
@@ -585,7 +611,8 @@ def warn_upstream ():
 			auto_newline ()
 
 			sys.stderr.write (
-				"Updating project: %s\n" % project)
+				"Updating project: %s\n" % (
+					project ["name"]))
 
 			project_repo.remotes.origin.pull ()
 
@@ -607,13 +634,21 @@ def warn_upstream ():
 
 		project_repo = git.Repo (repo_path)
 
-		bases = project_repo.merge_base (
-			project_repo.head,
-			project_repo.remotes.origin.refs.master)
+		project_origin = (
+			project_repo.remotes.origin)
+
+		project_origin_branch = (
+			project_origin.refs [
+				project ["default_branch"]])
+
+		bases = (
+			project_repo.merge_base (
+				project_repo.head,
+				project_origin_branch))
 
 		base = bases [0]
 
-		if base != project_repo.remotes.origin.refs.master.commit:
+		if base != project_origin_branch.commit:
 
 			if diverged_count == 0:
 
@@ -622,7 +657,8 @@ def warn_upstream ():
 				])
 
 				write_message ([
-					"New changes can be merged from master in at least one\n"
+					"New changes can be merged from %s in at least one\n" % (
+						project ["default_branch"]),
 					"project\n",
 				])
 
@@ -637,72 +673,77 @@ def warn_upstream ():
 
 			try:
 
-				if project_repo.active_branch.name == "master":
+				if project_repo.active_branch.name == project ["default_branch"]:
 
 					project_status.append (
-						"Diverged from master: %s\n" % project)
+						"Diverged from %s: %s\n" % (
+							project ["default_branch"],
+							project ["name"]))
 
 				else:
 
 					project_status.append (
-						"Diverged from master: %s (%s)\n" % (
-							project,
+						"Diverged from %s: %s (%s)\n" % (
+							project ["default_branch"],
+							project ["name"],
 							project_repo.active_branch.name))
 
 			except:
 
 				project_status.append (
 					"Not on a branch: %s\n" % (
-						project))
+						project ["name"]))
 
 			diverged_count += 1
 
 		elif project_repo.head.commit \
-			!= project_repo.remotes.origin.refs.master.commit:
+			!= project_origin_master.commit:
 
 			try:
 
-				if project_repo.active_branch.name == "master":
+				if project_repo.active_branch.name == project ["default_branch"]:
 
 					project_status.append (
-						"Not merged to master: %s\n" % (
-							project))
+						"Not merged to %s: %s\n" % (
+							project ["default_branch"],
+							project ["name"]))
 
 				else:
 
 					project_status.append (
-						"Not merged to master: %s (%s)\n" % (
-							project,
+						"Not merged to %s: %s (%s)\n" % (
+							project ["default_branch"],
+							project ["name"],
 							project_repo.active_branch.name))
 
 			except:
 
 				project_status.append (
 					"Not on a branch: %s\n" % (
-						project))
+						project ["name"]))
 
 		elif project_repo.is_dirty ():
 
 			try:
 
-				if project_repo.active_branch.name == "master":
+				if project_repo.active_branch.name == project ["default_branch"]:
 
 					project_status.append (
 						"Uncommitted changes: %s\n" % (
-							project))
+							project ["name"]))
 
 				else:
 
 					project_status.append (
 						"Uncommitted changes: %s (%s)\n" % (
-							project,
+							project ["name"],
 							project_repo.active_branch.name))
 
 			except:
 
 				project_status.append (
 					"Not on a branch: %s\n" % (
-						project))
+						project ["name"]))
 
 	if len (project_status) > 0:
 
@@ -761,7 +802,9 @@ def warn_redeploy ():
 			return
 
 	last_commit = max ([
-		os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project)
+		os.path.getmtime (
+			"/home/vagrant/%s/.git/HEAD" % (
+				project ["name"]))
 		for project in PROJECTS
 	])
 
@@ -779,14 +822,19 @@ def warn_redeploy ():
 			"Updated %s: %s\n" % (
 				project,
 				pretty_time (
-					os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project)),
+					os.path.getmtime (
+						"/home/vagrant/%s/.git/HEAD" % (
+							project ["name"]))),
 			)
 			for project in PROJECTS
 			if STATE ["last_redeploy"]
-				< os.path.getmtime ("/home/vagrant/%s/.git/HEAD" % project)
+				< os.path.getmtime (
+					"/home/vagrant/%s/.git/HEAD" % (
+						project ["name"]))
 		] + [
 			"Last redeploy: %s\n" % (
-				pretty_time (STATE ["last_redeploy"]),
+				pretty_time (
+					STATE ["last_redeploy"]),
 			),
 		])
 
