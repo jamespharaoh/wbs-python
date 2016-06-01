@@ -1,5 +1,11 @@
 ---
 
+- include: "fixtures-mongo.yml"
+  tags:
+
+    - "fixtures"
+    - "fixtures-mongo"
+
 - include: "fixtures-postgresql.yml"
   tags:
 

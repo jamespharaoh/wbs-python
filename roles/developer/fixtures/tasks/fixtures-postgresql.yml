@@ -30,12 +30,6 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-data',
   ] | join (' && ') }}"
 
-- shell: "
-    test ! -f '{{ deployment_home }}/shared/flags/postgresql-user' ||
-    mv '{{ deployment_home }}/shared/flags/postgresql-user'
-      '{{ deployment_home }}/shared/flags/postgresql-user-ubuntu'
-  "
-
 - name: "create postgresql user ubuntu"
   args:
 

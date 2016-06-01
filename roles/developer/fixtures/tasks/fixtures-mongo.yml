@@ -1,0 +1,21 @@
+---
+
+- name: "initialise replica set"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/mongo-replica-set"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      'mongo',
+      '--host',
+      deployment_name + '-mongo-0',
+      '--eval',
+      '\"rs.initiate ()\"',
+    ] | join (' '),
+    'sleep 2',
+    'touch ' + deployment_home + '/shared/flags/mongo-replica-set',
+  ] | join (' && ') }}"
+
+# ex: et ts=2 filetype=yaml
