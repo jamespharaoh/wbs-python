@@ -1,6 +1,6 @@
 {{ ansible_warning ['#'] }}
 
-{% for nfs_client in dev_nfs_clients %}
+{% for nfs_client in dev_trusted_clients %}
 {% print [
 	vagrant_home,
 	' ',

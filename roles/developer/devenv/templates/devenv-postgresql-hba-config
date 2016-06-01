@@ -1,9 +1,11 @@
 local all all trust
 
-# this vagrant's host machine
-host all all 172.28.128.1/32 trust
+# trusted hosts from config
+{% for trusted_client in dev_trusted_clients %}
+host all all {{ trusted_client }}/32 trust
+{% endfor %}
 
-# other vagrant boxes
+# other vagrant boxes (todo this doesn't work right, need to use vpn ips)
 {% for other_deployment_name in dev_deployment_names %}
 {% set other_deployment = deployments [other_deployment_name] %}
 host all all {{ other_deployment.bridge_network }}.0.1/32 trust
