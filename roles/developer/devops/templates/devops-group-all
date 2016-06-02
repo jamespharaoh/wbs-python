@@ -38,6 +38,12 @@ ssh_user_keys: {{ lookup ('file', DATA + '/ssh-user-keys')
 vpn_clients: {{ lookup ('file', DATA + '/vpn-clients')
   | from_yaml | to_json }}
 
+devops_inventory_deployment_modes: {{
+  lookup ('file', DATA + '/deployment-modes')
+  | from_yaml
+  | to_json
+}}
+
 # ---------------------------------------- secrets
 
 {% macro do_secrets (name) %}

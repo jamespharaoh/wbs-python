@@ -47,10 +47,6 @@ certificate_data:
   locality: "London"
   organization: "Wistla Limited"
 
-project_data:
-
-  devops_inventory_deployment_modes: "deployment-modes"
-
 resource_data:
 
   clusters: "cluster.cluster"
