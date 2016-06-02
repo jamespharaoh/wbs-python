@@ -180,6 +180,10 @@
   short: "shared content"
   default_branch: "master"
 
+- name: "wistla-test-images"
+  short: "content used by tests"
+  default_branch: "master"
+
 # ---------- miscellaneous
 
 - name: "wistla-iOS"
