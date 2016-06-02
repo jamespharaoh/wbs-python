@@ -25,7 +25,7 @@ cluster_deployment_types:
     checkouts:
 
       - name: "wistla-devops"
-        branch: "master"
+        branch: "development"
 
       - name: "wistla-scripts"
         branch: "master"
@@ -118,7 +118,7 @@ cluster_deployment_types:
           - "npm install"
 
       - name: "wistla-devops"
-        branch: "master"
+        branch: "development"
         configs:
 
           - "config"
@@ -299,7 +299,7 @@ cluster_deployment_types:
           - "npm install"
 
       - name: "wistla-devops"
-        branch: "master"
+        branch: "development"
         configs:
 
           - "config"
