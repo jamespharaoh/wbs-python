@@ -69,8 +69,8 @@ developer_full:
   #- name: "content-web"
   #  branch: "master"
 
-  #- name: "wistla-test-images"
-  #  branch: "master"
+  - name: "wistla-test-images"
+    branch: "master"
 
   # ---------- legacy
 
