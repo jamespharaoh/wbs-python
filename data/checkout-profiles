@@ -20,6 +20,9 @@ developer_full:
   - name: "wistla-api-server"
     branch: "development"
 
+  - name: "wistla-blob"
+    branch: "development"
+
   - name: "wistla-data-export"
     branch: "development"
 
@@ -36,6 +39,9 @@ developer_full:
     branch: "development"
 
   - name: "wistla-raml-api"
+    branch: "development"
+
+  - name: "wistla-media"
     branch: "development"
 
   - name: "wistla-raml-server"

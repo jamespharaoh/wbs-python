@@ -35,8 +35,17 @@
 
     - "wistla-data-process"
     - "wistla-db"
+    - "wistla-media"
     - "wistla-raml-api"
     - "wistla-raml-server"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-blob"
+  default_branch: "development"
+  npm_name: "@wistla/blob"
 
   build_steps:
 
@@ -69,6 +78,20 @@
   depends:
 
     - "wistla-db"
+
+- name: "wistla-media"
+  short: "media handling"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-media"
+
+  depends:
+
+    - "wistla-blob"
+    - "wistla-db"
+
+  build_steps:
+
+    - "npm install"
 
 - name: "wistla-raml-api"
   short: "api definitions in raml format"
