@@ -43,6 +43,7 @@ deployments:
   'enabled',
   'node_memory',
   'nodejs_version',
+  'nodejs_version_legacy',
 ] %}
 {% if key in other_deployment %}
     {{ key }}: {{ other_deployment [key] | to_json }}
