@@ -45,7 +45,7 @@
 
 - name: "wistla-blob"
   default_branch: "development"
-  npm_name: "@wistla/blob"
+  npm_name: "@wistla/wistla-blob"
 
   build_steps:
 
@@ -82,7 +82,7 @@
 - name: "wistla-media"
   short: "media handling"
   default_branch: "development"
-  npm_name: "@wistla/media"
+  npm_name: "@wistla/wistla-media"
 
   depends:
 

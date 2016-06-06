@@ -13,6 +13,12 @@ node_deploy_projects:
       - target: "local.yaml"
         source: "wistla-api-server-local.yaml"
 
+  - name: "wistla-blob"
+    type: "nodejs"
+
+  - name: "wistla-media"
+    type: "nodejs"
+
   - name: "wistla-raml-api"
     type: "nodejs"
 
