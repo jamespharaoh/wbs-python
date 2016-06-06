@@ -82,7 +82,7 @@
 - name: "wistla-media"
   short: "media handling"
   default_branch: "development"
-  npm_name: "@wistla/wistla-media"
+  npm_name: "@wistla/media"
 
   depends:
 
