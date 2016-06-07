@@ -39,7 +39,7 @@ from gitdb.util import (  # NOQA
 __all__ = ("stream_copy", "join_path", "to_native_path_windows", "to_native_path_linux",
            "join_path_native", "Stats", "IndexFileSHA1Writer", "Iterable", "IterableList",
            "BlockingLockFile", "LockFile", 'Actor', 'get_user_id', 'assure_directory_exists',
-           'RemoteProgress', 'rmtree', 'WaitGroup', 'unbare_repo')
+           'RemoteProgress', 'CallableRemoteProgress', 'rmtree', 'WaitGroup', 'unbare_repo')
 
 #{ Utility Methods
 
@@ -160,7 +160,6 @@ def finalize_process(proc, **kwargs):
 
 
 class RemoteProgress(object):
-
     """
     Handler providing an interface to parse progress information emitted by git-push
     and git-fetch and to dispatch callbacks allowing subclasses to react to the progress.
@@ -313,10 +312,21 @@ class RemoteProgress(object):
 
         You may read the contents of the current line in self._cur_line"""
         pass
+        
+
+class CallableRemoteProgress(RemoteProgress):
+    """An implementation forwarding updates to any callable"""
+    __slots__ = ('_callable')
+    
+    def __init__(self, fn):
+        self._callable = fn
+        super(CallableRemoteProgress, self).__init__()
+
+    def update(self, *args, **kwargs):
+        self._callable(*args, **kwargs)
 
 
 class Actor(object):
-
     """Actors hold information about a person acting on the repository. They
     can be committers and authors or anything with a name and an email as
     mentioned in the git log entries."""
