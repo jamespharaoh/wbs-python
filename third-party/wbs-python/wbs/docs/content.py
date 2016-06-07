@@ -32,7 +32,10 @@ class WbsDocsContent ():
 
 		# load section index
 
-		print ("LOAD SECTION: " + section_path)
+		print (
+			"Load section '%s' (%s)" % (
+				section_name,
+				section_path))
 
 		index_path = "%s/index" % section_path
 

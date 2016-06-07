@@ -66,12 +66,18 @@ class WistlaDocsMaster ():
 				self,
 				"%s/content" % self.home))
 
+		self.config = {
+			"project-path": self.home,
+			"static-path": "%s/static" % self.home,
+			"template-path": "%s/templates" % self.home,
+		}
+
 		self.settings = {
 			"server": {
 				"debug": "yes",
-				"hostname": "172.28.128.3:8080",
+				"hostname": "172.28.128.3:8888",
 				"listen-address": "172.28.128.3",
-				"listen-port": "8080",
+				"listen-port": "8888",
 			},
 			"security": {
 				"force-email": "user@wistla.com",
@@ -81,9 +87,9 @@ class WistlaDocsMaster ():
 
 		self.server = (
 			WbsDocsServer (
-				self,
-				self.content,
-				self.settings))
+				content = self.content,
+				config = self.config,
+				settings = self.settings))
 
 		self.server.run ()
 
