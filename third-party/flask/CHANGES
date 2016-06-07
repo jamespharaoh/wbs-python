@@ -3,10 +3,27 @@ Flask Changelog
 
 Here you can see the full list of changes between each Flask release.
 
-Version 1.0
------------
+Version 0.12
+------------
 
-(release date to be announced, codename to be selected)
+- the cli command now responds to `--version`.
+- Mimetype guessing for ``send_file`` has been removed, as per issue ``#104``.
+  See pull request ``#1849``.
+- Make ``flask.safe_join`` able to join multiple paths like ``os.path.join``
+  (pull request ``#1730``).
+
+Version 0.11.1
+--------------
+
+Bugfix release, unreleased.
+
+- Fixed a bug that prevented ``FLASK_APP=foobar/__init__.py`` from working. See
+  pull request ``#1872``.
+
+Version 0.11
+------------
+
+Released on May 29th 2016, codename Absinthe.
 
 - Added support to serializing top-level arrays to :func:`flask.jsonify`. This
   introduces a security risk in ancient browsers. See
@@ -26,7 +43,7 @@ Version 1.0
   from a view function.
 - Added :meth:`flask.Config.from_json`.
 - Added :attr:`flask.Flask.config_class`.
-- Added :meth:`flask.config.Config.get_namespace`.
+- Added :meth:`flask.Config.get_namespace`.
 - Templates are no longer automatically reloaded outside of debug mode. This
   can be configured with the new ``TEMPLATES_AUTO_RELOAD`` config key.
 - Added a workaround for a limitation in Python 3.3's namespace loader.
@@ -77,6 +94,8 @@ Version 1.0
 - ``send_from_directory`` now raises BadRequest if the filename is invalid on
   the server OS (pull request ``#1763``).
 - Added the ``JSONIFY_MIMETYPE`` configuration variable (pull request ``#1728``).
+- Exceptions during teardown handling will no longer leave bad application
+  contexts lingering around.
 
 Version 0.10.2
 --------------
