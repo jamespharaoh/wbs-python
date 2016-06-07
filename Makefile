@@ -3,7 +3,8 @@
 all: clean-pyc test
 
 test:
-	py.test tests examples
+	pip install -r test-requirements.txt -q
+	FLASK_DEBUG= py.test tests examples
 
 tox-test:
 	tox

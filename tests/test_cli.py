@@ -12,6 +12,8 @@
 # Copyright (C) 2015 CERN.
 #
 from __future__ import absolute_import, print_function
+import os
+import sys
 
 import click
 import pytest
@@ -19,7 +21,7 @@ from click.testing import CliRunner
 from flask import Flask, current_app
 
 from flask.cli import AppGroup, FlaskGroup, NoAppException, ScriptInfo, \
-    find_best_app, locate_app, script_info_option, with_appcontext
+    find_best_app, locate_app, with_appcontext, prepare_exec_for_file
 
 
 def test_cli_name(test_apps):
@@ -47,6 +49,26 @@ def test_find_best_app(test_apps):
         myapp2 = Flask('appname2')
 
     pytest.raises(NoAppException, find_best_app, mod)
+
+
+def test_prepare_exec_for_file(test_apps):
+    """Expect the correct path to be set and the correct module name to be returned.
+
+    :func:`prepare_exec_for_file` has a side effect, where
+    the parent directory of given file is added to `sys.path`.
+    """
+    realpath = os.path.realpath('/tmp/share/test.py')
+    dirname = os.path.dirname(realpath)
+    assert prepare_exec_for_file('/tmp/share/test.py') == 'test'
+    assert dirname in sys.path
+
+    realpath = os.path.realpath('/tmp/share/__init__.py')
+    dirname = os.path.dirname(os.path.dirname(realpath))
+    assert prepare_exec_for_file('/tmp/share/__init__.py') == 'share'
+    assert dirname in sys.path
+
+    with pytest.raises(NoAppException):
+        prepare_exec_for_file('/tmp/share/test.txt')
 
 
 def test_locate_app(test_apps):
@@ -123,7 +145,6 @@ def test_flaskgroup():
         return Flask("flaskgroup")
 
     @click.group(cls=FlaskGroup, create_app=create_app)
-    @script_info_option('--config', script_info_key='config')
     def cli(**params):
         pass
 

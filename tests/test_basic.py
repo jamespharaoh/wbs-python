@@ -1031,6 +1031,14 @@ def test_jsonify_mimetype():
         assert rv.mimetype == 'application/vnd.api+json'
 
 
+def test_jsonify_args_and_kwargs_check():
+    app = flask.Flask(__name__)
+    with app.test_request_context():
+        with pytest.raises(TypeError) as e:
+            flask.jsonify('fake args', kwargs='fake')
+        assert 'behavior undefined' in str(e.value)
+
+
 def test_url_generation():
     app = flask.Flask(__name__)
 
@@ -1114,6 +1122,30 @@ def test_static_files():
         assert flask.url_for('static', filename='index.html') == \
             '/static/index.html'
     rv.close()
+
+
+def test_static_path_deprecated(recwarn):
+    app = flask.Flask(__name__, static_path='/foo')
+    recwarn.pop(DeprecationWarning)
+
+    app.testing = True
+    rv = app.test_client().get('/foo/index.html')
+    assert rv.status_code == 200
+    rv.close()
+
+    with app.test_request_context():
+        assert flask.url_for('static', filename='index.html') == '/foo/index.html'
+
+
+def test_static_url_path():
+    app = flask.Flask(__name__, static_url_path='/foo')
+    app.testing = True
+    rv = app.test_client().get('/foo/index.html')
+    assert rv.status_code == 200
+    rv.close()
+
+    with app.test_request_context():
+        assert flask.url_for('static', filename='index.html') == '/foo/index.html'
 
 
 def test_none_response():

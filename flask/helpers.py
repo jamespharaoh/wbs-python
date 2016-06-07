@@ -14,7 +14,6 @@ import sys
 import pkgutil
 import posixpath
 import mimetypes
-from datetime import timedelta
 from time import time
 from zlib import adler32
 from threading import RLock
@@ -40,7 +39,7 @@ from jinja2 import FileSystemLoader
 from .signals import message_flashed
 from .globals import session, _request_ctx_stack, _app_ctx_stack, \
      current_app, request
-from ._compat import string_types, text_type
+from ._compat import string_types, text_type, PY2
 
 
 # sentinel
@@ -52,6 +51,13 @@ _missing = object()
 # able to access files from outside the filesystem.
 _os_alt_seps = list(sep for sep in [os.path.sep, os.path.altsep]
                     if sep not in (None, '/'))
+
+
+def get_debug_flag(default=None):
+    val = os.environ.get('FLASK_DEBUG')
+    if not val:
+        return default
+    return val not in ('0', 'false', 'no')
 
 
 def _endpoint_from_view_func(view_func):
@@ -300,14 +306,23 @@ def url_for(endpoint, **values):
     scheme = values.pop('_scheme', None)
     appctx.app.inject_url_defaults(endpoint, values)
 
+    # This is not the best way to deal with this but currently the
+    # underlying Werkzeug router does not support overriding the scheme on
+    # a per build call basis.
+    old_scheme = None
     if scheme is not None:
         if not external:
             raise ValueError('When specifying _scheme, _external must be True')
+        old_scheme = url_adapter.url_scheme
         url_adapter.url_scheme = scheme
 
     try:
-        rv = url_adapter.build(endpoint, values, method=method,
-                               force_external=external)
+        try:
+            rv = url_adapter.build(endpoint, values, method=method,
+                                   force_external=external)
+        finally:
+            if old_scheme is not None:
+                url_adapter.url_scheme = old_scheme
     except BuildError as error:
         # We need to inject the values again so that the app callback can
         # deal with that sort of stuff.
@@ -414,7 +429,7 @@ def get_flashed_messages(with_categories=False, category_filter=[]):
 
 def send_file(filename_or_fp, mimetype=None, as_attachment=False,
               attachment_filename=None, add_etags=True,
-              cache_timeout=None, conditional=False):
+              cache_timeout=None, conditional=False, last_modified=None):
     """Sends the contents of a file to the client.  This will use the
     most efficient method available and configured.  By default it will
     try to use the WSGI server's file_wrapper support.  Alternatively
@@ -422,11 +437,7 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
     to ``True`` to directly emit an ``X-Sendfile`` header.  This however
     requires support of the underlying webserver for ``X-Sendfile``.
 
-    By default it will try to guess the mimetype for you, but you can
-    also explicitly provide one.  For extra security you probably want
-    to send certain files as attachment (HTML for instance).  The mimetype
-    guessing requires a `filename` or an `attachment_filename` to be
-    provided.
+    You must explicitly provide the mimetype for the filename or file object.
 
     Please never pass filenames to this function from user sources;
     you should use :func:`send_from_directory` instead.
@@ -445,6 +456,11 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
 
     .. versionchanged:: 0.9
        cache_timeout pulls its default from application config, when None.
+
+    .. versionchanged:: 0.12
+       mimetype guessing and etag support removed for file objects.
+       If no mimetype or attachment_filename is provided, application/octet-stream
+       will be used.
 
     :param filename_or_fp: the filename of the file to send in `latin-1`.
                            This is relative to the :attr:`~Flask.root_path`
@@ -467,30 +483,17 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
                           (default), this value is set by
                           :meth:`~Flask.get_send_file_max_age` of
                           :data:`~flask.current_app`.
+    :param last_modified: set the ``Last-Modified`` header to this value,
+        a :class:`~datetime.datetime` or timestamp.
+        If a file was passed, this overrides its mtime.
     """
     mtime = None
     if isinstance(filename_or_fp, string_types):
         filename = filename_or_fp
         file = None
     else:
-        from warnings import warn
         file = filename_or_fp
         filename = getattr(file, 'name', None)
-
-        # XXX: this behavior is now deprecated because it was unreliable.
-        # removed in Flask 1.0
-        if not attachment_filename and not mimetype \
-           and isinstance(filename, string_types):
-            warn(DeprecationWarning('The filename support for file objects '
-                'passed to send_file is now deprecated.  Pass an '
-                'attach_filename if you want mimetypes to be guessed.'),
-                stacklevel=2)
-        if add_etags:
-            warn(DeprecationWarning('In future flask releases etags will no '
-                'longer be generated for file objects passed to the send_file '
-                'function because this behavior was unreliable.  Pass '
-                'filenames instead if possible, otherwise attach an etag '
-                'yourself based on another value'), stacklevel=2)
 
     if filename is not None:
         if not os.path.isabs(filename):
@@ -526,10 +529,10 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
     rv = current_app.response_class(data, mimetype=mimetype, headers=headers,
                                     direct_passthrough=True)
 
-    # if we know the file modification date, we can store it as
-    # the time of the last modification.
-    if mtime is not None:
-        rv.last_modified = int(mtime)
+    if last_modified is not None:
+        rv.last_modified = last_modified
+    elif mtime is not None:
+        rv.last_modified = mtime
 
     rv.cache_control.public = True
     if cache_timeout is None:
@@ -538,7 +541,9 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
         rv.cache_control.max_age = cache_timeout
         rv.expires = int(time() + cache_timeout)
 
-    if add_etags and filename is not None:
+    if add_etags and filename is not None and file is None:
+        from warnings import warn
+
         try:
             rv.set_etag('%s-%s-%s' % (
                 os.path.getmtime(filename),
@@ -561,8 +566,9 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
     return rv
 
 
-def safe_join(directory, filename):
-    """Safely join `directory` and `filename`.
+def safe_join(directory, *pathnames):
+    """Safely join `directory` and zero or more untrusted `pathnames`
+    components.
 
     Example usage::
 
@@ -572,20 +578,23 @@ def safe_join(directory, filename):
             with open(filename, 'rb') as fd:
                 content = fd.read()  # Read and process the file content...
 
-    :param directory: the base directory.
-    :param filename: the untrusted filename relative to that directory.
-    :raises: :class:`~werkzeug.exceptions.NotFound` if the resulting path
-             would fall out of `directory`.
+    :param directory: the trusted base directory.
+    :param pathnames: the untrusted pathnames relative to that directory.
+    :raises: :class:`~werkzeug.exceptions.NotFound` if one or more passed
+            paths fall out of its boundaries.
     """
-    filename = posixpath.normpath(filename)
-    for sep in _os_alt_seps:
-        if sep in filename:
+    for filename in pathnames:
+        if filename != '':
+            filename = posixpath.normpath(filename)
+        for sep in _os_alt_seps:
+            if sep in filename:
+                raise NotFound()
+        if os.path.isabs(filename) or \
+           filename == '..' or \
+           filename.startswith('../'):
             raise NotFound()
-    if os.path.isabs(filename) or \
-       filename == '..' or \
-       filename.startswith('../'):
-        raise NotFound()
-    return os.path.join(directory, filename)
+        directory = os.path.join(directory, filename)
+    return directory
 
 
 def send_from_directory(directory, filename, **options):
