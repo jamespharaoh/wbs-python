@@ -26,6 +26,7 @@ from scss.ast import MapLiteral
 from scss.ast import ArgspecLiteral
 from scss.ast import FunctionLiteral
 from scss.ast import AlphaFunctionLiteral
+from scss.ast import TernaryOp
 from scss.cssdefs import unescape
 from scss.types import Color
 from scss.types import Function
@@ -96,10 +97,11 @@ parser SassExpression:
     token VAR: "\$[-a-zA-Z0-9_]+"
 
     # Cheating, to make sure these only match function names.
-    # The last of these is the IE filter nonsense
-    token LITERAL_FUNCTION: "(calc|expression|progid:[\w.]+)(?=[(])"
+    token LITERAL_FUNCTION: "(-moz-calc|-webkit-calc|calc|expression|progid:[\w.]+)(?=[(])"
     token ALPHA_FUNCTION: "alpha(?=[(])"
+    token OPACITY: "((?i)opacity)"
     token URL_FUNCTION: "url(?=[(])"
+    token IF_FUNCTION: "if(?=[(])"
     # This must come AFTER the above
     token FNCT: "[-a-zA-Z_][-a-zA-Z0-9_]*(?=\()"
 
@@ -244,10 +246,13 @@ parser SassExpression:
         # filter syntax, where it appears as alpha(opacity=NN).  Since = isn't
         # normally valid Sass, we have to special-case it here
         | ALPHA_FUNCTION LPAR (
-            "opacity" "=" atom RPAR
+            OPACITY "=" atom RPAR
                 {{ return AlphaFunctionLiteral(atom) }}
             | argspec RPAR          {{ return CallOp("alpha", argspec) }}
             )
+        # This is a ternary operator, disguised as a function
+        | IF_FUNCTION LPAR expr_lst RPAR
+            {{ return TernaryOp(expr_lst) }}
         | LITERAL_FUNCTION LPAR interpolated_function RPAR
             {{ return Interpolation.maybe(interpolated_function, type=Function, function_name=LITERAL_FUNCTION) }}
         | FNCT LPAR argspec RPAR    {{ return CallOp(FNCT, argspec) }}

@@ -34,12 +34,12 @@ class CoreExtension(Extension):
         # import relative to the current file even if the current file isn't
         # anywhere in the search path.  is that right?
         path = PurePosixPath(name)
-        if path.suffix:
-            search_exts = [path.suffix]
-        else:
-            search_exts = compilation.compiler.dynamic_extensions
 
-        basename = path.stem
+        search_exts = list(compilation.compiler.dynamic_extensions)
+        if path.suffix and path.suffix in search_exts:
+            basename = path.stem
+        else:
+            basename = path.name
         relative_to = path.parent
         search_path = []  # tuple of (origin, start_from)
         if relative_to.is_absolute():
@@ -378,6 +378,12 @@ def invert(color):
     """Returns the inverse (negative) of a color.  The red, green, and blue
     values are inverted, while the opacity is left alone.
     """
+    if isinstance(color, Number):
+        # invert(n) and invert(n%) are CSS3 filters and should be left
+        # intact
+        return String.unquoted("invert(%s)" % (color.render(),))
+
+    expect_type(color, Color)
     r, g, b, a = color.rgba
     return Color.from_rgb(1 - r, 1 - g, 1 - b, alpha=a)
 
@@ -626,26 +632,6 @@ ns.set_function('floor', 1, Number.wrap_python_function(math.floor))
 # ------------------------------------------------------------------------------
 # List functions
 
-def __parse_separator(separator, default_from=None):
-    if separator is None:
-        separator = 'auto'
-    separator = String.unquoted(separator).value
-
-    if separator == 'comma':
-        return True
-    elif separator == 'space':
-        return False
-    elif separator == 'auto':
-        if not default_from:
-            return True
-        elif len(default_from) < 2:
-            return True
-        else:
-            return default_from.use_comma
-    else:
-        raise ValueError('Separator must be auto, comma, or space')
-
-
 # TODO get the compass bit outta here
 @ns.declare_alias('-compass-list-size')
 @ns.declare
@@ -729,12 +715,26 @@ def max_(*lst):
 
 
 @ns.declare
-def append(lst, val, separator=None):
+def append(lst, val, separator=String.unquoted('auto')):
+    expect_type(separator, String)
+
     ret = []
     ret.extend(List.from_maybe(lst))
     ret.append(val)
 
-    use_comma = __parse_separator(separator, default_from=lst)
+    separator = separator.value
+    if separator == 'comma':
+        use_comma = True
+    elif separator == 'space':
+        use_comma = False
+    elif separator == 'auto':
+        if len(lst) < 2:
+            use_comma = False
+        else:
+            use_comma = lst.use_comma
+    else:
+        raise ValueError('Separator must be auto, comma, or space')
+
     return List(ret, use_comma=use_comma)
 
 
@@ -840,8 +840,71 @@ def map_merge_deep(*maps):
     return Map(pairs)
 
 
+@ns.declare
+def keywords(value):
+    """Extract named arguments, as a map, from an argument list."""
+    expect_type(value, Arglist)
+    return value.extract_keywords()
+
+
 # ------------------------------------------------------------------------------
-# Meta functions
+# Introspection functions
+
+# TODO feature-exists
+
+@ns.declare_internal
+def variable_exists(namespace, name):
+    expect_type(name, String)
+    try:
+        namespace.variable('$' + name.value)
+    except KeyError:
+        return Boolean(False)
+    else:
+        return Boolean(True)
+
+
+@ns.declare_internal
+def global_variable_exists(namespace, name):
+    expect_type(name, String)
+
+    # TODO this is...  imperfect and invasive, but should be a good
+    # approximation
+    scope = namespace._variables
+    while len(scope.maps) > 1:
+        scope = scope.maps[-1]
+
+    try:
+        scope['$' + name.value]
+    except KeyError:
+        return Boolean(False)
+    else:
+        return Boolean(True)
+
+
+@ns.declare_internal
+def function_exists(namespace, name):
+    expect_type(name, String)
+    # TODO invasive, but there's no other way to ask for this at the moment
+    for fname, arity in namespace._functions.keys():
+        if name.value == fname:
+            return Boolean(True)
+    return Boolean(False)
+
+
+@ns.declare_internal
+def mixin_exists(namespace, name):
+    expect_type(name, String)
+    # TODO invasive, but there's no other way to ask for this at the moment
+    for fname, arity in namespace._mixins.keys():
+        if name.value == fname:
+            return Boolean(True)
+    return Boolean(False)
+
+
+@ns.declare
+def inspect(value):
+    return String.unquoted(value.render())
+
 
 @ns.declare
 def type_of(obj):  # -> bool, number, string, color, list
@@ -877,16 +940,4 @@ def comparable(number1, number2):
         and left.unit_denom == right.unit_denom)
 
 
-@ns.declare
-def keywords(value):
-    """Extract named arguments, as a map, from an argument list."""
-    expect_type(value, Arglist)
-    return value.extract_keywords()
-
-
-# ------------------------------------------------------------------------------
-# Miscellaneous
-
-@ns.declare
-def if_(condition, if_true, if_false=Null()):
-    return if_true if condition else if_false
+# TODO call
