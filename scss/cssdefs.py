@@ -1,6 +1,7 @@
 """Constants and functions defined by the CSS specification, not specific to
 Sass.
 """
+from fractions import Fraction
 from math import pi
 import re
 
@@ -166,15 +167,15 @@ BASE_UNIT_CONVERSIONS = {
     # Lengths
     'mm': (1, 'mm'),
     'cm': (10, 'mm'),
-    'in': (25.4, 'mm'),
-    'px': (25.4 / 96, 'mm'),
-    'pt': (25.4 / 72, 'mm'),
-    'pc': (25.4 / 6, 'mm'),
+    'in': (Fraction(254, 10), 'mm'),
+    'px': (Fraction(254, 960), 'mm'),
+    'pt': (Fraction(254, 720), 'mm'),
+    'pc': (Fraction(254, 60), 'mm'),
 
     # Angles
-    'deg': (1 / 360, 'turn'),
-    'grad': (1 / 400, 'turn'),
-    'rad': (pi / 2, 'turn'),
+    'deg': (Fraction(1, 360), 'turn'),
+    'grad': (Fraction(1, 400), 'turn'),
+    'rad': (Fraction.from_float(pi / 2), 'turn'),
     'turn': (1, 'turn'),
 
     # Times
@@ -187,7 +188,7 @@ BASE_UNIT_CONVERSIONS = {
 
     # Resolutions
     'dpi': (1, 'dpi'),
-    'dpcm': (2.54, 'dpi'),
+    'dpcm': (Fraction(254 / 100), 'dpi'),
     'dppx': (96, 'dpi'),
 }
 
@@ -252,7 +253,7 @@ def cancel_base_units(units, to_remove):
     # Copy the dict since we're about to mutate it
     to_remove = to_remove.copy()
     remaining_units = []
-    total_factor = 1
+    total_factor = Fraction(1)
 
     for unit in units:
         factor, base_unit = get_conversion_factor(unit)
@@ -448,7 +449,11 @@ escape_rx = re.compile(r"(?s)\\([0-9a-fA-F]{1,6})[\n\t ]?|\\(.)|\\\n")
 
 def _unescape_one(match):
     if match.group(1) is not None:
-        return six.unichr(int(match.group(1), 16))
+        try:
+            return six.unichr(int(match.group(1), 16))
+        except ValueError:
+            return (r'\U%08x' % int(match.group(1), 16)).decode(
+                'unicode-escape')
     elif match.group(2) is not None:
         return match.group(2)
     else:
@@ -480,6 +485,8 @@ _collapse_properties_space_re = re.compile(r'([:#])\s*{')
 _variable_re = re.compile('^\\$[-a-zA-Z0-9_]+$')
 
 _strings_re = re.compile(r'([\'"]).*?\1')
+# TODO i know, this is clumsy and won't always work; it's better than nothing
+_urls_re = re.compile(r'url[(].*?[)]')
 
 _has_placeholder_re = re.compile(r'(?<!\w)([a-z]\w*)?%')
 _prop_split_re = re.compile(r'[:=]')
