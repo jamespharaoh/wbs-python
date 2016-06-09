@@ -1,5 +1,22 @@
 ---
 
+my_system_packages:
+
+  - name: "build-essential"
+    state: "present"
+
+  - name: "graphicsmagick"
+    state: "present"
+
+  - name: "imagemagick"
+    state: "present"
+
+  - name: "iptables"
+    state: "present"
+
+  - name: "libav-tools"
+    state: "present"
+
 node_deploy_projects:
 
   - name: "wistla-api-server"
