@@ -29,7 +29,7 @@
     src: "{{ item.template }}"
 
 - name: "write nginx certificates"
-  with_items: "{{ cluster.app_certificates | default ([]) }}"
+  with_items: "{{ supercluster.app_certificates | default ([]) }}"
   become: "yes"
   action:
 
@@ -38,7 +38,7 @@
     src: "cluster-app-ssl-bundle"
 
 - name: "write nginx private keys"
-  with_items: "{{ cluster.app_certificates | default ([]) }}"
+  with_items: "{{ supercluster.app_certificates | default ([]) }}"
   become: "yes"
   action:
 
