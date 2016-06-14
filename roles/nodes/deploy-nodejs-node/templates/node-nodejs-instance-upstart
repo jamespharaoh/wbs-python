@@ -53,21 +53,21 @@ script
 		 #}
 
 		exec setuid ubuntu \
-		{{ node_nodejs_debug }} \
-		{{ node_nodejs_main }}
+		{{ item.0.nodejs_debug }} \
+		{{ item.0.nodejs_main }}
 
 	else
 
 		exec setuid ubuntu \
 		stdbuf -oL -eL \
-		{{ node_nodejs_interpreter }} \
+		{{ item.0.nodejs_interpreter }} \
 		--trace_gc \
 		--expose_gc \
 		--min_semi_space_size=${{ node_var }}_MIN_SEMI_SPACE_SIZE \
 		--max_semi_space_size=${{ node_var }}_MAX_SEMI_SPACE_SIZE \
 		--max_old_space_size=${{ node_var }}_MAX_OLD_SPACE_SIZE \
 		--max_executable_size=${{ node_var }}_MAX_EXECUTABLE_SIZE \
-		{{ node_nodejs_main }}
+		{{ item.0.nodejs_main }}
 
 	fi
 

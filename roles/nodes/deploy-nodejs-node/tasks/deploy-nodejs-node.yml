@@ -67,12 +67,32 @@
       - template: "node-nodejs-instance-upstart"
         target_suffix: "-instance"
 
+  when: "'nodejs_main' in item.0"
   become: "yes"
   action:
 
     module: "template"
     dest: "/etc/init/{{ item.0.name }}{{ item.1.target_suffix }}.conf"
     src: "{{ item.1.template }}"
+
+- name: "delete init config"
+  with_nested:
+
+    - "{{ node_deploy_projects }}"
+
+    - - template: "node-nodejs-upstart"
+        target_suffix: ""
+
+      - template: "node-nodejs-instance-upstart"
+        target_suffix: "-instance"
+
+  when: "'nodejs_main' not in item.0"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/init/{{ item.0.name }}{{ item.1.target_suffix }}.conf"
+    state: "absent"
 
 - name: "create links to config"
   with_items: "{{

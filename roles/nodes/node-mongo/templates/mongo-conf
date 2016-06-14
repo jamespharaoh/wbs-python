@@ -1,7 +1,7 @@
 {{ ansible_warning ['#'] }}
 
 dbpath = /var/lib/mongodb
-logpath = /var/log/mongodb/mongodb.log
+logpath = /shared/log/mongodb.log
 logappend = true
 bind_ip = 0.0.0.0
 smallfiles = true

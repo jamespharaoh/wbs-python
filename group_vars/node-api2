@@ -21,6 +21,9 @@ node_deploy_projects:
 
   - name: "wistla-api-server"
     type: "nodejs"
+    nodejs_main: "index.js"
+    nodejs_interpreter: "node --harmony"
+    nodejs_debug: "node debug --debug-brk=5005 --harmony"
     excludes:
 
       - "/config/wistla-api-server-local.yaml"
@@ -50,11 +53,6 @@ node_deploy_projects:
 
   - name: "wistla-db"
     type: "nodejs"
-
-node_nodejs_main: "index.js"
-
-node_nodejs_interpreter: "node --harmony"
-node_nodejs_debug: "node debug --debug-brk=5005 --harmony"
 
 nodejs_version: "{{ deployment.nodejs_version }}"
 

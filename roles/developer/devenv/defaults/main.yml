@@ -151,6 +151,9 @@ devenv_shared_logfiles:
   - log: "shared/log/content-common.log"
     user: "root"
 
+  - log: "shared/log/mongodb.log"
+    user: "mongodb"
+
   - log: "shared/log/nginx-access.log"
     user: "root"
 

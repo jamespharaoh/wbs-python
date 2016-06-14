@@ -24,6 +24,9 @@ node_deploy_projects:
 
   - name: "wistla-browser"
     type: "nodejs"
+    nodejs_main: "server.js"
+    nodejs_interpreter: "node --harmony"
+    nodejs_debug: "node-debug --nodejs --debug-brk=0 --harmony"
     excludes:
 
       - "/config/config.local.js"
@@ -39,11 +42,6 @@ node_deploy_projects:
 
   - name: "wistla-analytics"
     type: "nodejs"
-
-node_nodejs_main: "server.js"
-
-node_nodejs_interpreter: "node --harmony"
-node_nodejs_debug: "node-debug --nodejs --debug-brk=0 --harmony"
 
 nodejs_version: "{{ deployment.nodejs_version_legacy }}"
 
