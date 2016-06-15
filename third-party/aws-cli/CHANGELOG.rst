@@ -2,6 +2,21 @@
 CHANGELOG
 =========
 
+1.10.38
+=======
+
+* feature:``acm``: Update acm command to latest version
+* feature:``ses``: Update ses command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``cloudtrail``: Update cloudtrail command to latest version
+
+
+1.10.37
+=======
+
+* feature:``s3``: Update s3 command to latest version
+
+
 1.10.36
 =======
 
