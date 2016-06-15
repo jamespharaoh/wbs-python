@@ -2,6 +2,23 @@
 CHANGELOG
 =========
 
+1.4.28
+======
+
+* feature:``cloudtrail``: Update cloudtrail client to latest version
+* feature:``acm``: Update acm client to latest version
+* bugfix:Stubber: Fix regression in comparing multiple expected parameters
+* feature:``rds``: Update rds client to latest version
+* feature:``ses``: Update ses client to latest version
+
+
+1.4.27
+======
+
+* feature:Stubber: Allow certain paramters to be ignored by specifying stub.ANY. Resolves `#931 <https://github.com/boto/botocore/issues/931>`__
+* feature:``s3``: Update s3 client to latest version
+
+
 1.4.26
 ======
 
