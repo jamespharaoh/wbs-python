@@ -8,7 +8,6 @@
 import re
 import os
 
-from .exc import GitCommandError
 from .config import (
     SectionConstraint,
     cp,
@@ -452,6 +451,54 @@ class Remote(LazyMixin, Iterable):
             yield Remote(repo, section[lbound + 1:rbound])
         # END for each configuration section
 
+    def set_url(self, new_url, old_url=None, **kwargs):
+        """Configure URLs on current remote (cf command git remote set_url)
+
+        This command manages URLs on the remote.
+
+        :param new_url: string being the URL to add as an extra remote URL
+        :param old_url: when set, replaces this URL with new_url for the remote
+        :return: self
+        """
+        scmd = 'set-url'
+        kwargs['insert_kwargs_after'] = scmd
+        if old_url:
+            self.repo.git.remote(scmd, self.name, old_url, new_url, **kwargs)
+        else:
+            self.repo.git.remote(scmd, self.name, new_url, **kwargs)
+        return self
+
+    def add_url(self, url, **kwargs):
+        """Adds a new url on current remote (special case of git remote set_url)
+
+        This command adds new URLs to a given remote, making it possible to have
+        multiple URLs for a single remote.
+
+        :param url: string being the URL to add as an extra remote URL
+        :return: self
+        """
+        return self.set_url(url, add=True)
+
+    def delete_url(self, url, **kwargs):
+        """Deletes a new url on current remote (special case of git remote set_url)
+
+        This command deletes new URLs to a given remote, making it possible to have
+        multiple URLs for a single remote.
+
+        :param url: string being the URL to delete from the remote
+        :return: self
+        """
+        return self.set_url(url, delete=True)
+
+    @property
+    def urls(self):
+        """:return: Iterator yielding all configured URL targets on a remote
+        as strings"""
+        remote_details = self.repo.git.remote("show", self.name)
+        for line in remote_details.split('\n'):
+            if '  Push  URL:' in line:
+                yield line.split(': ')[-1]
+
     @property
     def refs(self):
         """
@@ -570,11 +617,11 @@ class Remote(LazyMixin, Iterable):
 
         progress_handler = progress.new_message_handler()
 
+        stderr_text = None
+
         for line in proc.stderr:
             line = force_text(line)
             for pline in progress_handler(line):
-                if line.startswith('fatal:') or line.startswith('error:'):
-                    raise GitCommandError(("Error when fetching: %s" % line,), 2)
                 # END handle special messages
                 for cmd in cmds:
                     if len(line) > 1 and line[0] == ' ' and line[1] == cmd:
@@ -584,7 +631,10 @@ class Remote(LazyMixin, Iterable):
                 # end for each comand code we know
             # end for each line progress didn't handle
         # end
-        finalize_process(proc)
+        if progress.error_lines():
+            stderr_text = '\n'.join(progress.error_lines())
+            
+        finalize_process(proc, stderr=stderr_text)
 
         # read head information
         fp = open(join(self.repo.git_dir, 'FETCH_HEAD'), 'rb')

@@ -14,7 +14,6 @@ import errno
 import mmap
 
 from git.odict import OrderedDict
-
 from contextlib import contextmanager
 import signal
 from subprocess import (
@@ -36,6 +35,7 @@ from .exc import (
 from git.compat import (
     string_types,
     defenc,
+    force_bytes,
     PY3,
     bchr,
     # just to satisfy flake8 on py3
@@ -307,22 +307,27 @@ class Git(LazyMixin):
         def __getattr__(self, attr):
             return getattr(self.proc, attr)
 
-        def wait(self, stderr=None):
+        def wait(self, stderr=b''):
             """Wait for the process and return its status code.
 
             :param stderr: Previously read value of stderr, in case stderr is already closed.
             :warn: may deadlock if output or error pipes are used and not handled separately.
             :raise GitCommandError: if the return status is not 0"""
+            if stderr is None:
+                stderr = b''
+            stderr = force_bytes(stderr)
+            
             status = self.proc.wait()
 
             def read_all_from_possibly_closed_stream(stream):
                 try:
-                    return stream.read()
+                    return stderr + force_bytes(stream.read())
                 except ValueError:
-                    return stderr or ''
+                    return stderr or b''
 
             if status != 0:
                 errstr = read_all_from_possibly_closed_stream(self.proc.stderr)
+                log.debug('AutoInterrupt wait stderr: %r' % (errstr,))
                 raise GitCommandError(self.args, status, errstr)
             # END status handling
             return status
