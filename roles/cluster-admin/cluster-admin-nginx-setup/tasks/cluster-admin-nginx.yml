@@ -8,6 +8,11 @@
       group: "root"
       mode: "0755"
 
+    - directory: "{{ nginx_config }}/fragments"
+      user: "root"
+      group: "root"
+      mode: "0755"
+
     - directory: "/var/log/nginx"
       user: "www-data"
       group: "adm"
@@ -36,10 +41,28 @@
 
     rsync
       --perms
+      --delete
       --recursive
       --rsync-path "sudo rsync"
+      --exclude "/fragments"
       "{{ WORK }}/cluster/{{ cluster_name }}/nginx/"
       "{{ inventory_hostname }}:{{ nginx_config }}/";
+
+- name: "cluster admin nginx fragments"
+  become: "yes"
+  with_items:
+
+    - target: "listen-insecure.conf"
+      template: "cluster-admin-nginx-listen-insecure-fragment"
+
+    - target: "listen-secure.conf"
+      template: "cluster-admin-nginx-listen-secure-fragment"
+
+  action:
+
+    module: "template"
+    dest: "{{ nginx_config }}/fragments/{{ item.target }}"
+    src: "{{ item.template }}"
 
 - name: "set nginx.state to 'enabled'"
   when: "nginx_state == 'installed'"

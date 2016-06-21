@@ -16,7 +16,7 @@ http {
 	keepalive_timeout 65;
 	types_hash_max_size 2048;
 
-	include {{ nginx_config_server }}/mime.types;
+	include {{ nginx_config_server }}/mime-types.conf;
 	default_type application/octet-stream;
 
 	log_format times '{{ [

@@ -2,9 +2,9 @@
 
 dependencies:
 
-  - "icinga-common"
-  - "install-icinga"
+  - "icinga-core-common"
+  - "icinga-core-install"
   - "setup-wistla-icinga-agent"
-  - "control-icinga"
+  - "icinga-core-control"
 
 # ex: et ts=2 filetype=yaml

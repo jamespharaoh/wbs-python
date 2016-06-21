@@ -11,6 +11,7 @@
 {%- endif -%}
 
 {%- print '\n127.0.0.1 localhost\n' -%}
+{%- print '\n127.0.0.1 graphite.ops.wistla.com\n' -%}
 
 {%- if inventory_hostname in groups.vagrant -%}
 

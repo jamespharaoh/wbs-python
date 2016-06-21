@@ -14,13 +14,22 @@ heka_state: "enabled"
 icinga: 
   
   certificate: "/authority/icinga/issue/17/certificate"
-  installed_version: "2.4.2-1"
+  installed_version: "2.4.10-12-trusty"
   needs_restart: "no"
   private_key: "/authority/icinga/issue/17/key"
   state: "enabled"
 
 icinga_certificate: "/authority/icinga/issue/17/certificate"
-icinga_installed_version: "2.4.2-1"
+icinga_core: 
+  
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "no"
+  state: "installed"
+
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "no"
+icinga_core_state: "installed"
+icinga_installed_version: "2.4.10-12-trusty"
 icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/17/key"
 icinga_state: "enabled"

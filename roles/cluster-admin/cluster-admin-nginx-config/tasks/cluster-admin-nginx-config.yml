@@ -21,8 +21,17 @@
     - target: "/dev-robots.txt"
       template: "cluster-admin-nginx-robots"
 
+    - target: "/fastcgi-params.conf"
+      template: "cluster-admin-nginx-fastcgi-params"
+
+    - target: "/mime-types.conf"
+      template: "cluster-admin-nginx-mime-types"
+
     - target: "/nginx.conf"
       template: "cluster-admin-nginx-config"
+
+    - target: "/uwsgi-params.conf"
+      template: "cluster-admin-nginx-uwsgi-params"
 
     - target: "/sites/docs.conf"
       template: "cluster-admin-nginx-docs-config"

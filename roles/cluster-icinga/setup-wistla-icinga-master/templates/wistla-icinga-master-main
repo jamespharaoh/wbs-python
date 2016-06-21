@@ -43,9 +43,9 @@ object FileLogger "main-log" {
 
 object IdoMysqlConnection "ido-mysql" {
 
-	host = "{{ icinga_database_hostname }}"
-	database = "{{ icinga_database_name }}"
-	user = "{{ icinga_database_username }}"
+	host = "{{ icinga_core_database_hostname }}"
+	database = "{{ icinga_core_database_name }}"
+	user = "{{ icinga_core_database_username }}"
 	password = DatabasePassword
 
 }

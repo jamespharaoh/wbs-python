@@ -151,10 +151,10 @@ wistla_icinga_master_config_templates:
 
 wistla_icinga_master_config_links:
 
-  - link: "{{ icinga_target }}/etc"
+  - link: "{{ icinga_core_target }}/etc"
     target: "../../etc"
 
-  - link: "{{ icinga_target }}/var"
+  - link: "{{ icinga_core_target }}/var"
     target: "../../var"
 
 # ==================== icinga slave config
@@ -238,10 +238,10 @@ wistla_icinga_slave_config_templates:
 
 wistla_icinga_slave_config_links:
 
-  - link: "{{ icinga_target }}/etc"
+  - link: "{{ icinga_core_target }}/etc"
     target: "../../etc"
 
-  - link: "{{ icinga_target }}/var"
+  - link: "{{ icinga_core_target }}/var"
     target: "../../var"
 
 # ==================== icinga agent config
@@ -337,10 +337,10 @@ wistla_icinga_agent_config_templates:
 
 wistla_icinga_agent_config_links:
 
-  - link: "{{ icinga_target }}/etc"
+  - link: "{{ icinga_core_target }}/etc"
     target: "../../etc"
 
-  - link: "{{ icinga_target }}/var"
+  - link: "{{ icinga_core_target }}/var"
     target: "../../var"
 
 # ==================== icinga web config

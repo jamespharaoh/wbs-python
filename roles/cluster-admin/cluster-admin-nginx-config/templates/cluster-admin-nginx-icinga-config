@@ -34,7 +34,9 @@ server {
 		auth_basic_user_file /opt/icinga2/etc/icinga2-classicui/htpasswd.users;
 
 		fastcgi_pass unix:/var/run/fcgiwrap.socket;
-		include /etc/nginx/fastcgi_params;
+
+		include fastcgi-params.conf;
+
 		fastcgi_param SCRIPT_FILENAME /opt/icinga/sbin/$fastcgi_script_name;
 		fastcgi_param ICINGA_CGI_CONFIG /opt/icinga2/etc/icinga2-classicui/cgi.cfg;
 		fastcgi_param AUTH_USER $remote_user;
@@ -80,7 +82,8 @@ server {
 
 		fastcgi_pass unix:/var/run/php5-fpm.sock;
 		fastcgi_index index.php;
-		include fastcgi_params;
+
+		include fastcgi-params.conf;
 
 		fastcgi_param SCRIPT_FILENAME /opt/icinga-web-2.0.0-rc1/public/index.php;
 		fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;

@@ -7,6 +7,13 @@ icinga:
   database_initialized: "yes"
   ticket_salt: "migqyvdljzdbdyvddige"
 
+icinga_core: 
+  
+  database_password: "ptndkfnnrpyquocfbnzf"
+  ticket_salt: "qclqmcljwivlozksocgf"
+
+icinga_core_database_password: "ptndkfnnrpyquocfbnzf"
+icinga_core_ticket_salt: "qclqmcljwivlozksocgf"
 icinga_database_initialized: "yes"
 icinga_database_password: "qqiwmlckafbtaechemji"
 icinga_ticket_salt: "migqyvdljzdbdyvddige"

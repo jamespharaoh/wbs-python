@@ -75,13 +75,16 @@ python_packages:
   - name: "pyyaml"
     version: "3.11"
 
-icinga_name: "{{ inventory_hostname }}"
-icinga_ticket_salt: "{{ cluster_network.icinga_ticket_salt }}"
-icinga_database_type: "mysql"
-icinga_database_password: "{{ cluster_network.icinga_database_password }}"
+icinga_core_name: "{{ inventory_hostname }}"
+icinga_core_ticket_salt: "{{ cluster_network.icinga_ticket_salt }}"
 
-icinga_web_database_type: "mysql"
-icinga_web_database_password: "{{ cluster_network.icinga_web_database_password }}"
+icinga_core_database_type: "mysql"
+icinga_core_database_hostname: "wistla-{{ cluster_name }}-admin-a"
+icinga_core_database_password: "{{ cluster_network.icinga_database_password }}"
+
+icinga_web_core_database_type: "mysql"
+icinga_web_core_database_hostname: "wistla-{{ cluster_name }}-admin-a"
+icinga_web_core_database_password: "{{ cluster_network.icinga_web_database_password }}"
 
 load_balancer_name: "{{ cluster_name }}-admin"
 
@@ -170,6 +173,7 @@ nodejs_packages_legacy:
     version: "1.1.3"
 
 nginx_version: "{{ supercluster.admin_nginx_version }}"
+nginx_config: "/etc/nginx"
 
 mysql_root_password: "{{ supercluster.admin_mysql_root_password }}"
 

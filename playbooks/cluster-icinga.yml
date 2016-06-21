@@ -2,14 +2,18 @@
 
 # ==================== icinga
 
+- hosts: "cluster-ops-network"
+  roles:
+
+    - "icinga-core-database-prepare"
+
 - hosts:
 
     - "cluster-admin"
 
   roles:
 
-    - "icinga-install-binary"
-    #- "install-icinga-classicui"
+    - "icinga-core-install"
     - "install-wistla-icinga-plugins"
 
 - hosts:
@@ -20,21 +24,19 @@
 
   roles:
 
-    - "icinga-install-binary"
-    #- "install-icinga-classicui"
+    - "icinga-core-install"
     - "install-wistla-icinga-plugins"
 
 - hosts: "cluster-ops-network"
   roles:
 
-    - "setup-icinga-database"
+    - "icinga-core-database-setup"
 
 - hosts: "wistla-ops-admin-a"
   roles:
 
     - "setup-wistla-icinga-master"
-    #- "setup-wistla-icinga-classicui"
-    - "control-icinga"
+    - "icinga-core-control"
 
 - hosts:
 
@@ -46,24 +48,34 @@
   roles:
 
     - "setup-wistla-icinga-agent"
-    - "control-icinga"
+    - "icinga-core-control"
 
 # ==================== icinga web
 
 - hosts: "cluster-ops-admin"
   roles:
 
-    - "install-icinga-web"
+    - "icinga-web-core-install"
 
 - hosts: "cluster-ops-network"
   roles:
 
-    - "setup-icinga-web-database"
+    - "icinga-web-core-database-setup"
 
 - hosts: "cluster-ops-admin"
   roles:
 
-    - "setup-wistla-icinga-web"
-    - "control-icinga-web"
+    - "icinga-web-core-setup"
+    - "icinga-web-core-control"
+
+    - "icinga-web-graphite"
+
+# =================== graphite
+
+- hosts: "cluster-ops-admin"
+  roles:
+
+    - "graphite-carbon"
+    - "graphite-web"
 
 # ex: et ts=2 filetype=yaml
