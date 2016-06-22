@@ -1,14 +1,29 @@
 ---
 
+# @wistla/db configuration
   db:
 
     pg:
 
       url: "postgres://wistla@{{ deployment_name }}-postgresql-0/wistla"
 
+# @wistla/api-server
+  # logger information
   log:
 
     level: "trace"
     time_level: "trace"
+
+# @wistla/blob configuration
+  blob:
+    mode: remote_stream
+    stream:
+      chunk_size: 5242880
+      concurrency: 1
+    remote_credentials:
+      access_key: "{{ deployment.aws_s3_access_key }}"
+      bucket_name: "{{ deployment.aws_s3_bucket_name }}"
+      region: "{{ deployment.aws_s3_region }}"
+      secret_key: "{{ deployment.aws_s3_secret_key }}"
 
 # ex: et ts=2 filetype=yaml
