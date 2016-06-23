@@ -5,25 +5,18 @@ ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
 node_template: "{{ node_type }}-template"
 
-node_active: "{{ 'yes' if (
-  deployment.enabled == 'yes'
-) and (
-  (
-    deployment_mode == 'vagrant'
-    and (node_index | int) < (dev_node_count [node_type] | int)
-  ) or (
-    deployment_mode == 'jenkins'
-    and (node_index | int) < (dev_node_count [node_type] | int)
-  ) or (
-    deployment_mode == 'cluster-shared'
-    and (node_index | int) == (instance_index | int)
-  ) or (
-    deployment_mode == 'cluster-alias'
-    and (node_index | int) == (instance_index | int)
-  ) or (
-    deployment_mode == 'cluster-simple'
-    and (node_index | int) == (instance_index | int)
-  )
-) else 'no' }}"
+node_active: "{{
+  'yes' if (
+    deployment.enabled == 'yes'
+  ) and (
+    (
+      (node_index | int) < (dev_node_count [node_type] | int)
+    ) if (
+      deployment_mode in [ 'vagrant', 'jenkins' ]
+    ) else (
+      (node_index | int) == (instance_index | int)
+    )
+  ) else 'no'
+}}"
 
 # ex: et ts=2 filetype=yaml
