@@ -35,7 +35,7 @@
 
     {
       zbackup restore "$build_source"
-        --password-file "/vagrant/secret/wistla-build-secret"
+        --password-file "{{ deployment_build_secret_path }}"
         --silent;
     } | {
       sudo tar

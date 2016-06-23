@@ -288,4 +288,8 @@ graphite_web:
 
   secret_key: "{{ cluster.graphite_web_secret_key }}"
 
+deployment_build_secret_path: "{{
+  deployment_modes [deployment_mode].build_secret_path
+}}"
+
 # ex: et ts=2 filetype=yaml
