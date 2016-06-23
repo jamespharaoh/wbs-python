@@ -35,7 +35,24 @@ cluster-shared:
     - "postgresql"
     - "rabbit"
 
+cluster-shared2:
+
+  node_types:
+
+    - "kafka"
+    - "mongo"
+    - "postgresql"
+    - "rabbit"
+
 cluster-alias:
+
+  node_types:
+
+    - "api"
+    - "browser"
+    - "load"
+
+cluster-alias2:
 
   node_types:
 
@@ -53,7 +70,7 @@ cluster-simple:
     - "mongo"
     - "rabbit"
 
-cluster-simple-v2:
+cluster-simple2:
 
   node_types:
 
