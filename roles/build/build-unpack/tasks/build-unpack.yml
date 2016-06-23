@@ -13,7 +13,7 @@
       '.tar',
     ] | join }}"
 
-    build_target: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
+    build_target: "/var/lib/lxc/{{ inventory_hostname }}"
 
   args:
 
@@ -23,12 +23,13 @@
 
     set -euf -o pipefail;
 
-    if test -e "$build_target"; then
+    if ! test -d "$build_target"; then
+      sudo mkdir "$build_target";
+    fi;
 
-      sudo btrfs subvolume delete "$build_target";
-
-      sleep 2;
-
+    if test -e "$build_target/rootfs"; then
+      sudo btrfs subvolume delete "$build_target/rootfs";
+      sleep 1;
     fi;
 
     sudo btrfs subvolume create "$build_target";
@@ -42,5 +43,56 @@
         --extract
         --directory "$build_target";
     };
+
+- name: "create lxc config"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/config"
+    src: "lxc-config"
+
+- name: "create shared dir"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/shared"
+    state: "directory"
+
+- name: "create host data dir"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}"
+    state: "directory"
+
+- name: "create host data dirs"
+  with_items: "{{ data_dirs }}"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ deployment_home }}/shared/{{ inventory_hostname }}/{{ item.name }}"
+    state: "directory"
+
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create container data dirs"
+  with_items: "{{ data_dirs }}"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
+    state: "directory"
 
 # ex: et ts=2 filetype=yaml

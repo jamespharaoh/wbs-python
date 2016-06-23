@@ -1,0 +1,37 @@
+{{ ansible_warning ['#'] }}
+
+lxc.include = /usr/share/lxc/config/ubuntu.common.conf
+
+# limits
+
+lxc.cgroup.memory.soft_limit_in_bytes = {{ lxc_memory_soft | int * 1024 * 1024 }}
+lxc.cgroup.memory.limit_in_bytes = {{ lxc_memory_hard | int * 1024 * 1024 }}
+
+# file system
+
+lxc.rootfs = /var/lib/lxc/{{ inventory_hostname }}/rootfs
+
+lxc.mount.entry = {{ deployment_home }}/shared shared none bind 0 0
+lxc.mount.entry = {{ deployment_home }}/config/{{ node_type }} config none bind,ro,remount 0 0
+
+{% for data_dir in data_dirs %}
+lxc.mount.entry = {{ deployment_home }}/shared/{{ inventory_hostname }}/{{ data_dir.name }} {{ data_dir.path }} none bind 0 0
+{% endfor %}
+
+# misc
+
+lxc.utsname = {{ inventory_hostname }}
+lxc.arch = amd64
+
+# network
+
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = {{ deployment.bridge_name }}
+lxc.network.hwaddr = {{ private_mac }}
+lxc.network.ipv4 = {{ private_address }}/{{ private_bits }}
+lxc.network.ipv4.gateway = {{ private_gateway }}
+
+# autostart
+
+lxc.start.auto = {{ 1 if is_template | default ('no') == 'no' else 0 }}
