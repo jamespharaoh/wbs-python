@@ -233,7 +233,7 @@ local_build_name: "{{
     deployment_mode in [ 'vagrant', 'jenkins' ]
   ) else None
 }}"
-local_build_id: "{{ local_build_name }}-{{ deployed_build_seq }}"
+local_build_id: "{{ local_build_name }}-{{ local_build_seq }}"
 local_build_bucket: "wistla-builds"
 local_build_target: "/builds/{{ local_build_name }}"
 

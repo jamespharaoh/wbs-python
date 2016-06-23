@@ -446,4 +446,143 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-web-overrides"
         target: "config/web/config.overrides.js"
 
+  simple2:
+
+    checkouts:
+
+      - name: "wistla-devops"
+        branch: "development"
+        configs:
+
+          - "config"
+          - "data/runtime"
+          - "security"
+
+      - name: "wistla-scripts"
+        branch: "master"
+
+    config_directories:
+
+      - "api"
+      - "api2"
+      - "browser"
+      - "load"
+      - "mongo"
+      - "rabbit"
+      - "web"
+
+    config_files:
+
+      - source: "security/test/google-service-account.key"
+        target: "config/api/google-service-account.key"
+        mode: "0600"
+
+      - source: "security/apple/push-notifications/ca.cert"
+        target: "config/api/apple-ca.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.cert"
+        target: "config/api/apple-push.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.key"
+        target: "config/api/apple-push.key"
+        mode: "0600"
+
+    config_templates:
+
+      # admin
+
+      - template: "cluster-deployment-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
+
+      # api
+
+      - template: "cluster-deployment-wistla-api-config"
+        target: "config/api/config.local.js"
+
+      - template: "cluster-deployment-wistla-api-environment"
+        target: "config/api/environment"
+
+      # browser
+
+      - template: "cluster-deployment-wistla-browser-config"
+        target: "config/browser/config.local.js"
+
+      - template: "cluster-deployment-wistla-browser-environment"
+        target: "config/browser/environment"
+
+      # devops
+
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
+
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config/overrides.yml"
+
+      - template: "cluster-deployment-wistla-devops-local"
+        target: "wistla-devops/config/local.yml"
+
+      - template: "cluster-deployment-wistla-devops-connections"
+        target: "wistla-devops/config/connections.yml"
+
+      # load
+
+      - template: "cluster-deployment-wistla-load-nginx-config"
+        target: "config/load/nginx-config"
+
+      # rabbit
+
+      - template: "cluster-deployment-wistla-rabbit-erlang-cookie"
+        target: "config/rabbit/erlang-cookie"
+        owner: "rabbitmq"
+        group: "root"
+        mode: "0400"
+
+      # web
+
+      - template: "cluster-deployment-wistla-web-config"
+        target: "config/web/config.local.js"
+
+      - template: "cluster-deployment-wistla-web-environment"
+        target: "config/web/environment"
+
+    config_links:
+
+      - source: "../../config/api/config.local.js"
+        target: "wistla-api/config/config.local.js"
+
+      - source: "../../config/api/config.overrides.js"
+        target: "wistla-api/config/config.overrides.js"
+
+      - source: "../../config/browser/config.local.js"
+        target: "wistla-browser/config/config.local.js"
+
+      - source: "../../config/browser/config.overrides.js"
+        target: "wistla-browser/config/config.overrides.js"
+
+      - source: "../../config/web/config.local.js"
+        target: "wistla-web/config/config.local.js"
+
+      - source: "../../config/web/config.overrides.js"
+        target: "wistla-web/config/config.overrides.js"
+
+      - source: "/opt/node-v{{ cluster_deployment.nodejs_version }}-linux-x64"
+        target: ".nodejs-stub-target"
+
+    shared_directories:
+
+      - "log"
+
+    override_templates:
+
+      - template: "cluster-deployment-wistla-api-overrides"
+        target: "config/api/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-browser-overrides"
+        target: "config/browser/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-web-overrides"
+        target: "config/web/config.overrides.js"
+
 # ex: et ts=2 filetype=yaml

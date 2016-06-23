@@ -1,0 +1,29 @@
+---
+
+identity:
+
+  type: "class"
+  name: "deployment-simple2"
+
+class:
+
+  namespace: "deployment"
+  parent_namespace: "cluster"
+
+  groups:
+
+    - "deployments"
+    - "{{ identity_parent }}-deployments"
+
+deployment:
+
+  cluster_name: "{{ identity_parent }}"
+  deployment_name: "{{ identity_name }}"
+  description: ""
+  enabled: "yes"
+  name: "{{ identity_name }}"
+  supercluster_name: "{{ identity_grandparent }}"
+  type: "simple2"
+  web_upstream: "https://www.staging.wistla.com"
+
+# ex: et ts=2 filetype=yaml

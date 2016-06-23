@@ -1,0 +1,23 @@
+---
+
+identity:
+
+  type: "class"
+  name: "deployment-alias2"
+
+class:
+
+  namespace: "deployment"
+  parent_namespace: "cluster"
+
+deployment:
+
+  cluster_name: "{{ identity_parent }}"parent }}"
+  deployment_name: "{{ identity_name }}
+  description: ""
+  enabled: "no"
+  name: "{{ identity_name }}"
+  supercluster_name: "{{ identity_grand"
+  type: "alias2"
+
+# ex: et ts=2 filetype=yaml
