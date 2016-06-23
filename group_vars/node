@@ -1,42 +1,32 @@
 ---
 
 private_gateway: "{{
-  [
+  ( [
     deployment.bridge_network,
     instance_index,
     cluster_zone_indices [instance_zone] * 64 + 1,
-  ] | join ('.') if deployment_mode in [
-    'cluster-shared',
-    'cluster-alias',
-    'cluster-simple',
-  ] else [
+  ] | join ('.') ) if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else ( [
     deployment.bridge_network,
     '0.1',
-  ] | join ('.')
+  ] | join ('.') )
 }}"
 
 private_bits: "{{
-  26 if deployment_mode in [
-    'cluster-shared',
-    'cluster-alias',
-    'cluster-simple',
-  ] else 16
+  16 if deployment_mode in [ 'vagrant', 'jenkins' ] else 16
 }}"
 
 node_instance_count: "{{
-  deployment.node_instance_count if deployment_mode in [
-    'cluster-shared',
-    'cluster-alias',
-    'cluster-simple',
-  ] else dev_node_instance_count
+  dev_node_instance_count if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else deployment.node_instance_count
 }}"
 
 node_memory: "{{
-  deployment.node_memory if deployment_mode in [
-    'cluster-shared',
-    'cluster-alias',
-    'cluster-simple',
-  ] else dev_node_memory
+  dev_node_memory if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else deployment.node_memory
 }}"
 
 lxc_memory_soft: "{{ node_memory [node_type] }}"

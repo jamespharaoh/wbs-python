@@ -192,6 +192,17 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api-environment"
         target: "config/api/environment"
 
+      # api2
+
+      - template: "cluster-deployment-wistla-api2-schema-config"
+        target: "config/api2/wistla-db-schema-local.yaml"
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/api2/wistla-api-server-local.yaml"
+
+      - template: "cluster-deployment-wistla-api2-environment"
+        target: "config/api2/environment"
+
       # browser
 
       - template: "cluster-deployment-wistla-browser-config"
@@ -222,13 +233,21 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-admin-config"
         target: "config/load/wistla-admin-config.local.js"
 
-      # web
+      # postgresql
 
-      - template: "cluster-deployment-wistla-web-config"
-        target: "config/web/config.local.js"
+      - template: "cluster-deployment-postgresql-config"
+        type: "postgresql"
+        target: "postgresql.conf"
+        owner: "postgres"
+        group: "postgres"
+        mode: "0644"
 
-      - template: "cluster-deployment-wistla-web-environment"
-        target: "config/web/environment"
+      - template: "cluster-deployment-hba-config"
+        type: "postgresql"
+        target: "postgresql-hba.conf"
+        owner: "postgres"
+        group: "postgres"
+        mode: "0640"
 
     shared_directories: []
 

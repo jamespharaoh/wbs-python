@@ -1,0 +1,11 @@
+---
+
+db:
+
+  database: "wistla"
+  host: "{{ cluster_deployment_alias_name }}-postgresql-a-4"
+  port: ""
+  user_name: ""
+  password: ""
+
+# ex: et ts=2 filetype=yaml
