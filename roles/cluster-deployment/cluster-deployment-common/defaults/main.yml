@@ -549,24 +549,6 @@ cluster_deployment_types:
 
     config_links:
 
-      - source: "../../config/api/config.local.js"
-        target: "wistla-api/config/config.local.js"
-
-      - source: "../../config/api/config.overrides.js"
-        target: "wistla-api/config/config.overrides.js"
-
-      - source: "../../config/browser/config.local.js"
-        target: "wistla-browser/config/config.local.js"
-
-      - source: "../../config/browser/config.overrides.js"
-        target: "wistla-browser/config/config.overrides.js"
-
-      - source: "../../config/web/config.local.js"
-        target: "wistla-web/config/config.local.js"
-
-      - source: "../../config/web/config.overrides.js"
-        target: "wistla-web/config/config.overrides.js"
-
       - source: "/opt/node-v{{ cluster_deployment.nodejs_version }}-linux-x64"
         target: ".nodejs-stub-target"
 
