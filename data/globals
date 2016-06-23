@@ -228,10 +228,14 @@ identity:
 SHORT_NAME: "wistla"
 SHORT_TITLE: "Wistla"
 
-build_name: "{{ deployment_name }}"
-build_id: "{{ build_name }}-{{ build_seq }}"
-build_bucket: "wistla-builds"
-build_target: "/builds/{{ build_name }}"
+local_build_name: "{{
+  deployment_name if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else None
+}}"
+local_build_id: "{{ local_build_name }}-{{ deployed_build_seq }}"
+local_build_bucket: "wistla-builds"
+local_build_target: "/builds/{{ local_build_name }}"
 
 amazon_credentials: "{{ lookup ('file', HOME + '/work/amazon-credentials') | from_yaml }}"
 

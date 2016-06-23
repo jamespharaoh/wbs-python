@@ -20,7 +20,7 @@
       '/builds/backups/',
       node_type,
       '-',
-      build_id,
+      local_build_id,
       '.tar',
     ] | join }}"
 
@@ -31,7 +31,7 @@
       '/builds/backups/',
       node_type,
       '-',
-      build_id,
+      local_build_id,
       '.tar',
     ] | join }}"
 

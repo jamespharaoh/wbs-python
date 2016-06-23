@@ -9,7 +9,7 @@
       '/builds/backups/',
       node_type,
       '-',
-      build_id,
+      deployment.deployed_build,
       '.tar',
     ] | join }}"
 
