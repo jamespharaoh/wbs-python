@@ -485,8 +485,10 @@ cluster_deployment_types:
       - "api"
       - "api2"
       - "browser"
+      - "kafka"
       - "load"
       - "mongo"
+      - "postgresql"
       - "rabbit"
       - "web"
 
@@ -549,6 +551,20 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-load-nginx-config"
         target: "config/load/nginx-config"
+
+      # postgresql
+
+      - template: "cluster-deployment-postgresql-config"
+        target: "config/postgresql/postgresql.conf"
+        owner: "postgres"
+        group: "postgres"
+        mode: "0644"
+
+      - template: "cluster-deployment-postgresql-hba-config"
+        target: "config/postgresql/postgresql-hba.conf"
+        owner: "postgres"
+        group: "postgres"
+        mode: "0640"
 
       # rabbit
 
