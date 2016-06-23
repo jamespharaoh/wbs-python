@@ -270,6 +270,15 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
+	elif CONFIG ["deployment_mode"] == "cluster-shared2":
+
+		write_message ([
+			"##### Running in CLUSTER-SHARED2 deployment mode #####\n",
+		])
+
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
+
 	elif CONFIG ["deployment_mode"] == "cluster-alias":
 
 		write_message ([
@@ -279,10 +288,28 @@ def check_deployment_mode ():
 		DEPLOYMENT_HOME = "/home/ubuntu"
 		DEPLOYMENT_USER = "ubuntu"
 
+	elif CONFIG ["deployment_mode"] == "cluster-alias2":
+
+		write_message ([
+			"##### Running in CLUSTER-ALIAS2 deployment mode #####\n",
+		])
+
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
+
 	elif CONFIG ["deployment_mode"] == "cluster-simple":
 
 		write_message ([
 			"##### Running in CLUSTER-SIMPLE deployment mode #####\n",
+		])
+
+		DEPLOYMENT_HOME = "/home/ubuntu"
+		DEPLOYMENT_USER = "ubuntu"
+
+	elif CONFIG ["deployment_mode"] == "cluster-simple2":
+
+		write_message ([
+			"##### Running in CLUSTER-SIMPLE2 deployment mode #####\n",
 		])
 
 		DEPLOYMENT_HOME = "/home/ubuntu"
