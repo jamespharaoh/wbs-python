@@ -45,7 +45,7 @@
 
 - name: "wistla-blob"
   default_branch: "development"
-  npm_name: "@wistla/wistla-blob"
+  npm_name: "@wistla/blob"
 
   build_steps:
 
