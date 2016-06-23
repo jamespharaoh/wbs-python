@@ -32,7 +32,7 @@
       sleep 1;
     fi;
 
-    sudo btrfs subvolume create "$build_target";
+    sudo btrfs subvolume create "$build_target/rootfs";
 
     {
       zbackup restore "$build_source"
@@ -41,7 +41,7 @@
     } | {
       sudo tar
         --extract
-        --directory "$build_target";
+        --directory "$build_target/rootfs";
     };
 
 - name: "create lxc config"
