@@ -14,8 +14,8 @@ developer_full:
 
   # ---------- modules
 
-  - name: "api-stub-server"
-    branch: "development"
+  #- name: "api-stub-server"
+  #  branch: "development"
 
   - name: "wistla-api-server"
     branch: "development"
