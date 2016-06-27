@@ -38,6 +38,9 @@
     - "wistla-media"
     - "wistla-raml-api"
     - "wistla-raml-server"
+    # todo: remove when this is running in the "environments"
+    # todo: container
+    - "wistla-db-schema"
 
   build_steps:
 

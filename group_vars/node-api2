@@ -54,6 +54,11 @@ node_deploy_projects:
   - name: "wistla-db"
     type: "nodejs"
 
+  # todo: remove when this is running in the "environments"
+  # todo: container
+  - name: "wistla-db-schema"
+    type: "nodejs"
+
 nodejs_version: "{{ deployment.nodejs_version }}"
 
 nodejs_packages: []
