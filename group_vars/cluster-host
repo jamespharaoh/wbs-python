@@ -61,4 +61,34 @@ cluster_production_override: ""
 
 ubuntu_apt_proxy_url: "http://wistla-{{ cluster_name }}-admin-{{ instance_zone }}:3142"
 
+ubuntu_sources_default:
+
+  - url: "{{ ubuntu_main_url }}"
+    source: "trusty"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ ubuntu_main_url }}"
+    source: "trusty-updates"
+    repositories:
+
+      - "main"
+      - "universe"
+
+  - url: "{{ ubuntu_security_url }}"
+    source: "trusty-security"
+    repositories:
+
+      - "main"
+      - "universe"
+
+ubuntu_sources_extra: []
+
+ubuntu_sources: "{{ []
+  | union (ubuntu_sources_default)
+  | union (ubuntu_sources_extra)
+}}"
+
 # ex: et ts=2 filetype=yaml

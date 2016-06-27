@@ -4,6 +4,18 @@ ansible_ssh_host: "{{ inventory_hostname }}"
 
 instance_type_colour: "202"
 
+ubuntu_sources_extra:
+
+  - url: "http://apt.postgresql.org/pub/repos/apt/"
+    source: "trusty-pgdg"
+    repositories:
+
+      - "main"
+
+ubuntu_keys_extra:
+
+  - url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+
 my_system_packages:
 
   # ---------- to remove
@@ -62,6 +74,9 @@ my_system_packages:
     state: "present"
 
   - name: "openvpn"
+    state: "present"
+
+  - name: "postgresql-client-9.5"
     state: "present"
 
   - name: "whois"
