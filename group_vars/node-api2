@@ -1,5 +1,17 @@
 ---
 
+ubuntu_sources_extra:
+
+  - url: "http://apt.postgresql.org/pub/repos/apt/"
+    source: "trusty-pgdg"
+    repositories:
+
+      - "main"
+
+ubuntu_keys_extra:
+
+  - url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+
 my_system_packages:
 
   - name: "build-essential"
@@ -15,6 +27,9 @@ my_system_packages:
     state: "present"
 
   - name: "libav-tools"
+    state: "present"
+
+  - name: "postgresql-client-9.5"
     state: "present"
 
 node_deploy_projects:
