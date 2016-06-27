@@ -179,6 +179,19 @@
     path: "{{ cluster_deployment_home }}/shared/{{ item }}"
     state: "directory"
 
+- name: "create shared logfiles"
+  with_items: "{{ cluster_deployment_shared_logfiles }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ cluster_deployment_home }}/{{ item.log }}"
+    state: "touch"
+
+    owner: "{{ item.user }}"
+    group: "{{ 'ubuntu' }}"
+    mode: "0640"
+
 - name: "create config files"
   with_items: "{{ cluster_deployment_config_templates }}"
   become: "yes"

@@ -90,6 +90,7 @@ http {
 	{%- endmacro -%}
 
 	{{ upstream ('api', 7000) }}
+	{{ upstream ('api2', 3000) }}
 	{{ upstream ('web', 3000) }}
 	{{ upstream ('browser', 3000) }}
 
@@ -111,6 +112,12 @@ http {
 
 		location / {
 			proxy_pass http://api;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
+		location /v2 {
+			proxy_pass http://api2;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}

@@ -16,6 +16,7 @@ cluster_deployment_config_templates: "{{ cluster_deployment_type.config_template
 cluster_deployment_config_files: "{{ cluster_deployment_type.config_files }}"
 cluster_deployment_config_links: "{{ cluster_deployment_type.config_links }}"
 cluster_deployment_shared_directories: "{{ cluster_deployment_type.shared_directories }}"
+cluster_deployment_shared_logfiles: "{{ cluster_deployment_type.shared_logfiles }}"
 cluster_deployment_override_templates: "{{ cluster_deployment_type.override_templates }}"
 
 cluster_deployment_types:
@@ -58,6 +59,7 @@ cluster_deployment_types:
     config_files: []
     config_links: []
     shared_directories: []
+    shared_logfiles: []
     override_templates: []
 
   alias:
@@ -250,6 +252,8 @@ cluster_deployment_types:
         mode: "0640"
 
     shared_directories: []
+
+    shared_logfiles: []
 
     override_templates:
 
@@ -454,6 +458,8 @@ cluster_deployment_types:
       - "user-upload"
       - "video"
 
+    shared_logfiles: []
+
     override_templates:
 
       - template: "cluster-deployment-wistla-api-overrides"
@@ -525,6 +531,17 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api-environment"
         target: "config/api/environment"
 
+      # api2
+
+      - template: "cluster-deployment-wistla-api2-schema-config"
+        target: "config/api2/wistla-db-schema-local.yaml"
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/api2/wistla-api-server-local.yaml"
+
+      - template: "cluster-deployment-wistla-api2-environment"
+        target: "config/api2/environment"
+
       # browser
 
       - template: "cluster-deployment-wistla-browser-config"
@@ -590,6 +607,38 @@ cluster_deployment_types:
     shared_directories:
 
       - "log"
+
+    shared_logfiles:
+
+      - log: "shared/log/content-common.log"
+        user: "root"
+
+      - log: "shared/log/mongodb.log"
+        user: "mongodb"
+
+      - log: "shared/log/nginx-access.log"
+        user: "root"
+
+      - log: "shared/log/nginx-error.log"
+        user: "root"
+
+      - log: "shared/log/nginx-times.log"
+        user: "root"
+
+      - log: "shared/log/postgresql.log"
+        user: "postgres"
+
+      - log: "shared/log/wistla-analytics.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-api-server.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-api.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-browser.log"
+        user: "ubuntu"
 
     override_templates:
 

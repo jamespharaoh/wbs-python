@@ -3,7 +3,7 @@
 db:
 
   database: "wistla"
-  host: "{{ cluster_deployment_alias_name }}-postgresql-a-4"
+  host: "{{ cluster_deployment_alias.name }}-postgresql-a-4"
   port: ""
   user_name: ""
   password: ""
