@@ -58,6 +58,14 @@ node_deploy_projects:
   # todo: container
   - name: "wistla-db-schema"
     type: "nodejs"
+    excludes:
+
+      - "/config/local.yaml"
+
+    configs:
+
+      - target: "local.yaml"
+        source: "wistla-db-schema-local.yaml"
 
 nodejs_version: "{{ deployment.nodejs_version }}"
 
