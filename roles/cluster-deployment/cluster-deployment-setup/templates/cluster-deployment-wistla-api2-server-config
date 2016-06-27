@@ -14,7 +14,7 @@
       urls:
 {%  for zone in data_zones %}
 {%  for instance in data_indices %}
-        - '{{ ['amqp://', cluster_deployment.rabbit_api_user, ':' cluster_deployment.rabbit_api_password, '@', cluster_deployment_alias.name, '-rabbit-', zone, '-', instance, ] | join }}
+        - {{ ['amqp://', cluster_deployment.rabbit_api_user, ':', cluster_deployment.rabbit_api_password, '@', cluster_deployment_alias.name, '-rabbit-', zone, '-', instance, ] | join }}
 {%  endfor %}
 {%  endfor %}
 
