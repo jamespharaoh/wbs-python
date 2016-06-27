@@ -5,7 +5,7 @@ db:
   database: "wistla"
   host: "{{ deployment_name }}-postgresql-0"
   port: ""
-  user_name: ""
+  user_name: "vagrant"
   password: ""
 
 # ex: et ts=2 filetype=yaml
