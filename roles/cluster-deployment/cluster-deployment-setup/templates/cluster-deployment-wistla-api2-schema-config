@@ -7,5 +7,10 @@ db:
   port: ""
   user_name: "vagrant"
   password: ""
+schemas:
+  -
+    path: ./schema.wistla.sql
+    target_directory: ./schema.wistla
+    data_import_directory: /shared
 
 # ex: et ts=2 filetype=yaml
