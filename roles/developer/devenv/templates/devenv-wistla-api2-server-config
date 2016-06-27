@@ -1,11 +1,31 @@
 ---
 
-# @wistla/db configuration
+# @wistla/db configurationit-
   db:
 
     pg:
 
-      url: "postgres://wistla@{{ deployment_name }}-postgresql-0/wistla"
+      url: "postgres://vagrant@{{ deployment_name }}-postgresql-0/wistla"
+
+# @wistla/pubsub configuration
+  pubsub:
+    amqp:
+{% if 'rabbit_api_password' in deployment %}
+      rest_api: {{ ['http://', deployment.rabbit_api_user, ':', deployment.rabbit_api_password, '@', deployment_name, '-rabbit-0:15672',] | join }}
+{% else %}
+      rest_api: {{ ['http://api:api-password@', deployment_name, '-rabbit-0:15672',] | join }}
+{% endif %}
+      urls:
+{% for rabbit_name in groups ['node-rabbit-host'] %}
+{% set rabbit_host = hostvars [rabbit_name] %}
+{% if rabbit_host.node_index < dev_node_count.rabbit | int %}
+{% if 'rabbit_api_password' in deployment %}
+        - {{ ['amqp://', deployment.rabbit_api_user, ':', deployment.rabbit_api_password, '@', deployment_name, '-rabbit-', rabbit_host.node_index,] | join }}
+{% else %}
+        - {{ ['amqp://api:api-password@', deployment_name, '-rabbit-', rabbit_host.node_index,] | join }}
+{% endif %}
+{% endif %}
+{% endfor %}
 
 # @wistla/api-server
   # logger information
