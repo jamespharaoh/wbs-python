@@ -89,9 +89,14 @@ http {
 
 	{%- endmacro -%}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 	{{ upstream ('api', 7000) }}
+{% endif %}
+
+{% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
 	{{ upstream ('api2', 3000) }}
-	{{ upstream ('web', 3000) }}
+{% endif %}
+
 	{{ upstream ('browser', 3000) }}
 
 	# api
@@ -110,17 +115,21 @@ http {
 
 		client_max_body_size 16m;
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location / {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+{% endif %}
 
+{% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
 		location /v2 {
 			proxy_pass http://api2;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+{% endif %}
 
 {% if cluster_deployment.test_routes_enabled != 'yes' %}
 
@@ -152,8 +161,14 @@ http {
 
 		client_max_body_size 16m;
 
+		location = / {
+			proxy_pass {{ cluster_deployment.web_upstream }}/index.html;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
 		location / {
-			proxy_pass http://web;
+			proxy_pass {{ cluster_deployment.web_upstream }}$uri;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
@@ -164,11 +179,13 @@ http {
 			proxy_set_header Connection "";
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+{% endif %}
 
 	}
 
@@ -231,11 +248,13 @@ http {
 			proxy_set_header Connection "";
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+{% endif %}
 
 	}
 
@@ -262,6 +281,7 @@ http {
 		}
 
 {% for location_char in [ '1', '2' ] %}
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 
 		location /{{ location_char }}/images {
 			proxy_pass http://api/images;
@@ -281,6 +301,7 @@ http {
 			proxy_set_header Connection "";
 		}
 
+{% endif %}
 {% endfor %}
 
 		location /api/emails {

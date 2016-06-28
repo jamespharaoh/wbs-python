@@ -1,6 +1,8 @@
 {{ ansible_warning ['#'] }}
 
 WISTLA_API2_COUNT="{{ cluster_deployment.node_instance_count.api2 }}"
+
+{% if cluster_deployment.node_instance_count.api2 != '0' %}
 WISTLA_API2_DEBUG="no"
 
 WISTLA_API2_MIN_SEMI_SPACE_SIZE="4"
@@ -12,5 +14,6 @@ WISTLA_API2_MAX_OLD_SPACE_SIZE="{{
 	) | int - 128
 }}"
 WISTLA_API2_MAX_EXECUTABLE_SIZE="32"
+{% endif %}
 
 # ex: noet ts=4 filetype=bash
