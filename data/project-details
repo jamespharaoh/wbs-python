@@ -28,6 +28,34 @@
 
 #    - "npm install"
 
+- name: "wistla-util"
+  short: "generic helpers that are used across @wistla/* modules"
+  default_branch: "development"
+  npm_name: "@wistla/util"
+  description:
+
+    generic helpers that are used across @wistla/* modules
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-pubsub"
+  short: "wistla pub/sub message queue razzamatazz"
+  default_branch: "development"
+  npm_name: "@wistla/pubsub"
+  description:
+
+    wistla pub/sub message queue razzamatazz
+
+  depends:
+
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-api-server"
   default_branch: "development"
   npm_name: "@wistla/api-server"
@@ -38,6 +66,7 @@
     - "wistla-media"
     - "wistla-raml-api"
     - "wistla-raml-server"
+    - "wistla-util"
     # todo: remove when this is running in the "environments"
     # todo: container
     - "wistla-db-schema"
@@ -91,6 +120,8 @@
 
     - "wistla-blob"
     - "wistla-db"
+    - "wistla-pubsub"
+    - "wistla-util"
 
   build_steps:
 
