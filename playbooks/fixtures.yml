@@ -1,8 +1,15 @@
 ---
 
-- hosts: "vagrant"
+- hosts:
+
+    - "localhost"
+
   roles:
 
-    - "fixtures"
+    - name: "fixtures"
+      when: "{{ deployment_mode in [
+        'vagrant',
+        'simple2',
+      ] }}"
 
 # ex: et ts=2 filetype=yaml
