@@ -21,6 +21,8 @@ cluster_deployment_override_templates: "{{ cluster_deployment_type.override_temp
 
 cluster_deployment_types:
 
+  # -------------------- shared
+
   shared:
 
     checkouts:
@@ -61,6 +63,8 @@ cluster_deployment_types:
     shared_directories: []
     shared_logfiles: []
     override_templates: []
+
+  # -------------------- alias
 
   alias:
 
@@ -194,6 +198,177 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api-environment"
         target: "config/api/environment"
 
+      # browser
+
+      - template: "cluster-deployment-wistla-browser-config"
+        target: "config/browser/config.local.js"
+
+      - template: "cluster-deployment-wistla-browser-environment"
+        target: "config/browser/environment"
+
+      # devops
+
+      - template: "cluster-deployment-wistla-devops-config"
+        target: "wistla-devops/config/overrides.yml"
+
+      - template: "cluster-deployment-wistla-devops-local"
+        target: "wistla-devops/config/local.yml"
+
+      - template: "cluster-deployment-wistla-devops-connections"
+        target: "wistla-devops/config/connections.yml"
+
+      - template: "cluster-deployment-wistla-devops-accounts"
+        target: "wistla-devops/accounts"
+
+      # load
+
+      - template: "cluster-deployment-wistla-load-nginx-config"
+        target: "config/load/nginx-config"
+
+      - template: "cluster-deployment-wistla-admin-config"
+        target: "config/load/wistla-admin-config.local.js"
+
+    shared_directories: []
+
+    shared_logfiles: []
+
+    override_templates:
+
+      - template: "cluster-deployment-wistla-api-overrides"
+        target: "config/api/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-browser-overrides"
+        target: "config/browser/config.overrides.js"
+
+      - template: "cluster-deployment-wistla-web-overrides"
+        target: "config/web/config.overrides.js"
+
+  # -------------------- alias2
+
+  alias2:
+
+    checkouts:
+
+      - name: "content-browser"
+        branch: "master"
+
+      - name: "content-common"
+        branch: "master"
+
+      - name: "content-iOS"
+        branch: "master"
+
+      - name: "content-api"
+        branch: "master"
+
+      - name: "content-web"
+        branch: "master"
+
+      - name: "wistla-analytics"
+        branch: "master"
+        build_steps:
+
+          - "npm install"
+
+      - name: "wistla-api"
+        branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            overlay: "node_modules/.wistla-analytics"
+            target: "../../wistla-analytics"
+
+        build_steps:
+
+          - "npm install"
+
+      - name: "wistla-browser"
+        branch: "master"
+        project_links:
+
+          - link: "node_modules/wistla-analytics"
+            overlay: "node_modules/.wistla-analytics"
+            target: "../../wistla-analytics"
+
+        build_steps:
+
+          - "npm install"
+
+      - name: "wistla-devops"
+        branch: "development"
+        configs:
+
+          - "config"
+          - "data/runtime"
+          - "security"
+
+      - name: "wistla-scripts"
+        branch: "master"
+
+      - name: "wistla-web"
+        branch: "master"
+        build_steps:
+
+          - "npm install"
+
+      - name: "wistla-test-images"
+        branch: "master"
+
+    config_directories:
+
+      - "api2"
+      - "browser"
+      - "load"
+      - "postgresql"
+
+    config_files:
+
+      - source: "security/test/google-service-account.key"
+        target: "config/api/google-service-account.key"
+        mode: "0600"
+
+      - source: "security/apple/push-notifications/ca.cert"
+        target: "config/api/apple-ca.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.cert"
+        target: "config/api/apple-push.cert"
+        mode: "0644"
+
+      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.key"
+        target: "config/api/apple-push.key"
+        mode: "0600"
+
+    config_links:
+
+      - source: "../../config/api/config.local.js"
+        target: "wistla-api/config/config.local.js"
+
+      - source: "../../config/api/config.overrides.js"
+        target: "wistla-api/config/config.overrides.js"
+
+      - source: "../../config/browser/config.local.js"
+        target: "wistla-browser/config/config.local.js"
+
+      - source: "../../config/browser/config.overrides.js"
+        target: "wistla-browser/config/config.overrides.js"
+
+      - source: "../../config/web/config.local.js"
+        target: "wistla-web/config/config.local.js"
+
+      - source: "../../config/web/config.overrides.js"
+        target: "wistla-web/config/config.overrides.js"
+
+    config_templates:
+
+      # api
+
+      - template: "cluster-deployment-wistla-api-config"
+        target: "config/api/config.local.js"
+
+      - template: "cluster-deployment-wistla-api-environment"
+        target: "config/api/environment"
+
       # api2
 
       - template: "cluster-deployment-wistla-api2-schema-config"
@@ -244,7 +419,7 @@ cluster_deployment_types:
         group: "postgres"
         mode: "0644"
 
-      - template: "cluster-deployment-hba-config"
+      - template: "cluster-deployment-postgresql-hba-config"
         type: "postgresql"
         target: "postgresql-hba.conf"
         owner: "postgres"
@@ -265,6 +440,8 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-web-overrides"
         target: "config/web/config.overrides.js"
+
+  # -------------------- simple
 
   simple:
 
@@ -470,6 +647,8 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-web-overrides"
         target: "config/web/config.overrides.js"
+
+  # -------------------- simple2
 
   simple2:
 
