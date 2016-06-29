@@ -44,6 +44,9 @@ developer_full:
   - name: "wistla-media"
     branch: "development"
 
+  - name: "wistla-pubsub"
+    branch: "development"
+
   - name: "wistla-raml-server"
     branch: "development"
 
