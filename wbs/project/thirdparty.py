@@ -25,37 +25,21 @@ def read_index ():
 	return yamlx.load_data (
 		"third-party/third-party-index")
 
+def build (* names):
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.build (* names)
+
 def fetch ():
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.fetch ()
-
-def update ():
-
-	third_party_setup = (
-		ThirdPartySetup ())
-
-	third_party_setup.load ()
-	third_party_setup.update ()
-
-def pull ():
-
-	third_party_setup = (
-		ThirdPartySetup ())
-
-	third_party_setup.load ()
-	third_party_setup.pull ()
-
-def build ():
-
-	third_party_setup = (
-		ThirdPartySetup ())
-
-	third_party_setup.load ()
-	third_party_setup.build ()
+	third_party_setup.fetch (* names)
 
 def merge ():
 
@@ -63,7 +47,31 @@ def merge ():
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.merge ()
+	third_party_setup.merge (* names)
+
+def pull (* names):
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.pull (* names)
+
+def push (* names):
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.push (* names)
+
+def update (* names):
+
+	third_party_setup = (
+		ThirdPartySetup ())
+
+	third_party_setup.load ()
+	third_party_setup.update (* names)
 
 class ThirdPartySetup (object):
 
@@ -72,6 +80,10 @@ class ThirdPartySetup (object):
 		self.project_path = (
 			os.path.abspath ("."))
 
+		self.project_name = (
+			os.path.basename (
+				self.project_path))
+
 		self.stashed = False
 
 	def load (self):
@@ -79,11 +91,16 @@ class ThirdPartySetup (object):
 		self.third_party_index = (
 			read_index ())
 
-		self.git_repo = (
-			git.Repo (
-				"."))
+		if os.path.exists (".git"):
 
-	def fetch (self):
+			self.git_repo = (
+				git.Repo ("."))
+
+		else:
+
+			self.git_repo = None
+
+	def fetch (self, * names):
 
 		log.notice (
 			"About to fetch third party libraries")
@@ -91,7 +108,7 @@ class ThirdPartySetup (object):
 		try:
 
 			self.create_remotes ()
-			self.fetch_remotes ()
+			self.fetch_remotes (* names)
 
 			log.notice (
 				"All done")
@@ -101,7 +118,7 @@ class ThirdPartySetup (object):
 			log.notice (
 				"Aborting due to user request")
 
-	def update (self):
+	def update (self, * names):
 
 		log.notice (
 			"About to update third party libraries")
@@ -109,7 +126,7 @@ class ThirdPartySetup (object):
 		try:
 
 			self.stash_changes ()
-			self.update_libraries ()
+			self.update_libraries (* names)
 
 			log.notice (
 				"All done")
@@ -123,17 +140,17 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def pull (self):
+	def pull (self, * names):
 
 		log.notice (
 			"About to pull third party libraries")
 
 		try:
 
-			self.create_remotes ()
-			self.fetch_remotes ()
+			self.create_remotes (* names)
+			self.fetch_remotes (* names)
 			self.stash_changes ()
-			self.update_libraries ()
+			self.update_libraries (* names)
 
 			log.notice (
 				"All done")
@@ -147,15 +164,15 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def build (self):
+	def push (self, * names):
 
 		log.notice (
-			"About to build third party libraries")
+			"About to push third party libraries")
 
 		try:
 
 			self.stash_changes ()
-			self.build_libraries ()
+			self.push_remotes (* names)
 
 			log.notice (
 				"All done")
@@ -169,7 +186,31 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def merge (self):
+	def build (self, * names):
+
+		log.notice (
+			"About to build third party libraries")
+
+		self.pre_build_libraries (* names)
+
+		try:
+
+			self.stash_changes ()
+			self.build_libraries (* names)
+
+			log.notice (
+				"All done")
+
+		except KeyboardInterrupt:
+
+			log.notice (
+				"Aborting due to user request")
+
+		finally:
+
+			self.unstash_changes ()
+
+	def merge (self, * names):
 
 		log.notice (
 			"About to merge third party libraries")
@@ -177,7 +218,7 @@ class ThirdPartySetup (object):
 		try:
 
 			self.stash_changes ()
-			self.merge_libraries ()
+			self.merge_libraries (* names)
 
 			log.notice (
 				"All done")
@@ -191,7 +232,7 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def create_remotes (self):
+	def create_remotes (self, * names):
 
 		remotes_index = dict ([
 			(remote.name, remote)
@@ -202,21 +243,28 @@ class ThirdPartySetup (object):
 		for library_name, library_data \
 		in self.third_party_index.items ():
 
-			if not library_name in remotes_index:
+			if names and library_name not in names:
+				continue
 
-				log.status (
-					"Create missing remote for %s" % (
-						library_name))
+			if library_name in remotes_index:
+				continue
+
+			with log.status (
+				"Create missing remote for %s" % (
+					library_name)):
 
 				remotes_index [library_name] = (
 					self.git_repo.create_remote (
 						library_name,
 						library_data ["url"]))
 
-	def fetch_remotes (self):
+	def fetch_remotes (self, * names):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			if "version" in library_data:
 
@@ -239,10 +287,11 @@ class ThirdPartySetup (object):
 						library_data ["branch"])):
 
 					self.git_repo.remotes [library_name].fetch (
-						"%s:refs/%s/%s" % (
+						"refs/heads/%s:refs/%s/%s" % (
 							library_data ["branch"],
 							library_name,
-							library_data ["branch"]))
+							library_data ["branch"]),
+						no_tags = True)
 
 			else:
 
@@ -252,6 +301,93 @@ class ThirdPartySetup (object):
 			"Fetched %s remotes" % (
 				len (self.third_party_index)))
 
+	def push_remotes (self, * names):
+
+		num_pushed = 0
+		num_failed = 0
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
+
+			if "push" not in library_data:
+				continue
+
+			library_prefix = (
+				"third-party/%s" % (
+					library_name))
+
+			try:
+
+				with log.status (
+					"Pushing changes for %s" % (
+						library_name)):
+
+					if library_data ["push"] == "simple":
+
+						subprocess.check_call (
+							[
+								"git",
+								"subtree",
+								"push",
+								"--prefix",
+								library_prefix,
+								library_name,
+								library_data ["branch"],
+								"--squash",
+								"--message",
+								"push changes from %s" % (
+									self.project_name),
+							],
+							stderr = subprocess.STDOUT)
+
+						subprocess.check_call (
+							[
+								"git",
+								"subtree",
+								"pull",
+								"--prefix",
+								library_prefix,
+								library_name,
+								library_data ["branch"],
+								"--squash",
+								"--message",
+								"pull for push of %s" % (
+									library_name),
+							],
+							stderr = subprocess.STDOUT)
+
+					else:
+
+						raise Exception ()
+
+				num_pushed += 1
+
+			except subprocess.CalledProcessError as error:
+
+				log.notice (
+					"Push failed!")
+
+				log.output (
+					error.output)
+
+				num_failed += 1
+
+		if num_failed:
+
+			print (
+				"Pushed %s libraries with %s failures" % (
+					num_pushed + num_failed,
+					num_failed))
+
+		elif num_pushed:
+
+			print (
+				"Pushed %s libraries" % (
+					num_pushed))
+
 	def handle_interrupt (self, * arguments):
 
 		log.notice (
@@ -260,6 +396,9 @@ class ThirdPartySetup (object):
 		self.interrupted = True
 
 	def stash_changes (self):
+
+		if not self.git_repo:
+			return
 
 		if self.stashed:
 			return
@@ -280,12 +419,38 @@ class ThirdPartySetup (object):
 		self.stashed_index_tree = (
 			self.git_repo.index.write_tree ())
 
-		self.git_repo.index.add (
-			[ "third-party" ],
-			force = False)
+		self.stashed_index_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_index_tree,
+				"Stashed index"))
+
+		self.stashed_index_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-index",
+				self.stashed_index_commit,
+				force = True))
+
+		self.git_repo.git.add (
+			"--all",
+			"third-party")
 
 		self.stashed_working_tree = (
 			self.git_repo.index.write_tree ())
+
+		self.stashed_working_commit = (
+			git.Commit.create_from_tree (
+				self.git_repo,
+				self.stashed_working_tree,
+				"Stashed working tree"))
+
+		self.stashed_working_tag = (
+			git.Tag.create (
+				self.git_repo,
+				"wbs/stashed-working",
+				self.stashed_working_commit,
+				force = True))
 
 		self.git_repo.index.reset (
 			working_tree = True)
@@ -300,6 +465,9 @@ class ThirdPartySetup (object):
 			raise KeyboardInterrupt ()
 
 	def unstash_changes (self):
+
+		if not self.git_repo:
+			return
 
 		if not self.stashed:
 			return
@@ -330,10 +498,13 @@ class ThirdPartySetup (object):
 
 		self.stashed = False
 
-	def update_libraries (self):
+	def update_libraries (self, * names):
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			self.update_library (
 				library_name,
@@ -350,6 +521,20 @@ class ThirdPartySetup (object):
 			"third-party/%s" % (
 				library_name))
 
+		if "version" in library_data:
+
+			library_version = (
+				library_data ["version"])
+
+		elif "branch" in library_data:
+
+			library_version = (
+				library_data ["branch"])
+
+		else:
+
+			raise Exception ()
+
 		if not os.path.isdir (
 			library_path):
 
@@ -364,7 +549,7 @@ class ThirdPartySetup (object):
 				"--prefix",
 				library_prefix,
 				library_data ["url"],
-				library_data ["version"],
+				library_version,
 				"--squash",
 			])
 
@@ -380,23 +565,12 @@ class ThirdPartySetup (object):
 				self.git_repo.remotes [
 					library_name])
 
-			if "version" in library_data:
+			remote_ref = (
+				git_remote.refs [
+					library_version])
 
-				remote_ref = (
-					git_remote.refs [
-						library_data ["version"]])
-
-				remote_commit = (
-					remote_ref.commit)
-
-			elif "branch" in library_data:
-
-				remote_ref = (
-					git_remote.refs [
-						library_data ["branch"]])
-
-				remote_commit = (
-					remote_ref.commit)
+			remote_commit = (
+				remote_ref.commit)
 
 			remote_tree = (
 				remote_commit.tree)
@@ -407,7 +581,8 @@ class ThirdPartySetup (object):
 			library_version = (
 				library_data.get (
 					"version",
-					library_data.get ("branch")))
+					library_data.get (
+						"branch")))
 
 			self.update_library_version (
 				library_name,
@@ -461,13 +636,54 @@ class ThirdPartySetup (object):
 			log.output (
 				error.output)
 
-	def build_libraries (self):
+	def pre_build_libraries (self, * names):
+
+		for library_name, library_data \
+		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
+
+			if not "symlink" in library_data:
+				continue
+
+			symlink_path = (
+				"%s/%s" % (
+					self.project_path,
+					library_data ["symlink"]))
+
+			if os.path.exists (symlink_path):
+				continue
+
+			symlink_directory_path = (
+				os.path.dirname (
+					symlink_path))
+
+			if not os.path.lexists (
+				symlink_directory_path):
+
+				os.makedirs (
+					symlink_directory_path)
+
+			symlink_target = (
+				"%sthird-party/%s" % (
+					"../" * (library_data ["symlink"].count ("/")),
+					library_name))
+
+			os.symlink (
+				symlink_target,
+				symlink_path)
+
+	def build_libraries (self, * names):
 
 		num_built = 0
 		num_failed = 0
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			library_path = (
 				"%s/third-party/%s" % (
@@ -490,16 +706,15 @@ class ThirdPartySetup (object):
 
 			):
 
-				build_data = {
-					"command": " ".join ([
-						"python setup.py build",
-					]),
-					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
-					},
-				}
+				python_site_packages = (
+					"%s/work/lib/python2.7/site-packages" % (
+						self.project_path))
+
+				if not os.path.isdir (
+					python_site_packages):
+
+					os.makedirs (
+						python_site_packages)
 
 				build_data = {
 					"command": " ".join ([
@@ -507,9 +722,7 @@ class ThirdPartySetup (object):
 						"--prefix %s/work" % self.project_path,
 					]),
 					"environment": {
-						"PYTHONPATH":
-							"%s/work/lib/python2.7/site-packages" % (
-								self.project_path),
+						"PYTHONPATH": python_site_packages,
 					},
 				}
 
@@ -569,13 +782,16 @@ class ThirdPartySetup (object):
 				"Built %s remotes" % (
 					num_built))
 
-	def merge_libraries (self):
+	def merge_libraries (self, * names):
 
 		num_merged = 0
 		num_failed = 0
 
 		for library_name, library_data \
 		in self.third_party_index.items ():
+
+			if names and library_name not in names:
+				continue
 
 			if not "merge" in library_data:
 				continue
