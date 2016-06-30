@@ -18,6 +18,7 @@ clusters:
   {{ other_cluster_name }}:
 {% for key in [
   'name',
+  'email_domain',
   'cluster_network',
   'instance_formation',
   'local_domain',
