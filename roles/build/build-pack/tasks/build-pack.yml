@@ -18,7 +18,7 @@
     build_target: "{{ [
       deployment_home,
       '/builds/backups/',
-      node_type,
+      node_template,
       '-',
       local_build_id,
       '.tar',
@@ -29,7 +29,7 @@
     creates: "{{ [
       deployment_home,
       '/builds/backups/',
-      node_type,
+      node_template,
       '-',
       local_build_id,
       '.tar',
