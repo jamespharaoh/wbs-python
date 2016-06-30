@@ -46,7 +46,7 @@ node_deploy_projects:
     configs:
 
       - target: "local.yaml"
-        source: "wistla-api-server-local.yaml"
+        source: "wistla-media-daemon-local.yaml"
 
   - name: "wistla-blob"
     type: "nodejs"
