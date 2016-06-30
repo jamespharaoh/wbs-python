@@ -15,6 +15,9 @@
 - name: "load"
   template: "load"
 
+- name: "media"
+  template: "media"
+
 - name: "mongo"
   template: "mongo"
 
