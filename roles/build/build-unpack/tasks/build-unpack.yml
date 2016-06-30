@@ -7,7 +7,7 @@
     build_source: "{{ [
       deployment_home,
       '/builds/backups/',
-      node_type,
+      node_template,
       '-',
       deployment.deployed_build,
       '.tar',

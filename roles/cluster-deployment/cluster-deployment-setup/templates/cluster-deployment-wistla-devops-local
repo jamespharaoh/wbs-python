@@ -53,4 +53,10 @@ deployments:
 {% endif %}
 {% endfor %}
 
+deployment_modes:
+
+{% for deployment_mode_name, deployment_mode in deployment_modes.items () %}
+  deployment_mode_name: {{ deployment_mode | to_json }}
+{% endfor %}
+
 # ex: et ts=2 filetype=yaml
