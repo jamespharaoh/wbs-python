@@ -20,6 +20,9 @@ developer_full:
   - name: "wistla-api-server"
     branch: "development"
 
+  - name: "wistla-media-daemon"
+    branch: "development"
+
   - name: "wistla-blob"
     branch: "development"
 
