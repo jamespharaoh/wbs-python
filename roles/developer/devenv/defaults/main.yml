@@ -186,6 +186,9 @@ devenv_shared_logfiles:
   - log: "shared/log/wistla-api-server.log"
     user: "vagrant"
 
+  - log: "shared/log/wistla-media-daemon.log"
+    user: "vagrant"
+
   - log: "shared/log/wistla-api.log"
     user: "vagrant"
 

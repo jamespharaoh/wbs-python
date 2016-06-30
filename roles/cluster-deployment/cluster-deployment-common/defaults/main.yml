@@ -829,6 +829,9 @@ cluster_deployment_types:
       - log: "shared/log/wistla-api-server.log"
         user: "ubuntu"
 
+      - log: "shared/log/wistla-media-daemon.log"
+        user: "ubuntu"
+
       - log: "shared/log/wistla-api.log"
         user: "ubuntu"
 
