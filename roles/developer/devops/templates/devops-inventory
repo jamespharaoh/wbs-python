@@ -12,38 +12,77 @@ wistla-{{ deployment_name }}-dev
 wistla-jenkins
 {% endif %}
 
-# ---------- nodes
+# ==================== node groups
 
 [node:children]
 node-template
 node-host
 
 [node-host:children]
-{% for node_type in devops_inventory_node_types %}
-node-{{ node_type }}-host
+{% for node_type in node_types %}
+{% if node_type.name in deployment_mode_data.node_types %}
+node-{{ node_type.name }}-host
+{% endif %}
 {% endfor %}
 
 [node-template:children]
 node-template-generic
 node-template-concrete
 
-[node-template-concrete:children]
-{% for node_type in devops_inventory_node_types %}
-node-{{ node_type }}-template
+[node-template-generic]
+{% for node_template in node_templates %}
+{% if node_template.type == 'generic'
+	and node_template.name in deployment_mode_data.node_templates %}
+{{ deployment_name }}-{{ node_template.name }}-template
+{% endif %}
 {% endfor %}
 
-[node-template-generic]
-{{ deployment_name }}-base-template
+[node-template-concrete:children]
+{% for node_template in node_templates %}
+{% if node_template.type == 'concrete'
+	and node_template.name in deployment_mode_data.node_templates %}
+node-{{ node_template.name }}-template
+{% endif %}
+{% endfor %}
 
-{% for node_type in devops_inventory_node_types %}
+# =================== node templates
 
-# ---------- node {{ node_type }}
+{% for node_template in node_templates %}
+{% if node_template.name in deployment_mode_data.node_templates %}
 
-[node-{{ node_type }}:children]
-node-{{ node_type }}-template
-node-{{ node_type }}-host
+[node-{{ node_template.name }}-template]
+{% if deployment_mode in [ 'vagrant', 'jenkins' ] -%}
 
-[node-{{ node_type }}-host]
+	{%- print [
+		deployment_name + '-' + node_template.name + '-template',
+		'node_template=' + node_template.name,
+	] | join (' '), '\n' -%}
+
+{%- else -%}
+
+	{%- print [
+		deployment_name + '-' + node_template.name + '-template',
+		'node_template=' + node_template.name,
+		'node_zone=' + instance_zone,
+	] | join (' '), '\n' -%}
+
+{%- endif -%}
+
+{%- endif %}
+{% endfor %}
+
+# =================== node types
+
+{% for node_type in node_types %}
+{% if node_type.name in deployment_mode_data.node_types %}
+
+# ---------- node {{ node_type.name }}
+
+[node-{{ node_type.name }}:children]
+node-{{ node_type.name }}-template
+node-{{ node_type.name }}-host
+
+[node-{{ node_type.name }}-host]
 {% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
 
 	{%- for node_index in range (4) -%}
@@ -51,19 +90,19 @@ node-{{ node_type }}-host
 		{%- print [
 			[
 				deployment_name,
-				node_type,
+				node_type.name,
 				node_index | string,
 			] | join ('-'),
-			'node_type=' + node_type,
+			'node_type=' + node_type.name,
 			'node_index=' + node_index | string,
 			'private_address=' + [
 				deployment.bridge_network,
 				node_index | string,
-				node_type_indices [node_type],
+				node_type_indices [node_type.name],
 			] | join ('.'),
 			'private_mac=' + [
 				deployment.bridge_mac,
-				"%0.2X" % node_type_indices [node_type],
+				"%0.2X" % node_type_indices [node_type.name],
 				"%0.2X" % node_index,
 			] | join (':'),
 		] | join (' ') + '\n' -%}
@@ -75,46 +114,29 @@ node-{{ node_type }}-host
 	{% print [
 		[
 			deployment_name,
-			node_type,
+			node_type.name,
 			instance_zone,
 			instance_index | string,
 		] | join ('-'),
-		'node_type=' + node_type,
+		'node_type=' + node_type.name,
 		'node_index=' + instance_index | string,
 		'node_zone=' + instance_zone,
 		'private_address=' + [
 			deployment.bridge_network,
 			instance_index | string,
 			(cluster_zone_indices [instance_zone] * 64
-				+ node_type_indices [node_type]) | string,
+				+ node_type_indices [node_type.name]) | string,
 		] | join ('.'),
 		'private_mac=' + [
 			deployment.bridge_mac,
 			"%0.2X" % instance_index | int,
-			"%0.2X" % node_type_indices [node_type],
+			"%0.2X" % node_type_indices [node_type.name],
 		] | join (':'),
 	] | join (' ') + '\n' -%}
 
 {%- endif %}
 
-[node-{{ node_type }}-template]
-{% if deployment_mode in [ 'vagrant', 'jenkins' ] %}
-
-	{%- print [
-		deployment_name + '-' + node_type + '-template',
-		'node_type=' + node_type,
-	] | join (' '), '\n' -%}
-
-{%- else -%}
-
-	{%- print [
-		deployment_name + '-' + node_type + '-template',
-		'node_type=' + node_type,
-		'node_zone=' + instance_zone,
-	] | join (' '), '\n' -%}
-
-{%- endif %}
-
+{% endif %}
 {% endfor %}
 
 # ---------- cluster

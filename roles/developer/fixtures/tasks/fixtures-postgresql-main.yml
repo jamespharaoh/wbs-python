@@ -1,22 +1,22 @@
 ---
 
-- name: "create postgresql data"
+- name: "create postgresql main data"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-data"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-data"
 
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo service postgresql stop || true',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo rm -rf /var/lib/postgresql/9.5/main',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo',
       '-H -u postgres',
       '/usr/lib/postgresql/9.5/bin/initdb',
@@ -24,28 +24,28 @@
       '/var/lib/postgresql/9.5/main',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo service postgresql start',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-data',
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-data',
   ] | join (' && ') }}"
 
-- name: "create postgresql user ubuntu"
+- name: "create postgresql main user ubuntu"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user-ubuntu"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-ubuntu"
 
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo',
       '-u postgres',
       'createuser',
       'ubuntu',
       '--superuser',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-user-ubuntu',
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-user-ubuntu',
   ] | join (' && ') }}"
 
 - name: "create postgresql user vagrant"
@@ -66,21 +66,21 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
   ] | join (' && ') }}"
 
-- name: "create postgresql user wistla"
+- name: "create postgresql main user wistla"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user-wistla"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-wistla"
 
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo',
       '-u postgres',
       'createuser',
       'wistla',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-user-wistla',
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-user-wistla',
   ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml

@@ -1,0 +1,36 @@
+---
+
+- name: "api"
+  template: "api"
+
+- name: "api2"
+  template: "api2"
+
+- name: "browser"
+  template: "browser"
+
+- name: "kafka"
+  template: "kafka"
+
+- name: "load"
+  template: "load"
+
+- name: "mongo"
+  template: "mongo"
+
+- name: "postgresql"
+  template: "postgresql"
+
+- name: "postgresql-main"
+  template: "postgresql-main"
+
+- name: "postgresql-cache"
+  template: "postgresql-cache"
+
+- name: "rabbit"
+  template: "rabbit"
+
+- name: "web"
+  template: "web"
+
+# ex: et ts=2 filetype=yaml

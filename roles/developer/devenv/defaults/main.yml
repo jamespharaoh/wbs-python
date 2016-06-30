@@ -10,7 +10,8 @@ devenv_config_directories:
   - "config/load"
   - "config/media"
   - "config/mongo"
-  - "config/postgresql"
+  - "config/postgresql-main"
+  - "config/postgresql-cache"
   - "config/rabbit"
 
 devenv_config_files:
@@ -89,17 +90,33 @@ devenv_config_templates:
     type: "load"
     target: "nginx-config"
 
-  # ---------- postgresql
+  # ---------- postgresql-main
 
   - template: "devenv-postgresql-config"
-    type: "postgresql"
+    type: "postgresql-main"
     target: "postgresql.conf"
     owner: "postgres"
     group: "postgres"
     mode: "0644"
 
   - template: "devenv-postgresql-hba-config"
-    type: "postgresql"
+    type: "postgresql-main"
+    target: "postgresql-hba.conf"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0640"
+
+  # ---------- postgresql-cache
+
+  - template: "devenv-postgresql-config"
+    type: "postgresql-cache"
+    target: "postgresql.conf"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0644"
+
+  - template: "devenv-postgresql-hba-config"
+    type: "postgresql-cache"
     target: "postgresql-hba.conf"
     owner: "postgres"
     group: "postgres"
@@ -177,7 +194,10 @@ devenv_shared_logfiles:
   - log: "shared/log/nginx-times.log"
     user: "root"
 
-  - log: "shared/log/postgresql.log"
+  - log: "shared/log/postgresql-main.log"
+    user: "postgres"
+
+  - log: "shared/log/postgresql-cache.log"
     user: "postgres"
 
   - log: "shared/log/wistla-analytics.log"

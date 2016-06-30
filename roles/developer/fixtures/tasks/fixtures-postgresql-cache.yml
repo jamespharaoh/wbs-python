@@ -1,0 +1,86 @@
+---
+
+- name: "create postgresql cache data"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-data"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo service postgresql stop || true',
+    ] | join (' '),
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo rm -rf /var/lib/postgresql/9.5/main',
+    ] | join (' '),
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo',
+      '-H -u postgres',
+      '/usr/lib/postgresql/9.5/bin/initdb',
+      '--pgdata',
+      '/var/lib/postgresql/9.5/main',
+    ] | join (' '),
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo service postgresql start',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-data',
+  ] | join (' && ') }}"
+
+- name: "create postgresql cache user ubuntu"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-user-ubuntu"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'ubuntu',
+      '--superuser',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-ubuntu',
+  ] | join (' && ') }}"
+
+- name: "create postgresql user vagrant"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-user-vagrant"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'vagrant',
+      '--superuser',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
+  ] | join (' && ') }}"
+
+- name: "create postgresql cache user wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-user-wistla"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-cache-0',
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'wistla',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-wistla',
+  ] | join (' && ') }}"
+
+# ex: et ts=2 filetype=yaml

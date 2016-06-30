@@ -3,6 +3,23 @@
 vagrant:
 
   build_secret_path: "/home/vagrant/wistla-devops/security/build/wistla-build-secret"
+
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "postgresql"
+
+    - "api"
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql-main"
+    - "postgresql-cache"
+    - "rabbit"
+
   node_types:
 
     - "api"
@@ -12,11 +29,28 @@ vagrant:
     - "load"
     - "media"
     - "mongo"
-    - "postgresql"
+    - "postgresql-main"
+    - "postgresql-cache"
     - "rabbit"
 
 jenkins:
 
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "api"
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql-main"
+    - "postgresql-cache"
+    - "rabbit"
+
   node_types:
 
     - "api"
@@ -26,28 +60,59 @@ jenkins:
     - "load"
     - "media"
     - "mongo"
-    - "postgresql"
+    - "postgresql-main"
+    - "postgresql-cache"
     - "rabbit"
 
 cluster-shared:
 
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "mongo"
+    - "rabbit"
+
   node_types:
 
-    - "kafka"
     - "mongo"
-    - "postgresql"
     - "rabbit"
 
 cluster-shared2:
 
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "kafka"
+    - "mongo"
+    - "postgresql-main"
+    - "postgresql-cache"
+    - "rabbit"
+
   node_types:
 
     - "kafka"
     - "mongo"
-    - "postgresql"
+    - "postgresql-main"
+    - "postgresql-cache"
     - "rabbit"
 
 cluster-alias:
+
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "api"
+    - "browser"
+    - "load"
 
   node_types:
 
@@ -57,6 +122,16 @@ cluster-alias:
 
 cluster-alias2:
 
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "api"
+    - "browser"
+    - "load"
+
   node_types:
 
     - "api"
@@ -64,6 +139,18 @@ cluster-alias2:
     - "load"
 
 cluster-simple:
+
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "api"
+    - "browser"
+    - "load"
+    - "mongo"
+    - "rabbit"
 
   node_types:
 
@@ -76,16 +163,32 @@ cluster-simple:
 cluster-simple2:
 
   build_secret_path: "/run/user/1000/wistla-build-secret"
+
+  node_templates:
+
+    - "base"
+    - "nodejs"
+    - "posgresql"
+
+    - "api2"
+    - "browser"
+    - "kafka"
+    - "load"
+    - "mongo"
+    - "postgresql-main"
+    - "postgresql-cache"
+    - "rabbit"
+
   node_types:
 
-    - "api"
     - "api2"
     - "browser"
     - "kafka"
     - "load"
     - "media"
     - "mongo"
-    - "postgresql"
+    - "postgresql-main"
+    - "postgresql-cache"
     - "rabbit"
 
 # ex: et ts=2 filetype=yaml

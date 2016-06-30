@@ -1,6 +1,6 @@
 {{ ansible_warning ['#'] }}
 
-description "wistla {{ node_type }}"
+description "wistla {{ node_template }}"
 
 start on runlevel [2345]
 stop on runlevel [!2345]
@@ -11,8 +11,8 @@ script
 
 	. /config/environment
 
-	for index in $(seq 0 $((WISTLA_{{ node_type | upper }}_COUNT - 1))); do
-		start {{ item.0.name }}-instance WISTLA_{{ node_type | upper }}_INDEX=$index
+	for index in $(seq 0 $((WISTLA_{{ node_template | upper }}_COUNT - 1))); do
+		start {{ item.0.name }}-instance WISTLA_{{ node_template | upper }}_INDEX=$index
 	done
 
 end script

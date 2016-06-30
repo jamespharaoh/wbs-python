@@ -1,9 +1,17 @@
 ---
 
+node_type_data: "{{
+  node_types
+  | selectattr ('name', 'equalto', node_type)
+  | first
+}}"
+
+is_template: "no"
+
 ansible_connection: "sudo_chroot"
 ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
-node_template: "{{ node_type }}-template"
+node_clone_from: "{{ deployment_name }}-{{ node_type_data.template }}-template"
 
 node_active: "{{
   'yes' if (

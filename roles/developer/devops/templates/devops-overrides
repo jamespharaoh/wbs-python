@@ -51,7 +51,8 @@ dev_node_count:
   load: "{{ (dev_node_count | default ({})).load | default ('1') }}"
   media: "{{ (dev_node_count | default ({})).media | default ('1') }}"
   mongo: "{{ (dev_node_count | default ({})).mongo | default ('1') }}"
-  postgresql: "{{ (dev_node_count | default ({})).postgresql | default ('1') }}"
+  postgresql-main: "{{ (dev_node_count | default ({})) ['postgresql-main'] | default ('1') }}"
+  postgresql-cache: "{{ (dev_node_count | default ({})) ['postgresql-cache'] | default ('1') }}"
   rabbit: "{{ (dev_node_count | default ({})).rabbit | default ('1') }}"
   web: "{{ (dev_node_count | default ({})).web | default ('1') }}"
 
@@ -72,7 +73,8 @@ dev_node_memory:
   load: "{{ (dev_node_memory | default ({})).load | default ('512') }}"
   media: "{{ (dev_node_memory | default ({})).media | default ('512') }}"
   mongo: "{{ (dev_node_memory | default ({})).mongo | default ('512') }}"
-  postgresql: "{{ (dev_node_memory | default ({})).postgresql | default ('512') }}"
+  postgresql-main: "{{ (dev_node_memory | default ({})) ['postgresql-main'] | default ('512') }}"
+  postgresql-cache: "{{ (dev_node_memory | default ({})) ['postgresql-cache'] | default ('512') }}"
   rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('512') }}"
   web: "{{ (dev_node_memory | default ({})).web | default ('512') }}"
 

@@ -1,5 +1,13 @@
 ---
 
+data_dirs:
+
+  - name: "postgresql-data"
+    path: "var/lib/postgresql"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0755"
+
 ubuntu_sources_extra:
 
   - url: "http://apt.postgresql.org/pub/repos/apt/"

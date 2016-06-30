@@ -1,5 +1,13 @@
 ---
 
+data_dirs:
+
+  - name: "postgresql-data"
+    path: "var/lib/postgresql"
+    owner: "postgres"
+    group: "postgres"
+    mode: "0755"
+
 ubuntu_sources_extra:
 
   - url: "http://apt.postgresql.org/pub/repos/apt/"
@@ -15,6 +23,9 @@ ubuntu_keys_extra:
 my_system_packages:
 
   - name: "postgresql-9.5"
+    state: "present"
+
+  - name: "postgresql-9.5-postgis-2.2"
     state: "present"
 
 # ex: et ts=2 filetype=yaml

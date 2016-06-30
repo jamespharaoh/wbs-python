@@ -832,7 +832,11 @@ def warn_redeploy ():
 		os.path.getmtime (
 			"/home/vagrant/%s/.git/HEAD" % (
 				project ["name"]))
-		for project in PROJECTS
+		for project
+		in PROJECTS
+		if os.path.isdir (
+			"/home/vagrant/%s" % (
+				project ["name"]))
 	])
 
 	if STATE ["last_redeploy"] < last_commit:
@@ -847,7 +851,7 @@ def warn_redeploy ():
 
 		write_message ([
 			"Updated %s: %s\n" % (
-				project,
+				project ["name"],
 				pretty_time (
 					os.path.getmtime (
 						"/home/vagrant/%s/.git/HEAD" % (
