@@ -59,6 +59,8 @@ and (inventory_hostname in groups.vagrant
 			'media',
 			'mongo',
 			'postgresql',
+			'postgresql-cache',
+			'postgresql-main',
 			'rabbit',
 			'web',
 		] -%}
@@ -243,6 +245,8 @@ and (inventory_hostname in groups.vagrant
 		{%- for node_type in [
 			'mongo',
 			'postgresql',
+			'postgresql-cache',
+			'postgresql-main',
 			'rabbit',
 		] -%}
 		{%- for node_zone in [ 'a', 'b', 'c' ] -%}
@@ -276,6 +280,8 @@ and (inventory_hostname in groups.vagrant
 		{%- for node_type in [
 			'mongo',
 			'postgresql',
+			'postgresql-cache',
+			'postgresql-main',
 			'rabbit',
 		] -%}
 		{%- for node_zone in [ 'a', 'b', 'c' ] -%}
@@ -314,6 +320,8 @@ and (inventory_hostname in groups.vagrant
 			'media',
 			'mongo',
 			'postgresql',
+			'postgresql-cache',
+			'postgresql-main',
 			'rabbit',
 			'web',
 		] -%}
@@ -373,6 +381,8 @@ and (inventory_hostname in groups.vagrant
 			'media',
 			'mongo',
 			'postgresql',
+			'postgresql-cache',
+			'postgresql-main',
 			'rabbit',
 		] -%}
 		{%- for node_zone in [ 'a', 'b', 'c' ] -%}
