@@ -47,9 +47,6 @@ developer_full:
   - name: "wistla-media"
     branch: "development"
 
-  - name: "wistla-media-daemon"
-    branch: "development"
-
   - name: "wistla-pubsub"
     branch: "development"
 

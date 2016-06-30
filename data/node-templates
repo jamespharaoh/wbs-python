@@ -40,6 +40,10 @@
   type: "concrete"
   parent: "base"
 
+- name: "media"
+  type: "concrete"
+  parent: "nodejs"
+
 - name: "mongo"
   type: "concrete"
   parent: "base"

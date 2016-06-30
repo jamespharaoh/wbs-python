@@ -8,6 +8,7 @@ devenv_config_directories:
   - "config/browser"
   - "config/kafka"
   - "config/load"
+  - "config/media"
   - "config/mongo"
   - "config/postgresql-main"
   - "config/postgresql-cache"
@@ -57,6 +58,16 @@ devenv_config_templates:
 
   - template: "devenv-wistla-api2-environment"
     type: "api2"
+    target: "environment"
+
+  # ---------- media
+
+  - template: "devenv-wistla-api2-server-config"
+    type: "media"
+    target: "wistla-media-daemon-local.yaml"
+
+  - template: "devenv-wistla-media-environment"
+    type: "media"
     target: "environment"
 
   # ---------- browser
@@ -143,6 +154,9 @@ devenv_config_links:
   - dest: "wistla-api-server/config/local.yaml"
     src: "../../config/api2/wistla-api-server-local.yaml"
 
+  - dest: "wistla-media-daemon/config/local.yaml"
+    src: "../../config/media/wistla-media-daemon-local.yaml"
+
   - dest: "wistla-browser/config/config.local.js"
     src: "../../config/browser/config.local.js"
 
@@ -190,6 +204,9 @@ devenv_shared_logfiles:
     user: "vagrant"
 
   - log: "shared/log/wistla-api-server.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-media-daemon.log"
     user: "vagrant"
 
   - log: "shared/log/wistla-api.log"

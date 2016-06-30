@@ -353,6 +353,14 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api2-environment"
         target: "config/api2/environment"
 
+      # media
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/media/wistla-media-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-media-environment"
+        target: "config/media/environment"
+
       # browser
 
       - template: "cluster-deployment-wistla-browser-config"
@@ -674,6 +682,14 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-api2-environment"
         target: "config/api2/environment"
 
+      # media
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/media/wistla-media-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-media-environment"
+        target: "config/media/environment"
+
       # browser
 
       - template: "cluster-deployment-wistla-browser-config"
@@ -777,6 +793,9 @@ cluster_deployment_types:
         user: "ubuntu"
 
       - log: "shared/log/wistla-api-server.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-media-daemon.log"
         user: "ubuntu"
 
       - log: "shared/log/wistla-api.log"
