@@ -59,4 +59,16 @@ deployment_modes:
   {{ deployment_mode_name }}: {{ deployment_mode | to_json }}
 {% endfor %}
 
+node_types:
+
+{% for node_type_data in node_types %}
+  - {{ node_type_data | to_json }}
+{% endfor %}
+
+node_templates:
+
+{% for node_template_data in node_templates %}
+  - {{ node_template_data | to_json }}
+{% endfor %}
+
 # ex: et ts=2 filetype=yaml
