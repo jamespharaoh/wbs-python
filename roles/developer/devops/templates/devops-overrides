@@ -49,6 +49,7 @@ dev_node_count:
   browser: "{{ (dev_node_count | default ({})).browser | default ('1') }}"
   kafka: "{{ (dev_node_count | default ({})).kafka | default ('1') }}"
   load: "{{ (dev_node_count | default ({})).load | default ('1') }}"
+  media: "{{ (dev_node_count | default ({})).media | default ('1') }}"
   mongo: "{{ (dev_node_count | default ({})).mongo | default ('1') }}"
   postgresql: "{{ (dev_node_count | default ({})).postgresql | default ('1') }}"
   rabbit: "{{ (dev_node_count | default ({})).rabbit | default ('1') }}"
@@ -58,6 +59,7 @@ dev_node_instance_count:
 
   api: "{{ (dev_node_instance_count | default ({})).api | default ('1') }}"
   api2: "{{ (dev_node_instance_count | default ({})).api2 | default ('1') }}"
+  media: "{{ (dev_node_instance_count | default ({})).media | default ('1') }}"
   browser: "{{ (dev_node_instance_count | default ({})).browser | default ('1') }}"
   web: "{{ (dev_node_instance_count | default ({})).web | default ('1') }}"
 
@@ -68,6 +70,7 @@ dev_node_memory:
   browser: "{{ (dev_node_memory | default ({})).browser | default ('1024') }}"
   kafka: "{{ (dev_node_memory | default ({})).kafka | default ('512') }}"
   load: "{{ (dev_node_memory | default ({})).load | default ('512') }}"
+  media: "{{ (dev_node_memory | default ({})).media | default ('512') }}"
   mongo: "{{ (dev_node_memory | default ({})).mongo | default ('512') }}"
   postgresql: "{{ (dev_node_memory | default ({})).postgresql | default ('512') }}"
   rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('512') }}"

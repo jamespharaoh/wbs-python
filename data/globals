@@ -18,6 +18,7 @@ node_type_indices:
   load: 4
   web: 5
   api2: 6
+  media: 7
 
   # data_network: 16
   # data_instance: 17
