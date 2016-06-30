@@ -8,6 +8,7 @@ vagrant:
 
     - "base"
     - "nodejs"
+    - "nodejs-legacy"
     - "postgresql"
 
     - "api"
@@ -40,6 +41,7 @@ jenkins:
 
     - "base"
     - "nodejs"
+    - "nodejs-legacy"
     - "posgresql"
 
     - "api"
@@ -110,6 +112,7 @@ cluster-alias:
 
     - "base"
     - "nodejs"
+    - "nodejs-legacy"
     - "posgresql"
 
     - "api"
@@ -128,6 +131,7 @@ cluster-alias2:
 
     - "base"
     - "nodejs"
+    - "nodejs-legacy"
     - "posgresql"
 
     - "api"
@@ -146,6 +150,7 @@ cluster-simple:
 
     - "base"
     - "nodejs"
+    - "nodejs-legacy"
     - "posgresql"
 
     - "api"
