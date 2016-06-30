@@ -58,4 +58,10 @@ resource_data:
   facebook_apps: "facebook-app.facebook_app"
   google_projects: "google-project.google_project"
 
+project_data:
+
+  deployment_modes: "deployment-modes"
+  node_templates: "node-templates"
+  node_types: "node-types"
+
 # ex: et ts=2 filetype=yaml

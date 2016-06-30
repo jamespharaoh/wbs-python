@@ -5,7 +5,7 @@
 
     pg:
 
-      url: "postgres://vagrant@{{ deployment_name }}-postgresql-0/wistla"
+      url: "postgres://vagrant@{{ deployment_name }}-postgresql-main-0/wistla"
 
 # @wistla/pubsub configuration
   pubsub:

@@ -1,0 +1,63 @@
+---
+
+# ---------- generic templates
+
+- name: "base"
+  type: "generic"
+  parent: ""
+
+- name: "nodejs"
+  type: "generic"
+  parent: "base-template"
+
+- name: "nodejs-legacy"
+  type: "generic"
+  parent: "base-template"
+
+- name: "postgresql"
+  type: "generic"
+  parent: "base-template"
+
+# ---------- concrete templates
+
+- name: "api"
+  type: "concrete"
+  parent: "nodejs-legacy"
+
+- name: "api2"
+  type: "concrete"
+  parent: "nodejs"
+
+- name: "browser"
+  type: "concrete"
+  parent: "nodejs-legacy"
+
+- name: "kafka"
+  type: "concrete"
+  parent: "base"
+
+- name: "load"
+  type: "concrete"
+  parent: "base"
+
+- name: "mongo"
+  type: "concrete"
+  parent: "base"
+
+- name: "postgresql-main"
+  type: "concrete"
+  parent: "postgresql"
+
+- name: "postgresql-cache"
+  type: "concrete"
+  parent: "postgresql"
+
+- name: "rabbit"
+  type: "concrete"
+  parent: "base"
+
+- name: "web"
+  type: "concrete"
+  parent: "node"
+
+# ex: et ts=2 filetype=yaml

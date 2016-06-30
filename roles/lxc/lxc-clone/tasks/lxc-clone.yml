@@ -29,7 +29,7 @@
 
     lxc-clone
       --backingstore btrfs
-      {{ deployment_name }}-{{ node_template }}
+      {{ node_clone_from }}
       {{ inventory_hostname }};
 
     chgrp {{ deployment_user }} /var/lib/lxc/{{ inventory_hostname }};

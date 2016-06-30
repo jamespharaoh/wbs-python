@@ -25,6 +25,8 @@ node_type_indices:
   rabbit: 19
   postgresql: 20
   kafka: 21
+  postgresql-main: 22
+  postgresql-cache: 23
 
 cluster_zone_indices:
 
@@ -37,6 +39,8 @@ devops_region: "eu-west-1"
 devops_bucket: "wistla-builds"
 
 deployment: "{{ deployments [deployment_name] }}"
+
+deployment_mode_data: "{{ deployment_modes [deployment_mode] }}"
 
 deployment_alias: "{{
   deployments [deployment.alias]

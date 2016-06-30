@@ -3,19 +3,27 @@
 - include: "fixtures-mongo.yml"
   tags:
 
-    - "fixtures"
     - "fixtures-mongo"
+    - "fixtures"
 
-- include: "fixtures-postgresql.yml"
+- include: "fixtures-postgresql-main.yml"
   tags:
 
-    - "fixtures"
+    - "fixtures-postgresql-main"
     - "fixtures-postgresql"
+    - "fixtures"
+
+- include: "fixtures-postgresql-cache.yml"
+  tags:
+
+    - "fixtures-postgresql-cache"
+    - "fixtures-postgresql"
+    - "fixtures"
 
 - include: "fixtures-rabbit.yml"
   tags:
 
-    - "fixtures"
     - "fixtures-rabbit"
+    - "fixtures"
 
 # ex: et ts=2 filetype=yaml
