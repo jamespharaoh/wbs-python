@@ -183,7 +183,6 @@ cluster-simple2:
     - "load"
     - "media"
     - "mongo"
-    - "posgresql"
     - "postgresql-main"
     - "postgresql-cache"
     - "rabbit"
