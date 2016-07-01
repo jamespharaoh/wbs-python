@@ -31,6 +31,8 @@ developer_profile: "{{ developer_profile | default ('full') }}"
 # NB - this debug option causes other node.js options to be disabled, including
 # memory limits and garbage collection.
 
+dev_offline: "{{
+  dev_offline | default ('no') }}"
 dev_debug: "{{
   dev_debug | default (debug | default ('no')) }}"
 dev_apple_push_notifications_enabled: "{{
