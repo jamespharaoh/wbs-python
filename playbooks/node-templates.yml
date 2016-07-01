@@ -86,7 +86,12 @@
     - "node-mongo"
     - "install-mongodb"
 
-- hosts: "node-postgresql-template"
+- hosts:
+
+    - "node-postgresql-template"
+    - "node-postgresql-main-template"
+    - "node-postgresql-cache-template"
+
   roles:
 
     - "node-postgresql"

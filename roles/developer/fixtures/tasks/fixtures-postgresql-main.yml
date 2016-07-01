@@ -48,15 +48,15 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-main-user-ubuntu',
   ] | join (' && ') }}"
 
-- name: "create postgresql user vagrant"
+- name: "create postgresql main user vagrant"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user-vagrant"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-vagrant"
 
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-main-0',
       'sudo',
       '-u postgres',
       'createuser',

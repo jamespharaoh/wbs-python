@@ -48,22 +48,22 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-ubuntu',
   ] | join (' && ') }}"
 
-- name: "create postgresql user vagrant"
+- name: "create postgresql cache user vagrant"
   args:
 
-    creates: "{{ deployment_home }}/shared/flags/postgresql-user-vagrant"
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-user-vagrant"
 
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-0',
+      deployment_name + '-postgresql-cache-0',
       'sudo',
       '-u postgres',
       'createuser',
       'vagrant',
       '--superuser',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-vagrant',
   ] | join (' && ') }}"
 
 - name: "create postgresql cache user wistla"
