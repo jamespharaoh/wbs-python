@@ -1,6 +1,7 @@
 ---
 
 - name: "link to postgresql configs"
+  when: "{{ node_template != 'postgresql' }}"
   with_items:
 
     - link: "/etc/postgresql/9.5/main/postgresql.conf"
