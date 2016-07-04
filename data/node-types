@@ -21,8 +21,8 @@
 - name: "mongo"
   template: "mongo"
 
-#- name: "postgresql"
-#  template: "postgresql"
+- name: "postgresql"
+  template: "postgresql"
 
 - name: "postgresql-main"
   template: "postgresql-main"
