@@ -297,6 +297,7 @@ cluster_deployment_types:
       - "api2"
       - "browser"
       - "load"
+      - "media"
       - "postgresql-main"
       - "postgresql-cache"
 
@@ -641,6 +642,7 @@ cluster_deployment_types:
       - "browser"
       - "kafka"
       - "load"
+      - "media"
       - "mongo"
       - "postgresql-main"
       - "postgresql-cache"
