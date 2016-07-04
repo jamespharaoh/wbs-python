@@ -21,6 +21,9 @@
 - name: "mongo"
   template: "mongo"
 
+- name: "notifications"
+  template: "notifications"
+
 - name: "postgresql"
   template: "postgresql"
 

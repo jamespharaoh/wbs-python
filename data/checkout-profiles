@@ -23,6 +23,9 @@ developer_full:
   - name: "wistla-media-daemon"
     branch: "development"
 
+  - name: "wistla-notification-daemon"
+    branch: "development"
+
   - name: "wistla-blob"
     branch: "development"
 
@@ -45,6 +48,9 @@ developer_full:
     branch: "development"
 
   - name: "wistla-media"
+    branch: "development"
+
+  - name: "wistla-notifications"
     branch: "development"
 
   - name: "wistla-pubsub"

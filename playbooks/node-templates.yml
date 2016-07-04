@@ -63,6 +63,13 @@
     - "nodejs"
     - "deploy-nodejs-node"
 
+- hosts: "node-notifications-template"
+  roles:
+
+    - "node-notifications"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
 - hosts: "node-browser-template"
   roles:
 
