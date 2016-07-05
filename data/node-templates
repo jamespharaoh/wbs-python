@@ -48,6 +48,10 @@
   type: "concrete"
   parent: "base"
 
+- name: "notifications"
+  type: "concrete"
+  parent: "nodejs"
+
 - name: "postgresql-main"
   type: "concrete"
   parent: "postgresql"

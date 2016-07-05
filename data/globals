@@ -19,6 +19,7 @@ node_type_indices:
   web: 5
   api2: 6
   media: 7
+  notifications: 8
 
   # data_network: 16
   # data_instance: 17

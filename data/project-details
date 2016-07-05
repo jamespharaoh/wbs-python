@@ -90,6 +90,20 @@
 
     - "npm install"
 
+- name: "wistla-notification-daemon"
+  default_branch: "development"
+  npm_name: "@wistla/notification-daemon"
+  depends:
+
+    - "wistla-db"
+    - "wistla-notifications"
+    - "wistla-pubsub"
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-blob"
   default_branch: "development"
   npm_name: "@wistla/blob"
@@ -134,6 +148,21 @@
   depends:
 
     - "wistla-blob"
+    - "wistla-db"
+    - "wistla-pubsub"
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-notifications"
+  short: "send push notifications"
+  default_branch: "development"
+  npm_name: "@wistla/notifications"
+
+  depends:
+
     - "wistla-db"
     - "wistla-pubsub"
     - "wistla-util"

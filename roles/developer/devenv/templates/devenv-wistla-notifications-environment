@@ -1,0 +1,16 @@
+{{ ansible_warning ['#'] }}
+
+WISTLA_NOTIFICATIONS_COUNT="{{ dev_node_instance_count.notifications }}"
+WISTLA_NOTIFICATIONS_DEBUG="{{ dev_debug }}"
+
+WISTLA_NOTIFICATIONS_MIN_SEMI_SPACE_SIZE="4"
+WISTLA_NOTIFICATIONS_MAX_SEMI_SPACE_SIZE="32"
+WISTLA_NOTIFICATIONS_MAX_OLD_SPACE_SIZE="{{
+	(
+		dev_node_memory.notifications | int
+		/ dev_node_instance_count.notifications | int
+	) | int - 128
+}}"
+WISTLA_NOTIFICATIONS_MAX_EXECUTABLE_SIZE="32"
+
+# ex: noet ts=4 filetype=bash

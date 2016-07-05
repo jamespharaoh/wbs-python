@@ -9,6 +9,7 @@ devenv_config_directories:
   - "config/kafka"
   - "config/load"
   - "config/media"
+  - "config/notifications"
   - "config/mongo"
   - "config/postgresql-main"
   - "config/postgresql-cache"
@@ -68,6 +69,16 @@ devenv_config_templates:
 
   - template: "devenv-wistla-media-environment"
     type: "media"
+    target: "environment"
+
+  # ---------- notifications
+
+  - template: "devenv-wistla-api2-server-config"
+    type: "notifications"
+    target: "wistla-notification-daemon-local.yaml"
+
+  - template: "devenv-wistla-notifications-environment"
+    type: "notifications"
     target: "environment"
 
   # ---------- browser
@@ -157,6 +168,9 @@ devenv_config_links:
   - dest: "wistla-media-daemon/config/local.yaml"
     src: "../../config/media/wistla-media-daemon-local.yaml"
 
+  - dest: "wistla-notification-daemon/config/local.yaml"
+    src: "../../config/notifications/wistla-notification-daemon-local.yaml"
+
   - dest: "wistla-browser/config/config.local.js"
     src: "../../config/browser/config.local.js"
 
@@ -207,6 +221,9 @@ devenv_shared_logfiles:
     user: "vagrant"
 
   - log: "shared/log/wistla-media-daemon.log"
+    user: "vagrant"
+
+  - log: "shared/log/wistla-notification-daemon.log"
     user: "vagrant"
 
   - log: "shared/log/wistla-api.log"

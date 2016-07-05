@@ -298,6 +298,7 @@ cluster_deployment_types:
       - "browser"
       - "load"
       - "media"
+      - "notifications"
       - "postgresql-main"
       - "postgresql-cache"
 
@@ -361,6 +362,14 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-media-environment"
         target: "config/media/environment"
+
+      # notifications
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/notifications/wistla-notification-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-notifications-environment"
+        target: "config/notifications/environment"
 
       # browser
 
@@ -644,6 +653,7 @@ cluster_deployment_types:
       - "load"
       - "media"
       - "mongo"
+      - "notifications"
       - "postgresql-main"
       - "postgresql-cache"
       - "rabbit"
@@ -691,6 +701,14 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-media-environment"
         target: "config/media/environment"
+
+      # notifications
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/notifications/wistla-notification-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-notifications-environment"
+        target: "config/notifications/environment"
 
       # browser
 
@@ -798,6 +816,9 @@ cluster_deployment_types:
         user: "ubuntu"
 
       - log: "shared/log/wistla-media-daemon.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-notification-daemon.log"
         user: "ubuntu"
 
       - log: "shared/log/wistla-api.log"
