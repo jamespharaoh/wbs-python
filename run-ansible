@@ -481,7 +481,7 @@ def update_config ():
 	time.sleep (0.3)
 
 	if CONFIG ["deployment_mode"] == "vagrant" \
-	and CONFIG ["dev_offline"] != "yes":
+	and CONFIG.get ("dev_offline") != "yes":
 
 		subprocess.check_call ([
 			"misc/amazon-auth",
