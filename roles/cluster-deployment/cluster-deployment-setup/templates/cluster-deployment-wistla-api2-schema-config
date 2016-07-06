@@ -9,8 +9,19 @@ db:
   password: ""
 schemas:
   -
-    path: ./schema.wistla.sql
-    target_directory: ./schema.wistla
+    host: "{{ deployment_name }}-postgresql-main-a-4"
+    name: wistla
+    exclude_tables:
+      - config
+      - feed_search
+      - timezones
+    path: ./schema.wistla.main.sql
+    target_directory: ./schema.wistla.main
     data_import_directory: /shared
+  -
+    host: "{{ deployment_name }}-postgresql-cache-a-4"
+    name: wistla
+    path: ./schema.wistla.cache.sql
+    target_directory: ./schema.wistla.cache
 
 # ex: et ts=2 filetype=yaml
