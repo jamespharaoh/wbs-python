@@ -23,5 +23,7 @@ schemas:
     name: wistla
     path: ./schema.wistla.cache.sql
     target_directory: ./schema.wistla.cache
+    map_servers:
+        - "{{ deployment_name }}-postgresql-main-a-4"
 
 # ex: et ts=2 filetype=yaml
