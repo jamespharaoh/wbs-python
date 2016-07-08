@@ -79,6 +79,7 @@
       '-u postgres',
       'createuser',
       'wistla',
+      '--superuser',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-wistla',
   ] | join (' && ') }}"
