@@ -4,8 +4,13 @@
   db:
 
     pg:
-
       url: "postgres://vagrant@{{ deployment_name }}-postgresql-main-0/wistla"
+
+      cache:
+        url: "postgres://vagrant@{{ deployment_name }}-postgresql-cache-0/wistla"
+      
+      main:
+        url: "postgres://vagrant@{{ deployment_name }}-postgresql-main-0/wistla"
 
 # @wistla/pubsub configuration
   pubsub:
