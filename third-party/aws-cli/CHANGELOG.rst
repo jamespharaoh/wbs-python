@@ -2,6 +2,81 @@
 CHANGELOG
 =========
 
+1.10.47
+=======
+
+* feature:Credential Provider: Add support for ECS metadata credential provider.
+* feature:``dms``: Update dms command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``efs``: Remove preview status from ``aws efs`` command
+* feature:``ecs``: Update ecs command to latest version
+
+
+1.10.46
+=======
+
+* feature:``config``: Update config command to latest version
+* feature:``ds``: Update ds command to latest version
+* feature:``opsworks``: Update opsworks command to latest version
+* feature:``servicecatalog``: Update servicecatalog command to latest version
+
+
+1.10.45
+=======
+
+* feature:``iam``: Update iam command to latest version
+* feature:``codepipeline``: Update codepipeline command to latest version
+* feature:``efs``: Update efs command to latest version
+
+
+1.10.44
+=======
+
+* feature:``ssm``: Update ssm command to latest version
+* feature:``dms``: Update dms command to latest version
+
+
+1.10.43
+=======
+
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``gamelift``: Update gamelift command to latest version
+* feature:``efs``: Update efs command to latest version
+* feature:``iot``: Update iot command to latest version
+* feature:``route53``: Update route53 command to latest version
+* feature:``sns``: Update sns command to latest version
+
+
+1.10.42
+=======
+
+* feature:``s3``: Update s3 command to latest version
+
+
+1.10.41
+=======
+
+* feature:``iam``: Update iam command to latest version
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``cognito-identity``: Update cognito-identity command to latest version
+* feature:``directconnect``: Update directconnect command to latest version
+
+
+1.10.40
+=======
+
+* bugfix:AssumeRole: Fix regression in assume role where cached credentials were not valid JSON (`botocore #962 <https://github.com/boto/botocore/pull/962>`__)
+
+
+1.10.39
+=======
+
+* feature:``codepipeline``: Update codepipeline command to latest version
+* feature:opsworks: Instead of always creating an IAM user for instance registration, allow using credentials from the instance profile
+* feature:``opsworks``: Update opsworks command to latest version
+
+
 1.10.38
 =======
 
