@@ -12,7 +12,8 @@
 
 # ---------- integration
 
-# TODO
+- name: "wistla-integration"
+  default_branch: "development"
 
 # ---------- modules
 

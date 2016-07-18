@@ -9,8 +9,8 @@ developer_full:
 
   # ---------- integration
 
-  #- name: "wistla-integration"
-  #  branch: "development"
+  - name: "wistla-integration"
+    branch: "development"
 
   # ---------- modules
 

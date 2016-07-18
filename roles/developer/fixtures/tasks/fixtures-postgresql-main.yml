@@ -63,7 +63,7 @@
       'vagrant',
       '--superuser',
     ] | join (' '),
-    'touch ' + deployment_home + '/shared/flags/postgresql-user-vagrant',
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-user-vagrant',
   ] | join (' && ') }}"
 
 - name: "create postgresql main user wistla"
