@@ -802,6 +802,9 @@ class PKeyTests(TestCase):
         self.assertRaises(ValueError, key.generate_key, TYPE_RSA, -1)
         self.assertRaises(ValueError, key.generate_key, TYPE_RSA, 0)
 
+        with pytest.raises(TypeError):
+            key.generate_key(TYPE_RSA, object())
+
         # XXX RSA generation for small values of bits is fairly buggy in a wide
         # range of OpenSSL versions.  I need to figure out what the safe lower
         # bound for a reasonable number of OpenSSL versions is and explicitly
@@ -956,17 +959,25 @@ class X509NameTests(TestCase):
         """
         name = self._x509name()
         name.commonName = "foo"
-        self.assertEqual(name.commonName, "foo")
-        self.assertEqual(name.CN, "foo")
+        assert name.commonName == "foo"
+        assert name.CN == "foo"
+
         name.CN = "baz"
-        self.assertEqual(name.commonName, "baz")
-        self.assertEqual(name.CN, "baz")
+        assert name.commonName == "baz"
+        assert name.CN == "baz"
+
         name.commonName = "bar"
-        self.assertEqual(name.commonName, "bar")
-        self.assertEqual(name.CN, "bar")
+        assert name.commonName == "bar"
+        assert name.CN == "bar"
+
         name.CN = "quux"
-        self.assertEqual(name.commonName, "quux")
-        self.assertEqual(name.CN, "quux")
+        assert name.commonName == "quux"
+        assert name.CN == "quux"
+
+        assert name.OU is None
+
+        with pytest.raises(AttributeError):
+            name.foobar
 
     def test_copy(self):
         """
@@ -1044,6 +1055,8 @@ class X509NameTests(TestCase):
         # Instances with different NIDs should not compare equal to each other.
         assertNotEqual(self._x509name(CN="foo"),
                        self._x509name(OU="foo"))
+
+        assertNotEqual(self._x509name(), object())
 
         def _inequality(a, b, assertTrue, assertFalse):
             assertTrue(a < b)
@@ -1845,6 +1858,15 @@ WpOdIpB8KksUTCzV591Nr1wd
         cert = X509()
         self.assertRaises(Error, cert.get_pubkey)
 
+    def test_set_pubkey_wrong_type(self):
+        """
+        :obj:`X509.set_pubkey` raises :obj:`TypeError` when given an object of
+        the wrong type.
+        """
+        cert = X509()
+        with pytest.raises(TypeError):
+            cert.set_pubkey(object())
+
     def test_subject_name_hash_wrong_args(self):
         """
         :py:obj:`X509.subject_name_hash` raises :py:obj:`TypeError` if called
@@ -1904,6 +1926,15 @@ tgI5
 """)
         cert = load_certificate(FILETYPE_PEM, certPEM)
         self.assertRaises(ValueError, cert.get_signature_algorithm)
+
+    def test_sign_bad_pubkey_type(self):
+        """
+        :obj:`X509.sign` raises :obj:`TypeError` when called with the wrong
+        type.
+        """
+        cert = X509()
+        with pytest.raises(TypeError):
+            cert.sign(object(), b"sha256")
 
 
 class X509StoreTests(TestCase):
@@ -2678,6 +2709,15 @@ class FunctionTests(TestCase):
         good_text = _runopenssl(dumped_pem, b"x509", b"-noout", b"-text")
         self.assertEqual(dumped_text, good_text)
 
+    def test_dump_certificate_bad_type(self):
+        """
+        :obj:`dump_certificate` raises a :obj:`ValueError` if it's called with
+        a bad type.
+        """
+        cert = load_certificate(FILETYPE_PEM, cleartextCertificatePEM)
+        with pytest.raises(ValueError):
+            dump_certificate(object(), cert)
+
     def test_dump_privatekey_pem(self):
         """
         :py:obj:`dump_privatekey` writes a PEM
@@ -2827,6 +2867,14 @@ class FunctionTests(TestCase):
         """
         self.assertRaises(Error, load_pkcs7_data, FILETYPE_PEM, b"foo")
 
+    def test_load_pkcs7_type_invalid(self):
+        """
+        If the type passed to :obj:`load_pkcs7_data`, :obj:`ValueError` is
+        raised.
+        """
+        with pytest.raises(ValueError):
+            load_pkcs7_data(object(), b"foo")
+
 
 class LoadCertificateTests(TestCase):
     """
@@ -2839,7 +2887,18 @@ class LoadCertificateTests(TestCase):
         neither :py:obj:`FILETYPE_PEM` nor :py:obj:`FILETYPE_ASN1` then
         :py:class:`ValueError` is raised.
         """
-        self.assertRaises(ValueError, load_certificate_request, object(), b"")
+        with pytest.raises(ValueError):
+            load_certificate_request(object(), b"")
+        with pytest.raises(ValueError):
+            load_certificate(object(), b"")
+
+    def test_bad_certificate(self):
+        """
+        If the bytes passed to :obj:`load_certificate` are not a valid
+        certificate, an exception is raised.
+        """
+        with pytest.raises(Error):
+            load_certificate(FILETYPE_ASN1, b"lol")
 
 
 class PKCS7Tests(TestCase):
