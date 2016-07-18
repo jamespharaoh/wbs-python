@@ -108,6 +108,11 @@
 	text-align: right;
 }
 
+.content table tr th.flag,
+.content table tr td.flag {
+	width: 0;
+}
+
 .content a {
 	text-decoration: none;
 	color: inherit;
@@ -150,4 +155,12 @@
 .content input[type=submit] {
 	font-family: montserrat, sans-serif;
 	padding: 0.3rem 0.8rem;
+}
+
+@media print {
+
+	.content {
+		margin-left: 0;
+	}
+
 }
