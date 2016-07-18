@@ -7,12 +7,16 @@ try:
 
 	import datetime
 	import flask
-	import httplib2
 	import json
+	import requests
+
+	__all__ = [
+		"LoginClient",
+	]
 
 except ImportError:
 
-	pass
+	__all__ = []
 
 class LoginClient (object):
 
@@ -22,8 +26,8 @@ class LoginClient (object):
 
 		self.settings = settings
 
-		self.http = (
-			httplib2.Http ())
+		self.http_session = (
+			requests.Session ())
 
 	def before_request (self):
 
@@ -70,12 +74,11 @@ class LoginClient (object):
 
 		if not token_data:
 
-			response, content = (
-				self.http.request (
-					"%s/api/verify" % (
+			http_request = (
+				self.http_session.post (
+					url = "%s/api/verify" % (
 						self.settings ["login-url"]),
-					"POST",
-					body = json.dumps ({
+					data = json.dumps ({
 						"token": token,
 					}),
 					headers = {
@@ -83,8 +86,7 @@ class LoginClient (object):
 					}))
 
 			token_data = (
-				json.loads (
-					content))
+				http_request.json ())
 
 			token_data ["expires"] = (
 				datetime.datetime.now ()
