@@ -800,16 +800,6 @@ class TestSourceRegion(BaseS3IntegrationTest):
         self.src_bucket = self.create_bucket(self.src_name, self.src_region)
         self.dest_bucket = self.create_bucket(self.dest_name, self.dest_region)
 
-    def test_fail_without_region(self):
-        self.files.create_file('foo.txt', 'foo')
-        p = aws('s3 sync %s s3://%s/ --region %s' %
-                (self.files.rootdir, self.src_bucket, self.src_region))
-        self.assert_no_errors(p)
-        p2 = aws('s3 sync s3://%s/ s3://%s/ --region %s' %
-                 (self.src_bucket, self.dest_bucket, self.src_region))
-        self.assertEqual(p2.rc, 1, p2.stdout)
-        self.assertIn('PermanentRedirect', p2.stderr)
-
     def test_cp_region(self):
         self.files.create_file('foo.txt', 'foo')
         p = aws('s3 sync %s s3://%s/ --region %s' %
@@ -1423,7 +1413,7 @@ class TestMemoryUtilization(BaseS3IntegrationTest):
 
 class TestWebsiteConfiguration(BaseS3IntegrationTest):
     def test_create_website_index_configuration(self):
-        bucket_name = _SHARED_BUCKET
+        bucket_name = self.create_bucket()
         # Supply only --index-document argument.
         full_command = 's3 website %s --index-document index.html' % \
             (bucket_name)
@@ -1438,7 +1428,7 @@ class TestWebsiteConfiguration(BaseS3IntegrationTest):
         self.assertNotIn('RedirectAllRequestsTo', parsed)
 
     def test_create_website_index_and_error_configuration(self):
-        bucket_name = _SHARED_BUCKET
+        bucket_name = self.create_bucket()
         # Supply both --index-document and --error-document arguments.
         p = aws('s3 website %s --index-document index.html '
                 '--error-document error.html' % bucket_name)
