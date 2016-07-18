@@ -1,6 +1,7 @@
 from __future__ import print_function
+import logging
 from os import path
-from flask import _request_ctx_stack
+from flask import current_app, _request_ctx_stack
 from flask.templating import render_template_string
 from webassets.env import (\
     BaseEnvironment, ConfigStorage, env_options, Resolver, url_prefix_join)
@@ -245,6 +246,12 @@ class FlaskResolver(Resolver):
             except ImportError as e:
                 print("You must have Flask CDN to use FLASK_ASSETS_USE_CDN option")
                 raise e
+        elif ctx.environment._app.config.get("FLASK_ASSETS_USE_AZURE"):
+            try:
+                from flask_azure_storage import url_for
+            except ImportError as e:
+                print("You must have Flask Azure Storage to use FLASK_ASSETS_USE_AZURE option")
+                raise e
         else:
             from flask import url_for
 
@@ -441,3 +448,49 @@ else:
             return impl.main(args)
 
     __all__ = __all__ + ('ManageAssets',)
+
+
+try:
+    import click
+    from flask import cli
+except ImportError:
+    pass
+else:
+    def _webassets_cmd(cmd):
+        """Helper to run a webassets command."""
+        from webassets.script import CommandLineEnvironment
+        logger = logging.getLogger('webassets')
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(logging.DEBUG)
+        cmdenv = CommandLineEnvironment(
+            current_app.jinja_env.assets_environment, logger
+        )
+        getattr(cmdenv, cmd)()
+
+
+    @click.group()
+    def assets():
+        """Web assets commands."""
+
+
+    @assets.command()
+    @cli.with_appcontext
+    def build():
+        """Build bundles."""
+        _webassets_cmd('build')
+
+
+    @assets.command()
+    @cli.with_appcontext
+    def clean():
+        """Clean bundles."""
+        _webassets_cmd('clean')
+
+
+    @assets.command()
+    @cli.with_appcontext
+    def watch():
+        """Watch bundles for file changes."""
+        _webassets_cmd('watch')
+
+    __all__ = __all__ + ('assets', 'build', 'clean', 'watch')
