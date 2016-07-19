@@ -3,6 +3,6 @@
 - include: "template-system.yml"
 - include: "template-nullmailer.yml"
 - include: "template-config.yml"
-- include: "template-scripts.yml"
+#- include: "template-scripts.yml"
 
 # ex: et ts=2 filetype=yaml
