@@ -142,21 +142,27 @@ devenv_config_links:
 
   - dest: "wistla-api/config/apple-ca.cert"
     src: "../../config/api/apple-ca.cert"
+    legacy: "yes"
 
   - dest: "wistla-api/config/apple-push.cert"
     src: "../../config/api/apple-push.cert"
+    legacy: "yes"
 
   - dest: "wistla-api/config/apple-push.key"
     src: "../../config/api/apple-push.key"
+    legacy: "yes"
 
   - dest: "wistla-api/config/config.local.js"
     src: "../../config/api/config.local.js"
+    legacy: "yes"
 
   - dest: "wistla-api/config/config.overrides.js"
     src: "../../config/api/config.overrides.js"
+    legacy: "yes"
 
   - dest: "wistla-api/config/google-service-account.key"
     src: "../../config/api/google-service-account.key"
+    legacy: "yes"
 
   - dest: "wistla-api-server/config/local.yaml"
     src: "../../config/api2/wistla-api-server-local.yaml"
@@ -169,9 +175,11 @@ devenv_config_links:
 
   - dest: "wistla-browser/config/config.local.js"
     src: "../../config/browser/config.local.js"
+    legacy: "yes"
 
   - dest: "wistla-browser/config/config.overrides.js"
     src: "../../config/browser/config.overrides.js"
+    legacy: "yes"
 
   - dest: "wistla-db-schema/config/local.yaml"
     src: "../../config/api2/wistla-db-schema-local.yaml"

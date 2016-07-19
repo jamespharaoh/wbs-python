@@ -241,6 +241,7 @@
 
 - name: "create links to config files"
   with_items: "{{ devenv_config_links }}"
+  when: "deployment_mode == 'vagrant' or item.legacy | default ('no') == 'no'"
   action:
 
     module: "file"
