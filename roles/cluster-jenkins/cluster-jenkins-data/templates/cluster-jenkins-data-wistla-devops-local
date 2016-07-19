@@ -41,14 +41,30 @@ deployments:
 {% for key in [
   'name',
   'admin_domain',
+  'android_app',
+  'api_domain',
+  'assets_domain',
+  'assets_origin_domain',
+  'aws_s3_access_key',
+  'aws_s3_bucket_name',
+  'aws_s3_region',
+  'aws_s3_secret_key',
   'bridge_network',
   'bridge_name',
   'bridge_mac',
   'deployed_build',
+  'email_domain',
   'enabled',
+  'facebook_app',
+  'google_project',
+  'main_domain',
   'node_memory',
   'nodejs_version',
   'nodejs_version_legacy',
+  'short_domain',
+  'url_scheme',
+  'web_domain',
+  'web_upstream',
 ] %}
 {% if key in other_deployment %}
     {{ key }}: {{ other_deployment [key] | to_json }}
@@ -73,6 +89,30 @@ node_templates:
 
 {% for node_template_data in node_templates %}
   - {{ node_template_data | to_json }}
+{% endfor %}
+
+android_apps:
+
+{% for android_app_name, android_app in android_apps.items () %}
+{% if android_app_name in [ 'dev' ] %}
+  {{ android_app_name }}: {{ android_app | to_json }}
+{% endif %}
+{% endfor %}
+
+facebook_apps:
+
+{% for facebook_app_name, facebook_app in facebook_apps.items () %}
+{% if facebook_app_name in [ 'dev' ] %}
+  {{ facebook_app_name }}: {{ facebook_app | to_json }}
+{% endif %}
+{% endfor %}
+
+google_projects:
+
+{% for google_project_name, google_project in google_projects.items () %}
+{% if google_project_name in [ 'dev' ] %}
+  {{ google_project_name }}: {{ google_project | to_json }}
+{% endif %}
 {% endfor %}
 
 # ex: et ts=2 filetype=yaml
