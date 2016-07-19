@@ -80,6 +80,9 @@ def build ():
 
 	global STATE, HAVE_GIT
 
+	if CONFIG ["deployment_mode"] == "jenkins":
+		return
+
 	if HAVE_GIT:
 
 		project_repo = (
