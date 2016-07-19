@@ -44,7 +44,7 @@ jenkins:
     - "base"
     - "nodejs"
     - "nodejs-legacy"
-    - "posgresql"
+    - "postgresql"
 
     - "api"
     - "api2"
