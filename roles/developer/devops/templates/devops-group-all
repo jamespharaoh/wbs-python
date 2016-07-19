@@ -72,7 +72,7 @@ third_parties:
 {% endif %}
 {% endif %}
 
-{% if deployment_mode == 'vagrant'
+{% if deployment_mode in [ 'jenkins', 'vagrant' ]
    and checkout_profiles is defined %}
 
 # ---------------------------------------- devenv checkouts
