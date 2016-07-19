@@ -93,10 +93,6 @@ devenv_config_templates:
 
   # ---------- load
 
-  - template: "devenv-wistla-admin-config"
-    type: "load"
-    target: "wistla-admin-config.local.js"
-
   - template: "devenv-wistla-load-nginx-config"
     type: "load"
     target: "nginx-config"

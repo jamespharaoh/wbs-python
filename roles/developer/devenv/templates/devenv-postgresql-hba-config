@@ -5,12 +5,6 @@ local all all trust
 host all all {{ trusted_client }}/32 trust
 {% endfor %}
 
-# other vagrant boxes (todo this doesn't work right, need to use vpn ips)
-{% for other_deployment_name in dev_deployment_names %}
-{% set other_deployment = deployments [other_deployment_name] %}
-host all all {{ other_deployment.bridge_network }}.0.1/32 trust
-{% endfor %}
-
 # local api2 nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
 {% print [
@@ -40,7 +34,6 @@ host all all {{ other_deployment.bridge_network }}.0.1/32 trust
 	'trust',
 ] | join (' '), '\n' %}
 {% endfor %}
-
 
 # local postgresql-cache nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
