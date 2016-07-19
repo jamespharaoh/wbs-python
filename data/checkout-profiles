@@ -107,6 +107,80 @@ developer_full:
   - name: "wistla-browser"
     branch: "master"
 
+developer_jenkins:
+
+  # ---------- devops
+
+  - name: "wistla-devops"
+    branch: "development"
+
+  # ---------- modules
+
+  - name: "wistla-api-server"
+    branch: "development"
+
+  - name: "wistla-media-daemon"
+    branch: "development"
+
+  - name: "wistla-notification-daemon"
+    branch: "development"
+
+  - name: "wistla-blob"
+    branch: "development"
+
+  - name: "wistla-data-export"
+    branch: "development"
+
+  - name: "wistla-data-import"
+    branch: "development"
+
+  - name: "wistla-data-process"
+    branch: "development"
+
+  - name: "wistla-db"
+    branch: "development"
+
+  - name: "wistla-db-schema"
+    branch: "development"
+
+  - name: "wistla-raml-api"
+    branch: "development"
+
+  - name: "wistla-media"
+    branch: "development"
+
+  - name: "wistla-notifications"
+    branch: "development"
+
+  - name: "wistla-pubsub"
+    branch: "development"
+
+  - name: "wistla-raml-server"
+    branch: "development"
+
+  - name: "wistla-raml-to-api"
+    branch: "development"
+
+  - name: "wistla-util"
+    branch: "development"
+
+  # ---------- content
+
+  - name: "content-api"
+    branch: "master"
+
+  - name: "content-browser"
+    branch: "master"
+
+  - name: "content-common"
+    branch: "master"
+
+  - name: "content-iOS"
+    branch: "master"
+
+  - name: "wistla-test-images"
+    branch: "master"
+
 developer_devops:
 
   - name: "wistla-devops"
