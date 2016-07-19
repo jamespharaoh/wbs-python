@@ -21,8 +21,6 @@ python_path = [
 os.environ ["PYTHONPATH"] = (
 	":".join (python_path))
 
-print (os.environ ["PYTHONPATH"])
-
 import hashlib
 import pipes
 import socket
