@@ -92,11 +92,6 @@ def build ():
 			STATE.get (
 				"last_third_party_build_tree"))
 
-		print (
-			"Found .git %s %s" % (
-				current_tree,
-				last_tree))
-
 		if current_tree == last_tree:
 			return
 
@@ -114,18 +109,10 @@ def build ():
 			STATE.get (
 				"last_third_party_build_tree"))
 
-		print (
-			"Found ../.git %s %s" % (
-				current_tree,
-				last_tree))
-
 		if current_tree == last_tree:
 			return
 
 	else:
-
-		print (
-			"Found nothing")
 
 		current_tree = None
 
