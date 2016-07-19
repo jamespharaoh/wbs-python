@@ -75,6 +75,9 @@ python_packages:
   - name: "chardet"
     version: "2.3.0"
 
+  - name: "gitpython"
+    version: "2.0.7"
+
   - name: "ipaddress"
     version: "1.0.7"
 
