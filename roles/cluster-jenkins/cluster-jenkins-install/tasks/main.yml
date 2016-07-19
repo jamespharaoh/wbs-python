@@ -1,0 +1,10 @@
+---
+
+- include: "cluster-jenkins-install.yml"
+  tags:
+
+    - "cluster"
+    - "cluster-jenkins"
+    - "cluster-jenkins-install"
+
+# ex: et ts=2 filetype=yaml

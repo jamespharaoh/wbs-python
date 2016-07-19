@@ -34,6 +34,19 @@ icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/17/key"
 icinga_state: "enabled"
 instance_id: "i-cb357b61"
+nginx: 
+  
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.11.2"
+  installed_version: "1.11.2"
+  needs_restart: "yes"
+  state: "enabled"
+
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.11.2"
+nginx_installed_version: "1.11.2"
+nginx_needs_restart: "yes"
+nginx_state: "enabled"
 python: 
   
   apt_installed_version: "0.9.3-1"

@@ -1,0 +1,21 @@
+---
+
+- name: "cluster jenkins nginx site config"
+  register: "cluster_jenkins_nginx_site_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/nginx/sites/jenkins.conf"
+    src: "cluster-jenkins-nginx-site"
+
+- name: "Cluster jenkins nginx reload"
+  changed_when: "cluster_jenkins_nginx_site_result | changed"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "nginx"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

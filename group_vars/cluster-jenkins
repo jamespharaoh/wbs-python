@@ -165,4 +165,6 @@ cluster_create_volumes:
     device_type: "gp2"
     delete_on_termination: "no"
 
+nginx_version: "{{ supercluster.jenkins_nginx_version }}"
+
 # ex: et ts=2 filetype=yaml

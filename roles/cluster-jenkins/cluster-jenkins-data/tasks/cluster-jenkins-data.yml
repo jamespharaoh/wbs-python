@@ -1,0 +1,22 @@
+---
+
+- name: "cluster jenkins data directory"
+  action:
+
+    module: "file"
+    path: "/home/ubuntu/wistla-data"
+    state: "directory"
+
+- name: "cluster jenkins data config"
+  with_items:
+
+    - target: "wistla-devops-local"
+      template: "cluster-jenkins-data-wistla-devops-local"
+
+  action:
+
+    module: "template"
+    dest: "/home/ubuntu/wistla-data/{{ item.target }}"
+    src: "{{ item.template }}"
+
+# ex: et ts=2 filetype=yaml

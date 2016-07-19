@@ -1,0 +1,77 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+superclusters:
+
+  {{ supercluster_name }}:
+{% for key in [
+  'name',
+] %}
+{% if key in supercluster %}
+    {{ key }}: {{ supercluster [key] | to_json }}
+{% endif %}
+{% endfor %}
+
+clusters:
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+{% if other_cluster.supercluster_name == supercluster_name %}
+  {{ other_cluster_name }}:
+{% for key in [
+  'name',
+  'email_domain',
+  'cluster_network',
+  'instance_formation',
+  'local_domain',
+  'supercluster_name',
+] %}
+{% if key in other_cluster %}
+    {{ key }}: {{ other_cluster [key] | to_json }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+deployments:
+
+{% for other_deployment_name, other_deployment in deployments.items () %}
+{% if other_deployment.supercluster_name == supercluster_name %}
+  {{ other_deployment_name }}:
+{% for key in [
+  'name',
+  'bridge_network',
+  'bridge_name',
+  'bridge_mac',
+  'deployed_build',
+  'enabled',
+  'node_memory',
+  'nodejs_version',
+  'nodejs_version_legacy',
+] %}
+{% if key in other_deployment %}
+    {{ key }}: {{ other_deployment [key] | to_json }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+deployment_modes:
+
+{% for deployment_mode_name, deployment_mode in deployment_modes.items () %}
+  {{ deployment_mode_name }}: {{ deployment_mode | to_json }}
+{% endfor %}
+
+node_types:
+
+{% for node_type_data in node_types %}
+  - {{ node_type_data | to_json }}
+{% endfor %}
+
+node_templates:
+
+{% for node_template_data in node_templates %}
+  - {{ node_template_data | to_json }}
+{% endfor %}
+
+# ex: et ts=2 filetype=yaml
