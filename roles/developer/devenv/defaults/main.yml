@@ -215,22 +215,22 @@ devenv_shared_logfiles:
     user: "postgres"
 
   - log: "shared/log/wistla-analytics.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-api-server.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-media-daemon.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-notification-daemon.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-api.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-browser.log"
-    user: "vagrant"
+    user: "{{ deployment_user }}"
 
 devenv_override_templates:
 
