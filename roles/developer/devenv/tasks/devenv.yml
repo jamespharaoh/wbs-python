@@ -230,7 +230,7 @@
 
 - name: "copy config secrets"
   with_items: "{{ devenv_config_secrets }}"
-  when: "'dev' in secrets"
+  when: "deployment_mode == 'vagrant' and 'dev' in secrets"
   action:
 
     module: "copy"
