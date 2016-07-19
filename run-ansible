@@ -87,10 +87,29 @@ def build ():
 				"."))
 
 		current_tree = str (
-			project_repo.head.commit.tree ["third-party"])
+			project_repo.head.commit.tree [
+				"third-party"])
 
 		last_tree = (
-			STATE.get ("last_third_party_build_tree"))
+			STATE.get (
+				"last_third_party_build_tree"))
+
+		if current_tree == last_tree:
+			return
+
+	elif HAVE_GIT and os.path.isdir ("../.git"):
+
+		project_repo = (
+			git.Repo (
+				".."))
+
+		current_tree = str (
+			project_repo.head.commit.tree [
+				"wistla-devops/third-party"])
+
+		last_tree = (
+			STATE.get (
+				"last_third_party_build_tree"))
 
 		if current_tree == last_tree:
 			return
