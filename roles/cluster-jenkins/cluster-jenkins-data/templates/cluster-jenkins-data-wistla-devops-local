@@ -40,6 +40,7 @@ deployments:
   {{ other_deployment_name }}:
 {% for key in [
   'name',
+  'admin_domain',
   'bridge_network',
   'bridge_name',
   'bridge_mac',
