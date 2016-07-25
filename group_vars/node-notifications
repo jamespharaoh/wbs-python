@@ -51,6 +51,9 @@ node_deploy_projects:
   - name: "wistla-db"
     type: "nodejs"
 
+  - name: "wistla-i18n"
+    type: "nodejs"
+
   - name: "wistla-util"
     type: "nodejs"
 

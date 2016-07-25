@@ -41,6 +41,18 @@
 
     - "npm install"
 
+- name: "wistla-i18n"
+  short: "internationalisation"
+  default_branch: "development"
+  npm_name: "@wistla/i18n"
+  description:
+
+    internationalisation
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-pubsub"
   short: "wistla pub/sub message queue razzamatazz"
   default_branch: "development"
@@ -165,6 +177,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-i18n"
     - "wistla-pubsub"
     - "wistla-util"
 

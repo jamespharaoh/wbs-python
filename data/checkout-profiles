@@ -65,6 +65,9 @@ developer_full:
   - name: "wistla-util"
     branch: "development"
 
+  - name: "wistla-i18n"
+    branch: "development"
+
   # ----------- misc
 
   - name: "wistla-iOS"
