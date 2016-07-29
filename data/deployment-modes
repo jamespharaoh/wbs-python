@@ -46,9 +46,7 @@ jenkins:
     - "nodejs-legacy"
     - "postgresql"
 
-    - "api"
     - "api2"
-    - "browser"
     - "kafka"
     - "load"
     - "media"
@@ -60,9 +58,7 @@ jenkins:
 
   node_types:
 
-    - "api"
     - "api2"
-    - "browser"
     - "kafka"
     - "load"
     - "media"
@@ -205,4 +201,4 @@ cluster-simple2:
     - "postgresql-cache"
     - "rabbit"
 
-# ex: et ts=2 filetype=yaml
+#
