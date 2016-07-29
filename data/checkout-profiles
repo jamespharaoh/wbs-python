@@ -146,6 +146,9 @@ developer_jenkins:
   - name: "wistla-db-schema"
     branch: "development"
 
+  - name: "wistla-i18n"
+    branch: "development"
+
   - name: "wistla-raml-api"
     branch: "development"
 
