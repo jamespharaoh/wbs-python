@@ -6,7 +6,7 @@
 
     module: "template"
     dest: "/etc/nginx/sites/proxy.conf"
-    src: "devbox-http-proxy"
+    src: "devbox-nginx-proxy"
 
 - name: "reload nginx"
   become: "yes"
