@@ -1,4 +1,6 @@
-proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=npm:16m inactive=1y max_size=4G;
+# ==================== nodejs
+
+proxy_cache_path /var/cache/nginx/npm levels=1:2 keys_zone=npm:16m inactive=1y max_size=4G;
 
 upstream registry_npm {
 	server registry.npmjs.org;
@@ -40,6 +42,52 @@ server {
 
 		proxy_pass http://registry_npm;
 
+	}
+
+}
+
+# ==================== python
+
+proxy_cache_path /var/cache/nginx/pypi levels=1:2 keys_zone=pypi:16m inactive=1y max_size=4G;
+
+server {
+
+	listen 8082 default_server;
+
+	server_name pypi.example.com;
+
+	root /var/www;
+
+	proxy_cache pypi;
+	proxy_cache_key $uri;
+	proxy_cache_lock on;
+	proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+
+	proxy_http_version 1.1;
+	proxy_set_header Host pypi.python.org;
+	proxy_set_header Connection "";
+	proxy_set_header Accept-Encoding "";
+
+	proxy_redirect ~https?://pypi.python.org(.*) $1;
+
+	location / {
+		sub_filter 'https://pypi.python.org' $scheme://$host;
+		sub_filter_once off;
+		proxy_pass https://pypi;
+		proxy_cache off;
+	}
+
+	location ^~ /simple {
+		rewrite ^(.*[^/])$ $1/ break;
+		add_header X-Cache2 $upstream_cache_status;
+		proxy_cache_valid any 5m;
+		proxy_pass https://pypi;
+	}
+
+	location ^~ /packages {
+		add_header X-Cache2 $upstream_cache_status;
+		proxy_cache_valid any 1M;
+		proxy_pass https://pypi;
 	}
 
 }
