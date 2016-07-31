@@ -100,9 +100,14 @@ http {
 
 	{%- endmacro -%}
 
-	{%- print upstream ('api', 7000) + '\n' -%}
-	{%- print upstream ('api2', 3000) + '\n' -%}
-	{%- print upstream ('browser', 3000) + '\n' -%}
+	{%- if deployment.v1_enabled == 'yes' -%}
+		{%- print upstream ('api', 7000) + '\n' -%}
+		{%- print upstream ('browser', 3000) + '\n' -%}
+	{%- endif -%}
+
+	{%- if deployment.v2_enabled == 'yes' -%}
+		{%- print upstream ('api2', 3000) + '\n' -%}
+	{%- endif -%}
 
 	# api
 
@@ -112,17 +117,21 @@ http {
 
 		client_max_body_size 16m;
 
+		{% if deployment.v1_enabled == 'yes' %}
 		location / {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+		{% endif %}
 
+		{% if deployment.v2_enabled == 'yes' %}
 		location /v2 {
 			proxy_pass http://api2;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+		{% endif %}
 
 	}
 
@@ -141,17 +150,21 @@ http {
 			proxy_set_header Connection "";
 		}
 
+		{% if deployment.v1_enabled == 'yes' %}
 		location /in {
 			proxy_pass http://browser;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+		{% endif %}
 
+		{% if deployment.v1_enabled == 'yes' %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+		{% endif %}
 
 	}
 

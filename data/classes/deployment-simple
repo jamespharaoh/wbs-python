@@ -27,4 +27,7 @@ deployment:
 
   web_upstream: "https://www.staging.wistla.com"
 
+  v1_enabled: "yes"
+  v2_enabled: "yes"
+
 # ex: et ts=2 filetype=yaml
