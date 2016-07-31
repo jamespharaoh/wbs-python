@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import collections
 import itertools
 
 def flatten_hash (values, * inner_names):
@@ -89,7 +90,8 @@ def order_by_depends (
 
 		return_function = (
 			lambda items:
-				dict (items))
+				collections.OrderedDict (
+					items))
 
 	else:
 

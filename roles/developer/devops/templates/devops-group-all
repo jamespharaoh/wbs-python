@@ -77,16 +77,21 @@ third_parties:
 
 # ---------------------------------------- devenv checkouts
 
-{% set project_details_ordered = project_details | order_by_depends %}
+{% set project_details_ordered =
+  project_details | order_by_depends %}
+
+{% set developer_checkout_profile =
+  checkout_profiles ['developer_' + developer_profile]
+  | index_by ('name') %}
 
 devenv_checkouts:
 
-{% for project_reference
-  in checkout_profiles ['developer_' + developer_profile] %}
+{% for project_name, project_detail
+  in project_details_ordered.items () %}
+{% if project_name in developer_checkout_profile %}
 
-{% set project_detail =
-  project_details_ordered [project_reference.name]
-    | default ({}) %}
+{% set project_reference =
+  developer_checkout_profile [project_name] %}
 
   - name: {{ project_reference.name | to_json }}
     branch: {{ project_reference.branch | to_json }}
@@ -105,7 +110,9 @@ devenv_checkouts:
 {% endif %}
 {% endfor %}
 
+{% endif %}
 {% endfor %}
+
 {% endif %}
 
 # ex: et ts=2 filetype=yaml
