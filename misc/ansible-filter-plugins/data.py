@@ -66,63 +66,111 @@ def dict_map (keys, mapping):
 		for key in keys
 	])
 
-def order_by_depends (projects):
+def order_by_depends (
+		items,
+		name_function = None,
+		depends_function = None):
+
+	if isinstance (items, dict):
+
+		if not name_function:
+
+			name_function = (
+				lambda (key, value):
+					key)
+
+		if not depends_function:
+
+			depends_function = (
+				lambda (key, value):
+					value.get ("depends", []))
+
+		items = items.items ()
+
+		return_function = (
+			lambda items:
+				dict (items))
+
+	else:
+
+		if not name_function:
+
+			name_function = (
+				lambda item:
+					item ["name"])
+
+		if not depends_function:
+
+			depends_function = (
+				lambda item:
+					item.get ("depends", []))
+
+		return_function = (
+			lambda items:
+				items)
 
 	# sanity check
 
-	all_project_names = set ([
-		project ["name"]
-		for project in projects
+	all_names = set ([
+		name_function (item)
+		for item in items
 	])
 
 	all_depends = set ([
 		depends
-		for project in projects
-		for depends in project.get ("depends", [])
+		for item in items
+		for depends in depends_function (item)
 	])
 
 	missing_depends = (
-		all_depends - all_project_names)
+		all_depends - all_names)
 
 	if missing_depends:
 
 		raise Exception (
-			"Missing dependent projects: %s" % (
+			"Missing dependencies: %s" % (
 				", ".join (missing_depends)))
 
 	# sort by dependencies
 
-	unordered_projects = (
-		list (projects))
+	unordered_items = (
+		list (items))
 
-	ordered_projects = (
+	ordered_items = (
 		list ())
 
-	satisfied_projects = (
+	satisfied_items = (
 		set ())
 
-	while unordered_projects:
+	while unordered_items:
 
 		progress = False
 
-		next_unordered_projects = (
+		next_unordered_items = (
 			list ())
 
-		for project in unordered_projects:
+		for item in unordered_items:
 
-			if set (project.get ("depends", [])) \
-				- satisfied_projects:
+			item_depends = (
+				depends_function (
+					item))
 
-				next_unordered_projects.append (
-					project)
+			item_name = (
+				name_function (
+					item))
+
+			if set (item_depends) - satisfied_items:
+
+				next_unordered_items.append (
+					item)
 
 			else:
 
-				ordered_projects.append (
-					project)
+				ordered_items.append (
+					item)
 
-				satisfied_projects.add (
-					project ["name"])
+				satisfied_items.add (
+					item_name)
 
 				progress = True
 
@@ -131,15 +179,16 @@ def order_by_depends (projects):
 			raise Exception (
 				"Circular dependency between: %s" % (
 					", ".join ([
-						project ["name"]
-						for project
-						in unordered_projects
+						name_function (item)
+						for item
+						in unordered_items
 					])))
 
-		unordered_projects = (
-			next_unordered_projects)
+		unordered_items = (
+			next_unordered_items)
 
-	return ordered_projects
+	return return_function (
+		ordered_items)
 
 class FilterModule (object):
 

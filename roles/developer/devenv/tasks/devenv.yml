@@ -132,7 +132,7 @@
 
 - name: "run build steps"
   tags: "build"
-  with_items: "{{ devenv_checkouts | order_by_depends }}"
+  with_items: "{{ devenv_checkouts }}"
   args:
 
     executable: "/bin/bash"

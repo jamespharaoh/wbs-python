@@ -77,10 +77,16 @@ third_parties:
 
 # ---------------------------------------- devenv checkouts
 
+{% set project_details_ordered = project_details | order_by_depends %}
+
 devenv_checkouts:
 
-{% for project_reference in checkout_profiles ['developer_' + developer_profile] %}
-{% set project_detail = project_details [project_reference.name] | default ({}) %}
+{% for project_reference
+  in checkout_profiles ['developer_' + developer_profile] %}
+
+{% set project_detail =
+  project_details_ordered [project_reference.name]
+    | default ({}) %}
 
   - name: {{ project_reference.name | to_json }}
     branch: {{ project_reference.branch | to_json }}
