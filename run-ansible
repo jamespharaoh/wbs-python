@@ -505,6 +505,12 @@ def update_config ():
 				"# ex: et ts=2 filetype=yaml",
 			]) + "\n")
 
+	if not os.path.exists ("group_vars/all"):
+
+		with open ("group_vars/all", "w") as file_handle:
+
+			pass
+
 	time.sleep (0.3)
 
 	if CONFIG ["deployment_mode"] == "vagrant" \
