@@ -219,6 +219,10 @@
 
     lower level module that handles connecting to mongo/postgres
 
+  depends:
+
+    - "wistla-util"
+
   build_steps:
 
     - "npm install"
