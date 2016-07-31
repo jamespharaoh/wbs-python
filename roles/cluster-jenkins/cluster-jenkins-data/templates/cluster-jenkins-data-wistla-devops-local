@@ -63,6 +63,8 @@ deployments:
   'nodejs_version_legacy',
   'short_domain',
   'url_scheme',
+  'v1_enabled',
+  'v2_enabled',
   'web_domain',
   'web_upstream',
 ] %}
