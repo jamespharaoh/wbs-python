@@ -3,6 +3,13 @@
 - name: "deploy projects"
   tags: "quick"
   with_items: "{{ node_load_deploy_projects }}"
+  when: "
+    (
+      'when' not in item
+    ) or (
+      deployment [item.when] == 'yes'
+    )
+  "
   changed_when: "deploy_output.stdout != ''"
   register: "deploy_output"
   delegate_to: "localhost"

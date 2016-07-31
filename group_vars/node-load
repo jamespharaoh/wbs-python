@@ -12,18 +12,21 @@ network_route_localnet:
 node_load_deploy_projects:
 
   - name: "wistla-browser"
+    when: "v1_enabled"
     filters:
 
       - "--include /static"
       - "--exclude /'*'"
 
   - name: "content-api"
+    when: "v1_enabled"
     filters:
 
       - "--include /emails"
       - "--exclude /'*'"
 
   - name: "content-browser"
+    when: "v1_enabled"
     filters:
 
       - "--include /assets"
