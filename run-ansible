@@ -13,8 +13,14 @@ site.addsitedir (
 	"%s/work/lib/python2.7/site-packages" % (
 		project_path))
 
+sys.path.append (
+	"%s/third-party/wbs-python" % (
+		project_path))
+
 python_path = [
 	"%s/work/lib/python2.7/site-packages" % (
+		project_path),
+	"%s/third-party/wbs-python" % (
 		project_path),
 ]
 
@@ -28,6 +34,7 @@ import subprocess
 import threading
 import time
 import yaml
+import wbs
 
 try:
 	import git
@@ -358,6 +365,7 @@ def mount_secrets ():
 def run_playbook (args):
 
 	playbook_path = "playbooks/%s" % args [0]
+
 	if not os.path.exists (args [0]) and os.path.exists (playbook_path):
 		args [0] = playbook_path
 
@@ -464,10 +472,12 @@ def update_config ():
 			os.unlink (
 				"work/inventory/script")
 
-	with open ("work/inventory/generated", "w") as file_handle:
+	if not os.path.exists ("work/inventory/generated"):
 
-		file_handle.write (
-			"localhost ansible_connection=local\n")
+		with open ("work/inventory/generated", "w") as file_handle:
+
+			file_handle.write (
+				"localhost ansible_connection=local\n")
 
 	time.sleep (0.3)
 
@@ -507,9 +517,46 @@ def update_config ():
 
 	auto_newline ()
 
-	run_playbook ([
-		"playbooks/devops.yml",
-	])
+	old_hashes = [ ]
+	has_failed = False
+
+	while True:
+
+		new_hashes = map (
+			wbs.file_hash_sha1,
+			[
+				"config/overrides.yml",
+				"group_vars/all",
+				"work/inventory/generated",
+			]);
+
+		if new_hashes == old_hashes:
+			break
+
+		if has_failed:
+
+			run_playbook ([
+				"playbooks/devops.yml",
+			])
+
+		else:
+
+			try:
+
+				run_playbook ([
+					"playbooks/devops.yml",
+				])
+
+			except:
+
+				has_failed = True
+
+				with open ("work/inventory/generated", "w") as file_handle:
+
+					file_handle.write (
+						"localhost ansible_connection=local\n")
+
+		old_hashes = new_hashes
 
 def fetch_upstream ():
 
