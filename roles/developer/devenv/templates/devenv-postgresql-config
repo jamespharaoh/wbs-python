@@ -25,6 +25,7 @@ log_directory = '/shared/log'
 log_filename = '{{ item.type }}.log'
 log_line_prefix = '%t [%p-%l] %q%u@%d '
 log_timezone = 'UTC'
+log_min_messages = 'NOTICE'
 
 # ----------- statistics
 
