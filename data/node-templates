@@ -32,6 +32,10 @@
   type: "concrete"
   parent: "nodejs-legacy"
 
+- name: "db-daemon"
+  type: "concrete"
+  parent: "nodejs"
+
 - name: "kafka"
   type: "concrete"
   parent: "base"

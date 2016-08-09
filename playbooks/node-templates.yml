@@ -56,6 +56,13 @@
     - "nodejs"
     - "deploy-nodejs-node"
 
+- hosts: "node-db-daemon-template"
+  roles:
+
+    - "node-db-daemon"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
 - hosts: "node-media-template"
   roles:
 

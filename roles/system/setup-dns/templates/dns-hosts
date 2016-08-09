@@ -55,6 +55,8 @@ and (inventory_hostname in groups.vagrant
 			'api',
 			'api2',
 			'browser',
+			'db-daemon',
+			'kafka',
 			'load',
 			'media',
 			'mongo',
@@ -244,6 +246,7 @@ and (inventory_hostname in groups.vagrant
 	{%- elif other_deployment.type == 'shared' -%}
 
 		{%- for node_type in [
+			'kafka',
 			'mongo',
 			'postgresql',
 			'postgresql-cache',
@@ -279,6 +282,7 @@ and (inventory_hostname in groups.vagrant
 	{%- elif other_deployment.type == 'shared2' -%}
 
 		{%- for node_type in [
+			'kafka',
 			'mongo',
 			'postgresql',
 			'postgresql-cache',
@@ -317,6 +321,8 @@ and (inventory_hostname in groups.vagrant
 			'api',
 			'api2',
 			'browser',
+			'db-daemon',
+			'kafka',
 			'load',
 			'media',
 			'mongo',
@@ -379,6 +385,8 @@ and (inventory_hostname in groups.vagrant
 		{%- for node_type in [
 			'api2',
 			'browser',
+			'db-daemon',
+			'kafka',
 			'load',
 			'media',
 			'mongo',

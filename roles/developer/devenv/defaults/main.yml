@@ -6,6 +6,7 @@ devenv_config_directories:
   - "config/api"
   - "config/api2"
   - "config/browser"
+  - "config/db-daemon"
   - "config/kafka"
   - "config/load"
   - "config/media"
@@ -59,6 +60,16 @@ devenv_config_templates:
 
   - template: "devenv-wistla-api2-environment"
     type: "api2"
+    target: "environment"
+
+  # ---------- db-daemon
+
+  - template: "devenv-wistla-api2-server-config"
+    type: "db-daemon"
+    target: "wistla-db-daemon-local.yaml"
+
+  - template: "devenv-wistla-db-daemon-environment"
+    type: "db-daemon"
     target: "environment"
 
   # ---------- media
@@ -167,6 +178,9 @@ devenv_config_links:
   - dest: "wistla-api-server/config/local.yaml"
     src: "../../config/api2/wistla-api-server-local.yaml"
 
+  - dest: "wistla-db-daemon/config/local.yaml"
+    src: "../../config/db-daemon/wistla-db-daemon-local.yaml"
+
   - dest: "wistla-media-daemon/config/local.yaml"
     src: "../../config/media/wistla-media-daemon-local.yaml"
 
@@ -222,6 +236,9 @@ devenv_shared_logfiles:
     user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-api-server.log"
+    user: "{{ deployment_user }}"
+
+  - log: "shared/log/wistla-db-daemon.log"
     user: "{{ deployment_user }}"
 
   - log: "shared/log/wistla-media-daemon.log"

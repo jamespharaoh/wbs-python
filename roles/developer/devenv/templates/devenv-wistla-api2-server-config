@@ -31,6 +31,10 @@
 {% endif %}
 {% endif %}
 {% endfor %}
+    kafka:
+      client_id: "db-audit-log"
+      urls:
+        - {{ [ deployment_name, '-kafka-', kafka_host.node_index, ] | join }}
 
 # @wistla/api-server
   # logger information

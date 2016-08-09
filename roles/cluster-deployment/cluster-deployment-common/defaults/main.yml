@@ -296,6 +296,7 @@ cluster_deployment_types:
 
       - "api2"
       - "browser"
+      - "db-daemon"
       - "load"
       - "media"
       - "notifications"
@@ -354,6 +355,14 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-api2-environment"
         target: "config/api2/environment"
+
+      # db-daemon
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/db-daemon/wistla-db-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-db-daemon-environment"
+        target: "config/db-daemon/environment"
 
       # media
 
@@ -649,6 +658,7 @@ cluster_deployment_types:
 
       - "api2"
       - "browser"
+      - "db-daemon"
       - "kafka"
       - "load"
       - "media"
@@ -693,6 +703,14 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-api2-environment"
         target: "config/api2/environment"
+
+      # db-daemon
+
+      - template: "cluster-deployment-wistla-api2-server-config"
+        target: "config/db-daemon/wistla-db-daemon-local.yaml"
+
+      - template: "cluster-deployment-wistla-db-daemon-environment"
+        target: "config/db-daemon/environment"
 
       # media
 
@@ -813,6 +831,9 @@ cluster_deployment_types:
         user: "ubuntu"
 
       - log: "shared/log/wistla-api-server.log"
+        user: "ubuntu"
+
+      - log: "shared/log/wistla-db-daemon.log"
         user: "ubuntu"
 
       - log: "shared/log/wistla-media-daemon.log"

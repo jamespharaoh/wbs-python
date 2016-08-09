@@ -30,6 +30,14 @@
         - {{ ['amqp://', cluster_deployment.rabbit_api_user, ':', cluster_deployment.rabbit_api_password, '@', cluster_deployment_alias.name, '-rabbit-', zone, '-', instance, ] | join }}
 {%  endfor %}
 {%  endfor %}
+    kafka:
+      client_id: "db-audit-log"
+      urls:
+{%  for zone in data_zones %}
+{%  for instance in data_indices %}
+        - {{ [ cluster_deployment_alias.name, '-kafka-', zone, '-', instance, ] | join }}
+{%  endfor %}
+{%  endfor %}
 
 # @wistla/api-server
   # logger information
