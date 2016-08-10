@@ -27,7 +27,7 @@ log_line_prefix = '%t [%p-%l] %q%u@%d '
 log_timezone = 'UTC'
 log_min_messages = 'NOTICE'
 log_min_error_statement = 'ERROR'
-log_duration = 'on'
+log_min_duration_statement = 500
 log_error_verbosity = 'TERSE'
 
 
