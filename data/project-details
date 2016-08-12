@@ -231,6 +231,7 @@
     - "wistla-db"
     - "wistla-raml-api"
     - "wistla-raml-to-api"
+    - "wistla-util"
 
   build_steps:
 
