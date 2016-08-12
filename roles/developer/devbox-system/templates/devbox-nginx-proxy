@@ -46,6 +46,7 @@ server {
 
 }
 
+{#
 # ==================== python
 
 proxy_cache_path /var/cache/nginx/pypi levels=1:2 keys_zone=pypi:16m inactive=1y max_size=4G;
@@ -91,3 +92,4 @@ server {
 	}
 
 }
+#}
