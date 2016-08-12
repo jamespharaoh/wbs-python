@@ -15,8 +15,8 @@
 deployment_name: "{{ deployment_name | default (deployment) | default ('dev') }}"
 deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
 
-deployment_user: "{{ deployment_path | default ('vagrant') }}"
-deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
+deployment_user: "{{ deployment_user | default ('vagrant') }}"
+deployment_home: "{{ deployment_home | default ('/home/vagrant') }}"
 
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"
