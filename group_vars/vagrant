@@ -177,6 +177,9 @@ ubuntu_system_packages:
   - name: "zbackup"
     state: "present"
 
+  - name: "zookeeperd"
+    state: "present"
+
 nodejs_packages:
 
   - name: "bunyan"
