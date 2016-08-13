@@ -32,7 +32,7 @@ else:
 if command_name in [
 	"build",
 	"fetch",
-	"merge",
+	"integrate",
 	"pull",
 	"push",
 	"update",
@@ -64,10 +64,10 @@ else:
 			"",
 			"Syntax:",
 			"",
-			"  {name} pull   Pull remote changes down from server",
-			"  {name} build  Build third party libraries",
-			"  {name} merge  Merge third party libraries",
-			"  {name} push   Push local changes up to server",
+			"  {name} build      Build third party libraries",
+			"  {name} integrate  Integrate third party code into main tree",
+			"  {name} pull       Pull remote changes down from server",
+			"  {name} push       Push local changes up to server",
 			"",
 		])
 

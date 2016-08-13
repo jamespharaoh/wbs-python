@@ -33,7 +33,7 @@ def build (* names):
 	third_party_setup.load ()
 	third_party_setup.build (* names)
 
-def fetch ():
+def fetch (* names):
 
 	third_party_setup = (
 		ThirdPartySetup ())
@@ -41,13 +41,13 @@ def fetch ():
 	third_party_setup.load ()
 	third_party_setup.fetch (* names)
 
-def merge ():
+def integrate (* names):
 
 	third_party_setup = (
 		ThirdPartySetup ())
 
 	third_party_setup.load ()
-	third_party_setup.merge (* names)
+	third_party_setup.integrate (* names)
 
 def pull (* names):
 
@@ -210,15 +210,15 @@ class ThirdPartySetup (object):
 
 			self.unstash_changes ()
 
-	def merge (self, * names):
+	def integrate (self, * names):
 
 		log.notice (
-			"About to merge third party libraries")
+			"About to integrate third party libraries")
 
 		try:
 
 			self.stash_changes ()
-			self.merge_libraries (* names)
+			self.integrate_libraries (* names)
 
 			log.notice (
 				"All done")
@@ -782,9 +782,9 @@ class ThirdPartySetup (object):
 				"Built %s remotes" % (
 					num_built))
 
-	def merge_libraries (self, * names):
+	def integrate_libraries (self, * names):
 
-		num_merged = 0
+		num_integrated = 0
 		num_failed = 0
 
 		for library_name, library_data \
@@ -793,7 +793,7 @@ class ThirdPartySetup (object):
 			if names and library_name not in names:
 				continue
 
-			if not "merge" in library_data:
+			if not "integrate" in library_data:
 				continue
 
 			library_path = (
@@ -803,36 +803,36 @@ class ThirdPartySetup (object):
 
 			try:
 
-				for library_merge in library_data ["merge"]:
+				for library_integrate in library_data ["integrate"]:
 
 					with log.status (
-						"Merging library: %s (%s -> %s)" % (
+						"Integrating library: %s (%s -> %s)" % (
 							library_name,
-							library_merge ["source"],
-							library_merge ["target"])):
+							library_integrate ["source"],
+							library_integrate ["target"])):
 
-						unmerged_path = (
-							".merged/%s" % (
-								library_merge ["target"]))
+						unintegrated_path = (
+							".integated/%s" % (
+								library_integrate ["target"]))
 
 						if os.path.exists (
 							"%s/%s" % (
 								self.project_path,
-								unmerged_path)):
+								unintegrated_path)):
 
-							unmerged_tree = (
+							unintegrated_tree = (
 								self.git_repo.head.commit.tree [
-									unmerged_path])
+									unintegrated_path])
 
 						else:
 
-							unmerged_tree = (
+							unintegrated_tree = (
 								self.git_repo.tree (
 									"4b825dc642cb6eb9a060e54bf8d69288fbee4904"))
 
 						target_path = (
 							"%s" % (
-								library_merge ["target"] [1:]))
+								library_integrate ["target"] [1:]))
 
 						if os.path.exists (
 							"%s/%s" % (
@@ -852,7 +852,7 @@ class ThirdPartySetup (object):
 						source_path = (
 							"third-party/%s%s" % (
 								library_name,
-								library_merge ["source"]))
+								library_integrate ["source"]))
 
 						source_tree = (
 							self.git_repo.head.commit.tree [
@@ -877,20 +877,20 @@ class ThirdPartySetup (object):
 						includes = set (map (
 							lambda include: "third-party/%s%s%s" % (
 								library_name,
-								library_merge ["source"],
+								library_integrate ["source"],
 								include),
 							[
 								item2
-								for item1 in library_merge.get ("include", [])
+								for item1 in library_integrate.get ("include", [])
 								for item2 in expand_parents (item1)
 							]))
 
 						excludes = set (map (
 							lambda exclude: "third-party/%s%s%s" % (
 								library_name,
-								library_merge ["source"],
+								library_integrate ["source"],
 								exclude),
-							library_merge.get ("exclude", [])))
+							library_integrate.get ("exclude", [])))
 
 						if includes or excludes:
 
@@ -915,7 +915,7 @@ class ThirdPartySetup (object):
 							source_prune_length = len (
 								"third-party/%s%s/" % (
 									library_name,
-									library_merge ["source"]))
+									library_integrate ["source"]))
 
 							for item in source_tree.traverse (
 									predicate = lambda i, d: True,
@@ -932,18 +932,18 @@ class ThirdPartySetup (object):
 							source_tree = (
 								source_index.write_tree ())
 
-						merged_index = (
+						integrated_index = (
 							git.IndexFile.from_tree (
 								self.git_repo,
-								unmerged_tree,
+								unintegrated_tree,
 								target_tree,
 								source_tree))
 
-						merged_tree = (
-							merged_index.write_tree ())
+						integrated_tree = (
+							integrated_index.write_tree ())
 
 						log.notice (
-							"MERGED TREE: " + unicode (merged_tree))
+							"INTEGRATED TREE: " + unicode (integrated_tree))
 
 						if os.path.exists (
 							"%s/%s" % (
@@ -956,14 +956,14 @@ class ThirdPartySetup (object):
 								target_path)
 
 						self.git_repo.git.read_tree (
-							unicode (merged_tree),
+							unicode (integrated_tree),
 							"--prefix",
 							target_path)
 
 						self.git_repo.git.read_tree (
 							unicode (source_tree),
 							"--prefix",
-							unmerged_path)
+							unintegrated_path)
 
 						log.notice (
 							"INDEX TREE: " + unicode (
@@ -972,15 +972,15 @@ class ThirdPartySetup (object):
 				if len (self.git_repo.index.diff ()):
 
 					self.git_repo.index.commit (
-						"Auto-merge changes from %s" % (
+						"Auto-integrate changes from %s" % (
 							library_name))
 
-					num_merged += 1
+					num_integrated += 1
 
 			except subprocess.CalledProcessError as error:
 
 				log.notice (
-					"Merge failed!")
+					"Integrate failed!")
 
 				log.output (
 					error.output)
@@ -990,14 +990,14 @@ class ThirdPartySetup (object):
 		if num_failed:
 
 			log.notice (
-				"Merged %s libraries with %s failures" % (
-					num_merged,
+				"Integrated %s libraries with %s failures" % (
+					num_integrated,
 					num_failed))
 
-		elif num_merged:
+		elif num_integrated:
 
 			log.notice (
-				"Merged %s libraries" % (
-					num_merged))
+				"Integrated %s libraries" % (
+					num_integrated))
 
 # ex: noet ts=4 filetype=python
