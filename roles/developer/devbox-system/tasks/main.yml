@@ -1,5 +1,8 @@
 ---
 
+- include: "devbox-squid.yml"
+  tags: "devbox-squid"
+
 - include: "devbox-nginx.yml"
   tags: "devbox-nginx"
 
