@@ -25,19 +25,15 @@ class TestUtils(TestBase):
     def _cmp_contents(self, file_path, data):
         # raise if data from file at file_path
         # does not match data string
-        fp = open(file_path, "rb")
-        try:
+        with open(file_path, "rb") as fp:
             assert fp.read() == data.encode("ascii")
-        finally:
-            fp.close()
 
     def test_lockedfd(self):
         my_file = tempfile.mktemp()
         orig_data = "hello"
         new_data = "world"
-        my_file_fp = open(my_file, "wb")
-        my_file_fp.write(orig_data.encode("ascii"))
-        my_file_fp.close()
+        with open(my_file, "wb") as my_file_fp:
+            my_file_fp.write(orig_data.encode("ascii"))
 
         try:
             lfd = LockedFD(my_file)
@@ -60,7 +56,7 @@ class TestUtils(TestBase):
             self._cmp_contents(my_file, orig_data)
             assert not os.path.isfile(lockfilepath)
 
-            # additional call doesnt fail
+            # additional call doesn't fail
             lfd.commit()
             lfd.rollback()
 
