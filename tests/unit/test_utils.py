@@ -593,6 +593,36 @@ class TestFixS3Host(unittest.TestCase):
         # a request for GetBucketLocation.
         self.assertEqual(request.url, original_url)
 
+    def test_can_provide_default_endpoint_url(self):
+        request = AWSRequest(
+            method='PUT', headers={},
+            url='https://s3-us-west-2.amazonaws.com/bucket/key.txt'
+        )
+        region_name = 'us-west-2'
+        signature_version = 's3'
+        fix_s3_host(
+            request=request, signature_version=signature_version,
+            region_name=region_name,
+            default_endpoint_url='foo.s3.amazonaws.com')
+        self.assertEqual(request.url,
+                         'https://bucket.foo.s3.amazonaws.com/key.txt')
+
+    def test_no_endpoint_url_uses_request_url(self):
+        request = AWSRequest(
+            method='PUT', headers={},
+            url='https://s3-us-west-2.amazonaws.com/bucket/key.txt'
+        )
+        region_name = 'us-west-2'
+        signature_version = 's3'
+        fix_s3_host(
+            request=request, signature_version=signature_version,
+            region_name=region_name,
+            # A value of None means use the url in the current request.
+            default_endpoint_url=None,
+        )
+        self.assertEqual(request.url,
+                         'https://bucket.s3-us-west-2.amazonaws.com/key.txt')
+
 
 class TestSwitchToVirtualHostStyle(unittest.TestCase):
     def test_switch_to_virtual_host_style(self):
@@ -1000,6 +1030,15 @@ class TestS3RegionRedirector(unittest.TestCase):
         self.assertEqual(
             params['url'], 'https://us-west-2.amazonaws.com/foo')
 
+    def test_set_request_url_keeps_old_scheme(self):
+        params = {'url': 'http://us-west-2.amazonaws.com/foo'}
+        context = {'signing': {
+            'endpoint': 'https://eu-central-1.amazonaws.com'
+        }}
+        self.redirector.set_request_url(params, context)
+        self.assertEqual(
+            params['url'], 'http://eu-central-1.amazonaws.com/foo')
+
     def test_sets_signing_context_from_cache(self):
         signing_context = {'endpoint': 'bar'}
         self.cache['foo'] = signing_context
@@ -1190,7 +1229,7 @@ class TestContainerMetadataFetcher(unittest.TestCase):
     def fake_response(self, status_code, body):
         response = mock.Mock()
         response.status_code = status_code
-        response.content = body
+        response.text = body
         return response
 
     def set_http_responses_to(self, *responses):
