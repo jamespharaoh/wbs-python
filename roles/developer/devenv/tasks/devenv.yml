@@ -169,6 +169,7 @@
     state: "directory"
 
 - name: "create config directories"
+  tags: "config"
   with_items: "{{ devenv_config_directories }}"
   action:
 
@@ -190,6 +191,7 @@
     mode: "0640"
 
 - name: "create config files"
+  tags: "config"
   with_items: "{{ devenv_config_templates }}"
   become: "yes"
   action:
@@ -203,6 +205,7 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "stat override config files"
+  tags: "config"
   with_items: "{{ devenv_override_templates }}"
   register: "devenv_stat_override_templates_result"
   action:
@@ -211,6 +214,7 @@
     path: "{{ deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
+  tags: "config"
   with_indexed_items: "{{ devenv_override_templates }}"
   when: "not devenv_stat_override_templates_result.results [item.0].stat.exists"
   action:
@@ -220,6 +224,7 @@
     src: "{{ item.1.template }}"
 
 - name: "copy config files"
+  tags: "config"
   with_items: "{{ devenv_config_files }}"
   action:
 
@@ -229,6 +234,7 @@
     mode: "0644"
 
 - name: "copy config secrets"
+  tags: "config"
   with_items: "{{ devenv_config_secrets }}"
   when: "deployment_mode == 'vagrant' and 'dev' in secrets"
   action:
@@ -240,6 +246,7 @@
     mode: "0600"
 
 - name: "create links to config files"
+  tags: "config"
   with_items: "{{ devenv_config_links }}"
   when: "deployment_mode == 'vagrant' or item.legacy | default ('no') == 'no'"
   action:
@@ -251,6 +258,7 @@
     force: "yes"
 
 - name: "create deployment name link"
+  tags: "config"
   when: "deployment_mode == 'vagrant'"
   action:
 

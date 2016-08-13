@@ -91,6 +91,12 @@ devenv_config_templates:
     type: "browser"
     target: "environment"
 
+  # ---------- kafka
+
+  - template: "devenv-kafka-server-properties"
+    type: "kafka"
+    target: "server.properties"
+
   # ---------- load
 
   - template: "devenv-wistla-load-nginx-config"
