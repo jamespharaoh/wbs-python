@@ -2,6 +2,87 @@
 CHANGELOG
 =========
 
+1.10.55
+=======
+
+* feature:``s3``: Add support for dualstack configuration
+* feature:``ecs``: Update ecs command to latest version
+* feature:``autoscaling``: Update autoscaling command to latest version
+* feature:``elbv2``: Update elbv2 command to latest version
+* feature:``kms``: Update kms command to latest version
+* feature:``kinesisanalytics``: Update kinesisanalytics command to latest version
+* feature:``snowball``: Update snowball command to latest version
+* feature:``elb``: Update elb command to latest version
+
+
+1.10.54
+=======
+
+* feature:``ecr``: Update ecr command to latest version
+* feature:``cloudfront``: Update cloudfront command to latest version
+* feature:``marketplacecommerceanalytics``: Update marketplacecommerceanalytics command to latest version
+
+
+1.10.53
+=======
+
+* feature:``lambda``: Update lambda command to latest version
+* feature:``gamelift``: Update gamelift command to latest version
+* feature:``rds``: Update rds command to latest version
+
+
+1.10.52
+=======
+
+* feature:``rds``: Update rds command to latest version
+* feature:``route53domains``: Update route53domains command to latest version
+* feature:``cloudwatch``: Update cloudwatch command to latest version
+* feature:``machinelearning``: Update machinelearning command to latest version
+* feature:``meteringmarketplace``: Update meteringmarketplace command to latest version
+* feature:``iot``: Update iot command to latest version
+* feature:``application-autoscaling``: Update application-autoscaling command to latest version
+* feature:``emr``: Update emr command to latest version
+* feature:``ds``: Update ds command to latest version
+* feature:``logs``: Update logs command to latest version
+
+
+1.10.51
+=======
+
+* feature:``sts``: Update sts command to latest version
+* feature:``ds``: Update ds command to latest version
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``es``: Update es command to latest version
+* feature:``apigateway``: Update apigateway command to latest version
+* feature:``cognito-idp``: Update cognito-idp command to latest version
+* feature:``ses``: Update ses command to latest version
+
+
+1.10.50
+=======
+
+* feature:``iot``: Update iot command to latest version
+* feature:``s3``: Update s3 command to latest version
+
+
+1.10.49
+=======
+
+* feature:``cloudformation``: Update cloudformation command to latest version
+* feature:``elastictranscoder``: Update elastictranscoder command to latest version
+* feature:``config``: Update config command to latest version
+* feature:``application-autoscaling``: Update application-autoscaling command to latest version
+* feature:``acm``: Update acm command to latest version
+
+
+1.10.48
+=======
+
+* feature:``devicefarm``: Update devicefarm command to latest version
+* feature:``ssm``: Update ssm command to latest version
+* bugfix:emr: Fixes a bug in exception handling which was causing create-default-roles to break.
+
+
 1.10.47
 =======
 
