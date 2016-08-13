@@ -33,7 +33,20 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
-- name: "create wistla icinga configuration"
+- name: "create wistla icinga configuration files"
+  with_items: "{{ wistla_icinga_master_config_files }}"
+  notify: "set icinga.needs_restart to 'yes'"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "{{ item.target }}"
+    src: "{{ item.source }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "create wistla icinga configuration templates"
   with_items: "{{ wistla_icinga_master_config_templates }}"
   notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
