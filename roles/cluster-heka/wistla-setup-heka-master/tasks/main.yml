@@ -3,7 +3,10 @@
 - include: "wistla-setup-heka-master.yml"
   tags:
 
-    - "heka"
     - "wistla-setup-heka-master"
+    - "wistla-setup-heka"
+
+    - "heka-master"
+    - "heka"
 
 # ex: et ts=2 filetype=yaml
