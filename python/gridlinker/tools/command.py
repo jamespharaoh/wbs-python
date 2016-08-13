@@ -65,7 +65,10 @@ class GenericCommand:
 
 		# determine name
 
-		unique_name = self.helper.create_unique_name (context, args)
+		unique_name = (
+			self.helper.create_unique_name (
+				context,
+				args))
 
 		if collection.exists_slow (unique_name):
 
@@ -99,12 +102,16 @@ class GenericCommand:
 
 			temp_file = tempfile.NamedTemporaryFile ()
 
-			record_yaml = collection.to_yaml (record_data)
+			record_yaml = (
+				collection.to_yaml (
+					record_data))
 
 			temp_file.write (record_yaml)
 			temp_file.flush ()
 
-			os.system ("%s %s" % (os.environ ["EDITOR"], temp_file.name))
+			os.system (
+				"%s %s" % (os.environ ["EDITOR"],
+				temp_file.name))
 
 			temp_again = open (temp_file.name, "r")
 			record_yaml = temp_again.read ()
@@ -284,15 +291,25 @@ class GenericCommand:
 
 		for unique_name, record_data in filtered_records:
 
-			self.helper.update_record (context, args, record_data)
+			self.helper.update_record (
+				context,
+				args,
+				record_data)
 
-			collection.set (record_name, record_data)
+			collection.set (
+				unique_name,
+				record_data)
 
-			self.helper.update_files (context, args, unique_name, collection)
+			self.helper.update_files (
+				context,
+				args,
+				unique_name,
+				collection)
 
-			print ("Updated %s %s" % (
-				self.helper.name,
-				record_name))
+			print (
+				"Updated %s %s" % (
+					self.helper.name,
+					unique_name))
 
 	def args_edit (self, sub_parsers):
 
@@ -476,4 +493,4 @@ class CommandHelper:
 
 		return True
 
-# ex: noet ts=4 filetype=yaml
+# ex: noet ts=4 filetype=python
