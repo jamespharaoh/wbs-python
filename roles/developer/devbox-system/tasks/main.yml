@@ -12,8 +12,8 @@
 - include: "devbox-system.yml"
   tags: "devbox-system"
 
-- include: "devbox-btrfs.yml"
-  tags: "devbox-btrfs"
+- include: "devbox-fstab.yml"
+  tags: "devbox-fstab"
 
 - include: "devbox-network.yml"
   tags: "devbox-network"

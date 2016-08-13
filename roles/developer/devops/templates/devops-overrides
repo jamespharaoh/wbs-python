@@ -137,6 +137,16 @@ github_username: "{{ github_username | default ('') }}"
 github_access_token: "{{ github_access_token | default ('') }}"
 
 #
+# devbox specifics
+#
+# various low-level customisations for the devbox itself
+#
+
+devbox_root_device: "{{ devbox_root_device | default ('/dev/sda1') }}"
+devbox_lxc_device: "{{ devbox_lxc_device | default ('/btrfs-image') }}"
+devbox_swap_device: "{{ devbox_swap_device | default ('') }}"
+
+#
 # package repository urls
 #
 # change these to a local mirror for faster deployments.
