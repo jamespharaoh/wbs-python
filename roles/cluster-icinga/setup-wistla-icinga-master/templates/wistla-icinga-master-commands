@@ -19,6 +19,7 @@ object NotificationCommand "mail-host-notification" {
 		NOTIFICATIONAUTHORNAME = "$notification.author$"
 		NOTIFICATIONCOMMENT = "$notification.comment$"
 		HOSTDISPLAYNAME = "$host.display_name$"
+		FROMEMAIL = "icinga@ops.wistla.com"
 		USEREMAIL = "$user.email$"
 	}
 
@@ -45,6 +46,7 @@ object NotificationCommand "mail-service-notification" {
 		NOTIFICATIONCOMMENT = "$notification.comment$"
 		HOSTDISPLAYNAME = "$host.display_name$"
 		SERVICEDISPLAYNAME = "$service.display_name$"
+		FROMEMAIL = "icinga@ops.wistla.com"
 		USEREMAIL = "$user.email$"
 	}
 

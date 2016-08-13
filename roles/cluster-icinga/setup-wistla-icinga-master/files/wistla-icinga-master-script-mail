@@ -88,6 +88,7 @@ def main (
 			variables))
 
 	send_email (
+		variables ["FROMEMAIL"],
 		variables ["USEREMAIL"],
 		email_message)
 
@@ -123,7 +124,7 @@ def create_email (
 
 	email_message.add_header (
 		"From",
-		"{{ icinga_email_from }}")
+		variables ["FROMEMAIL"])
 
 	email_message.add_header (
 		"To",
@@ -155,6 +156,7 @@ def create_email (
 	return email_message
 
 def send_email (
+		from_address,
 		to_address,
 		email_message):
 
@@ -163,7 +165,7 @@ def send_email (
 			"localhost"))
 
 	smtp_server.sendmail (
-		"{{ icinga_email_from }}",
+		from_address,
 		[ to_address ],
 		email_message.as_string ())
 
