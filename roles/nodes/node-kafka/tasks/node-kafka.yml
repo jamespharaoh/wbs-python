@@ -4,7 +4,7 @@
   delegate_to: "localhost"
   args:
 
-    creates: "/etc/java-flag-openjdk-7"
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/etc/java-flag-openjdk-7"
     executable: "/bin/bash"
 
   become: "yes"
@@ -19,7 +19,7 @@
     chroot "$rootfs"
     apt-get install --yes openjdk-7-jdk;
 
-    touch "/etc/java-flag-openjdk-7";
+    touch "$rootfs/etc/java-flag-openjdk-7";
 
 - name: "install kafka"
   args:

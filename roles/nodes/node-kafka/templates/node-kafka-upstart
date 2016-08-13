@@ -1,0 +1,27 @@
+{{ ansible_warning ['#'] }}
+
+description "kafka"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit unlimited
+
+env HOME=/var/lib/kafka
+env JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+script
+
+	cd /opt/kafka-{{ kafka_version }}
+
+	exec > /shared/log/kafka.log 2>&1
+
+	exec \
+	setuid kafka \
+	bin/kafka-server-start.sh \
+	/config/server.properties
+
+end script
+
+post-stop exec sleep 2

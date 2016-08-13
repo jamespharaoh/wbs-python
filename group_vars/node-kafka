@@ -1,5 +1,13 @@
 ---
 
+data_dirs:
+
+  - name: "kafka-data"
+    path: "var/lib/kafka"
+    owner: "kafka"
+    group: "kafka"
+    mode: "0755"
+
 kafka_version: "{{ deployment.kafka_version }}"
 
 # ex: et ts=2 filetype=yaml
