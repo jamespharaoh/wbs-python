@@ -18,4 +18,10 @@
   home: "/var/lib/postgresql"
   shell: "/bin/bash"
 
+- name: "kafka"
+  uid: "203"
+  gid: "203"
+  home: "/var/lib/kafka"
+  shell: "/bin/bash"
+
 # ex: et ts=2 filetype=yaml
