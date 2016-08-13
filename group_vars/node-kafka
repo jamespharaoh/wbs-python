@@ -1,5 +1,5 @@
 ---
 
-{}
+kafka_version: "{{ deployment.kafka_version }}"
 
 # ex: et ts=2 filetype=yaml

@@ -1,0 +1,3 @@
+dataDir = /var/lib/kafka
+clientPort = 2181
+maxClientCnxns = 0
