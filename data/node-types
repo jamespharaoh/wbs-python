@@ -6,14 +6,17 @@
 - name: "api2"
   template: "api2"
 
+- name: "db-daemon"
+  template: "db-daemon"
+
 - name: "browser"
   template: "browser"
 
-- name: "kafka"
-  template: "kafka"
-
 - name: "load"
   template: "load"
+
+- name: "kafka"
+  template: "kafka"
 
 - name: "media"
   template: "media"
