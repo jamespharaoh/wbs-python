@@ -1,6 +1,6 @@
 ---
 
-# @wistla/db configurationit-
+# @wistla/db configuration
   db:
 
     pg:
@@ -34,7 +34,7 @@
     kafka:
       client_id: "db-audit-log"
       urls:
-        - {{ [ deployment_name, '-kafka-', kafka_host.node_index, ] | join }}
+        - {{ deployment_name }}-kafka-0
 
 # @wistla/api-server
   # logger information
