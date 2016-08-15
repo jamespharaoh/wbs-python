@@ -168,7 +168,7 @@ http {
 		}
 
 		location / {
-			proxy_pass {{ cluster_deployment.web_upstream }}$uri;
+			proxy_pass {{ cluster_deployment.web_upstream }}$request_uri;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
