@@ -1,0 +1,12 @@
+---
+
+- name: "run build steps"
+  with_items: "{{ devenv_checkouts }}"
+  args:
+
+    executable: "/bin/bash"
+    chdir: "{{ deployment_home }}/{{ item.name }}"
+
+  shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
+
+# ex: et ts=2 filetype=yaml
