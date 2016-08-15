@@ -545,6 +545,8 @@ def update_config ():
 				"playbooks/devops.yml",
 			])
 
+			old_hashes = new_hashes
+
 		else:
 
 			try:
@@ -552,6 +554,8 @@ def update_config ():
 				run_playbook ([
 					"playbooks/devops.yml",
 				])
+
+				old_hashes = new_hashes
 
 			except:
 
@@ -562,7 +566,7 @@ def update_config ():
 					file_handle.write (
 						"localhost ansible_connection=local\n")
 
-		old_hashes = new_hashes
+				old_hashes = [ ]
 
 def fetch_upstream ():
 
