@@ -265,6 +265,8 @@ wistla_dist_url: "{{ dev_wistla_dist_url }}"
 nodejs_version: "6.3.0"
 nodejs_version_legacy: "5.6.0"
 
+nodejs_npm_registry: "http://localhost:8081"
+
 nginx_version: "1.9.14"
 
 # ex: et ts=2 filetype=yaml
