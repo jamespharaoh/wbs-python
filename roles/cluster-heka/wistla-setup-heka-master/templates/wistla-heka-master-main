@@ -137,7 +137,10 @@ message_matcher = '{{ [
 	'Payload =~ / %% CONTAINER-PROCESS-CONTROL %% (START|STOP) %% /',
 ] | join (' && ') }}'
 send_from = "heka@{{ cluster.super_domain }}"
-send_to = [ "notifications.production.warning@wistla.com" ]
+send_to = [
+	"notifications.production.warning@wistla.com",
+	"support@wistla.zendesk.com",
+]
 subject = "Wistla API restart notifications"
 send_interval = 60
 encoder = "encoder-simple"
@@ -153,7 +156,10 @@ message_matcher = '{{ [
 	'Payload =~ /[{,]"level":[6-9][0-9][},]/',
 ] | join (' && ') }}'
 send_from = "heka@{{ cluster.super_domain }}"
-send_to = [ "notifications.production.warning@wistla.com" ]
+send_to = [
+	"notifications.production.warning@wistla.com",
+	"support@wistla.zendesk.com",
+]
 subject = "Wistla fatal logging notifications"
 send_interval = 60
 encoder = "encoder-simple"

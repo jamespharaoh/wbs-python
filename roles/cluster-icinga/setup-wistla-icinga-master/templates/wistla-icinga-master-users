@@ -14,8 +14,26 @@ object User "shared-warning" {
 
 	email = "notifications.production.warning@wistla.com"
 
-	states = [ Warning, Critical, Unknown ]
-	types = [ Problem, Recovery ]
+	states = [
+		OK,
+		Warning,
+		Critical,
+		Unknown,
+		Up,
+		Down,
+	]
+
+	types = [
+		DowntimeStart,
+		DowntimeEnd,
+		DowntimeRemoved,
+		Custom,
+		Acknowledgement,
+		Problem,
+		Recovery,
+	]
+
+	period = "24x7"
 
 }
 
@@ -29,7 +47,52 @@ object User "shared-critical" {
 
 	email = "notifications.production.critical@wistla.com"
 
-	states = [ Critical ]
-	types = [ Problem, Recovery ]
+	states = [
+		Critical,
+		Down,
+	]
+
+	types = [
+		Custom,
+		Problem,
+		Recovery,
+	]
+
+	period = "24x7"
 
 }
+
+object User "zendesk" {
+
+	import "generic-user"
+
+	display_name = "Zendesk"
+
+	groups = [ "shared" ]
+
+	email = "support@wistla.zendesk.com"
+
+	states = [
+		OK,
+		Warning,
+		Critical,
+		Unknown,
+		Up,
+		Down,
+	]
+
+	types = [
+		DowntimeStart,
+		DowntimeEnd,
+		DowntimeRemoved,
+		Custom,
+		Acknowledgement,
+		Problem,
+		Recovery,
+	]
+
+	period = "24x7"
+
+}
+
+# ex: noet ts=4

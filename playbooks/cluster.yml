@@ -5,5 +5,6 @@
 - include: "cluster-hosts.yml"
 - include: "cluster-deployments-setup.yml"
 - include: "cluster-deployments-templates.yml"
+- include: "cluster-icinga.yml"
 
 # ex: et ts=2 filetype=yaml

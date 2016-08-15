@@ -1,6 +1,9 @@
 ---
 
-- debug:
-    msg: "TODO"
+- include: "node-kafka.yml"
+  tags:
+
+    - "node-kafka"
+    - "node"
 
 # ex: et ts=2 filetype=yaml

@@ -149,6 +149,14 @@ wistla_icinga_master_config_templates:
     group: "root"
     mode: "0644"
 
+wistla_icinga_master_config_files:
+
+  - target: "/etc/icinga2/scripts/mail"
+    source: "wistla-icinga-master-script-mail"
+    user: "root"
+    group: "root"
+    mode: "0755"
+
 wistla_icinga_master_config_links:
 
   - link: "{{ icinga_core_target }}/etc"

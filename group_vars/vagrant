@@ -2,8 +2,8 @@
 
 ansible_connection: "local"
 
-vagrant_user: "vagrant"
-vagrant_home: "/home/vagrant"
+vagrant_user: "{{ deployment_user }}"
+vagrant_home: "{{ deployment_home }}"
 
 devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
 
@@ -175,6 +175,9 @@ ubuntu_system_packages:
     state: "present"
 
   - name: "zbackup"
+    state: "present"
+
+  - name: "zookeeperd"
     state: "present"
 
 nodejs_packages:

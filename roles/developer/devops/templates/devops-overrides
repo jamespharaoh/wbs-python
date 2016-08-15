@@ -15,8 +15,8 @@
 deployment_name: "{{ deployment_name | default (deployment) | default ('dev') }}"
 deployment_mode: "{{ deployment_mode | default ('vagrant') }}"
 
-deployment_user: "{{ deployment_path | default ('vagrant') }}"
-deployment_home: "{{ deployment_path | default ('/home/vagrant') }}"
+deployment_user: "{{ deployment_user | default ('vagrant') }}"
+deployment_home: "{{ deployment_home | default ('/home/vagrant') }}"
 
 developer_name: "{{ developer_name | default ('') }}"
 developer_email: "{{ developer_email | default ('') }}"
@@ -138,6 +138,16 @@ ssh_host_keys_extra: []
 
 github_username: "{{ github_username | default ('') }}"
 github_access_token: "{{ github_access_token | default ('') }}"
+
+#
+# devbox specifics
+#
+# various low-level customisations for the devbox itself
+#
+
+devbox_root_device: "{{ devbox_root_device | default ('/dev/sda1') }}"
+devbox_lxc_device: "{{ devbox_lxc_device | default ('/btrfs-image') }}"
+devbox_swap_device: "{{ devbox_swap_device | default ('') }}"
 
 #
 # package repository urls

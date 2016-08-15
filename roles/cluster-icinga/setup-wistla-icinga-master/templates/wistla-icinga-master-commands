@@ -4,7 +4,10 @@ object NotificationCommand "mail-host-notification" {
 
 	import "plugin-notification-command"
 
-	command = [ SysconfDir + "/icinga2/scripts/mail-host-notification.sh" ]
+	command = [
+		SysconfDir + "/icinga2/scripts/mail",
+		"host",
+	]
 
 	env = {
 		NOTIFICATIONTYPE = "$notification.type$"
@@ -16,6 +19,7 @@ object NotificationCommand "mail-host-notification" {
 		NOTIFICATIONAUTHORNAME = "$notification.author$"
 		NOTIFICATIONCOMMENT = "$notification.comment$"
 		HOSTDISPLAYNAME = "$host.display_name$"
+		FROMEMAIL = "icinga@ops.wistla.com"
 		USEREMAIL = "$user.email$"
 	}
 
@@ -25,7 +29,10 @@ object NotificationCommand "mail-service-notification" {
 
 	import "plugin-notification-command"
 
-	command = [ SysconfDir + "/icinga2/scripts/mail-service-notification.sh" ]
+	command = [
+		SysconfDir + "/icinga2/scripts/mail",
+		"service",
+	]
 
 	env = {
 		NOTIFICATIONTYPE = "$notification.type$"
@@ -39,6 +46,7 @@ object NotificationCommand "mail-service-notification" {
 		NOTIFICATIONCOMMENT = "$notification.comment$"
 		HOSTDISPLAYNAME = "$host.display_name$"
 		SERVICEDISPLAYNAME = "$service.display_name$"
+		FROMEMAIL = "icinga@ops.wistla.com"
 		USEREMAIL = "$user.email$"
 	}
 

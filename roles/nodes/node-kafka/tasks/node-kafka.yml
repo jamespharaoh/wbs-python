@@ -1,0 +1,61 @@
+---
+
+- name: "install java"
+  delegate_to: "localhost"
+  args:
+
+    creates: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/etc/java-flag-openjdk-7"
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rootfs="/var/lib/lxc/{{ inventory_hostname }}/rootfs";
+
+    mount -o bind "/proc" "$rootfs/proc";
+
+    chroot "$rootfs"
+    apt-get install --yes openjdk-7-jdk;
+
+    touch "$rootfs/etc/java-flag-openjdk-7";
+
+- name: "install kafka"
+  args:
+
+    creates: "/etc/kafka-flag-{{ kafka_version }}"
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf /tmp/kafka-install;
+    mkdir -p /tmp/kafka-install;
+    cd /tmp/kafka-install;
+
+    wget "{{ wistla_dist_url }}/kafka/kafka_{{ kafka_version }}.tgz";
+
+    tar --extract --gzip --file "kafka_{{ kafka_version }}.tgz";
+
+    rsync --archive --verbose --delete
+      "kafka_{{ kafka_version }}/"
+      "/opt/kafka-{{ kafka_version }}/";
+
+    cd /;
+    rm -rf /tmp/kafka-install;
+
+    rm -f /etc/kafka-flag-*;
+    touch /etc/kafka-flag-{{ kafka_version }};
+
+- name: "install kafka upstart script"
+  become: "yes"
+  action:
+
+    module: "template"
+    src: "node-kafka-upstart"
+    dest: "/etc/init/kafka.conf"
+
+# ex: et ts=2 filetype=yaml

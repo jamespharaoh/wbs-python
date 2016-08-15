@@ -1,6 +1,7 @@
 ---
 
 - name: "create btrfs disk"
+  when: "devbox_lxc_device == '/btrfs-image'"
   args:
 
     creates: "/btrfs-image"
@@ -9,6 +10,7 @@
   command: "truncate --size 32GiB /btrfs-image"
 
 - name: "create btrfs file system"
+  when: "devbox_lxc_device == '/btrfs-image'"
   args:
 
     executable: "/bin/bash"
@@ -36,5 +38,12 @@
   changed_when: "mount_result.stdout != ''"
   become: "yes"
   command: "mount -a"
+
+- name: "active swap partition"
+  when: "devbox_swap_device != ''"
+  register: "swapon_result"
+  changed_when: "swapon_result.stdout != ''"
+  become: "yes"
+  command: "swapon -a"
 
 # ex: et ts=2 filetype=yaml

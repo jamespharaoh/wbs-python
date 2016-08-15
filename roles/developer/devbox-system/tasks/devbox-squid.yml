@@ -11,4 +11,20 @@
     module: "apt"
     name: "{{ item }}"
 
+- name: "configure squid"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/squid3/squid.conf"
+    src: "devbox-squid-config"
+
+- name: "reload squid"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "squid3"
+    state: "restarted"
+
 # ex: et ts=2 filetype=yaml

@@ -1,4 +1,11 @@
 {{ ansible_warning ['#'] }}
 
-/dev/sda1     /             ext4    errors=remount-ro    0 0
-/btrfs-image  /var/lib/lxc  btrfs   defaults             0 1
+{{ devbox_root_device }} / ext4 discard,errors=remount-ro 0 0
+
+{{ devbox_lxc_device }} /var/lib/lxc btrfs autodefrag,compress=lzo,discard 0 1
+
+{% if devbox_swap_device != '' %}
+{{ devbox_swap_device }} none swap discard 0 0
+{% endif %}
+
+# ex: noet ts=4

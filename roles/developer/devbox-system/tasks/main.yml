@@ -1,5 +1,8 @@
 ---
 
+- include: "devbox-squid.yml"
+  tags: "devbox-squid"
+
 - include: "devbox-nginx.yml"
   tags: "devbox-nginx"
 
@@ -12,8 +15,8 @@
 - include: "devbox-system.yml"
   tags: "devbox-system"
 
-- include: "devbox-btrfs.yml"
-  tags: "devbox-btrfs"
+- include: "devbox-fstab.yml"
+  tags: "devbox-fstab"
 
 - include: "devbox-network.yml"
   tags: "devbox-network"
