@@ -36,7 +36,7 @@ clusters:
 deployments:
 
 {% for other_deployment_name, other_deployment in deployments.items () %}
-{% if other_deployment.supercluster_name == supercluster_name %}
+{% if other_deployment.name | starts_with ('jenkins-') %}
   {{ other_deployment_name }}:
 {% for key in [
   'name',
