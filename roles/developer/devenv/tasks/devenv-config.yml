@@ -1,24 +1,5 @@
 ---
 
-- name: "checkout projects from git"
-  with_items: "{{ devenv_checkouts }}"
-  when: "deployment_mode == 'vagrant'"
-  tags: "checkout"
-  args:
-
-    executable: "/bin/bash"
-    creates: "{{ deployment_home }}/{{ item.name }}"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    cd {{ deployment_home }};
-
-    git clone
-      {{ git_base_url }}/{{ item.name }}
-      --branch {{ item.branch }};
-
 - name: "create project links"
   with_items: "{{ devenv_checkouts | flatten_hash ('project_links') }}"
   become: "yes"
@@ -130,16 +111,6 @@
       item.depends,
     ] | join }}"
 
-- name: "run build steps"
-  tags: "build"
-  with_items: "{{ devenv_checkouts }}"
-  args:
-
-    executable: "/bin/bash"
-    chdir: "{{ deployment_home }}/{{ item.name }}"
-
-  shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
-
 - name: "create git pre-commit hooks"
   with_items: "{{ devenv_checkouts }}"
   when: "deployment_mode == 'vagrant'"
@@ -169,7 +140,6 @@
     state: "directory"
 
 - name: "create config directories"
-  tags: "config"
   with_items: "{{ devenv_config_directories }}"
   action:
 
@@ -191,7 +161,6 @@
     mode: "0640"
 
 - name: "create config files"
-  tags: "config"
   with_items: "{{ devenv_config_templates }}"
   become: "yes"
   action:
@@ -205,7 +174,6 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "stat override config files"
-  tags: "config"
   with_items: "{{ devenv_override_templates }}"
   register: "devenv_stat_override_templates_result"
   action:
@@ -214,7 +182,6 @@
     path: "{{ deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
-  tags: "config"
   with_indexed_items: "{{ devenv_override_templates }}"
   when: "not devenv_stat_override_templates_result.results [item.0].stat.exists"
   action:
@@ -224,7 +191,6 @@
     src: "{{ item.1.template }}"
 
 - name: "copy config files"
-  tags: "config"
   with_items: "{{ devenv_config_files }}"
   action:
 
@@ -234,7 +200,6 @@
     mode: "0644"
 
 - name: "copy config secrets"
-  tags: "config"
   with_items: "{{ devenv_config_secrets }}"
   when: "deployment_mode == 'vagrant' and 'dev' in secrets"
   action:
@@ -246,7 +211,6 @@
     mode: "0600"
 
 - name: "create links to config files"
-  tags: "config"
   with_items: "{{ devenv_config_links }}"
   when: "deployment_mode == 'vagrant' or item.legacy | default ('no') == 'no'"
   action:
@@ -258,7 +222,6 @@
     force: "yes"
 
 - name: "create deployment name link"
-  tags: "config"
   when: "deployment_mode == 'vagrant'"
   action:
 
@@ -267,53 +230,5 @@
     state: "link"
 
     src: "."
-
-- name: "create bridge network interface"
-  register: "devenv_bridge_create_result"
-  become: "yes"
-  action:
-
-    module: "template"
-    src: "devenv-bridge-interface"
-    dest: "/etc/network/interfaces.d/{{ deployment.bridge_name }}.cfg"
-
-- name: "stop network bridge"
-  when: "devenv_bridge_create_result | changed"
-  register: "devenv_bridge_stop_result"
-  changed_when: "devenv_bridge_stop_result.stdout != 'UNCHANGED'"
-  become: "yes"
-  args:
-
-    executable: "/bin/bash"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    if ! ifquery --state {{ deployment.bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi
-
-    ifdown {{ deployment.bridge_name }};
-
-- name: "start network bridge"
-  register: "devenv_bridge_start_result"
-  changed_when: "devenv_bridge_start_result.stdout != 'UNCHANGED'"
-  become: "yes"
-  args:
-
-    executable: "/bin/bash"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    if ifquery --state {{ deployment.bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi
-
-    ifup {{ deployment.bridge_name }};
 
 # ex: et ts=2 filetype=yaml
