@@ -58,6 +58,7 @@ deployments:
   'facebook_app',
   'google_project',
   'kafka',
+  'kafka_version',
   'main_domain',
   'node_memory',
   'nodejs_version',
