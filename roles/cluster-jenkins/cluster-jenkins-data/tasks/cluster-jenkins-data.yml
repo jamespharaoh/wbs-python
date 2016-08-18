@@ -25,5 +25,6 @@
     module: "copy"
     dest: "/home/ubuntu/wistla-data/wistla-build-secret"
     src: "{{ deployment_build_secret_path }}"
+    mode: "0600"
 
 # ex: et ts=2 filetype=yaml
