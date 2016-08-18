@@ -4,13 +4,13 @@
   roles:
 
     - "setup-common-users"
-    - "setup-apt"
+    - "system-apt-setup"
     - "setup-system"
     - "setup-hostname"
     - "setup-dns"
     - "setup-logging"
 
-    - "install-system-packages"
+    - "system-packages-install"
 
     - "python"
     - "nginx"
