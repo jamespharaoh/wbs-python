@@ -1,6 +1,40 @@
 ---
 
+- name: "check valid playbook name"
+  when: "
+    cluster_deployment_playbook_name not in [
+      'build-down',
+      'node-restart',
+      'node-start',
+      'node-stop',
+      'node-templates',
+      'node-templates-update',
+    ]
+  "
+  fail:
+    msg: "invalid cluster playbook name {{ cluster_deployment_playbook_name }}"
+
 - name: "run cluster deployment playbook {{ cluster_deployment_playbook_name }}"
+  when: "
+    (
+      cluster_deployment_playbook_name in [
+        'node-stop',
+        'node-start',
+        'node-restart',
+      ]
+    ) or (
+      cluster_deployment.build_type == 'local'
+      and cluster_deployment_playbook_name in [
+        'node-templates',
+        'node-templates-update',
+      ]
+    ) or (
+      cluster_deployment.build_type == 'central'
+      and cluster_deployment_playbook_name in [
+        'build-down',
+      ]
+    )
+  "
   args:
 
     executable: "/bin/bash"

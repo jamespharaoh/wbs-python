@@ -12,12 +12,16 @@ class:
 
 deployment:
 
-  cluster_name: "{{ identity_parent }}"
+  name: "{{ identity_name }}"
+  type: "alias2"
+
   deployment_name: "{{ identity_name }}"
+  cluster_name: "{{ identity_parent }}"
+  supercluster_name: "{{ identity_grandparent }}"
+
   description: ""
   enabled: "no"
-  name: "{{ identity_name }}"
-  supercluster_name: "{{ identity_grandparent }}"
-  type: "alias2"
+
+  build_type: "central"
 
 # ex: et ts=2 filetype=yaml

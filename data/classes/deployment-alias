@@ -13,11 +13,15 @@ class:
 deployment:
 
   name: "{{ identity_name }}"
+  type: "alias"
+
   deployment_name: "{{ identity_name }}"
   cluster_name: "{{ identity_parent }}"
   supercluster_name: "{{ identity_grandparent }}"
 
-  enabled: "no"
   description: ""
+  enabled: "no"
+
+  build_type: "local"
 
 # ex: et ts=2 filetype=yaml

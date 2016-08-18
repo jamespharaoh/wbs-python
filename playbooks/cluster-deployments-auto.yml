@@ -91,13 +91,13 @@
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging"
-      cluster_deployment_playbook_name: "start"
+      cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "staging" ]
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'standby'"
       cluster_deployment_name: "staging"
-      cluster_deployment_playbook_name: "stop"
+      cluster_deployment_playbook_name: "node-stop"
       tags: [ "cluster-deployment", "staging" ]
 
 - hosts: "cluster-test-app"
@@ -106,31 +106,31 @@
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-everest"
-      cluster_deployment_playbook_name: "restart"
+      cluster_deployment_playbook_name: "node-restart"
       tags: [ "cluster-deployment", "test-everest" ]
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-k2"
-      cluster_deployment_playbook_name: "restart"
+      cluster_deployment_playbook_name: "node-restart"
       tags: [ "cluster-deployment", "test-k2" ]
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-montblanc"
-      cluster_deployment_playbook_name: "restart"
+      cluster_deployment_playbook_name: "node-restart"
       tags: [ "cluster-deployment", "test-montblanc" ]
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-erebus"
-      cluster_deployment_playbook_name: "restart"
+      cluster_deployment_playbook_name: "node-restart"
       tags: [ "cluster-deployment", "test-erebus" ]
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-fitzroy"
-      cluster_deployment_playbook_name: "restart"
+      cluster_deployment_playbook_name: "node-restart"
       tags: [ "cluster-deployment", "test-fitzroy" ]
 
 # ex: et ts=2 filetype=yaml
