@@ -32,7 +32,7 @@ unique identifier to them. For example, start with 1, and increment by 1 for
 each new build. This then needs specifying when you run the build script:
 
 ```sh
-./run-ansible playbooks/build-up.yml --extra-vars local_build_id=1
+./run-ansible playbooks/build-up.yml --extra-vars "local_build_seq=1"
 ```
 
 This performs the following steps:
@@ -41,4 +41,12 @@ This performs the following steps:
 * Pack each of your local templates into the build repostiory
 * Upload the changes to the build repository to S3
 
-Your builds are now ready to be deployed to other environments.
+Please note, this will take a long time if you have never downloaded the build
+repository before, since this is several gigabytes in size. After the initial
+download, it will be updated incrementally. The repository size will grow very
+slowly, due to the very efficient deduplication performed by ZBackup.
+
+Your builds are now ready to be deployed to other environments. The name of the
+build will be your deployment name, then a hyphen, then the local build id you
+provided on the command line, for example: `berk-1`, if your deployment name is
+`berk` and you provided a local build sequence of `1`.
