@@ -36,6 +36,7 @@
 
     {
       zbackup restore "$build_source"
+        --cache-size "{{ zbackup_cache_size }}"
         --password-file "{{ deployment_build_secret_path }}"
         --silent;
     } | {
