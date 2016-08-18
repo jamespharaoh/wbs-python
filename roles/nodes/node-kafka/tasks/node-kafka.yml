@@ -14,12 +14,16 @@
 
     rootfs="/var/lib/lxc/{{ inventory_hostname }}/rootfs";
 
-    mount -o bind "/proc" "$rootfs/proc";
+    if ! test -f "$rootfs/proc/cmdline"; then
+      mount -o bind "/proc" "$rootfs/proc";
+    fi;
 
     chroot "$rootfs"
     apt-get install --yes openjdk-7-jdk;
 
     touch "$rootfs/etc/java-flag-openjdk-7";
+
+    umount "$rootfs/proc";
 
 - name: "install kafka"
   args:
