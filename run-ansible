@@ -282,8 +282,8 @@ def check_deployment_mode ():
 			"##### Running in VAGRANT deployment mode #####\n",
 		])
 
-		DEPLOYMENT_HOME = "/home/vagrant"
-		DEPLOYMENT_USER = "vagrant"
+		DEPLOYMENT_HOME = CONFIG ["deployment_home"]
+		DEPLOYMENT_USER = CONFIG ["deployment_user"]
 
 	elif CONFIG ["deployment_mode"] == "cluster-shared":
 
@@ -905,12 +905,14 @@ def warn_redeploy ():
 
 	last_commit = max ([
 		os.path.getmtime (
-			"/home/vagrant/%s/.git/HEAD" % (
+			"%s/%s/.git/HEAD" % (
+				DEPLOYMENT_HOME,
 				project ["name"]))
 		for project
 		in PROJECTS
 		if os.path.isdir (
-			"/home/vagrant/%s" % (
+			"%s/%s" % (
+				DEPLOYMENT_HOME,
 				project ["name"]))
 	])
 
