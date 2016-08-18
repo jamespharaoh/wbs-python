@@ -19,4 +19,11 @@
     dest: "/home/ubuntu/wistla-data/{{ item.target }}"
     src: "{{ item.template }}"
 
+- name: "cluster jenkins wistla build secret"
+  action:
+
+    module: "copy"
+    dest: "/home/ubuntu/wistla-data/wistla-build-secret"
+    src: "{{ deployment_build_secret_path }}"
+
 # ex: et ts=2 filetype=yaml
