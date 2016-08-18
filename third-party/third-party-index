@@ -178,6 +178,12 @@ ramlfications:
   branch: "master"
   auto: "python"
 
+requests:
+
+  url: "git@github.com:kennethreitz/requests.git"
+  branch: "master"
+  auto: "python"
+
 roman:
 
   url: "git@gitlab.wellbehavedsoftware.com:well-behaved-software/python-roman.git"
