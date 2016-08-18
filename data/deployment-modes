@@ -2,7 +2,7 @@
 
 vagrant:
 
-  build_secret_path: "/home/vagrant/wistla-devops/security/build/wistla-build-secret"
+  build_secret_path: "{{ deployment_home }}/wistla-devops/security/build/wistla-build-secret"
 
   node_templates:
 
