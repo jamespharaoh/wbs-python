@@ -3,6 +3,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+__all__ = [
+	"LoginClient",
+]
+
 try:
 
 	import datetime
@@ -10,17 +14,20 @@ try:
 	import json
 	import requests
 
-	__all__ = [
-		"LoginClient",
-	]
+	import_success = True
 
 except ImportError:
 
-	__all__ = []
+	impor_success = False
 
 class LoginClient (object):
 
 	def __init__ (self, settings):
+
+		if not import_success:
+
+			raise Exception (
+				"Missing required libraries")
 
 		self.token_cache = dict ()
 
