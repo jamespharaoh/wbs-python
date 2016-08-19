@@ -5,6 +5,11 @@ from __future__ import unicode_literals
 
 import collections
 
+__all__ = [
+	"freeze",
+	"deep_copy",
+]
+
 immutable_types = set ([ int, str, unicode ])
 
 class Frozen (object):

@@ -246,4 +246,4 @@ def load_data (path):
 			"File or directory doesn't exist: %s" % (
 				path))
 
-# ex: noet ts=4 filetype=yaml
+# ex: noet ts=4 filetype=python
