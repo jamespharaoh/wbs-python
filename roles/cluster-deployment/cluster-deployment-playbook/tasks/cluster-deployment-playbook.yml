@@ -14,6 +14,14 @@
   fail:
     msg: "invalid cluster playbook name {{ cluster_deployment_playbook_name }}"
 
+- name: "copy wistla build secret"
+  when: "cluster_deployment_playbook_name == 'build-down'"
+  action:
+
+    module: "copy"
+    dest: "/run/user/1000/wistla-build-secret"
+    src: "{{ deployment_build_secret_path }}"
+
 - name: "run cluster deployment playbook {{ cluster_deployment_playbook_name }}"
   when: "
     (
