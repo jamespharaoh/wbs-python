@@ -123,16 +123,12 @@ append_newlines = false
 
 # TODO
 
-{% if inventory_hostname in [
-	'wistla-production-admin-a',
-	'wistla-staging-admin-a-DISABLED',
-] %}
-
 # ---------- email events
 
 [output-wistla-api-restart]
 type = "SmtpOutput"
 message_matcher = '{{ [
+	'Fields[Supercluster] == "production"',
 	'Fields[Category] == "wistla-api"',
 	'Payload =~ / %% CONTAINER-PROCESS-CONTROL %% (START|STOP) %% /',
 ] | join (' && ') }}'
@@ -148,6 +144,8 @@ encoder = "encoder-simple"
 [output-wistla-fatal]
 type = "SmtpOutput"
 message_matcher = '{{ [
+	'Fields[Supercluster] == "production"',
+	'Fields[Zone] == "' + instance_zone + '"',
 	'(' + [
 		'Fields[Category] == "wistla-api"',
 		'Fields[Category] == "wistla-browser"',
@@ -164,6 +162,25 @@ subject = "Wistla fatal logging notifications"
 send_interval = 60
 encoder = "encoder-simple"
 
-{% endif %}
+[output-wistla-misc]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'Fields[Supercluster] == "production"',
+	'Fields[Zone] == "' + instance_zone + '"',
+	'(' + [
+		'Fields[Category] == "wistla-api"',
+		'Fields[Category] == "wistla-browser"',
+		'Fields[Category] == "wistla-web"',
+	] | join (' || ') + ')',
+	'Payload =~ /CONNECTION_FORCED - broker forced connection closure with reason \\\'shutdown\\\'/',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.super_domain }}"
+send_to = [
+	"notifications.production.warning@wistla.com",
+	"support@wistla.zendesk.com",
+]
+subject = "Wistla fatal logging notifications"
+send_interval = 60
+encoder = "encoder-simple"
 
 # ex: noet ts=4 filetype=toml
