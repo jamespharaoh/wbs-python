@@ -18,13 +18,24 @@ S3 bucket on each machine which needs access to it.
 
 This instructions explain how to create a build from your locally build
 templates, and upload it to the shared repository. It is assumed that you have
-already performed a build and tested it to your satisfaction.
+already built a full set of templates locally and tested then to your
+satisfaction.
 
-You will need to be logged into amazon, so run `amazon-auth` and enter your MFA
-code, if you have not already done so:
+You will need to have your devops secrets mounted, and be logged into amazon, so
+run `run-anisble` and `amazon-auth` and enter your MFA code, if you have not
+already done so:
 
 ```sh
-misc/amazon-auto
+./run-ansible
+./misc/amazon-auto
+```
+
+You may want to shut down your running containers, to free up resources for the
+intensive deduplication and compression processes which take place when creating
+a build:
+
+```sh
+./run-ansible playbooks/node-stop.yml
 ```
 
 Your builds will be named after your deployment, and you will need to add a
@@ -50,3 +61,42 @@ Your builds are now ready to be deployed to other environments. The name of the
 build will be your deployment name, then a hyphen, then the local build id you
 provided on the command line, for example: `berk-1`, if your deployment name is
 `berk` and you provided a local build sequence of `1`.
+
+## Deploying a build to a cluster deployment
+
+These instructions explain how to deploy a previously created build to an
+environment.
+
+You will need to have your devops secrets mounted, and be logged into amazon, so
+run `run-anisble` and `amazon-auth` and enter your MFA code, if you have not
+already done so:
+
+```sh
+./run-ansible
+./misc/amazon-auto
+```
+
+Set the deployment name so that you can cut and paste the following commands:
+
+```sh
+deloyment_name="..."
+```
+
+The deployment needs to be configured correctly to receive the build. We also
+need to update the `deployed_build` to specify the build to deploy. Edit the
+resource and change this and any other relevant fields.
+
+```sh
+./wistla-devops resource edit --name deployment/$deployment_name
+```
+
+Now we need to update the configuration, deploy the build, and restart the
+containers.
+
+```sh
+./run-ansible playbooks/cluster-deployments-setup.yml --tags $deployment_name
+./run-ansible playbooks/cluster-deployments-build-down.yml --tags $deployment_name
+./run-ansible playbooks/cluster-deployments-restart.yml --tags $deployment_name
+```
+
+Your specified build should now be deployed to the environment.
