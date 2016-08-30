@@ -51,7 +51,7 @@ deployment:
 
     zookeeper_connect: "{{ [
       'wistla-', deployment_name, '-dev',
-      ':2128',
+      ':2181',
       '/wistla-', deployment_name, '-dev',
       '/kafka',
     ] | join }}"
