@@ -49,14 +49,47 @@ certificate_data:
 
 resource_data:
 
-  clusters: "cluster.cluster"
-  superclusters: "supercluster.supercluster"
-  deployments: "deployment.deployment"
-  dev_deployments: "dev-deployments.deployment"
+  clusters:
 
-  android_apps: "android-app.android_app"
-  facebook_apps: "facebook-app.facebook_app"
-  google_projects: "google-project.google_project"
+    group: "cluster"
+    key: "{{ identity_name }}"
+    section: "cluster"
+
+  superclusters:
+
+    group: "supercluster"
+    key: "{{ identity_name }}"
+    section: "supercluster"
+
+  deployments:
+
+    group: "deployment"
+    key: "{{ identity_name }}"
+    section: "deployment"
+
+  dev_deployments:
+
+    group: "dev-deployments"
+    key: "{{ identity_name }}"
+    section: "deployment"
+
+  android_apps:
+
+    group: "android-app"
+    key: "{{ identity_name }}"
+    section: "android_app"
+
+  facebook_apps:
+
+    group: "facebook-app"
+    key: "{{ identity_name }}"
+    section: "facebook_app"
+
+  google_projects:
+
+    group: "google-project"
+    key: "{{ identity_name }}"
+    section: "google_project"
 
 project_data:
 

@@ -81,7 +81,7 @@ http {
 
 {% for deployment_name in cluster.super_deployment_names %}
 {% set deployment = deployments [deployment_name] %}
-{% if deployment.type in [ 'simple', 'alias' ] %}
+{% if deployment.type in [ 'alias', 'alias2', 'simple', 'simple2' ] %}
 {% set deployment_cluster = clusters [deployment.cluster_name] %}
 
 	upstream deployment-{{ deployment_name }} {
@@ -487,7 +487,7 @@ http {
 {% for deployment_name, deployment in deployments.items ()
 if deployment.supercluster_name == supercluster_name %}
 
-{% if deployment.type == 'shared' %}
+{% if deployment.type in [ 'shared', 'shared2' ] %}
 
 #==============================================================================#
 
@@ -504,7 +504,7 @@ if deployment.supercluster_name == supercluster_name %}
 	deployment,
 	deployment.target) }}
 
-{% elif deployment.type == 'alias' %}
+{% elif deployment.type in [ 'alias', 'alias2' ] %}
 {% set deployment_alias = deployments [deployment.alias] %}
 
 #==============================================================================#
@@ -525,7 +525,7 @@ if deployment.supercluster_name == supercluster_name %}
 	deployment_alias,
 	deployment_name) }}
 
-{% elif deployment.type == 'simple' %}
+{% elif deployment.type in [ 'simple', 'simple2' ] %}
 
 #==============================================================================#
 

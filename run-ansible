@@ -282,8 +282,8 @@ def check_deployment_mode ():
 			"##### Running in VAGRANT deployment mode #####\n",
 		])
 
-		DEPLOYMENT_HOME = "/home/vagrant"
-		DEPLOYMENT_USER = "vagrant"
+		DEPLOYMENT_HOME = CONFIG ["deployment_home"]
+		DEPLOYMENT_USER = CONFIG ["deployment_user"]
 
 	elif CONFIG ["deployment_mode"] == "cluster-shared":
 
@@ -545,6 +545,8 @@ def update_config ():
 				"playbooks/devops.yml",
 			])
 
+			old_hashes = new_hashes
+
 		else:
 
 			try:
@@ -552,6 +554,8 @@ def update_config ():
 				run_playbook ([
 					"playbooks/devops.yml",
 				])
+
+				old_hashes = new_hashes
 
 			except:
 
@@ -562,7 +566,7 @@ def update_config ():
 					file_handle.write (
 						"localhost ansible_connection=local\n")
 
-		old_hashes = new_hashes
+				old_hashes = [ ]
 
 def fetch_upstream ():
 
@@ -901,12 +905,14 @@ def warn_redeploy ():
 
 	last_commit = max ([
 		os.path.getmtime (
-			"/home/vagrant/%s/.git/HEAD" % (
+			"%s/%s/.git/HEAD" % (
+				DEPLOYMENT_HOME,
 				project ["name"]))
 		for project
 		in PROJECTS
 		if os.path.isdir (
-			"/home/vagrant/%s" % (
+			"%s/%s" % (
+				DEPLOYMENT_HOME,
 				project ["name"]))
 	])
 

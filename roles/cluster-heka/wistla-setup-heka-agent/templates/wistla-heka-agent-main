@@ -41,7 +41,7 @@ type = "ScribbleDecoder"
 
 {% for cluster_deployment_name in cluster.deployment_names | default ([]) %}
 {% set cluster_deployment = deployments [cluster_deployment_name] %}
-{% if cluster_deployment.type != 'alias' %}
+{% if cluster_deployment.type not in [ 'alias', 'alias2', 'virtual' ] %}
 {% for log_name in [ 'wistla-api', 'wistla-browser', 'wistla-web' ] %}
 
 [input-{{ cluster_deployment_name }}-{{ log_name }}]
@@ -56,6 +56,9 @@ type = "ScribbleDecoder"
 	[decode-{{ cluster_deployment_name }}-{{ log_name }}.message_fields]
 	Category = "{{ log_name }}"
 	Deployment = "{{ cluster_deployment_name }}"
+	Supercluster = "{{ supercluster_name }}"
+	Cluster = "{{ cluster_name }}"
+	Zone = "{{ instance_zone }}"
 
 {% endfor %}
 {% endif %}
@@ -74,6 +77,9 @@ type = "ScribbleDecoder"
 
 	[decode-nginx-{{ nginx_log_type }}.message_fields]
 	Category = "nginx-{{ nginx_log_type }}"
+	Supercluster = "{{ supercluster_name }}"
+	Cluster = "{{ cluster_name }}"
+	Zone = "{{ instance_zone }}"
 
 {% endfor %}
 

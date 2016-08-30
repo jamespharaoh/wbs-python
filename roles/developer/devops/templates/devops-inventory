@@ -12,6 +12,8 @@ wistla-{{ deployment_name }}-dev
 wistla-jenkins
 {% endif %}
 
+{% if deployment_mode_data %}
+
 # ==================== node groups
 
 [node:children]
@@ -394,3 +396,5 @@ cluster-{{ other_cluster_name }}-network
 {%- endif %}
 
 {% endfor %}
+
+{% endif %}

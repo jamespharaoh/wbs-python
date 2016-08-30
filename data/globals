@@ -299,4 +299,6 @@ deployment_build_secret_path: "{{
   devops_inventory_deployment_modes [deployment_mode].build_secret_path
 }}"
 
+zbackup_cache_size: "512mb"
+
 # ex: et ts=2 filetype=yaml

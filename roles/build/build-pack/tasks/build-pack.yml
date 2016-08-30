@@ -44,10 +44,12 @@
     {
       sudo tar
         --create
+        --one-file-system
         --directory "$build_source"
         ".";
     } | {
       zbackup backup "$build_target.temp"
+        --cache-size {{ zbackup_cache_size }}
         --password-file "{{ deployment_build_secret_path }}"
         --silent;
     };

@@ -19,6 +19,7 @@ deployment:
 
   name: "{{ identity_name }}"
   type: "simple2"
+
   deployment_name: "{{ identity_name }}"
   cluster_name: "{{ identity_parent }}"
   supercluster_name: "{{ identity_grandparent }}"
@@ -30,6 +31,7 @@ deployment:
 
   v1_enabled: "no"
   v2_enabled: "yes"
+  build_type: "central"
 
   kafka:
 

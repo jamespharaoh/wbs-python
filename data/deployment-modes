@@ -2,7 +2,10 @@
 
 vagrant:
 
-  build_secret_path: "/home/vagrant/wistla-devops/security/build/wistla-build-secret"
+  build_secret_path: "{{ [
+    deployment_home,
+    '/wistla-devops/security/build/wistla-build-secret',
+  ] | join }}"
 
   node_templates:
 
@@ -40,6 +43,8 @@ vagrant:
     - "rabbit"
 
 jenkins:
+
+  build_secret_path: "/home/ubuntu/wistla-data/wistla-build-secret"
 
   node_templates:
 

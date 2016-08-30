@@ -11,9 +11,9 @@
 
     - "lxc-create"
 
-    - "setup-apt"
+    - "system-apt-setup"
     - "setup-system"
-    - "install-system-packages"
+    - "system-packages-install"
     - "setup-common-users"
     - "node-template"
 
@@ -31,9 +31,9 @@
 
     - "lxc-clone"
 
-    - "setup-apt"
+    - "system-apt-setup"
     - "setup-system"
-    - "install-system-packages"
+    - "system-packages-install"
     - "setup-common-users"
     - "node-template"
 

@@ -651,9 +651,6 @@ cluster_deployment_types:
           - "data/runtime"
           - "security"
 
-      - name: "wistla-scripts"
-        branch: "master"
-
     config_directories:
 
       - "api2"
@@ -668,23 +665,7 @@ cluster_deployment_types:
       - "postgresql-cache"
       - "rabbit"
 
-    config_files:
-
-      - source: "security/test/google-service-account.key"
-        target: "config/api/google-service-account.key"
-        mode: "0600"
-
-      - source: "security/apple/push-notifications/ca.cert"
-        target: "config/api/apple-ca.cert"
-        mode: "0644"
-
-      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.cert"
-        target: "config/api/apple-push.cert"
-        mode: "0644"
-
-      - source: "security/apple/push-notifications/{{ cluster_deployment.apple_push_notifications_name | default ('none') }}.key"
-        target: "config/api/apple-push.key"
-        mode: "0600"
+    config_files: []
 
     config_templates:
 
@@ -849,9 +830,6 @@ cluster_deployment_types:
         user: "ubuntu"
 
     override_templates:
-
-      - template: "cluster-deployment-wistla-api-overrides"
-        target: "config/api/config.overrides.js"
 
       - template: "cluster-deployment-wistla-browser-overrides"
         target: "config/browser/config.overrides.js"

@@ -8,7 +8,7 @@
     - "wait-for-ssh"
     - "scan-ssh-key"
 
-    - "setup-apt"
+    - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
     - "setup-system"
@@ -16,7 +16,7 @@
     - "setup-logging"
 
     - "cluster-ssh"
-    - "install-system-packages"
+    - "system-packages-install"
     - "install-kernel"
     - "install-postfix"
     - "cluster-volumes"
