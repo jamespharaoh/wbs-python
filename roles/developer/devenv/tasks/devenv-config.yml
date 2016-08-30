@@ -133,11 +133,16 @@
 
 - name: "create shared directories"
   with_items: "{{ devenv_shared_directories }}"
+  become: "yes"
   action:
 
     module: "file"
-    path: "{{ deployment_home }}/{{ item }}"
+    path: "{{ deployment_home }}/{{ item.directory }}"
     state: "directory"
+
+    owner: "{{ item.user }}"
+    group: "{{ deployment_user }}"
+    mode: "0755"
 
 - name: "create config directories"
   with_items: "{{ devenv_config_directories }}"

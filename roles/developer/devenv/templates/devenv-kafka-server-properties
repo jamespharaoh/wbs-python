@@ -13,7 +13,7 @@ socket.send.buffer.bytes = {{ kafka.socket_send_buffer_bytes }}
 socket.receive.buffer.bytes = {{ kafka.socket_receive_buffer_bytes }}
 socket.request.max.bytes = {{ kafka.socket_request_max_bytes }}
 
-# ---------- logging
+# ---------- journal logging
 
 log.dirs = /var/lib/kafka/logs
 num.partitions = {{ kafka.num_partitions }}
