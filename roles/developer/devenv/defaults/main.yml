@@ -108,6 +108,10 @@ devenv_config_templates:
     type: "kafka"
     target: "server.properties"
 
+  - template: "devenv-kafka-log4j-properties"
+    type: "kafka"
+    target: "log4j.properties"
+
   # ---------- load
 
   - template: "devenv-wistla-load-nginx-config"
@@ -220,14 +224,32 @@ devenv_config_links:
 
 devenv_shared_directories:
 
-  - "shared"
-  - "shared/audio"
-  - "shared/cms-image"
-  - "shared/flags"
-  - "shared/image"
-  - "shared/log"
-  - "shared/user-upload"
-  - "shared/video"
+  - directory: "shared"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/audio"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/cms-image"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/flags"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/image"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/log"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/log/kafka"
+    user: "kafka"
+
+  - directory: "shared/user-upload"
+    user: "{{ deployment_user }}"
+
+  - directory: "shared/video"
+    user: "{{ deployment_user }}"
 
 devenv_shared_logfiles:
 
