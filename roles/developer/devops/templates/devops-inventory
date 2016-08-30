@@ -50,6 +50,15 @@ node-{{ node_template.name }}-template
 # =================== node templates
 
 {% for node_template in node_templates %}
+{% if node_template.name in deployment_mode_data.node_templates
+	and node_template.name not in deployment_mode_data.node_types %}
+[node-{{ node_template.name }}:children]
+node-{{ node_template.name }}-template
+{{ '' }}
+{% endif %}
+{% endfor %}
+
+{% for node_template in node_templates %}
 {% if node_template.name in deployment_mode_data.node_templates %}
 
 [node-{{ node_template.name }}-template]
