@@ -28,4 +28,37 @@ log.retention.check.interval.ms = {{ kafka.log_retention_check_interval_ms }}
 zookeeper.connect = {{ kafka.zookeeper_connect }}
 zookeeper.connection.timeout.ms = {{ kafka.zookeeper_connection_timeout_ms }}
 
+
+# ---------- kafka
+
+# The port the socket server listens on
+port=9092
+
+# The number of threads handling network requests
+num.network.threads=3
+ 
+# The number of threads doing disk I/O
+num.io.threads=8
+
+# The send buffer (SO_SNDBUF) used by the socket server
+socket.send.buffer.bytes=102400
+
+# The receive buffer (SO_RCVBUF) used by the socket server
+socket.receive.buffer.bytes=102400
+
+# The maximum size of a request that the socket server will accept (protection against OOM)
+socket.request.max.bytes=104857600
+
+# The default number of log partitions per topic. More partitions allow greater
+# parallelism for consumption, but this will also result in more files across
+# the brokers.
+num.partitions=1
+
+# allow deletion of topics, might want to not enable this in prod, I don't know yet
+delete.topic.enable=true
+
+# allow topics to be created outside of the kafka CLI, i.e. from node
+auto.create.topics.enable=true
+
+
 # ex: noet ts=4
