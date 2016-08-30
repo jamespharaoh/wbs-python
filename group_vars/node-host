@@ -6,7 +6,9 @@ node_type_data: "{{
   | first
 }}"
 
-is_template: "no"
+node_is_template: "no"
+
+lxc_start_auto: "1"
 
 ansible_connection: "sudo_chroot"
 ansible_ssh_host: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"

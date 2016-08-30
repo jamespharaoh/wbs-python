@@ -13,4 +13,6 @@ lxc.network.link = {{ deployment.bridge_name }}
 lxc.network.hwaddr = {{ private_mac }}
 lxc.network.ipv4 = {{ private_address }}/{{ private_bits }}
 
-lxc.start.auto = {{ 1 if is_template | default ('no') == 'no' and enabled == yes else 0 }}
+lxc.start.auto = {{ lxc_start_auto }}
+
+# ex: noet ts=4

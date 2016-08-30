@@ -27,4 +27,4 @@ lxc.network.ipv4.gateway = {{ private_gateway }}
 
 # autostart
 
-lxc.start.auto = {{ 1 if is_template | default ('no') == 'no' else 0 }}
+lxc.start.auto = {{ lxc_start_auto }}

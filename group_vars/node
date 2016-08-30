@@ -1,5 +1,22 @@
 ---
 
+node_global_config_links: []
+
+node_instance_count: "{{
+  dev_node_instance_count if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else deployment.node_instance_count
+}}"
+
+node_memory: "{{
+  dev_node_memory if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+  ) else deployment.node_memory
+}}"
+
+node_lxc_path: "/var/lib/lxc/{{ inventory_hostname }}"
+node_rootfs_path: "{{ node_lxc_path }}/rootfs"
+
 private_gateway: "{{
   ( [
     deployment.bridge_network,
@@ -15,18 +32,6 @@ private_gateway: "{{
 
 private_bits: "{{
   16 if deployment_mode in [ 'vagrant', 'jenkins' ] else 16
-}}"
-
-node_instance_count: "{{
-  dev_node_instance_count if (
-    deployment_mode in [ 'vagrant', 'jenkins' ]
-  ) else deployment.node_instance_count
-}}"
-
-node_memory: "{{
-  dev_node_memory if (
-    deployment_mode in [ 'vagrant', 'jenkins' ]
-  ) else deployment.node_memory
 }}"
 
 lxc_memory_soft: "{{ node_memory [node_type] }}"

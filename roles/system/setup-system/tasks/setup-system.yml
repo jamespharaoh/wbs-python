@@ -13,7 +13,7 @@
     name: "{{ item }}"
 
 - name: "disable service startup"
-  when: "is_template | default ('no') == 'yes'"
+  when: "node_is_template | default ('no') == 'yes'"
   become: "yes"
   action:
 
@@ -23,7 +23,7 @@
     mode: "0755"
 
 - name: "enable service startup"
-  when: "is_template | default ('no') == 'no'"
+  when: "node_is_template | default ('no') == 'no'"
   become: "yes"
   action:
 
@@ -41,7 +41,7 @@
     src: "sysctl-config"
 
 - name: "reload sysctl"
-  when: "is_template | default ('no') == 'no'"
+  when: "node_is_template | default ('no') == 'no'"
   changed_when: "install_sysctl_config_result | changed"
   become: "yes"
   command: "sysctl --load"
@@ -56,7 +56,7 @@
     src: "sysfs-config"
 
 - name: "reload sysfs"
-  when: "is_template | default ('no') == 'no'"
+  when: "node_is_template | default ('no') == 'no'"
   changed_when: "install_sysfs_config_result | changed"
   become: "yes"
   command: "service sysfsutils force-reload"

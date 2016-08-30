@@ -34,9 +34,14 @@ node-template-concrete
 [node-template-generic]
 {% for node_template in node_templates %}
 {% if node_template.type == 'generic'
-	and node_template.name in deployment_mode_data.node_templates %}
-{{ deployment_name }}-{{ node_template.name }}-template
-{% endif %}
+	and node_template.name in deployment_mode_data.node_templates -%}
+
+	{%- print [
+		deployment_name + '-' + node_template.name + '-template',
+		'node_type=' + node_template.name,
+	] | join (' '), '\n' -%}
+
+{%- endif %}
 {% endfor %}
 
 [node-template-concrete:children]
@@ -67,6 +72,7 @@ node-{{ node_template.name }}-template
 	{%- print [
 		deployment_name + '-' + node_template.name + '-template',
 		'node_template=' + node_template.name,
+		'node_type=' + node_template.name,
 	] | join (' '), '\n' -%}
 
 {%- else -%}
