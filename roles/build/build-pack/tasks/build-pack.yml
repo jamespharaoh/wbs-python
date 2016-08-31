@@ -16,8 +16,8 @@
     build_source: "/var/lib/lxc/{{ inventory_hostname }}/rootfs"
 
     build_target: "{{ [
-      deployment_home,
-      '/builds/backups/',
+      builds_path,
+      '/backups/',
       node_template,
       '-',
       local_build_id,
@@ -27,8 +27,8 @@
   args:
 
     creates: "{{ [
-      deployment_home,
-      '/builds/backups/',
+      builds_path,
+      '/backups/',
       node_template,
       '-',
       local_build_id,

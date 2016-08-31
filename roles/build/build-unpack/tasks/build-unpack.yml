@@ -5,8 +5,8 @@
   environment:
 
     build_source: "{{ [
-      deployment_home,
-      '/builds/backups/',
+      builds_path,
+      '/backups/',
       node_template,
       '-',
       deployment.deployed_build,
