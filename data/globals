@@ -71,6 +71,8 @@ dev_deployment_names: "{{
 
 global_system_packages:
 
+  # ---------- absent
+
   - name: "apport"
     state: "absent"
 
@@ -86,7 +88,12 @@ global_system_packages:
   - name: "resolvconf"
     state: "absent"
 
+  # ---------- present
+
   - name: "btrfs-tools"
+    state: "present"
+
+  - name: "build-essential"
     state: "present"
 
   - name: "curl"
