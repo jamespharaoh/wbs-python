@@ -20,4 +20,8 @@ server {
 
 	}
 
+	location /skype-bot/endpoint {
+		proxy_pass http://localhost:8899/endpoint;
+	}
+
 }

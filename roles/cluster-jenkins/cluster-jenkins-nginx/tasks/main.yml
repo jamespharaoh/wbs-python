@@ -7,4 +7,9 @@
     - "cluster-jenkins"
     - "cluster-jenkins-nginx"
 
+    - "jenkins-nginx"
+    - "jenkinx"
+
+    - "nginx"
+
 # ex: et ts=2 filetype=yaml

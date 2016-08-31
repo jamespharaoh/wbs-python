@@ -13,6 +13,9 @@
     - target: "wistla-devops-local"
       template: "cluster-jenkins-data-wistla-devops-local"
 
+    - target: "skypebot-settings"
+      template: "cluster-jenkins-data-skypebot-settings"
+
   action:
 
     module: "template"

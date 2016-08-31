@@ -6,6 +6,18 @@ instance_type_colour: "197"
 
 ubuntu_apt_proxy_url: "http://localhost:3142"
 
+ubuntu_sources_extra:
+
+  - url: "http://apt.postgresql.org/pub/repos/apt/"
+    source: "trusty-pgdg"
+    repositories:
+
+      - "main"
+
+ubuntu_keys_extra:
+
+  - url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+
 my_system_packages:
 
   # ----- remove
@@ -55,6 +67,9 @@ my_system_packages:
     state: "present"
 
   - name: "ntp"
+    state: "present"
+
+  - name: "postgresql-9.5"
     state: "present"
 
   - name: "whois"
