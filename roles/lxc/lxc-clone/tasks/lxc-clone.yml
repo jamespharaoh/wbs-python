@@ -87,4 +87,26 @@
     path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
     state: "directory"
 
+- name: "bind mount config directory"
+  when: "node_is_template == 'yes'"
+  delegate_to: "localhost"
+  become: "yes"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    if ! cut -d' ' -f2 </dev/mounts
+      | grep -x {{ node_rootfs_path }}/config;
+    then
+
+      mount -o bind
+        "{{ deployment_home }}/config/{{ node_type }}"
+        "{{ node_rootfs_path }}/config";
+
+    fi;
+
 # ex: et ts=2 filetype=yaml

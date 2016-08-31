@@ -8,15 +8,15 @@
 
 - name: "nodejs"
   type: "generic"
-  parent: "base-template"
+  parent: "base"
 
 - name: "nodejs-legacy"
   type: "generic"
-  parent: "base-template"
+  parent: "base"
 
 - name: "postgresql"
   type: "generic"
-  parent: "base-template"
+  parent: "base"
 
 # ---------- concrete templates
 

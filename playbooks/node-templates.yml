@@ -6,10 +6,25 @@
 # templates, and doing it this way reduces disk space and speeds the process up
 # because the common steps are done once and cloned cheaply.
 
-- hosts: "node-template-generic"
+- hosts: "node-base-template"
   roles:
 
     - "lxc-create"
+
+    - "system-apt-setup"
+    - "setup-system"
+    - "system-packages-install"
+    - "setup-common-users"
+    - "node-template"
+
+# Second, create the other base templates. These are cloned from the base for
+# efficiency and will be cloned later by similar containers to further speed up
+# the process and save space.
+
+- hosts: "node-template-generic:!node-base-template"
+  roles:
+
+    - "lxc-clone"
 
     - "system-apt-setup"
     - "setup-system"

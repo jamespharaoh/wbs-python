@@ -12,6 +12,9 @@ devenv_config_directories:
   - "config/media"
   - "config/notifications"
   - "config/mongo"
+  - "config/nodejs"
+  - "config/nodejs-legacy"
+  - "config/postgresql"
   - "config/postgresql-main"
   - "config/postgresql-cache"
   - "config/rabbit"
@@ -40,6 +43,10 @@ devenv_config_templates:
 
   # ---------- api
 
+  - template: "devenv-npmrc"
+    type: "api"
+    target: "npmrc"
+
   - template: "devenv-wistla-api-config"
     type: "api"
     target: "config.local.js"
@@ -49,6 +56,10 @@ devenv_config_templates:
     target: "environment"
 
   # ---------- api2
+
+  - template: "devenv-npmrc"
+    type: "api2"
+    target: "npmrc"
 
   - template: "devenv-wistla-api2-schema-config"
     type: "api2"
@@ -74,6 +85,10 @@ devenv_config_templates:
 
   # ---------- media
 
+  - template: "devenv-npmrc"
+    type: "media"
+    target: "npmrc"
+
   - template: "devenv-wistla-api2-server-config"
     type: "media"
     target: "wistla-media-daemon-local.yaml"
@@ -82,7 +97,23 @@ devenv_config_templates:
     type: "media"
     target: "environment"
 
+  # ---------- nodejs
+
+  - template: "devenv-npmrc"
+    type: "nodejs"
+    target: "npmrc"
+
+  # ---------- nodejs legacy
+
+  - template: "devenv-npmrc"
+    type: "nodejs-legacy"
+    target: "npmrc"
+
   # ---------- notifications
+
+  - template: "devenv-npmrc"
+    type: "notifications"
+    target: "npmrc"
 
   - template: "devenv-wistla-api2-server-config"
     type: "notifications"
@@ -93,6 +124,10 @@ devenv_config_templates:
     target: "environment"
 
   # ---------- browser
+
+  - template: "devenv-npmrc"
+    type: "browser"
+    target: "npmrc"
 
   - template: "devenv-wistla-browser-config"
     type: "browser"

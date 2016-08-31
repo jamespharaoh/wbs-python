@@ -2,11 +2,25 @@
 
 - name: "create config dir"
   action:
+
     module: "file"
     path: "/config"
     state: "directory"
+
     owner: "root"
     group: "root"
     mode: "0755"
+
+- name: "create global config links"
+  with_items: "{{ node_global_config_links }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.link }}"
+    state: "link"
+
+    src: "{{ item.target }}"
+    force: "yes"
 
 # ex: et ts=2 filetype=yaml

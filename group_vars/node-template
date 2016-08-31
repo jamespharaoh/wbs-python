@@ -6,7 +6,9 @@ node_template_data: "{{
   | first
 }}"
 
-is_template: "yes"
+node_is_template: "yes"
+
+lxc_start_auto: "0"
 
 node_clone_from: "{{ deployment_name }}-{{ node_template_data.parent }}-template"
 

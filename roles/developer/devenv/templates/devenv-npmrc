@@ -1,0 +1,1 @@
+registry=http://wistla-{{ deployment_name }}-dev:8081
