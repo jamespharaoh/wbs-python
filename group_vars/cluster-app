@@ -14,7 +14,7 @@ ubuntu_sources_extra:
 
 ubuntu_keys_extra:
 
-  - url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+  - file: "security/apt-keys/postgresql-apt-key"
 
 my_system_packages:
 
