@@ -53,6 +53,21 @@ host all all {{ deployment.bridge_network }}.0.1/32 trust
 ] | join (' '), '\n' %}
 {% endfor %}
 
+# local notification-daemon nodes
+{% for index in [ 0, 1, 2, 3, 4 ] %}
+{% print [
+	'host',
+	'all',
+	'all',
+	[
+		deployment.bridge_network,
+		index,
+		node_type_indices.notifications,
+	] | join ('.') + '/32',
+	'trust',
+] | join (' '), '\n' %}
+{% endfor %}
+
 # local postgresql-cache nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
 {% print [
