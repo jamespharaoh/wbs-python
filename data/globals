@@ -308,4 +308,10 @@ deployment_build_secret_path: "{{
 
 zbackup_cache_size: "512mb"
 
+builds_path: "{{ (
+  deployment_home + '/builds'
+) if deployment_mode == 'vagrant' else (
+  '/home/ubuntu/builds'
+) }}"
+
 # ex: et ts=2 filetype=yaml
