@@ -5,6 +5,9 @@ local all all trust
 host all all {{ trusted_client }}/32 trust
 {% endfor %}
 
+# local vagrant
+host all all {{ deployment.bridge_network }}.0.1/32 trust
+
 # local api2 nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
 {% print [
