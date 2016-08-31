@@ -1,0 +1,10 @@
+---
+
+- include: "cluster-jenkins-skypebot.yml"
+  tags:
+
+    - "cluster-jenkins-skypebot"
+    - "cluster-jenkins"
+    - "cluster"
+
+# ex: et ts=2 filetype=yaml
