@@ -17,6 +17,7 @@ vagrant:
     - "api"
     - "api2"
     - "browser"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"
@@ -31,6 +32,7 @@ vagrant:
     - "api"
     - "api2"
     - "browser"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"
@@ -52,6 +54,7 @@ jenkins:
     - "postgresql"
 
     - "api2"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"
@@ -64,6 +67,7 @@ jenkins:
   node_types:
 
     - "api2"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"
@@ -184,6 +188,7 @@ cluster-simple2:
 
     - "api2"
     - "browser"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"
@@ -197,6 +202,7 @@ cluster-simple2:
 
     - "api2"
     - "browser"
+    - "db-daemon"
     - "kafka"
     - "load"
     - "media"

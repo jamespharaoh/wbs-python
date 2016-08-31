@@ -1,6 +1,6 @@
 ---
 
-# @wistla/db configurationit-
+# @wistla/db configuration
   db:
 
     pg:
@@ -31,6 +31,10 @@
 {% endif %}
 {% endif %}
 {% endfor %}
+    kafka:
+      client_id: "db-audit-log"
+      urls:
+        - wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka
 
 # @wistla/api-server
   # logger information

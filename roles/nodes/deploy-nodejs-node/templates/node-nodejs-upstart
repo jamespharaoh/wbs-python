@@ -1,5 +1,7 @@
 {{ ansible_warning ['#'] }}
 
+{% set node_var = 'WISTLA_' + node_template | upper | replace('-', '_') %}
+
 description "wistla {{ node_template }}"
 
 start on runlevel [2345]
@@ -11,8 +13,8 @@ script
 
 	. /config/environment
 
-	for index in $(seq 0 $((WISTLA_{{ node_template | upper }}_COUNT - 1))); do
-		start {{ item.0.name }}-instance WISTLA_{{ node_template | upper }}_INDEX=$index
+	for index in $(seq 0 $(({{ node_var }}_COUNT - 1))); do
+		start {{ item.0.name }}-instance {{ node_var }}_INDEX=$index
 	done
 
 end script

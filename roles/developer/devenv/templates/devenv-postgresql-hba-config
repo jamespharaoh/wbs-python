@@ -5,6 +5,9 @@ local all all trust
 host all all {{ trusted_client }}/32 trust
 {% endfor %}
 
+# local vagrant
+host all all {{ deployment.bridge_network }}.0.1/32 trust
+
 # local api2 nodes
 {% for index in [ 0, 1, 2, 3, 4 ] %}
 {% print [
@@ -15,6 +18,21 @@ host all all {{ trusted_client }}/32 trust
 		deployment.bridge_network,
 		index,
 		node_type_indices.api2,
+	] | join ('.') + '/32',
+	'trust',
+] | join (' '), '\n' %}
+{% endfor %}
+
+# local db-daemon nodes
+{% for index in [ 0, 1, 2, 3, 4 ] %}
+{% print [
+	'host',
+	'all',
+	'all',
+	[
+		deployment.bridge_network,
+		index,
+		node_type_indices ['db-daemon'],
 	] | join ('.') + '/32',
 	'trust',
 ] | join (' '), '\n' %}

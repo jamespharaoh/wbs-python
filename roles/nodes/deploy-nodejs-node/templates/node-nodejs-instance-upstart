@@ -1,6 +1,6 @@
 {{ ansible_warning ['#'] }}
 
-{% set node_var = 'WISTLA_' + node_template | upper %}
+{% set node_var = 'WISTLA_' + node_template | upper | replace('-', '_') %}
 
 description "{{ item.0.name }} instance"
 
