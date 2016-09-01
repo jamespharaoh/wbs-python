@@ -143,6 +143,10 @@ devenv_config_templates:
     type: "kafka"
     target: "server.properties"
 
+  - template: "devenv-kafka-consumer-properties"
+    type: "kafka"
+    target: "consumer.properties"
+
   - template: "devenv-kafka-log4j-properties"
     type: "kafka"
     target: "log4j.properties"
