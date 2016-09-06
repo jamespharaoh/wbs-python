@@ -16,15 +16,32 @@ schemas:
       - feed_search
       - timezones
     path: ./schema.wistla.main.sql
+    publish_changes: true
     target_directory: ./schema.wistla.main
     data_import_directory: ../shared
   -
     host: "{{ deployment_name }}-postgresql-cache-0"
     name: wistla
+    exclude_tables:
+      - config
+      - feed_search
+      - timezones
+      - device_push_tokens
+      - wistl_profile
+      - user_profile
+      - community_profile
+      - community_activity_counts
+      - user_aggregated_counts
+      - user_activity_counts
+      - user_miscellaneous_counts
+      - user_relationship_counts
+      - wistl_activity_counts
+      - geo_locations
     path: ./schema.wistla.cache.sql
     target_directory: ./schema.wistla.cache
-    map_servers:
-        - "{{ deployment_name }}-postgresql-main-0"
+    data_import_directory: ../shared
+    # map_servers:
+    #     - "{{ deployment_name }}-postgresql-main-0"
 
 
 # ex: et ts=2 filetype=yaml
