@@ -81,6 +81,7 @@
     - "wistla-pubsub"
     - "wistla-raml-api"
     - "wistla-raml-server"
+    - "wistla-test"
     - "wistla-util"
     # todo: remove when this is running in the "environments"
     # todo: container
@@ -303,6 +304,15 @@
 
     module to convert RAML 1.0 markup into JSON that can be used to generate API
     endpoints and HTTP server(s); as well as the data transforms
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-test"
+  short: "testing related shizzle"
+  default_branch: "development"
+  npm_name: "@wistla/test"
 
   build_steps:
 

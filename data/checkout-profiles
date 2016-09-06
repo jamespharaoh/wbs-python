@@ -68,6 +68,9 @@ developer_full:
   - name: "wistla-util"
     branch: "development"
 
+  - name: "wistla-test"
+    branch: "development"
+
   - name: "wistla-i18n"
     branch: "development"
 
