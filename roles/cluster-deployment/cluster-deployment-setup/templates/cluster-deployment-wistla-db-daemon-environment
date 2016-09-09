@@ -2,7 +2,7 @@
 
 WISTLA_DB_DAEMON_COUNT="{{ cluster_deployment.node_instance_count ['db-daemon'] }}"
 
-{% if cluster_deployment.node_instance_count.db_daemon != '0' %}
+{% if cluster_deployment.node_instance_count ['db-daemon'] != '0' %}
 WISTLA_DB_DAEMON_DEBUG="no"
 
 WISTLA_DB_DAEMON_MIN_SEMI_SPACE_SIZE="4"
