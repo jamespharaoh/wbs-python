@@ -1,5 +1,8 @@
 {{ ansible_warning ['#'] }}
 
+# high swappiness
+vm.swappiness = 90
+
 {% if system_reboot_on_error | default ('no') == 'yes' %}
 # automatically reboot if hung
 kernel.panic = 10
