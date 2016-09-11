@@ -27,7 +27,14 @@ case "$TERM" in
 
 xterm*|rxvt*)
 
-	PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	wistla_colour="\[\e[48;5;018m\e[38;5;255m\]"
+	deployment_colour="\[\e[48;5;{{ deployment.xterm_colour }}m\e[38;5;255m\]"
+	normal_colour="\[\e[49m\e[39m\]"
+	wistla_logo="$wistla_colour  \341\[\272\230\]   $deployment_colour {{ deployment_name }} $normal_colour"
+	window_title="\[\e]0;${debian_chroot:+($debian_chroot)}\h: \w\a\]"
+	working_directory="\w"
+	PS1="$window_title$wistla_logo $working_directory \$ "
+
 	;;
 
 *)
