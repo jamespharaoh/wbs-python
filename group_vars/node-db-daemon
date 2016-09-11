@@ -42,7 +42,6 @@ node_deploy_projects:
       - target: "local.yaml"
         source: "wistla-db-daemon-local.yaml"
 
-
   - name: "wistla-pubsub"
     type: "nodejs"
 
