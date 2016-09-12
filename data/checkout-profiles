@@ -176,6 +176,9 @@ developer_jenkins:
   - name: "wistla-raml-to-api"
     branch: "development"
 
+  - name: "wistla-test"
+    branch: "development"
+
   - name: "wistla-util"
     branch: "development"
 
