@@ -33,6 +33,7 @@ import socket
 import subprocess
 import threading
 import time
+import traceback
 import yaml
 import wbs
 
@@ -579,7 +580,8 @@ def fetch_upstream ():
 		return
 
 	if "last_sync_success" in STATE \
-	and STATE ["last_sync_success"] >= time.time () - 3600:
+	and STATE ["last_sync_success"] >= time.time () - 3600 \
+	and sys.argv [1:] != [ "--sync" ]:
 		return
 
 	write_message ([
@@ -592,7 +594,9 @@ def fetch_upstream ():
 		"will now automatically attempt to fetch the latest code.\n",
 	])
 
-	if not os.path.exists ("/home/vagrant/.ssh/control_github.com_22_git"):
+	if not os.path.exists (
+		"%s/.ssh/control_github.com_22_git" % (
+			DEPLOYMENT_HOME)):
 
 		write_message ([
 			"Starting shared ssh connection to github.com.\n",
@@ -628,9 +632,31 @@ def fetch_upstream ():
 
 	if len (errors):
 
-		auto_newline ()
-		sys.stderr.write ("Failed to sync, ignoring...\n")
-		set_newline ()
+		if sys.argv [1:] == [ "--sync" ]:
+
+			for project_name, sync_exception_info \
+			in errors.items ():
+
+				auto_newline ()
+
+				write_message ([
+					"##### Error syncing %s #####\n" % (
+						project_name),
+				])
+
+				auto_newline ()
+
+				write_message (
+					traceback.format_exception (
+						* sync_exception_info))
+
+				auto_newline ()
+
+		else:
+
+			auto_newline ()
+			sys.stderr.write ("Failed to sync, ignoring...\n")
+			set_newline ()
 
 	STATE ["last_sync_success"] = time.time ()
 	write_state ()
@@ -643,7 +669,8 @@ def fetch_one_upstream (project, errors):
 
 		project_repo = (
 			git.Repo (
-				"/home/vagrant/%s" % (
+				"%s/%s" % (
+					DEPLOYMENT_HOME,
 					project ["name"])))
 
 		project_repo.remotes.origin.fetch ()
@@ -657,7 +684,7 @@ def fetch_one_upstream (project, errors):
 	except Exception as exception:
 
 		errors [project ["name"]] = (
-			exception)
+			sys.exc_info ())
 
 def warn_upstream ():
 
@@ -676,7 +703,8 @@ def warn_upstream ():
 		for project in PROJECTS:
 
 			repo_path = (
-				"/home/vagrant/%s" % (
+				"%s/%s" % (
+					DEPLOYMENT_HOME,
 					project ["name"]))
 
 			if not os.path.isdir (repo_path):
