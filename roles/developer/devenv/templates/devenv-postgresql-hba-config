@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 local all all trust
 
 # trusted hosts from config

@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 # ---------- file locations
 
 data_directory = '/var/lib/postgresql/9.5/main'
