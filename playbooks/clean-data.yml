@@ -33,4 +33,19 @@
         path: "{{ deployment_home }}/shared"
         state: "directory"
 
+    - name: "clean out zookeeper"
+      args:
+
+        executable: "/bin/bash"
+
+      shell:
+
+        set -euf -o pipefail;
+
+        /usr/lib/zookeeper/bin/load_gen
+          "localhost:2181"
+          "/wistla-{{ deployment_name }}-dev/kafka"
+          "clean"
+        || true;
+
 # ex: et ts=2 filetype=yaml
