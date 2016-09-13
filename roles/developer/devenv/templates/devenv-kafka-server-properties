@@ -2,7 +2,7 @@
 
 {% set kafka = deployment.kafka %}
 
-broker.id = 0
+broker.id = -1
 
 # ---------- networking
 
@@ -35,7 +35,6 @@ log.retention.check.interval.ms = {{ kafka.log_retention_check_interval_ms }}
 
 zookeeper.connect = {{ kafka.zookeeper_connect }}
 zookeeper.connection.timeout.ms = {{ kafka.zookeeper_connection_timeout_ms }}
-
 
 # ---------- kafka
 
