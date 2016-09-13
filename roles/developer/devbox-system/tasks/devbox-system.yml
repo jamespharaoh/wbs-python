@@ -35,12 +35,20 @@
     src: "devbox-sudoers-ssh-agent"
 
 - name: "install motd"
-  become: "yes"
-  action:
+  args:
 
-    module: "copy"
-    dest: "/etc/motd"
-    src: "{{ HOME }}/misc/deployment-icons/{{ deployment_name }}.xterm"
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    paste
+      "{{ HOME }}/misc/deployment-icons/{{ deployment_name }}.xterm"
+      "{{ HOME }}/misc/wistla-dark.xterm"
+    | sed 's/\t//'
+    > /etc/motd;
 
 - name: "remove annoying motd elements"
   with_items:
