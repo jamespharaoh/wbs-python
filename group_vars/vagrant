@@ -165,6 +165,9 @@ ubuntu_system_packages:
   - name: "python-yaml"
     state: "absent"
 
+  - name: "rlwrap"
+    state: "present"
+
   - name: "samba"
     state: "present"
 
@@ -175,6 +178,9 @@ ubuntu_system_packages:
     state: "present"
 
   - name: "zbackup"
+    state: "present"
+
+  - name: "zookeeper-bin"
     state: "present"
 
   - name: "zookeeperd"
