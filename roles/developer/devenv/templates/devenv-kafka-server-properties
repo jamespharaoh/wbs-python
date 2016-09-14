@@ -24,6 +24,9 @@ socket.request.max.bytes = {{ kafka.socket_request_max_bytes }}
 # ---------- journal logging
 
 log.dirs = /var/lib/kafka/logs
+# The default number of log partitions per topic. More partitions allow greater
+# parallelism for consumption, but this will also result in more files across
+# the brokers.
 num.partitions = {{ kafka.num_partitions }}
 num.recovery.threads.per.data.dir = {{ kafka.num_recovery_threads_per_data_dir }}
 
@@ -40,11 +43,6 @@ zookeeper.connection.timeout.ms = {{ kafka.zookeeper_connection_timeout_ms }}
 
 # The port the socket server listens on
 port=9092
- 
-# The default number of log partitions per topic. More partitions allow greater
-# parallelism for consumption, but this will also result in more files across
-# the brokers.
-num.partitions=1
 
 # allow deletion of topics, might want to not enable this in prod, I don't know yet
 delete.topic.enable=true
