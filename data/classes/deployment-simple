@@ -42,7 +42,7 @@ deployment:
     socket_receive_buffer_bytes: "102400"
     socket_request_max_bytes: "102400"
 
-    num_partitions: "1"
+    num_partitions: "256"
     num_recovery_threads_per_data_dir: "1"
 
     log_retention_hours: "168"
