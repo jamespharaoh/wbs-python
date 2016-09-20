@@ -1,5 +1,7 @@
 ---
 
+{% set google_project = google_projects [deployment.google_project] %}
+
 # @wistla/db configuration
   db:
 
@@ -8,7 +10,7 @@
 
       cache:
         url: "postgres://vagrant@{{ deployment_name }}-postgresql-cache-0/wistla"
-      
+
       main:
         url: "postgres://vagrant@{{ deployment_name }}-postgresql-main-0/wistla"
 
@@ -33,6 +35,7 @@
 {% endfor %}
     kafka:
       client_id: "db-audit-log"
+      max_batch_size: 16
       urls:
         - wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka
 
@@ -42,6 +45,14 @@
 
     level: "trace"
     time_level: "trace"
+
+# @wistla/notifications config
+  notifications:
+    enabled: true
+    gcm:
+      api_key: {{ google_project.cloud_messaging_api_key }}
+      sender_id: {{ google_project.cloud_messaging_sender_id }}
+      app_name: {{ google_project.cloud_messaging_app_name }}
 
 # @wistla/blob configuration
   blob:
