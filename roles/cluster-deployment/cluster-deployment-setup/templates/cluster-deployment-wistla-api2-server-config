@@ -36,10 +36,18 @@
       client_id: "db-audit-log"
       max_batch_size: 16
       urls:
-{%  for zone in data_zones %}
-{%  for instance in data_indices %}
-        - {{ [ cluster_deployment_alias.name, '-kafka-', zone, '-', instance, '/wistla-', cluster_deployment_alias.name, '/kafka'] | join }}
-{%  endfor %}
+{%  for zone in [ 'a', 'b', 'c' ] %}
+        - "{{ [
+          [
+            'wistla-',
+            cluster_name,
+            '-admin-',
+            zone,
+          ] | join,
+          ':2181/',
+          cluster_deployment_name,
+          '/kafka',
+        ] | join }}"
 {%  endfor %}
 
 # @wistla/api-server
