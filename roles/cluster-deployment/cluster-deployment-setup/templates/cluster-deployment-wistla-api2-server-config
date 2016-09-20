@@ -35,7 +35,7 @@
       urls:
 {%  for zone in data_zones %}
 {%  for instance in data_indices %}
-        - {{ [ cluster_deployment_alias.name, '-kafka-', zone, '-', instance, ] | join }}
+        - {{ [ cluster_deployment_alias.name, '-kafka-', zone, '-', instance, '/wistla-', cluster_deployment_alias.name, '/kafka'] | join }}
 {%  endfor %}
 {%  endfor %}
 

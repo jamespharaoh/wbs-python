@@ -14,17 +14,20 @@ schemas:
     name: "wistla"
     exclude_tables:
 
+      - "acl"
       - "config"
       - "feed_search"
       - "timezones"
 
     path: ./schema.wistla.main.sql
+    publish_changes: true
     target_directory: ./schema.wistla.main
     data_import_directory: /shared
 
   - host: "{{ cluster_deployment.name }}-postgresql-cache-a-4"
     name: "wistla"
     exclude_tables:
+      - acl
       - config
       - feed_search
       - timezones
