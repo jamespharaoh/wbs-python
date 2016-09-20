@@ -1,0 +1,51 @@
+---
+
+- name: "cluster admin zookeeper system packages"
+  with_items:
+
+    - "zookeeper-bin"
+    - "zookeeperd"
+
+  become: "yes"
+  action:
+
+    module: "apt"
+    name: "{{ item }}"
+
+- name: "cluster admin zookeeper config"
+  register: "cluster_admin_zookeeper_config_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/zookeeper/conf/zoo.cfg"
+    src: "cluster-admin-zookeeper-zoo-cfg"
+
+- name: "cluster admin zookeeper server id"
+  register: "cluster_admin_zookeeper_server_id_result"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/zookeeper/conf/myid"
+    content: "{{
+      {
+        'a': 1,
+        'b': 2,
+        'c': 3,
+      } [instance_zone]
+    }}"
+
+- name: "cluster admin zookeeper reload"
+  changed_when: "
+    cluster_admin_zookeeper_config_result | changed
+    or cluster_admin_zookeeper_server_id_result | changed
+  "
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "zookeeper"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

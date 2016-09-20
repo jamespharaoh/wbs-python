@@ -47,6 +47,8 @@
     - "wistla-heka-master"
     - "cluster-admin-snapshots"
 
+    - "cluster-admin-zookeeper"
+
     - "cluster-activate"
 
 # ex: et ts=2 filetype=yaml

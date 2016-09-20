@@ -1,0 +1,12 @@
+---
+
+- include: "cluster-admin-zookeeper.yml"
+  tags:
+
+    - "cluster-admin-zookeeper"
+    - "cluster-admin"
+    - "cluster"
+
+    - "zookeeper"
+
+# ex: et ts=2 filetype=yaml
