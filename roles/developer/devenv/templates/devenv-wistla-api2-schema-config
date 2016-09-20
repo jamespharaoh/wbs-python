@@ -12,6 +12,7 @@ schemas:
     host: "{{ deployment_name }}-postgresql-main-0"
     name: wistla
     exclude_tables:
+      - acl
       - config
       - feed_search
       - timezones
@@ -23,6 +24,7 @@ schemas:
     host: "{{ deployment_name }}-postgresql-cache-0"
     name: wistla
     exclude_tables:
+      - acl
       - config
       - feed_search
       - timezones
