@@ -200,7 +200,6 @@ cluster-simple2:
   node_types:
 
     - "api2"
-    - "browser"
     - "db-daemon"
     - "kafka"
     - "load"
