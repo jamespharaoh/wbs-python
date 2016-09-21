@@ -49,12 +49,6 @@ deployment:
     log_segment_bytes: "1073741824"
     log_retention_check_interval_ms: "300000"
 
-    zookeeper_connect: "{{ [
-      'wistla-', deployment_name, '-dev',
-      ':2181',
-      '/wistla-', deployment_name, '-dev',
-      '/kafka',
-    ] | join }}"
     zookeeper_connection_timeout_ms: "1000"
 
 # ex: et ts=2 filetype=yaml

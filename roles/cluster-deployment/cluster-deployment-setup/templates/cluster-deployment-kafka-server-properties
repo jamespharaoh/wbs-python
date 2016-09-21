@@ -36,7 +36,20 @@ log.retention.check.interval.ms = {{ kafka.log_retention_check_interval_ms }}
 
 # ---------- zookeeper
 
-zookeeper.connect = {{ kafka.zookeeper_connect }}
+{% set comma = joiner(',') %}
+zookeeper.connect = "{% for zone in [ 'a', 'b', 'c' ] -%}
+        {{ comma() }}{{ [
+          [
+            'wistla-',
+            cluster_name,
+            '-admin-',
+            zone,
+          ] | join,
+          ':2181/',
+          cluster_deployment_name,
+          '/kafka',
+        ] | join }}
+{%- endfor %}"
 zookeeper.connection.timeout.ms = {{ kafka.zookeeper_connection_timeout_ms }}
 
 # ---------- kafka
