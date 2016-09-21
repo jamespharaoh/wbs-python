@@ -410,6 +410,20 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-admin-config"
         target: "config/load/wistla-admin-config.local.js"
 
+      # ---------- kafka
+
+      - template: "cluster-deployment-kafka-server-properties"
+        type: "kafka"
+        target: "server.properties"
+
+      - template: "cluster-deployment-kafka-consumer-properties"
+        type: "kafka"
+        target: "consumer.properties"
+
+      - template: "cluster-deployment-kafka-log4j-properties"
+        type: "kafka"
+        target: "log4j.properties"
+
       # postgresql main
 
       - template: "cluster-deployment-postgresql-config"
