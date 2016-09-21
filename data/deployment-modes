@@ -187,7 +187,6 @@ cluster-simple2:
     - "posgresql"
 
     - "api2"
-    - "browser"
     - "db-daemon"
     - "kafka"
     - "load"
