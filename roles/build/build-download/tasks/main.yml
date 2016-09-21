@@ -1,6 +1,9 @@
 ---
 
 - include: "build-download.yml"
-  tags: [ "build", "build-download" ]
+  tags:
+
+    - "build"
+    - "build-download"
 
 # ex: et ts=2 filetype=yaml

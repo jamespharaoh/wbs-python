@@ -1,17 +1,35 @@
 ---
 
+- name: "build unpack server start"
+  delegate_to: "localhost"
+  run_once: "yes"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    ! nc -z localhost:4152;
+
+    ls -l "{{ builds_path }}";
+
+    rzbackup-server
+      "127.0.0.1:4152"
+      "{{ builds_path }}"
+      "{{ deployment_build_secret_path }}"
+    >> /tmp/rzbackup-server.log
+    2>&1
+    &
+
+    echo $! > /tmp/rzbackup-server.pid;
+
+    disown;
+
 - name: "unpack build"
   delegate_to: "localhost"
   environment:
-
-    build_source: "{{ [
-      builds_path,
-      '/backups/',
-      node_template,
-      '-',
-      deployment.deployed_build,
-      '.tar',
-    ] | join }}"
 
     build_target: "/var/lib/lxc/{{ inventory_hostname }}"
 
@@ -35,10 +53,9 @@
     sudo btrfs subvolume create "$build_target/rootfs";
 
     {
-      zbackup restore "$build_source"
-        --cache-size "{{ zbackup_cache_size }}"
-        --password-file "{{ deployment_build_secret_path }}"
-        --silent;
+      rzbackup-client restore
+        "localhost:4152"
+        "/{{ node_template }}-{{ deployment.deployed_build }}.tar";
     } | {
       sudo tar
         --extract
@@ -95,5 +112,22 @@
     module: "file"
     path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
     state: "directory"
+
+- name: "build unpack server stop"
+  delegate_to: "localhost"
+  run_once: "yes"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    kill $(
+      cat "/tmp/rzbackup-server.pid";
+    );
+
+    rm "/tmp/rzbackup-server.pid";
 
 # ex: et ts=2 filetype=yaml
