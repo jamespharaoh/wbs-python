@@ -243,7 +243,7 @@ devenv_config_links:
 
   # ---------- wistla-data-process
 
-  - dest: "wistla-data-process/config/local.yml"
+  - dest: "wistla-data-process/config/local.yaml"
     src: "../../config/api2/wistla-api-server-local.yaml"
 
   # ---------- wistla-db-schema

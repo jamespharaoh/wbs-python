@@ -68,6 +68,14 @@ node_deploy_projects:
 
   - name: "wistla-data-process"
     type: "nodejs"
+    excludes:
+
+      - "/config/local.yaml"
+
+    configs:
+
+      - target: "local.yaml"
+        source: "wistla-api-server-local.yaml"
 
   - name: "wistla-db"
     type: "nodejs"
