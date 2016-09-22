@@ -39,6 +39,7 @@ def parse_arguments(args):
         args.remove('-v')
     if '--verbose' in args:
         verbose = True
+        args.remove('--verbose')
     if 'YAML_TEST_VERBOSE' in os.environ:
         verbose = True
     include_functions = []
@@ -118,6 +119,7 @@ def display(results, verbose):
         sys.stdout.write('FAILURES: %s\n' % failures)
     if errors:
         sys.stdout.write('ERRORS: %s\n' % errors)
+    return not (failures or errors)
 
 def run(collections, args=None):
     test_functions = find_test_functions(collections)
@@ -147,5 +149,5 @@ def run(collections, args=None):
         else:
             result = execute(function, [], verbose)
             results.append(result)
-    display(results, verbose=verbose)
+    return display(results, verbose=verbose)
 
