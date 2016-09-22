@@ -410,31 +410,26 @@ cluster_deployment_types:
       - template: "cluster-deployment-wistla-admin-config"
         target: "config/load/wistla-admin-config.local.js"
 
-      # ---------- kafka
+      # kafka
 
       - template: "cluster-deployment-kafka-server-properties"
-        type: "kafka"
-        target: "server.properties"
+        target: "config/kafka/server.properties"
 
       - template: "cluster-deployment-kafka-consumer-properties"
-        type: "kafka"
-        target: "consumer.properties"
+        target: "config/kafka/consumer.properties"
 
       - template: "cluster-deployment-kafka-log4j-properties"
-        type: "kafka"
-        target: "log4j.properties"
+        target: "config/kafka/log4j.properties"
 
       # postgresql main
 
       - template: "cluster-deployment-postgresql-config"
-        type: "postgresql-main"
         target: "config/postgresql-main/postgresql.conf"
         owner: "postgres"
         group: "postgres"
         mode: "0644"
 
       - template: "cluster-deployment-postgresql-hba-config"
-        type: "postgresql-main"
         target: "config/postgresql-main/postgresql-hba.conf"
         owner: "postgres"
         group: "postgres"
@@ -443,14 +438,12 @@ cluster_deployment_types:
       # postgresql cache
 
       - template: "cluster-deployment-postgresql-config"
-        type: "postgresql-cache"
         target: "config/postgresql-cache/postgresql.conf"
         owner: "postgres"
         group: "postgres"
         mode: "0644"
 
       - template: "cluster-deployment-postgresql-hba-config"
-        type: "postgresql-cache"
         target: "config/postgresql-cache/postgresql-hba.conf"
         owner: "postgres"
         group: "postgres"
@@ -753,16 +746,13 @@ cluster_deployment_types:
       # ---------- kafka
 
       - template: "cluster-deployment-kafka-server-properties"
-        type: "kafka"
-        target: "server.properties"
+        target: "config/kafka/server.properties"
 
       - template: "cluster-deployment-kafka-consumer-properties"
-        type: "kafka"
-        target: "consumer.properties"
+        target: "config/kafka/consumer.properties"
 
       - template: "cluster-deployment-kafka-log4j-properties"
-        type: "kafka"
-        target: "log4j.properties"
+        target: "config/kafka/log4j.properties"
 
       # postgresql main
 
