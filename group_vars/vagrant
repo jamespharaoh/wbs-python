@@ -273,6 +273,6 @@ nodejs_version_legacy: "5.6.0"
 
 nodejs_npm_registry: "http://localhost:8081"
 
-nginx_version: "1.9.14"
+nginx_install_version: "1.9.14"
 
 # ex: et ts=2 filetype=yaml
