@@ -2,6 +2,20 @@
 CHANGELOG
 =========
 
+0.1.4
+=====
+
+* feature:chunksize: Automatically adjust the chunksize if it doesn't meet S3s requirements.
+* bugfix:Download: Add support for downloading to special UNIX file by name
+
+
+0.1.3
+=====
+
+* feature:delete: Add a ``.delete()`` method to the transfer manager.
+* bugfix:seekable upload: Fix issue where seeked position of seekable file for a nonmultipart upload was not being taken into account.
+
+
 0.1.2
 =====
 
