@@ -66,6 +66,34 @@ class TestSuperLen:
             assert super_len(fd) == 4
         assert len(recwarn) == warnings_num
 
+    def test_super_len_with__len__(self):
+        foo = [1,2,3,4]
+        len_foo = super_len(foo)
+        assert len_foo == 4
+
+    def test_super_len_with_no__len__(self):
+        class LenFile(object):
+            def __init__(self):
+                self.len = 5
+
+        assert super_len(LenFile()) == 5
+
+    def test_super_len_with_tell(self):
+        foo = StringIO.StringIO('12345')
+        assert super_len(foo) == 5
+        foo.read(2)
+        assert super_len(foo) == 3
+
+    def test_super_len_with_fileno(self):
+        with open(__file__, 'rb') as f:
+            length = super_len(f)
+            file_data = f.read()
+        assert length == len(file_data)
+
+    def test_super_len_with_no_matches(self):
+        """Ensure that objects without any length methods default to 0"""
+        assert super_len(object()) == 0
+
 
 class TestToKeyValList:
 
@@ -323,6 +351,9 @@ http_proxies = {'http': 'http://http.proxy',
                 'http://some.host': 'http://some.host.proxy'}
 all_proxies = {'all': 'socks5://http.proxy',
                'all://some.host': 'socks5://some.host.proxy'}
+mixed_proxies = {'http': 'http://http.proxy',
+                 'http://some.host': 'http://some.host.proxy',
+                 'all': 'socks5://http.proxy'}
 @pytest.mark.parametrize(
     'url, expected, proxies', (
         ('hTTp://u:p@Some.Host/path', 'http://some.host.proxy', http_proxies),
@@ -336,6 +367,11 @@ all_proxies = {'all': 'socks5://http.proxy',
         ('hTTp:///path', 'socks5://http.proxy', all_proxies),
         ('hTTps://Other.Host', 'socks5://http.proxy', all_proxies),
 
+        ('http://u:p@other.host/path', 'http://http.proxy', mixed_proxies),
+        ('http://u:p@some.host/path', 'http://some.host.proxy', mixed_proxies),
+        ('https://u:p@other.host/path', 'socks5://http.proxy', mixed_proxies),
+        ('https://u:p@some.host/path', 'socks5://http.proxy', mixed_proxies),
+        ('https://', 'socks5://http.proxy', mixed_proxies),
         # XXX: unsure whether this is reasonable behavior
         ('file:///etc/motd', 'socks5://http.proxy', all_proxies),
     ))
