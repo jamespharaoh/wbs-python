@@ -75,18 +75,20 @@ from OpenSSL.SSL import (
     SSL_CB_ACCEPT_EXIT, SSL_CB_CONNECT_LOOP, SSL_CB_CONNECT_EXIT,
     SSL_CB_HANDSHAKE_START, SSL_CB_HANDSHAKE_DONE)
 
-from .util import WARNING_TYPE_EXPECTED, NON_ASCII, TestCase, b
+from .util import WARNING_TYPE_EXPECTED, NON_ASCII, TestCase
 from .test_crypto import (
     cleartextCertificatePEM, cleartextPrivateKeyPEM,
     client_cert_pem, client_key_pem, server_cert_pem, server_key_pem,
     root_cert_pem)
 
 
-# openssl dhparam 128 -out dh-128.pem (note that 128 is a small number of bits
-# to use)
+# openssl dhparam 1024 -out dh-1024.pem (note that 1024 is a small number of
+# bits to use)
 dhparam = """\
 -----BEGIN DH PARAMETERS-----
-MBYCEQCobsg29c9WZP/54oAPcwiDAgEC
+MIGHAoGBALdUMvn+C9MM+y5BWZs11mSeH6HHoEq0UVbzVq7UojC1hbsZUuGukQ3a
+Qh2/pwqb18BZFykrWB0zv/OkLa0kx4cuUgNrUVq1EFheBiX6YqryJ7t2sO09NQiO
+V7H54LmltOT/hEh6QWsJqb6BQgH65bswvV/XkYGja8/T0GzvbaVzAgEC
 -----END DH PARAMETERS-----
 """
 
@@ -136,10 +138,10 @@ def socket_pair():
     # Let's pass some unencrypted data to make sure our socket connection is
     # fine.  Just one byte, so we don't have to worry about buffers getting
     # filled up or fragmentation.
-    server.send(b("x"))
-    assert client.recv(1024) == b("x")
-    client.send(b("y"))
-    assert server.recv(1024) == b("y")
+    server.send(b"x")
+    assert client.recv(1024) == b"x"
+    client.send(b"y")
+    assert server.recv(1024) == b"y"
 
     # Most of our callers want non-blocking sockets, make it easy for them.
     server.setblocking(False)
@@ -168,45 +170,45 @@ def _create_certificate_chain():
         2. A new intermediate certificate signed by cacert (icert)
         3. A new server certificate signed by icert (scert)
     """
-    caext = X509Extension(b('basicConstraints'), False, b('CA:true'))
+    caext = X509Extension(b'basicConstraints', False, b'CA:true')
 
     # Step 1
     cakey = PKey()
-    cakey.generate_key(TYPE_RSA, 512)
+    cakey.generate_key(TYPE_RSA, 1024)
     cacert = X509()
     cacert.get_subject().commonName = "Authority Certificate"
     cacert.set_issuer(cacert.get_subject())
     cacert.set_pubkey(cakey)
-    cacert.set_notBefore(b("20000101000000Z"))
-    cacert.set_notAfter(b("20200101000000Z"))
+    cacert.set_notBefore(b"20000101000000Z")
+    cacert.set_notAfter(b"20200101000000Z")
     cacert.add_extensions([caext])
     cacert.set_serial_number(0)
     cacert.sign(cakey, "sha1")
 
     # Step 2
     ikey = PKey()
-    ikey.generate_key(TYPE_RSA, 512)
+    ikey.generate_key(TYPE_RSA, 1024)
     icert = X509()
     icert.get_subject().commonName = "Intermediate Certificate"
     icert.set_issuer(cacert.get_subject())
     icert.set_pubkey(ikey)
-    icert.set_notBefore(b("20000101000000Z"))
-    icert.set_notAfter(b("20200101000000Z"))
+    icert.set_notBefore(b"20000101000000Z")
+    icert.set_notAfter(b"20200101000000Z")
     icert.add_extensions([caext])
     icert.set_serial_number(0)
     icert.sign(cakey, "sha1")
 
     # Step 3
     skey = PKey()
-    skey.generate_key(TYPE_RSA, 512)
+    skey.generate_key(TYPE_RSA, 1024)
     scert = X509()
     scert.get_subject().commonName = "Server Certificate"
     scert.set_issuer(icert.get_subject())
     scert.set_pubkey(skey)
-    scert.set_notBefore(b("20000101000000Z"))
-    scert.set_notAfter(b("20200101000000Z"))
+    scert.set_notBefore(b"20000101000000Z")
+    scert.set_notAfter(b"20200101000000Z")
     scert.add_extensions([
-        X509Extension(b('basicConstraints'), True, b('CA:false'))])
+        X509Extension(b'basicConstraints', True, b'CA:false')])
     scert.set_serial_number(0)
     scert.sign(ikey, "sha1")
 
@@ -775,7 +777,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         """
         context = Context(TLSv1_METHOD)
         options = context.set_options(OP_NO_SSLv2)
-        self.assertTrue(OP_NO_SSLv2 & options)
+        assert options & OP_NO_SSLv2 == OP_NO_SSLv2
 
     @skip_if_py3
     def test_set_options_long(self):
@@ -785,7 +787,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         """
         context = Context(TLSv1_METHOD)
         options = context.set_options(long(OP_NO_SSLv2))
-        self.assertTrue(OP_NO_SSLv2 & options)
+        assert options & OP_NO_SSLv2 == OP_NO_SSLv2
 
     def test_set_mode_wrong_args(self):
         """
@@ -923,7 +925,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         :py:obj:`Context.set_passwd_cb` accepts a callable which will be
         invoked when a private key is loaded from an encrypted PEM.
         """
-        passphrase = b("foobar")
+        passphrase = b"foobar"
         pemFile = self._write_encrypted_pem(passphrase)
         calledWith = []
 
@@ -943,7 +945,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         :py:obj:`Context.use_privatekey_file` propagates any exception raised
         by the passphrase callback.
         """
-        pemFile = self._write_encrypted_pem(b("monkeys are nice"))
+        pemFile = self._write_encrypted_pem(b"monkeys are nice")
 
         def passphraseCallback(maxlen, verify, extra):
             raise RuntimeError("Sorry, I am a fail.")
@@ -958,7 +960,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         :py:obj:`OpenSSL.SSL.Error` if the passphrase callback returns a false
         value.
         """
-        pemFile = self._write_encrypted_pem(b("monkeys are nice"))
+        pemFile = self._write_encrypted_pem(b"monkeys are nice")
 
         def passphraseCallback(maxlen, verify, extra):
             return b""
@@ -973,7 +975,7 @@ class ContextTests(TestCase, _LoopbackMixin):
         :py:obj:`OpenSSL.SSL.Error` if the passphrase callback returns a true
         non-string value.
         """
-        pemFile = self._write_encrypted_pem(b("monkeys are nice"))
+        pemFile = self._write_encrypted_pem(b"monkeys are nice")
 
         def passphraseCallback(maxlen, verify, extra):
             return 10
@@ -988,12 +990,12 @@ class ContextTests(TestCase, _LoopbackMixin):
         longer than the indicated maximum length, it is truncated.
         """
         # A priori knowledge!
-        passphrase = b("x") * 1024
+        passphrase = b"x" * 1024
         pemFile = self._write_encrypted_pem(passphrase)
 
         def passphraseCallback(maxlen, verify, extra):
             assert maxlen == 1024
-            return passphrase + b("y")
+            return passphrase + b"y"
 
         context = Context(TLSv1_METHOD)
         context.set_passwd_cb(passphraseCallback)
@@ -1678,11 +1680,11 @@ class ServerNameCallbackTests(TestCase, _LoopbackMixin):
 
         client = Connection(Context(TLSv1_METHOD), None)
         client.set_connect_state()
-        client.set_tlsext_host_name(b("foo1.example.com"))
+        client.set_tlsext_host_name(b"foo1.example.com")
 
         self._interactInMemory(server, client)
 
-        self.assertEqual([(server, b("foo1.example.com"))], args)
+        self.assertEqual([(server, b"foo1.example.com")], args)
 
 
 class NextProtoNegotiationTests(TestCase, _LoopbackMixin):
@@ -2192,13 +2194,13 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         self.assertRaises(TypeError, conn.set_tlsext_host_name, object())
         self.assertRaises(TypeError, conn.set_tlsext_host_name, 123, 456)
         self.assertRaises(
-            TypeError, conn.set_tlsext_host_name, b("with\0null"))
+            TypeError, conn.set_tlsext_host_name, b"with\0null")
 
         if PY3:
             # On Python 3.x, don't accidentally implicitly convert from text.
             self.assertRaises(
                 TypeError,
-                conn.set_tlsext_host_name, b("example.com").decode("ascii"))
+                conn.set_tlsext_host_name, b"example.com".decode("ascii"))
 
     def test_get_servername_wrong_args(self):
         """
@@ -2232,10 +2234,10 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         :py:obj:`socket.MSG_PEEK` is passed.
         """
         server, client = self._loopback()
-        server.send(b('xy'))
-        self.assertEqual(client.recv(2, MSG_PEEK), b('xy'))
-        self.assertEqual(client.recv(2, MSG_PEEK), b('xy'))
-        self.assertEqual(client.recv(2), b('xy'))
+        server.send(b'xy')
+        self.assertEqual(client.recv(2, MSG_PEEK), b'xy')
+        self.assertEqual(client.recv(2, MSG_PEEK), b'xy')
+        self.assertEqual(client.recv(2), b'xy')
 
     def test_connect_wrong_args(self):
         """
@@ -2890,9 +2892,9 @@ class ConnectionSendTests(TestCase, _LoopbackMixin):
         all of it and returns the number of bytes sent.
         """
         server, client = self._loopback()
-        count = server.send(b('xy'))
+        count = server.send(b'xy')
         self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b('xy'))
+        self.assertEquals(client.recv(2), b'xy')
 
     def test_text(self):
         """
@@ -2921,9 +2923,9 @@ class ConnectionSendTests(TestCase, _LoopbackMixin):
         of bytes sent.
         """
         server, client = self._loopback()
-        count = server.send(memoryview(b('xy')))
+        count = server.send(memoryview(b'xy'))
         self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b('xy'))
+        self.assertEquals(client.recv(2), b'xy')
 
     @skip_if_py3
     def test_short_buffer(self):
@@ -2933,9 +2935,9 @@ class ConnectionSendTests(TestCase, _LoopbackMixin):
         of bytes sent.
         """
         server, client = self._loopback()
-        count = server.send(buffer(b('xy')))
+        count = server.send(buffer(b'xy'))
         self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b('xy'))
+        self.assertEquals(client.recv(2), b'xy')
 
 
 def _make_memoryview(size):
@@ -2959,10 +2961,10 @@ class ConnectionRecvIntoTests(TestCase, _LoopbackMixin):
         output_buffer = factory(5)
 
         server, client = self._loopback()
-        server.send(b('xy'))
+        server.send(b'xy')
 
         self.assertEqual(client.recv_into(output_buffer), 2)
-        self.assertEqual(output_buffer, bytearray(b('xy\x00\x00\x00')))
+        self.assertEqual(output_buffer, bytearray(b'xy\x00\x00\x00'))
 
     def test_bytearray_no_length(self):
         """
@@ -2980,11 +2982,11 @@ class ConnectionRecvIntoTests(TestCase, _LoopbackMixin):
         output_buffer = factory(10)
 
         server, client = self._loopback()
-        server.send(b('abcdefghij'))
+        server.send(b'abcdefghij')
 
         self.assertEqual(client.recv_into(output_buffer, 5), 5)
         self.assertEqual(
-            output_buffer, bytearray(b('abcde\x00\x00\x00\x00\x00'))
+            output_buffer, bytearray(b'abcde\x00\x00\x00\x00\x00')
         )
 
     def test_bytearray_respects_length(self):
@@ -3005,12 +3007,12 @@ class ConnectionRecvIntoTests(TestCase, _LoopbackMixin):
         output_buffer = factory(5)
 
         server, client = self._loopback()
-        server.send(b('abcdefghij'))
+        server.send(b'abcdefghij')
 
         self.assertEqual(client.recv_into(output_buffer), 5)
-        self.assertEqual(output_buffer, bytearray(b('abcde')))
+        self.assertEqual(output_buffer, bytearray(b'abcde'))
         rest = client.recv(5)
-        self.assertEqual(b('fghij'), rest)
+        self.assertEqual(b'fghij', rest)
 
     def test_bytearray_doesnt_overfill(self):
         """
@@ -3032,13 +3034,13 @@ class ConnectionRecvIntoTests(TestCase, _LoopbackMixin):
     def test_peek(self):
 
         server, client = self._loopback()
-        server.send(b('xy'))
+        server.send(b'xy')
 
         for _ in range(2):
             output_buffer = bytearray(5)
             self.assertEqual(
                 client.recv_into(output_buffer, flags=MSG_PEEK), 2)
-            self.assertEqual(output_buffer, bytearray(b('xy\x00\x00\x00')))
+            self.assertEqual(output_buffer, bytearray(b'xy\x00\x00\x00'))
 
     @skip_if_py26
     def test_memoryview_no_length(self):
@@ -3099,8 +3101,8 @@ class ConnectionSendallTests(TestCase, _LoopbackMixin):
         passed to it.
         """
         server, client = self._loopback()
-        server.sendall(b('x'))
-        self.assertEquals(client.recv(1), b('x'))
+        server.sendall(b'x')
+        self.assertEquals(client.recv(1), b'x')
 
     def test_text(self):
         """
@@ -3127,8 +3129,8 @@ class ConnectionSendallTests(TestCase, _LoopbackMixin):
         :py:obj:`Connection.sendall` transmits all of them.
         """
         server, client = self._loopback()
-        server.sendall(memoryview(b('x')))
-        self.assertEquals(client.recv(1), b('x'))
+        server.sendall(memoryview(b'x'))
+        self.assertEquals(client.recv(1), b'x')
 
     @skip_if_py3
     def test_short_buffers(self):
@@ -3137,8 +3139,8 @@ class ConnectionSendallTests(TestCase, _LoopbackMixin):
         :py:obj:`Connection.sendall` transmits all of them.
         """
         server, client = self._loopback()
-        server.sendall(buffer(b('x')))
-        self.assertEquals(client.recv(1), b('x'))
+        server.sendall(buffer(b'x'))
+        self.assertEquals(client.recv(1), b'x')
 
     def test_long(self):
         """
@@ -3150,7 +3152,7 @@ class ConnectionSendallTests(TestCase, _LoopbackMixin):
         # Should be enough, underlying SSL_write should only do 16k at a time.
         # On Windows, after 32k of bytes the write will block (forever
         # - because no one is yet reading).
-        message = b('x') * (1024 * 32 - 1) + b('y')
+        message = b'x' * (1024 * 32 - 1) + b'y'
         server.sendall(message)
         accum = []
         received = 0
@@ -3158,7 +3160,7 @@ class ConnectionSendallTests(TestCase, _LoopbackMixin):
             data = client.recv(1024)
             accum.append(data)
             received += len(data)
-        self.assertEquals(message, b('').join(accum))
+        self.assertEquals(message, b''.join(accum))
 
     def test_closed(self):
         """
@@ -3447,7 +3449,7 @@ class MemoryBIOTests(TestCase, _LoopbackMixin):
             client_conn.client_random(), client_conn.server_random())
 
         # Here are the bytes we'll try to send.
-        important_message = b('One if by land, two if by sea.')
+        important_message = b'One if by land, two if by sea.'
 
         server_conn.write(important_message)
         self.assertEquals(
@@ -3471,7 +3473,7 @@ class MemoryBIOTests(TestCase, _LoopbackMixin):
         """
         server_conn, client_conn = self._loopback()
 
-        important_message = b("Help me Obi Wan Kenobi, you're my only hope.")
+        important_message = b"Help me Obi Wan Kenobi, you're my only hope."
         client_conn.send(important_message)
         msg = server_conn.recv(1024)
         self.assertEqual(msg, important_message)
@@ -3488,7 +3490,7 @@ class MemoryBIOTests(TestCase, _LoopbackMixin):
         :py:obj:`OpenSSL.SSL.bio_write` don't work on
         :py:obj:`OpenSSL.SSL.Connection`() that use sockets.
         """
-        context = Context(SSLv3_METHOD)
+        context = Context(TLSv1_METHOD)
         client = socket()
         clientSSL = Connection(context, client)
         self.assertRaises(TypeError, clientSSL.bio_read, 100)
