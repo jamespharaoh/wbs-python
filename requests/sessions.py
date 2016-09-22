@@ -226,7 +226,7 @@ class SessionRedirectMixin(object):
         if self.trust_env and not should_bypass_proxies(url):
             environ_proxies = get_environ_proxies(url)
 
-            proxy = environ_proxies.get('all', environ_proxies.get(scheme))
+            proxy = environ_proxies.get(scheme, environ_proxies.get('all'))
 
             if proxy:
                 new_proxies.setdefault(scheme, proxy)
@@ -322,7 +322,7 @@ class Session(SessionRedirectMixin):
         #: SSL Verification default.
         self.verify = True
 
-        #: SSL certificate default.
+        #: SSL client certificate default.
         self.cert = None
 
         #: Maximum number of redirects allowed. If the request exceeds this

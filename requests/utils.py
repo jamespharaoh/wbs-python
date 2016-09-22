@@ -45,7 +45,7 @@ def dict_to_sequence(d):
 
 
 def super_len(o):
-    total_length = 0
+    total_length = None
     current_position = 0
 
     if hasattr(o, '__len__'):
@@ -53,10 +53,6 @@ def super_len(o):
 
     elif hasattr(o, 'len'):
         total_length = o.len
-
-    elif hasattr(o, 'getvalue'):
-        # e.g. BytesIO, cStringIO.StringIO
-        total_length = len(o.getvalue())
 
     elif hasattr(o, 'fileno'):
         try:
@@ -87,7 +83,22 @@ def super_len(o):
             # is actually a special file descriptor like stdin. In this
             # instance, we don't know what the length is, so set it to zero and
             # let requests chunk it instead.
-            current_position = total_length
+            if total_length is not None:
+                current_position = total_length
+
+        if hasattr(o, 'seek') and total_length is None:
+            # StringIO and BytesIO have seek but no useable fileno
+
+            # seek to end of file
+            o.seek(0, 2)
+            total_length = o.tell()
+
+            # seek back to current position to support
+            # partially read file-like objects
+            o.seek(current_position or 0)
+
+    if total_length is None:
+        total_length = 0
 
     return max(0, total_length - current_position)
 
@@ -617,13 +628,13 @@ def select_proxy(url, proxies):
     proxies = proxies or {}
     urlparts = urlparse(url)
     if urlparts.hostname is None:
-        return proxies.get('all', proxies.get(urlparts.scheme))
+        return proxies.get(urlparts.scheme, proxies.get('all'))
 
     proxy_keys = [
-        'all://' + urlparts.hostname,
-        'all',
         urlparts.scheme + '://' + urlparts.hostname,
         urlparts.scheme,
+        'all://' + urlparts.hostname,
+        'all',
     ]
     proxy = None
     for proxy_key in proxy_keys:

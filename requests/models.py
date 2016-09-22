@@ -10,6 +10,11 @@ This module contains the primary objects that power Requests.
 import collections
 import datetime
 
+# Import encoding now, to avoid implicit import later.
+# Implicit import within threads may cause LookupError when standard library is in a ZIP,
+# such as in Embedded Python. See https://github.com/kennethreitz/requests/issues/3578.
+import encodings.idna
+
 from io import BytesIO, UnsupportedOperation
 from .hooks import default_hooks
 from .structures import CaseInsensitiveDict
@@ -848,7 +853,14 @@ class Response(object):
 
         http_error_msg = ''
         if isinstance(self.reason, bytes):
-            reason = self.reason.decode('utf-8', 'ignore')
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode('utf-8')
+            except UnicodeDecodeError:
+                reason = self.reason.decode('iso-8859-1')
         else:
             reason = self.reason
 
