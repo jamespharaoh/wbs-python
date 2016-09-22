@@ -30,7 +30,7 @@ from awscli.customizations.s3.s3handler import S3Handler
 from awscli.customizations.s3.s3handler import S3TransferStreamHandler
 from awscli.customizations.s3.utils import find_bucket_key, uni_print, \
     AppendFilter, find_dest_path_comp_key, human_readable_size, \
-    RequestParamsMapper
+    RequestParamsMapper, split_s3_bucket_key
 from awscli.customizations.s3.syncstrategy.base import MissingFileSync, \
     SizeAndLastModifiedSync, NeverSync
 from awscli.customizations.s3 import transferconfig
@@ -605,6 +605,36 @@ class WebsiteCommand(S3Command):
         return path
 
 
+class PresignCommand(S3Command):
+    NAME = 'presign'
+    DESCRIPTION = ("Generate a pre-signed URL for an Amazon S3 object. "
+                   "This allows anyone who receives the pre-signed URL "
+                   "to retrieve the S3 object with an HTTP GET request.")
+    USAGE = "<S3Uri>"
+    ARG_TABLE = [{'name': 'path',
+                  'positional_arg': True, 'synopsis': USAGE},
+                 {'name': 'expires-in', 'default': 3600,
+                  'cli_type_name': 'integer',
+                  'help_text': (
+                      'Number of seconds until the pre-signed '
+                      'URL expires.  Default is 3600 seconds.')}]
+
+    def _run_main(self, parsed_args, parsed_globals):
+        super(PresignCommand, self)._run_main(parsed_args, parsed_globals)
+        path = parsed_args.path
+        if path.startswith('s3://'):
+            path = path[5:]
+        bucket, key = find_bucket_key(path)
+        url = self.client.generate_presigned_url(
+            'get_object',
+            {'Bucket': bucket, 'Key': key},
+            ExpiresIn=parsed_args.expires_in
+        )
+        uni_print(url)
+        uni_print('\n')
+        return 0
+
+
 class S3TransferCommand(S3Command):
     def _run_main(self, parsed_args, parsed_globals):
         super(S3TransferCommand, self)._run_main(parsed_args, parsed_globals)
@@ -720,12 +750,35 @@ class SyncCommand(S3TransferCommand):
                 [METADATA, METADATA_DIRECTIVE]
 
 
-class MbCommand(S3TransferCommand):
+class MbCommand(S3Command):
     NAME = 'mb'
     DESCRIPTION = "Creates an S3 bucket."
     USAGE = "<S3Uri>"
-    ARG_TABLE = [{'name': 'paths', 'nargs': 1, 'positional_arg': True,
-                  'synopsis': USAGE}]
+    ARG_TABLE = [{'name': 'path', 'positional_arg': True, 'synopsis': USAGE}]
+
+    def _run_main(self, parsed_args, parsed_globals):
+        super(MbCommand, self)._run_main(parsed_args, parsed_globals)
+
+        if not parsed_args.path.startswith('s3://'):
+            raise TypeError("%s\nError: Invalid argument type" % self.USAGE)
+        bucket, _ = split_s3_bucket_key(parsed_args.path)
+
+        bucket_config = {'LocationConstraint': self.client.meta.region_name}
+        params = {'Bucket': bucket}
+        if self.client.meta.region_name != 'us-east-1':
+            params['CreateBucketConfiguration'] = bucket_config
+
+        # TODO: Consolidate how we handle return codes and errors
+        try:
+            self.client.create_bucket(**params)
+            uni_print("make_bucket: %s\n" % bucket)
+            return 0
+        except Exception as e:
+            uni_print(
+                "make_bucket failed: %s %s\n" % (parsed_args.path, e),
+                sys.stderr
+            )
+            return 1
 
 
 class RbCommand(S3TransferCommand):
@@ -809,7 +862,7 @@ class CommandArchitecture(object):
         self.instructions.append('s3_handler')
 
     def needs_filegenerator(self):
-        if self.cmd in ['mb', 'rb'] or self.parameters['is_stream']:
+        if self.cmd == 'rb' or self.parameters['is_stream']:
             return False
         else:
             return True
@@ -877,7 +930,6 @@ class CommandArchitecture(object):
                                       'mv': 'move'}
         cmd_translation['s3'] = {
             'rm': 'delete',
-            'mb': 'make_bucket',
             'rb': 'remove_bucket'
         }
         result_queue = queue.Queue()
@@ -972,9 +1024,6 @@ class CommandArchitecture(object):
                             'file_generator': [file_generator],
                             'filters': [create_filter(self.parameters)],
                             'file_info_builder': [file_info_builder],
-                            's3_handler': [s3handler]}
-        elif self.cmd == 'mb':
-            command_dict = {'setup': [taskinfo],
                             's3_handler': [s3handler]}
         elif self.cmd == 'rb':
             command_dict = {'setup': [taskinfo],
