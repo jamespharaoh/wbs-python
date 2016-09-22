@@ -193,6 +193,16 @@ else use the usual :meth:`app.run() <flask.Flask.run>`.
 `Flask-Script <http://packages.python.org/Flask-Script/>`_ may come in handy
 here.
 
+Controlling What Is Followed
+----------------------------
+
+Frozen-Flask follows links automatically or with some help from URL generators.
+If you want to control what gets followed, then URL generators should be used
+with the Freezer's ``with_no_argument_rules`` and ``log_url_for`` flags.
+Disabling these flags will force Frozen-Flask to use URL generators only. The
+combination of these three elements determines how much Frozen-Flask will
+follow.
+
 Configuration
 -------------
 
@@ -279,10 +289,19 @@ are accepted:
     404 error is returned by your application.
     In this case, a warning will be printed on stdout and the static page will
     be generated using your 404 error page handler or flask's default one.
-    This can be usefull during development phase if you have already referenced
-    pages wich aren't written yet.
+    This can be useful during development phase if you have already referenced
+    pages which aren't written yet.
 
     .. versionadded:: 0.12
+
+``FREEZER_REDIRECT_POLICY``
+    The policy for handling redirects. The default is ``'follow'`` which means
+    that when a redirect response is encountered it will follow it to get the
+    content from the redirected location. ``'ignore'`` will not stop freezing,
+    but no content will appear in the redirected location. ``'error'`` will
+    raise an exception if a redirect is encountered.
+
+    .. versionadded:: 0.13
 
 .. _mime-types:
 
