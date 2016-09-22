@@ -175,6 +175,12 @@ class TestRefs(TestBase):
 
     def test_orig_head(self):
         assert type(self.rorepo.head.orig_head()) == SymbolicReference
+        
+    @with_rw_repo('0.1.6')
+    def test_head_checkout_detached_head(self, rw_repo):
+        res = rw_repo.remotes.origin.refs.master.checkout()
+        assert isinstance(res, SymbolicReference)
+        assert res.name == 'HEAD'
 
     @with_rw_repo('0.1.6')
     def test_head_reset(self, rw_repo):
@@ -320,8 +326,8 @@ class TestRefs(TestBase):
         assert remote_refs_so_far
 
         for remote in remotes:
-            # remotes without references throw
-            self.failUnlessRaises(AssertionError, getattr, remote, 'refs')
+            # remotes without references should produce an empty list
+            self.assertEqual(remote.refs, [])
         # END for each remote
 
         # change where the active head points to
