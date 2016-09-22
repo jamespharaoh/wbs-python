@@ -627,12 +627,23 @@ cluster_deployment_types:
 
     shared_directories:
 
-      - "audio"
-      - "cms-image"
-      - "image"
-      - "log"
-      - "user-upload"
-      - "video"
+      - directory: "audio"
+        user: "ubuntu"
+
+      - directory: "cms-image"
+        user: "ubuntu"
+
+      - directory: "image"
+        user: "ubuntu"
+
+      - directory: "log"
+        user: "ubuntu"
+
+      - directory: "user-upload"
+        user: "ubuntu"
+
+      - directory: "video"
+        user: "ubuntu"
 
     shared_logfiles: []
 
@@ -801,7 +812,11 @@ cluster_deployment_types:
 
     shared_directories:
 
-      - "log"
+      - directory: "log"
+        user: "ubuntu"
+
+      - directory: "log/kafka"
+        user: kafka
 
     shared_logfiles:
 
