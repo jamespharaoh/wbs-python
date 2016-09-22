@@ -4,8 +4,7 @@ Changelog
 Versions are year-based with a strict backward-compatibility policy.
 The third digit is only for regressions.
 
-
-16.1.0 (UNRELEASED)
+16.2.0 (UNRELEASED)
 -------------------
 
 Backward-incompatible changes:
@@ -23,12 +22,37 @@ Deprecations:
 Changes:
 ^^^^^^^^
 
+*none*
+
+
+----
+
+
+16.1.0 (2016-08-26)
+-------------------
+
+Backward-incompatible changes:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*none*
+
+
+Deprecations:
+^^^^^^^^^^^^^
+
+- Dropped support for OpenSSL 0.9.8.
+
+
+Changes:
+^^^^^^^^
+
 - Fix memory leak in ``OpenSSL.crypto.dump_privatekey()`` with ``FILETYPE_TEXT``.
   `#496 <https://github.com/pyca/pyopenssl/pull/496>`_
 - Enable use of CRL (and more) in verify context.
   `#483 <https://github.com/pyca/pyopenssl/pull/483>`_
 - ``OpenSSL.crypto.PKey`` can now be constructed from ``cryptography`` objects and also exported as such.
   `#439 <https://github.com/pyca/pyopenssl/pull/439>`_
+- Support newer versions of ``cryptography`` which use opaque structs for OpenSSL 1.1.0 compatibility.
 
 
 ----
