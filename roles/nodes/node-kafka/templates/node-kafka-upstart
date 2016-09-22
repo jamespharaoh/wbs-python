@@ -11,6 +11,7 @@ respawn limit unlimited
 env HOME=/var/lib/kafka
 env JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 env KAFKA_LOG4J_OPTS=-Dlog4j.configuration=file:/config/log4j.properties
+env LOG_DIR=/shared/log/kafka
 
 chdir /opt/kafka-{{ kafka_version }}
 

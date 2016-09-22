@@ -36,12 +36,12 @@ log.retention.check.interval.ms = {{ kafka.log_retention_check_interval_ms }}
 
 # ---------- zookeeper
 
-zookeeper.connect = "{{ [
-      'wistla-', deployment_name, '-dev',
-      ':2181',
-      '/wistla-', deployment_name, '-dev',
-      '/kafka',
-    ] | join }}"
+zookeeper.connect = {{ [
+	'wistla-', deployment_name, '-dev',
+	':2181',
+	'/wistla-', deployment_name, '-dev',
+	'/kafka',
+] | join }}
 zookeeper.connection.timeout.ms = {{ kafka.zookeeper_connection_timeout_ms }}
 
 # ---------- kafka
