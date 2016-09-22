@@ -51,7 +51,7 @@ And then add this to your Flask app::
     from raven.contrib.flask import Sentry
     sentry = Sentry(app, dsn='YOUR_DSN_HERE')
 
-Of if you are using factories you can also init it later::
+Or if you are using factories you can also init it later::
 
     from raven.contrib.flask import Sentry
     sentry = Sentry(dsn='YOUR_DSN_HERE')
@@ -77,7 +77,7 @@ You might want to show custom error pages to the user when an error occurs.
 This can be done by registering error handlers.
 
 Error handlers are normal :ref:`views` but instead of being registered for
-routes they are registered for exceptions that are rised while trying to
+routes, they are registered for exceptions that are raised while trying to
 do something else.
 
 Registering
