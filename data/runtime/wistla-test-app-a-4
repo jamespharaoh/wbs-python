@@ -60,6 +60,13 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+rzbackup: 
+  
+  needs_restart: "yes"
+  state: "enabled"
+
+rzbackup_needs_restart: "yes"
+rzbackup_state: "enabled"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAp/89Q3qndZqdbADzuVdQHIqCHlaxBo1K0x65EpWF8Lwz7mbA4Bt55sGrIWZvt8tT10PXpfAX/t4K8SXktZZJQ="

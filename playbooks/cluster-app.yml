@@ -53,6 +53,8 @@
     - "cluster-app-lxc"
     - "cluster-app-cron"
 
+    - "rzbackup"
+
     - "cluster-activate"
 
 # ex: et ts=2 filetype=yaml

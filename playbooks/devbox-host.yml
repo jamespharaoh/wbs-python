@@ -33,6 +33,7 @@
     - "install-tools"
 
     - "etcd"
+    - "rzbackup"
 
     - "devbox-user"
 

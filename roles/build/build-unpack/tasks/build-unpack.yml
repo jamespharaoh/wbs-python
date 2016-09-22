@@ -1,6 +1,6 @@
 ---
 
-- name: "build unpack server start"
+- name: "build unpack server reindex"
   delegate_to: "localhost"
   run_once: "yes"
   args:
@@ -11,21 +11,8 @@
 
     set -euf -o pipefail;
 
-    ! nc -z localhost:4152;
-
-    ls -l "{{ builds_path }}";
-
-    rzbackup-server
-      "127.0.0.1:4152"
-      "{{ builds_path }}"
-      "{{ deployment_build_secret_path }}"
-    >> /tmp/rzbackup-server.log
-    2>&1
-    &
-
-    echo $! > /tmp/rzbackup-server.pid;
-
-    disown;
+    rzbackup-client reindex
+      "127.0.0.1:4152";
 
 - name: "unpack build"
   delegate_to: "localhost"
@@ -112,22 +99,5 @@
     module: "file"
     path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/{{ item.path }}"
     state: "directory"
-
-- name: "build unpack server stop"
-  delegate_to: "localhost"
-  run_once: "yes"
-  args:
-
-    executable: "/bin/bash"
-
-  shell:
-
-    set -euf -o pipefail;
-
-    kill $(
-      cat "/tmp/rzbackup-server.pid";
-    );
-
-    rm "/tmp/rzbackup-server.pid";
 
 # ex: et ts=2 filetype=yaml
