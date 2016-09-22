@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-#   Copyright (c) 2008-2016, David P. D. Moss. All rights reserved.
+#   Copyright (c) 2008-2015, David P. D. Moss. All rights reserved.
 #
 #   Released under the BSD license. See the LICENSE file for details.
 #-----------------------------------------------------------------------------
@@ -347,11 +347,6 @@ class IPAddress(BaseIP):
         """
         if not self.is_netmask():
             return self._module.width
-
-        # the '0' address (e.g. 0.0.0.0 or 0000::) is a valid netmask with
-        # no bits set.
-        if self._value == 0:
-            return 0
 
         i_val = self._value
         numbits = 0
@@ -1282,12 +1277,11 @@ class IPNetwork(BaseIP, IPListMixin):
 
     def iter_hosts(self):
         """
-        A generator that provides all the IP addresses that can be assigned
+        An generator that provides all the IP addresses that can be assigned
         to hosts within the range of this IP object's subnet.
 
         - for IPv4, the network and broadcast addresses are always excluded. \
-          for subnets that contains less than 4 IP addresses /31 and /32 \
-          report in a manner per RFC 3021
+          Any subnet that contains less than 4 IP addresses yields an empty list.
 
         - for IPv6, only the unspecified address '::' or Subnet-Router anycast \
           address (first address in the network) is excluded.
