@@ -200,6 +200,6 @@ cluster_create_volumes:
     device_type: "gp2"
     delete_on_termination: "no"
 
-nginx_version: "{{ supercluster.app_nginx_version }}"
+nginx_install_version: "{{ supercluster.app_nginx_version }}"
 
 # ex: et ts=2 filetype=yaml
