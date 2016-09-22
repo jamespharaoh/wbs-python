@@ -36,8 +36,9 @@
     kafka:
       client_id: "db-audit-log"
       max_batch_size: 16
+      url: "wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka" 
       urls:
-        - wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka
+        - "wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka"
 
 # @wistla/api-server
   # logger information

@@ -35,6 +35,14 @@
     kafka:
       client_id: "db-audit-log"
       max_batch_size: 16
+      url: "{{ [
+  (
+    [ 'a', 'b', 'c' ]
+    | prepend_list ('wistla-' + cluster_name + '-admin-')
+    | append_list (':2181')
+  ) | join (','),
+  '/' + cluster_deployment_name + '/kafka',
+] | join }}"
       urls:
 {%  for zone in [ 'a', 'b', 'c' ] %}
         - "{{ [
