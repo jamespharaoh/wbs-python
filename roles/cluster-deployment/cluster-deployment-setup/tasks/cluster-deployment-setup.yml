@@ -180,7 +180,7 @@
 
     owner: "{{ item.user }}"
     group: "ubuntu"
-    mode: "0750"
+    mode: "0755"
 
 - name: "create shared logfiles"
   with_items: "{{ cluster_deployment_shared_logfiles }}"
