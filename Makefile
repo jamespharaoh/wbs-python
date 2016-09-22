@@ -1,17 +1,17 @@
 #-----------------------------------------------------------------------------
-#   Copyright (c) 2008-2016, David P. D. Moss. All rights reserved.
+#   Copyright (c) 2008-2015, David P. D. Moss. All rights reserved.
 #
 #   Released under the BSD license. See the LICENSE file for details.
 #-----------------------------------------------------------------------------
 #
-# netaddr library build script
+# Unified build script for the netaddr library
 #
 SHELL = /bin/bash
 
-.PHONY = default clean dist doc download test
+.PHONY = all clean dist doc download test
 
-default:
-	@echo 'Please select a build target.'
+all:
+	@echo 'default target does nothing. try clean'
 
 clean:
 	@echo 'cleaning up temporary files'
@@ -24,18 +24,20 @@ clean:
 
 dist: clean doc
 	@echo 'building netaddr release'
-	python setup.py develop
+	python setup_egg.py develop
 	@echo 'building source distributions'
 	python setup.py sdist --formats=gztar,zip
+	@echo 'building egg package'
+	python setup_egg.py bdist_egg
 	@echo 'building wheel package'
 	pip install --upgrade pip
 	pip install wheel
-	python setup.py bdist_wheel --universal
+	python setup_egg.py bdist_wheel --universal
 
 doc:
 	@echo 'building documentation'
 	pip install sphinx
-	python setup.py develop
+	python setup_egg.py develop
 	cd docs/ && $(MAKE) -f Makefile clean html
 	cd docs/build/html && zip -r ../netaddr.zip *
 
@@ -61,8 +63,7 @@ push_tags:
 
 test: clean
 	@echo 'running test suite'
-	pip install -r requirements.txt
-	py.test netaddr/tests
+	python setup.py test
 	@echo 'running doc tests (tutorials)'
 	python tutorials/run_doctests.py
 
