@@ -768,6 +768,29 @@ def test_error_handling():
     assert b'forbidden' == rv.data
 
 
+def test_error_handling_processing():
+    app = flask.Flask(__name__)
+    app.config['LOGGER_HANDLER_POLICY'] = 'never'
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return 'internal server error', 500
+
+    @app.route('/')
+    def broken_func():
+        1 // 0
+
+    @app.after_request
+    def after_request(resp):
+        resp.mimetype = 'text/x-special'
+        return resp
+
+    with app.test_client() as c:
+        resp = c.get('/')
+        assert resp.mimetype == 'text/x-special'
+        assert resp.data == b'internal server error'
+
+
 def test_before_request_and_routing_errors():
     app = flask.Flask(__name__)
 
@@ -1268,8 +1291,6 @@ def test_werkzeug_passthrough_errors(monkeypatch, debug, use_debugger,
     monkeypatch.setattr(werkzeug.serving, 'run_simple', run_simple_mock)
     app.config['PROPAGATE_EXCEPTIONS'] = propagate_exceptions
     app.run(debug=debug, use_debugger=use_debugger, use_reloader=use_reloader)
-    # make sure werkzeug always passes errors through
-    assert rv['passthrough_errors']
 
 
 def test_max_content_length():
