@@ -67,4 +67,56 @@
     'touch ' + deployment_home + '/shared/flags/rabbit-api-user-permissions',
   ] | join (' && ') }}"
 
+- name: "create rabbit admin user"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user"
+  shell: "{{ [
+    'sleep 5',
+    [
+      '(',
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'add_user',
+      'admin',
+      third_parties.dev.rabbit_admin_password,
+      ') || true',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-admin-user',
+  ] | join (' && ') }}"
+
+- name: "set rabbit admin user tags"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user-tags"
+  shell: "{{ [
+    'sleep 1',
+    [
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'set_user_tags',
+      'admin',
+      'management',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-admin-user-tags',
+  ] | join (' && ') }}"
+
+- name: "set rabbit admin user permissions"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user-permissions"
+  shell: "{{ [
+    'sleep 1',
+    [
+      deployment_name + '-rabbit-0',
+      'sudo',
+      'rabbitmqctl',
+      'set_permissions',
+      'admin',
+      '.\\*',
+      '.\\*',
+      '.\\*',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-admin-user-permissions',
+  ] | join (' && ') }}"
+
 # ex: et ts=2 filetype=yaml
