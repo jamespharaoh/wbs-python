@@ -38,9 +38,13 @@ schemas:
       - community_activity_counts
       - user_aggregated_counts
       - user_activity_counts
+      - user_communities_profile
       - user_miscellaneous_counts
+      - user_notifications_profile
       - user_relationship_counts
+      - user_relationships_profile
       - wistl_activity_counts
+      - wistl_communities_profile
       - geo_locations
     path: "./schema.wistla.cache.sql"
     target_directory: "./schema.wistla.cache"
