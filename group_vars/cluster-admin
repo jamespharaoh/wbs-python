@@ -148,7 +148,7 @@ etcd_client_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].clie
 etcd_client_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].client_private_key }}"
 
 php_install_from: "distro"
-php_version: "5"
+php_install_version: "5"
 
 php_packages:
 
@@ -172,8 +172,8 @@ nodejs_packages_legacy:
   - name: "prettyjson"
     version: "1.1.3"
 
-nginx_version: "{{ supercluster.admin_nginx_version }}"
-nginx_config: "/etc/nginx"
+nginx_install_version: "{{ supercluster.admin_nginx_version }}"
+#nginx_config: "/etc/nginx"
 
 mysql_root_password: "{{ supercluster.admin_mysql_root_password }}"
 
