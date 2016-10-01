@@ -275,9 +275,10 @@ nodejs_npm_registry: "http://localhost:8081"
 
 nginx_install_version: "1.9.14"
 
-rzbackup_install_version: "2.0.3-trusty"
+rzbackup_install_version: "2.0.6-trusty"
 rzbackup_user: "{{ deployment_user }}"
 rzbackup_repository: "{{ deployment_home }}/builds"
 rzbackup_password_file: "{{ deployment_build_secret_path }}"
+rzbackup_max_compressed_filesystem_cache_entries: "65536"
 
 # ex: et ts=2 filetype=yaml
