@@ -210,4 +210,4 @@ cluster-simple2:
     - "postgresql-cache"
     - "rabbit"
 
-#
+# ex: noet ts=2 filetype=yaml
