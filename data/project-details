@@ -65,6 +65,7 @@
 
     - "wistla-db"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -103,6 +104,7 @@
     - "wistla-db"
     - "wistla-pubsub"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -121,6 +123,7 @@
     - "wistla-media"
     - "wistla-pubsub"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -139,6 +142,7 @@
     - "wistla-notifications"
     - "wistla-pubsub"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -147,6 +151,10 @@
 - name: "wistla-blob"
   default_branch: "development"
   npm_name: "@wistla/blob"
+
+  depends:
+
+    - "wistla-test"
 
   build_steps:
 
@@ -163,6 +171,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-test"
 
   build_steps:
 
@@ -179,6 +188,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-test"
 
 - name: "wistla-media"
   short: "media handling"
@@ -191,6 +201,7 @@
     - "wistla-db"
     - "wistla-pubsub"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -207,6 +218,7 @@
     - "wistla-i18n"
     - "wistla-pubsub"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -233,6 +245,7 @@
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -249,6 +262,7 @@
   depends:
 
     - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -291,6 +305,7 @@
   depends:
 
     - "wistla-raml-to-api"
+    - "wistla-test"
 
   build_steps:
 
@@ -304,6 +319,10 @@
 
     module to convert RAML 1.0 markup into JSON that can be used to generate API
     endpoints and HTTP server(s); as well as the data transforms
+
+  depends:
+
+    - "wistla-test"
 
   build_steps:
 
