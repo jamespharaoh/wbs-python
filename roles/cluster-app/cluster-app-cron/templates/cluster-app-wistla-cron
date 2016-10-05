@@ -4,6 +4,8 @@ SHELL="/bin/bash"
 HOME="/home/ubuntu"
 MAILTO="{{ cluster.cron_email }}"
 
+10 */2 * * * root btrfs balance start /var/lib/lxc
+
 {% for cluster_deployment_name in cluster.deployment_names -%}
 {%- set cluster_deployment = deployments [cluster_deployment_name] -%}
 
