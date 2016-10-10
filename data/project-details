@@ -304,6 +304,7 @@
 
   depends:
 
+    - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-test"
 
@@ -322,6 +323,7 @@
 
   depends:
 
+    - "wistla-raml-api"
     - "wistla-test"
 
   build_steps:
