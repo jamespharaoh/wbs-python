@@ -83,6 +83,9 @@ node_deploy_projects:
   - name: "wistla-util"
     type: "nodejs"
 
+  - name: "wistla-test"
+    type: "nodejs"
+
   # todo: remove when this is running in the "environments"
   # todo: container
   - name: "wistla-db-schema"

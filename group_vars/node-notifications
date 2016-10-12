@@ -57,6 +57,9 @@ node_deploy_projects:
   - name: "wistla-util"
     type: "nodejs"
 
+  - name: "wistla-test"
+    type: "nodejs"
+
 nodejs_version: "{{ deployment.nodejs_version }}"
 
 nodejs_packages: []
