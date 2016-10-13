@@ -131,6 +131,16 @@
     dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/post-checkout"
     mode: "0755"
 
+- name: "create git pre-push hooks"
+  with_items: "{{ devenv_checkouts }}"
+  when: "deployment_mode == 'vagrant'"
+  action:
+
+    module: "template"
+    src: "devenv-git-hook-pre-push"
+    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/pre-push"
+    mode: "0755"
+
 - name: "create shared directories"
   with_items: "{{ devenv_shared_directories }}"
   become: "yes"
