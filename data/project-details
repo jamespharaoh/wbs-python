@@ -49,6 +49,10 @@
 
     internationalisation
 
+  depends:
+
+    - "wistla-util"
+
   build_steps:
 
     - "npm install"
@@ -155,6 +159,7 @@
   depends:
 
     - "wistla-test"
+    - "wistla-util"
 
   build_steps:
 
@@ -172,6 +177,7 @@
 
     - "wistla-db"
     - "wistla-test"
+    - "wistla-util"
 
   build_steps:
 
@@ -189,6 +195,7 @@
 
     - "wistla-db"
     - "wistla-test"
+    - "wistla-util"
 
 - name: "wistla-media"
   short: "media handling"
@@ -219,17 +226,6 @@
     - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-raml-api"
-  short: "api definitions in raml format"
-  default_branch: "development"
-  description:
-
-    the wistla v2 API defined in RAML 1.0 format
 
   build_steps:
 
@@ -277,6 +273,10 @@
     the postgres db schema and helper scripts to import/export and
     assemble/split the schema
 
+  depends:
+
+    - "wistla-util"
+
   build_steps:
 
     - "npm install"
@@ -288,6 +288,10 @@
   description:
 
     the wistla v2 API defined in RAML 1.0 format
+
+  depends:
+
+    - "wistla-util"
 
   build_steps:
 
@@ -307,6 +311,7 @@
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-test"
+    - "wistla-util"
 
   build_steps:
 
@@ -325,6 +330,7 @@
 
     - "wistla-raml-api"
     - "wistla-test"
+    - "wistla-util"
 
   build_steps:
 
@@ -334,6 +340,10 @@
   short: "testing related shizzle"
   default_branch: "development"
   npm_name: "@wistla/test"
+
+  depends:
+
+    - "wistla-util"
 
   build_steps:
 
