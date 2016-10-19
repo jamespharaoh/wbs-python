@@ -57,4 +57,7 @@ delete.topic.enable=true
 # allow topics to be created outside of the kafka CLI, i.e. from node
 auto.create.topics.enable=true
 
+# resolve offsetOutOfRange errors by automatically resetting the offset to the smallest offset
+auto.offset.reset=smallest
+
 # ex: noet ts=4
