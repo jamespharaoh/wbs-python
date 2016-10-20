@@ -31,75 +31,75 @@ rabbitmq_admin_password="password"
 Setup the main postgresql cluster:
 
 ```sh
-$deployment_name-postgresql-main-0 \
+$deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/initdb \
 	--pgdata "/var/lib/postgresql/9.5/main" \
 	--encoding "utf-8"
 
-$deployment_name-postgresql-main-0 \
+$deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
-$deployment_name-postgresql-main-0 \
+$deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
 
-$deployment_name-postgresql-main-0 \
+$deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
 
-$deployment_name-postgresql-main-0 \
+$deployment_name-postgresql-main-a-4 \
 sudo service postgresql start
 ```
 
 And the cache cluster:
 
 ```sh
-$deployment_name-postgresql-cache-0 \
+$deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/initdb \
 	--pgdata "/var/lib/postgresql/9.5/main" \
 	--encoding "utf-8"
 
-$deployment_name-postgresql-cache-0 \
+$deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
-$deployment_name-postgresql-cache-0 \
+$deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
 
-$deployment_name-postgresql-cache-0 \
+$deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
 
-$deployment_name-postgresql-cache-0 \
+$deployment_name-postgresql-cache-a-4 \
 sudo service postgresql start
 ```
 
 Then rabbitmq:
 
 ```sh
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmq-plugins enable "rabbitmq_management"
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl add_user api "$rabbitmq_api_password"
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_user_tags "api" "management"
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_permissions "api" '.\*' '.\*' '.\*'
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl add_user "admin" "$rabbitmq_admin_password"
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_user_tags "admin" "management"
 
-$deployment_name-rabbit-0 \
+$deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_permissions "admin" '.\*' '.\*' '.\*'
 ```
 
