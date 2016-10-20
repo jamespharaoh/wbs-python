@@ -3,8 +3,8 @@
 - name: "create work dirs"
   with_items:
 
-    - "/home/vagrant/work"
-    - "/home/vagrant/work/{{ cluster_name }}"
+    - "{{ deployment_home }}/work"
+    - "{{ deployment_home }}/work/{{ cluster_name }}"
 
   action:
 

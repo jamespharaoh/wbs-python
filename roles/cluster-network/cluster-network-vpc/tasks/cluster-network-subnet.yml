@@ -5,7 +5,7 @@
 
     module: "template"
     src: "cluster-network-subnet-stack"
-    dest: "/home/vagrant/work/{{ cluster_name }}/{{ subnet_name }}-subnet-stack.yaml"
+    dest: "{{ deployment_home }}/work/{{ cluster_name }}/{{ subnet_name }}-subnet-stack.yaml"
 
 - name: "create {{ subnet_name }} subnet stack"
   register: "subnet_stack_result"
@@ -15,7 +15,7 @@
     stack_name: "{{ cluster_name }}-subnet-{{ subnet_name }}"
     state: "present"
 
-    template: "/home/vagrant/work/{{ cluster_name }}/{{ subnet_name }}-subnet-stack.yaml"
+    template: "{{ deployment_home }}/work/{{ cluster_name }}/{{ subnet_name }}-subnet-stack.yaml"
     template_format: "yaml"
 
     region: "{{ amazon_region_name }}"
