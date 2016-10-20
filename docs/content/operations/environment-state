@@ -6,6 +6,97 @@ Description: Operational documentation to manage the state of Wistla's various
 This document contains various operational documentation for management of
 Wistla's environments.
 
+## Initialise a test environment
+
+This is handled automatically by the `fixtures` playbook and role in dev, but we
+don't use this on the infrastructure, because of more complex usage and
+configurations.
+
+Once an environment has been deployed and started, the following steps can be
+used to initialise the "fixtures", which consist of the two databases and the
+rabbitmq server.
+
+First some preparation, ssh to the server, and set some variables so you can cut
+and paste the commands below. The rabbitmq passwords must match what are
+configured in the deployment resource.
+
+```sh
+ssh wistla-test-app-a-4
+
+deployment_name="test-xxx"
+rabbitmq_api_password="password"
+rabbitmq_admin_password="password"
+```
+
+Setup the main postgresql cluster:
+
+```sh
+$deployment_name-postgresql-main-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/initdb \
+	--pgdata "/var/lib/postgresql/9.5/main" \
+	--encoding "utf-8"
+
+$deployment_name-postgresql-main-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
+
+$deployment_name-postgresql-main-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
+
+$deployment_name-postgresql-main-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
+```
+
+And the cache cluster:
+
+```sh
+$deployment_name-postgresql-cache-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/initdb \
+	--pgdata "/var/lib/postgresql/9.5/main" \
+	--encoding "utf-8"
+
+$deployment_name-postgresql-cache-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
+
+$deployment_name-postgresql-cache-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
+
+$deployment_name-postgresql-cache-0 \
+sudo -H -u "postgres" \
+/usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
+```
+
+Then rabbitmq:
+
+```sh
+$deployment_name-rabbit-0 \
+sudo rabbitmq-plugins enable "rabbitmq_management"
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl add_user api "$rabbitmq_api_password"
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl set_user_tags "api" "management"
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl set_permissions "api" '.\*' '.\*' '.\*'
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl add_user "admin" "$rabbitmq_admin_password"
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl set_user_tags "admin" "management"
+
+$deployment_name-rabbit-0 \
+sudo rabbitmqctl set_permissions "admin" '.\*' '.\*' '.\*'
+```
+
 ## Clear an environment
 
 This script is used regularly during testing in order to remove all data from
