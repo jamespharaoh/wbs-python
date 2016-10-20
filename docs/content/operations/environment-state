@@ -91,7 +91,7 @@ $deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_user_tags "api" "management"
 
 $deployment_name-rabbit-a-4 \
-sudo rabbitmqctl set_permissions "api" '.\*' '.\*' '.\*'
+sudo rabbitmqctl set_permissions "api" '.*' '.*' '.*'
 
 $deployment_name-rabbit-a-4 \
 sudo rabbitmqctl add_user "admin" "$rabbitmq_admin_password"
@@ -100,7 +100,7 @@ $deployment_name-rabbit-a-4 \
 sudo rabbitmqctl set_user_tags "admin" "management"
 
 $deployment_name-rabbit-a-4 \
-sudo rabbitmqctl set_permissions "admin" '.\*' '.\*' '.\*'
+sudo rabbitmqctl set_permissions "admin" '.*' '.*' '.*'
 ```
 
 ## Clear an environment
