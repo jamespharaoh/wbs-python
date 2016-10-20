@@ -38,6 +38,9 @@ sudo -H -u "postgres" \
 	--encoding "utf-8"
 
 $deployment_name-postgresql-main-a-4 \
+sudo service postgresql start
+
+$deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
@@ -48,9 +51,6 @@ sudo -H -u "postgres" \
 $deployment_name-postgresql-main-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
-
-$deployment_name-postgresql-main-a-4 \
-sudo service postgresql start
 ```
 
 And the cache cluster:
@@ -63,6 +63,9 @@ sudo -H -u "postgres" \
 	--encoding "utf-8"
 
 $deployment_name-postgresql-cache-a-4 \
+sudo service postgresql start
+
+$deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
@@ -73,9 +76,6 @@ sudo -H -u "postgres" \
 $deployment_name-postgresql-cache-a-4 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
-
-$deployment_name-postgresql-cache-a-4 \
-sudo service postgresql start
 ```
 
 Then rabbitmq:
