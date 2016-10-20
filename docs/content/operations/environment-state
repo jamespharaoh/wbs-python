@@ -48,6 +48,9 @@ sudo -H -u "postgres" \
 $deployment_name-postgresql-main-0 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
+
+$deployment_name-postgresql-main-0 \
+sudo service postgresql start
 ```
 
 And the cache cluster:
@@ -70,6 +73,9 @@ sudo -H -u "postgres" \
 $deployment_name-postgresql-cache-0 \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
+
+$deployment_name-postgresql-cache-0 \
+sudo service postgresql start
 ```
 
 Then rabbitmq:
