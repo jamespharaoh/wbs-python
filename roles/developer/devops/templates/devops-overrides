@@ -89,6 +89,9 @@ dev_node_memory:
 dev_api_use_s3: "{{ dev_api_use_s3 | default ('no') }}"
 dev_web_use_s3: "{{ dev_web_use_s3 | default ('no') }}"
 
+dev_ip_address: "{{ dev_ip_address | default ('172.28.128.3') }}"
+dev_hostname: "{{ dev_hostname | default ('172.28.128.3') }}"
+
 dev_trusted_clients:
 
   - "172.28.128.1"

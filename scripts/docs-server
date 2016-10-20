@@ -49,11 +49,17 @@ in third_party_index.items ():
 			HOME,
 			third_party_data ["python"]))
 
+from wbs import yamlx
 from wbs.docs import *
 
 class WistlaDocsMaster ():
 
 	def __init__ (self, project_home):
+
+		self.project_config = (
+			yamlx.load_data (
+				"%s/config/overrides.yml" % (
+					project_home)))
 
 		self.home = (
 			"%s/docs" % (
@@ -75,8 +81,10 @@ class WistlaDocsMaster ():
 		self.settings = {
 			"server": {
 				"debug": "yes",
-				"hostname": "172.28.128.3:8888",
-				"listen-address": "172.28.128.3",
+				"hostname": "%s:8888" % (
+					self.project_config ["dev_hostname"]),
+				"listen-address": "%s" % (
+					self.project_config ["dev_ip_address"]),
 				"listen-port": "8888",
 			},
 			"security": {
