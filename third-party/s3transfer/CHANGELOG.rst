@@ -2,6 +2,31 @@
 CHANGELOG
 =========
 
+0.1.8
+=====
+
+* feature:download: Support downloading to FIFOs.
+
+
+0.1.7
+=====
+
+* bugfix:TransferManager: Fix memory leak when using same client to create multiple TransferManagers
+
+
+0.1.6
+=====
+
+* bugfix:download: Fix issue where S3 Object was not downloaded to disk when empty
+
+
+0.1.5
+=====
+
+* bugfix:Cntrl-C: Fix issue of hangs when Cntrl-C happens for many queued transfers
+* feature:cancel: Expose messages for cancels
+
+
 0.1.4
 =====
 
