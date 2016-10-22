@@ -17,7 +17,8 @@ from .cookies import (
     cookiejar_from_dict, extract_cookies_to_jar, RequestsCookieJar, merge_cookies)
 from .models import Request, PreparedRequest, DEFAULT_REDIRECT_LIMIT
 from .hooks import default_hooks, dispatch_hook
-from .utils import to_key_val_list, default_headers, to_native_string
+from ._internal_utils import to_native_string
+from .utils import to_key_val_list, default_headers
 from .exceptions import (
     TooManyRedirects, InvalidSchema, ChunkedEncodingError, ContentDecodingError)
 from .packages.urllib3._collections import RecentlyUsedContainer
@@ -156,7 +157,7 @@ class SessionRedirectMixin(object):
             # in the new request. Because we've mutated our copied prepared
             # request, use the old one that we haven't yet touched.
             extract_cookies_to_jar(prepared_request._cookies, req, resp.raw)
-            prepared_request._cookies.update(self.cookies)
+            merge_cookies(prepared_request._cookies, self.cookies)
             prepared_request.prepare_cookies(prepared_request._cookies)
 
             # Rebuild auth and proxy information.

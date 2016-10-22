@@ -21,6 +21,7 @@ from .structures import CaseInsensitiveDict
 
 from .auth import HTTPBasicAuth
 from .cookies import cookiejar_from_dict, get_cookie_header, _copy_cookie_jar
+from .packages import idna
 from .packages.urllib3.fields import RequestField
 from .packages.urllib3.filepost import encode_multipart_formdata
 from .packages.urllib3.util import parse_url
@@ -29,11 +30,11 @@ from .packages.urllib3.exceptions import (
 from .exceptions import (
     HTTPError, MissingSchema, InvalidURL, ChunkedEncodingError,
     ContentDecodingError, ConnectionError, StreamConsumedError)
+from ._internal_utils import to_native_string
 from .utils import (
     guess_filename, get_auth_from_url, requote_uri,
     stream_decode_response_unicode, to_key_val_list, parse_header_links,
-    iter_slices, guess_json_utf, super_len, to_native_string,
-    check_header_validity)
+    iter_slices, guess_json_utf, super_len, check_header_validity)
 from .compat import (
     cookielib, urlunparse, urlsplit, urlencode, str, bytes, StringIO,
     is_py2, chardet, builtin_str, basestring)
@@ -363,8 +364,8 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
 
         # Only want to apply IDNA to the hostname
         try:
-            host = host.encode('idna').decode('utf-8')
-        except UnicodeError:
+            host = idna.encode(host, uts46=True).decode('utf-8')
+        except (UnicodeError, idna.IDNAError):
             raise InvalidURL('URL has an invalid label.')
 
         # Carefully reconstruct the network location
@@ -424,7 +425,6 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         # Nottin' on you.
         body = None
         content_type = None
-        length = None
 
         if not data and json is not None:
             # urllib3 requires a bytes-like body. Python 2's json.dumps
@@ -475,17 +475,16 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         self.body = body
 
     def prepare_content_length(self, body):
-        if hasattr(body, 'seek') and hasattr(body, 'tell'):
-            curr_pos = body.tell()
-            body.seek(0, 2)
-            end_pos = body.tell()
-            self.headers['Content-Length'] = builtin_str(max(0, end_pos - curr_pos))
-            body.seek(curr_pos, 0)
-        elif body is not None:
-            l = super_len(body)
-            if l:
-                self.headers['Content-Length'] = builtin_str(l)
-        elif (self.method not in ('GET', 'HEAD')) and (self.headers.get('Content-Length') is None):
+        """Prepare Content-Length header based on request method and body"""
+        if body is not None:
+            length = super_len(body)
+            if length:
+                # If length exists, set it. Otherwise, we fallback
+                # to Transfer-Encoding: chunked.
+                self.headers['Content-Length'] = builtin_str(length)
+        elif self.method not in ('GET', 'HEAD') and self.headers.get('Content-Length') is None:
+            # Set Content-Length to 0 for methods that can have a body
+            # but don't provide one. (i.e. not GET or HEAD)
             self.headers['Content-Length'] = '0'
 
     def prepare_auth(self, auth, url=''):
@@ -749,18 +748,14 @@ class Response(object):
 
         if self._content is False:
             # Read the contents.
-            try:
-                if self._content_consumed:
-                    raise RuntimeError(
-                        'The content for this response was already consumed')
+            if self._content_consumed:
+                raise RuntimeError(
+                    'The content for this response was already consumed')
 
-                if self.status_code == 0:
-                    self._content = None
-                else:
-                    self._content = bytes().join(self.iter_content(CONTENT_CHUNK_SIZE)) or bytes()
-
-            except AttributeError:
+            if self.status_code == 0:
                 self._content = None
+            else:
+                self._content = bytes().join(self.iter_content(CONTENT_CHUNK_SIZE)) or bytes()
 
         self._content_consumed = True
         # don't need to release the connection; that's been handled by urllib3

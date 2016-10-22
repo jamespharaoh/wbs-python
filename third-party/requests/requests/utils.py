@@ -20,10 +20,11 @@ import warnings
 
 from . import __version__
 from . import certs
+# to_native_string is unused here, but imported here for backwards compatibility
+from ._internal_utils import to_native_string
 from .compat import parse_http_list as _parse_list_header
-from .compat import (quote, urlparse, bytes, str, OrderedDict, unquote, is_py2,
-                     builtin_str, getproxies, proxy_bypass, urlunparse,
-                     basestring)
+from .compat import (quote, urlparse, bytes, str, OrderedDict, unquote,
+                     getproxies, proxy_bypass, urlunparse, basestring)
 from .cookies import RequestsCookieJar, cookiejar_from_dict
 from .structures import CaseInsensitiveDict
 from .exceptions import InvalidURL, InvalidHeader, FileModeWarning
@@ -85,17 +86,17 @@ def super_len(o):
             # let requests chunk it instead.
             if total_length is not None:
                 current_position = total_length
+        else:
+            if hasattr(o, 'seek') and total_length is None:
+                # StringIO and BytesIO have seek but no useable fileno
 
-        if hasattr(o, 'seek') and total_length is None:
-            # StringIO and BytesIO have seek but no useable fileno
+                # seek to end of file
+                o.seek(0, 2)
+                total_length = o.tell()
 
-            # seek to end of file
-            o.seek(0, 2)
-            total_length = o.tell()
-
-            # seek back to current position to support
-            # partially read file-like objects
-            o.seek(current_position or 0)
+                # seek back to current position to support
+                # partially read file-like objects
+                o.seek(current_position or 0)
 
     if total_length is None:
         total_length = 0
@@ -768,22 +769,6 @@ def get_auth_from_url(url):
         auth = ('', '')
 
     return auth
-
-
-def to_native_string(string, encoding='ascii'):
-    """Given a string object, regardless of type, returns a representation of
-    that string in the native string type, encoding and decoding where
-    necessary. This assumes ASCII unless told otherwise.
-    """
-    if isinstance(string, builtin_str):
-        out = string
-    else:
-        if is_py2:
-            out = string.encode(encoding)
-        else:
-            out = string.decode(encoding)
-
-    return out
 
 
 # Moved outside of function to avoid recompile every call
