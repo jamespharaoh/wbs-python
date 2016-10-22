@@ -2,6 +2,99 @@
 CHANGELOG
 =========
 
+1.11.8
+======
+
+* feature:``waf``: Update waf command to latest version
+* feature:s3: Port mv to s3transfer.
+* feature:``budgets``: Update budgets command to latest version
+
+
+1.11.7
+======
+
+* feature:``cloudfront``: Update cloudfront command to latest version
+* feature:``iot``: Update iot command to latest version
+* feature:``config``: Update config command to latest version
+* feature:``kinesisanalytics``: Update kinesisanalytics command to latest version
+* feature:``rds``: Update rds command to latest version
+
+
+1.11.6
+======
+
+* feature:``route53``: Update route53 command to latest version
+* feature:``--region``: Add support for us-east-2
+
+
+1.11.5
+======
+
+* bugfix:``s3 sync --delete``: Fix regression where ``--delete`` would not delete local files
+
+
+1.11.4
+======
+
+* feature:``elasticbeanstalk``: Update elasticbeanstalk command to latest version
+* feature:``gamelift``: Update gamelift command to latest version
+* feature:``s3``: Integrate sync command with s3transfer
+* feature:``acm``: Update acm command to latest version
+* feature:``s3``: Output progress even when discovering new files to transfer
+
+
+1.11.3
+======
+
+* bugfix:Pagination: Fix validation error when providing ``--no-paginate`` with normalized paging argument.
+* feature:``apigateway``: Update apigateway command to latest version
+* feature:``cloudfront``: Update cloudfront command to latest version
+* feature:``gamelift``: Update gamelift command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``codedeploy``: Update codedeploy command to latest version
+* feature:``sns``: Update sns command to latest version
+* feature:``kms``: Update kms command to latest version
+* feature:``elasticache``: Update elasticache command to latest version
+* feature:``ecr``: Update ecr command to latest version
+
+
+1.11.2
+======
+
+* feature:``s3``: Update s3 command to latest version
+* feature:``waf``: Update waf command to latest version
+* feature:``devicefarm``: Update devicefarm command to latest version
+* feature:``kms``: Update kms command to latest version
+* feature:``opsworks``: Update opsworks command to latest version
+* bugfix:s3: Refactor rb into its own command. In addition, validate that no key is supplied regardless of whether or not the force argument is supplied.
+* bugfix:route53domains: Rename `--end` to `--end-time` to fix a bug relating to argparse prefix expansion. Alias `--start` to `--start-time` to maintain a consistent interface while keeping the old parameter.
+* feature:``cognito-idp``: Update cognito-idp command to latest version
+
+
+1.11.1
+======
+
+* bugfix:``s3``: Fix regression when downloading empty files.
+
+
+1.11.0
+======
+
+* feature:``snowball``: Update snowball command to latest version
+* feature:``s3``: Update s3 command to latest version
+* feature:``ec2``: Update ec2 command to latest version
+* feature:s3: Port cp and rm to s3transfer. Improve progress for those commands, showing byte progress.
+
+
+1.10.67
+=======
+
+* feature:``codepipeline``: Update codepipeline command to latest version
+* feature:``kms``: Update kms command to latest version
+* feature:``efs``: Update efs command to latest version
+* feature:``cloudformation``: Update cloudformation command to latest version
+
+
 1.10.66
 =======
 

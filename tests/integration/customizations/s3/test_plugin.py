@@ -419,7 +419,9 @@ class TestCp(BaseS3IntegrationTest):
         self.put_object(bucket_name, key_name='foo.txt',
                         contents=foo_contents)
         local_foo_txt = self.files.full_path('foo.txt')
-        process = aws('s3 cp s3://%s/foo.txt %s' %
+        # --quiet is added to make sure too much output is not communicated
+        # to the PIPE, causing a deadlock when not consumed.
+        process = aws('s3 cp s3://%s/foo.txt %s --quiet' %
                       (bucket_name, local_foo_txt), wait_for_finish=False)
         # Give it some time to start up and enter it's main task loop.
         time.sleep(2)
@@ -441,8 +443,9 @@ class TestCp(BaseS3IntegrationTest):
         with open(foo_txt, 'wb') as f:
             for i in range(20):
                 f.write(b'a' * 1024 * 1024)
-
-        process = aws('s3 cp %s s3://%s/' % (foo_txt, bucket_name),
+        # --quiet is added to make sure too much output is not communicated
+        # to the PIPE, causing a deadlock when not consumed.
+        process = aws('s3 cp %s s3://%s/ --quiet' % (foo_txt, bucket_name),
                       wait_for_finish=False)
         time.sleep(3)
         # The process has 60 seconds to finish after being sent a Ctrl+C,
@@ -493,6 +496,18 @@ class TestCp(BaseS3IntegrationTest):
         # Assert that the file was downloaded properly.
         with open(local_filename, 'r') as f:
             self.assertEqual(f.read(), contents)
+
+    def test_download_empty_object(self):
+        bucket_name = _SHARED_BUCKET
+        object_name = 'empty-object'
+        self.put_object(bucket_name, object_name, '')
+        local_filename = self.files.full_path('empty.txt')
+        p = aws('s3 cp s3://%s/%s %s' % (
+            bucket_name, object_name, local_filename))
+        self.assertEqual(p.rc, 0)
+        # Assert that the file was downloaded and has no content.
+        with open(local_filename, 'r') as f:
+            self.assertEqual(f.read(), '')
 
     def test_website_redirect_ignore_paramfile(self):
         bucket_name = _SHARED_BUCKET
@@ -777,6 +792,22 @@ class TestSync(BaseS3IntegrationTest):
         self.assertTrue(self.key_exists(dst_bucket, src_key_name))
         self.assertFalse(self.key_exists(src_bucket, dst_key_name))
         self.assertFalse(self.key_exists(dst_bucket, dst_key_name))
+
+    def test_sync_delete_locally(self):
+        bucket_name = _SHARED_BUCKET
+        file_to_delete = self.files.create_file(
+            'foo.txt', contents='foo contents')
+        self.put_object(bucket_name, 'bar.txt', contents='bar contents')
+
+        p = aws('s3 sync s3://%s/ %s --delete' % (
+            bucket_name, self.files.rootdir))
+        self.assert_no_errors(p)
+
+        # Make sure the uploaded file got downloaded and the previously
+        # existing local file got deleted
+        self.assertTrue(os.path.exists(
+            os.path.join(self.files.rootdir, 'bar.txt')))
+        self.assertFalse(os.path.exists(file_to_delete))
 
 
 class TestSourceRegion(BaseS3IntegrationTest):
