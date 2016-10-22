@@ -19,7 +19,8 @@ from requests.auth import HTTPDigestAuth, _basic_auth_str
 from requests.compat import (
     Morsel, cookielib, getproxies, str, urlparse,
     builtin_str, OrderedDict)
-from requests.cookies import cookiejar_from_dict, morsel_to_cookie
+from requests.cookies import (
+    cookiejar_from_dict, morsel_to_cookie, merge_cookies)
 from requests.exceptions import (
     ConnectionError, ConnectTimeout, InvalidSchema, InvalidURL,
     MissingSchema, ReadTimeout, Timeout, RetryError, TooManyRedirects,
@@ -89,6 +90,16 @@ class TestRequests:
     def test_no_content_length(self, httpbin, method):
         req = requests.Request(method, httpbin(method.lower())).prepare()
         assert 'Content-Length' not in req.headers
+
+    @pytest.mark.parametrize('method', ('POST', 'PUT', 'PATCH', 'OPTIONS'))
+    def test_no_body_content_length(self, httpbin, method):
+        req = requests.Request(method, httpbin(method.lower())).prepare()
+        assert req.headers['Content-Length'] == '0'
+
+    @pytest.mark.parametrize('method', ('POST', 'PUT', 'PATCH', 'OPTIONS'))
+    def test_empty_content_length(self, httpbin, method):
+        req = requests.Request(method, httpbin(method.lower()), data='').prepare()
+        assert req.headers['Content-Length'] == '0'
 
     def test_override_content_length(self, httpbin):
         headers = {
@@ -343,6 +354,38 @@ class TestRequests:
         r = s.get(httpbin('cookies'), cookies=cj)
         # Make sure the cookie was sent
         assert r.json()['cookies']['foo'] == 'bar'
+
+    def test_cookielib_cookiejar_on_redirect(self, httpbin):
+        """Tests resolve_redirect doesn't fail when merging cookies
+        with non-RequestsCookieJar cookiejar.
+
+        See GH #3579
+        """
+        cj = cookiejar_from_dict({'foo': 'bar'}, cookielib.CookieJar())
+        s = requests.Session()
+        s.cookies = cookiejar_from_dict({'cookie': 'tasty'})
+
+        # Prepare request without using Session
+        req = requests.Request('GET', httpbin('headers'), cookies=cj)
+        prep_req = req.prepare()
+
+        # Send request and simulate redirect
+        resp = s.send(prep_req)
+        resp.status_code = 302
+        resp.headers['location'] = httpbin('get')
+        redirects = s.resolve_redirects(resp, prep_req)
+        resp = next(redirects)
+
+        # Verify CookieJar isn't being converted to RequestsCookieJar
+        assert isinstance(prep_req._cookies, cookielib.CookieJar)
+        assert isinstance(resp.request._cookies, cookielib.CookieJar)
+        assert not isinstance(resp.request._cookies, requests.cookies.RequestsCookieJar)
+
+        cookies = {}
+        for c in resp.request._cookies:
+            cookies[c.name] = c.value
+        assert cookies['foo'] == 'bar'
+        assert cookies['cookie'] == 'tasty'
 
     def test_requests_in_history_are_not_overridden(self, httpbin):
         resp = requests.get(httpbin('redirect/3'))
@@ -814,6 +857,16 @@ class TestRequests:
         s = requests.Session()
         prep = s.prepare_request(req)
         assert prep.url == "https://httpbin.org/"
+
+    def test_request_with_bytestring_host(self, httpbin):
+        s = requests.Session()
+        resp = s.request(
+            'GET',
+            httpbin('cookies/set?cookie=value'),
+            allow_redirects=False,
+            headers={'Host': b'httpbin.org'}
+        )
+        assert resp.cookies.get('cookie') == 'value'
 
     def test_links(self):
         r = requests.Response()
@@ -1831,6 +1884,55 @@ def test_urllib3_pool_connection_closed(httpbin):
 def test_vendor_aliases():
     from requests.packages import urllib3
     from requests.packages import chardet
+    from requests.packages import idna
 
     with pytest.raises(ImportError):
         from requests.packages import webbrowser
+
+
+class TestPreparingURLs(object):
+    @pytest.mark.parametrize(
+        'url,expected',
+        (
+            ('http://google.com', 'http://google.com/'),
+            (u'http://ジェーピーニック.jp', u'http://xn--hckqz9bzb1cyrb.jp/'),
+            (
+                u'http://ジェーピーニック.jp'.encode('utf-8'),
+                u'http://xn--hckqz9bzb1cyrb.jp/'
+            ),
+            (
+                u'http://straße.de/straße',
+                u'http://xn--strae-oqa.de/stra%C3%9Fe'
+            ),
+            (
+                u'http://straße.de/straße'.encode('utf-8'),
+                u'http://xn--strae-oqa.de/stra%C3%9Fe'
+            ),
+            (
+                u'http://Königsgäßchen.de/straße',
+                u'http://xn--knigsgchen-b4a3dun.de/stra%C3%9Fe'
+            ),
+            (
+                u'http://Königsgäßchen.de/straße'.encode('utf-8'),
+                u'http://xn--knigsgchen-b4a3dun.de/stra%C3%9Fe'
+            ),
+        )
+    )
+    def test_preparing_url(self, url, expected):
+        r = requests.Request(url=url)
+        p = r.prepare()
+        assert p.url == expected
+
+    @pytest.mark.parametrize(
+        'url',
+        (
+            b"http://*.google.com",
+            b"http://*",
+            u"http://*.google.com",
+            u"http://*",
+        )
+    )
+    def test_preparing_bad_url(self, url):
+        r = requests.Request(url=url)
+        with pytest.raises(requests.exceptions.InvalidURL):
+            r.prepare()

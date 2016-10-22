@@ -263,7 +263,7 @@ system.
 For the sake of security we recommend upgrading certifi frequently!
 
 .. _HTTP persistent connection: https://en.wikipedia.org/wiki/HTTP_persistent_connection
-.. _connection pooling: https://urllib3.readthedocs.io/en/latest/pools.html
+.. _connection pooling: http://urllib3.readthedocs.io/en/latest/reference/index.html#module-urllib3.connectionpool
 .. _certifi: http://certifi.io/
 .. _Mozilla trust store: https://hg.mozilla.org/mozilla-central/raw-file/tip/security/nss/lib/ckfw/builtins/certdata.txt
 
@@ -796,6 +796,24 @@ headers.
 
 Excellent. Time to write a Python program that abuses the GitHub API in all
 kinds of exciting ways, 4995 more times.
+
+.. _custom-verbs:
+
+Custom Verbs
+------------
+
+From time to time you may be working with a server that, for whatever reason,
+allows use or even requires use of HTTP verbs not covered above. One example of
+this would be the MKCOL method some WEBDAV servers use. Do not fret, these can
+still be used with Requests. These make use of the built-in ``.request``
+method. For example::
+
+    >>> r = requests.request('MKCOL', url, data=data)
+    >>> r.status_code
+    200 # Assuming your call was correct
+
+Utilising this, you can make use of any method verb that your server allows.
+
 
 .. _link-headers:
 
