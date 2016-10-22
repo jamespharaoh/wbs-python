@@ -5,10 +5,17 @@
 # This module is part of GitPython and is released under
 # the BSD License: http://www.opensource.org/licenses/bsd-license.php
 import os
-import sys
-import mock
 import subprocess
+import sys
 
+from git import (
+    Git,
+    GitCommandError,
+    GitCommandNotFound,
+    Repo,
+    cmd
+)
+from git.compat import PY3, is_darwin
 from git.test.lib import (
     TestBase,
     patch,
@@ -18,15 +25,16 @@ from git.test.lib import (
     assert_match,
     fixture_path
 )
-from git import (
-    Git,
-    GitCommandError,
-    GitCommandNotFound,
-    Repo
-)
-from gitdb.test.lib import with_rw_directory
+from git.test.lib import with_rw_directory
+from git.util import finalize_process
 
-from git.compat import PY3
+import os.path as osp
+
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestGit(TestBase):
@@ -35,6 +43,10 @@ class TestGit(TestBase):
     def setUpClass(cls):
         super(TestGit, cls).setUpClass()
         cls.git = Git(cls.rorepo.working_dir)
+
+    def tearDown(self):
+        import gc
+        gc.collect()
 
     @patch.object(Git, 'execute')
     def test_call_process_calls_execute(self, git):
@@ -76,17 +88,16 @@ class TestGit(TestBase):
 
         # order is undefined
         res = self.git.transform_kwargs(**{'s': True, 't': True})
-        assert ['-s', '-t'] == res or ['-t', '-s'] == res
+        self.assertEqual(set(['-s', '-t']), set(res))
 
     def test_it_executes_git_to_shell_and_returns_result(self):
         assert_match('^git version [\d\.]{2}.*$', self.git.execute(["git", "version"]))
 
     def test_it_accepts_stdin(self):
         filename = fixture_path("cat_file_blob")
-        fh = open(filename, 'r')
-        assert_equal("70c379b63ffa0795fdbfbc128e5a2818397b7ef8",
-                     self.git.hash_object(istream=fh, stdin=True))
-        fh.close()
+        with open(filename, 'r') as fh:
+            assert_equal("70c379b63ffa0795fdbfbc128e5a2818397b7ef8",
+                         self.git.hash_object(istream=fh, stdin=True))
 
     @patch.object(Git, 'execute')
     def test_it_ignores_false_kwargs(self, git):
@@ -108,28 +119,29 @@ class TestGit(TestBase):
         g.stdin.write(b"b2339455342180c7cc1e9bba3e9f181f7baa5167\n")
         g.stdin.flush()
         obj_info_two = g.stdout.readline()
-        assert obj_info == obj_info_two
+        self.assertEqual(obj_info, obj_info_two)
 
         # read data - have to read it in one large chunk
         size = int(obj_info.split()[2])
-        data = g.stdout.read(size)
+        g.stdout.read(size)
         g.stdout.read(1)
 
         # now we should be able to read a new object
         g.stdin.write(b"b2339455342180c7cc1e9bba3e9f181f7baa5167\n")
         g.stdin.flush()
-        assert g.stdout.readline() == obj_info
+        self.assertEqual(g.stdout.readline(), obj_info)
 
         # same can be achived using the respective command functions
         hexsha, typename, size = self.git.get_object_header(hexsha)
-        hexsha, typename_two, size_two, data = self.git.get_object_data(hexsha)
-        assert typename == typename_two and size == size_two
+        hexsha, typename_two, size_two, data = self.git.get_object_data(hexsha)  # @UnusedVariable
+        self.assertEqual(typename, typename_two)
+        self.assertEqual(size, size_two)
 
     def test_version(self):
         v = self.git.version_info
-        assert isinstance(v, tuple)
+        self.assertIsInstance(v, tuple)
         for n in v:
-            assert isinstance(n, int)
+            self.assertIsInstance(n, int)
         # END verify number types
 
     def test_cmd_override(self):
@@ -137,7 +149,7 @@ class TestGit(TestBase):
         exc = GitCommandNotFound
         try:
             # set it to something that doens't exist, assure it raises
-            type(self.git).GIT_PYTHON_GIT_EXECUTABLE = os.path.join(
+            type(self.git).GIT_PYTHON_GIT_EXECUTABLE = osp.join(
                 "some", "path", "which", "doesn't", "exist", "gitbinary")
             self.failUnlessRaises(exc, self.git.version)
         finally:
@@ -149,6 +161,20 @@ class TestGit(TestBase):
         git_version = self.git(version=True).NoOp()
         git_command_version = self.git.version()
         self.assertEquals(git_version, git_command_version)
+
+    def test_persistent_options(self):
+        git_command_version = self.git.version()
+        # analog to test_options_are_passed_to_git
+        self.git.set_persistent_git_options(version=True)
+        git_version = self.git.NoOp()
+        self.assertEquals(git_version, git_command_version)
+        # subsequent calls keep this option:
+        git_version_2 = self.git.NoOp()
+        self.assertEquals(git_version_2, git_command_version)
+
+        # reset to empty:
+        self.git.set_persistent_git_options()
+        self.assertRaises(GitCommandError, self.git.NoOp)
 
     def test_single_char_git_options_are_passed_to_git(self):
         input_value = 'TestValue'
@@ -164,55 +190,48 @@ class TestGit(TestBase):
 
     def test_env_vars_passed_to_git(self):
         editor = 'non_existant_editor'
-        with mock.patch.dict('os.environ', {'GIT_EDITOR': editor}):
-            assert self.git.var("GIT_EDITOR") == editor
+        with mock.patch.dict('os.environ', {'GIT_EDITOR': editor}):  # @UndefinedVariable
+            self.assertEqual(self.git.var("GIT_EDITOR"), editor)
 
     @with_rw_directory
     def test_environment(self, rw_dir):
         # sanity check
-        assert self.git.environment() == {}
+        self.assertEqual(self.git.environment(), {})
 
         # make sure the context manager works and cleans up after itself
         with self.git.custom_environment(PWD='/tmp'):
-            assert self.git.environment() == {'PWD': '/tmp'}
+            self.assertEqual(self.git.environment(), {'PWD': '/tmp'})
 
-        assert self.git.environment() == {}
+        self.assertEqual(self.git.environment(), {})
 
         old_env = self.git.update_environment(VARKEY='VARVALUE')
         # The returned dict can be used to revert the change, hence why it has
         # an entry with value 'None'.
-        assert old_env == {'VARKEY': None}
-        assert self.git.environment() == {'VARKEY': 'VARVALUE'}
+        self.assertEqual(old_env, {'VARKEY': None})
+        self.assertEqual(self.git.environment(), {'VARKEY': 'VARVALUE'})
 
         new_env = self.git.update_environment(**old_env)
-        assert new_env == {'VARKEY': 'VARVALUE'}
-        assert self.git.environment() == {}
+        self.assertEqual(new_env, {'VARKEY': 'VARVALUE'})
+        self.assertEqual(self.git.environment(), {})
 
-        path = os.path.join(rw_dir, 'failing-script.sh')
-        stream = open(path, 'wt')
-        stream.write("#!/usr/bin/env sh\n" +
-                     "echo FOO\n")
-        stream.close()
-        os.chmod(path, 0o555)
+        path = osp.join(rw_dir, 'failing-script.sh')
+        with open(path, 'wt') as stream:
+            stream.write("#!/usr/bin/env sh\n"
+                         "echo FOO\n")
+        os.chmod(path, 0o777)
 
-        rw_repo = Repo.init(os.path.join(rw_dir, 'repo'))
+        rw_repo = Repo.init(osp.join(rw_dir, 'repo'))
         remote = rw_repo.create_remote('ssh-origin', "ssh://git@server/foo")
 
-        # This only works if we are not evaluating git-push/pull output in a thread !
-        import select
-        if hasattr(select, 'poll'):
-            with rw_repo.git.custom_environment(GIT_SSH=path):
-                try:
-                    remote.fetch()
-                except GitCommandError as err:
-                    if sys.version_info[0] < 3 and sys.platform == 'darwin':
-                        assert 'ssh-origin' in str(err)
-                        assert err.status == 128
-                    else:
-                        assert 'FOO' in str(err)
-                # end
-            # end
-        # end if select.poll exists
+        with rw_repo.git.custom_environment(GIT_SSH=path):
+            try:
+                remote.fetch()
+            except GitCommandError as err:
+                if sys.version_info[0] < 3 and is_darwin:
+                    self.assertIn('ssh-orig, ' in str(err))
+                    self.assertEqual(err.status, 128)
+                else:
+                    self.assertIn('FOO', str(err))
 
     def test_handle_process_output(self):
         from git.cmd import handle_process_output
@@ -226,13 +245,16 @@ class TestGit(TestBase):
         def counter_stderr(line):
             count[2] += 1
 
-        proc = subprocess.Popen([sys.executable, fixture_path('cat_file.py'), str(fixture_path('issue-301_stderr'))],
+        cmdline = [sys.executable, fixture_path('cat_file.py'), str(fixture_path('issue-301_stderr'))]
+        proc = subprocess.Popen(cmdline,
                                 stdin=None,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
-                                shell=False)
+                                shell=False,
+                                creationflags=cmd.PROC_CREATIONFLAGS,
+                                )
 
-        handle_process_output(proc, counter_stdout, counter_stderr, lambda proc: proc.wait())
+        handle_process_output(proc, counter_stdout, counter_stderr, finalize_process)
 
-        assert count[1] == line_count
-        assert count[2] == line_count
+        self.assertEqual(count[1], line_count)
+        self.assertEqual(count[2], line_count)

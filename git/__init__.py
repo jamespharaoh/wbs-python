@@ -4,10 +4,13 @@
 # This module is part of GitPython and is released under
 # the BSD License: http://www.opensource.org/licenses/bsd-license.php
 # flake8: noqa
-
+#@PydevCodeAnalysisIgnore
+import inspect
 import os
 import sys
-import inspect
+
+import os.path as osp
+
 
 __version__ = 'git'
 
@@ -16,7 +19,7 @@ __version__ = 'git'
 def _init_externals():
     """Initialize external projects by putting them into the path"""
     if __version__ == 'git':
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'ext', 'gitdb'))
+        sys.path.insert(0, osp.join(osp.dirname(__file__), 'ext', 'gitdb'))
 
     try:
         import gitdb
@@ -32,17 +35,17 @@ _init_externals()
 
 #{ Imports
 
-from git.config import GitConfigParser
-from git.objects import *
-from git.refs import *
-from git.diff import *
-from git.exc import *
-from git.db import *
-from git.cmd import Git
-from git.repo import Repo
-from git.remote import *
-from git.index import *
-from git.util import (
+from git.config import GitConfigParser  # @NoMove @IgnorePep8
+from git.objects import *               # @NoMove @IgnorePep8
+from git.refs import *                  # @NoMove @IgnorePep8
+from git.diff import *                  # @NoMove @IgnorePep8
+from git.exc import *                   # @NoMove @IgnorePep8
+from git.db import *                    # @NoMove @IgnorePep8
+from git.cmd import Git                 # @NoMove @IgnorePep8
+from git.repo import Repo               # @NoMove @IgnorePep8
+from git.remote import *                # @NoMove @IgnorePep8
+from git.index import *                 # @NoMove @IgnorePep8
+from git.util import (                  # @NoMove @IgnorePep8
     LockFile,
     BlockingLockFile,
     Stats,

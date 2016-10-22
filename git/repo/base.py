@@ -4,51 +4,15 @@
 # This module is part of GitPython and is released under
 # the BSD License: http://www.opensource.org/licenses/bsd-license.php
 
-from git.exc import (
-    InvalidGitRepositoryError,
-    NoSuchPathError,
-    GitCommandError
-)
+from collections import namedtuple
+import logging
+import os
+import re
+import sys
+
 from git.cmd import (
     Git,
     handle_process_output
-)
-from git.refs import (
-    HEAD,
-    Head,
-    Reference,
-    TagReference,
-)
-from git.objects import (
-    Submodule,
-    RootModule,
-    Commit
-)
-from git.util import (
-    Actor,
-    finalize_process
-)
-from git.index import IndexFile
-from git.config import GitConfigParser
-from git.remote import (
-    Remote,
-    add_progress,
-    to_progress_instance
-)
-
-from git.db import GitCmdObjectDB
-
-from gitdb.util import (
-    join,
-    isfile,
-    hex_to_bin
-)
-
-from .fun import (
-    rev_parse,
-    is_git_dir,
-    find_git_dir,
-    touch,
 )
 from git.compat import (
     text_type,
@@ -56,12 +20,22 @@ from git.compat import (
     PY3,
     safe_decode,
     range,
+    is_win,
 )
+from git.config import GitConfigParser
+from git.db import GitCmdObjectDB
+from git.exc import InvalidGitRepositoryError, NoSuchPathError, GitCommandError
+from git.index import IndexFile
+from git.objects import Submodule, RootModule, Commit
+from git.refs import HEAD, Head, Reference, TagReference
+from git.remote import Remote, add_progress, to_progress_instance
+from git.util import Actor, finalize_process, decygpath, hex_to_bin
+import os.path as osp
 
-import os
-import sys
-import re
-from collections import namedtuple
+from .fun import rev_parse, is_git_dir, find_submodule_git_dir, touch
+
+
+log = logging.getLogger(__name__)
 
 DefaultDBType = GitCmdObjectDB
 if sys.version_info[:2] < (2, 5):     # python 2.4 compatiblity
@@ -71,11 +45,11 @@ if sys.version_info[:2] < (2, 5):     # python 2.4 compatiblity
 BlameEntry = namedtuple('BlameEntry', ['commit', 'linenos', 'orig_path', 'orig_linenos'])
 
 
-__all__ = ('Repo', )
+__all__ = ('Repo',)
 
 
 def _expand_path(p):
-    return os.path.abspath(os.path.expandvars(os.path.expanduser(p)))
+    return osp.normpath(osp.abspath(osp.expandvars(osp.expanduser(p))))
 
 
 class Repo(object):
@@ -93,6 +67,11 @@ class Repo(object):
 
     'git_dir' is the .git repository directory, which is always set."""
     DAEMON_EXPORT_FILE = 'git-daemon-export-ok'
+
+    git = None  # Must exist, or  __del__  will fail in case we raise on `__init__()`
+    working_dir = None
+    _working_tree_dir = None
+    git_dir = None
 
     # precompiled regex
     re_whitespace = re.compile(r'\s+')
@@ -120,6 +99,9 @@ class Repo(object):
                 repo = Repo("~/Development/git-python.git")
                 repo = Repo("$REPOSITORIES/Development/git-python.git")
 
+            - In *Cygwin*, path may be a `'cygdrive/...'` prefixed path.
+            - If it evaluates to false, :envvar:`GIT_DIR` is used, and if this also evals to false,
+              the current-directory is used.
         :param odbt:
             Object DataBase type - a type which is constructed by providing
             the directory containing the database objects, i.e. .git/objects. It will
@@ -132,37 +114,41 @@ class Repo(object):
         :raise InvalidGitRepositoryError:
         :raise NoSuchPathError:
         :return: git.Repo """
-        epath = _expand_path(path or os.getcwd())
-        self.git = None  # should be set for __del__ not to fail in case we raise
+        epath = path or os.getenv('GIT_DIR')
+        if not epath:
+            epath = os.getcwd()
+        if Git.is_cygwin():
+            epath = decygpath(epath)
+        epath = _expand_path(epath or path or os.getcwd())
         if not os.path.exists(epath):
             raise NoSuchPathError(epath)
 
-        self.working_dir = None
-        self._working_tree_dir = None
-        self.git_dir = None
-        curpath = os.getenv('GIT_DIR', epath)
-
-        # walk up the path to find the .git dir
+        ## Walk up the path to find the `.git` dir.
+        #
+        curpath = epath
         while curpath:
-            # ABOUT os.path.NORMPATH
+            # ABOUT osp.NORMPATH
             # It's important to normalize the paths, as submodules will otherwise initialize their
             # repo instances with paths that depend on path-portions that will not exist after being
             # removed. It's just cleaner.
             if is_git_dir(curpath):
-                self.git_dir = os.path.normpath(curpath)
+                self.git_dir = curpath
                 self._working_tree_dir = os.path.dirname(self.git_dir)
                 break
 
-            gitpath = find_git_dir(join(curpath, '.git'))
-            if gitpath is not None:
-                self.git_dir = os.path.normpath(gitpath)
+            sm_gitpath = find_submodule_git_dir(osp.join(curpath, '.git'))
+            if sm_gitpath is not None:
+                self.git_dir = osp.normpath(sm_gitpath)
+            sm_gitpath = find_submodule_git_dir(osp.join(curpath, '.git'))
+            if sm_gitpath is not None:
+                self.git_dir = _expand_path(sm_gitpath)
                 self._working_tree_dir = curpath
                 break
 
             if not search_parent_directories:
                 break
-            curpath, dummy = os.path.split(curpath)
-            if not dummy:
+            curpath, tail = osp.split(curpath)
+            if not tail:
                 break
         # END while curpath
 
@@ -186,7 +172,7 @@ class Repo(object):
         self.git = self.GitCommandWrapperType(self.working_dir)
 
         # special handling, in special times
-        args = [join(self.git_dir, 'objects')]
+        args = [osp.join(self.git_dir, 'objects')]
         if issubclass(odbt, GitCmdObjectDB):
             args.append(self.git)
         self.odb = odbt(*args)
@@ -208,12 +194,14 @@ class Repo(object):
 
     # Description property
     def _get_description(self):
-        filename = join(self.git_dir, 'description')
-        return open(filename, 'rb').read().rstrip().decode(defenc)
+        filename = osp.join(self.git_dir, 'description')
+        with open(filename, 'rb') as fp:
+            return fp.read().rstrip().decode(defenc)
 
     def _set_description(self, descr):
-        filename = join(self.git_dir, 'description')
-        open(filename, 'wb').write((descr + '\n').encode(defenc))
+        filename = osp.join(self.git_dir, 'description')
+        with open(filename, 'wb') as fp:
+            fp.write((descr + '\n').encode(defenc))
 
     description = property(_get_description, _set_description,
                            doc="the project's description")
@@ -369,18 +357,18 @@ class Repo(object):
     def _get_config_path(self, config_level):
         # we do not support an absolute path of the gitconfig on windows ,
         # use the global config instead
-        if sys.platform == "win32" and config_level == "system":
+        if is_win and config_level == "system":
             config_level = "global"
 
         if config_level == "system":
             return "/etc/gitconfig"
         elif config_level == "user":
-            config_home = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.environ.get("HOME", '~'), ".config")
-            return os.path.normpath(os.path.expanduser(join(config_home, "git", "config")))
+            config_home = os.environ.get("XDG_CONFIG_HOME") or osp.join(os.environ.get("HOME", '~'), ".config")
+            return osp.normpath(osp.expanduser(osp.join(config_home, "git", "config")))
         elif config_level == "global":
-            return os.path.normpath(os.path.expanduser("~/.gitconfig"))
+            return osp.normpath(osp.expanduser("~/.gitconfig"))
         elif config_level == "repository":
-            return os.path.normpath(join(self.git_dir, "config"))
+            return osp.normpath(osp.join(self.git_dir, "config"))
 
         raise ValueError("Invalid configuration level: %r" % config_level)
 
@@ -524,12 +512,12 @@ class Repo(object):
         return True
 
     def _get_daemon_export(self):
-        filename = join(self.git_dir, self.DAEMON_EXPORT_FILE)
-        return os.path.exists(filename)
+        filename = osp.join(self.git_dir, self.DAEMON_EXPORT_FILE)
+        return osp.exists(filename)
 
     def _set_daemon_export(self, value):
-        filename = join(self.git_dir, self.DAEMON_EXPORT_FILE)
-        fileexists = os.path.exists(filename)
+        filename = osp.join(self.git_dir, self.DAEMON_EXPORT_FILE)
+        fileexists = osp.exists(filename)
         if value and not fileexists:
             touch(filename)
         elif not value and fileexists:
@@ -544,14 +532,11 @@ class Repo(object):
         """The list of alternates for this repo from which objects can be retrieved
 
         :return: list of strings being pathnames of alternates"""
-        alternates_path = join(self.git_dir, 'objects', 'info', 'alternates')
+        alternates_path = osp.join(self.git_dir, 'objects', 'info', 'alternates')
 
-        if os.path.exists(alternates_path):
-            try:
-                f = open(alternates_path, 'rb')
+        if osp.exists(alternates_path):
+            with open(alternates_path, 'rb') as f:
                 alts = f.read().decode(defenc)
-            finally:
-                f.close()
             return alts.strip().splitlines()
         else:
             return list()
@@ -567,18 +552,13 @@ class Repo(object):
         :note:
             The method does not check for the existance of the paths in alts
             as the caller is responsible."""
-        alternates_path = join(self.git_dir, 'objects', 'info', 'alternates')
+        alternates_path = osp.join(self.git_dir, 'objects', 'info', 'alternates')
         if not alts:
-            if isfile(alternates_path):
+            if osp.isfile(alternates_path):
                 os.remove(alternates_path)
         else:
-            try:
-                f = open(alternates_path, 'wb')
+            with open(alternates_path, 'wb') as f:
                 f.write("\n".join(alts).encode(defenc))
-            finally:
-                f.close()
-            # END file handling
-        # END alts handling
 
     alternates = property(_get_alternates, _set_alternates,
                           doc="Retrieve a list of alternates paths or set a list paths to be used as alternates")
@@ -603,7 +583,7 @@ class Repo(object):
             default_args.append(path)
         if index:
             # diff index against HEAD
-            if isfile(self.index.path) and \
+            if osp.isfile(self.index.path) and \
                     len(self.git.diff('--cached', *default_args)):
                 return True
         # END index handling
@@ -863,7 +843,7 @@ class Repo(object):
         :return: ``git.Repo`` (the newly created repo)"""
         if path:
             path = _expand_path(path)
-        if mkdir and path and not os.path.exists(path):
+        if mkdir and path and not osp.exists(path):
             os.makedirs(path, 0o755)
 
         # git command automatically chdir into the directory
@@ -876,63 +856,43 @@ class Repo(object):
         if progress is not None:
             progress = to_progress_instance(progress)
 
-        # special handling for windows for path at which the clone should be
-        # created.
-        # tilde '~' will be expanded to the HOME no matter where the ~ occours. Hence
-        # we at least give a proper error instead of letting git fail
-        prev_cwd = None
-        prev_path = None
         odbt = kwargs.pop('odbt', odb_default_type)
-        if os.name == 'nt':
-            if '~' in path:
-                raise OSError("Git cannot handle the ~ character in path %r correctly" % path)
 
-            # on windows, git will think paths like c: are relative and prepend the
-            # current working dir ( before it fails ). We temporarily adjust the working
-            # dir to make this actually work
-            match = re.match("(\w:[/\\\])(.*)", path)
-            if match:
-                prev_cwd = os.getcwd()
-                prev_path = path
-                drive, rest_of_path = match.groups()
-                os.chdir(drive)
-                path = rest_of_path
-                kwargs['with_keep_cwd'] = True
-            # END cwd preparation
-        # END windows handling
-
-        try:
-            proc = git.clone(url, path, with_extended_output=True, as_process=True,
-                             v=True, **add_progress(kwargs, git, progress))
-            if progress:
-                handle_process_output(proc, None, progress.new_message_handler(), finalize_process)
-            else:
-                (stdout, stderr) = proc.communicate()
-                finalize_process(proc, stderr=stderr)
-            # end handle progress
-        finally:
-            if prev_cwd is not None:
-                os.chdir(prev_cwd)
-                path = prev_path
-            # END reset previous working dir
-        # END bad windows handling
+        ## A bug win cygwin's Git, when `--bare` or `--separate-git-dir`
+        #  it prepends the cwd or(?) the `url` into the `path, so::
+        #        git clone --bare  /cygwin/d/foo.git  C:\\Work
+        #  becomes::
+        #        git clone --bare  /cygwin/d/foo.git  /cygwin/d/C:\\Work
+        #
+        clone_path = (Git.polish_url(path)
+                      if Git.is_cygwin() and 'bare'in kwargs
+                      else path)
+        sep_dir = kwargs.get('separate_git_dir')
+        if sep_dir:
+            kwargs['separate_git_dir'] = Git.polish_url(sep_dir)
+        proc = git.clone(Git.polish_url(url), clone_path, with_extended_output=True, as_process=True,
+                         v=True, **add_progress(kwargs, git, progress))
+        if progress:
+            handle_process_output(proc, None, progress.new_message_handler(), finalize_process)
+        else:
+            (stdout, stderr) = proc.communicate()  # FIXME: Will block if outputs are big!
+            log.debug("Cmd(%s)'s unused stdout: %s", getattr(proc, 'args', ''), stdout)
+            finalize_process(proc, stderr=stderr)
 
         # our git command could have a different working dir than our actual
         # environment, hence we prepend its working dir if required
-        if not os.path.isabs(path) and git.working_dir:
-            path = join(git._working_dir, path)
+        if not osp.isabs(path) and git.working_dir:
+            path = osp.join(git._working_dir, path)
 
         # adjust remotes - there may be operating systems which use backslashes,
         # These might be given as initial paths, but when handling the config file
         # that contains the remote from which we were clones, git stops liking it
         # as it will escape the backslashes. Hence we undo the escaping just to be
         # sure
-        repo = cls(os.path.abspath(path), odbt=odbt)
+        repo = cls(path, odbt=odbt)
         if repo.remotes:
-            writer = repo.remotes[0].config_writer
-            writer.set_value('url', repo.remotes[0].url.replace("\\\\", "\\").replace("\\", "/"))
-            # PY3: be sure cleanup is performed and lock is released
-            writer.release()
+            with repo.remotes[0].config_writer as writer:
+                writer.set_value('url', Git.polish_url(repo.remotes[0].url))
         # END handle remote repo
         return repo
 
@@ -1000,7 +960,7 @@ class Repo(object):
         """
         if self.bare:
             return False
-        return os.path.isfile(os.path.join(self.working_tree_dir, '.git'))
+        return osp.isfile(osp.join(self.working_tree_dir, '.git'))
 
     rev_parse = rev_parse
 
