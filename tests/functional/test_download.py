@@ -24,6 +24,7 @@ from tests import RecordingSubscriber
 from tests import RecordingOSUtils
 from tests import NonSeekableWriter
 from tests import BaseGeneralInterfaceTest
+from tests import skip_if_windows
 from s3transfer.compat import six
 from s3transfer.compat import SOCKET_ERROR
 from s3transfer.exceptions import RetriesExceededError
@@ -77,6 +78,9 @@ class BaseDownloadTest(BaseGeneralInterfaceTest):
         }
 
     def create_stubbed_responses(self):
+        # We want to make sure the beginning of the stream is always used
+        # incase this gets called twice.
+        self.stream.seek(0)
         return [
             {
                 'method': 'head_object',
@@ -312,6 +316,24 @@ class BaseDownloadTest(BaseGeneralInterfaceTest):
         self.assertEqual(len(osutil.open_records), 1)
         self.assertEqual(len(osutil.rename_records), 1)
 
+    @skip_if_windows('Windows does not support UNIX special files')
+    def test_download_for_fifo_file(self):
+        self.add_head_object_response()
+        self.add_successful_get_object_responses()
+
+        # Create the fifo file
+        os.mkfifo(self.filename)
+
+        future = self.manager.download(
+            self.bucket, self.key, self.filename, self.extra_args)
+
+        # The call to open a fifo will block until there is both a reader
+        # and a writer, so we need to open it for reading after we've
+        # started the transfer.
+        with open(self.filename, 'rb') as fifo:
+            future.result()
+            self.assertEqual(fifo.read(), self.content)
+
 
 class TestNonRangedDownload(BaseDownloadTest):
     # TODO: If you want to add tests outside of this test class and still
@@ -342,6 +364,19 @@ class TestNonRangedDownload(BaseDownloadTest):
         op_model = self.client.meta.service_model.operation_model('GetObject')
         for allowed_upload_arg in self._manager.ALLOWED_DOWNLOAD_ARGS:
             self.assertIn(allowed_upload_arg, op_model.input_shape.members)
+
+    def test_download_empty_object(self):
+        self.content = b''
+        self.stream = six.BytesIO(self.content)
+        self.add_head_object_response()
+        self.add_successful_get_object_responses()
+        future = self.manager.download(
+            self.bucket, self.key, self.filename, self.extra_args)
+        future.result()
+
+        # Ensure that the empty file exists
+        with open(self.filename, 'rb') as f:
+            self.assertEqual(b'', f.read())
 
 
 class TestRangedDownload(BaseDownloadTest):

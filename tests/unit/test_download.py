@@ -14,6 +14,7 @@ import copy
 import os
 import shutil
 import tempfile
+import mock
 
 from tests import BaseTaskTest
 from tests import BaseSubmissionTaskTest
@@ -31,10 +32,13 @@ from s3transfer.download import DownloadSeekableOutputManager
 from s3transfer.download import DownloadNonSeekableOutputManager
 from s3transfer.download import DownloadSubmissionTask
 from s3transfer.download import GetObjectTask
+from s3transfer.download import ImmediatelyWriteIOGetObjectTask
 from s3transfer.download import IOWriteTask
 from s3transfer.download import IOStreamingWriteTask
 from s3transfer.download import IORenameFileTask
+from s3transfer.download import IOCloseTask
 from s3transfer.download import CompleteDownloadNOOPTask
+from s3transfer.download import DownloadChunkIterator
 from s3transfer.download import DeferQueue
 from s3transfer.futures import IN_MEMORY_DOWNLOAD_TAG
 from s3transfer.futures import BoundedExecutor
@@ -60,7 +64,7 @@ class WriteCollector(object):
         self._pos += len(data)
 
 
-class AlwaysInicatesSpecialFileOSUtils(OSUtils):
+class AlwaysIndicatesSpecialFileOSUtils(OSUtils):
     """OSUtil that always returns True for is_special_file"""
     def is_special_file(self, filename):
         return True
@@ -160,11 +164,20 @@ class TestDownloadFilenameOutputManager(BaseDownloadOutputManagerTest):
         self.io_executor.shutdown()
         self.assertEqual(fileobj.writes, [(0, 'foo'), (3, 'bar')])
 
+    def test_get_file_io_write_task(self):
+        fileobj = WriteCollector()
+        io_write_task = self.download_output_manager.get_io_write_task(
+            fileobj=fileobj, data='foo', offset=3)
+        self.assertIsInstance(io_write_task, IOWriteTask)
+
+        io_write_task()
+        self.assertEqual(fileobj.writes, [(3, 'foo')])
+
 
 class TestDownloadSpecialFilenameOutputManager(BaseDownloadOutputManagerTest):
     def setUp(self):
         super(TestDownloadSpecialFilenameOutputManager, self).setUp()
-        self.osutil = AlwaysInicatesSpecialFileOSUtils()
+        self.osutil = AlwaysIndicatesSpecialFileOSUtils()
         self.download_output_manager = DownloadSpecialFilenameOutputManager(
             self.osutil, self.transfer_coordinator,
             io_executor=self.io_executor)
@@ -172,30 +185,34 @@ class TestDownloadSpecialFilenameOutputManager(BaseDownloadOutputManagerTest):
     def test_is_compatible_for_special_file(self):
         self.assertTrue(
             self.download_output_manager.is_compatible(
-                self.filename, AlwaysInicatesSpecialFileOSUtils())
-        )
+                self.filename, AlwaysIndicatesSpecialFileOSUtils()))
 
     def test_is_not_compatible_for_non_special_file(self):
         self.assertFalse(
             self.download_output_manager.is_compatible(
-                self.filename, OSUtils())
-        )
+                self.filename, OSUtils()))
 
     def test_get_fileobj_for_io_writes(self):
         with self.download_output_manager.get_fileobj_for_io_writes(
                 self.future) as f:
             # Ensure it is a file like object returned
             self.assertTrue(hasattr(f, 'read'))
-            self.assertTrue(hasattr(f, 'seek'))
             # Make sure the name of the file returned is the same as the
             # final filename as we should not be writing to a temporary file.
             self.assertEqual(f.name, self.filename)
 
     def test_get_final_io_task(self):
         self.assertIsInstance(
-            self.download_output_manager.get_final_io_task(),
-            CompleteDownloadNOOPTask
-        )
+            self.download_output_manager.get_final_io_task(), IOCloseTask)
+
+    def test_can_queue_file_io_task(self):
+        fileobj = WriteCollector()
+        self.download_output_manager.queue_file_io_task(
+            fileobj=fileobj, data='foo', offset=0)
+        self.download_output_manager.queue_file_io_task(
+            fileobj=fileobj, data='bar', offset=3)
+        self.io_executor.shutdown()
+        self.assertEqual(fileobj.writes, [(0, 'foo'), (3, 'bar')])
 
 
 class TestDownloadSeekableOutputManager(BaseDownloadOutputManagerTest):
@@ -257,6 +274,15 @@ class TestDownloadSeekableOutputManager(BaseDownloadOutputManagerTest):
         self.io_executor.shutdown()
         self.assertEqual(fileobj.writes, [(0, 'foo'), (3, 'bar')])
 
+    def test_get_file_io_write_task(self):
+        fileobj = WriteCollector()
+        io_write_task = self.download_output_manager.get_io_write_task(
+            fileobj=fileobj, data='foo', offset=3)
+        self.assertIsInstance(io_write_task, IOWriteTask)
+
+        io_write_task()
+        self.assertEqual(fileobj.writes, [(3, 'foo')])
+
 
 class TestDownloadNonSeekableOutputManager(BaseDownloadOutputManagerTest):
     def setUp(self):
@@ -313,6 +339,15 @@ class TestDownloadNonSeekableOutputManager(BaseDownloadOutputManagerTest):
             fileobj=fileobj, data='foo', offset=1)
         io_executor.shutdown()
         self.assertEqual(fileobj.writes, [(0, 'foo'), (3, 'bar')])
+
+    def test_get_file_io_write_task(self):
+        fileobj = WriteCollector()
+        io_write_task = self.download_output_manager.get_io_write_task(
+            fileobj=fileobj, data='foo', offset=1)
+        self.assertIsInstance(io_write_task, IOStreamingWriteTask)
+
+        io_write_task()
+        self.assertEqual(fileobj.writes, [(0, 'foo')])
 
 
 class TestDownloadSubmissionTask(BaseSubmissionTaskTest):
@@ -502,6 +537,7 @@ class TestGetObjectTask(BaseTaskTest):
         self.fileobj = WriteCollector()
         self.osutil = OSUtils()
         self.io_chunksize = 64 * (1024 ** 2)
+        self.task_cls = GetObjectTask
         self.download_output_manager = DownloadSeekableOutputManager(
             self.osutil, self.transfer_coordinator, self.io_executor)
 
@@ -515,7 +551,8 @@ class TestGetObjectTask(BaseTaskTest):
             'io_chunksize': self.io_chunksize,
         }
         default_kwargs.update(kwargs)
-        return self.get_task(GetObjectTask, main_kwargs=default_kwargs)
+        self.transfer_coordinator.set_status_to_queued()
+        return self.get_task(self.task_cls, main_kwargs=default_kwargs)
 
     def assert_io_writes(self, expected_writes):
         # Let the io executor process all of the writes before checking
@@ -660,6 +697,22 @@ class TestGetObjectTask(BaseTaskTest):
         self.assert_io_writes([])
 
 
+class TestImmediatelyWriteIOGetObjectTask(TestGetObjectTask):
+    def setUp(self):
+        super(TestImmediatelyWriteIOGetObjectTask, self).setUp()
+        self.task_cls = ImmediatelyWriteIOGetObjectTask
+        # When data is written out, it should not use the io executor at all
+        # if it does use the io executor that is a deviation from expected
+        # behavior as the data should be written immediately to the file
+        # object once downloaded.
+        self.io_executor = None
+        self.download_output_manager = DownloadSeekableOutputManager(
+            self.osutil, self.transfer_coordinator, self.io_executor)
+
+    def assert_io_writes(self, expected_writes):
+        self.assertEqual(self.fileobj.writes, expected_writes)
+
+
 class BaseIOTaskTest(BaseTaskTest):
     def setUp(self):
         super(BaseIOTaskTest, self).setUp()
@@ -741,6 +794,39 @@ class TestIORenameFileTask(BaseIOTaskTest):
             task()
         self.assertTrue(os.path.exists(self.final_filename))
         self.assertFalse(os.path.exists(self.temp_filename))
+
+
+class TestIOCloseTask(BaseIOTaskTest):
+    def test_main(self):
+        with open(self.temp_filename, 'w') as f:
+            task = self.get_task(IOCloseTask, main_kwargs={'fileobj': f})
+            task()
+            self.assertTrue(f.closed)
+
+
+class TestDownloadChunkIterator(unittest.TestCase):
+    def test_iter(self):
+        content = b'my content'
+        body = six.BytesIO(content)
+        ref_chunks = []
+        for chunk in DownloadChunkIterator(body, len(content)):
+            ref_chunks.append(chunk)
+        self.assertEqual(ref_chunks, [b'my content'])
+
+    def test_iter_chunksize(self):
+        content = b'1234'
+        body = six.BytesIO(content)
+        ref_chunks = []
+        for chunk in DownloadChunkIterator(body, 3):
+            ref_chunks.append(chunk)
+        self.assertEqual(ref_chunks, [b'123', b'4'])
+
+    def test_empty_content(self):
+        body = six.BytesIO(b'')
+        ref_chunks = []
+        for chunk in DownloadChunkIterator(body, 3):
+            ref_chunks.append(chunk)
+        self.assertEqual(ref_chunks, [b''])
 
 
 class TestDeferQueue(unittest.TestCase):

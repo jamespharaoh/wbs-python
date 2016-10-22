@@ -34,6 +34,7 @@ from s3transfer.utils import calculate_range_parameter
 from s3transfer.utils import FunctionContainer
 from s3transfer.utils import CountCallbackInvoker
 from s3transfer.utils import StreamReaderProgress
+from s3transfer.utils import DeferredOpenFile
 from s3transfer.tasks import Task
 from s3transfer.tasks import SubmissionTask
 
@@ -106,14 +107,33 @@ class DownloadOutputManager(object):
         """
         self._transfer_coordinator.submit(
             self._io_executor,
-            IOWriteTask(
-                self._transfer_coordinator,
-                main_kwargs={
-                    'fileobj': fileobj,
-                    'data': data,
-                    'offset': offset,
-                }
-            )
+            self.get_io_write_task(fileobj, data, offset)
+         )
+
+    def get_io_write_task(self, fileobj, data, offset):
+        """Get an IO write task for the requested set of data
+
+        This task can be ran immediately or be submitted to the IO executor
+        for it to run.
+
+        :type fileobj: file-like object
+        :param fileobj: The file-like object to write to
+
+        :type data: bytes
+        :param data: The data to write out
+
+        :type offset: integer
+        :param offset: The offset to write the data to in the file-like object
+
+        :returns: An IO task to be used to write data to a file-like object
+        """
+        return IOWriteTask(
+            self._transfer_coordinator,
+            main_kwargs={
+                'fileobj': fileobj,
+                'data': data,
+                'offset': offset,
+            }
         )
 
     def get_final_io_task(self):
@@ -129,6 +149,14 @@ class DownloadOutputManager(object):
         """
         raise NotImplementedError(
             'must implement get_final_io_task()')
+
+    def _get_fileobj_from_filename(self, filename):
+        f = DeferredOpenFile(
+            filename, mode='wb', open_function=self._osutil.open)
+        # Make sure the file gets closed and we remove the temporary file
+        # if anything goes wrong during the process.
+        self._transfer_coordinator.add_failure_cleanup(f.close)
+        return f
 
 
 class DownloadFilenameOutputManager(DownloadOutputManager):
@@ -165,36 +193,10 @@ class DownloadFilenameOutputManager(DownloadOutputManager):
         )
 
     def _get_temp_fileobj(self):
-        f = self._get_fileobj(self._temp_filename)
+        f = self._get_fileobj_from_filename(self._temp_filename)
         self._transfer_coordinator.add_failure_cleanup(
             self._osutil.remove_file, self._temp_filename)
         return f
-
-    def _get_fileobj(self, filename):
-        f = self._osutil.open(filename, 'wb')
-        # Make sure the file gets closed and we remove the temporary file
-        # if anything goes wrong during the process.
-        self._transfer_coordinator.add_failure_cleanup(f.close)
-        return f
-
-
-class DownloadSpecialFilenameOutputManager(DownloadFilenameOutputManager):
-    """Handles special files that cannot use a temporary file for io writes"""
-    @classmethod
-    def is_compatible(cls, download_target, osutil):
-        return super(DownloadSpecialFilenameOutputManager, cls).is_compatible(
-                download_target, osutil) and \
-                osutil.is_special_file(download_target)
-
-    def get_fileobj_for_io_writes(self, transfer_future):
-        fileobj = transfer_future.meta.call_args.fileobj
-        return self._get_fileobj(fileobj)
-
-    def get_final_io_task(self):
-        # This task will serve the purpose of signaling when all of the io
-        # writes have finished so done callbacks can be called.
-        return CompleteDownloadNOOPTask(
-            transfer_coordinator=self._transfer_coordinator)
 
 
 class DownloadSeekableOutputManager(DownloadOutputManager):
@@ -244,16 +246,43 @@ class DownloadNonSeekableOutputManager(DownloadOutputManager):
                 data = write['data']
                 logger.debug("Queueing IO offset %s for fileobj: %s",
                              write['offset'], fileobj)
-                self._transfer_coordinator.submit(
-                    self._io_executor,
-                    IOStreamingWriteTask(
-                        self._transfer_coordinator,
-                        main_kwargs={
-                            'fileobj': fileobj,
-                            'data': data,
-                        }
-                    )
-                )
+                super(
+                    DownloadNonSeekableOutputManager, self).queue_file_io_task(
+                        fileobj, data, offset)
+
+    def get_io_write_task(self, fileobj, data, offset):
+        return IOStreamingWriteTask(
+            self._transfer_coordinator,
+            main_kwargs={
+                'fileobj': fileobj,
+                'data': data,
+            }
+        )
+
+
+class DownloadSpecialFilenameOutputManager(DownloadNonSeekableOutputManager):
+    def __init__(self, osutil, transfer_coordinator, io_executor,
+                 defer_queue=None):
+        super(DownloadSpecialFilenameOutputManager, self).__init__(
+            osutil, transfer_coordinator, io_executor, defer_queue)
+        self._fileobj = None
+
+    @classmethod
+    def is_compatible(cls, download_target, osutil):
+        return isinstance(download_target, six.string_types) and \
+               osutil.is_special_file(download_target)
+
+    def get_fileobj_for_io_writes(self, transfer_future):
+        filename = transfer_future.meta.call_args.fileobj
+        self._fileobj = self._get_fileobj_from_filename(filename)
+        return self._fileobj
+
+    def get_final_io_task(self):
+        # Make sure the file gets closed once the transfer is done.
+        return IOCloseTask(
+            transfer_coordinator=self._transfer_coordinator,
+            is_final=True,
+            main_kwargs={'fileobj': self._fileobj})
 
 
 class DownloadSubmissionTask(SubmissionTask):
@@ -353,18 +382,13 @@ class DownloadSubmissionTask(SubmissionTask):
         # Get any associated tags for the get object task.
         get_object_tag = download_output_manager.get_download_task_tag()
 
-        # Callback invoker to submit the final io task once the download
-        # is complete.
-        finalize_download_invoker = CountCallbackInvoker(
-            self._get_final_io_task_submission_callback(
-                download_output_manager, io_executor
-            )
-        )
-        finalize_download_invoker.increment()
+        # Get the final io task to run once the download is complete.
+        final_task = download_output_manager.get_final_io_task()
+
         # Submit the task to download the object.
         self._transfer_coordinator.submit(
             request_executor,
-            GetObjectTask(
+            ImmediatelyWriteIOGetObjectTask(
                 transfer_coordinator=self._transfer_coordinator,
                 main_kwargs={
                     'client': client,
@@ -377,12 +401,10 @@ class DownloadSubmissionTask(SubmissionTask):
                     'download_output_manager': download_output_manager,
                     'io_chunksize': config.io_chunksize,
                 },
-                done_callbacks=[finalize_download_invoker.decrement]
+                done_callbacks=[final_task]
             ),
             tag=get_object_tag
         )
-
-        finalize_download_invoker.finalize()
 
     def _submit_ranged_download_request(self, client, config, osutil,
                                         request_executor, io_executor,
@@ -492,15 +514,16 @@ class GetObjectTask(Task):
                     response['Body'], callbacks)
 
                 current_index = start_index
-                chunks = iter(
-                    lambda: streaming_body.read(io_chunksize), b'')
+                chunks = DownloadChunkIterator(streaming_body, io_chunksize)
                 for chunk in chunks:
                     # If the transfer is done because of a cancellation
                     # or error somewhere else, stop trying to submit more
                     # data to be written and break out of the download.
                     if not self._transfer_coordinator.done():
-                        download_output_manager.queue_file_io_task(
-                            fileobj, chunk, current_index)
+                        self._handle_io(
+                            download_output_manager, fileobj, chunk,
+                            current_index
+                        )
                         current_index += len(chunk)
                     else:
                         return
@@ -517,6 +540,21 @@ class GetObjectTask(Task):
                     callbacks, start_index - current_index)
                 continue
         raise RetriesExceededError(last_exception)
+
+    def _handle_io(self, download_output_manager, fileobj, chunk, index):
+        download_output_manager.queue_file_io_task(fileobj, chunk, index)
+
+
+class ImmediatelyWriteIOGetObjectTask(GetObjectTask):
+    """GetObjectTask that immediately writes to the provided file object
+
+    This is useful for downloads where it is known only one thread is
+    downloading the object so there is no reason to go through the
+    overhead of using an IO queue and executor.
+    """
+    def _handle_io(self, download_output_manager, fileobj, chunk, index):
+        task = download_output_manager.get_io_write_task(fileobj, chunk, index)
+        task()
 
 
 class IOWriteTask(Task):
@@ -560,6 +598,15 @@ class IORenameFileTask(Task):
         osutil.rename_file(fileobj.name, final_filename)
 
 
+class IOCloseTask(Task):
+    """A task to close out a file once the download is complete.
+
+    :param fileobj: The fileobj to close.
+    """
+    def _main(self, fileobj):
+        fileobj.close()
+
+
 class CompleteDownloadNOOPTask(Task):
     """A NOOP task to serve as an indicator that the download is complete
 
@@ -579,6 +626,36 @@ class CompleteDownloadNOOPTask(Task):
 
     def _main(self):
         pass
+
+
+class DownloadChunkIterator(object):
+    def __init__(self, body, chunksize):
+        """Iterator to chunk out a downloaded S3 stream
+
+        :param body: A readable file-like object
+        :param chunksize: The amount to read each time
+        """
+        self._body = body
+        self._chunksize = chunksize
+        self._num_reads = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        chunk = self._body.read(self._chunksize)
+        self._num_reads += 1
+        if chunk:
+            return chunk
+        elif self._num_reads == 1:
+            # Even though the response may have not had any
+            # content, we still want to account for an empty object's
+            # existance so return the empty chunk for that initial
+            # read.
+            return chunk
+        raise StopIteration()
+
+    next = __next__
 
 
 class DeferQueue(object):
