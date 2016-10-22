@@ -1,7 +1,8 @@
 """Performance tests for object store"""
 from __future__ import print_function
-from time import time
+
 import sys
+from time import time
 
 from .lib import (
     TestBigRepoR

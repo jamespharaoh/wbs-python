@@ -5,16 +5,17 @@
 # the BSD License: http://www.opensource.org/licenses/bsd-license.php
 import re
 
-from gitdb.util import hex_to_bin
+from git.cmd import handle_process_output
+from git.compat import (
+    defenc,
+    PY3
+)
+from git.util import finalize_process, hex_to_bin
 
 from .compat import binary_type
 from .objects.blob import Blob
 from .objects.util import mode_str_to_int
 
-from git.compat import (
-    defenc,
-    PY3
-)
 
 __all__ = ('Diffable', 'DiffIndex', 'Diff', 'NULL_TREE')
 
@@ -89,11 +90,11 @@ class Diffable(object):
 
         :param paths:
             is a list of paths or a single path to limit the diff to.
-            It will only include at least one of the givne path or paths.
+            It will only include at least one of the given path or paths.
 
         :param create_patch:
             If True, the returned Diff contains a detailed patch that if applied
-            makes the self to other. Patches are somwhat costly as blobs have to be read
+            makes the self to other. Patches are somewhat costly as blobs have to be read
             and diffed.
 
         :param kwargs:
@@ -104,7 +105,7 @@ class Diffable(object):
 
         :note:
             On a bare repository, 'other' needs to be provided as Index or as
-            as Tree/Commit, or a git command error will occour"""
+            as Tree/Commit, or a git command error will occur"""
         args = list()
         args.append("--abbrev=40")        # we need full shas
         args.append("--full-index")       # get full index paths, not only filenames
@@ -145,10 +146,10 @@ class Diffable(object):
         kwargs['as_process'] = True
         proc = diff_cmd(*self._process_diff_args(args), **kwargs)
 
-        diff_method = Diff._index_from_raw_format
-        if create_patch:
-            diff_method = Diff._index_from_patch_format
-        index = diff_method(self.repo, proc.stdout)
+        diff_method = (Diff._index_from_patch_format
+                       if create_patch
+                       else Diff._index_from_raw_format)
+        index = diff_method(self.repo, proc)
 
         proc.wait()
         return index
@@ -170,7 +171,7 @@ class DiffIndex(list):
     def iter_change_type(self, change_type):
         """
         :return:
-            iterator yieling Diff instances that match the given change_type
+            iterator yielding Diff instances that match the given change_type
 
         :param change_type:
             Member of DiffIndex.change_type, namely:
@@ -345,7 +346,7 @@ class Diff(object):
             msg += '\n---'
         # END diff info
 
-        # Python2 sillyness: have to assure we convert our likely to be unicode object to a string with the
+        # Python2 silliness: have to assure we convert our likely to be unicode object to a string with the
         # right encoding. Otherwise it tries to convert it using ascii, which may fail ungracefully
         res = h + msg
         if not PY3:
@@ -397,13 +398,18 @@ class Diff(object):
         return None
 
     @classmethod
-    def _index_from_patch_format(cls, repo, stream):
+    def _index_from_patch_format(cls, repo, proc):
         """Create a new DiffIndex from the given text which must be in patch format
         :param repo: is the repository we are operating on - it is required
         :param stream: result of 'git diff' as a stream (supporting file protocol)
         :return: git.DiffIndex """
+
+        ## FIXME: Here SLURPING raw, need to re-phrase header-regexes linewise.
+        text = []
+        handle_process_output(proc, text.append, None, finalize_process, decode_streams=False)
+
         # for now, we have to bake the stream
-        text = stream.read()
+        text = b''.join(text)
         index = DiffIndex()
         previous_header = None
         for header in cls.re_header.finditer(text):
@@ -420,7 +426,7 @@ class Diff(object):
             b_path = cls._pick_best_path(b_path, rename_to, b_path_fallback)
 
             # Our only means to find the actual text is to see what has not been matched by our regex,
-            # and then retro-actively assin it to our index
+            # and then retro-actively assign it to our index
             if previous_header is not None:
                 index[-1].diff = text[previous_header.end():header.start()]
             # end assign actual diff
@@ -450,17 +456,19 @@ class Diff(object):
         return index
 
     @classmethod
-    def _index_from_raw_format(cls, repo, stream):
+    def _index_from_raw_format(cls, repo, proc):
         """Create a new DiffIndex from the given stream which must be in raw format.
         :return: git.DiffIndex"""
         # handles
         # :100644 100644 687099101... 37c5e30c8... M    .gitignore
+
         index = DiffIndex()
-        for line in stream.readlines():
+
+        def handle_diff_line(line):
             line = line.decode(defenc)
             if not line.startswith(":"):
-                continue
-            # END its not a valid diff line
+                return
+
             meta, _, path = line[1:].partition('\t')
             old_mode, new_mode, a_blob_id, b_blob_id, change_type = meta.split(None, 4)
             path = path.strip()
@@ -471,7 +479,7 @@ class Diff(object):
             rename_from = None
             rename_to = None
 
-            # NOTE: We cannot conclude from the existance of a blob to change type
+            # NOTE: We cannot conclude from the existence of a blob to change type
             # as diffs with the working do not have blobs yet
             if change_type == 'D':
                 b_blob_id = None
@@ -489,6 +497,7 @@ class Diff(object):
             diff = Diff(repo, a_path, b_path, a_blob_id, b_blob_id, old_mode, new_mode,
                         new_file, deleted_file, rename_from, rename_to, '', change_type)
             index.append(diff)
-        # END for each line
+
+        handle_process_output(proc, handle_diff_line, None, finalize_process, decode_streams=False)
 
         return index

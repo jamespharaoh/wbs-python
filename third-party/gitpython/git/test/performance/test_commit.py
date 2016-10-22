@@ -17,6 +17,10 @@ from git.test.test_commit import assert_commit_serialization
 
 class TestPerformance(TestBigRepoRW):
 
+    def tearDown(self):
+        import gc
+        gc.collect()
+
     # ref with about 100 commits in its history
     ref_100 = '0.1.6'
 
@@ -48,7 +52,7 @@ class TestPerformance(TestBigRepoRW):
             # END for each object
         # END for each commit
         elapsed_time = time() - st
-        print("Traversed %i Trees and a total of %i unchached objects in %s [s] ( %f objs/s )"
+        print("Traversed %i Trees and a total of %i uncached objects in %s [s] ( %f objs/s )"
               % (nc, no, elapsed_time, no / elapsed_time), file=sys.stderr)
 
     def test_commit_traversal(self):
