@@ -5,7 +5,11 @@
   action:
 
     module: "apt"
-    name: "linux-generic-lts-wily"
+    name: "{{ (
+      'linux-generic-lts-wily'
+    ) if cluster_name in [ 'production', 'production-2' ] else (
+      'linux-generic-ltx-xenial'
+    )"
 
   register: "install_kernel_result"
 
