@@ -31,7 +31,7 @@ private_gateway: "{{
 }}"
 
 private_bits: "{{
-  16 if deployment_mode in [ 'vagrant', 'jenkins' ] else 16
+  16 if deployment_mode in [ 'vagrant', 'jenkins' ] else 26
 }}"
 
 lxc_memory_soft: "{{ node_memory [node_type] }}"
