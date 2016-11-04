@@ -11,8 +11,8 @@
     - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
-    - "setup-system"
     - "setup-dns"
+    - "setup-system"
     - "setup-logging"
 
     - "cluster-ssh"
@@ -31,5 +31,7 @@
 
     - "nodejs-install"
     - "nodejs-packages-install"
+
+    - "rzbackup"
 
 # ex: et ts=2 filetype=yaml

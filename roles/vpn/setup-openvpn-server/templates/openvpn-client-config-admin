@@ -2,16 +2,19 @@
 
 {% set host_cluster_name = hostvars [item].cluster_name %}
 {% set host_cluster = clusters [host_cluster_name] %}
+{% set host_zone = hostvars [item].instance_zone %}
+
+# ---------- fixed ip address and gateway
 
 ifconfig-push {{ [
 	[
 		vpn_network,
-		host_cluster.admin_vpn_ips [hostvars [item].instance_zone],
+		host_cluster.admin_vpn_ips [host_zone],
 	] | join ('.'),
 	'255.255.255.0',
 ] | join (' ') }}
 
-# ---------- cluster {{ host_cluster_name }}
+# ---------- iroute cluster {{ host_cluster_name }}
 
 iroute {{ [
 	[
@@ -27,15 +30,19 @@ iroute {{ [
 {% set host_cluster_deployment = deployments [host_cluster_deployment_name] %}
 {% if 'bridge_network' in host_cluster_deployment %}
 
-# ---------- deployment {{ host_cluster_deployment_name }}
+# ---------- iroute deployment {{ host_cluster_deployment_name }}
 
 {% for index in range (256) %}
 iroute {{ [
-	host_cluster_deployment.bridge_network,
-	index,
-	cluster_zone_indices [hostvars [item].instance_zone] | int * 64,
-] | join ('.') }} 255.255.255.192
+	[
+		host_cluster_deployment.bridge_network,
+		index,
+		cluster_zone_indices [hostvars [item].instance_zone] | int * 64,
+	] | join ('.'),
+	'255.255.255.192',
+] | join (' ') }}
 {% endfor %}
+
 {% endif %}
 {% endfor %}
 {% endif %}

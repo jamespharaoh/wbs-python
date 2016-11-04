@@ -1,0 +1,62 @@
+---
+
+amazon_instance_type_running: "m4.large"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+instance_id: "i-2642cf28"
+python: 
+  
+  installed_version: "2.7.11"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "2.7.11/0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "2.7.11/0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.11"
+python_pip: 
+  
+  installed_version: "2.7.11/8.1.1"
+  state: "installed"
+
+python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_state: "installed"
+python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+  installed_version: "2.0.7-trusty"
+  needs_restart: "yes"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+rzbackup_installed_version: "2.0.7-trusty"
+rzbackup_needs_restart: "yes"
+rzbackup_state: "enabled"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJmAoE+Dg+xffAf4fSsWnzgdPfGv2F1qHrc9yDzsBHLOLZeEGyRT13aT1+/H3nHOetdjWmOwicfAhxbEKSqCw60="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDyXjRaXTL4IpFKmYc1MW94ryPPTwCanbsDTuKo8l11qBglycpfq5B8qTj9xAgYswDFxok188lQGZoTx4QcmQs0Y9v3s7KElosYDB+57FwbwnmKOydqdEF78iupc7CS9aVnxSTvzcQ8z97QrVlRFCDJdKEqLJggRIU/b5yaS1rTL1nulY7kZpiA08GIBJJE3KHMlP7v0Q3D7VUEA85p8a7AXpNyO1ByJdTT1z1Su0oBRr1HsTrHxwHY6hNto3+TEGTbLfER1JQVU+Gp0uxN4XSSwyGMyrSoKORYGZmOX7LwmoXloSLQBIoG0ryf9aDv/Mpwlsf10GxV7AHoZWlI323v"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJmAoE+Dg+xffAf4fSsWnzgdPfGv2F1qHrc9yDzsBHLOLZeEGyRT13aT1+/H3nHOetdjWmOwicfAhxbEKSqCw60="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDyXjRaXTL4IpFKmYc1MW94ryPPTwCanbsDTuKo8l11qBglycpfq5B8qTj9xAgYswDFxok188lQGZoTx4QcmQs0Y9v3s7KElosYDB+57FwbwnmKOydqdEF78iupc7CS9aVnxSTvzcQ8z97QrVlRFCDJdKEqLJggRIU/b5yaS1rTL1nulY7kZpiA08GIBJJE3KHMlP7v0Q3D7VUEA85p8a7AXpNyO1ByJdTT1z1Su0oBRr1HsTrHxwHY6hNto3+TEGTbLfER1JQVU+Gp0uxN4XSSwyGMyrSoKORYGZmOX7LwmoXloSLQBIoG0ryf9aDv/Mpwlsf10GxV7AHoZWlI323v"
+volume_ids: 
+  
+  data: "vol-ec21a338"
+  system: "vol-5321a387"
+
+volume_ids_data: "vol-ec21a338"
+volume_ids_system: "vol-5321a387"
+
+
+# ex: et ts=2 filetype=yaml

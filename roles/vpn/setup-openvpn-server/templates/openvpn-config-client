@@ -1,13 +1,24 @@
 {{ ansible_warning ['#'] }}
 
 {% set other_cluster_name = item.0 %}
+{% set other_zone = item.1 %}
+
+{% set other_host_name = [
+	'wistla',
+	other_cluster_name,
+	'admin',
+	other_zone
+] | join ('-') %}
+
 {% set other_cluster = clusters [other_cluster_name] %}
+{% set other_vpn_network = other_cluster.vpn_networks [other_zone] %}
+{% set other_zone_index = cluster_zone_indices [other_zone] %}
 
 {% set other_host_name = [
 	'wistla-',
 	other_cluster_name,
 	'-admin-',
-	item.1.
+	item.1,
 ] | join %}
 
 # ---------- client
@@ -15,10 +26,12 @@
 client
 resolv-retry infinite
 nobind
-remote {{ hostvars [other_host_name].instance_zone }}.vpn.{{ other_cluster.local_domain }} 1194
+remote {{ other_zone }}.vpn.{{ other_cluster.local_domain }} 1194
 proto udp
 keepalive 5 20
-status /var/log/vpn-{{ other_host_name }}.log
+
+log /var/log/vpn-wistla-{{ cluster_name }}.{{ other_host_name }}.log
+status /var/run/vpn-wistla-{{ cluster_name }}.{{ other_host_name }}
 
 # ---------- network
 
@@ -28,8 +41,18 @@ tun-mtu 1500
 persist-tun
 
 max-routes 1024
+route-gateway {{ other_vpn_network }}.1
 
-route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [hostvars [other_host_name].instance_zone] * 64 }}.0 255.255.192.0
+# cluster
+
+route {{ [
+	[
+		other_cluster.cluster_network,
+		other_zone_index * 64,
+		'0',
+	] | join ('.'),
+	'255.255.192.0',
+] | join (' ') }}
 
 {% for other_cluster_deployment_name in other_cluster.deployment_names %}
 {% set other_cluster_deployment = deployments [other_cluster_deployment_name] %}
@@ -38,11 +61,15 @@ route {{ other_cluster.cluster_network }}.{{ cluster_zone_indices [hostvars [oth
 
 {% for index in range (256) %}
 route {{ [
-	other_cluster_deployment.bridge_network,
-	index,
-	cluster_zone_indices [hostvars [other_host_name].instance_zone] * 64,
-] | join ('.') }} 255.255.255.192
+	[
+		other_cluster_deployment.bridge_network,
+		index,
+		other_zone_index * 64,
+	] | join ('.'),
+	'255.255.255.192',
+] | join (' ') }}
 {% endfor %}
+
 {% endfor %}
 
 # ---------- security

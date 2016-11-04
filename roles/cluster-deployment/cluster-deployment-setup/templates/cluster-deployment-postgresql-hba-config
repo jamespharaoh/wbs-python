@@ -1,3 +1,15 @@
 local all all trust
 host all all {{ cluster.cluster_network }}.0.0/16 trust
-host all all {{ cluster_deployment.bridge_network }}.0.0/16 trust
+
+{% for other_deployment in cluster.deployment_names %}
+{% set other_deployment = deployments [other_deployment] %}
+{% if (
+	other_deployment.type in [ 'alias', 'alias2' ]
+	and other_deployment.alias == cluster_deployment.name
+) or other_deployment.name == cluster_deployment.name %}
+
+# {{ other_deployment.name }}
+host all all {{ other_deployment.bridge_network }}.0.0/16 trust
+
+{% endif %}
+{% endfor %}

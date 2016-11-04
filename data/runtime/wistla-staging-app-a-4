@@ -1,7 +1,7 @@
 ---
 
 amazon_instance_state: "running"
-amazon_instance_type_running: "m4.large"
+amazon_instance_type_running: "m3.medium"
 heka: 
   
   installed_version: "0.10.0"
@@ -60,6 +60,17 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+  installed_version: "2.0.7-trusty"
+  needs_restart: "yes"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+rzbackup_installed_version: "2.0.7-trusty"
+rzbackup_needs_restart: "yes"
+rzbackup_state: "enabled"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDQNC/7Je/NsvIro1NKcxrQTj+heC7kkgcmxErPQRtnTPtxbbvt+/flXrPfDLQywLHepIMI07potMfF3pe7OcW0="

@@ -87,23 +87,23 @@ path = "/var/log/cluster-system.log"
 message_matcher = 'Fields[Category] == "system"'
 encoder = "encoder-simple"
 
-[output-wistla-api-log]
+{% for log_name in [
+	'wistla-api',
+	'wistla-api-server',
+	'wistla-browser',
+	'wistla-db-daemon',
+	'wistla-media-daemon',
+	'wistla-notifications-daemon',
+	'wistla-web',
+] %}
+
+[output-wistla-{{ log_name }}-log]
 type = "FileOutput"
-path = "/var/log/cluster-wistla-api.log"
-message_matcher = 'Fields[Category] == "wistla-api"'
+path = "/var/log/cluster-{{ log_name }}.log"
+message_matcher = 'Fields[Category] == "{{ log_name }}"'
 encoder = "encoder-simple"
 
-[output-wistla-browser-log]
-type = "FileOutput"
-path = "/var/log/cluster-wistla-browser.log"
-message_matcher = 'Fields[Category] == "wistla-browser"'
-encoder = "encoder-simple"
-
-[output-wistla-web-log]
-type = "FileOutput"
-path = "/var/log/cluster-wistla-web.log"
-message_matcher = 'Fields[Category] == "wistla-web"'
-encoder = "encoder-simple"
+{% endfor %}
 
 {% for nginx_log_type in [ 'access', 'error', 'times' ] %}
 

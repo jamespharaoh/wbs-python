@@ -1,11 +1,15 @@
 {{ ansible_warning ['#'] }}
 
+{# ###################### utilities #}
+
 {% set restrictions %}
 {% for whitelist_ip in cluster.whitelist_ips %}
 			allow {{ whitelist_ip.ip }}; # {{ whitelist_ip.name }}
 {% endfor %}
 			deny all;
 {% endset %}
+
+{# ###################### main config #}
 
 user www-data;
 worker_processes 4;
@@ -73,24 +77,26 @@ http {
 	real_ip_header proxy_protocol;
 	real_ip_recursive on;
 
+{# ###################### upstream servers #}
+
 #==============================================================================#
 
 #
 # upstream servers per deployment
 #
 
-{% for deployment_name in cluster.super_deployment_names %}
-{% set deployment = deployments [deployment_name] %}
-{% if deployment.type in [ 'alias', 'alias2', 'simple', 'simple2' ] %}
-{% set deployment_cluster = clusters [deployment.cluster_name] %}
+{% for proxy_deployment_name in cluster.proxy_deployment_names %}
+{% set proxy_deployment = deployments [proxy_deployment_name] %}
+{% if proxy_deployment.type in [ 'alias', 'alias2', 'simple', 'simple2' ] %}
+{% set proxy_deployment_cluster = clusters [proxy_deployment.cluster_name] %}
 
-	upstream deployment-{{ deployment_name }} {
+	upstream deployment-{{ proxy_deployment_name }} {
 
-{% for index in deployment_cluster.instance_formation.app.indices %}
-{% for zone in deployment_cluster.instance_formation.app.zones %}
+{% for index in proxy_deployment_cluster.instance_formation.app.indices %}
+{% for zone in proxy_deployment_cluster.instance_formation.app.zones %}
 		server {{ [
 			[
-				deployment_name,
+				proxy_deployment_name,
 				'load',
 				zone,
 				index,
@@ -107,7 +113,9 @@ http {
 {% endif %}
 {% endfor %}
 
-{% if cluster_name == 'test' %}
+{# ###################### default site for test #}
+
+{% if cluster_name in [ 'test', 'staging', 'staging-2' ] %}
 
 #==============================================================================#
 
@@ -136,9 +144,17 @@ http {
 
 {% endif %}
 
+{# ###################### per-deployment macro #}
+
 {% macro do_deployment (deployment, deployment_alias, target) %}
 
 	# website redirect naked domain to www
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -158,6 +174,12 @@ http {
 	}
 
 	# website redirect http to https
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -171,6 +193,12 @@ http {
 	}
 
 	# website
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -228,6 +256,12 @@ http {
 	}
 
 	# api
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -279,6 +313,12 @@ http {
 	}
 
 	# admin redirect http to https
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -292,6 +332,12 @@ http {
 	}
 
 	# api
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -332,6 +378,12 @@ http {
 	}
 
 	# short redirect http to https
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -346,6 +398,12 @@ http {
 	}
 
 	# short
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -388,6 +446,12 @@ http {
 	}
 
 	# assets redirect http to https
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -402,6 +466,12 @@ http {
 	}
 
 	# assets
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -444,6 +514,12 @@ http {
 	}
 
 	# assets origin
+	#
+	# deployment: {{ deployment.name }}
+{% if deployment_alias.name != deployment.name %}
+	# deployment alias: {{ deployment_alias.name }}
+{% endif %}
+	# target: {{ target }}
 
 	server {
 
@@ -484,64 +560,71 @@ http {
 
 {% endmacro %}
 
-{% for deployment_name, deployment in deployments.items ()
-if deployment.supercluster_name == supercluster_name %}
+{# ###################### iterate deployments #}
 
-{% if deployment.type in [ 'shared', 'shared2' ] %}
+{% for proxy_deployment_name in cluster.proxy_deployment_names %}
+{% set proxy_deployment = deployments [proxy_deployment_name] %}
+
+{% if proxy_deployment.type in [ 'shared', 'shared2' ] %}
 
 #==============================================================================#
 
 #
-# shared deployment {{ deployment.name }}
+# shared deployment {{ proxy_deployment.name }}
 #
-# main domain: {{ deployment.main_domain }}
-# short domain: {{ deployment.short_domain }}
-# target: {{ deployment.target }}
+# main domain: {{ proxy_deployment.main_domain }}
+# short domain: {{ proxy_deployment.short_domain }}
+# target: {{ proxy_deployment.target }}
 #
 
 {{ do_deployment (
-	deployment,
-	deployment,
-	deployment.target) }}
+	proxy_deployment,
+	proxy_deployment,
+	proxy_deployment.target) }}
 
 {% elif deployment.type in [ 'alias', 'alias2' ] %}
-{% set deployment_alias = deployments [deployment.alias] %}
+{% set proxy_deployment_alias = deployments [proxy_deployment.alias] %}
 
 #==============================================================================#
 
 #
-# deployment alias {{ deployment_name }}
+# deployment alias {{ proxy_deployment_name }}
 #
-# main domain: {{ deployment.main_domain }}
-# short domain: {{ deployment.short_domain }}
+# main domain: {{ proxy_deployment.main_domain }}
+# short domain: {{ proxy_deployment.short_domain }}
 #
-# alias name: {{ deployment.alias }}
-# main domain: {{ deployment_alias.main_domain }}
-# short domain: {{ deployment_alias.short_domain }}
+# alias name: {{ proxy_deployment.alias }}
+# main domain: {{ proxy_deployment_alias.main_domain }}
+# short domain: {{ proxy_deployment_alias.short_domain }}
 #
 
 {{ do_deployment (
-	deployment,
-	deployment_alias,
-	deployment_name) }}
+	proxy_deployment,
+	proxy_deployment_alias,
+	proxy_deployment_name) }}
 
-{% elif deployment.type in [ 'simple', 'simple2' ] %}
+{% elif proxy_deployment.type in [ 'simple', 'simple2' ] %}
 
 #==============================================================================#
 
 #
-# simple deployment {{ deployment_name }}
+# simple deployment {{ proxy_deployment_name }}
 #
-# main domain: {{ deployment.main_domain }}
-# short domain: {{ deployment.short_domain }}
+# main domain: {{ proxy_deployment.main_domain }}
+# short domain: {{ proxy_deployment.short_domain }}
 #
 
 {{ do_deployment (
-	deployment,
-	deployment,
-	deployment_name) }}
+	proxy_deployment,
+	proxy_deployment,
+	proxy_deployment_name) }}
 
 {% endif %}
+
 {% endfor %}
 
+{# ###################### close file #}
+
 }
+
+# ex: noet ts=4 filetype=nginx

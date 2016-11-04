@@ -1,0 +1,55 @@
+{{ ansible_warning ['#'] }}
+
+{% set vpn_client_name = item %}
+
+{% set vpn_client =
+	vpn_clients
+	| selectattr ('name', 'equalto', vpn_client_name)
+	| first
+%}
+
+# ========== fixed ip address and gateway
+
+ifconfig-push {{ vpn_network }}.{{ vpn_client.vpn_ip }} 255.255.255.0
+
+push "route-gateway {{ vpn_network }}.1"
+
+# ========== client's routed addresses
+
+{% for iroute in vpn_client.iroutes %}
+iroute {{ iroute.network }} {{ iroute.netmask }}
+{% endfor %}
+
+# ========== push route local cluster
+
+push "route {{ cluster.cluster_network }}.0.0 255.255.0.0"
+
+# ========== push route local vpns
+
+{% for other_vpn_network in cluster.vpn_networks.values () %}
+push "route {{ other_vpn_network }}.0 255.255.255.0"
+{% endfor %}
+
+# ========== push route local cluster deployments
+
+{% for cluster_deployment_name in cluster.deployment_names | default ([]) %}
+{% set cluster_deployment = deployments [cluster_deployment_name] %}
+{% if cluster_deployment.type != 'virtual' %}
+
+# {{ cluster_deployment_name }}
+push "route {{ cluster_deployment.bridge_network }}.0.0 255.255.0.0 {{ vpn_network }}.1"
+
+{% endif %}
+{% endfor %}
+
+# ========== push dev deployments in ops
+
+{% if cluster_name == 'ops' %}
+{% for dev_deployment_name in dev_deployment_names %}
+{% set dev_deployment = deployments [dev_deployment_name] %}
+
+# {{ dev_deployment_name }}
+push "route {{ dev_deployment.bridge_network }}.0.0 255.255.0.0"
+
+{% endfor %}
+{% endif %}

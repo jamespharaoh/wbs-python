@@ -98,7 +98,6 @@ cluster-shared2:
   node_templates:
 
     - "base"
-    - "nodejs"
     - "posgresql"
 
     - "kafka"
@@ -140,18 +139,20 @@ cluster-alias2:
 
     - "base"
     - "nodejs"
-    - "nodejs-legacy"
-    - "posgresql"
 
-    - "api"
-    - "browser"
+    - "api2"
+    - "db-daemon"
     - "load"
+    - "media"
+    - "notifications"
 
   node_types:
 
-    - "api"
-    - "browser"
+    - "api2"
+    - "db-daemon"
     - "load"
+    - "media"
+    - "notifications"
 
 cluster-simple:
 

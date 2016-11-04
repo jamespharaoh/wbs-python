@@ -10,7 +10,7 @@ db:
 
 schemas:
 
-  - host: "{{ cluster_deployment.name }}-postgresql-main-a-4"
+  - host: "{{ cluster_deployment_alias.name }}-postgresql-main-a-4"
     name: "wistla"
     exclude_tables:
 
@@ -24,7 +24,7 @@ schemas:
     target_directory: ./schema.wistla.main
     data_import_directory: /shared
 
-  - host: "{{ cluster_deployment.name }}-postgresql-cache-a-4"
+  - host: "{{ cluster_deployment_alias.name }}-postgresql-cache-a-4"
     name: "wistla"
     exclude_tables:
       - acl

@@ -40,4 +40,20 @@
 
 - meta: "flush_handlers"
 
+- name: "remove resolvconf"
+  become: "yes"
+  action:
+
+    module: "apt"
+    name: "resolvconf"
+    state: "absent"
+
+- name: "write resolv.conf"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/resolv.conf"
+    src: "dns-resolv-conf"
+
 # ex: et ts=2 filetype=yaml

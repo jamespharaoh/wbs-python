@@ -1,0 +1,1 @@
+{{ cluster_deployment.rabbit_erlang_cookie }}

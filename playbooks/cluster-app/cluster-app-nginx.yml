@@ -1,0 +1,10 @@
+---
+
+- hosts: "cluster-app"
+  roles:
+
+    - "nginx-install"
+    - "cluster-app-nginx"
+    - "nginx-control"
+
+# ex: et ts=2 filetype=yaml

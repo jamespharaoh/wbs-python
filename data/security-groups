@@ -155,6 +155,11 @@
       group_id: "{{ security_group_id_app }}"
 
     - proto: "tcp"
+      from_port: "5432"
+      to_port: "5432"
+      group_id: "{{ security_group_id_app }}"
+
+    - proto: "tcp"
       from_port: "5672"
       to_port: "5672"
       group_id: "{{ security_group_id_app }}"

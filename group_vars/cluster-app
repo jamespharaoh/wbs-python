@@ -208,4 +208,6 @@ rzbackup_repository: "/home/ubuntu/builds"
 rzbackup_password_file: "/run/wistla-build-secret"
 rzbackup_max_compressed_filesystem_cache_entries: "65536"
 
+icinga_certificate: ""
+
 # ex: et ts=2 filetype=yaml

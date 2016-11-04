@@ -90,4 +90,13 @@
 - network: "10.173"
   deployment: "bananaman"
 
+- network: "10.174"
+  deployment: "staging-2"
+
+- network: "10.175"
+  deployment: "staging-2-a"
+
+- network: "10.176"
+  deployment: "staging-2-b"
+
 # ex: et ts=2 filetype=yaml

@@ -242,6 +242,8 @@ if (
 
 {%- endfor %}
 
+{# ==================== superclusters #}
+
 {% for other_supercluster_name, other_supercluster in superclusters.items ()
 if (
 	deployment_mode in [ 'vagrant', 'jenkins' ]
@@ -267,7 +269,48 @@ if (
 
 {%- endfor %}
 
+[supercluster-{{ other_supercluster_name }}-admin:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name not in [ 'dev' ]
+) and (
+	other_cluster.supercluster_name == other_supercluster_name
+) %}
+cluster-{{ other_cluster_name }}-admin
 {% endfor %}
+
+[supercluster-{{ other_supercluster_name }}-app:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name not in [ 'dev', 'ops' ]
+) and (
+	other_cluster.supercluster_name == other_supercluster_name
+) %}
+cluster-{{ other_cluster_name }}-app
+{% endfor %}
+
+[supercluster-{{ other_supercluster_name }}-data:children]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name not in [ 'dev', 'ops', 'test' ]
+) and (
+	other_cluster.supercluster_name == other_supercluster_name
+) %}
+cluster-{{ other_cluster_name }}-data
+{% endfor %}
+
+{% endfor %}
+
+{# ==================== clusters #}
 
 {% for other_cluster_name, other_cluster in clusters.items ()
 if (

@@ -1,0 +1,104 @@
+{{ ansible_warning ['#'] }}
+
+# ---------- server
+
+mode server
+proto udp
+port 1194
+keepalive 5 20
+
+log /var/log/vpn-wistla-{{ cluster_name }}.log
+status /var/run/vpn-wistla-{{ cluster_name }}
+
+client-config-dir clients
+client-connect client-connect-script
+client-disconnect client-disconnect-script
+
+# ========== network
+
+dev tun
+topology subnet
+tun-mtu 1500
+persist-tun
+client-to-client
+
+max-routes 8192
+max-routes-per-client 1024
+
+ifconfig {{ vpn_network }}.1 255.255.255.0
+route-gateway {{ vpn_network }}.1
+
+# ---------- route clusters
+
+{% for other_cluster_name, other_cluster in clusters.items () %}
+{% if other_cluster_name != cluster_name
+	and other_cluster.supercluster_name == supercluster_name
+	and other_cluster_name not in cluster.vpn_upstream_clusters %}
+
+# cluster {{ other_cluster_name }}
+
+{% for zone in [ 'a', 'b', 'c', 'd' ] %}
+route {{ [
+	[
+		other_cluster.cluster_network,
+		cluster_zone_indices [zone] * 64,
+		'0',
+	] | join ('.'),
+	'255.255.192.0',
+	[
+		vpn_network,
+		other_cluster.admin_vpn_ips [zone],
+	] | join ('.'),
+] | join (' ') }}
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+# ---------- route super cluster deployments
+
+{% for super_deployment_name
+	in cluster.super_deployment_names | default ([]) %}
+{% set super_deployment = deployments [super_deployment_name] %}
+{% set super_cluster = clusters [super_deployment.cluster_name] %}
+{% if (
+	super_deployment.type != 'virtual'
+) and (
+	cluster_name in super_cluster.vpn_upstream_clusters
+) %}
+
+# deployment {{ super_deployment_name }}
+
+{% for admin_host_name in groups ['supercluster-' + supercluster_name + '-admin'] %}
+{% if hostvars [admin_host_name].cluster_name != cluster_name %}
+{% set gateway_address = [
+	vpn_network,
+	clusters [hostvars [admin_host_name].cluster_name].admin_vpn_ips [
+		hostvars [admin_host_name].instance_zone],
+] | join ('.') %}
+{% for index in range (256) %}
+{% set network_address = [
+	super_deployment.bridge_network,
+	index,
+	cluster_zone_indices [hostvars [admin_host_name].instance_zone] * 64,
+] | join ('.') %}
+route {{ network_address }} 255.255.255.192 {{ gateway_address }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+# ---------- security
+
+tls-server
+persist-key
+
+dh wistla-dh.pem
+
+ca wistla-ca.cert
+#crl-verify wistla-ca.crl
+
+cert wistla-{{ cluster_name }}-vpn.cert
+key wistla-{{ cluster_name }}-vpn.key

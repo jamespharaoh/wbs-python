@@ -1,5 +1,0 @@
-{%- set cluster_deployment_security = lookup ('file',
-	HOME + '/security/deployments/' + cluster_deployment_name
-) | from_yaml -%}
-
-{%- print cluster_deployment_security.rabbit.erlang_cookie -%}

@@ -170,7 +170,6 @@
 
 - name: "create shared directories"
   with_items: "{{ cluster_deployment_shared_directories }}"
-  when: "cluster_deployment.type != 'alias'"
   become: "yes"
   action:
 

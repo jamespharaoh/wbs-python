@@ -12,8 +12,8 @@
     - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
-    - "setup-system"
     - "setup-dns"
+    - "setup-system"
     - "setup-logging"
 
     - "cluster-ssh"
@@ -46,15 +46,16 @@
 
     - "nodejs-stubs"
 
-    - "nginx-install"
-    - "cluster-app-nginx"
-    - "nginx-control"
+- include: "cluster-app/cluster-app-nginx.yml"
+
+- hosts: "cluster-app"
+  roles:
 
     - "cluster-app-lxc"
     - "cluster-app-cron"
 
     - "rzbackup"
 
-    - "cluster-activate"
+- include: "cluster-app/cluster-app-activate.yml"
 
 # ex: et ts=2 filetype=yaml

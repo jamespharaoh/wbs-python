@@ -166,4 +166,10 @@ cluster_create_volumes:
     device_type: "gp2"
     delete_on_termination: "no"
 
+rzbackup_install_version: "2.0.7-trusty"
+rzbackup_user: "ubuntu"
+rzbackup_repository: "/home/ubuntu/builds"
+rzbackup_password_file: "/run/wistla-build-secret"
+rzbackup_max_compressed_filesystem_cache_entries: "65536"
+
 # ex: et ts=2 filetype=yaml

@@ -38,6 +38,24 @@
       cluster_deployment_name: "staging"
       tags: [ "cluster-deployment", "staging" ]
 
+- hosts: "supercluster-staging-app"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "staging-2-a"
+      tags: [ "cluster-deployment", "staging-2-a" ]
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "staging-2-b"
+      tags: [ "cluster-deployment", "staging-2-b" ]
+
+- hosts: "supercluster-staging-data"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "staging-2"
+      tags: [ "cluster-deployment", "staging-2" ]
+
 - hosts: "cluster-test-app"
   roles:
 

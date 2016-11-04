@@ -14,6 +14,9 @@ my_system_packages:
   - name: "apport-symptoms"
     state: "absent"
 
+  - name: "apt-cacher-ng"
+    state: "absent"
+
   - name: "python-apport"
     state: "absent"
 
@@ -22,7 +25,7 @@ my_system_packages:
 
   # ---------- to install
 
-  - name: "apt-cacher-ng"
+  - name: "apt-cacher"
     state: "present"
 
   - name: "awscli"

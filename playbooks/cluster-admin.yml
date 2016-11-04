@@ -1,7 +1,5 @@
 ---
 
-# ========== admin
-
 - hosts: "cluster-admin"
   roles:
 
@@ -42,7 +40,11 @@
     - "cluster-admin-nginx-setup"
     - "nginx-control"
 
-    - "setup-openvpn-server"
+- include: "cluster-admin/cluster-admin-vpn.yml"
+
+- hosts: "cluster-admin"
+  roles:
+
     - "cluster-admin-routes"
     - "wistla-heka-master"
     - "cluster-admin-snapshots"

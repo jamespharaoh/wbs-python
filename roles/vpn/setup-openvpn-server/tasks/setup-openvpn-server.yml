@@ -67,7 +67,7 @@
 
     module: "template"
     dest: "/etc/openvpn/wistla-{{ cluster_name }}-vpn.conf"
-    src: "openvpn-config"
+    src: "openvpn-config-server"
 
 - name: "create openvpn client config dir"
   become: "yes"
@@ -77,23 +77,29 @@
     name: "/etc/openvpn/clients"
     state: "directory"
 
-- name: "create openvpn client configs"
-  with_items: "{{ vpn_clients }}"
-  become: "yes"
-  action:
-
-    module: "template"
-    dest: "/etc/openvpn/clients/{{ item.name }}"
-    src: "openvpn-client-config"
-
-- name: "create openvpn admin client configs"
-  with_items: "{{ groups ['cluster-admin'] }}"
+- name: "create openvpn dev client configs"
+  with_items: "{{ vpn_clients | map (attribute = 'name') | list }}"
   become: "yes"
   action:
 
     module: "template"
     dest: "/etc/openvpn/clients/{{ item }}"
-    src: "openvpn-admin-client-config"
+    src: "openvpn-client-config-dev"
+
+- name: "create openvpn admin client configs"
+  with_items: "{{ groups ['cluster-admin'] }}"
+  when: "(
+    hostvars [item].cluster_name != cluster_name
+  ) and (
+    clusters [hostvars [item].cluster_name].supercluster_name
+      == supercluster_name
+  )"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/openvpn/clients/{{ item }}"
+    src: "openvpn-client-config-admin"
 
 - name: "create openvpn client connect script"
   become: "yes"
@@ -101,7 +107,7 @@
 
     module: "template"
     dest: "/etc/openvpn/client-connect-script"
-    src: "openvpn-client-connect-script"
+    src: "openvpn-client-script-connect"
 
     mode: "0755"
 
@@ -111,11 +117,11 @@
 
     module: "template"
     dest: "/etc/openvpn/client-disconnect-script"
-    src: "openvpn-client-disconnect-script"
+    src: "openvpn-client-script-disconnect"
 
     mode: "0755"
 
-- name: "create openvpn cluster configs"
+- name: "create openvpn admin configs"
   with_nested:
 
     - "{{ cluster.vpn_upstream_clusters }}"
@@ -133,7 +139,7 @@
       item.1,
       '.conf',
     ] | join }}"
-    src: "openvpn-cluster-config"
+    src: "openvpn-config-client"
 
 - meta: "flush_handlers"
 
