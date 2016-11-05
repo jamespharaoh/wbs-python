@@ -13,4 +13,12 @@ WISTLA_DB_DAEMON_MAX_OLD_SPACE_SIZE="{{
 }}"
 WISTLA_DB_DAEMON_MAX_EXECUTABLE_SIZE="32"
 
+{% if (
+	deployment_mode not in [ 'vagrant', 'jenkins' ]
+) and (
+	instance_zone != 'a' or instance_index != '4'
+) %}
+export WISTLA_NUM_PARTITIONS="0"
+{% endif %}
+
 # ex: noet ts=4 filetype=bash
