@@ -116,19 +116,29 @@ http {
 		client_max_body_size 16m;
 
 {% if cluster_deployment.type in [ 'alias', 'simple' ] %}
+
 		location / {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+
 {% endif %}
 
 {% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
+
 		location /v2 {
 			proxy_pass http://api2;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
+
+		location /hello {
+			proxy_pass http://api2/v2/hello;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+		}
+
 {% endif %}
 
 {% if cluster_deployment.test_routes_enabled != 'yes' %}
