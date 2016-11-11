@@ -67,6 +67,12 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+skypebot_client_id: "0601dfa4-cb9a-4632-9202-f246ce7a5c3e"
+skypebot_client_secret: "6aReRurg4dvjdmUa3W5cjF1"
+skypebot_database_hostname: "localhost"
+skypebot_database_name: "skypebot"
+skypebot_database_password: "tcqjfzcwhidmsskrcsdp"
+skypebot_database_username: "skypebot"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKq2xHvh99CssSn3KkUzmSV02PwCNR90BqGH+iUnAJwUQFDgUKwE4PcUIEv8YzncXeTxA1jL5IzXIWGT56vw6pE="
@@ -82,12 +88,5 @@ volume_ids:
 volume_ids_data: "vol-7178cd62"
 volume_ids_system: "vol-78cb2d6b"
 
-skypebot_client_id: "0601dfa4-cb9a-4632-9202-f246ce7a5c3e"
-skypebot_client_secret: "6aReRurg4dvjdmUa3W5cjF1"
-
-skypebot_database_hostname: "localhost"
-skypebot_database_username: "skypebot"
-skypebot_database_password: "tcqjfzcwhidmsskrcsdp"
-skypebot_database_name: "skypebot"
 
 # ex: et ts=2 filetype=yaml
