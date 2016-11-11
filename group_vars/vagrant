@@ -281,4 +281,6 @@ rzbackup_repository: "{{ deployment_home }}/builds"
 rzbackup_password_file: "{{ deployment_build_secret_path }}"
 rzbackup_max_compressed_filesystem_cache_entries: "65536"
 
+fixtures_host_suffix: "0"
+
 # ex: et ts=2 filetype=yaml

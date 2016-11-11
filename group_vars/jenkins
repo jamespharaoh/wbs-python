@@ -10,4 +10,6 @@ python_packages:
 nodejs_version: "{{ deployment.nodejs_version }}"
 nodejs_version_legacy: "{{ deployment.nodejs_version_legacy }}"
 
+fixtures_host_suffix: "0"
+
 # ex: et ts=2 filetype=yaml

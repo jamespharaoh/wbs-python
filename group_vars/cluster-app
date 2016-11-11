@@ -210,4 +210,6 @@ rzbackup_max_compressed_filesystem_cache_entries: "65536"
 
 icinga_certificate: ""
 
+fixtures_host_suffix: "0"
+
 # ex: et ts=2 filetype=yaml

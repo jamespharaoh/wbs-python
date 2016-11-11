@@ -6,7 +6,7 @@
   shell: "{{ [
     'sleep 10',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmq-plugins',
       'enable',
@@ -22,7 +22,7 @@
     'sleep 5',
     [
       '(',
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'add_user',
@@ -39,7 +39,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_user_tags',
@@ -55,7 +55,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_permissions',
@@ -74,7 +74,7 @@
     'sleep 5',
     [
       '(',
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'add_user',
@@ -91,7 +91,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_user_tags',
@@ -107,7 +107,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_permissions',
