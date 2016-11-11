@@ -3,7 +3,6 @@
 - name: "remove bind mounts"
   when: "node_is_template == 'yes'"
   delegate_to: "localhost"
-  become: "yes"
   args:
 
     executable: "/bin/bash"
