@@ -1,0 +1,36 @@
+---
+
+- hosts: "cluster-jenkins"
+  tasks:
+
+    - name: "cluster jenkins kick stop"
+      action:
+
+        module: "ec2"
+        instance_id: "{{ instance_id }}"
+        state: "stopped"
+        wait: "no"
+
+    - name: "cluster jenkins pause 5 seconds"
+      action:
+
+        module: "pause"
+        seconds: "5"
+
+    - name: "cluster jenkins kick force stop"
+      action:
+
+        module: "ec2"
+        instance_id: "{{ instance_id }}"
+        state: "stopped"
+        wait: "yes"
+
+    - name: "cluster jenkins kick start"
+      action:
+
+        module: "ec2"
+        instance_id: "{{ instance_id }}"
+        state: "started"
+        wait: "yes"
+
+# ex: et ts=2 filetype=yaml
