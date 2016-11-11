@@ -2,63 +2,154 @@
 
 # TODO generate this file
 
-- hosts: "cluster-production-app"
-  roles:
+- hosts: "cluster-staging-admin"
+  tasks:
 
-    - role: "cluster-deployment-clean"
-      cluster_deployment_name: "production-a"
-      tags: [ "cluster-deployment-clean", "production-a" ]
-
-    - role: "cluster-deployment-clean"
-      cluster_deployment_name: "production-b"
-      tags: [ "cluster-deployment-clean", "production-b" ]
-
-- hosts: "cluster-production-data"
-  roles:
-
-    - role: "cluster-deployment-clean"
-      cluster_deployment_name: "production"
-      tags: [ "cluster-deployment-clean", "production" ]
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/staging/kafka',
+        'clean',
+      ] | join (' ') }} || true"
+      tags: [ "cluster-deployment", "staging", "staging-a", "staging-b" ]
 
 - hosts: "cluster-staging-app"
   roles:
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging-a"
-      tags: [ "cluster-deployment-clean", "staging-a" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging-a" ]
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging-b"
-      tags: [ "cluster-deployment-clean", "staging-b" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging-b" ]
 
 - hosts: "cluster-staging-data"
   roles:
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "staging"
-      tags: [ "cluster-deployment-clean", "staging" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging" ]
+
+- hosts: "cluster-staging-2-admin"
+  tasks:
+
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/staging-2/kafka',
+        'clean',
+      ] | join (' ') }}"
+      tags: [ "cluster-deployment", "staging-2", "staging-a", "staging-b" ]
+
+- hosts: "cluster-staging-2-app"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2-a"
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging-2-a" ]
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2-b"
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging-2-b" ]
+
+- hosts: "cluster-staging-2-data"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2"
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "staging-2" ]
+
+- hosts: "cluster-test-admin"
+  tasks:
+
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/test-k2/kafka',
+        'clean',
+      ] | join (' ') }}"
+      tags: [ "cluster-deployment", "test-k2" ]
+
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/test-montblanc/kafka',
+        'clean',
+      ] | join (' ') }}"
+      tags: [ "cluster-deployment", "test-montblanc" ]
+
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/test-erebus/kafka',
+        'clean',
+      ] | join (' ') }}"
+      tags: [ "cluster-deployment", "test-erebus" ]
+
+    - name: "clean zookeeper"
+      run_once: "yes"
+      command: "{{ [
+        '/usr/lib/zookeeper/bin/load_gen',
+        'localhost:2181',
+        '/test-fitzroy/kafka',
+        'clean',
+      ] | join (' ') }}"
+      tags: [ "cluster-deployment", "test-fitzroy" ]
 
 - hosts: "cluster-test-app"
   roles:
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-everest"
-      tags: [ "cluster-deployment-clean", "test-everest" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "test-everest" ]
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-k2"
-      tags: [ "cluster-deployment-clean", "test-k2" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "test-k2" ]
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-montblanc"
-      tags: [ "cluster-deployment-clean", "test-montblanc" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "test-montblanc" ]
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-erebus"
-      tags: [ "cluster-deployment-clean", "test-erebus" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "test-erebus" ]
 
-    - role: "cluster-deployment-clean"
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       cluster_deployment_name: "test-fitzroy"
-      tags: [ "cluster-deployment-clean", "test-fitzroy" ]
+      cluster_deployment_playbook_name: "clean-data"
+      tags: [ "cluster-deployment", "test-fitzroy" ]
 
 # ex: et ts=2 filetype=yaml
