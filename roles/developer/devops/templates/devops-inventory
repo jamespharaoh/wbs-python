@@ -221,7 +221,7 @@ if (
 	other_cluster_name != 'dev'
 ) %}
 
-	{%- if other_cluster_name not in [ 'ops', 'test' ] -%}
+	{%- if other_cluster_name not in [ 'ops' ] -%}
 		{%- print 'cluster-', other_cluster_name, '-data\n' -%}
 	{%- endif -%}
 
@@ -301,7 +301,7 @@ if (
 	deployment_mode in [ 'vagrant', 'jenkins' ]
 	or other_cluster_name == cluster_name
 ) and (
-	other_cluster_name not in [ 'dev', 'ops', 'test' ]
+	other_cluster_name not in [ 'dev', 'ops' ]
 ) and (
 	other_cluster.supercluster_name == other_supercluster_name
 ) %}
@@ -327,7 +327,7 @@ cluster-{{ other_cluster_name }}-admin
 {% if other_cluster_name != 'ops' %}
 cluster-{{ other_cluster_name }}-app
 {% endif %}
-{% if other_cluster_name not in [ 'ops', 'test' ] %}
+{% if other_cluster_name not in [ 'ops' ] %}
 cluster-{{ other_cluster_name }}-data
 {% endif %}
 {% if other_cluster_name == 'ops' %}
@@ -397,7 +397,7 @@ cluster-{{ other_cluster_name }}-network
 {%- endfor -%}
 {%- endif %}
 
-{% if other_cluster_name not in [ 'ops', 'test' ] %}
+{% if other_cluster_name not in [ 'ops' ] %}
 [cluster-{{ other_cluster_name }}-data]
 {% for instance_zone in other_cluster.instance_formation.data.zones -%}
 {%- for instance_index in other_cluster.instance_formation.data.indices -%}
