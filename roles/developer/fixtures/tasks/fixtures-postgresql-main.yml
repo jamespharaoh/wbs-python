@@ -86,4 +86,22 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-main-user-wistla',
   ] | join (' && ') }}"
 
+- name: "create postgresql main user replicate"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-wistla"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'replicate',
+      '--replication',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-user-replicate',
+  ] | join (' && ') }}"
+
 # ex: et ts=2 filetype=yaml
