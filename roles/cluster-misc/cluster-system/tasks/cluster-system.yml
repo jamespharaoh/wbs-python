@@ -1,0 +1,16 @@
+---
+
+- name: "cluster system config files"
+  with_items:
+
+    - target: "/etc/environment"
+      template: "cluster-system-environment"
+
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,9 @@
+---
+
+- include: "cluster-system.yml"
+  tags:
+
+    - "cluster-system"
+    - "cluster"
+
+# ex: et ts=2 filetype=yaml

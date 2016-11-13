@@ -9,6 +9,7 @@
     - "wait-for-ssh"
     - "scan-ssh-key"
 
+    - "cluster-system"
     - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
