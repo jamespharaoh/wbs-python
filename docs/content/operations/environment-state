@@ -167,3 +167,41 @@ TODO this is too rough.
 
 )
 ```
+
+## Setup PostgreSQL replication
+
+To set up a replica, we can use the `pg_basebackup` command:
+
+```
+deployment_name="production-2"
+deployment_name="staging-2"
+
+database_cluster="main"
+database_cluster="cache"
+
+master_zone="a"
+master_zone="b"
+master_zone="c"
+
+$deployment_name-postgresql-$database_cluster-$INSTANCE_ZONE_INDEX \
+sudo service postgresql stop
+
+$deployment_name-postgresql-$database_cluster-$INSTANCE_ZONE_INDEX \
+sudo sh -c 'rm -rf /var/lib/postgresql/9.5/main/*'
+
+$deployment_name-postgresql-$database_cluster-$INSTANCE_ZONE_INDEX \
+sudo -H -u postgres \
+/usr/lib/postgresql/9.5/bin/pg_basebackup \
+    --pgdata /var/lib/postgresql/9.5/main \
+    --progress \
+    --host $deployment_name-postgresql-$database_cluster-$master_zone-$INSTANCE_INDEX \
+    --username replicate \
+    --write-recovery-conf \
+    --xlog-method stream
+
+$deployment_name-postgresql-$database_cluster-$INSTANCE_ZONE_INDEX \
+sudo service postgresql start
+
+$deployment_name-postgresql-$database_cluster-$INSTANCE_ZONE_INDEX \
+sudo -H -u postgres psql -l
+```
