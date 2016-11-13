@@ -30,6 +30,13 @@ log_min_error_statement = 'ERROR'
 log_min_duration_statement = 500
 log_error_verbosity = 'TERSE'
 
+# ---------- write-ahead log
+
+wal_level = hot_standby
+max_wal_senders = 16
+wal_keep_segments = 64
+hot_standby = on
+
 # ----------- statistics
 
 stats_temp_directory = '/var/run/postgresql/9.5-main.pg_stat_tmp'
