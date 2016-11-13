@@ -1,11 +1,11 @@
 ---
 
+- include: "clean-templates.yml"
+- include: "clean-data.yml"
+
 - hosts: "wistla-jenkins"
   gather_facts: "no"
   roles: [ "devenv" ]
-
-- include: "clean-templates.yml"
-- include: "clean-data.yml"
 
 - include: "node-templates.yml"
 - include: "node-start.yml"
