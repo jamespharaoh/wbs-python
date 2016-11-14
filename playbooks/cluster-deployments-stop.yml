@@ -44,6 +44,30 @@
       cluster_deployment_playbook_name: "node-stop"
       tags: [ "cluster-deployment", "staging" ]
 
+- hosts: "cluster-staging-2-app"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2-a"
+      cluster_deployment_playbook_name: "node-stop"
+      tags: [ "cluster-deployment", "staging-2-a" ]
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2-b"
+      cluster_deployment_playbook_name: "node-stop"
+      tags: [ "cluster-deployment", "staging-2-b" ]
+
+- hosts: "cluster-staging-2-data"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      cluster_deployment_name: "staging-2"
+      cluster_deployment_playbook_name: "node-stop"
+      tags: [ "cluster-deployment", "staging-2" ]
+
 - hosts: "cluster-test-app"
   roles:
 
