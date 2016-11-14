@@ -18,7 +18,7 @@ schemas:
   - host: "{{ [
       cluster_deployment_alias.name,
       '-postgresql-main-',
-      cluster.postgresql_cache_master_zone,
+      cluster.postgresql_main_master_zone,
       '-4',
     ] | join }}"
     name: "wistla"
