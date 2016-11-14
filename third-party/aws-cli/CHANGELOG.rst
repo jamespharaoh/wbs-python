@@ -2,6 +2,46 @@
 CHANGELOG
 =========
 
+1.11.14
+=======
+
+* feature:``cloudformation``: Update cloudformation command to latest version
+* feature:``logs``: Update logs command to latest version
+
+
+1.11.13
+=======
+
+* feature:``directconnect``: Update directconnect command to latest version
+
+
+1.11.12
+=======
+
+* feature:``ses``: Update ses command to latest version
+
+
+1.11.11
+=======
+
+* bugfix:``cloudtrail``: Use STS instead of IAM in CreateSubscription
+* feature:``cloudformation``: Update cloudformation command to latest version
+
+
+1.11.10
+=======
+
+* feature:``autoscaling``: Update autoscaling command to latest version
+* feature:``elbv2``: Update elbv2 command to latest version
+
+
+1.11.9
+======
+
+* feature:``ecs``: Update ecs command to latest version
+* feature:``sms``: Update sms command to latest version
+
+
 1.11.8
 ======
 
