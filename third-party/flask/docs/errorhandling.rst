@@ -216,7 +216,7 @@ A formatter can be instantiated with a format string.  Note that
 tracebacks are appended to the log entry automatically.  You don't have to
 do that in the log formatter format string.
 
-Here some example setups:
+Here are some example setups:
 
 Email
 `````
@@ -276,8 +276,9 @@ that this list is not complete, consult the official documentation of the
 | ``%(lineno)d``   | Source line number where the logging call was      |
 |                  | issued (if available).                             |
 +------------------+----------------------------------------------------+
-| ``%(asctime)s``  | Human-readable time when the LogRecord` was        |
-|                  | created.  By default this is of the form           |
+| ``%(asctime)s``  | Human-readable time when the                       |
+|                  | :class:`~logging.LogRecord` was created.           |
+|                  | By default this is of the form                     |
 |                  | ``"2003-07-08 16:49:45,896"`` (the numbers after   |
 |                  | the comma are millisecond portion of the time).    |
 |                  | This can be changed by subclassing the formatter   |
