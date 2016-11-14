@@ -11,6 +11,8 @@ task
 
 script
 
+	set -e
+
 	. /config/environment
 
 {% if 'build_steps' in item.0 %}
