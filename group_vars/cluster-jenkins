@@ -153,6 +153,13 @@ cluster_volumes:
     amazon: "/dev/svdg"
     backup: "daily"
 
+  - name: "builds"
+    type: "ext4"
+    path: "/home"
+    device: "/dev/xvdi"
+    amazon: "/dev/svdi"
+    backup: "never"
+
 cluster_create_instance_tags:
 
   "Name": "jenkins"
@@ -182,6 +189,18 @@ cluster_create_volumes:
     volume_size: "128"
     device_type: "gp2"
     delete_on_termination: "no"
+
+  - comment: "builds"
+    device_name: "/dev/sdh"
+    volume_size: "16"
+    device_type: "gp2"
+    delete_on_termination: "yes"
+
+  - comment: "builds"
+    device_name: "/dev/sdi"
+    volume_size: "64"
+    device_type: "gp2"
+    delete_on_termination: "yes"
 
 nginx_version: "{{ supercluster.jenkins_nginx_version }}"
 
