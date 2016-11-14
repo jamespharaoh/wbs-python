@@ -1,6 +1,7 @@
 ---
 
 - name: "create deployment directory"
+  tags: "config"
   become: "yes"
   action:
 
@@ -13,6 +14,7 @@
     mode: "0755"
 
 - name: "create deployment link"
+  tags: "config"
   action:
 
     module: "file"
@@ -21,6 +23,7 @@
     src: "{{ cluster_deployment_home }}"
 
 - name: "create active deployment link"
+  tags: "config"
   when: "
     cluster_deployment.type == 'alias'
     and cluster_deployment_alias.target == cluster_deployment_name
@@ -45,6 +48,7 @@
     force: "yes"
 
 - name: "create project links"
+  tags: "config"
   with_items: "{{ cluster_deployment_checkouts | flatten_hash ('project_links') }}"
   become: "yes"
   args:
@@ -90,6 +94,7 @@
       "$link/";
 
 - name: "create links to config files"
+  tags: "config"
   with_items: "{{ cluster_deployment_config_links }}"
   action:
 
@@ -110,6 +115,7 @@
   shell: "{{ item.build_steps | default ([ 'true' ]) | join (' && ') }}"
 
 - name: "create config directory"
+  tags: "config"
   action:
 
     module: "file"
@@ -117,6 +123,7 @@
     state: "directory"
 
 - name: "create config directories"
+  tags: "config"
   with_items: "{{ cluster_deployment_config_directories }}"
   action:
 
@@ -125,6 +132,7 @@
     state: "directory"
 
 - when: "{{ cluster_deployment.type == 'alias' }}"
+  tags: "config"
   block:
 
     - name: "create shared link target"
@@ -161,6 +169,7 @@
         src: "../{{ cluster_deployment.alias }}/shared"
 
 - name: "create shared directory"
+  tags: "config"
   when: "cluster_deployment.type != 'alias'"
   action:
 
@@ -169,6 +178,7 @@
     state: "directory"
 
 - name: "create shared directories"
+  tags: "config"
   with_items: "{{ cluster_deployment_shared_directories }}"
   become: "yes"
   action:
@@ -182,6 +192,7 @@
     mode: "0755"
 
 - name: "create shared logfiles"
+  tags: "config"
   with_items: "{{ cluster_deployment_shared_logfiles }}"
   become: "yes"
   action:
@@ -195,6 +206,7 @@
     mode: "0640"
 
 - name: "create config files"
+  tags: "config"
   with_items: "{{ cluster_deployment_config_templates }}"
   become: "yes"
   action:
@@ -208,6 +220,7 @@
     mode: "{{ item.mode | default ('0644') }}"
 
 - name: "copy config files"
+  tags: "config"
   with_items: "{{ cluster_deployment_config_files }}"
   action:
 
@@ -217,6 +230,7 @@
     mode: "{{ item.mode }}"
 
 - name: "stat override config files"
+  tags: "config"
   with_items: "{{ cluster_deployment_override_templates }}"
   register: "cluster_deployment_stat_override_templates_result"
   action:
@@ -225,6 +239,7 @@
     path: "{{ cluster_deployment_home }}/{{ item.target }}"
 
 - name: "create override config templates"
+  tags: "config"
   with_indexed_items: "{{ cluster_deployment_override_templates }}"
   when: "not cluster_deployment_stat_override_templates_result.results [item.0].stat.exists"
   action:
@@ -234,6 +249,7 @@
     src: "{{ item.1.template }}"
 
 - name: "create deployment bridge network interface"
+  tags: "config"
   become: "yes"
   action:
 
@@ -242,6 +258,7 @@
     src: "cluster-deployment-bridge-interface"
 
 - name: "start deployment network bridge"
+  tags: "config"
   register: "ifup_result"
   changed_when: "ifup_result.stdout != 'UNCHANGED'"
   become: "yes"
@@ -261,6 +278,7 @@
     ifup {{ cluster_deployment.bridge_name }};
 
 - name: "create logrotate config"
+  tags: "config"
   become: "yes"
   action:
 
