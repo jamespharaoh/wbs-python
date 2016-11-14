@@ -48,6 +48,10 @@ node_deploy_projects:
       - target: "local.yaml"
         source: "wistla-api-server-local.yaml"
 
+    build_steps:
+
+      - "sudo -H -u ubuntu sh -c 'cd $HOME/wistla-data-process; npm run build-db'"
+
   - name: "wistla-blob"
     type: "nodejs"
 
