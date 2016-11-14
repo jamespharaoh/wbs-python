@@ -33,6 +33,8 @@ deployment:
   v2_enabled: "yes"
   build_type: "central"
 
+  api_server_db_query_timeout_ms: "120000"
+
   kafka:
 
     num_network_threads: "3"

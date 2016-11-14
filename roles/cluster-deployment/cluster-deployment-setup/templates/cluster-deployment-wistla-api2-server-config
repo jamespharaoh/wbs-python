@@ -14,13 +14,30 @@
   db:
 
     pg:
-      url: "postgres://vagrant@{{ cluster_deployment_alias.name }}-postgresql-main-a-4/wistla"
+
+      query_timeout_ms: "{{
+        cluster_deployment.api_server_db_query_timeout_ms
+      }}"
 
       cache:
-        url: "postgres://vagrant@{{ cluster_deployment_alias.name }}-postgresql-cache-a-4/wistla"
+
+        url: "{{ [
+          'postgres://vagrant@',
+          cluster_deployment_alias.name,
+          '-postgresql-cache-',
+          cluster.postgresql_cache_master_zone,
+          '-4/wistla',
+        ] | join }}"
 
       main:
-        url: "postgres://vagrant@{{ cluster_deployment_alias.name }}-postgresql-main-a-4/wistla"
+
+        url: "{{ [
+          'postgres://vagrant@',
+          cluster_deployment_alias.name,
+          '-postgresql-main-',
+          cluster.postgresql_main_master_zone,
+          '-4/wistla',
+        ] | join }}"
 
 # @wistla/pubsub configuration
   pubsub:

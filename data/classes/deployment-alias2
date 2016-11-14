@@ -24,4 +24,6 @@ deployment:
 
   build_type: "central"
 
+  api_server_db_query_timeout_ms: "120000"
+
 # ex: et ts=2 filetype=yaml
