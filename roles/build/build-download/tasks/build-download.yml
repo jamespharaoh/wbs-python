@@ -16,6 +16,7 @@
     aws s3 sync
       --size-only
       --delete
+      --exclude 'snapshots/*'
       "s3://wistla-builds/zbackup"
       "{{ builds_path }}";
 
