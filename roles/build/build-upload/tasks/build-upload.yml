@@ -16,6 +16,7 @@
 
     aws s3 sync
       "{{ builds_path }}"
-      "s3://wistla-builds/zbackup";
+      "s3://wistla-builds/zbackup"
+      --exclude 'snapshots/*';
 
 # ex: et ts=2 filetype=yaml
