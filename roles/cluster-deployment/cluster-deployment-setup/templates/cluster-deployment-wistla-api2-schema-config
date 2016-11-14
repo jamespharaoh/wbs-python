@@ -16,6 +16,7 @@ schemas:
 
       - "acl"
       - "config"
+      - "dirty_pants"
       - "feed_search"
       - "timezones"
 
@@ -29,6 +30,7 @@ schemas:
     exclude_tables:
       - acl
       - config
+      - dirty_pants
       - feed_search
       - timezones
       - device_push_tokens
