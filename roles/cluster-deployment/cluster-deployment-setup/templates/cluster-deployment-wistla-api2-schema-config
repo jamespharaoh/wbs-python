@@ -3,7 +3,7 @@
 db:
 
   database: "wistla"
-  - host: "{{ [
+  host: "{{ [
       cluster_deployment_alias.name,
       '-postgresql-main-',
       cluster.postgresql_cache_master_zone,
