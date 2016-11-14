@@ -7,9 +7,9 @@
   roles:
 
     - name: "fixtures"
-      when: "{{ deployment_mode in [
-        'vagrant',
-        'simple2',
-      ] }}"
+      when: "
+        deployment_mode in [ 'vagrant', 'jenkins' ]
+        or supercluster_name != 'production'
+      "
 
 # ex: et ts=2 filetype=yaml

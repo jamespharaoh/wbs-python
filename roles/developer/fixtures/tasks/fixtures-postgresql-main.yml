@@ -8,15 +8,15 @@
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo service postgresql stop || true',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo rm -rf /var/lib/postgresql/9.5/main',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
       '-H -u postgres',
       '/usr/lib/postgresql/9.5/bin/initdb',
@@ -26,7 +26,7 @@
       'utf-8',
     ] | join (' '),
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo service postgresql start',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/postgresql-main-data',
@@ -40,7 +40,7 @@
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
       '-u postgres',
       'createuser',
@@ -58,7 +58,7 @@
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
       '-u postgres',
       'createuser',
@@ -76,7 +76,7 @@
   shell: "{{ [
     'sleep 2',
     [
-      deployment_name + '-postgresql-main-0',
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
       '-u postgres',
       'createuser',
@@ -84,6 +84,24 @@
       '--superuser',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/postgresql-main-user-wistla',
+  ] | join (' && ') }}"
+
+- name: "create postgresql main user replicate"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-wistla"
+
+  shell: "{{ [
+    'sleep 2',
+    [
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'createuser',
+      'replicate',
+      '--replication',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-user-replicate',
   ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml

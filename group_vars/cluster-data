@@ -110,9 +110,6 @@ nodejs_packages:
   - name: "node-gyp"
     version: "3.2.1"
 
-  - name: "node-inspector"
-    version: "0.12.5"
-
   - name: "prettyjson"
     version: "1.1.3"
 

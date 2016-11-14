@@ -314,4 +314,8 @@ builds_path: "{{ (
   '/home/ubuntu/builds'
 ) }}"
 
+fixtures_host_suffix: "{{
+  '0' if deployment_mode in [ 'vagrant', 'jenkins' ] else 'a-4'
+}}"
+
 # ex: et ts=2 filetype=yaml

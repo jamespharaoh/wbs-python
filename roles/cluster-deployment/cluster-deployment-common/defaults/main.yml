@@ -788,6 +788,9 @@ cluster_deployment_types:
 
     shared_directories:
 
+      - directory: "flags"
+        user: "ubuntu"
+
       - directory: "log"
         user: "ubuntu"
 

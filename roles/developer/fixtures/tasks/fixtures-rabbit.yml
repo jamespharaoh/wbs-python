@@ -6,7 +6,7 @@
   shell: "{{ [
     'sleep 10',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmq-plugins',
       'enable',
@@ -22,12 +22,12 @@
     'sleep 5',
     [
       '(',
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'add_user',
       'api',
-      third_parties.dev.rabbit_api_password,
+      deployment.rabbit_api_password,
       ') || true',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/rabbit-api-user',
@@ -39,7 +39,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_user_tags',
@@ -55,7 +55,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_permissions',
@@ -74,12 +74,12 @@
     'sleep 5',
     [
       '(',
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'add_user',
       'admin',
-      third_parties.dev.rabbit_admin_password,
+      deployment.rabbit_admin_password,
       ') || true',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/rabbit-admin-user',
@@ -91,7 +91,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_user_tags',
@@ -107,7 +107,7 @@
   shell: "{{ [
     'sleep 1',
     [
-      deployment_name + '-rabbit-0',
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
       'rabbitmqctl',
       'set_permissions',

@@ -4,6 +4,8 @@
   when: "
     cluster_deployment_playbook_name not in [
       'build-down',
+      'clean-data',
+      'fixtures',
       'node-restart',
       'node-start',
       'node-stop',
@@ -30,6 +32,8 @@
   when: "
     (
       cluster_deployment_playbook_name in [
+        'clean-data',
+        'fixtures',
         'node-stop',
         'node-start',
         'node-restart',
