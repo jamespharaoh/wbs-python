@@ -9,6 +9,23 @@
     path: "{{ deployment_home }}/work/build"
     state: "directory"
 
+- name: "write metadata"
+  with_items:
+
+    - extension: "yml"
+      template: "build-pack-manifest-yaml"
+
+    - extension: "env"
+      template: "build-pack-manifest-posix"
+
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/MANIFEST.{{ item.extension }}"
+    src: "{{ item.template }}"
+
 - name: "create package"
   delegate_to: "localhost"
   environment:
