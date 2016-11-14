@@ -133,6 +133,7 @@ zone_colours:
   b: "99"
   c: "105"
 
+ubuntu_release: "trusty"
 ubuntu_mirror: "http:/"
 
 my_system_packages: []
@@ -317,5 +318,12 @@ builds_path: "{{ (
 fixtures_host_suffix: "{{
   '0' if deployment_mode in [ 'vagrant', 'jenkins' ] else 'a-4'
 }}"
+
+zbackup_version: "3e4977c5-{{ ubuntu_release }}"
+zbackup_directory: "zbackup-{{ zbackup_version }}"
+zbackup_archive: "{{ zbackup_directory }}.tar.xz"
+zbackup_url: "https://dist.wellbehavedsoftware.com/zbackup/{{ zbackup_archive }}"
+zbackup_temp: "/tmp/zbackup-install"
+zbackup_target: "/opt/{{ zbackup_directory }}"
 
 # ex: et ts=2 filetype=yaml
