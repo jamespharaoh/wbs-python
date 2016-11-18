@@ -157,6 +157,9 @@ cluster_deployment_types:
 
     shared_directories:
 
+      - directory: "flags"
+        user: "ubuntu"
+
       - directory: "log"
         user: "ubuntu"
 
@@ -164,6 +167,9 @@ cluster_deployment_types:
         user: kafka
 
     shared_logfiles:
+
+      - log: "shared/log/kafka.log"
+        user: "kafka"
 
       - log: "shared/log/mongodb.log"
         user: "mongodb"
