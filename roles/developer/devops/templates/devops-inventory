@@ -12,7 +12,7 @@ wistla-{{ deployment_name }}-dev
 wistla-jenkins
 {% endif %}
 
-{% if deployment_mode_data %}
+{% if deployment_mode_data | default (false) %}
 
 # ==================== node groups
 
@@ -460,7 +460,7 @@ cluster-{{ other_cluster_name }}-network
 [cluster-instance-active]
 {% for other_cluster_name, other_cluster in clusters.items ()
 if (
-	deployment_mode in [ 'vagrant', 'jenkins' ]
+	deployment_mode == 'vagrant'
 	or other_cluster_name == cluster_name
 ) and (
 	other_cluster_name != 'dev'
