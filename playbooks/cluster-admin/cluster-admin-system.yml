@@ -1,0 +1,23 @@
+---
+
+- hosts: "cluster-admin"
+  roles:
+
+    - "cluster-system"
+    - "system-apt-setup"
+    - "setup-common-users"
+    - "setup-hostname"
+    - "setup-system"
+    - "setup-dns"
+    - "setup-logging"
+
+    - "cluster-ssh"
+    - "system-packages-install"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-volumes"
+    - "cluster-user"
+
+    - "cluster-admin-firewall"
+
+# ex: et ts=2 filetype=yaml

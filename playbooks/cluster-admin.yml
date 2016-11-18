@@ -1,29 +1,10 @@
 ---
 
+- include: "cluster-admin/cluster-admin-create.yml"
+- include: "cluster-admin/cluster-admin-system.yml"
+
 - hosts: "cluster-admin"
   roles:
-
-    - "cluster-create"
-    - "cluster-assign-elastic-ip"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
-
-    - "cluster-system"
-    - "system-apt-setup"
-    - "setup-common-users"
-    - "setup-hostname"
-    - "setup-system"
-    - "setup-dns"
-    - "setup-logging"
-
-    - "cluster-ssh"
-    - "system-packages-install"
-    - "install-kernel"
-    - "install-postfix"
-    - "cluster-volumes"
-    - "cluster-user"
-
-    - "cluster-admin-firewall"
 
     - "python"
     - "etcd"
@@ -33,14 +14,8 @@
     - "install-mongodb"
     - "install-tools"
 
-    - "nodejs-install"
-    - "nodejs-packages-install"
-    - "nodejs-stubs"
-
-    - "nginx-install"
-    - "cluster-admin-nginx-setup"
-    - "nginx-control"
-
+- include: "cluster-admin/cluster-admin-nodejs.yml"
+- include: "cluster-admin/cluster-admin-nginx.yml"
 - include: "cluster-admin/cluster-admin-vpn.yml"
 
 - hosts: "cluster-admin"

@@ -4,6 +4,5 @@
   roles:
 
     - "cluster-config"
-    - "cluster-admin-nginx-config"
 
 # ex: et ts=2 filetype=yaml

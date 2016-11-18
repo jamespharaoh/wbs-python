@@ -9,6 +9,7 @@
 
 - include: "cluster-deployments-stop.yml"
 - include: "cluster-deployments-clean.yml"
+- include: "cluster-deployments-setup.yml"
 - include: "cluster-deployments-start.yml"
 - include: "cluster-deployments-fixtures.yml"
 

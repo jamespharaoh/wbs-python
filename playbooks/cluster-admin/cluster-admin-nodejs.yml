@@ -1,0 +1,15 @@
+---
+
+- hosts: "cluster-network"
+  roles:
+
+    - "cluster-admin-nginx-config"
+
+- hosts: "cluster-admin"
+  roles:
+
+    - "nodejs-install"
+    - "nodejs-packages-install"
+    - "nodejs-stubs"
+
+# ex: et ts=2 filetype=yaml

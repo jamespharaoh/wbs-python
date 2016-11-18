@@ -56,7 +56,11 @@
       cluster_deployment_name: "staging-2"
       tags: [ "cluster-deployment", "staging-2" ]
 
-- hosts: "cluster-test-app"
+- hosts:
+
+    - "cluster-test-app"
+    - "cluster-test-data"
+
   roles:
 
     - role: "cluster-deployment-setup"

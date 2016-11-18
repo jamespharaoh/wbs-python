@@ -9,30 +9,22 @@
 
 - hosts:
 
-    - "cluster-admin"
+    - "cluster-admin:&cluster-instance-active"
+    - "cluster-app:&cluster-instance-active"
+    - "cluster-data:&cluster-instance-active"
+    - "cluster-jenkins:&cluster-instance-active"
 
   roles:
 
     - "icinga-core-install"
     - "install-wistla-icinga-plugins"
 
-- hosts:
-
-    - "cluster-app"
-    - "cluster-data"
-    - "cluster-jenkins"
-
-  roles:
-
-    - "icinga-core-install"
-    - "install-wistla-icinga-plugins"
-
-- hosts: "cluster-ops-network"
+- hosts: "cluster-ops-network:&cluster-instance-active"
   roles:
 
     - "icinga-core-database-setup"
 
-- hosts: "wistla-ops-admin-a"
+- hosts: "wistla-ops-admin-a:&cluster-instance-active"
   roles:
 
     - "setup-wistla-icinga-master"
@@ -40,10 +32,10 @@
 
 - hosts:
 
-    - "cluster-admin:!wistla-ops-admin-a"
-    - "cluster-app"
-    - "cluster-data"
-    - "cluster-jenkins"
+    - "cluster-admin:&cluster-instance-active:!wistla-ops-admin-a"
+    - "cluster-app:&cluster-instance-active"
+    - "cluster-data:&cluster-instance-active"
+    - "cluster-jenkins:&cluster-instance-active"
 
   roles:
 

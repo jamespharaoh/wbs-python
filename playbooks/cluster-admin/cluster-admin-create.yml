@@ -1,0 +1,11 @@
+---
+
+- hosts: "cluster-admin"
+  roles:
+
+    - "cluster-create"
+    - "cluster-assign-elastic-ip"
+    - "wait-for-ssh"
+    - "scan-ssh-key"
+
+# ex: et ts=2 filetype=yaml
