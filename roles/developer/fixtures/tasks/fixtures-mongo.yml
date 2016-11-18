@@ -10,7 +10,7 @@
     [
       'mongo',
       '--host',
-      deployment_name + '-mongo-' + fixtures_host_suffix,
+      deployment_alias_name + '-mongo-' + fixtures_host_suffix,
       '--eval',
       '\"rs.initiate ()\"',
     ] | join (' '),

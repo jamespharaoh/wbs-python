@@ -1,12 +1,14 @@
 ---
 
 - include: "fixtures-mongo.yml"
+  when: "deployment_type in [ 'shared2', 'simple2' ]"
   tags:
 
     - "fixtures-mongo"
     - "fixtures"
 
 - include: "fixtures-postgresql-main.yml"
+  when: "deployment_type in [ 'shared2', 'simple2' ]"
   tags:
 
     - "fixtures-postgresql-main"
@@ -14,6 +16,7 @@
     - "fixtures"
 
 - include: "fixtures-postgresql-cache.yml"
+  when: "deployment_type in [ 'shared2', 'simple2' ]"
   tags:
 
     - "fixtures-postgresql-cache"
@@ -21,6 +24,7 @@
     - "fixtures"
 
 - include: "fixtures-rabbit.yml"
+  when: "deployment_type in [ 'shared2', 'simple2' ]"
   tags:
 
     - "fixtures-rabbit"

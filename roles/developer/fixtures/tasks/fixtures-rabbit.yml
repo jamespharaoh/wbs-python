@@ -4,7 +4,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-management-plugin"
   shell: "{{ [
-    'sleep 10',
     [
       deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
@@ -19,7 +18,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-api-user"
   shell: "{{ [
-    'sleep 5',
     [
       '(',
       deployment_name + '-rabbit-' + fixtures_host_suffix,
@@ -37,7 +35,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-api-user-tags"
   shell: "{{ [
-    'sleep 1',
     [
       deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
@@ -53,7 +50,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-api-user-permissions"
   shell: "{{ [
-    'sleep 1',
     [
       deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
@@ -71,7 +67,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user"
   shell: "{{ [
-    'sleep 5',
     [
       '(',
       deployment_name + '-rabbit-' + fixtures_host_suffix,
@@ -89,7 +84,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user-tags"
   shell: "{{ [
-    'sleep 1',
     [
       deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
@@ -105,7 +99,6 @@
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-admin-user-permissions"
   shell: "{{ [
-    'sleep 1',
     [
       deployment_name + '-rabbit-' + fixtures_host_suffix,
       'sudo',
@@ -117,6 +110,33 @@
       '.\\*',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/rabbit-admin-user-permissions',
+  ] | join (' && ') }}"
+
+- name: "join rabbit cluster"
+  when: "instance_zone != 'a'"
+  args:
+    creates: "{{ deployment_home }}/shared/flags/rabbit-cluster"
+  shell: "{{ [
+    [
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
+      'sudo',
+      'rabbitmqctl',
+      'stop_app',
+    ] | join (' '),
+    [
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
+      'sudo',
+      'rabbitmqctl',
+      'join_cluster',
+      'rabbit@' + deployment_name + '-rabbit-a-4',
+    ] | join (' '),
+    [
+      deployment_name + '-rabbit-' + fixtures_host_suffix,
+      'sudo',
+      'rabbitmqctl',
+      'start_app',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/rabbit-cluster',
   ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml
