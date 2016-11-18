@@ -1,5 +1,7 @@
 ---
 
+{{ ansible_warning ['#'] }}
+
 {% if 'data' in cluster.instance_formation %}
 {% set data_zones = cluster.instance_formation.data.zones %}
 {% set data_indices = cluster.instance_formation.data.indices %}

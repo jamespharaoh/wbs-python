@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 local all all trust
 host all all {{ cluster.cluster_network }}.0.0/16 trust
 

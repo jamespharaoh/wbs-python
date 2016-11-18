@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 {{ cluster_deployment_home }}/shared/log/*.log {
 	daily
 	missingok
