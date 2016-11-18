@@ -60,7 +60,7 @@
     | prepend_list ('wistla-' + cluster_name + '-admin-')
     | append_list (':2181')
   ) | join (','),
-  '/' + cluster_deployment_name + '/kafka',
+  '/' + cluster_deployment_alias.name + '/kafka',
 ] | join }}"
       urls:
 {%  for zone in [ 'a', 'b', 'c' ] %}
@@ -72,7 +72,7 @@
             zone,
           ] | join,
           ':2181/',
-          cluster_deployment_name,
+          cluster_deployment_alias.name,
           '/kafka',
         ] | join }}"
 {%  endfor %}
