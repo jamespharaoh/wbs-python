@@ -43,7 +43,20 @@ devops_bucket: "wistla-builds"
 
 deployment: "{{ deployments [deployment_name] }}"
 
-deployment_mode_data: "{{ deployment_modes [deployment_mode] }}"
+deployment_mode_data: "{{
+  (
+    deployment_modes [deployment_mode]
+  ) if (
+    deployment_mode in [ 'vagrant', 'jenkins' ]
+    or cluster_name != 'test'
+  ) else (
+    deployment_modes ['cluster-alias2']
+  ) if instance_type == 'app' else (
+    deployment_modes ['cluster-shared2']
+  ) if instance_type == 'data' else (
+    None
+  )
+}}"
 
 deployment_alias: "{{
   deployments [deployment.alias]
