@@ -12,12 +12,6 @@
         msg: "please set cluster_production_override"
 
 - hosts: "cluster-host"
-  roles:
-
-    - "cluster-app-lxc"
-    - "cluster-activate"
-
-- hosts: "cluster-host"
   tasks:
 
     - name: "set amazon_instance_state to 'standby'"
@@ -25,6 +19,12 @@
       update_resource:
 
         amazon_instance_state: "standby"
+
+- hosts: "cluster-host"
+  roles:
+
+    - "cluster-app-lxc"
+    - "cluster-activate"
 
 - hosts: "cluster-app"
   roles:

@@ -2,6 +2,8 @@
 
 # TODO generate this file
 
+# ==================== cluster-staging
+
 - hosts: "cluster-staging-admin"
   tasks:
 
@@ -39,10 +41,19 @@
       cluster_deployment_playbook_name: "clean-data"
       tags: [ "cluster-deployment", "staging" ]
 
+# ==================== cluster-staging-2
+
 - hosts: "cluster-staging-2-admin"
   tasks:
 
     - name: "clean zookeeper"
+      tags:
+
+        - "cluster-deployment"
+        - "staging-2"
+        - "staging-a"
+        - "staging-b"
+
       run_once: "yes"
       command: "{{ [
         '/usr/lib/zookeeper/bin/load_gen',
@@ -50,31 +61,47 @@
         '/staging-2/kafka',
         'clean',
       ] | join (' ') }}"
-      tags: [ "cluster-deployment", "staging-2", "staging-a", "staging-b" ]
 
 - hosts: "cluster-staging-2-app"
   roles:
 
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
+    - when: "amazon_instance_state == 'running'"
+      tags:
+
+        - "cluster-deployment"
+        - "staging-2-a"
+
+      role: "cluster-deployment-playbook"
+
       cluster_deployment_name: "staging-2-a"
       cluster_deployment_playbook_name: "clean-data"
-      tags: [ "cluster-deployment", "staging-2-a" ]
 
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
+    - when: "amazon_instance_state == 'running'"
+      tags:
+
+        - "cluster-deployment"
+        - "staging-2-b"
+
+      role: "cluster-deployment-playbook"
+
       cluster_deployment_name: "staging-2-b"
       cluster_deployment_playbook_name: "clean-data"
-      tags: [ "cluster-deployment", "staging-2-b" ]
 
 - hosts: "cluster-staging-2-data"
   roles:
 
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
+    - when: "amazon_instance_state == 'running'"
+      tags:
+
+        - "cluster-deployment"
+        - "staging-2"
+
+      role: "cluster-deployment-playbook"
+
       cluster_deployment_name: "staging-2"
       cluster_deployment_playbook_name: "clean-data"
-      tags: [ "cluster-deployment", "staging-2" ]
+
+# ==================== cluster-test
 
 - hosts: "cluster-test-admin"
   tasks:
