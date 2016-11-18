@@ -455,4 +455,84 @@ cluster-{{ other_cluster_name }}-network
 
 {% endfor %}
 
+# ---------- active instances
+
+[cluster-instance-active]
+{% for other_cluster_name, other_cluster in clusters.items ()
+if (
+	deployment_mode in [ 'vagrant', 'jenkins' ]
+	or other_cluster_name == cluster_name
+) and (
+	other_cluster_name != 'dev'
+) -%}
+
+	{%- for instance_type in [
+		'admin',
+		'app',
+		'data',
+		'jenkins',
+	] -%}
+	{%- if instance_type in other_cluster.instance_formation -%}
+
+		{%- for instance_zone
+			in other_cluster.instance_formation [instance_type].zones -%}
+		{%- for instance_index
+			in other_cluster.instance_formation [instance_type].indices -%}
+
+			{%- set instance_name -%}
+			{%- if instance_type == 'admin' -%}
+
+				{%- print [
+					'wistla',
+					other_cluster_name,
+					instance_type,
+					instance_zone,
+				] | join ('-') -%}
+
+			{%- elif instance_type == 'jenkins' -%}
+
+				{%- print [
+					'wistla',
+					other_cluster_name,
+					instance_type,
+				] | join ('-') -%}
+
+			{%- else -%}
+
+				{%- print [
+					'wistla',
+					other_cluster_name,
+					instance_type,
+					instance_zone,
+					instance_index,
+				] | join ('-') -%}
+
+			{%- endif -%}
+			{%- endset -%}
+
+			{%- if (
+				instance_name in hostvars
+			) and (
+				hostvars [instance_name].amazon_instance_state in [
+					'running',
+					'standby',
+				]
+			) -%}
+
+				{%- print instance_name, '\n' -%}
+
+			{%- else -%}
+
+				{%- print '# ', instance_name, '\n' -%}
+
+			{%- endif -%}
+
+		{%- endfor -%}
+		{%- endfor -%}
+
+	{%- endif -%}
+	{%- endfor -%}
+
+{%- endfor %}
+
 {% endif %}

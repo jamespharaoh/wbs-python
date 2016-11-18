@@ -52,7 +52,7 @@
 
 # ==================== icinga web
 
-- hosts: "cluster-ops-admin"
+- hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
     - "icinga-web-core-install"
@@ -62,17 +62,15 @@
 
     - "icinga-web-core-database-setup"
 
-- hosts: "cluster-ops-admin"
+- hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
     - "icinga-web-core-setup"
-    - "icinga-web-core-control"
-
     - "icinga-web-graphite"
 
 # =================== graphite
 
-- hosts: "cluster-ops-admin"
+- hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
     - "graphite-carbon"

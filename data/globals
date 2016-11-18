@@ -136,6 +136,8 @@ zone_colours:
 ubuntu_release: "trusty"
 ubuntu_mirror: "http:/"
 
+system_init: "upstart"
+
 my_system_packages: []
 
 ubuntu_system_packages: "{{ []
@@ -260,11 +262,22 @@ default:
 
 icinga_core:
 
-  version: "2.4.10-12-trusty"
+  authority: "icinga"
+  ca_certificate: "/authority/icinga/certificate"
+
+  database_type: "mysql"
+  database_hostname: "wistla-ops-admin-a"
+  database_port: "3306"
+  database_username: "icinga"
+  database_delegate: "wistla-ops-admin-a"
 
 icinga_web_core:
 
-  version: "2.3.2"
+  database_type: "mysql"
+  database_hostname: "wistla-ops-admin-a"
+  database_port: "3306"
+  database_username: "icingaweb"
+  database_delegate: "wistla-ops-admin-a"
 
   hostname: "icinga.ops.wistla.com"
   security: "full"

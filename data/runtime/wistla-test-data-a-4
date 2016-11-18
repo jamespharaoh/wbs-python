@@ -10,6 +10,21 @@ heka:
 heka_installed_version: "0.10.0"
 heka_needs_restart: "no"
 heka_state: "enabled"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/106/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/106/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/106/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/106/key"
+icinga_core_state: "enabled"
 instance_id: "i-3e8a11b5"
 python: 
   

@@ -20,6 +20,21 @@ icinga:
   state: "enabled"
 
 icinga_certificate: "/authority/icinga/issue/48/certificate"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/88/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/88/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/88/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/88/key"
+icinga_core_state: "enabled"
 icinga_installed_version: "2.4.2-1"
 icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/48/key"

@@ -49,13 +49,19 @@ icinga:
 icinga_certificate: "/authority/icinga/issue/0/certificate"
 icinga_core: 
   
+  certificate: "/authority/icinga/issue/59/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
   installed_version: "2.4.10-12-trusty"
   needs_restart: "no"
-  state: "installed"
+  private_key: "/authority/icinga/issue/59/key"
+  state: "enabled"
 
+icinga_core_certificate: "/authority/icinga/issue/59/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
 icinga_core_installed_version: "2.4.10-12-trusty"
 icinga_core_needs_restart: "no"
-icinga_core_state: "installed"
+icinga_core_private_key: "/authority/icinga/issue/59/key"
+icinga_core_state: "enabled"
 icinga_installed_version: "2.4.10-12-trusty"
 icinga_needs_restart: "no"
 icinga_private_key: "/authority/icinga/issue/0/key"
@@ -67,9 +73,11 @@ icinga_web:
 
 icinga_web_core: 
   
+  installed_prefix: "/opt/icinga-web-2.3.2"
   installed_version: "2.3.2"
   state: "enabled"
 
+icinga_web_core_installed_prefix: "/opt/icinga-web-2.3.2"
 icinga_web_core_installed_version: "2.3.2"
 icinga_web_core_state: "enabled"
 icinga_web_graphite: 

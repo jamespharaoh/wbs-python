@@ -210,7 +210,7 @@ object HostGroup "{{ other_cluster_name }}-instances" {
 
 {% for other_deployment_name, other_deployment in deployments.items () %}
 {% if other_deployment.cluster_name in clusters
-	and other_deployment.type in [ 'simple', 'shared', 'alias' ]
+	and other_deployment.type != 'virtual'
 	and other_deployment.monitoring == 'yes' %}
 {% set other_cluster = clusters [other_deployment.cluster_name] %}
 
@@ -224,57 +224,15 @@ object HostGroup "{{ other_deployment_name }}-nodes" {
 
 }
 
-{%	if other_deployment.cluster_name == 'test' %}
-{%		set app_instance_type = 'app' %}
-{%		set data_instance_type = 'app' %}
-{%	else %}
-{%		set app_instance_type = 'app' %}
-{%		set data_instance_type = 'data' %}
-{%	endif %}
-
-{%	if other_deployment.type in [ 'shared', 'simple' ] %}
+{%	for node_type in deployment_modes ['cluster-' + other_deployment.type].node_types %}
 
 {%		print deployment_nodes (
-			'mongo',
+			node_type,
 			other_deployment_name,
-			data_instance_type,
+			'data',
 			None) %}
 
-{%		print deployment_nodes (
-			'rabbit',
-			other_deployment_name,
-			data_instance_type,
-			None) %}
-
-{%	endif %}
-
-{%	if other_deployment.type in [ 'alias', 'simple' ] %}
-
-{%		print deployment_nodes (
-			'api',
-			other_deployment_name,
-			app_instance_type,
-			7000) %}
-
-{%		print deployment_nodes (
-			'browser',
-			other_deployment_name,
-			app_instance_type,
-			3000) %}
-
-{%		print deployment_nodes (
-			'load',
-			other_deployment_name,
-			app_instance_type,
-			None) %}
-
-{%		print deployment_nodes (
-			'web',
-			other_deployment_name,
-			app_instance_type,
-			3000) %}
-
-{%	endif %}
+{%	endfor %}
 
 {% endif %}
 {% endfor %}

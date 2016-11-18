@@ -85,11 +85,7 @@ server {
 
 		include fastcgi-params.conf;
 
-		fastcgi_param SCRIPT_FILENAME {{ [
-			'/opt/icinga-web-',
-			icinga_web_core_version,
-			'/public/index.php',
-		] | join }};
+		fastcgi_param SCRIPT_FILENAME /opt/icinga-web/public/index.php;
 		fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;
 		fastcgi_param REMOTE_USER $remote_user;
 		fastcgi_param HTTPS on;

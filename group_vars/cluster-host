@@ -91,4 +91,10 @@ ubuntu_sources: "{{ []
   | union (ubuntu_sources_extra)
 }}"
 
+icinga_core_install: "yes"
+icinga_core_install_version: "2.4.10-12-trusty"
+
+icinga_web_core_install: "yes"
+icinga_web_core_install_version: "2.3.2"
+
 # ex: et ts=2 filetype=yaml

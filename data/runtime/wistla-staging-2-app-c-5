@@ -16,6 +16,21 @@ icinga:
   private_key: "/authority/icinga/issue/55/key"
 
 icinga_certificate: "/authority/icinga/issue/55/certificate"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/95/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/95/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/95/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/95/key"
+icinga_core_state: "enabled"
 icinga_private_key: "/authority/icinga/issue/55/key"
 instance_id: "i-18e08d8b"
 nginx: 

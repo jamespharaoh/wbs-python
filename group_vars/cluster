@@ -24,25 +24,6 @@ region_code: "{{ cluster.region_code }}"
 
 postfix_always_bcc: "{{ cluster.bcc_email }}"
 
-# --------- icinga
-
-icinga_web_version: "2.2.0"
-
-icinga_database_type: "mysql"
-icinga_database_hostname: "wistla-ops-admin-a"
-icinga_database_port: "3306"
-icinga_database_username: "icinga"
-icinga_database_delegate: "wistla-ops-admin-a"
-
-icinga_web_database_type: "mysql"
-icinga_web_database_hostname: "wistla-ops-admin-a"
-icinga_web_database_port: "3306"
-icinga_web_database_username: "icingaweb"
-icinga_web_database_delegate: "wistla-ops-admin-a"
-
-icinga_authority: "icinga"
-icinga_ca_certificate: "/authority/icinga/certificate"
-
 # ---------- repository urls
 
 ubuntu_main_url: "http://archive.ubuntu.com/ubuntu"

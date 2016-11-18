@@ -1,12 +1,12 @@
 ---
 
 - name: "create wistla icinga certificate"
-  when: "icinga_certificate == ''"
+  when: "icinga_core_certificate == ''"
   register: "wistla_icinga_certificate_result"
   action:
 
     module: "certificate_authority_issue"
-    authority: "{{ icinga_authority }}"
+    authority: "{{ icinga_core_authority }}"
     common_name: "{{ inventory_hostname }}"
     usage: "mixed"
     alt_dns: [ "{{ inventory_hostname }}" ]
@@ -15,8 +15,8 @@
   when: "wistla_icinga_certificate_result | changed"
   update_resource:
 
-    icinga.certificate: "{{ wistla_icinga_certificate_result.certificate }}"
-    icinga.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
+    icinga_core.certificate: "{{ wistla_icinga_certificate_result.certificate }}"
+    icinga_core.private_key: "{{ wistla_icinga_certificate_result.private_key }}"
 
 - name: "create wistla icinga agent directories"
   with_items: "{{ wistla_icinga_agent_directories }}"
@@ -56,21 +56,10 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
 
-- name: "create wistla icinga agent links"
-  with_items: "{{ wistla_icinga_agent_config_links }}"
-  become: "yes"
-  action:
-
-    module: "file"
-    path: "{{ item.link }}"
-    state: "link"
-
-    src: "{{ item.target }}"
-
-- name: "set icinga_state to 'enabled'"
-  when: "icinga_state == 'installed'"
+- name: "set icinga_core.state to 'enabled'"
+  when: "icinga_core_state == 'installed'"
   update_resource:
 
-    icinga.state: "enabled"
+    icinga_core.state: "enabled"
 
 # ex: et ts=2 filetype=yaml
