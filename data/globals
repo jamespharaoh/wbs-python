@@ -316,7 +316,11 @@ builds_path: "{{ (
 ) }}"
 
 fixtures_host_suffix: "{{
-  '0' if deployment_mode in [ 'vagrant', 'jenkins' ] else 'a-4'
+  (
+    '0'
+  ) if deployment_mode in [ 'vagrant', 'jenkins' ] else (
+    instance_zone + '-' + instance_index
+  )
 }}"
 
 zbackup_version: "3e4977c5-{{ ubuntu_release }}"
