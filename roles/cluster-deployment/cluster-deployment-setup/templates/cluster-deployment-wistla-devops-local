@@ -50,6 +50,7 @@ deployments:
   'nodejs_version_legacy',
   'rabbit_admin_password',
   'rabbit_api_password',
+  'type',
 ] %}
 {% if key in other_deployment %}
     {{ key }}: {{ other_deployment [key] | to_json }}
