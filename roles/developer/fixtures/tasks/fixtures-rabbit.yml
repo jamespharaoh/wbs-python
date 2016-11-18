@@ -113,7 +113,10 @@
   ] | join (' && ') }}"
 
 - name: "join rabbit cluster"
-  when: "instance_zone != 'a'"
+  when: "
+    deployment_mode not in [ 'jenkins', 'vagrant' ]
+    and instance_zone != 'a'
+  "
   args:
     creates: "{{ deployment_home }}/shared/flags/rabbit-cluster"
   shell: "{{ [

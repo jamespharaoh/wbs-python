@@ -6,7 +6,6 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-main-data"
 
   shell: "{{ [
-    'sleep 2',
     [
       deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo service postgresql stop || true',
@@ -38,7 +37,6 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-ubuntu"
 
   shell: "{{ [
-    'sleep 2',
     [
       deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
@@ -56,7 +54,6 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-vagrant"
 
   shell: "{{ [
-    'sleep 2',
     [
       deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
@@ -74,7 +71,6 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-wistla"
 
   shell: "{{ [
-    'sleep 2',
     [
       deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
@@ -92,7 +88,6 @@
     creates: "{{ deployment_home }}/shared/flags/postgresql-main-user-wistla"
 
   shell: "{{ [
-    'sleep 2',
     [
       deployment_name + '-postgresql-main-' + fixtures_host_suffix,
       'sudo',
@@ -102,6 +97,39 @@
       '--replication',
     ] | join (' '),
     'touch ' + deployment_home + '/shared/flags/postgresql-main-user-replicate',
+  ] | join (' && ') }}"
+
+- name: "create postgresql main database wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-database-wistla"
+
+  shell: "{{ [
+    [
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'createdb',
+      'wistla',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-database-wistla',
+  ] | join (' && ') }}"
+
+- name: "create postgresql main schema wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-main-schema-wistla"
+
+  shell: "{{ [
+    [
+      deployment_name + '-postgresql-main-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'psql',
+      'wistla',
+      '-c \"CREATE SCHEMA wistla;\"',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-main-schema-wistla',
   ] | join (' && ') }}"
 
 # ex: et ts=2 filetype=yaml

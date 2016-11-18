@@ -104,4 +104,37 @@
     'touch ' + deployment_home + '/shared/flags/postgresql-cache-user-replicate',
   ] | join (' && ') }}"
 
+- name: "create postgresql cache database wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-database-wistla"
+
+  shell: "{{ [
+    [
+      deployment_name + '-postgresql-cache-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'createdb',
+      'wistla',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-database-wistla',
+  ] | join (' && ') }}"
+
+- name: "create postgresql cache schema wistla"
+  args:
+
+    creates: "{{ deployment_home }}/shared/flags/postgresql-cache-schema-wistla"
+
+  shell: "{{ [
+    [
+      deployment_name + '-postgresql-cache-' + fixtures_host_suffix,
+      'sudo',
+      '-u postgres',
+      'psql',
+      'wistla',
+      '-c \"CREATE SCHEMA wistla;\"',
+    ] | join (' '),
+    'touch ' + deployment_home + '/shared/flags/postgresql-cache-schema-wistla',
+  ] | join (' && ') }}"
+
 # ex: et ts=2 filetype=yaml
