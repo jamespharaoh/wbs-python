@@ -116,12 +116,12 @@
 - name: "balancer"
   rules:
 
+    # icmp, http and https from anywhere
+
     - proto: "icmp"
       cidr_ip: "0.0.0.0/0"
       from_port: "-1"
       to_port: "-1"
-
-    # http and https from anywhere
 
     - proto: "tcp"
       from_port: "80"
@@ -136,23 +136,26 @@
 - name: "data"
   rules:
 
+    # anything in the local group
+
+    - proto: "-1"
+      group_id: "{{ security_group_id_data }}"
+
+    # icmp from anywhere
+
     - proto: "icmp"
       cidr_ip: "0.0.0.0/0"
       from_port: "-1"
       to_port: "-1"
+
+    # ssh from any private address
 
     - proto: "tcp"
       from_port: "22"
       to_port: "22"
       cidr_ip: "10.0.0.0/8"
 
-    - proto: "-1"
-      group_id: "{{ security_group_id_data }}"
-
-    - proto: "tcp"
-      from_port: "27017"
-      to_port: "27017"
-      group_id: "{{ security_group_id_app }}"
+    # various services
 
     - proto: "tcp"
       from_port: "5432"
@@ -162,6 +165,16 @@
     - proto: "tcp"
       from_port: "5672"
       to_port: "5672"
+      group_id: "{{ security_group_id_app }}"
+
+    - proto: "tcp"
+      from_port: "9092"
+      to_port: "9092"
+      group_id: "{{ security_group_id_app }}"
+
+    - proto: "tcp"
+      from_port: "27017"
+      to_port: "27017"
       group_id: "{{ security_group_id_app }}"
 
 - name: "jenkins"
