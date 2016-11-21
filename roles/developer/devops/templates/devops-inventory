@@ -461,10 +461,6 @@ cluster-{{ other_cluster_name }}-network
 {% for other_cluster_name, other_cluster in clusters.items ()
 if (
 	deployment_mode == 'vagrant'
-	or (
-		deployment_mode != 'jenkins'
-		and other_cluster_name == cluster_name
-	)
 ) and (
 	other_cluster_name != 'dev'
 ) -%}
