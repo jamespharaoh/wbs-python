@@ -1,5 +1,6 @@
 ---
 
+amazon_instance_state: "stopped"
 amazon_instance_type_running: "m4.large"
 heka: 
   
