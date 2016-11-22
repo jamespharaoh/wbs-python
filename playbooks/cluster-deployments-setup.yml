@@ -2,7 +2,7 @@
 
 # TODO generate this file
 
-- hosts: "cluster-production-app"
+- hosts: "cluster-production-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
@@ -13,14 +13,14 @@
       cluster_deployment_name: "production-b"
       tags: [ "cluster-deployment", "production-b" ]
 
-- hosts: "cluster-production-data"
+- hosts: "cluster-production-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
       cluster_deployment_name: "production"
       tags: [ "cluster-deployment", "production" ]
 
-- hosts: "cluster-staging-app"
+- hosts: "cluster-staging-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
@@ -31,14 +31,14 @@
       cluster_deployment_name: "staging-b"
       tags: [ "cluster-deployment", "staging-b" ]
 
-- hosts: "cluster-staging-data"
+- hosts: "cluster-staging-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
       cluster_deployment_name: "staging"
       tags: [ "cluster-deployment", "staging" ]
 
-- hosts: "supercluster-staging-app"
+- hosts: "supercluster-staging-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
@@ -49,7 +49,7 @@
       cluster_deployment_name: "staging-2-b"
       tags: [ "cluster-deployment", "staging-2-b" ]
 
-- hosts: "supercluster-staging-data"
+- hosts: "supercluster-staging-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-setup"
@@ -58,8 +58,8 @@
 
 - hosts:
 
-    - "cluster-test-app"
-    - "cluster-test-data"
+    - "cluster-test-app:&cluster-instance-active"
+    - "cluster-test-data:&cluster-instance-active"
 
   roles:
 

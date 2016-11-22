@@ -4,20 +4,32 @@
 
 # ==================== cluster-staging
 
-- hosts: "cluster-staging-admin"
+- hosts: "cluster-staging-admin:&cluster-instance-active"
   tasks:
 
     - name: "clean zookeeper"
-      run_once: "yes"
-      command: "{{ [
-        '/usr/lib/zookeeper/bin/load_gen',
-        'localhost:2181',
-        '/staging/kafka',
-        'clean',
-      ] | join (' ') }} || true"
-      tags: [ "cluster-deployment", "staging", "staging-a", "staging-b" ]
+      tags:
 
-- hosts: "cluster-staging-app"
+        - "cluster-deployment"
+
+        - "staging"
+        - "staging-a"
+        - "staging-b"
+
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-staging-admin-a:2181',
+          'wistla-staging-admin-b:2181',
+          'wistla-staging-admin-c:2181',
+        ] | join (',') }}"
+        name: "/staging/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-staging-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -32,7 +44,7 @@
       cluster_deployment_playbook_name: "clean-data"
       tags: [ "cluster-deployment", "staging-b" ]
 
-- hosts: "cluster-staging-data"
+- hosts: "cluster-staging-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -43,26 +55,31 @@
 
 # ==================== cluster-staging-2
 
-- hosts: "cluster-staging-2-admin"
+- hosts: "cluster-staging-2-admin:&cluster-instance-active"
   tasks:
 
     - name: "clean zookeeper"
       tags:
 
         - "cluster-deployment"
+
         - "staging-2"
-        - "staging-a"
-        - "staging-b"
+        - "staging-2-a"
+        - "staging-2-b"
 
       run_once: "yes"
-      command: "{{ [
-        '/usr/lib/zookeeper/bin/load_gen',
-        'localhost:2181',
-        '/staging-2/kafka',
-        'clean',
-      ] | join (' ') }}"
+      action:
 
-- hosts: "cluster-staging-2-app"
+        module: "znode"
+        hosts: "{{ [
+          'wistla-staging-2-admin-a:2181',
+          'wistla-staging-2-admin-b:2181',
+          'wistla-staging-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/staging-2/kafka"
+        state: "absent"
+
+- hosts: "cluster-staging-2-app:&cluster-instance-active"
   roles:
 
     - when: "amazon_instance_state == 'running'"
@@ -87,7 +104,7 @@
       cluster_deployment_name: "staging-2-b"
       cluster_deployment_playbook_name: "clean-data"
 
-- hosts: "cluster-staging-2-data"
+- hosts: "cluster-staging-2-data:&cluster-instance-active"
   roles:
 
     - when: "amazon_instance_state == 'running'"
@@ -103,7 +120,7 @@
 
 # ==================== cluster-test
 
-- hosts: "cluster-test-admin"
+- hosts: "cluster-test-admin:&cluster-instance-active"
   tasks:
 
     - name: "clean zookeeper"
@@ -146,7 +163,7 @@
       ] | join (' ') }}"
       tags: [ "cluster-deployment", "test-fitzroy" ]
 
-- hosts: "cluster-test-app"
+- hosts: "cluster-test-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"

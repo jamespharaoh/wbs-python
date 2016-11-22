@@ -2,7 +2,7 @@
 
 # TODO generate this file
 
-- hosts: "cluster-production-app"
+- hosts: "cluster-production-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -16,7 +16,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "production-b" ]
 
-- hosts: "cluster-production-data"
+- hosts: "cluster-production-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -25,7 +25,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "production" ]
 
-- hosts: "cluster-staging-app"
+- hosts: "cluster-staging-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -40,7 +40,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "staging-b" ]
 
-- hosts: "cluster-staging-data"
+- hosts: "cluster-staging-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -49,7 +49,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "staging" ]
 
-- hosts: "cluster-staging-2-app"
+- hosts: "cluster-staging-2-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -64,7 +64,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "staging-2-b" ]
 
-- hosts: "cluster-staging-2-data"
+- hosts: "cluster-staging-2-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -73,7 +73,7 @@
       cluster_deployment_playbook_name: "node-start"
       tags: [ "cluster-deployment", "staging-2" ]
 
-- hosts: "cluster-test-app"
+- hosts: "cluster-test-app:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
