@@ -35,6 +35,9 @@ deployment:
 
   api_server_db_query_timeout_ms: "120000"
 
+  rabbit_admin_user: "admin"
+  rabbit_api_user: "api"
+
   kafka:
 
     num_network_threads: "3"
