@@ -72,6 +72,9 @@ python_packages:
   - name: "boto"
     version: "2.38.0"
 
+  - name: "kazoo"
+    version: "2.2.1"
+
   - name: "mysql-python"
     version: "1.2.5"
 
