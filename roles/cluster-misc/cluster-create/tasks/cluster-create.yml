@@ -3,10 +3,17 @@
 - when: "
     amazon_instance_state in [ 'running', 'standby' ]
     and amazon_instance_type != amazon_instance_type_running
-    and (
-      cluster_name != 'production'
-      or cluster_production_override == inventory_hostname
-    )
+    and cluster_name == 'production'
+    and cluster_production_override != inventory_hostname
+    and instance_id is defined
+  "
+  fail:
+
+    msg: "must set cluster_production_override to make changes to production"
+
+- when: "
+    amazon_instance_state in [ 'running', 'standby' ]
+    and amazon_instance_type != amazon_instance_type_running
     and instance_id is defined
   "
   block:
