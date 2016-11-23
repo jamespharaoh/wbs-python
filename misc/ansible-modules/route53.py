@@ -50,7 +50,7 @@ options:
     description:
       - The type of DNS record to create
     required: true
-    choices: [ 'A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS' ]
+    choices: [ 'A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS', 'SOA' ]
   alias:
     description:
       - Indicates if this is an alias record.
@@ -131,7 +131,9 @@ options:
     required: false
     default: null
     version_added: "2.0"
-author: "Bruce Pennypacker (@bpennypacker)"
+author:
+  - "Bruce Pennypacker (@bpennypacker)"
+  - "Mike Buzzetti <mike.buzzetti@gmail.com>"
 extends_documentation_fragment: aws
 '''
 
@@ -288,7 +290,7 @@ def main():
             hosted_zone_id       = dict(required=False, default=None),
             record               = dict(required=True),
             ttl                  = dict(required=False, type='int', default=3600),
-            type                 = dict(choices=['A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS'], required=True),
+            type                 = dict(choices=['A', 'CNAME', 'MX', 'AAAA', 'TXT', 'PTR', 'SRV', 'SPF', 'NS', 'SOA'], required=True),
             alias                = dict(required=False, type='bool'),
             alias_hosted_zone_id = dict(required=False),
             value                = dict(required=False),
@@ -325,6 +327,8 @@ def main():
     health_check_in         = module.params.get('health_check')
     failover_in             = module.params.get('failover')
     vpc_id_in               = module.params.get('vpc_id')
+
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
@@ -458,4 +462,3 @@ from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
 main()
-
