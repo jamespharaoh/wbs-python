@@ -27,6 +27,7 @@
         ] | join (',') }}"
         name: "/staging/kafka"
         state: "absent"
+        recursive: "yes"
 
 - hosts: "cluster-staging-app:&cluster-instance-active"
   roles:
@@ -77,6 +78,7 @@
         ] | join (',') }}"
         name: "/staging-2/kafka"
         state: "absent"
+        recursive: "yes"
 
 - hosts: "cluster-staging-2-app:&cluster-instance-active"
   roles:
@@ -140,6 +142,7 @@
         ] | join (',') }}"
         name: "/test-erebus/kafka"
         state: "absent"
+        recursive: "yes"
 
     - name: "clean zookeeper"
       tags:
@@ -159,6 +162,7 @@
         ] | join (',') }}"
         name: "/test-everest/kafka"
         state: "absent"
+        recursive: "yes"
 
     - name: "clean zookeeper"
       tags:
@@ -178,6 +182,7 @@
         ] | join (',') }}"
         name: "/test-fitzroy/kafka"
         state: "absent"
+        recursive: "yes"
 
     - name: "clean zookeeper"
       tags:
@@ -197,6 +202,7 @@
         ] | join (',') }}"
         name: "/test-k2/kafka"
         state: "absent"
+        recursive: "yes"
 
     - name: "clean zookeeper"
       tags:
@@ -216,6 +222,7 @@
         ] | join (',') }}"
         name: "/test-montblanc/kafka"
         state: "absent"
+        recursive: "yes"
 
 - hosts: "cluster-test-app:&cluster-instance-active"
   roles:
