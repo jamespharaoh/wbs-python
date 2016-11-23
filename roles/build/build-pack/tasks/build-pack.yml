@@ -26,6 +26,35 @@
     dest: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/MANIFEST.{{ item.extension }}"
     src: "{{ item.template }}"
 
+- name: "create metadata dir"
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/MANIFEST"
+    state: "directory"
+
+- name: "name create metadata files"
+  with_dict:
+
+    build-host: "{{ lookup ('pipe', 'hostname') }}"
+    build-user: "{{ lookup ('env', 'USER') }}"
+    build-template: "{{ node_template }}"
+    build-id: "{{ local_build_id }}"
+    build-name: "{{ node_template }}-{{ local_build_id }}"
+    build-timestamp: "{{ lookup ('pipe', 'date --utc +%Y-%m-%dT%H:%M:%SZ') }}"
+
+  delegate_to: "localhost"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/MANIFEST/{{ item.key }}"
+    content: "{{ item.value }}\n"
+
+# ex: noet ts=2 filetype=sh
+
 - name: "create package"
   delegate_to: "localhost"
   environment:
