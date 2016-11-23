@@ -213,8 +213,8 @@ Also, should you wish to parameterize roles, by adding variables, you can do so,
     - hosts: webservers
       roles:
         - common
-        - { role: foo_app_instance, dir: '/opt/a',  port: 5000 }
-        - { role: foo_app_instance, dir: '/opt/b',  port: 5001 }
+        - { role: foo_app_instance, dir: '/opt/a',  app_port: 5000 }
+        - { role: foo_app_instance, dir: '/opt/b',  app_port: 5001 }
 
 While it's probably not something you should do often, you can also conditionally apply roles like so::
 
@@ -227,7 +227,7 @@ While it's probably not something you should do often, you can also conditionall
 This works by applying the conditional to every task in the role.  Conditionals are covered later on in
 the documentation.
 
-Finally, you may wish to assign tags to the roles you specify. You can do so inline:::
+Finally, you may wish to assign tags to the roles you specify. You can do so inline::
 
     ---
 
@@ -284,7 +284,7 @@ a list of roles and parameters to insert before the specified role, such as the 
     ---
     dependencies:
       - { role: common, some_parameter: 3 }
-      - { role: apache, port: 80 }
+      - { role: apache, appache_port: 80 }
       - { role: postgres, dbname: blarg, other_parameter: 12 }
 
 Role dependencies can also be specified as a full path, just like top level roles::

@@ -26,6 +26,7 @@ from ansible.playbook.included_file import IncludedFile
 from ansible.plugins import action_loader
 from ansible.plugins.strategy import StrategyBase
 from ansible.template import Templar
+from ansible.utils.unicode import to_unicode
 
 try:
     from __main__ import display
@@ -58,7 +59,7 @@ class StrategyModule(StrategyBase):
         work_to_do = True
         while work_to_do and not self._tqm._terminated:
 
-            hosts_left = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts and not iterator.is_failed(host)]
+            hosts_left = [host for host in self._inventory.get_hosts(iterator._play.hosts) if host.name not in self._tqm._unreachable_hosts]
             if len(hosts_left) == 0:
                 self._tqm.send_callback('v2_playbook_on_no_hosts_remaining')
                 result = False
@@ -107,6 +108,15 @@ class StrategyModule(StrategyBase):
                         templar = Templar(loader=self._loader, variables=task_vars)
                         display.debug("done getting variables")
 
+                        try:
+                            task.name = to_unicode(templar.template(task.name, fail_on_undefined=False), nonstring='empty')
+                            display.debug("done templating")
+                        except:
+                            # just ignore any errors during task name templating,
+                            # we don't care if it just shows the raw name
+                            display.debug("templating failed for some reason")
+                            pass
+
                         run_once = templar.template(task.run_once) or action and getattr(action, 'BYPASS_HOST_LOOP', False)
                         if run_once:
                             if action and getattr(action, 'BYPASS_HOST_LOOP', False):
@@ -123,6 +133,7 @@ class StrategyModule(StrategyBase):
                             # if there is metadata, check to see if the allow_duplicates flag was set to true
                             if task._role._metadata is None or task._role._metadata and not task._role._metadata.allow_duplicates:
                                 display.debug("'%s' skipped because role has already run" % task)
+                                del self._blocked_hosts[host_name]
                                 continue
 
                         if task.action == 'meta':
@@ -190,6 +201,9 @@ class StrategyModule(StrategyBase):
 
             # pause briefly so we don't spin lock
             time.sleep(0.001)
+
+        # collect all the final results
+        results = self._wait_on_pending_results(iterator)
 
         # run the base class run() method, which executes the cleanup function
         # and runs any outstanding handlers which have been triggered

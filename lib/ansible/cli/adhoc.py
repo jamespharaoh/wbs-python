@@ -32,6 +32,7 @@ from ansible.parsing.splitter import parse_kv
 from ansible.playbook.play import Play
 from ansible.plugins import get_all_plugin_loaders
 from ansible.utils.vars import load_extra_vars
+from ansible.utils.vars import load_options_vars
 from ansible.utils.unicode import to_unicode
 from ansible.vars import VariableManager
 
@@ -123,11 +124,13 @@ class AdHocCLI(CLI):
         variable_manager = VariableManager()
         variable_manager.extra_vars = load_extra_vars(loader=loader, options=self.options)
 
+        variable_manager.options_vars = load_options_vars(self.options)
+
         inventory = Inventory(loader=loader, variable_manager=variable_manager, host_list=self.options.inventory)
         variable_manager.set_inventory(inventory)
 
         no_hosts = False
-        if len(inventory.list_hosts(pattern)) == 0:
+        if len(inventory.list_hosts()) == 0:
             # Empty inventory
             display.warning("provided hosts list is empty, only localhost is available")
             no_hosts = True
@@ -136,7 +139,7 @@ class AdHocCLI(CLI):
         hosts = inventory.list_hosts(pattern)
         if len(hosts) == 0 and no_hosts is False:
             # Invalid limit
-            raise AnsibleError("Specified --limit does not match any hosts")
+            raise AnsibleError("Specified hosts and/or --limit does not match any hosts")
 
         if self.options.listhosts:
             display.display('  hosts (%d):' % len(hosts))
@@ -191,5 +194,7 @@ class AdHocCLI(CLI):
         finally:
             if self._tqm:
                 self._tqm.cleanup()
+            if loader:
+                loader.cleanup_all_tmp_files()
 
         return result

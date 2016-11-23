@@ -66,8 +66,14 @@ class ShellModule(object):
         path = self._unquote(path)
         return path.endswith('/') or path.endswith('\\')
 
-    def chmod(self, mode, path):
-        return ''
+    def chmod(self, paths, mode):
+        raise NotImplementedError('chmod is not implemented for Powershell')
+
+    def chown(self, paths, user):
+        raise NotImplementedError('chown is not implemented for Powershell')
+
+    def set_user_facl(self, paths, user, mode):
+        raise NotImplementedError('set_user_facl is not implemented for Powershell')
 
     def remove(self, path, recurse=False):
         path = self._escape(self._unquote(path))

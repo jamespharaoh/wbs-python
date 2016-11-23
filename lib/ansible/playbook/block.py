@@ -65,8 +65,6 @@ class Block(Base, Become, Conditional, Taggable):
 
         all_vars = self.vars.copy()
 
-        if self._role:
-            all_vars.update(self._role.get_vars(self._dep_chain))
         if self._parent_block:
             all_vars.update(self._parent_block.get_vars())
         if self._task_include:
@@ -271,9 +269,6 @@ class Block(Base, Become, Conditional, Taggable):
         if self._parent_block is not None:
             if not self._parent_block.evaluate_conditional(templar, all_vars):
                 return False
-        elif self._role is not None:
-            if not self._role.evaluate_conditional(templar, all_vars):
-                return False
         return super(Block, self).evaluate_conditional(templar, all_vars)
 
     def set_loader(self, loader):
@@ -387,4 +382,25 @@ class Block(Base, Become, Conditional, Taggable):
 
     def has_tasks(self):
         return len(self.block) > 0 or len(self.rescue) > 0 or len(self.always) > 0
+
+    def get_include_params(self):
+        if self._parent:
+            return self._parent.get_include_params()
+        else:
+            return dict()
+
+    def all_parents_static(self):
+        '''
+        Determine if all of the parents of this block were statically loaded
+        or not. Since Task/TaskInclude objects may be in the chain, they simply
+        call their parents all_parents_static() method. Only Block objects in
+        the chain check the statically_loaded value of the parent.
+        '''
+        from ansible.playbook.task_include import TaskInclude
+        if self._task_include and not self._task_include.statically_loaded:
+            return False
+        elif self._parent_block:
+            return self._parent_block.all_parents_static()
+
+        return True
 

@@ -21,8 +21,7 @@ __metaclass__ = type
 
 import os
 
-from collections import defaultdict
-from collections import MutableMapping
+from collections import defaultdict, MutableMapping
 
 from ansible.compat.six import iteritems
 from jinja2.exceptions import UndefinedError
@@ -52,6 +51,11 @@ except ImportError:
 
 VARIABLE_CACHE = dict()
 HOSTVARS_CACHE = dict()
+
+class AnsibleInventoryVarsData(dict):
+    def __init__(self, *args, **kwargs):
+        super(AnsibleInventoryVarsData, self).__init__(*args, **kwargs)
+        self.path = None
 
 def preprocess_vars(a):
     '''
@@ -99,6 +103,7 @@ class VariableManager:
         self._inventory = None
         self._hostvars = None
         self._omit_token = '__omit_place_holder__%s' % sha1(os.urandom(64)).hexdigest()
+        self._options_vars = defaultdict(dict)
 
     def __getstate__(self):
         data = dict(
@@ -109,6 +114,7 @@ class VariableManager:
             host_vars_files = self._host_vars_files,
             group_vars_files = self._group_vars_files,
             omit_token = self._omit_token,
+            options_vars = self._options_vars,
             #inventory = self._inventory,
         )
         return data
@@ -122,6 +128,7 @@ class VariableManager:
         self._group_vars_files = data.get('group_vars_files', defaultdict(dict))
         self._omit_token = data.get('omit_token', '__omit_place_holder__%s' % sha1(os.urandom(64)).hexdigest())
         self._inventory = data.get('inventory', None)
+        self._options_vars = data.get('options_vars', dict())
 
     def _get_cache_entry(self, play=None, host=None, task=None):
         play_id = "NONE"
@@ -151,6 +158,17 @@ class VariableManager:
 
     def set_inventory(self, inventory):
         self._inventory = inventory
+
+    @property
+    def options_vars(self):
+        ''' ensures a clean copy of the options_vars are made '''
+        return self._options_vars.copy()
+
+    @options_vars.setter
+    def options_vars(self, value):
+        ''' ensures a clean copy of the options_vars are used to set the value '''
+        assert isinstance(value, dict)
+        self._options_vars = value.copy()
 
     def _preprocess_vars(self, a):
         '''
@@ -218,21 +236,24 @@ class VariableManager:
             # sure it sees its defaults above any other roles, as we previously
             # (v1) made sure each task had a copy of its roles default vars
             if task and task._role is not None:
-                all_vars = combine_vars(all_vars, task._role.get_default_vars())
+                dep_chain = []
+                if task._block:
+                    dep_chain = task._block.get_dep_chain()
+                all_vars = combine_vars(all_vars, task._role.get_default_vars(dep_chain=dep_chain))
 
         if host:
             # next, if a host is specified, we load any vars from group_vars
             # files and then any vars from host_vars files which may apply to
             # this host or the groups it belongs to
 
-            # we merge in vars from groups specified in the inventory (INI or script)
-            all_vars = combine_vars(all_vars, host.get_group_vars())
-
-            # then we merge in the special 'all' group_vars first, if they exist
+            # we merge in the special 'all' group_vars first, if they exist
             if 'all' in self._group_vars_files:
                 data = preprocess_vars(self._group_vars_files['all'])
                 for item in data:
                     all_vars = combine_vars(all_vars, item)
+
+            # we merge in vars from groups specified in the inventory (INI or script)
+            all_vars = combine_vars(all_vars, host.get_group_vars())
 
             for group in sorted(host.get_groups(), key=lambda g: g.depth):
                 if group.name in self._group_vars_files and group.name != 'all':
@@ -304,26 +325,43 @@ class VariableManager:
                         display.vvv("skipping vars_file '%s' due to an undefined variable" % vars_file_item)
                         continue
 
+            # By default, we now merge in all vars from all roles in the play,
+            # unless the user has disabled this via a config option
             if not C.DEFAULT_PRIVATE_ROLE_VARS:
                 for role in play.get_roles():
                     all_vars = combine_vars(all_vars, role.get_vars(include_params=False))
 
+        # next, we merge in the vars from the role, which will specifically
+        # follow the role dependency chain, and then we merge in the tasks
+        # vars (which will look at parent blocks/task includes)
         if task:
             if task._role:
-                all_vars = combine_vars(all_vars, task._role.get_vars())
-                all_vars = combine_vars(all_vars, task._role.get_role_params(task._block._dep_chain))
+                dep_chain = []
+                if task._block:
+                    dep_chain = task._block.get_dep_chain()
+                all_vars = combine_vars(all_vars, task._role.get_vars(dep_chain=dep_chain, include_params=False))
             all_vars = combine_vars(all_vars, task.get_vars())
 
+        # next, we merge in the vars cache (include vars) and nonpersistent
+        # facts cache (set_fact/register), in that order
         if host:
             all_vars = combine_vars(all_vars, self._vars_cache.get(host.get_name(), dict()))
             all_vars = combine_vars(all_vars, self._nonpersistent_fact_cache.get(host.name, dict()))
 
-        # special case for include tasks, where the include params
-        # may be specified in the vars field for the task, which should
-        # have higher precedence than the vars/np facts above
+        # next, we merge in role params and task include params
         if task:
+            if task._role:
+                dep_chain = []
+                if task._block:
+                    dep_chain = task._block.get_dep_chain()
+                all_vars = combine_vars(all_vars, task._role.get_role_params(dep_chain=dep_chain))
+
+            # special case for include tasks, where the include params
+            # may be specified in the vars field for the task, which should
+            # have higher precedence than the vars/np facts above
             all_vars = combine_vars(all_vars, task.get_include_params())
 
+        # finally, we merge in extra vars and the magic variables
         all_vars = combine_vars(all_vars, self._extra_vars)
         all_vars = combine_vars(all_vars, magic_variables)
 
@@ -392,6 +430,9 @@ class VariableManager:
         # the 'omit' value alows params to be left out if the variable they are based on is undefined
         variables['omit'] = self._omit_token
         variables['ansible_version'] = CLI.version_info(gitinfo=False)
+        # Set options vars
+        for option, option_value in iteritems(self._options_vars):
+            variables[option] = option_value
 
         if self._hostvars is not None and include_hostvars:
             variables['hostvars'] = self._hostvars
@@ -456,15 +497,18 @@ class VariableManager:
                 # try looking it up based on the address field, and finally
                 # fall back to creating a host on the fly to use for the var lookup
                 if delegated_host is None:
-                    for h in self._inventory.get_hosts(ignore_limits_and_restrictions=True):
-                        # check if the address matches, or if both the delegated_to host
-                        # and the current host are in the list of localhost aliases
-                        if h.address == delegated_host_name or h.name in C.LOCALHOST and delegated_host_name in C.LOCALHOST:
-                            delegated_host = h
-                            break
+                    if delegated_host_name in C.LOCALHOST:
+                        delegated_host = self._inventory.localhost
                     else:
-                        delegated_host = Host(name=delegated_host_name)
-                        delegated_host.vars.update(new_delegated_host_vars)
+                        for h in self._inventory.get_hosts(ignore_limits_and_restrictions=True):
+                            # check if the address matches, or if both the delegated_to host
+                            # and the current host are in the list of localhost aliases
+                            if h.address == delegated_host_name:
+                                delegated_host = h
+                                break
+                        else:
+                            delegated_host = Host(name=delegated_host_name)
+                            delegated_host.vars.update(new_delegated_host_vars)
             else:
                 delegated_host = Host(name=delegated_host_name)
                 delegated_host.vars.update(new_delegated_host_vars)
@@ -515,7 +559,7 @@ class VariableManager:
             # do not parse hidden files or dirs, e.g. .svn/
             paths = [os.path.join(path, name) for name in names if not name.startswith('.')]
             for p in paths:
-                _found, results = self._load_inventory_file(path=p, loader=loader)
+                results = self._load_inventory_file(path=p, loader=loader)
                 if results is not None:
                     data = combine_vars(data, results)
 
@@ -532,8 +576,11 @@ class VariableManager:
                 if loader.path_exists(path):
                     data = loader.load_from_file(path)
 
-        name = self._get_inventory_basename(path)
-        return (name, data)
+        rval = AnsibleInventoryVarsData()
+        rval.path = path
+        if data is not None:
+            rval.update(data)
+        return rval
 
     def add_host_vars_file(self, path, loader):
         '''
@@ -542,14 +589,21 @@ class VariableManager:
         the extension, for matching against a given inventory host name
         '''
 
-        (name, data) = self._load_inventory_file(path, loader)
-        if data:
-            if name not in self._host_vars_files:
-                self._host_vars_files[name] = []
-            self._host_vars_files[name].append(data)
-            return data
+        name = self._get_inventory_basename(path)
+        if name not in self._host_vars_files:
+            self._host_vars_files[name] = []
+
+        for entry in self._host_vars_files[name]:
+            if entry.path == path:
+                data = entry
+                break
         else:
-            return dict()
+            data = self._load_inventory_file(path, loader)
+            if data:
+                self._host_vars_files[name].append(data)
+
+        return data
+
 
     def add_group_vars_file(self, path, loader):
         '''
@@ -558,14 +612,41 @@ class VariableManager:
         the extension, for matching against a given inventory host name
         '''
 
-        (name, data) = self._load_inventory_file(path, loader)
-        if data:
-            if name not in self._group_vars_files:
-                self._group_vars_files[name] = []
-            self._group_vars_files[name].append(data)
-            return data
+        name = self._get_inventory_basename(path)
+        if name not in self._group_vars_files:
+            self._group_vars_files[name] = []
+
+        for entry in self._group_vars_files[name]:
+            if entry.path == path:
+                data = entry
+                break
         else:
-            return dict()
+            data = self._load_inventory_file(path, loader)
+            if data:
+                self._group_vars_files[name].append(data)
+
+        return data
+
+    def clear_playbook_hostgroup_vars_files(self, path):
+        for f in self._host_vars_files.keys():
+            keepers = []
+            for entry in self._host_vars_files[f]:
+                if os.path.dirname(entry.path) != os.path.join(path, 'host_vars'):
+                    keepers.append(entry)
+            self._host_vars_files[f] = keepers
+        for f in self._group_vars_files.keys():
+            keepers = []
+            for entry in self._group_vars_files[f]:
+                if os.path.dirname(entry.path) != os.path.join(path, 'group_vars'):
+                    keepers.append(entry)
+            self._group_vars_files[f] = keepers
+
+    def clear_facts(self, hostname):
+        '''
+        Clears the facts for a host
+        '''
+        if hostname in self._fact_cache:
+            del self._fact_cache[hostname]
 
     def set_host_facts(self, host, facts):
         '''

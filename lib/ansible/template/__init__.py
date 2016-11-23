@@ -39,7 +39,6 @@ from ansible.plugins import filter_loader, lookup_loader, test_loader
 from ansible.template.safe_eval import safe_eval
 from ansible.template.template import AnsibleJ2Template
 from ansible.template.vars import AnsibleJ2Vars
-from ansible.utils.debug import debug
 from ansible.utils.unicode import to_unicode, to_str
 
 try:
@@ -174,7 +173,7 @@ class Templar:
         self.variable_start = self.environment.variable_start_string
         self.variable_end   = self.environment.variable_end_string
         self._clean_regex   = re.compile(r'(?:%s|%s|%s|%s)' % (self.variable_start, self.block_start, self.block_end, self.variable_end))
-        self._no_type_regex = re.compile(r'.*\|(?:%s)\s*(?:%s)?$' % ('|'.join(C.STRING_TYPE_FILTERS), self.variable_end))
+        self._no_type_regex = re.compile(r'.*\|\s*(?:%s)\s*(?:%s)?$' % ('|'.join(C.STRING_TYPE_FILTERS), self.variable_end))
 
     def _get_filters(self):
         '''
@@ -499,7 +498,7 @@ class Templar:
                     errmsg += "Make sure your variable name does not contain invalid characters like '-': %s" % to_str(te)
                     raise AnsibleUndefinedVariable(errmsg)
                 else:
-                    debug("failing because of a type error, template data is: %s" % to_str(data))
+                    display.debug("failing because of a type error, template data is: %s" % to_str(data))
                     raise AnsibleError("Unexpected templating type error occurred on (%s): %s" % (to_str(data),to_str(te)))
 
             if preserve_trailing_newlines:

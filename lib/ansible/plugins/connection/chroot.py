@@ -28,7 +28,7 @@ import traceback
 
 from ansible import constants as C
 from ansible.errors import AnsibleError
-from ansible.plugins.connection import ConnectionBase
+from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.module_utils.basic import is_executable
 from ansible.utils.unicode import to_bytes
 
@@ -37,8 +37,6 @@ try:
 except ImportError:
     from ansible.utils.display import Display
     display = Display()
-
-BUFSIZE = 65536
 
 
 class Connection(ConnectionBase):
@@ -65,7 +63,11 @@ class Connection(ConnectionBase):
             raise AnsibleError("%s is not a directory" % self.chroot)
 
         chrootsh = os.path.join(self.chroot, 'bin/sh')
-        if not is_executable(chrootsh):
+        # Want to check for a usable bourne shell inside the chroot.
+        # is_executable() == True is sufficient.  For symlinks it
+        # gets really complicated really fast.  So we punt on finding that
+        # out.  As long as it's a symlink we assume that it will work
+        if not (is_executable(chrootsh) or (os.path.lexists(chrootsh) and os.path.islink(chrootsh))):
             raise AnsibleError("%s does not look like a chrootable dir (/bin/sh missing)" % self.chroot)
 
         self.chroot_cmd = distutils.spawn.find_executable('chroot')
