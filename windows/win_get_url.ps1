@@ -19,6 +19,9 @@
 # WANT_JSON
 # POWERSHELL_COMMON
 
+# temporary fix to keep this module working in 2.0. Needs parameter validation fixes to work in future versions
+Set-StrictMode -Off
+
 $params = Parse-Args $args;
 
 $result = New-Object psobject @{
@@ -26,26 +29,37 @@ $result = New-Object psobject @{
     changed = $false
 }
 
-$url = Get-AnsibleParam $params -name "url" -failifempty $true
-$dest = Get-AnsibleParam $params -name "dest" -failifempty $true
+# TODO: StrictMode fix
+If ($params.url) {
+    $url = $params.url
+}
+Else {
+    Fail-Json $result "missing required argument: url"
+}
 
-$skip_certificate_validation = Get-AnsibleParam $params -name "skip_certificate_validation" -default $false
-$skip_certificate_validation = $skip_certificate_validation | ConvertTo-Bool
-$username = Get-AnsibleParam $params "username"
-$password = Get-AnsibleParam $params "password"
+# TODO: StrictMode fix
+If ($params.dest) {
+    $dest = $params.dest
+}
+Else {
+    Fail-Json $result "missing required argument: dest"
+}
 
-$proxy_url = Get-AnsibleParam $params "proxy_url"
-$proxy_username = Get-AnsibleParam $params "proxy_username"
-$proxy_password = Get-AnsibleParam $params "proxy_password"
+$skip_certificate_validation = Get-Attr $params "skip_certificate_validation" $false | ConvertTo-Bool
+$username = Get-Attr $params "username"
+$password = Get-Attr $params "password"
+
+$proxy_url = Get-Attr $params "proxy_url"
+$proxy_username = Get-Attr $params "proxy_username"
+$proxy_password = Get-Attr $params "proxy_password"
 
 if($skip_certificate_validation){
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
 }
 
-$force = Get-AnsibleParam -obj $params -name "force" -default $true
-$force = $force | ConvertTo-Bool
+$force = Get-Attr -obj $params -name "force" "yes" | ConvertTo-Bool
 
-Function Download-File($result, $url, $dest, $username, $password, $proxy_url, $proxy_username, $proxy_password) {
+If ($force -or -not (Test-Path $dest)) {
     $webClient = New-Object System.Net.WebClient
     if($proxy_url) {
         $proxy_server = New-Object System.Net.WebProxy($proxy_url, $true)
@@ -67,18 +81,8 @@ Function Download-File($result, $url, $dest, $username, $password, $proxy_url, $
     Catch {
         Fail-Json $result "Error downloading $url to $dest $($_.Exception.Message)"
     }
-
-}
-
-
-If ($force -or -not (Test-Path $dest)) {
-   Download-File -result $result -url $url -dest $dest -username $username -password $password -proxy_url $proxy_url -proxy_username $proxy_username -proxy_password $proxy_password
-
 }
 Else {
-    $fileLastMod = ([System.IO.FileInfo]$dest).LastWriteTimeUtc
-    $webLastMod = $null
-
     Try {
         $webRequest = [System.Net.HttpWebRequest]::Create($url)
 
@@ -86,22 +90,24 @@ Else {
             $webRequest.Credentials = New-Object System.Net.NetworkCredential($username, $password)
         }
 
-        $webRequest.Method = "HEAD"
+        $webRequest.IfModifiedSince = ([System.IO.FileInfo]$dest).LastWriteTime
+        $webRequest.Method = "GET"
         [System.Net.HttpWebResponse]$webResponse = $webRequest.GetResponse()
-
-        $webLastMod = $webResponse.GetResponseHeader("Last-Modified")
-        $webResponse.Close()
+        
+        $stream = New-Object System.IO.StreamReader($webResponse.GetResponseStream())
+        
+        $stream.ReadToEnd() | Set-Content -Path $dest -Force -ErrorAction Stop
+        
+        $result.changed = $true
+    }
+    Catch [System.Net.WebException] {
+        If ($_.Exception.Response.StatusCode -ne [System.Net.HttpStatusCode]::NotModified) {
+            Fail-Json $result "Error downloading $url to $dest $($_.Exception.Message)"
+        }
     }
     Catch {
-        Fail-Json $result "Error when requesting Last-Modified date from $url $($_.Exception.Message)"
+        Fail-Json $result "Error downloading $url to $dest $($_.Exception.Message)"
     }
-
-    If (($webLastMod) -and ((Get-Date -Date $webLastMod ) -lt $fileLastMod)) {
-        $result.changed = $false
-    } Else {
-        Download-File -result $result -url $url -dest $dest -username $username -password $password -proxy_url $proxy_url -proxy_username $proxy_username -proxy_password $proxy_password
-    }
-
 }
 
 Set-Attr $result.win_get_url "url" $url

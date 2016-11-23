@@ -53,7 +53,7 @@ EXAMPLES = '''
 
 def main():
     module = AnsibleModule(argument_spec=dict(
-        clouds=dict(required=False, type='list', default=[]),
+        clouds=dict(required=False, default=[]),
     ))
     p = module.params
 
@@ -71,5 +71,4 @@ def main():
 # import module snippets
 from ansible.module_utils.basic import *
 
-if __name__ == "__main__":
-    main()
+main()

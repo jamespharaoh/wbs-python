@@ -337,7 +337,7 @@ def _create_connection( (host, port), connect_timeout):
         Socket object
     """
     if sys.version_info < (2, 6):
-        (family, _) = (_convert_host_to_ip(host))[0]
+        (family, _) = _convert_host_to_ip(host)
         connect_socket = socket.socket(family, socket.SOCK_STREAM)
         connect_socket.settimeout(connect_timeout)
         connect_socket.connect( (host, port) )
@@ -355,11 +355,11 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             host=dict(default='127.0.0.1'),
-            timeout=dict(default=300, type='int'),
-            connect_timeout=dict(default=5, type='int'),
-            delay=dict(default=0, type='int'),
-            port=dict(default=None, type='int'),
-            path=dict(default=None, type='path'),
+            timeout=dict(default=300),
+            connect_timeout=dict(default=5),
+            delay=dict(default=0),
+            port=dict(default=None),
+            path=dict(default=None),
             search_regex=dict(default=None),
             state=dict(default='started', choices=['started', 'stopped', 'present', 'absent', 'drained']),
             exclude_hosts=dict(default=None, type='list')
@@ -369,10 +369,13 @@ def main():
     params = module.params
 
     host = params['host']
-    timeout = params['timeout']
-    connect_timeout = params['connect_timeout']
-    delay = params['delay']
-    port = params['port']
+    timeout = int(params['timeout'])
+    connect_timeout = int(params['connect_timeout'])
+    delay = int(params['delay'])
+    if params['port']:
+        port = int(params['port'])
+    else:
+        port = None
     state = params['state']
     path = params['path']
     search_regex = params['search_regex']

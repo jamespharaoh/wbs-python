@@ -5,7 +5,6 @@
 # (c) 2013, Mike Grozak  <mike.grozak@gmail.com>
 # (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
 # (c) 2015, Evan Kaufman <evan@digitalflophouse.com>
-# (c) 2015, Luca Berruti <nadirio@gmail.com>
 #
 # This file is part of Ansible
 #
@@ -36,22 +35,17 @@ DOCUMENTATION = """
 module: cron
 short_description: Manage cron.d and crontab entries.
 description:
-  - Use this module to manage crontab and environment variables entries. This module allows
-    you to create environment variables and named crontab entries, update, or delete them.
-  - 'When crontab jobs are managed: the module includes one line with the description of the
-    crontab entry C("#Ansible: <name>") corresponding to the "name" passed to the module,
-    which is used by future ansible/module calls to find/check the state. The "name"
-    parameter should be unique, and changing the "name" value will result in a new cron
-    task being created (or a different one being removed).'
-  - 'When environment variables are managed: no comment line is added, but, when the module
-    needs to find/check the state, it uses the "name" parameter to find the environment
-    variable definition line.'
+  - Use this module to manage crontab entries. This module allows you to create named
+    crontab entries, update, or delete them.
+  - 'The module includes one line with the description of the crontab entry C("#Ansible: <name>")
+    corresponding to the "name" passed to the module, which is used by future ansible/module calls
+    to find/check the state.  The "name" parameter should be unique, and changing the "name" value
+    will result in a new cron task being created (or a different one being removed)'
 version_added: "0.9"
 options:
   name:
     description:
-      - Description of a crontab entry or, if env is set, the name of environment variable.
-        Required if state=absent
+      - Description of a crontab entry. Required if state=absent
     default: null
     required: false
   user:
@@ -61,22 +55,18 @@ options:
     default: root
   job:
     description:
-      - The command to execute or, if env is set, the value of environment variable.
-        Required if state=present.
+      - The command to execute. Required if state=present.
     required: false
-    aliases: ['value']
     default: null
   state:
     description:
-      - Whether to ensure the job or environment variable is present or absent.
+      - Whether to ensure the job is present or absent.
     required: false
     default: present
     choices: [ "present", "absent" ]
   cron_file:
     description:
-      - If specified, uses this file instead of an individual user's crontab.
-        If this is a relative path, it is interpreted with respect to
-        /etc/cron.d. (If it is absolute, it will typically be /etc/crontab).
+      - If specified, uses this file in cron.d instead of an individual user's crontab.
         To use the C(cron_file) parameter you must specify the C(user) as well.
     required: false
     default: null
@@ -134,28 +124,6 @@ options:
     version_added: "2.0"
     required: false
     default: false
-  env:
-    description:
-      - If set, manages a crontab's environment variable. New variables are added on top of crontab.
-        "name" and "value" paramenters are the name and the value of environment variable.
-    version_added: "2.1"
-    required: false
-    default: "no"
-    choices: [ "yes", "no" ]
-  insertafter:
-    description:
-      - Used with C(state=present) and C(env). If specified, the environment variable will be
-        inserted after the declaration of specified environment variable.
-    version_added: "2.1"
-    required: false
-    default: null
-  insertbefore:
-    description:
-      - Used with C(state=present) and C(env). If specified, the environment variable will be
-        inserted before the declaration of specified environment variable.
-    version_added: "2.1"
-    required: false
-    default: null
 requirements:
   - cron
 author:
@@ -163,7 +131,6 @@ author:
     - 'Mike Grozak'
     - 'Patrick Callahan'
     - 'Evan Kaufman (@EvanK)'
-    - 'Luca Berruti (@lberruti)'
 """
 
 EXAMPLES = '''
@@ -178,13 +145,6 @@ EXAMPLES = '''
 # Creates an entry like "@reboot /some/job.sh"
 - cron: name="a job for reboot" special_time=reboot job="/some/job.sh"
 
-# Creates an entry like "PATH=/opt/bin" on top of crontab
-- cron: name=PATH env=yes value=/opt/bin
-
-# Creates an entry like "APP_HOME=/srv/app" and insert it after PATH
-# declaration
-- cron: name=APP_HOME env=yes value=/srv/app insertafter=PATH
-
 # Creates a cron file under /etc/cron.d
 - cron: name="yum autoupdate" weekday="2" minute=0 hour=12
         user="root" job="YUMINTERACTIVE=0 /usr/sbin/yum-autoupdate"
@@ -192,13 +152,9 @@ EXAMPLES = '''
 
 # Removes a cron file from under /etc/cron.d
 - cron: name="yum autoupdate" cron_file=ansible_yum-autoupdate state=absent
-
-# Removes "APP_HOME" environment variable from crontab
-- cron: name=APP_HOME env=yes state=absent
 '''
 
 import os
-import pwd
 import re
 import tempfile
 import platform
@@ -214,7 +170,7 @@ class CronTab(object):
         CronTab object to write time based crontab file
 
         user      - the user of the crontab (defaults to root)
-        cron_file - a cron file under /etc/cron.d, or an absolute path
+        cron_file - a cron file under /etc/cron.d
     """
     def __init__(self, module, user=None, cron_file=None):
         self.module    = module
@@ -224,10 +180,7 @@ class CronTab(object):
         self.ansible   = "#Ansible: "
 
         if cron_file:
-            if os.path.isabs(cron_file):
-                self.cron_file = cron_file
-            else:
-                self.cron_file = os.path.join('/etc/cron.d', cron_file)
+            self.cron_file = '/etc/cron.d/%s' % cron_file
         else:
             self.cron_file = None
 
@@ -319,38 +272,6 @@ class CronTab(object):
     def do_remove_job(self, lines, comment, job):
         return None
 
-    def add_env(self, decl, insertafter=None, insertbefore=None):
-        if not (insertafter or insertbefore):
-            self.lines.insert(0, decl)
-            return
-
-        if insertafter:
-            other_name = insertafter
-        elif insertbefore:
-            other_name = insertbefore
-        other_decl = self.find_env(other_name)
-        if len(other_decl) > 0:
-            if insertafter:
-                index = other_decl[0]+1
-            elif insertbefore:
-                index = other_decl[0]
-            self.lines.insert(index, decl)
-            return
-
-        self.module.fail_json(msg="Variable named '%s' not found." % other_name)
-
-    def update_env(self, name, decl):
-        return self._update_env(name, decl, self.do_add_env)
-
-    def do_add_env(self, lines, decl):
-        lines.append(decl)
-
-    def remove_env(self, name):
-        return self._update_env(name, '', self.do_remove_env)
-
-    def do_remove_env(self, lines, decl):
-        return None
-
     def remove_job_file(self):
         try:
             os.unlink(self.cron_file)
@@ -374,17 +295,7 @@ class CronTab(object):
 
         return []
 
-    def find_env(self, name):
-        for index, l in enumerate(self.lines):
-            if re.match( r'^%s=' % name, l):
-                return [index, l]
-
-        return []
-
     def get_cron_job(self,minute,hour,day,month,weekday,job,special,disabled):
-        # normalize any leading/trailing newlines (ansible/ansible-modules-core#3791)
-        job = job.strip('\r\n')
-
         if disabled:
             disable_prefix = '#'
         else:
@@ -412,15 +323,6 @@ class CronTab(object):
 
         return jobnames
 
-    def get_envnames(self):
-        envnames = []
-
-        for l in self.lines:
-            if re.match( r'^\S+=' , l):
-                envnames.append(l.split('=')[0])
-
-        return envnames
-
     def _update_job(self, name, job, addlinesfunction):
         ansiblename = "%s%s" % (self.ansible, name)
         newlines = []
@@ -441,17 +343,6 @@ class CronTab(object):
             return True
         else:
             return False # TODO add some more error testing
-
-    def _update_env(self, name, decl, addenvfunction):
-        newlines = []
-
-        for l in self.lines:
-            if re.match( r'^%s=' % name, l):
-                addenvfunction(newlines, decl)
-            else:
-                newlines.append(l)
-
-        self.lines = newlines
 
     def render(self):
         """
@@ -478,7 +369,7 @@ class CronTab(object):
                 return "%s -l %s" % (pipes.quote(CRONCMD), pipes.quote(self.user))
             elif platform.system() == 'HP-UX':
                 return "%s %s %s" % (CRONCMD , '-l', pipes.quote(self.user))
-            elif pwd.getpwuid(os.getuid())[0] != self.user:
+            else:
                 user = '-u %s' % pipes.quote(self.user)
         return "%s %s %s" % (CRONCMD , user, '-l')
 
@@ -490,9 +381,9 @@ class CronTab(object):
         if self.user:
             if platform.system() in ['SunOS', 'HP-UX', 'AIX']:
                 return "chown %s %s ; su '%s' -c '%s %s'" % (pipes.quote(self.user), pipes.quote(path), pipes.quote(self.user), CRONCMD, pipes.quote(path))
-            elif pwd.getpwuid(os.getuid())[0] != self.user:
+            else:
                 user = '-u %s' % pipes.quote(self.user)
-        return "%s %s %s" % (CRONCMD , user, pipes.quote(path))
+        return "%s %s %s" % (CRONCMD , pipes.quote(path), user)
 
 
 
@@ -509,11 +400,7 @@ def main():
     # - name: no job
     #   cron: name="an old job" state=absent
     #
-    # - name: sets env
-    #   cron: name="PATH" env=yes value="/bin:/usr/bin"
-    #
     # Would produce:
-    # PATH=/bin:/usr/bin
     # # Ansible: check dirs
     # * * 5,2 * * ls -alh > /dev/null
     # # Ansible: do the job
@@ -523,7 +410,7 @@ def main():
         argument_spec = dict(
             name=dict(required=False),
             user=dict(required=False),
-            job=dict(required=False, aliases=['value']),
+            job=dict(required=False),
             cron_file=dict(required=False),
             state=dict(default='present', choices=['present', 'absent']),
             backup=dict(default=False, type='bool'),
@@ -537,16 +424,9 @@ def main():
                               default=None,
                               choices=["reboot", "yearly", "annually", "monthly", "weekly", "daily", "hourly"],
                               type='str'),
-            disabled=dict(default=False, type='bool'),
-            env=dict(required=False, type='bool'),
-            insertafter=dict(required=False),
-            insertbefore=dict(required=False),
+            disabled=dict(default=False, type='bool')
         ),
-        supports_check_mode = True,
-        mutually_exclusive=[
-                ['reboot', 'special_time'],
-                ['insertafter', 'insertbefore'],
-            ]
+        supports_check_mode = False,
     )
 
     name         = module.params['name']
@@ -563,9 +443,6 @@ def main():
     reboot       = module.params['reboot']
     special_time = module.params['special_time']
     disabled     = module.params['disabled']
-    env          = module.params['env']
-    insertafter  = module.params['insertafter']
-    insertbefore = module.params['insertbefore']
     do_install   = state == 'present'
 
     changed      = False
@@ -577,17 +454,6 @@ def main():
 
     module.debug('cron instantiated - name: "%s"' % name)
 
-    if module._diff:
-        diff = dict()
-        diff['before'] = crontab.render()
-        if crontab.cron_file:
-            diff['before_header'] = crontab.cron_file
-        else:
-            if crontab.user:
-                diff['before_header'] = 'crontab for user "%s"' % crontab.user
-            else:
-                diff['before_header'] = 'crontab'
-
     # --- user input validation ---
 
     if (special_time or reboot) and \
@@ -598,94 +464,62 @@ def main():
         if not user:
             module.fail_json(msg="To use cron_file=... parameter you must specify user=... as well")
 
-    if job is None and do_install:
-        module.fail_json(msg="You must specify 'job' to install a new cron job or variable")
+    if reboot and special_time:
+        module.fail_json(msg="reboot and special_time are mutually exclusive")
 
-    if (insertafter or insertbefore) and not env and do_install:
-        module.fail_json(msg="Insertafter and insertbefore parameters are valid only with env=yes")
+    if name is None and do_install:
+        module.fail_json(msg="You must specify 'name' to install a new cron job")
+
+    if job is None and do_install:
+        module.fail_json(msg="You must specify 'job' to install a new cron job")
+
+    if job and name is None and not do_install:
+        module.fail_json(msg="You must specify 'name' to remove a cron job")
 
     if reboot:
-        special_time = "reboot"
+        if special_time:
+            module.fail_json(msg="reboot and special_time are mutually exclusive")
+        else:
+            special_time = "reboot"
 
     # if requested make a backup before making a change
-    if backup and not module.check_mode:
+    if backup:
         (backuph, backup_file) = tempfile.mkstemp(prefix='crontab')
         crontab.write(backup_file)
 
 
     if crontab.cron_file and not name and not do_install:
-        if module._diff:
-            diff['after'] = ''
-            diff['after_header'] = '/dev/null'
-        else:
-            diff = dict()
-        if module.check_mode:
-            changed = os.path.isfile(crontab.cron_file)
-        else:
-            changed = crontab.remove_job_file()
-        module.exit_json(changed=changed,cron_file=cron_file,state=state,diff=diff)
+        changed = crontab.remove_job_file()
+        module.exit_json(changed=changed,cron_file=cron_file,state=state)
 
-    if env:
-        if ' ' in name:
-            module.fail_json(msg="Invalid name for environment variable")
-        decl = '%s="%s"' % (name, job)
-        old_decl = crontab.find_env(name)
+    job = crontab.get_cron_job(minute, hour, day, month, weekday, job, special_time, disabled)
+    old_job = crontab.find_job(name)
 
-        if do_install:
-            if len(old_decl) == 0:
-                crontab.add_env(decl, insertafter, insertbefore)
-                changed = True
-            if len(old_decl) > 0 and old_decl[1] != decl:
-                crontab.update_env(name, decl)
-                changed = True
-        else:
-            if len(old_decl) > 0:
-                crontab.remove_env(name)
-                changed = True
+    if do_install:
+        if len(old_job) == 0:
+            crontab.add_job(name, job)
+            changed = True
+        if len(old_job) > 0 and old_job[1] != job:
+            crontab.update_job(name, job)
+            changed = True
     else:
-        old_job = crontab.find_job(name)
-
-        if do_install:
-            job = crontab.get_cron_job(minute, hour, day, month, weekday, job, special_time, disabled)
-            if len(old_job) == 0:
-                crontab.add_job(name, job)
-                changed = True
-            if len(old_job) > 0 and old_job[1] != job:
-                crontab.update_job(name, job)
-                changed = True
-        else:
-            if len(old_job) > 0:
-                crontab.remove_job(name)
-                changed = True
+        if len(old_job) > 0:
+            crontab.remove_job(name)
+            changed = True
 
     res_args = dict(
-        jobs = crontab.get_jobnames(),
-        envs = crontab.get_envnames(),
-        changed = changed
+        jobs = crontab.get_jobnames(), changed = changed
     )
 
     if changed:
-        if not module.check_mode:
-            crontab.write()
-        if module._diff:
-            diff['after'] = crontab.render()
-            if crontab.cron_file:
-                diff['after_header'] = crontab.cron_file
-            else:
-                if crontab.user:
-                    diff['after_header'] = 'crontab for user "%s"' % crontab.user
-                else:
-                    diff['after_header'] = 'crontab'
-
-            res_args['diff'] = diff
+        crontab.write()
 
     # retain the backup only if crontab or cron file have changed
     if backup:
         if changed:
             res_args['backup_file'] = backup_file
         else:
-            if not module.check_mode:
-                os.unlink(backup_file)
+            os.unlink(backup_file)
 
     if cron_file:
         res_args['cron_file'] = cron_file

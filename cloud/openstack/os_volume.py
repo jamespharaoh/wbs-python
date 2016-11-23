@@ -35,9 +35,8 @@ description:
 options:
    size:
      description:
-        - Size of volume in GB. This parameter is required when the
-          I(state) parameter is 'present'.
-     required: false
+        - Size of volume in GB
+     required: only when state is 'present'
      default: None
    display_name:
      description:

@@ -43,13 +43,11 @@ options:
       - type of instance (i.e. MySQL, MariaDB, Percona)
     default: MySQL
     version_added: "2.0"
-    aliases: ['type']
   cdb_version:
     description:
       - version of database (MySQL supports 5.1 and 5.6, MariaDB supports 10, Percona supports 5.6)
     choices: ['5.1', '5.6', '10']
     version_added: "2.0"
-    aliases: ['version']
   state:
     description:
       - Indicate desired state of the resource
@@ -224,8 +222,8 @@ def main():
             name=dict(type='str', required=True),
             flavor=dict(type='int', default=1),
             volume=dict(type='int', default=2),
-            cdb_type=dict(type='str', default='MySQL', aliases=['type']),
-            cdb_version=dict(type='str', default='5.6', aliases=['version']),
+            cdb_type=dict(type='str', default='MySQL'),
+            cdb_version=dict(type='str', default='5.6'),
             state=dict(default='present', choices=['present', 'absent']),
             wait=dict(type='bool', default=False),
             wait_timeout=dict(type='int', default=300),
@@ -243,8 +241,8 @@ def main():
     name = module.params.get('name')
     flavor = module.params.get('flavor')
     volume = module.params.get('volume')
-    cdb_type = module.params.get('cdb_type')
-    cdb_version = module.params.get('cdb_version')
+    cdb_type = module.params.get('type')
+    cdb_version = module.params.get('version')
     state = module.params.get('state')
     wait = module.params.get('wait')
     wait_timeout = module.params.get('wait_timeout')

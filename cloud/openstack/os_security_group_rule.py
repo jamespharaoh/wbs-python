@@ -34,7 +34,7 @@ description:
 options:
    security_group:
      description:
-        - Name or ID of the security group
+        - Name of the security group
      required: true
    protocol:
       description:
@@ -57,8 +57,7 @@ options:
       required: false
    remote_group:
       description:
-        - Name or ID of the Security group to link (exclusive with
-          remote_ip_prefix)
+        - ID of Security group to link (exclusive with remote_ip_prefix)
       required: false
    ethertype:
       description:
@@ -205,7 +204,7 @@ def _ports_match(protocol, module_min, module_max, rule_min, rule_max):
     return module_min == rule_min and module_max == rule_max
 
 
-def _find_matching_rule(module, secgroup, remotegroup):
+def _find_matching_rule(module, secgroup):
     """
     Find a rule in the group that matches the module parameters.
     :returns: The matching rule dict, or None if no matches.
@@ -214,7 +213,7 @@ def _find_matching_rule(module, secgroup, remotegroup):
     remote_ip_prefix = module.params['remote_ip_prefix']
     ethertype = module.params['ethertype']
     direction = module.params['direction']
-    remote_group_id = remotegroup['id']
+    remote_group_id = module.params['remote_group']
 
     for rule in secgroup['security_group_rules']:
         if (protocol == rule['protocol']
@@ -231,10 +230,10 @@ def _find_matching_rule(module, secgroup, remotegroup):
     return None
 
 
-def _system_state_change(module, secgroup, remotegroup):
+def _system_state_change(module, secgroup):
     state = module.params['state']
     if secgroup:
-        rule_exists = _find_matching_rule(module, secgroup, remotegroup)
+        rule_exists = _find_matching_rule(module, secgroup)
     else:
         return False
 
@@ -255,6 +254,7 @@ def main():
         port_range_min   = dict(required=False, type='int'),
         port_range_max   = dict(required=False, type='int'),
         remote_ip_prefix = dict(required=False, default=None),
+        # TODO(mordred): Make remote_group handle name and id
         remote_group     = dict(required=False, default=None),
         ethertype        = dict(default='IPv4',
                                 choices=['IPv4', 'IPv6']),
@@ -279,27 +279,21 @@ def main():
 
     state = module.params['state']
     security_group = module.params['security_group']
-    remote_group = module.params['remote_group']
     changed = False
 
     try:
         cloud = shade.openstack_cloud(**module.params)
         secgroup = cloud.get_security_group(security_group)
 
-        if remote_group:
-            remotegroup = cloud.get_security_group(remote_group)
-        else:
-            remotegroup = { 'id' : None }
-
         if module.check_mode:
-            module.exit_json(changed=_system_state_change(module, secgroup, remotegroup))
+            module.exit_json(changed=_system_state_change(module, secgroup))
 
         if state == 'present':
             if not secgroup:
                 module.fail_json(msg='Could not find security group %s' %
                                  security_group)
 
-            rule = _find_matching_rule(module, secgroup, remotegroup)
+            rule = _find_matching_rule(module, secgroup)
             if not rule:
                 rule = cloud.create_security_group_rule(
                     secgroup['id'],
@@ -307,7 +301,7 @@ def main():
                     port_range_max=module.params['port_range_max'],
                     protocol=module.params['protocol'],
                     remote_ip_prefix=module.params['remote_ip_prefix'],
-                    remote_group_id=remotegroup['id'],
+                    remote_group_id=module.params['remote_group'],
                     direction=module.params['direction'],
                     ethertype=module.params['ethertype']
                 )
@@ -315,7 +309,7 @@ def main():
             module.exit_json(changed=changed, rule=rule, id=rule['id'])
 
         if state == 'absent' and secgroup:
-            rule = _find_matching_rule(module, secgroup, remotegroup)
+            rule = _find_matching_rule(module, secgroup)
             if rule:
                 cloud.delete_security_group_rule(rule['id'])
                 changed = True

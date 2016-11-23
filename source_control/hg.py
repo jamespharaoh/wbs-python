@@ -211,7 +211,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             repo = dict(required=True, aliases=['name']),
-            dest = dict(required=True, type='path'),
+            dest = dict(required=True),
             revision = dict(default=None, aliases=['version']),
             force = dict(default='no', type='bool'),
             purge = dict(default='no', type='bool'),
@@ -220,7 +220,7 @@ def main():
         ),
     )
     repo = module.params['repo']
-    dest = module.params['dest']
+    dest = os.path.expanduser(module.params['dest'])
     revision = module.params['revision']
     force = module.params['force']
     purge = module.params['purge']
