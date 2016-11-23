@@ -42,7 +42,8 @@ options:
    network_name:
      description:
         - Name of the network to which the subnet should be attached
-     required: true when state is 'present'
+        - requried when I(state) is 'present'
+     required: false
    name:
      description:
        - The name of the subnet that should be created. Although Neutron
@@ -52,8 +53,8 @@ options:
    cidr:
      description:
         - The CIDR representation of the subnet that should be assigned to
-          the subnet.
-     required: true when state is 'present'
+          the subnet. Required when I(state) is 'present'
+     required: false
      default: None
    ip_version:
      description:
@@ -104,6 +105,12 @@ options:
      choices: ['dhcpv6-stateful', 'dhcpv6-stateless', 'slaac']
      required: false
      default: None
+   project:
+     description:
+        - Project name or ID containing the subnet (name admin-only)
+     required: false
+     default: None
+     version_added: "2.1"
 requirements:
     - "python >= 2.6"
     - "shade"
@@ -163,7 +170,7 @@ def _can_update(subnet, module, cloud):
                                       subnet')
     if ip_version and subnet['ip_version'] != ip_version:
         module.fail_json(msg='Cannot update ip_version in existing subnet')
-    if ipv6_ra_mode and subnet.get('ipv6_ra_mode', None) != ip_version:
+    if ipv6_ra_mode and subnet.get('ipv6_ra_mode', None) != ipv6_ra_mode:
         module.fail_json(msg='Cannot update ipv6_ra_mode in existing subnet')
     if ipv6_a_mode and subnet.get('ipv6_address_mode', None) != ipv6_a_mode:
         module.fail_json(msg='Cannot update ipv6_address_mode in existing \
@@ -232,6 +239,7 @@ def main():
         ipv6_ra_mode=dict(default=None, choice=ipv6_mode_choices),
         ipv6_address_mode=dict(default=None, choice=ipv6_mode_choices),
         state=dict(default='present', choices=['absent', 'present']),
+        project=dict(default=None)
     )
 
     module_kwargs = openstack_module_kwargs()
@@ -255,6 +263,7 @@ def main():
     host_routes = module.params['host_routes']
     ipv6_ra_mode = module.params['ipv6_ra_mode']
     ipv6_a_mode = module.params['ipv6_address_mode']
+    project = module.params.pop('project')
 
     # Check for required parameters when state == 'present'
     if state == 'present':
@@ -271,7 +280,17 @@ def main():
 
     try:
         cloud = shade.openstack_cloud(**module.params)
-        subnet = cloud.get_subnet(subnet_name)
+        if project is not None:
+            proj = cloud.get_project(project)
+            if proj is None:
+                module.fail_json(msg='Project %s could not be found' % project)
+            project_id = proj['id']
+            filters = {'tenant_id': project_id}
+        else:
+            project_id = None
+            filters = None
+
+        subnet = cloud.get_subnet(subnet_name, filters=filters)
 
         if module.check_mode:
             module.exit_json(changed=_system_state_change(module, subnet,
@@ -288,7 +307,8 @@ def main():
                                              allocation_pools=pool,
                                              host_routes=host_routes,
                                              ipv6_ra_mode=ipv6_ra_mode,
-                                             ipv6_address_mode=ipv6_a_mode)
+                                             ipv6_address_mode=ipv6_a_mode,
+                                             tenant_id=project_id)
                 changed = True
             else:
                 if _needs_update(subnet, module, cloud):

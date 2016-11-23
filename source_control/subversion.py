@@ -28,6 +28,7 @@ version_added: "0.7"
 author: "Dane Summers (@dsummersl) <njharman@gmail.com>"
 notes:
    - Requires I(svn) to be installed on the client.
+   - This module does not handle externals
 requirements: []
 options:
   repo:
@@ -193,20 +194,20 @@ class Subversion(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dest=dict(required=True),
+            dest=dict(required=True, type='path'),
             repo=dict(required=True, aliases=['name', 'repository']),
             revision=dict(default='HEAD', aliases=['rev', 'version']),
             force=dict(default='no', type='bool'),
             username=dict(required=False),
-            password=dict(required=False),
-            executable=dict(default=None),
+            password=dict(required=False, no_log=True),
+            executable=dict(default=None, type='path'),
             export=dict(default=False, required=False, type='bool'),
             switch=dict(default=True, required=False, type='bool'),
         ),
         supports_check_mode=True
     )
 
-    dest = os.path.expanduser(module.params['dest'])
+    dest = module.params['dest']
     repo = module.params['repo']
     revision = module.params['revision']
     force = module.params['force']
@@ -216,7 +217,10 @@ def main():
     export = module.params['export']
     switch = module.params['switch']
 
-    os.environ['LANG'] = 'C'
+    # We screenscrape a huge amount of svn commands so use C locale anytime we
+    # call run_command()
+    module.run_command_environ_update = dict(LANG='C', LC_MESSAGES='C')
+
     svn = Subversion(module, dest, repo, revision, username, password, svn_path)
 
     if export or not os.path.exists(dest):

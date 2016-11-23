@@ -64,9 +64,9 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-# Create and policy with the name of 'Admin' to the group 'administrators'
+# Create a policy with the name of 'Admin' to the group 'administrators'
 tasks:
-- name: Create two new IAM users with API keys
+- name: Assign a policy called Admin to the administrators group
   iam_policy:
     iam_type: group
     iam_name: administrators
@@ -87,7 +87,7 @@ task:
      - Luigi
   register: new_groups
 
-- name:
+- name: Apply READ-ONLY policy to new groups that have been recently created
   iam_policy:
     iam_type: group
     iam_name: "{{ item.created_group.group_name }}"
@@ -146,14 +146,12 @@ def user_action(module, iam, name, policy_name, skip, pdoc, state):
       if urllib.unquote(iam.get_user_policy(name, pol).
                         get_user_policy_result.policy_document) == pdoc:
         policy_match = True
-        if policy_match:
-          msg=("The policy document you specified already exists "
-               "under the name %s." % pol)
-    if state == 'present' and skip:
-      if policy_name not in current_policies and not policy_match:
-        changed = True
-        iam.put_user_policy(name, policy_name, pdoc)
-    elif state == 'present' and not skip:
+
+    if state == 'present':
+      # If policy document does not already exist (either it's changed
+      # or the policy is not present) or if we're not skipping dupes then
+      # make the put call.  Note that the put call does a create or update.
+      if not policy_match or not skip:
         changed = True
         iam.put_user_policy(name, policy_name, pdoc)
     elif state == 'absent':
@@ -186,23 +184,21 @@ def role_action(module, iam, name, policy_name, skip, pdoc, state):
   except boto.exception.BotoServerError as e:
     if e.error_code == "NoSuchEntity":
       # Role doesn't exist so it's safe to assume the policy doesn't either
-      module.exit_json(changed=False)
+      module.exit_json(changed=False, msg="No such role, policy will be skipped.")
     else:
       module.fail_json(msg=e.message)
-      
-  try:    
+
+  try:
     for pol in current_policies:
       if urllib.unquote(iam.get_role_policy(name, pol).
                         get_role_policy_result.policy_document) == pdoc:
         policy_match = True
-        if policy_match:
-          msg=("The policy document you specified already exists "
-               "under the name %s." % pol)
-    if state == 'present' and skip:
-      if policy_name not in current_policies and not policy_match:
-        changed = True
-        iam.put_role_policy(name, policy_name, pdoc)
-    elif state == 'present' and not skip:
+
+    if state == 'present':
+      # If policy document does not already exist (either it's changed
+      # or the policy is not present) or if we're not skipping dupes then
+      # make the put call.  Note that the put call does a create or update.
+      if not policy_match or not skip:
         changed = True
         iam.put_role_policy(name, policy_name, pdoc)
     elif state == 'absent':
@@ -215,6 +211,8 @@ def role_action(module, iam, name, policy_name, skip, pdoc, state):
           changed = False
           module.exit_json(changed=changed,
                            msg="%s policy is already absent" % policy_name)
+        else:
+          module.fail_json(msg=err.message)
 
     updated_policies = [cp for cp in iam.list_role_policies(name).
                                         list_role_policies_result.
@@ -241,11 +239,11 @@ def group_action(module, iam, name, policy_name, skip, pdoc, state):
         if policy_match:
           msg=("The policy document you specified already exists "
                "under the name %s." % pol)
-    if state == 'present' and skip:
-      if policy_name not in current_policies and not policy_match:
-        changed = True
-        iam.put_group_policy(name, policy_name, pdoc)
-    elif state == 'present' and not skip:
+    if state == 'present':
+      # If policy document does not already exist (either it's changed
+      # or the policy is not present) or if we're not skipping dupes then
+      # make the put call.  Note that the put call does a create or update.
+      if not policy_match or not skip:
         changed = True
         iam.put_group_policy(name, policy_name, pdoc)
     elif state == 'absent':
@@ -305,10 +303,13 @@ def main():
           pdoc = json.dumps(json.load(json_data))
           json_data.close()
   elif module.params.get('policy_json') != None:
-      try:
-        pdoc = json.dumps(module.params.get('policy_json'))
-      except Exception as e:
-        module.fail_json(msg=str(e) + '\n' + module.params.get('policy_json'))
+      pdoc = module.params.get('policy_json')
+      # if its a string, assume it is already JSON
+      if not isinstance(pdoc, basestring):
+        try:
+          pdoc = json.dumps(pdoc)
+        except Exception as e:
+          module.fail_json(msg='Failed to convert the policy into valid JSON: %s' % str(e))
   else:
     pdoc=None
 
@@ -316,7 +317,7 @@ def main():
 
   try:
     if region:
-        iam = boto.iam.connect_to_region(region, **aws_connect_kwargs)
+        iam = connect_to_aws(boto.iam, region, **aws_connect_kwargs)
     else:
         iam = boto.iam.connection.IAMConnection(**aws_connect_kwargs)
   except boto.exception.NoAuthHandlerFound, e:
