@@ -13,11 +13,28 @@ script
 
 	set -e
 
+	service_log () {
+
+		timestamp="$(date +'%Y-%m-%d %H:%I:%S' --utc)"
+		hostname="$(hostname)"
+		message="$1"
+		service="{{ node_template }}"
+
+		echo "$timestamp $hostname $service $message" >>/shared/log/service.log
+
+	}
+
+	trap "service_log Exit due to error" EXIT
+
+	service_log "Starting"
+
 	. /config/environment
 
 {% if 'build_steps' in item.0 %}
 
 	# run startup build steps
+
+	service_log "Building"
 
 	(
 {% for build_step in item.0.build_steps %}
@@ -25,10 +42,20 @@ script
 {% endfor %}
 	)
 
+	service_log "Build complete"
+
 {% endif %}
 
 	for index in $(seq 0 $(({{ node_var }}_COUNT - 1))); do
+
+		service_log "Start instance $index"
+
 		start {{ item.0.name }}-instance {{ node_var }}_INDEX=$index
+
 	done
+
+	service_log "Startup complete"
+
+	trap - EXIT
 
 end script

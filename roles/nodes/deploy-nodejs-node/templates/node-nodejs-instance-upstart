@@ -17,6 +17,21 @@ pre-start script
 
 	set -e
 
+	service_log () {
+
+		timestamp="$(date +'%Y-%m-%d %H:%I:%S' --utc)"
+		hostname="$(hostname)"
+		message="$1"
+		service="{{ node_template }}-${{ node_var }}_INDEX"
+
+		echo "$timestamp $hostname $service $message" >>/shared/log/service.log
+
+	}
+
+	trap "service_log Exit due to error" EXIT
+
+	service_log "Configuring"
+
 	. /config/environment
 
 	setuid ubuntu \
@@ -33,11 +48,30 @@ pre-start script
 	START_TIME="$(date +"%s")"
 	echo "$START_TIME" > "/var/run/{{ item.0.name }}-${{ node_var }}_INDEX-start"
 
+	service_log "Configuration complete"
+
+	trap - EXIT
+
 end script
 
 script
 
 	set -e
+
+	service_log () {
+
+		timestamp="$(date +'%Y-%m-%d %H:%I:%S' --utc)"
+		hostname="$(hostname)"
+		message="$1"
+		service="{{ node_template }}-${{ node_var }}_INDEX"
+
+		echo "$timestamp $hostname $service $message" >>/shared/log/service.log
+
+	}
+
+	trap "service_log Exit due to error" EXIT
+
+	service_log "Starting"
 
 	. /config/environment
 
@@ -81,6 +115,21 @@ post-stop script
 
 	set -e
 
+	service_log () {
+
+		timestamp="$(date +'%Y-%m-%d %H:%I:%S' --utc)"
+		hostname="$(hostname)"
+		message="$1"
+		service="{{ node_template }}-${{ node_var }}_INDEX"
+
+		echo "$timestamp $hostname $service $message" >>/shared/log/service.log
+
+	}
+
+	trap "service_log Exit due to error" EXIT
+
+	service_log "Stopping"
+
 	. /config/environment
 
 	setuid ubuntu \
@@ -97,6 +146,7 @@ post-stop script
 	DURATION="$((END_TIME - START_TIME))"
 
 	echo "$(date --iso-8601=seconds) $(hostname) %% CONTAINER-PROCESS-CONTROL %% STOP %% {{ item.0.name }}[${{ node_var }}_INDEX] (after $DURATION seconds)"
+sh
 
 	exec sleep 2
 
