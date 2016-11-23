@@ -125,6 +125,37 @@ append_newlines = false
 
 # ---------- email events
 
+[output-oom-killer-production]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'Fields[Supercluster] == "production"',
+	'Fields[Category] == "system"',
+	'Payload =~ /\boom-killer\b/',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.super_domain }}"
+send_to = [
+	"notifications.production.warning@wistla.com",
+	"support@wistla.zendesk.com",
+]
+subject = "Wistla API restart notifications"
+send_interval = 60
+encoder = "encoder-simple"
+
+[output-oom-killer-staging]
+type = "SmtpOutput"
+message_matcher = '{{ [
+	'Fields[Supercluster] == "staging"',
+	'Fields[Category] == "system"',
+	'Payload =~ /\boom-killer\b/',
+] | join (' && ') }}'
+send_from = "heka@{{ cluster.super_domain }}"
+send_to = [
+	"notifications.staging.warning@wistla.com",
+]
+subject = "Wistla API restart notifications"
+send_interval = 60
+encoder = "encoder-simple"
+
 [output-wistla-api-restart]
 type = "SmtpOutput"
 message_matcher = '{{ [
