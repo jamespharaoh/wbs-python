@@ -1,6 +1,6 @@
 ---
 
-- hosts: "cluster-data"
+- hosts: "cluster-data:&cluster-instance-active"
   roles:
 
     - "cluster-stop"
