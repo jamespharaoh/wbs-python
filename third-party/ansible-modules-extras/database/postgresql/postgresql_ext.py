@@ -22,7 +22,7 @@ module: postgresql_ext
 short_description: Add or remove PostgreSQL extensions from a database.
 description:
    - Add or remove PostgreSQL extensions from a database.
-version_added: "0.1"
+version_added: "1.9"
 options:
   name:
     description:
@@ -118,7 +118,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             login_user=dict(default="postgres"),
-            login_password=dict(default=""),
+            login_password=dict(default="", no_log=True),
             login_host=dict(default=""),
             port=dict(default="5432"),
             db=dict(required=True),

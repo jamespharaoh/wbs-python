@@ -160,7 +160,15 @@ EXAMPLES = """
         issue={{issue.meta.key}} operation=transition status="Done"
 """
 
-import json
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        # Let snippet from module_utils/basic.py return a proper error in this case
+        pass
+
 import base64
 
 def request(url, user, passwd, data=None, method=None):
@@ -179,7 +187,7 @@ def request(url, user, passwd, data=None, method=None):
                                headers={'Content-Type':'application/json',
                                         'Authorization':"Basic %s" % auth})
 
-    if info['status'] not in (200, 204):
+    if info['status'] not in (200, 201, 204):
         module.fail_json(msg=info['msg'])
 
     body = response.read()
@@ -299,7 +307,7 @@ def main():
             comment=dict(),
             status=dict(),
             assignee=dict(),
-            fields=dict(default={})
+            fields=dict(default={}, type='dict')
         ),
         supports_check_mode=False
     )

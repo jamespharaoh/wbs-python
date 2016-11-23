@@ -381,6 +381,50 @@ EXAMPLES = """
     - test-container-new-archive-destroyed-clone
 """
 
+RETURN="""
+lxc_container:
+    description: container information
+    returned: success
+    type: list
+    contains:
+        name:
+            description: name of the lxc container
+            returned: success
+            type: string
+            sample: test_host
+        init_pid:
+            description: pid of the lxc init process
+            returned: success
+            type: int
+            sample: 19786
+        interfaces:
+            description: list of the container's network interfaces
+            returned: success
+            type: list
+            sample: [ "eth0", "lo" ]
+        ips:
+            description: list of ips
+            returned: success
+            type: list
+            sample: [ "10.0.3.3" ]
+        state:
+            description: resulting state of the container
+            returned: success
+            type: string
+            sample: "running"
+        archive:
+            description: resulting state of the container
+            returned: success, when archive is true
+            type: string
+            sample: "/tmp/test-container-config.tar"
+        clone:
+            description: if the container was cloned
+            returned: success, when clone_name is specified
+            type: boolean
+            sample: True
+"""
+
+import re
 
 try:
     import lxc
@@ -637,45 +681,23 @@ class LxcContainerManagement(object):
         else:
             return return_dict
 
-    def _run_command(self, build_command, unsafe_shell=False, timeout=600):
+    def _run_command(self, build_command, unsafe_shell=False):
         """Return information from running an Ansible Command.
 
         This will squash the build command list into a string and then
         execute the command via Ansible. The output is returned to the method.
         This output is returned as `return_code`, `stdout`, `stderr`.
 
-        Prior to running the command the method will look to see if the LXC
-        lockfile is present. If the lockfile "/var/lock/subsys/lxc" the method
-        will wait upto 10 minutes for it to be gone; polling every 5 seconds.
-
         :param build_command: Used for the command and all options.
         :type build_command: ``list``
         :param unsafe_shell: Enable or Disable unsafe sell commands.
         :type unsafe_shell: ``bol``
-        :param timeout: Time before the container create process quites.
-        :type timeout: ``int``
         """
 
-        lockfile = '/var/lock/subsys/lxc'
-
-        for _ in xrange(timeout):
-            if os.path.exists(lockfile):
-                time.sleep(1)
-            else:
-                return self.module.run_command(
-                    ' '.join(build_command),
-                    use_unsafe_shell=unsafe_shell
-                )
-        else:
-            message = (
-                'The LXC subsystem is locked and after 5 minutes it never'
-                ' became unlocked. Lockfile [ %s ]' % lockfile
-            )
-            self.failure(
-                error='LXC subsystem locked',
-                rc=0,
-                msg=message
-            )
+        return self.module.run_command(
+            ' '.join(build_command),
+            use_unsafe_shell=unsafe_shell
+        )
 
     def _config(self):
         """Configure an LXC container.
@@ -703,10 +725,13 @@ class LxcContainerManagement(object):
 
         config_change = False
         for key, value in parsed_options:
+            key = key.strip()
+            value = value.strip()
             new_entry = '%s = %s\n' % (key, value)
+            keyre = re.compile(r'%s(\s+)?=' % key)
             for option_line in container_config:
                 # Look for key in config
-                if option_line.startswith(key):
+                if keyre.match(option_line):
                     _, _value = option_line.split('=', 1)
                     config_value = ' '.join(_value.split())
                     line_index = container_config.index(option_line)
@@ -872,7 +897,8 @@ class LxcContainerManagement(object):
             'interfaces': self.container.get_interfaces(),
             'ips': self.container.get_ips(),
             'state': self._get_state(),
-            'init_pid': int(self.container.init_pid)
+            'init_pid': int(self.container.init_pid),
+            'name' : self.container_name,
         }
 
     def _unfreeze(self):
@@ -1640,7 +1666,7 @@ def main():
                 type='str'
             ),
             config=dict(
-                type='str',
+                type='path',
             ),
             vg_name=dict(
                 type='str',
@@ -1658,7 +1684,7 @@ def main():
                 default='5G'
             ),
             directory=dict(
-                type='str'
+                type='path'
             ),
             zfs_root=dict(
                 type='str'
@@ -1667,7 +1693,7 @@ def main():
                 type='str'
             ),
             lxc_path=dict(
-                type='str'
+                type='path'
             ),
             state=dict(
                 choices=LXC_ANSIBLE_STATES.keys(),
@@ -1680,7 +1706,7 @@ def main():
                 type='str'
             ),
             container_log=dict(
-                choices=BOOLEANS,
+                type='bool',
                 default='false'
             ),
             container_log_level=dict(
@@ -1692,15 +1718,15 @@ def main():
                 required=False
             ),
             clone_snapshot=dict(
-                choices=BOOLEANS,
+                type='bool',
                 default='false'
             ),
             archive=dict(
-                choices=BOOLEANS,
+                type='bool',
                 default='false'
             ),
             archive_path=dict(
-                type='str',
+                type='path',
             ),
             archive_compression=dict(
                 choices=LXC_COMPRESSION_MAP.keys(),
@@ -1728,4 +1754,5 @@ def main():
 
 # import module bits
 from ansible.module_utils.basic import *
-main()
+if __name__ == '__main__':
+    main()

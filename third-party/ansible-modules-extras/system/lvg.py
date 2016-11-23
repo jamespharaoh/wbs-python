@@ -35,6 +35,7 @@ options:
   pvs:
     description:
     - List of comma-separated devices to use as physical devices in this volume group. Required when creating or resizing volume group.
+    - The module will take care of running pvcreate if needed. 
     required: false
   pesize:
     description:
@@ -130,6 +131,7 @@ def main():
     pesize = module.params['pesize']
     vgoptions = module.params['vg_options'].split()
 
+    dev_list = []
     if module.params['pvs']:
         dev_list = module.params['pvs']
     elif state == 'present':

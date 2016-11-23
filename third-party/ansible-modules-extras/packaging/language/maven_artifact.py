@@ -54,17 +54,17 @@ options:
         required: false
         default: latest
     classifier:
-        description: 
+        description:
             - The maven classifier coordinate
         required: false
         default: null
     extension:
-        description: 
+        description:
             - The maven type/extension coordinate
         required: false
         default: jar
     repository_url:
-        description: 
+        description:
             - The URL of the Maven Repository to download from
         required: false
         default: http://repo1.maven.org/maven2
@@ -90,7 +90,7 @@ options:
         default: present
         choices: [present,absent]
     validate_certs:
-        description: 
+        description:
             - If C(no), SSL certificates will not be validated. This should only be set to C(no) when no other option exists.
         required: false
         default: 'yes'
@@ -195,14 +195,20 @@ class MavenDownloader:
             return v[0]
 
     def find_uri_for_artifact(self, artifact):
+        if artifact.version == "latest":
+            artifact.version = self._find_latest_version_available(artifact)
+
         if artifact.is_snapshot():
             path = "/%s/maven-metadata.xml" % (artifact.path())
             xml = self._request(self.base + path, "Failed to download maven-metadata.xml", lambda r: etree.parse(r))
             timestamp = xml.xpath("/metadata/versioning/snapshot/timestamp/text()")[0]
             buildNumber = xml.xpath("/metadata/versioning/snapshot/buildNumber/text()")[0]
+            for snapshotArtifact in xml.xpath("/metadata/versioning/snapshotVersions/snapshotVersion"):
+                if len(snapshotArtifact.xpath("classifier/text()")) > 0 and snapshotArtifact.xpath("classifier/text()")[0] == artifact.classifier and len(snapshotArtifact.xpath("extension/text()")) > 0 and snapshotArtifact.xpath("extension/text()")[0] == artifact.extension:
+                    return self._uri_for_artifact(artifact, snapshotArtifact.xpath("value/text()")[0])
             return self._uri_for_artifact(artifact, artifact.version.replace("SNAPSHOT", timestamp + "-" + buildNumber))
-        else:
-            return self._uri_for_artifact(artifact)
+
+        return self._uri_for_artifact(artifact, artifact.version)
 
     def _uri_for_artifact(self, artifact, version=None):
         if artifact.is_snapshot() and not version:
@@ -299,7 +305,7 @@ def main():
             extension = dict(default='jar'),
             repository_url = dict(default=None),
             username = dict(default=None),
-            password = dict(default=None),
+            password = dict(default=None, no_log=True),
             state = dict(default="present", choices=["present","absent"]), # TODO - Implement a "latest" state
             dest = dict(type="path", default=None),
             validate_certs = dict(required=False, default=True, type='bool'),
@@ -331,7 +337,7 @@ def main():
     prev_state = "absent"
     if os.path.isdir(dest):
         dest = dest + "/" + artifact_id + "-" + version + "." + extension
-    if os.path.lexists(dest):
+    if os.path.lexists(dest) and downloader.verify_md5(dest, downloader.find_uri_for_artifact(artifact) + '.md5'):
         prev_state = "present"
     else:
         path = os.path.dirname(dest)

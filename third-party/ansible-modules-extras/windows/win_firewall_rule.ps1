@@ -20,6 +20,9 @@
 # WANT_JSON
 # POWERSHELL_COMMON
 
+# temporarily disable strictmode, for this module only
+Set-StrictMode -Off
+
 function getFirewallRule ($fwsettings) {
     try {
 
@@ -212,6 +215,7 @@ $action=Get-Attr $params "action" "";
 $misArg = ''
 # Check the arguments
 if ($enable -ne $null) {
+    $enable=ConvertTo-Bool $enable;
     if ($enable -eq $true) {
         $fwsettings.Add("Enabled", "yes");
     } elseif ($enable -eq $false) {

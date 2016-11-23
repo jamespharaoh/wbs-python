@@ -312,9 +312,9 @@ class HAProxy(object):
         Figure out what you want to do from ansible, and then do it.
         """
 
-	self.get_current_state(self.host, self.backend)
-	self.previous_states = ','.join(self.status_server)
-	self.previous_weights = ','.join(self.status_weight)
+        self.get_current_state(self.host, self.backend)
+        self.previous_states = ','.join(self.status_server)
+        self.previous_weights = ','.join(self.status_weight)
 
         # toggle enable/disbale server
         if self.state == 'enabled':
@@ -348,7 +348,7 @@ def main():
             backend=dict(required=False, default=None),
             weight=dict(required=False, default=None),
             socket = dict(required=False, default=DEFAULT_SOCKET_LOCATION),
-            shutdown_sessions=dict(required=False, default=False),
+            shutdown_sessions=dict(required=False, default=False, type='bool'),
             wait=dict(required=False, default=False, type='bool'),
             wait_retries=dict(required=False, default=WAIT_RETRIES, type='int'),
             wait_interval=dict(required=False, default=WAIT_INTERVAL, type='int'),
