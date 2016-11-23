@@ -316,6 +316,8 @@ class PKey(object):
         :return: The number of bits of the key.
         """
         return _lib.EVP_PKEY_bits(self._pkey)
+
+
 PKeyType = PKey
 
 
@@ -1518,6 +1520,28 @@ class X509Store(object):
         """
         _openssl_assert(_lib.X509_STORE_set_flags(self._store, flags) != 0)
 
+    def set_time(self, vfy_time):
+        """
+        Set the time against which the certificates are verified.
+
+        Normally the current time is used.
+
+        .. note::
+
+          For example, you can determine if a certificate was valid at a given
+          time.
+
+        .. versionadded:: 16.3.0
+
+        :param datetime vfy_time: The verification time to set on this store.
+        :return: ``None`` if the verification time was successfully set.
+        """
+        param = _lib.X509_VERIFY_PARAM_new()
+        param = _ffi.gc(param, _lib.X509_VERIFY_PARAM_free)
+
+        _lib.X509_VERIFY_PARAM_set_time(param, int(vfy_time.strftime('%s')))
+        _openssl_assert(_lib.X509_STORE_set1_param(self._store, param) != 0)
+
 
 X509StoreType = X509Store
 
@@ -2180,6 +2204,7 @@ class PKCS7(object):
         string_type = _lib.OBJ_nid2sn(nid)
         return _ffi.string(string_type)
 
+
 PKCS7Type = PKCS7
 
 
@@ -2474,7 +2499,9 @@ class _PassphraseHelper(object):
         elif callable(self._passphrase):
             return _ffi.callback("pem_password_cb", self._read_passphrase)
         else:
-            raise TypeError("Last argument must be string or callable")
+            raise TypeError(
+                "Last argument must be a byte string or a callable."
+            )
 
     @property
     def callback_args(self):
@@ -2485,7 +2512,9 @@ class _PassphraseHelper(object):
         elif callable(self._passphrase):
             return _ffi.NULL
         else:
-            raise TypeError("Last argument must be string or callable")
+            raise TypeError(
+                "Last argument must be a byte string or a callable."
+            )
 
     def raise_if_problem(self, exceptionType=Error):
         try:
