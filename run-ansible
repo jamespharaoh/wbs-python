@@ -130,11 +130,23 @@ def build ():
 		os.makedirs (
 			"work/lib/python2.7/site-packages")
 
-	subprocess.check_call (
-		[
-			"scripts/setup-project",
-			"build",
-		])
+	subprocess.check_call ([
+		"rm",
+		"-rf",
+		"work/lib/python2.7",
+	])
+
+	subprocess.check_call ([
+		"git",
+		"clean",
+		"-xdf",
+		"third-parties",
+	])
+
+	subprocess.check_call ([
+		"scripts/setup-project",
+		"build",
+	])
 
 	STATE ["last_third_party_build_tree"] = (
 		current_tree)
