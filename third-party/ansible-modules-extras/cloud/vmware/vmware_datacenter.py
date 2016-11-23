@@ -25,9 +25,9 @@ short_description: Manage VMware vSphere Datacenters
 description:
     - Manage VMware vSphere Datacenters
 version_added: 2.0
-author: "Joseph Callen (@jcpowermac), Kamil Szczygiel (@kamsz)"
+author: "Joseph Callen (@jcpowermac)"
 notes:
-    - Tested on vSphere 6.0
+    - Tested on vSphere 5.5
 requirements:
     - "python >= 2.6"
     - PyVmomi
@@ -54,8 +54,7 @@ options:
         description:
             - If the datacenter should be present or absent
         choices: ['present', 'absent']
-        default: present
-extends_documentation_fragment: vmware.documentation
+        required: True
 '''
 
 EXAMPLES = '''
@@ -64,7 +63,7 @@ EXAMPLES = '''
       local_action: >
         vmware_datacenter
         hostname="{{ ansible_ssh_host }}" username=root password=vmware
-        datacenter_name="datacenter" state=present
+        datacenter_name="datacenter"
 '''
 
 try:
@@ -74,29 +73,18 @@ except ImportError:
     HAS_PYVMOMI = False
 
 
-def get_datacenter(context, module):
-    try:
-        datacenter_name = module.params.get('datacenter_name')
-        datacenter = find_datacenter_by_name(context, datacenter_name)
-        return datacenter
-    except vmodl.RuntimeFault as runtime_fault:
-        module.fail_json(msg=runtime_fault.msg)
-    except vmodl.MethodFault as method_fault:
-        module.fail_json(msg=method_fault.msg)
+def state_create_datacenter(module):
+    datacenter_name = module.params['datacenter_name']
+    content = module.params['content']
+    changed = True
+    datacenter = None
 
-
-def create_datacenter(context, module):
-    datacenter_name = module.params.get('datacenter_name')
-    folder = context.rootFolder
+    folder = content.rootFolder
 
     try:
-        datacenter = get_datacenter(context, module)
-        changed = False
-        if not datacenter:
-            changed = True
-            if not module.check_mode:
-                folder.CreateDatacenter(name=datacenter_name)
-        module.exit_json(changed=changed)
+        if not module.check_mode:
+            datacenter = folder.CreateDatacenter(name=datacenter_name)
+        module.exit_json(changed=changed, result=str(datacenter))
     except vim.fault.DuplicateName:
         module.fail_json(msg="A datacenter with the name %s already exists" % datacenter_name)
     except vim.fault.InvalidName:
@@ -110,17 +98,34 @@ def create_datacenter(context, module):
         module.fail_json(msg=method_fault.msg)
 
 
-def destroy_datacenter(context, module):
+def check_datacenter_state(module):
+    datacenter_name = module.params['datacenter_name']
+
+    try:
+        content = connect_to_api(module)
+        datacenter = find_datacenter_by_name(content, datacenter_name)
+        module.params['content'] = content
+
+        if datacenter is None:
+            return 'absent'
+        else:
+            module.params['datacenter'] = datacenter
+            return 'present'
+    except vmodl.RuntimeFault as runtime_fault:
+        module.fail_json(msg=runtime_fault.msg)
+    except vmodl.MethodFault as method_fault:
+        module.fail_json(msg=method_fault.msg)
+
+
+def state_destroy_datacenter(module):
+    datacenter = module.params['datacenter']
+    changed = True
     result = None
 
     try:
-        datacenter = get_datacenter(context, module)
-        changed = False
-        if datacenter:
-            changed = True
-            if not module.check_mode:
-                task = datacenter.Destroy_Task()
-                changed, result = wait_for_task(task)
+        if not module.check_mode:
+            task = datacenter.Destroy_Task()
+            changed, result = wait_for_task(task)
         module.exit_json(changed=changed, result=result)
     except vim.fault.VimFault as vim_fault:
         module.fail_json(msg=vim_fault.msg)
@@ -130,28 +135,39 @@ def destroy_datacenter(context, module):
         module.fail_json(msg=method_fault.msg)
 
 
+def state_exit_unchanged(module):
+    module.exit_json(changed=False)
+
+
 def main():
 
     argument_spec = vmware_argument_spec()
     argument_spec.update(
         dict(
-            datacenter_name=dict(required=True, type='str'),
-            state=dict(default='present', choices=['present', 'absent'], type='str')
+                datacenter_name=dict(required=True, type='str'),
+                state=dict(required=True, choices=['present', 'absent'], type='str'),
+                )
         )
-    )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     if not HAS_PYVMOMI:
         module.fail_json(msg='pyvmomi is required for this module')
 
-    context = connect_to_api(module)
-    state = module.params.get('state')
+    datacenter_states = {
+        'absent': {
+            'present': state_destroy_datacenter,
+            'absent': state_exit_unchanged,
+        },
+        'present': {
+            'present': state_exit_unchanged,
+            'absent': state_create_datacenter,
+        }
+    }
+    desired_state = module.params['state']
+    current_state = check_datacenter_state(module)
 
-    if state == 'present':
-        create_datacenter(context, module)
+    datacenter_states[desired_state][current_state](module)
 
-    if state == 'absent':
-        destroy_datacenter(context, module)
 
 from ansible.module_utils.basic import *
 from ansible.module_utils.vmware import *

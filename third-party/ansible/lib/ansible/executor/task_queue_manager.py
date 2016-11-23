@@ -28,14 +28,12 @@ from ansible.errors import AnsibleError
 from ansible.executor.play_iterator import PlayIterator
 from ansible.executor.process.result import ResultProcess
 from ansible.executor.stats import AggregateStats
-from ansible.playbook.block import Block
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins import callback_loader, strategy_loader, module_loader
 from ansible.template import Templar
 from ansible.vars.hostvars import HostVars
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.unicode import to_unicode
-from ansible.compat.six import string_types
 
 try:
     from __main__ import display
@@ -57,13 +55,6 @@ class TaskQueueManager:
     The queue manager is responsible for loading the play strategy plugin,
     which dispatches the Play's tasks to hosts.
     '''
-
-    RUN_OK                = 0
-    RUN_ERROR             = 1
-    RUN_FAILED_HOSTS      = 2
-    RUN_UNREACHABLE_HOSTS = 3
-    RUN_FAILED_BREAK_PLAY = 4
-    RUN_UNKNOWN_ERROR     = 255
 
     def __init__(self, inventory, variable_manager, loader, options, passwords, stdout_callback=None, run_additional_callbacks=True, run_tree=False):
 
@@ -114,7 +105,7 @@ class TaskQueueManager:
         self._result_prc = ResultProcess(self._final_q, self._workers)
         self._result_prc.start()
 
-    def _initialize_notified_handlers(self, play):
+    def _initialize_notified_handlers(self, handlers):
         '''
         Clears and initializes the shared notified handlers dict with entries
         for each handler in the play, which is an empty array that will contain
@@ -123,25 +114,18 @@ class TaskQueueManager:
 
         # Zero the dictionary first by removing any entries there.
         # Proxied dicts don't support iteritems, so we have to use keys()
-        self._notified_handlers.clear()
+        for key in self._notified_handlers.keys():
+            del self._notified_handlers[key]
 
-        def _process_block(b):
-            temp_list = []
-            for t in b.block:
-                if isinstance(t, Block):
-                    temp_list.extend(_process_block(t))
-                else:
-                    temp_list.append(t)
-            return temp_list
-
+        # FIXME: there is a block compile helper for this...
         handler_list = []
-        for handler_block in play.handlers:
-            handler_list.extend(_process_block(handler_block))
+        for handler_block in handlers:
+            for handler in handler_block.block:
+                handler_list.append(handler)
 
-        # then initialize it with the given handler list
+        # then initialize it with the handler names from the handler list
         for handler in handler_list:
-            if handler not in self._notified_handlers:
-                self._notified_handlers[handler] = []
+            self._notified_handlers[handler.get_name()] = []
 
     def load_callbacks(self):
         '''
@@ -159,7 +143,7 @@ class TaskQueueManager:
 
         if isinstance(self._stdout_callback, CallbackBase):
             stdout_callback_loaded = True
-        elif isinstance(self._stdout_callback, string_types):
+        elif isinstance(self._stdout_callback, basestring):
             if self._stdout_callback not in callback_loader:
                 raise AnsibleError("Invalid callback for stdout specified: %s" % self._stdout_callback)
             else:
@@ -206,7 +190,6 @@ class TaskQueueManager:
 
         new_play = play.copy()
         new_play.post_validate(templar)
-        new_play.handlers = new_play.compile_roles_handlers() + new_play.handlers
 
         self.hostvars = HostVars(
             inventory=self._inventory,
@@ -227,7 +210,7 @@ class TaskQueueManager:
         self.send_callback('v2_playbook_on_play_start', new_play)
 
         # initialize the shared dictionary containing the notified handlers
-        self._initialize_notified_handlers(new_play)
+        self._initialize_notified_handlers(new_play.handlers)
 
         # load the specified strategy (or the default linear one)
         strategy = strategy_loader.get(new_play.strategy, self)
@@ -244,16 +227,6 @@ class TaskQueueManager:
             start_at_done = self._start_at_done,
         )
 
-        # Because the TQM may survive multiple play runs, we start by marking
-        # any hosts as failed in the iterator here which may have been marked
-        # as failed in previous runs. Then we clear the internal list of failed
-        # hosts so we know what failed this round.
-        for host_name in self._failed_hosts.keys():
-            host = self._inventory.get_host(host_name)
-            iterator.mark_host_failed(host)
-
-        self.clear_failed_hosts()
-
         # during initialization, the PlayContext will clear the start_at_task
         # field to signal that a matching task was found, so check that here
         # and remember it so we don't try to skip tasks on future plays
@@ -262,11 +235,6 @@ class TaskQueueManager:
 
         # and run the play using the strategy and cleanup on way out
         play_return = strategy.run(iterator, play_context)
-
-        # now re-save the hosts that failed from the iterator to our internal list
-        for host_name in iterator.get_failed_hosts():
-            self._failed_hosts[host_name] = True
-
         self._cleanup_processes()
         return play_return
 
@@ -309,18 +277,6 @@ class TaskQueueManager:
     def terminate(self):
         self._terminated = True
 
-    def has_dead_workers(self):
-
-        # [<WorkerProcess(WorkerProcess-2, stopped[SIGKILL])>,
-        # <WorkerProcess(WorkerProcess-2, stopped[SIGTERM])>
-
-        defunct = False
-        for idx,x in enumerate(self._workers):
-            if hasattr(x[0], 'exitcode'):
-                if x[0].exitcode in [-9, -15]:
-                    defunct = True
-        return defunct
-
     def send_callback(self, method_name, *args, **kwargs):
         for callback_plugin in [self._stdout_callback] + self._callback_plugins:
             # a plugin that set self.disabled to True will not be called
@@ -354,7 +310,4 @@ class TaskQueueManager:
                         method(*args, **kwargs)
                 except Exception as e:
                     #TODO: add config toggle to make this fatal or not?
-                    display.warning(u"Failure using method (%s) in callback plugin (%s): %s" % (to_unicode(method_name), to_unicode(callback_plugin), to_unicode(e)))
-                    from traceback import format_tb
-                    from sys import exc_info
-                    display.debug('Callback Exception: \n' + ' '.join(format_tb(exc_info()[2])))
+                    display.warning(u"Failure when attempting to use callback plugin (%s): %s" % (to_unicode(callback_plugin), to_unicode(e)))

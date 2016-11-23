@@ -32,7 +32,7 @@ options:
     required: true
   password:
     description:
-      - set the user's password.
+      - set the user's password. (Required when adding a user)
     required: false
     default: null
   encrypted:
@@ -47,15 +47,6 @@ options:
       - the 'host' part of the MySQL username
     required: false
     default: localhost
-  host_all:
-    description:
-      - override the host option, making ansible apply changes to
-        all hostnames for a given user.  This option cannot be used
-        when creating users
-    required: false
-    choices: [ "yes", "no" ]
-    default: "no"
-    version_added: "2.1"
   priv:
     description:
       - "MySQL privileges string in the format: C(db.table:priv1,priv2)"
@@ -69,13 +60,6 @@ options:
     choices: [ "yes", "no" ]
     default: "no"
     version_added: "1.4"
-  sql_log_bin:
-    description:
-      - Whether binary logging should be enabled or disabled for the connection.
-    required: false
-    choices: ["yes", "no" ]
-    default: "yes"
-    version_added: "2.1"
   state:
     description:
       - Whether the user should exist.  When C(absent), removes
@@ -110,12 +94,6 @@ extends_documentation_fragment: mysql
 '''
 
 EXAMPLES = """
-# Removes anonymous user account for localhost
-- mysql_user: name='' host=localhost state=absent
-
-# Removes all anonymous user accounts
-- mysql_user: name='' host_all=yes state=absent
-
 # Create database user with name 'bob' and password '12345' with all database privileges
 - mysql_user: name=bob password=12345 priv=*.*:ALL state=present
 
@@ -128,11 +106,8 @@ EXAMPLES = """
 # Modify user Bob to require SSL connections. Note that REQUIRESSL is a special privilege that should only apply to *.* by itself.
 - mysql_user: name=bob append_privs=true priv=*.*:REQUIRESSL state=present
 
-# Ensure no user named 'sally'@'localhost' exists, also passing in the auth credentials.
+# Ensure no user named 'sally' exists, also passing in the auth credentials.
 - mysql_user: login_user=root login_password=123456 name=sally state=absent
-
-# Ensure no user named 'sally' exists at all
-- mysql_user: name=sally host_all=yes state=absent
 
 # Specify grants composed of more than one word
 - mysql_user: name=replication password=12345 priv="*.*:REPLICATION CLIENT" state=present
@@ -145,9 +120,6 @@ mydb.*:INSERT,UPDATE/anotherdb.*:SELECT/yetanotherdb.*:ALL
 
 # Example using login_unix_socket to connect to server
 - mysql_user: name=root password=abc123 login_unix_socket=/var/run/mysqld/mysqld.sock
-
-# Example of skipping binary logging while adding user 'bob'
-- mysql_user: name=bob password=12345 priv=*.*:USAGE state=present sql_log_bin=no
 
 # Example .my.cnf file for setting the root password
 
@@ -211,30 +183,19 @@ def get_mode(cursor):
         mode = 'NOTANSI'
     return mode
 
-def user_exists(cursor, user, host, host_all):
+def user_exists(cursor, user, host, host_all=False):
     if host_all:
         cursor.execute("SELECT count(*) FROM user WHERE user = %s", user)
     else:
         cursor.execute("SELECT count(*) FROM user WHERE user = %s AND host = %s", (user,host))
-
     count = cursor.fetchone()
     return count[0] > 0
 
-def user_add(cursor, user, host, host_all, password, encrypted, new_priv, check_mode):
-    # we cannot create users without a proper hostname
-    if host_all:
-        return False
-
-    if check_mode:
-        return True
-
+def user_add(cursor, user, host, password, encrypted, new_priv):
     if password and encrypted:
         cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user,host,password))
     elif password and not encrypted:
         cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user,host,password))
-    else:
-        cursor.execute("CREATE USER %s@%s", (user,host))
-
     if new_priv is not None:
         for db_table, priv in new_priv.iteritems():
             privileges_grant(cursor, user,host,db_table,priv)
@@ -247,119 +208,84 @@ def is_hash(password):
             ishash = True
     return ishash
 
-def user_mod(cursor, user, host, host_all, password, encrypted, new_priv, append_privs, module):
+def user_mod(cursor, user, host, password, encrypted, new_priv, append_privs):
     changed = False
     grant_option = False
 
-    if host_all:
-        hostnames = user_get_hostnames(cursor, user)
-    else:
-        hostnames = [host]
+    # Handle clear text and hashed passwords.
+    if bool(password):
+        # Determine what user management method server uses
+        old_user_mgmt = server_version_check(cursor)
 
-    for host in hostnames:
-        # Handle clear text and hashed passwords.
-        if bool(password):
-            # Determine what user management method server uses
-            old_user_mgmt = server_version_check(cursor)
+        if old_user_mgmt:
+            cursor.execute("SELECT password FROM user WHERE user = %s AND host = %s", (user,host))
+        else:
+            cursor.execute("SELECT authentication_string FROM user WHERE user = %s AND host = %s", (user,host))
+        current_pass_hash = cursor.fetchone()
 
-            if old_user_mgmt:
-                cursor.execute("SELECT password FROM user WHERE user = %s AND host = %s", (user,host))
-            else:
-                cursor.execute("SELECT authentication_string FROM user WHERE user = %s AND host = %s", (user,host))
-            current_pass_hash = cursor.fetchone()
-
-            if encrypted:
-                encrypted_string = (password)
-                if is_hash(password):
-                    if current_pass_hash[0] != encrypted_string:
-                        if module.check_mode:
-                            return True
-                        if old_user_mgmt:
-                            cursor.execute("SET PASSWORD FOR %s@%s = %s", (user, host, password))
-                        else:
-                            cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, password))
-                        changed = True
-                else:
-                    module.fail_json(msg="encrypted was specified however it does not appear to be a valid hash expecting: *SHA1(SHA1(your_password))")
-            else:
-                if old_user_mgmt:
-                    cursor.execute("SELECT PASSWORD(%s)", (password,))
-                else:
-                    cursor.execute("SELECT CONCAT('*', UCASE(SHA1(UNHEX(SHA1(%s)))))", (password,))
-                new_pass_hash = cursor.fetchone()
-                if current_pass_hash[0] != new_pass_hash[0]:
-                    if module.check_mode:
-                        return True
+        if encrypted:
+            encrypted_string = (password)
+            if is_hash(password):
+                if current_pass_hash[0] != encrypted_string:
                     if old_user_mgmt:
-                        cursor.execute("SET PASSWORD FOR %s@%s = PASSWORD(%s)", (user, host, password))
+                        cursor.execute("SET PASSWORD FOR %s@%s = %s", (user, host, password))
                     else:
-                        cursor.execute("ALTER USER %s@%s IDENTIFIED BY %s", (user, host, password))
+                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, password))
+                    changed = True
+            else:
+                module.fail_json(msg="encrypted was specified however it does not appear to be a valid hash expecting: *SHA1(SHA1(your_password))")
+        else:
+            if old_user_mgmt:
+                cursor.execute("SELECT PASSWORD(%s)", (password,))
+            else:
+                cursor.execute("SELECT CONCAT('*', UCASE(SHA1(UNHEX(SHA1(%s)))))", (password,))
+            new_pass_hash = cursor.fetchone()
+            if current_pass_hash[0] != new_pass_hash[0]:
+                if old_user_mgmt:
+                    cursor.execute("SET PASSWORD FOR %s@%s = PASSWORD(%s)", (user, host, password))
+                else:
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED BY %s", (user, host, password))
+                changed = True
+
+
+    # Handle privileges
+    if new_priv is not None:
+        curr_priv = privileges_get(cursor, user,host)
+
+        # If the user has privileges on a db.table that doesn't appear at all in
+        # the new specification, then revoke all privileges on it.
+        for db_table, priv in curr_priv.iteritems():
+            # If the user has the GRANT OPTION on a db.table, revoke it first.
+            if "GRANT" in priv:
+                grant_option = True
+            if db_table not in new_priv:
+                if user != "root" and "PROXY" not in priv and not append_privs:
+                    privileges_revoke(cursor, user,host,db_table,priv,grant_option)
                     changed = True
 
-        # Handle privileges
-        if new_priv is not None:
-            curr_priv = privileges_get(cursor, user,host)
+        # If the user doesn't currently have any privileges on a db.table, then
+        # we can perform a straight grant operation.
+        for db_table, priv in new_priv.iteritems():
+            if db_table not in curr_priv:
+                privileges_grant(cursor, user,host,db_table,priv)
+                changed = True
 
-            # If the user has privileges on a db.table that doesn't appear at all in
-            # the new specification, then revoke all privileges on it.
-            for db_table, priv in curr_priv.iteritems():
-                # If the user has the GRANT OPTION on a db.table, revoke it first.
-                if "GRANT" in priv:
-                    grant_option = True
-                if db_table not in new_priv:
-                    if user != "root" and "PROXY" not in priv and not append_privs:
-                        if module.check_mode:
-                            return True
-                        privileges_revoke(cursor, user,host,db_table,priv,grant_option)
-                        changed = True
-
-            # If the user doesn't currently have any privileges on a db.table, then
-            # we can perform a straight grant operation.
-            for db_table, priv in new_priv.iteritems():
-                if db_table not in curr_priv:
-                    if module.check_mode:
-                        return True
-                    privileges_grant(cursor, user,host,db_table,priv)
-                    changed = True
-
-            # If the db.table specification exists in both the user's current privileges
-            # and in the new privileges, then we need to see if there's a difference.
-            db_table_intersect = set(new_priv.keys()) & set(curr_priv.keys())
-            for db_table in db_table_intersect:
-                priv_diff = set(new_priv[db_table]) ^ set(curr_priv[db_table])
-                if (len(priv_diff) > 0):
-                    if module.check_mode:
-                        return True
-                    if not append_privs:
-                        privileges_revoke(cursor, user,host,db_table,curr_priv[db_table],grant_option)
-                    privileges_grant(cursor, user,host,db_table,new_priv[db_table])
-                    changed = True
+        # If the db.table specification exists in both the user's current privileges
+        # and in the new privileges, then we need to see if there's a difference.
+        db_table_intersect = set(new_priv.keys()) & set(curr_priv.keys())
+        for db_table in db_table_intersect:
+            priv_diff = set(new_priv[db_table]) ^ set(curr_priv[db_table])
+            if (len(priv_diff) > 0):
+                if not append_privs:
+                    privileges_revoke(cursor, user,host,db_table,curr_priv[db_table],grant_option)
+                privileges_grant(cursor, user,host,db_table,new_priv[db_table])
+                changed = True
 
     return changed
 
-def user_delete(cursor, user, host, host_all, check_mode):
-    if check_mode:
-        return True
-
-    if host_all:
-        hostnames = user_get_hostnames(cursor, user)
-
-        for hostname in hostnames:
-            cursor.execute("DROP USER %s@%s", (user, hostname))
-    else:
-        cursor.execute("DROP USER %s@%s", (user, host))
-
+def user_delete(cursor, user, host):
+    cursor.execute("DROP USER %s@%s", (user, host))
     return True
-
-def user_get_hostnames(cursor, user):
-    cursor.execute("SELECT Host FROM mysql.user WHERE user = %s", user)
-    hostnames_raw = cursor.fetchall()
-    hostnames = []
-
-    for hostname_raw in hostnames_raw:
-        hostnames.append(hostname_raw[0])
-
-    return hostnames
 
 def privileges_get(cursor, user,host):
     """ MySQL doesn't have a better method of getting privileges aside from the
@@ -476,7 +402,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             login_user=dict(default=None),
-            login_password=dict(default=None, no_log=True),
+            login_password=dict(default=None),
             login_host=dict(default="localhost"),
             login_port=dict(default=3306, type='int'),
             login_unix_socket=dict(default=None),
@@ -484,20 +410,16 @@ def main():
             password=dict(default=None, no_log=True, type='str'),
             encrypted=dict(default=False, type='bool'),
             host=dict(default="localhost"),
-            host_all=dict(type="bool", default="no"),
             state=dict(default="present", choices=["absent", "present"]),
             priv=dict(default=None),
             append_privs=dict(default=False, type='bool'),
             check_implicit_admin=dict(default=False, type='bool'),
             update_password=dict(default="always", choices=["always", "on_create"]),
-            connect_timeout=dict(default=30, type='int'),
-            config_file=dict(default="~/.my.cnf", type='path'),
-            sql_log_bin=dict(default=True, type='bool'),
-            ssl_cert=dict(default=None, type='path'),
-            ssl_key=dict(default=None, type='path'),
-            ssl_ca=dict(default=None, type='path'),
-        ),
-        supports_check_mode=True
+            config_file=dict(default="~/.my.cnf"),
+            ssl_cert=dict(default=None),
+            ssl_key=dict(default=None),
+            ssl_ca=dict(default=None),
+        )
     )
     login_user = module.params["login_user"]
     login_password = module.params["login_password"]
@@ -505,11 +427,9 @@ def main():
     password = module.params["password"]
     encrypted = module.boolean(module.params["encrypted"])
     host = module.params["host"].lower()
-    host_all = module.params["host_all"]
     state = module.params["state"]
     priv = module.params["priv"]
     check_implicit_admin = module.params['check_implicit_admin']
-    connect_timeout = module.params['connect_timeout']
     config_file = module.params['config_file']
     append_privs = module.boolean(module.params["append_privs"])
     update_password = module.params['update_password']
@@ -517,8 +437,8 @@ def main():
     ssl_key = module.params["ssl_key"]
     ssl_ca = module.params["ssl_ca"]
     db = 'mysql'
-    sql_log_bin = module.params["sql_log_bin"]
 
+    config_file = os.path.expanduser(os.path.expandvars(config_file))
     if not mysqldb_found:
         module.fail_json(msg="the python mysqldb module is required")
 
@@ -526,19 +446,14 @@ def main():
     try:
         if check_implicit_admin:
             try:
-                cursor = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca, db,
-                                       connect_timeout=connect_timeout)
+                cursor = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca, db)
             except:
                 pass
 
         if not cursor:
-            cursor = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca, db,
-                                   connect_timeout=connect_timeout)
+            cursor = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca, db)
     except Exception, e:
         module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. Exception message: %s" % (config_file, e))
-
-    if not sql_log_bin:
-        cursor.execute("SET SQL_LOG_BIN=0;")
 
     if priv is not None:
         try:
@@ -551,25 +466,25 @@ def main():
             module.fail_json(msg="invalid privileges string: %s" % str(e))
 
     if state == "present":
-        if user_exists(cursor, user, host, host_all):
+        if user_exists(cursor, user, host):
             try:
                 if update_password == 'always':
-                    changed = user_mod(cursor, user, host, host_all, password, encrypted, priv, append_privs, module)
+                    changed = user_mod(cursor, user, host, password, encrypted, priv, append_privs)
                 else:
-                    changed = user_mod(cursor, user, host, host_all, None, encrypted, priv, append_privs, module)
+                    changed = user_mod(cursor, user, host, None, encrypted, priv, append_privs)
 
             except (SQLParseError, InvalidPrivsError, MySQLdb.Error), e:
                 module.fail_json(msg=str(e))
         else:
-            if host_all:
-                module.fail_json(msg="host_all parameter cannot be used when adding a user")
+            if password is None:
+                module.fail_json(msg="password parameter required when adding a user")
             try:
-                changed = user_add(cursor, user, host, host_all, password, encrypted, priv, module.check_mode)
+                changed = user_add(cursor, user, host, password, encrypted, priv)
             except (SQLParseError, InvalidPrivsError, MySQLdb.Error), e:
                 module.fail_json(msg=str(e))
     elif state == "absent":
-        if user_exists(cursor, user, host, host_all):
-            changed = user_delete(cursor, user, host, host_all, module.check_mode)
+        if user_exists(cursor, user, host):
+            changed = user_delete(cursor, user, host)
         else:
             changed = False
     module.exit_json(changed=changed, user=user)

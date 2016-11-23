@@ -62,18 +62,6 @@ options:
         required: False
         default: null
         version_added: "2.0"
-    sslcacert:
-        description:
-            - supply a custom ssl CA certificate file for use with registration
-        required: False
-        default: None
-        version_added: "2.1"
-    systemorgid:
-        description:
-            - supply an organizational id for use with registration
-        required: False
-        default: None
-        version_added: "2.1"
     channels:
         description:
             - Optionally specify a list of comma-separated channels to subscribe to upon successful registration.
@@ -119,9 +107,8 @@ sys.path.insert(0, '/usr/share/rhn')
 try:
     import up2date_client
     import up2date_client.config
-    HAS_UP2DATE_CLIENT = True
 except ImportError, e:
-    HAS_UP2DATE_CLIENT = False
+    module.fail_json(msg="Unable to import up2date_client.  Is 'rhn-client-tools' installed?\n%s" % e)
 
 # INSERT REDHAT SNIPPETS
 from ansible.module_utils.redhat import *
@@ -138,9 +125,6 @@ class Rhn(RegistrationBase):
         '''
             Read configuration from /etc/sysconfig/rhn/up2date
         '''
-        if not HAS_UP2DATE_CLIENT:
-            return None
-
         self.config = up2date_client.config.initUp2dateConfig()
 
         # Add support for specifying a default value w/o having to standup some
@@ -234,7 +218,7 @@ class Rhn(RegistrationBase):
         self.update_plugin_conf('rhnplugin', True)
         self.update_plugin_conf('subscription-manager', False)
 
-    def register(self, enable_eus=False, activationkey=None, profilename=None, sslcacert=None, systemorgid=None):
+    def register(self, enable_eus=False, activationkey=None, profilename=None):
         '''
             Register system to RHN.  If enable_eus=True, extended update
             support will be requested.
@@ -248,10 +232,7 @@ class Rhn(RegistrationBase):
             register_cmd.extend(['--activationkey', activationkey])
         if profilename is not None:
             register_cmd.extend(['--profilename', profilename])
-        if sslcacert is not None:
-            register_cmd.extend(['--sslCACert', sslcacert])
-        if systemorgid is not None:
-            register_cmd.extend(['--systemorgid', systemorgid])
+        # FIXME - support --systemorgid
         rc, stdout, stderr = self.module.run_command(register_cmd, check_rc=True)
 
     def api(self, method, *args):
@@ -283,31 +264,10 @@ class Rhn(RegistrationBase):
     def subscribe(self, channels=[]):
         if len(channels) <= 0:
             return
-        if self._is_hosted():
-            current_channels = self.api('channel.software.listSystemChannels', self.systemid)
-            new_channels = [item['channel_label'] for item in current_channels]
-            new_channels.extend(channels)
-            return self.api('channel.software.setSystemChannels', self.systemid, list(new_channels))
-        else:
-            current_channels = self.api('channel.software.listSystemChannels', self.systemid)
-            current_channels = [item['label'] for item in current_channels]
-            new_base = None
-            new_childs = []
-            for ch in channels:
-                if ch in current_channels:
-                    continue
-                if self.api('channel.software.getDetails', ch)['parent_channel_label'] == '':
-                    new_base = ch
-                else:
-                    if ch not in new_childs:
-                        new_childs.append(ch)
-            out_base = 0
-            out_childs = 0
-            if new_base:
-                out_base = self.api('system.setBaseChannel', self.systemid, new_base)
-            if new_childs:
-                out_childs = self.api('system.setChildChannels', self.systemid, new_childs)
-            return out_base and out_childs
+        current_channels = self.api('channel.software.listSystemChannels', self.systemid)
+        new_channels = [item['channel_label'] for item in current_channels]
+        new_channels.extend(channels)
+        return self.api('channel.software.setSystemChannels', self.systemid, new_channels)
 
     def _subscribe(self, channels=[]):
         '''
@@ -323,16 +283,6 @@ class Rhn(RegistrationBase):
                 if re.search(wanted_repo, available_channel):
                     rc, stdout, stderr = self.module.run_command(rhn_channel_cmd + " --add --channel=%s" % available_channel, check_rc=True)
 
-    def _is_hosted(self):
-        '''
-            Return True if we are running against Hosted (rhn.redhat.com) or
-            False otherwise (when running against Satellite or Spacewalk)
-        '''
-        if 'rhn.redhat.com' in self.hostname:
-            return True
-        else:
-            return False
-
 def main():
 
     # Read system RHN configuration
@@ -342,22 +292,14 @@ def main():
                 argument_spec = dict(
                     state = dict(default='present', choices=['present', 'absent']),
                     username = dict(default=None, required=False),
-                    password = dict(default=None, required=False, no_log=True),
-                    server_url = dict(default=None, required=False),
-                    activationkey = dict(default=None, required=False, no_log=True),
+                    password = dict(default=None, required=False),
+                    server_url = dict(default=rhn.config.get_option('serverURL'), required=False),
+                    activationkey = dict(default=None, required=False),
                     profilename = dict(default=None, required=False),
-                    sslcacert = dict(default=None, required=False, type='path'),
-                    systemorgid = dict(default=None, required=False),
                     enable_eus = dict(default=False, type='bool'),
                     channels = dict(default=[], type='list'),
                 )
             )
-
-    if not HAS_UP2DATE_CLIENT:
-        module.fail_json(msg="Unable to import up2date_client.  Is 'rhn-client-tools' installed?")
-
-    if not module.params['server_url']:
-        module.params['server_url'] = rhn.config.get_option('serverURL')
 
     state = module.params['state']
     rhn.username = module.params['username']
@@ -365,8 +307,6 @@ def main():
     rhn.configure(module.params['server_url'])
     activationkey = module.params['activationkey']
     profilename = module.params['profilename']
-    sslcacert = module.params['sslcacert']
-    systemorgid = module.params['systemorgid']
     channels = module.params['channels']
     rhn.module = module
 
@@ -385,7 +325,7 @@ def main():
         else:
             try:
                 rhn.enable()
-                rhn.register(module.params['enable_eus'] == True, activationkey, profilename, sslcacert, systemorgid)
+                rhn.register(module.params['enable_eus'] == True, activationkey)
                 rhn.subscribe(channels)
             except Exception, e:
                 module.fail_json(msg="Failed to register with '%s': %s" % (rhn.hostname, e))

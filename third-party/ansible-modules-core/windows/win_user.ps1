@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-# WANT_JSON
 # POWERSHELL_COMMON
 
 ########
@@ -137,16 +136,8 @@ If ($state -eq 'present') {
             [void][system.reflection.assembly]::LoadWithPartialName('System.DirectoryServices.AccountManagement')
             $host_name = [System.Net.Dns]::GetHostName()
             $pc = New-Object -TypeName System.DirectoryServices.AccountManagement.PrincipalContext 'Machine', $host_name
-
-            # ValidateCredentials will fail if either of these are true- just force update...
-            If($user_obj.AccountDisabled -or $user_obj.PasswordExpired) {
-                $password_match = $false
-            }
-            Else {
-                $password_match = $pc.ValidateCredentials($username, $password)
-            }
-
-            If (-not $password_match) {
+            # ValidateCredentials fails if PasswordExpired == 1
+            If (!$pc.ValidateCredentials($username, $password)) {
                 $user_obj.SetPassword($password)
                 $result.changed = $true
             }

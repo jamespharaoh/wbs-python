@@ -17,41 +17,16 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import re
-
-from ansible.module_utils.basic import AnsibleModule, env_fallback, get_exception
-from ansible.module_utils.shell import Shell, ShellError, Command, HAS_PARAMIKO
-from ansible.module_utils.netcfg import parse
-
 NET_PASSWD_RE = re.compile(r"[\r\n]?password: $", re.I)
 
 NET_COMMON_ARGS = dict(
     host=dict(required=True),
     port=dict(default=22, type='int'),
-    username=dict(fallback=(env_fallback, ['ANSIBLE_NET_USERNAME'])),
-    password=dict(no_log=True, fallback=(env_fallback, ['ANSIBLE_NET_PASSWORD'])),
-    ssh_keyfile=dict(fallback=(env_fallback, ['ANSIBLE_NET_SSH_KEYFILE']), type='path'),
-    authorize=dict(default=False, fallback=(env_fallback, ['ANSIBLE_NET_AUTHORIZE']), type='bool'),
-    auth_pass=dict(no_log=True, fallback=(env_fallback, ['ANSIBLE_NET_AUTH_PASS'])),
-    provider=dict(),
-    timeout=dict(default=10, type='int')
+    username=dict(required=True),
+    password=dict(no_log=True),
+    authorize=dict(default=False, type='bool'),
+    auth_pass=dict(no_log=True),
 )
-
-CLI_PROMPTS_RE = [
-    re.compile(r"[\r\n]?[\w+\-\.:\/\[\]]+(?:\([^\)]+\)){,3}(?:>|#) ?$"),
-    re.compile(r"\[\w+\@[\w\-\.]+(?: [^\]])\] ?[>#\$] ?$")
-]
-
-CLI_ERRORS_RE = [
-    re.compile(r"% ?Error"),
-    re.compile(r"% ?Bad secret"),
-    re.compile(r"invalid input", re.I),
-    re.compile(r"(?:incomplete|ambiguous) command", re.I),
-    re.compile(r"connection timed out", re.I),
-    re.compile(r"[^\r\n]+ not found", re.I),
-    re.compile(r"'[^']' +returned error code: ?\d+"),
-]
-
 
 def to_list(val):
     if isinstance(val, (list, tuple)):
@@ -60,7 +35,6 @@ def to_list(val):
         return [val]
     else:
         return list()
-
 
 class Cli(object):
 
@@ -74,45 +48,23 @@ class Cli(object):
 
         username = self.module.params['username']
         password = self.module.params['password']
-        key_filename = self.module.params['ssh_keyfile']
-        timeout = self.module.params['timeout']
 
-        allow_agent = (key_filename is not None) or (key_filename is None and password is None)
-
-        try:
-            self.shell = Shell(kickstart=False, prompts_re=CLI_PROMPTS_RE,
-                    errors_re=CLI_ERRORS_RE)
-            self.shell.open(host, port=port, username=username,
-                    password=password, key_filename=key_filename,
-                    allow_agent=allow_agent, timeout=timeout)
-        except ShellError:
-            e = get_exception()
-            msg = 'failed to connect to %s:%s - %s' % (host, port, str(e))
-            self.module.fail_json(msg=msg)
+        self.shell = Shell()
+        self.shell.open(host, port=port, username=username, password=password)
 
     def authorize(self):
         passwd = self.module.params['auth_pass']
         self.send(Command('enable', prompt=NET_PASSWD_RE, response=passwd))
 
     def send(self, commands):
-        try:
-            return self.shell.send(commands)
-        except ShellError:
-            e = get_exception()
-            self.module.fail_json(msg=e.message, commands=commands)
+        return self.shell.send(commands)
 
-
-class NetworkModule(AnsibleModule):
+class IosModule(AnsibleModule):
 
     def __init__(self, *args, **kwargs):
-        super(NetworkModule, self).__init__(*args, **kwargs)
+        super(IosModule, self).__init__(*args, **kwargs)
         self.connection = None
         self._config = None
-        self._connected = False
-
-    @property
-    def connected(self):
-        return self._connected
 
     @property
     def config(self):
@@ -120,24 +72,17 @@ class NetworkModule(AnsibleModule):
             self._config = self.get_config()
         return self._config
 
-    def _load_params(self):
-        super(NetworkModule, self)._load_params()
-        provider = self.params.get('provider') or dict()
-        for key, value in provider.items():
-            if key in NET_COMMON_ARGS:
-                if self.params.get(key) is None and value is not None:
-                    self.params[key] = value
-
     def connect(self):
-        self.connection = Cli(self)
+        try:
+            self.connection = Cli(self)
+            self.connection.connect()
+            self.execute('terminal length 0')
 
-        self.connection.connect()
-        self.connection.send('terminal length 0')
+            if self.params['authorize']:
+                self.connection.authorize()
 
-        if self.params['authorize']:
-            self.connection.authorize()
-
-        self._connected = True
+        except Exception, exc:
+            self.fail_json(msg=exc.message)
 
     def configure(self, commands):
         commands = to_list(commands)
@@ -147,13 +92,10 @@ class NetworkModule(AnsibleModule):
         return responses
 
     def execute(self, commands, **kwargs):
-        if not self.connected:
-            self.connect()
-        return self.connection.send(commands, **kwargs)
+        return self.connection.send(commands)
 
     def disconnect(self):
         self.connection.close()
-        self._connected = False
 
     def parse_config(self, cfg):
         return parse(cfg, indent=1)
@@ -164,18 +106,28 @@ class NetworkModule(AnsibleModule):
             cmd += ' all'
         return self.execute(cmd)[0]
 
-
 def get_module(**kwargs):
-    """Return instance of NetworkModule
+    """Return instance of IosModule
     """
+
     argument_spec = NET_COMMON_ARGS.copy()
     if kwargs.get('argument_spec'):
         argument_spec.update(kwargs['argument_spec'])
     kwargs['argument_spec'] = argument_spec
+    kwargs['check_invalid_arguments'] = False
 
-    module = NetworkModule(**kwargs)
+    module = IosModule(**kwargs)
 
+    # HAS_PARAMIKO is set by module_utils/shell.py
     if not HAS_PARAMIKO:
         module.fail_json(msg='paramiko is required but does not appear to be installed')
 
+    # copy in values from local action.
+    params = json_dict_unicode_to_bytes(json.loads(MODULE_COMPLEX_ARGS))
+    for key, value in params.iteritems():
+        module.params[key] = value
+
+    module.connect()
+
     return module
+

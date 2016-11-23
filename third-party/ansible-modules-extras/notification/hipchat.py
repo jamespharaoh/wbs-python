@@ -147,7 +147,7 @@ def send_msg_v2(module, token, room, msg_from, msg, msg_format='text',
 
     POST_URL = api + NOTIFY_URI_V2
 
-    url = POST_URL.replace('{id_or_name}', urllib.pathname2url(room))
+    url = POST_URL.replace('{id_or_name}', room)
     data = json.dumps(body)
 
     if module.check_mode:
@@ -155,10 +155,7 @@ def send_msg_v2(module, token, room, msg_from, msg, msg_format='text',
         module.exit_json(changed=False)
 
     response, info = fetch_url(module, url, data=data, headers=headers, method='POST')
-
-    # https://www.hipchat.com/docs/apiv2/method/send_room_notification shows
-    # 204 to be the expected result code.
-    if info['status'] in [200, 204]:
+    if info['status'] == 200:
         return response.read()
     else:
         module.fail_json(msg="failed to send message, return status=%s" % str(info['status']))
@@ -172,7 +169,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(required=True, no_log=True),
+            token=dict(required=True),
             room=dict(required=True),
             msg=dict(required=True),
             msg_from=dict(default="Ansible", aliases=['from']),

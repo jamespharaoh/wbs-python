@@ -101,15 +101,12 @@ try {
 
 # Result
 $pool = Get-Item IIS:\AppPools\$name
-if ($pool)
-{
-  $result.info = @{
-    name = $pool.Name
-    state = $pool.State
-    attributes =  New-Object psobject @{}
-  };
-  
-  $pool.Attributes | ForEach { $result.info.attributes.Add($_.Name, $_.Value)};
-}
+$result.info = @{
+  name = $pool.Name
+  state = $pool.State
+  attributes =  New-Object psobject @{}
+};
+
+$pool.Attributes | ForEach { $result.info.attributes.Add($_.Name, $_.Value)};
 
 Exit-Json $result

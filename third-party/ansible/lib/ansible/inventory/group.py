@@ -18,6 +18,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.errors import AnsibleError
+from ansible.utils.debug import debug
 
 class Group:
     ''' a group of ansible hosts '''
@@ -33,7 +34,6 @@ class Group:
         self.child_groups = []
         self.parent_groups = []
         self._hosts_cache = None
-        self.priority = 1
 
         #self.clear_hosts_cache()
         #if self.name is None:
@@ -140,14 +140,10 @@ class Group:
             for kk in kid_hosts:
                 if kk not in seen:
                     seen[kk] = 1
-                    if self.name == 'all' and kk.implicit:
-                        continue
                     hosts.append(kk)
         for mine in self.hosts:
             if mine not in seen:
                 seen[mine] = 1
-                if self.name == 'all' and mine.implicit:
-                    continue
                 hosts.append(mine)
         return hosts
 
@@ -165,11 +161,4 @@ class Group:
     def get_ancestors(self):
 
         return self._get_ancestors().values()
-
-    def set_priority(self, priority):
-        try:
-            self.priority = int(priority)
-        except TypeError:
-            #FIXME: warn about invalid priority
-            pass
 

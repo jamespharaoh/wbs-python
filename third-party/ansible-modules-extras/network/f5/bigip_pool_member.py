@@ -114,13 +114,6 @@ options:
             - Pool member ratio weight. Valid values range from 1 through 100. New pool members -- unless overriden with this value -- default to 1.
         required: false
         default: null
-    preserve_node:
-        description:
-            - When state is absent and the pool member is no longer referenced in other pools, the default behavior removes the unused node object. Setting this to 'yes' disables this behavior.
-        required: false
-        default: 'no'
-        choices: ['yes', 'no']
-        version_added: 2.1
 '''
 
 EXAMPLES = '''
@@ -324,8 +317,7 @@ def main():
             connection_limit = dict(type='int'),
             description = dict(type='str'),
             rate_limit = dict(type='int'),
-            ratio = dict(type='int'),
-            preserve_node = dict(type='bool', default=False)
+            ratio = dict(type='int')
         )
     )
 
@@ -345,16 +337,15 @@ def main():
     host = module.params['host']
     address = fq_name(partition, host)
     port = module.params['port']
-    preserve_node = module.params['preserve_node']
 
 
     # sanity check user supplied values
 
-    if (host and port is None) or (port is not None and not host):
+    if (host and not port) or (port and not host):
         module.fail_json(msg="both host and port must be supplied")
 
-    if 0 > port or port > 65535:
-        module.fail_json(msg="valid ports must be in range 0 - 65535")
+    if 1 > port > 65535:
+        module.fail_json(msg="valid ports must be in range 1 - 65535")
 
     try:
         api = bigip_api(server, user, password, validate_certs)
@@ -366,11 +357,8 @@ def main():
             if member_exists(api, pool, address, port):
                 if not module.check_mode:
                     remove_pool_member(api, pool, address, port)
-                    if preserve_node:
-                        result = {'changed': True}
-                    else:
-                        deleted = delete_node_address(api, address)
-                        result = {'changed': True, 'deleted': deleted}
+                    deleted = delete_node_address(api, address)
+                    result = {'changed': True, 'deleted': deleted}
                 else:
                     result = {'changed': True}
 
@@ -415,7 +403,7 @@ def main():
                         if not module.check_mode:
                             set_member_session_enabled_state(api, pool, address, port, session_state)
                         result = {'changed': True}
-                    elif session_state == 'disabled' and session_status != 'forced_disabled':
+                    elif session_state == 'disabled' and session_status != 'force_disabled':
                         if not module.check_mode:
                             set_member_session_enabled_state(api, pool, address, port, session_state)
                         result = {'changed': True}
@@ -438,6 +426,5 @@ def main():
 # import module snippets
 from ansible.module_utils.basic import *
 from ansible.module_utils.f5 import *
+main()
 
-if __name__ == '__main__':
-    main()

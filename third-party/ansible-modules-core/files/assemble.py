@@ -229,7 +229,8 @@ def main():
             result['validation'] = dict(rc=rc, stdout=out, stderr=err)
             if rc != 0:
                 cleanup(path)
-                module.fail_json(msg="failed to validate: rc:%s error:%s" % (rc, err))
+                result['msg'] = "failed to validate: rc:%s error:%s" % (rc, err)
+                module.fail_json(result)
         if backup and dest_hash is not None:
             result['backup_file'] = module.backup_local(dest)
 

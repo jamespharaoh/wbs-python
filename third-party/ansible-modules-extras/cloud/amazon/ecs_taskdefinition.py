@@ -53,7 +53,6 @@ options:
         required: False
         type: list of name
 extends_documentation_fragment:
-    - aws
     - ec2
 '''
 
@@ -96,6 +95,7 @@ taskdefinition:
     type: dict inputs plus revision, status, taskDefinitionArn
 '''
 try:
+    import json
     import boto
     import botocore
     HAS_BOTO = True
@@ -120,7 +120,7 @@ class EcsTaskManager:
                 module.fail_json(msg="Region must be specified as a parameter, in EC2_REGION or AWS_REGION environment variables or in boto configuration file")
             self.ecs = boto3_conn(module, conn_type='client', resource='ecs', region=region, endpoint=ec2_url, **aws_connect_kwargs)
         except boto.exception.NoAuthHandlerFound, e:
-            module.fail_json(msg="Can't authorize connection - "+str(e))
+            self.module.fail_json(msg="Can't authorize connection - "+str(e))
 
     def describe_task(self, task_name):
         try:

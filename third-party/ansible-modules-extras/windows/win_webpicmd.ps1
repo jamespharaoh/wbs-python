@@ -21,11 +21,21 @@ $ErrorActionPreference = "Stop"
 # WANT_JSON
 # POWERSHELL_COMMON
 
+# temporary fix to keep this module working in 2.0. Needs parameter validation fixes to work in future versions
+Set-StrictMode -Off
+
 $params = Parse-Args $args;
 $result = New-Object PSObject;
 Set-Attr $result "changed" $false;
 
-$package = Get-AnsibleParam $params -name "name" -failifempty $true
+If ($params.name)
+{
+    $package = $params.name
+}
+Else
+{
+    Fail-Json $result "missing required argument: name"
+}
 
 Function Find-Command
 {
@@ -35,9 +45,9 @@ Function Find-Command
     )
     $installed = get-command $command -erroraction Ignore
     write-verbose "$installed"
-    if ($installed)
+    if ($installed.length -gt 0)
     {
-        return $installed
+        return $installed[0]
     }
     return $null
 }
@@ -80,12 +90,8 @@ Function Test-IsInstalledFromWebPI
     }
     Write-Verbose "$results"
 
-    if ($results -match "^$package\s+")
-    {
-        return $true
-    }
-
-    return $false
+    $matches = $results | select-string -pattern "^$package\s+"
+    return $matches.length -gt 0
 }
 
 Function Install-WithWebPICmd
@@ -109,8 +115,8 @@ Function Install-WithWebPICmd
     }
 
     write-verbose "$results"
-
-    if ($results -match "Install of Products: SUCCESS")
+    $success = $results | select-string -pattern "Install of Products: SUCCESS"
+    if ($success.length -gt 0)
     {
         $result.changed = $true
     }

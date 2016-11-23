@@ -142,9 +142,7 @@ ufw: rule=reject port=auth log=yes
 # for details. Typical usage is:
 ufw: rule=limit port=ssh proto=tcp
 
-# Allow OpenSSH. (Note that as ufw manages its own state, simply removing
-# a rule=allow task can leave those ports exposed. Either use delete=yes
-# or a separate state=reset task)
+# Allow OpenSSH
 ufw: rule=allow name=OpenSSH
 
 # Delete OpenSSH rule
@@ -225,7 +223,7 @@ def main():
     if len(commands) < 1:
         module.fail_json(msg="Not any of the command arguments %s given" % commands)
 
-    if(params['interface'] is not None and params['direction'] is None):
+    if('interface' in params and 'direction' not in params):
       module.fail_json(msg="Direction must be specified when creating a rule on an interface")
 
     # Ensure ufw is available
@@ -260,11 +258,10 @@ def main():
             cmd.append([module.boolean(params['route']), 'route'])
             cmd.append([params['insert'], "insert %s" % params['insert']])
             cmd.append([value])
-            cmd.append([params['direction'], "%s" % params['direction']])
-            cmd.append([params['interface'], "on %s" % params['interface']])
             cmd.append([module.boolean(params['log']), 'log'])
 
-            for (key, template) in [('from_ip',   "from %s" ), ('from_port', "port %s" ),
+            for (key, template) in [('direction', "%s"      ), ('interface', "on %s"   ),
+                                    ('from_ip',   "from %s" ), ('from_port', "port %s" ),
                                     ('to_ip',     "to %s"   ), ('to_port',   "port %s" ),
                                     ('proto',     "proto %s"), ('app',       "app '%s'")]:
 

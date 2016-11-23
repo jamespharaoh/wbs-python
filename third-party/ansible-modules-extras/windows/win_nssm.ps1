@@ -95,9 +95,6 @@ Function Nssm-Install
     {
         Throw "Error installing service ""$name"". No application was supplied."
     }
-    If (-Not (Test-Path -Path $application -PathType Leaf)) {
-        Throw "$application does not exist on the host"
-    }
 
     if (!(Service-Exists -name $name))
     {
@@ -141,21 +138,6 @@ Function Nssm-Install
             $result.changed = $true
         }
      }
-
-     if ($result.changed)
-     {
-        $applicationPath = (Get-Item $application).DirectoryName
-        $cmd = "nssm set ""$name"" AppDirectory $applicationPath"
-
-        $results = invoke-expression $cmd
-
-        if ($LastExitCode -ne 0)
-        {
-            Set-Attr $result "nssm_error_cmd" $cmd
-            Set-Attr $result "nssm_error_log" "$results"
-            Throw "Error installing service ""$name"""
-        }
-     }
 }
 
 Function ParseAppParameters()
@@ -167,9 +149,7 @@ Function ParseAppParameters()
         [string]$appParameters
     )
 
-    $escapedAppParameters = $appParameters.TrimStart("@").TrimStart("{").TrimEnd("}").Replace("; ","`n").Replace("\","\\")
-
-    return ConvertFrom-StringData -StringData $escapedAppParameters
+    return ConvertFrom-StringData -StringData $appParameters.TrimStart("@").TrimStart("{").TrimEnd("}").Replace("; ","`n")
 }
 
 

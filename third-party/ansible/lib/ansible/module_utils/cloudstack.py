@@ -35,18 +35,6 @@ try:
 except ImportError:
     has_lib_cs = False
 
-CS_HYPERVISORS = [
-    "KVM", "kvm",
-    "VMware", "vmware",
-    "BareMetal", "baremetal",
-    "XenServer", "xenserver",
-    "LXC", "lxc",
-    "HyperV", "hyperv",
-    "UCS", "ucs",
-    "OVM", "ovm",
-    "Simulator", "simulator",
-    ]
-
 def cs_argument_spec():
     return dict(
         api_key = dict(default=None),
@@ -93,9 +81,6 @@ class AnsibleCloudStack(object):
         # these keys will be compared case sensitive in self.has_changed()
         self.case_sensitive_keys = [
             'id',
-            'displaytext',
-            'displayname',
-            'description',
         ]
 
         self.module = module
@@ -157,27 +142,12 @@ class AnsibleCloudStack(object):
                 continue
 
             if key in current_dict:
-                if isinstance(value, (int, float, long, complex)):
-                    # ensure we compare the same type
-                    if isinstance(value, int):
-                        current_dict[key] = int(current_dict[key])
-                    elif isinstance(value, float):
-                        current_dict[key] = float(current_dict[key])
-                    elif isinstance(value, long):
-                        current_dict[key] = long(current_dict[key])
-                    elif isinstance(value, complex):
-                        current_dict[key] = complex(current_dict[key])
-
-                    if value != current_dict[key]:
+                if self.case_sensitive_keys and key in self.case_sensitive_keys:
+                    if str(value) != str(current_dict[key]):
                         return True
-                else:
-                    if self.case_sensitive_keys and key in self.case_sensitive_keys:
-                        if value != current_dict[key].encode('utf-8'):
-                            return True
-
-                    # Test for diff in case insensitive way
-                    elif value.lower() != current_dict[key].encode('utf-8').lower():
-                        return True
+                # Test for diff in case insensitive way
+                elif str(value).lower() != str(current_dict[key]).lower():
+                    return True
             else:
                 return True
         return False

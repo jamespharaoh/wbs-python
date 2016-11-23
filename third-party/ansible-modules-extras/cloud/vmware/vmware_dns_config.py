@@ -32,6 +32,20 @@ requirements:
     - "python >= 2.6"
     - PyVmomi
 options:
+    hostname:
+        description:
+            - The hostname or IP address of the vSphere vCenter API server
+        required: True
+    username:
+        description:
+            - The username of the vSphere vCenter
+        required: True
+        aliases: ['user', 'admin']
+    password:
+        description:
+            - The password of the vSphere vCenter
+        required: True
+        aliases: ['pass', 'pwd']
     change_hostname_to:
         description:
             - The hostname that an ESXi host should be changed to.
@@ -44,7 +58,6 @@ options:
         description:
             - The DNS servers that the host should be configured to use.
         required: True
-extends_documentation_fragment: vmware.documentation
 '''
 
 EXAMPLES = '''

@@ -50,12 +50,6 @@ options:
             - The amount of time to wait for a node to appear.
         default: 300
         required: false
-    recursive:
-        description:
-            - Recursively delete node and all its children.
-        default: False
-        required: false
-        version_added: "2.1"
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
@@ -96,8 +90,7 @@ def main():
             value=dict(required=False, default=None, type='str'),
             op=dict(required=False, default=None, choices=['get', 'wait', 'list']),
             state=dict(choices=['present', 'absent']),
-            timeout=dict(required=False, default=300, type='int'),
-            recursive=dict(required=False, default=False, type='bool')
+            timeout=dict(required=False, default=300, type='int')
         ),
         supports_check_mode=False
     )
@@ -182,7 +175,7 @@ class KazooCommandProxy():
 
     def _absent(self, znode):
         if self.exists(znode):
-            self.zk.delete(znode, recursive=self.module.params['recursive'])
+            self.zk.delete(znode)
             return True, {'changed': True, 'msg': 'The znode was deleted.'}
         else:
             return True, {'changed': False, 'msg': 'The znode does not exist.'}

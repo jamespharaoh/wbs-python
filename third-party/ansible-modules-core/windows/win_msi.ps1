@@ -25,7 +25,6 @@ $path = Get-Attr $params "path" -failifempty $true
 $state = Get-Attr $params "state" "present"
 $creates = Get-Attr $params "creates" $false
 $extra_args = Get-Attr $params "extra_args" ""
-$wait = Get-Attr $params "wait" $false | ConvertTo-Bool
 
 $result = New-Object psobject @{
     changed = $false
@@ -39,25 +38,11 @@ If (($creates -ne $false) -and ($state -ne "absent") -and (Test-Path $creates))
 $logfile = [IO.Path]::GetTempFileName();
 if ($state -eq "absent")
 {
-  If ($wait)
-  {
-    Start-Process -FilePath msiexec.exe -ArgumentList "/x `"$path`" /qn /l $logfile $extra_args" -Verb Runas -Wait;
-  }
-  Else
-  {
-    Start-Process -FilePath msiexec.exe -ArgumentList "/x `"$path`" /qn /l $logfile $extra_args" -Verb Runas;
-  }
+    msiexec.exe /x $path /qn /l $logfile $extra_args
 }
 Else
 {
-  If ($wait)
-  {
-    Start-Process -FilePath msiexec.exe -ArgumentList "/i `"$path`" /qn /l $logfile $extra_args" -Verb Runas -Wait;
-  }
-  Else
-  {
-    Start-Process -FilePath msiexec.exe -ArgumentList "/i `"$path`" /qn /l $logfile $extra_args" -Verb Runas;
-  }
+    msiexec.exe /i $path /qn /l $logfile $extra_args
 }
 
 Set-Attr $result "changed" $true;

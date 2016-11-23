@@ -59,9 +59,7 @@ options:
         description:
             - Whether or not to use HTTPS
         required: false
-        choices:
-            - true
-            - false
+        choices: BOOLEANS 
         default: 'false'
 
     site_apps:
@@ -114,9 +112,9 @@ def main():
             state = dict(required=False, choices=['present', 'absent'], default='present'),
             # You can specify an IP address or hostname.
             host = dict(required=True),
-            https = dict(required=False, type='bool', default=False),
-            subdomains = dict(required=False, type='list', default=[]),
-            site_apps = dict(required=False, type='list', default=[]),
+            https = dict(required=False, choices=BOOLEANS, default=False),
+            subdomains = dict(required=False, default=[]),
+            site_apps = dict(required=False, default=[]),
             login_name = dict(required=True),
             login_password = dict(required=True),
         ),

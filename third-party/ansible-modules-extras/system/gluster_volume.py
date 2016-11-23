@@ -71,7 +71,6 @@ options:
   start_on_create:
     choices: [ 'yes', 'no']
     required: false
-    default: 'yes'
     description:
       - Controls whether the volume is started after creation or not, defaults to yes
   rebalance:
@@ -251,7 +250,7 @@ def wait_for_peer(host):
 def probe(host, myhostname):
     global module
     out = run_gluster([ 'peer', 'probe', host ])
-    if out.find('localhost') == -1 and not wait_for_peer(host):
+    if not out.find('localhost') and not wait_for_peer(host):
         module.fail_json(msg='failed to probe peer %s on %s' % (host, myhostname))
     changed = True
 
@@ -288,14 +287,8 @@ def stop_volume(name):
 def set_volume_option(name, option, parameter):
     run_gluster([ 'volume', 'set', name, option, parameter ])
 
-def add_bricks(name, new_bricks, stripe, replica, force):
+def add_bricks(name, new_bricks, force):
     args = [ 'volume', 'add-brick', name ]
-    if stripe:
-        args.append('stripe')
-        args.append(str(stripe))
-    if replica:
-        args.append('replica')
-        args.append(str(replica))
     args.extend(new_bricks)
     if force:
         args.append('force')
@@ -356,11 +349,8 @@ def main():
 
     # Clean up if last element is empty. Consider that yml can look like this:
     #   cluster="{% for host in groups['glusterfs'] %}{{ hostvars[host]['private_ip'] }},{% endfor %}"
-    if cluster != None and len(cluster) > 1 and cluster[-1] == '':
+    if cluster != None and cluster[-1] == '':
         cluster = cluster[0:-1]
-
-    if cluster == None or cluster[0] == '':
-        cluster = [myhostname]
 
     if brick_paths != None and "," in brick_paths:
         brick_paths = brick_paths.split(",")
@@ -418,7 +408,7 @@ def main():
                     removed_bricks.append(brick)
 
             if new_bricks:
-                add_bricks(volume_name, new_bricks, stripes, replicas, force)
+                add_bricks(volume_name, new_bricks, force)
                 changed = True
 
             # handle quotas

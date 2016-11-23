@@ -19,6 +19,8 @@
 # WANT_JSON
 # POWERSHELL_COMMON
 
+# temporary fix to keep this module working in 2.0. Needs parameter validation fixes to work in future versions
+Set-StrictMode -Off
 
 $params = Parse-Args $args;
 
@@ -27,47 +29,66 @@ $result = New-Object psobject @{
     changed = $false
 }
 
-$creates = Get-AnsibleParam -obj $params -name "creates"
-If ($creates -ne $null) {
+# TODO: StrictMode fix
+If ($params.creates) {
     If (Test-Path $params.creates) {
         Exit-Json $result "The 'creates' file or directory already exists."
     }
+
 }
 
-$src = Get-AnsibleParam -obj $params -name "src" -failifempty $true
-If (-Not (Test-Path -path $src)){
-    Fail-Json $result "src file: $src does not exist."
-}
+# TODO: StrictMode fix
+If ($params.src) {
+    $src = $params.src.toString()
 
-$ext = [System.IO.Path]::GetExtension($src)
-
-
-$dest = Get-AnsibleParam -obj $params -name "dest" -failifempty $true
-If (-Not (Test-Path $dest -PathType Container)){
-    Try{
-        New-Item -itemtype directory -path $dest
+    If (-Not (Test-Path -path $src)){
+        Fail-Json $result "src file: $src does not exist."
     }
-    Catch {
-        $err_msg = $_.Exception.Message
-        Fail-Json $result "Error creating $dest directory! Msg: $err_msg"
-    }
+
+    $ext = [System.IO.Path]::GetExtension($src)
+}
+Else {
+    Fail-Json $result "missing required argument: src"
 }
 
-$recurse = ConvertTo-Bool (Get-AnsibleParam -obj $params -name "recurse" -default "false")
-$rm = ConvertTo-Bool (Get-AnsibleParam -obj $params -name "rm" -default "false")
+If (-Not($params.dest -eq $null)) {
+    $dest = $params.dest.toString()
+
+    If (-Not (Test-Path $dest -PathType Container)){
+        Try{
+            New-Item -itemtype directory -path $dest
+        }
+        Catch {
+            Fail-Json $result "Error creating $dest directory"
+        }
+    }
+}
+Else {
+    Fail-Json $result "missing required argument: dest"
+}
+
+If ($params.recurse) {
+   $recurse = ConvertTo-Bool ($params.recurse)
+}
+Else {
+    $recurse = $false
+}
+
+If ($params.rm) { 
+    $rm = ConvertTo-Bool ($params.rm) 
+} 
+Else { 
+    $rm = $false 
+}
 
 If ($ext -eq ".zip" -And $recurse -eq $false) {
     Try {
         $shell = New-Object -ComObject Shell.Application
-        $zipPkg = $shell.NameSpace([IO.Path]::GetFullPath($src))
-        $destPath = $shell.NameSpace([IO.Path]::GetFullPath($dest))
-        # 20 means do not display any dialog (4) and overwrite any file (16)
-        $destPath.CopyHere($zipPkg.Items(), 20)
+        $shell.NameSpace($dest).copyhere(($shell.NameSpace($src)).items(), 20)
         $result.changed = $true
     }
     Catch {
-        $err_msg = $_.Exception.Message
-        Fail-Json $result "Error unzipping $src to $dest! Msg: $err_msg"
+        Fail-Json $result "Error unzipping $src to $dest"
     }
 }
 # Requires PSCX
@@ -111,12 +132,11 @@ Else {
         }
     }
     Catch {
-        $err_msg = $_.Exception.Message
         If ($recurse) {
-            Fail-Json $result "Error recursively expanding $src to $dest! Msg: $err_msg"
+            Fail-Json $result "Error recursively expanding $src to $dest"
         }
         Else {
-            Fail-Json $result "Error expanding $src to $dest! Msg: $err_msg"
+            Fail-Json $result "Error expanding $src to $dest"
         }
     }
 }

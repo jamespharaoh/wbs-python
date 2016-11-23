@@ -210,8 +210,11 @@ class AnsibleCloudStackProject(AnsibleCloudStack):
         return project
 
 
-    def state_project(self, state='active'):
-        project = self.present_project()
+    def state_project(self, state=None):
+        project = self.get_project()
+
+        if not project:
+            self.module.fail_json(msg="No project named '%s' found." % self.module.params('name'))
 
         if project['state'].lower() != state:
             self.result['changed'] = True

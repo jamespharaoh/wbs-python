@@ -183,6 +183,11 @@ def _choose_id_value(module):
     return None
 
 
+def _is_value_true(value):
+    true_values = [True, 'yes', 'Yes', 'True', 'true']
+    if value in true_values:
+        return True
+    return False
 
 
 def _choose_if_password_only(module, patch):
@@ -213,7 +218,7 @@ def main():
         properties=dict(type='dict', default={}),
         ironic_url=dict(required=False),
         chassis_uuid=dict(required=False),
-        skip_update_of_masked_password=dict(required=False, type='bool'),
+        skip_update_of_masked_password=dict(required=False, choices=BOOLEANS),
         state=dict(required=False, default='present')
     )
     module_kwargs = openstack_module_kwargs()
@@ -344,6 +349,4 @@ def main():
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *
 from ansible.module_utils.openstack import *
-
-if __name__ == "__main__":
-    main()
+main()

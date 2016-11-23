@@ -57,9 +57,6 @@ EXAMPLES = '''
 - modprobe: name=dummy state=present params="numdummies=2"
 '''
 
-import shlex
-
-
 def main():
     module = AnsibleModule(
         argument_spec={
@@ -103,9 +100,7 @@ def main():
     # Add/remove module as needed
     if args['state'] == 'present':
         if not present:
-            command = [module.get_bin_path('modprobe', True), args['name']]
-            command.extend(shlex.split(args['params']))
-            rc, _, err = module.run_command(command)
+            rc, _, err = module.run_command([module.get_bin_path('modprobe', True), args['name'], args['params']])
             if rc != 0:
                 module.fail_json(msg=err, **args)
             args['changed'] = True

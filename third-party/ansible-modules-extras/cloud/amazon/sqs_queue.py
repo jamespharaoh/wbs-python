@@ -22,9 +22,7 @@ description:
   - Create or delete AWS SQS queues.
   - Update attributes on existing queues.
 version_added: "2.0"
-author:
-  - Alan Loi (@loia)
-  - Fernando Jose Pando (@nand0p)
+author: Alan Loi (@loia)
 requirements:
   - "boto >= 2.33.0"
 options:
@@ -63,12 +61,6 @@ options:
       - The receive message wait time in seconds.
     required: false
     default: null
-  policy:
-    description:
-      - The json dict policy to attach to queue
-    required: false
-    default: null
-    version_added: "2.1"
 extends_documentation_fragment:
     - aws
     - ec2
@@ -84,7 +76,6 @@ EXAMPLES = '''
     maximum_message_size: 1024
     delivery_delay: 30
     receive_message_wait_time: 20
-    policy: "{{ json_dict }}"
 
 # Delete SQS queue
 - sqs_queue:
@@ -111,7 +102,6 @@ def create_or_update_sqs_queue(connection, module):
         maximum_message_size=module.params.get('maximum_message_size'),
         delivery_delay=module.params.get('delivery_delay'),
         receive_message_wait_time=module.params.get('receive_message_wait_time'),
-        policy=module.params.get('policy'),
     )
 
     result = dict(
@@ -146,8 +136,7 @@ def update_sqs_queue(queue,
                      message_retention_period=None,
                      maximum_message_size=None,
                      delivery_delay=None,
-                     receive_message_wait_time=None,
-                     policy=None):
+                     receive_message_wait_time=None):
     changed = False
 
     changed = set_queue_attribute(queue, 'VisibilityTimeout', default_visibility_timeout,
@@ -160,8 +149,6 @@ def update_sqs_queue(queue,
                                   check_mode=check_mode) or changed
     changed = set_queue_attribute(queue, 'ReceiveMessageWaitTimeSeconds', receive_message_wait_time,
                                   check_mode=check_mode) or changed
-    changed = set_queue_attribute(queue, 'Policy', policy,
-                                  check_mode=check_mode) or changed
     return changed
 
 
@@ -169,17 +156,7 @@ def set_queue_attribute(queue, attribute, value, check_mode=False):
     if not value:
         return False
 
-    try:
-        existing_value = queue.get_attributes(attributes=attribute)[attribute]
-    except:
-        existing_value = ''
-
-    # convert dict attributes to JSON strings (sort keys for comparing)
-    if attribute is 'Policy':
-        value = json.dumps(value, sort_keys=True)
-        if existing_value:
-            existing_value = json.dumps(json.loads(existing_value), sort_keys=True)
-
+    existing_value = queue.get_attributes(attributes=attribute)[attribute]
     if str(value) != existing_value:
         if not check_mode:
             queue.set_attribute(attribute, value)
@@ -223,7 +200,6 @@ def main():
         maximum_message_size=dict(type='int'),
         delivery_delay=dict(type='int'),
         receive_message_wait_time=dict(type='int'),
-        policy=dict(type='dict', required=False),
     ))
 
     module = AnsibleModule(
@@ -239,8 +215,8 @@ def main():
 
     try:
         connection = connect_to_aws(boto.sqs, region, **aws_connect_params)
-
-    except (NoAuthHandlerFound, AnsibleAWSError), e:
+        
+    except (NoAuthHandlerFound, StandardError), e:
         module.fail_json(msg=str(e))
 
     state = module.params.get('state')
@@ -254,5 +230,4 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-if __name__ == '__main__':
-    main()
+main()

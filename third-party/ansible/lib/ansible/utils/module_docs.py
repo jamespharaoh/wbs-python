@@ -37,11 +37,9 @@ except ImportError:
     display = Display()
 
 # modules that are ok that they do not have documentation strings
-BLACKLIST_MODULES = frozenset((
-   'async_wrapper',
-   'accelerate',
-   'fireball',
-))
+BLACKLIST_MODULES = [
+   'async_wrapper', 'accelerate', 'async_status'
+]
 
 def get_docstring(filename, verbose=False):
     """
@@ -69,7 +67,7 @@ def get_docstring(filename, verbose=False):
                         theid = t.id
                     except AttributeError as e:
                         # skip errors can happen when trying to use the normal code
-                        display.warning("Failed to assign id for %s on %s, skipping" % (t, filename))
+                        display.warning("Failed to assign id for %t on %s, skipping" % (t, filename))
                         continue
 
                     if 'DOCUMENTATION' in theid:

@@ -117,9 +117,6 @@ ubuntu_system_packages:
   - name: "libav-tools"
     state: "present"
 
-  - name: "libcurl-dev"
-    state: "present"
-
   - name: "libffi-dev"
     state: "present"
 
@@ -172,9 +169,6 @@ ubuntu_system_packages:
     state: "present"
 
   - name: "samba"
-    state: "present"
-
-  - name: "software-properties-common"
     state: "present"
 
   - name: "super"

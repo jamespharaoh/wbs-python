@@ -83,8 +83,7 @@ options:
     description:
       - Optional attribute which with to sort the results.
       - If specifying 'tag', the 'tag_name' parameter is required.
-      - Starting at version 2.1, additional sort choices of architecture, block_device_mapping, creationDate, hypervisor, is_public, location, owner_id, platform, root_device_name, root_device_type, state, and virtualization_type are supported.  
-    choices: ['name', 'description', 'tag', 'architecture', 'block_device_mapping', 'creationDate', 'hypervisor', 'is_public', 'location', 'owner_id', 'platform', 'root_device_name', 'root_device_type', 'state', 'virtualization_type']
+    choices: ['name', 'description', 'tag']
     default: null
     required: false
   sort_tag:
@@ -300,11 +299,11 @@ def main():
                 aliases = ['search_tags', 'image_tags']),
             architecture = dict(required=False),
             hypervisor = dict(required=False),
-            is_public = dict(required=False, type='bool'),
+            is_public = dict(required=False),
             name = dict(required=False),
             platform = dict(required=False),
             sort = dict(required=False, default=None,
-                choices=['name', 'description', 'tag', 'architecture', 'block_device_mapping', 'creationDate', 'hypervisor', 'is_public', 'location', 'owner_id', 'platform', 'root_device_name', 'root_device_type', 'state', 'virtualization_type']),
+                choices=['name', 'description', 'tag']),
             sort_tag = dict(required=False),
             sort_order = dict(required=False, default='ascending',
                 choices=['ascending', 'descending']),

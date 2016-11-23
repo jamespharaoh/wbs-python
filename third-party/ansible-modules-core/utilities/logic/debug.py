@@ -38,12 +38,6 @@ options:
   var:
     description:
       - A variable name to debug.  Mutually exclusive with the 'msg' option.
-  verbosity:
-    description:
-      - A number that controls when the debug is run, if you set to 3 it will only run debug when -vvv or above
-    required: False
-    default: 0
-    version_added: "2.1"
 author: 
     - "Dag Wieers (@dagwieers)"
     - "Michael DeHaan"
@@ -59,8 +53,8 @@ EXAMPLES = '''
 - shell: /usr/bin/uptime
   register: result
 
-- debug: var=result verbosity=2
+- debug: var=result
 
 - name: Display all variables/facts known for a host
-  debug: var=hostvars[inventory_hostname] verbosity=4
+  debug: var=hostvars[inventory_hostname]
 '''

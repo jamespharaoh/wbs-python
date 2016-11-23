@@ -76,12 +76,11 @@ def main():
     # no remote kill mode currently exists, but probably should
     # consider log_path + ".pid" file and also unlink that above
 
-    data = None
+    data = file(log_path).read()
     try:
-        data = file(log_path).read()
         data = json.loads(data)
-    except Exception:
-        if not data:
+    except Exception, e:
+        if data == '':
             # file not written yet?  That means it is running
             module.exit_json(results_file=log_path, ansible_job_id=jid, started=1, finished=0)
         else:
@@ -91,8 +90,6 @@ def main():
     if not 'started' in data:
         data['finished'] = 1
         data['ansible_job_id'] = jid
-    elif 'finished' not in data:
-        data['finished'] = 0
 
     # Fix error: TypeError: exit_json() keywords must be strings
     data = dict([(str(k), v) for k, v in data.iteritems()])

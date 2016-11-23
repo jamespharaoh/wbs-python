@@ -124,7 +124,7 @@ class InventoryParser(object):
                     del pending_declarations[groupname]
 
                 continue
-            elif line.startswith('[') and line.endswith(']'):
+            elif line.startswith('['):
                 self._raise_error("Invalid section entry: '%s'. Please make sure that there are no spaces" % line + \
                                   "in the section entry, and that there are no other invalid characters")
 
@@ -143,10 +143,7 @@ class InventoryParser(object):
             # applied to the current group.
             elif state == 'vars':
                 (k, v) = self._parse_variable_definition(line)
-                if k != 'ansible_group_priority':
-                    self.groups[groupname].set_variable(k, v)
-                else:
-                    self.groups[groupname].set_priority(v)
+                self.groups[groupname].set_variable(k, v)
 
             # [groupname:children] contains subgroup names that must be
             # added as children of the current group. The subgroup names

@@ -27,9 +27,6 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = dict()
 
-        if self._task.environment:
-            self._display.warning('raw module does not support the environment keyword')
-
         result = super(ActionModule, self).run(tmp, task_vars)
 
         if self._play_context.check_mode:
@@ -37,7 +34,7 @@ class ActionModule(ActionBase):
             result['skipped'] = True
             return result
 
-        executable = self._task.args.get('executable', False)
+        executable = self._task.args.get('executable')
         result.update(self._low_level_execute_command(self._task.args.get('_raw_params'), executable=executable))
 
         return result

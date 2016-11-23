@@ -82,9 +82,8 @@ options:
     roles:
         version_added: "1.3"
         description:
-            - "The database user roles valid values could either be one or more of the following strings: 'read', 'readWrite', 'dbAdmin', 'userAdmin', 'clusterAdmin', 'readAnyDatabase', 'readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase'"
-            - "Or the following dictionary '{ db: DATABASE_NAME, role: ROLE_NAME }'."
-            - "This param requires pymongo 2.5+. If it is a string, mongodb 2.4+ is also required. If it is a dictionary, mongo 2.6+  is required."
+            - "The database user roles valid values are one or more of the following: read, 'readWrite', 'dbAdmin', 'userAdmin', 'clusterAdmin', 'readAnyDatabase', 'readWriteAnyDatabase', 'userAdminAnyDatabase', 'dbAdminAnyDatabase'"
+            - This param requires mongodb 2.4+ and pymongo 2.5+
         required: false
         default: "readWrite"
     state:
@@ -125,23 +124,7 @@ EXAMPLES = '''
 - mongodb_user: database=burgers name=joe password=12345 roles='readWriteAnyDatabase' state=present
 
 # add a user to database in a replica set, the primary server is automatically discovered and written to
-- mongodb_user: database=burgers name=bob replica_set=belcher password=12345 roles='readWriteAnyDatabase' state=present
-
-# add a user 'oplog_reader' with read only access to the 'local' database on the replica_set 'belcher'. This is usefull for oplog access (MONGO_OPLOG_URL).
-# please notice the credentials must be added to the 'admin' database because the 'local' database is not syncronized and can't receive user credentials
-# To login with such user, the connection string should be MONGO_OPLOG_URL="mongodb://oplog_reader:oplog_reader_password@server1,server2/local?authSource=admin"
-# This syntax requires mongodb 2.6+ and pymongo 2.5+
-- mongodb_user:
-    login_user: root
-    login_password: root_password
-    database: admin
-    user: oplog_reader
-    password: oplog_reader_password
-    state: present
-    replica_set: belcher
-    roles:
-     - { db: "local"  , role: "read" }
-
+- mongodb_user: database=burgers name=bob replica_set=blecher password=12345 roles='readWriteAnyDatabase' state=present
 '''
 
 import ConfigParser
@@ -165,33 +148,16 @@ else:
 # MongoDB module specific support methods.
 #
 
-def user_find(client, user, db_name):
-    """Check if the user exists.
-
-    Args:
-        client (cursor): Mongodb cursor on admin database.
-        user (str): User to check.
-        db_name (str): User's database.
-
-    Returns:
-        dict: when user exists, False otherwise.
-    """
+def user_find(client, user):
     for mongo_user in client["admin"].system.users.find():
         if mongo_user['user'] == user:
-            # NOTE: there is no 'db' field in mongo 2.4.
-            if 'db' not in mongo_user:
-                return mongo_user
-
-            if mongo_user["db"] == db_name:
-                return mongo_user
+            return mongo_user
     return False
 
-
 def user_add(module, client, db_name, user, password, roles):
-    #pymongo's user_add is a _create_or_update_user so we won't know if it was changed or updated
+    #pymono's user_add is a _create_or_update_user so we won't know if it was changed or updated
     #without reproducing a lot of the logic in database.py of pymongo
     db = client[db_name]
-
     if roles is None:
         db.add_user(user, password, False)
     else:
@@ -204,10 +170,8 @@ def user_add(module, client, db_name, user, password, roles):
             module.fail_json(msg=err_msg)
 
 def user_remove(module, client, db_name, user):
-    exists = user_find(client, user, db_name)
+    exists = user_find(client, user)
     if exists:
-        if module.check_mode:
-            module.exit_json(changed=True, user=user)
         db = client[db_name]
         db.remove_user(user)
     else:
@@ -228,44 +192,6 @@ def load_mongocnf():
 
     return creds
 
-
-
-def check_if_roles_changed(uinfo, roles, db_name):
-# We must be aware of users which can read the oplog on a replicaset
-# Such users must have access to the local DB, but since this DB does not store users credentials
-# and is not synchronized among replica sets, the user must be stored on the admin db
-# Therefore their structure is the following :
-# {
-#     "_id" : "admin.oplog_reader",
-#     "user" : "oplog_reader",
-#     "db" : "admin",                    # <-- admin DB
-#     "roles" : [
-#         {
-#             "role" : "read",
-#             "db" : "local"             # <-- local DB
-#         }
-#     ]
-# }
-
-    def make_sure_roles_are_a_list_of_dict(roles, db_name):
-        output = list()
-        for role in roles:
-            if isinstance(role, basestring):
-                new_role = { "role": role, "db": db_name }
-                output.append(new_role)
-            else:
-                output.append(role)
-        return output
-
-    roles_as_list_of_dict = make_sure_roles_are_a_list_of_dict(roles, db_name)
-    uinfo_roles = uinfo.get('roles', [])
-
-    if sorted(roles_as_list_of_dict) == sorted(uinfo_roles):
-        return False
-    return True
-
-
-
 # =========================================
 # Module execution.
 #
@@ -282,12 +208,11 @@ def main():
             database=dict(required=True, aliases=['db']),
             name=dict(required=True, aliases=['user']),
             password=dict(aliases=['pass']),
-            ssl=dict(default=False, type='bool'),
+            ssl=dict(default=False),
             roles=dict(default=None, type='list'),
             state=dict(default='present', choices=['absent', 'present']),
             update_password=dict(default="always", choices=["always", "on_create"]),
-        ),
-        supports_check_mode=True
+        )
     )
 
     if not pymongo_found:
@@ -298,7 +223,7 @@ def main():
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     login_database = module.params['login_database']
-
+    
     replica_set = module.params['replica_set']
     db_name = module.params['database']
     user = module.params['name']
@@ -336,24 +261,13 @@ def main():
         if password is None and update_password == 'always':
             module.fail_json(msg='password parameter required when adding a user unless update_password is set to on_create')
 
+        if update_password != 'always' and user_find(client, user):
+            password = None
+
         try:
-            uinfo = user_find(client, user, db_name)
-            if update_password != 'always' and uinfo:
-                password = None
-                if not check_if_roles_changed(uinfo, roles, db_name):
-                    module.exit_json(changed=False, user=user)
-
-            if module.check_mode:
-                module.exit_json(changed=True, user=user)
-
             user_add(module, client, db_name, user, password, roles)
         except OperationFailure, e:
             module.fail_json(msg='Unable to add or update user: %s' % str(e))
-
-            # Here we can  check password change if mongo provide a query for that : https://jira.mongodb.org/browse/SERVER-22848
-            #newuinfo = user_find(client, user, db_name)
-            #if uinfo['role'] == newuinfo['role'] and CheckPasswordHere:
-            #    module.exit_json(changed=False, user=user)
 
     elif state == 'absent':
         try:

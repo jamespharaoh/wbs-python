@@ -28,9 +28,9 @@ import time
 import locale
 import logging
 import getpass
-import errno
 from struct import unpack, pack
 from termios import TIOCGWINSZ
+from multiprocessing import Lock
 
 from ansible import constants as C
 from ansible.errors import AnsibleError
@@ -38,21 +38,15 @@ from ansible.utils.color import stringc
 from ansible.utils.unicode import to_bytes, to_unicode
 
 try:
-    from __main__ import debug_lock
-except ImportError:
-    # for those not using a CLI, though ...
-    # this might not work well after fork
-    from multiprocessing import Lock
-    debug_lock = Lock()
-
-try:
     # Python 2
     input = raw_input
 except NameError:
-    # Python 3, we already have raw_input
+    # Python 3
     pass
 
 
+# These are module level as we currently fork and serialize the whole process and locks in the objects don't play well with that
+debug_lock = Lock()
 
 logger = None
 #TODO: make this a logging callback instead
@@ -135,19 +129,11 @@ class Display:
                 msg2 = to_unicode(msg2, self._output_encoding(stderr=stderr))
 
             if not stderr:
-                fileobj = sys.stdout
+                sys.stdout.write(msg2)
+                sys.stdout.flush()
             else:
-                fileobj = sys.stderr
-
-            fileobj.write(msg2)
-
-            try:
-                fileobj.flush()
-            except IOError as e:
-                # Ignore EPIPE in case fileobj has been prematurely closed, eg.
-                # when piping to "head -n1"
-                if e.errno != errno.EPIPE:
-                    raise
+                sys.stderr.write(msg2)
+                sys.stderr.flush()
 
         if logger and not screen_only:
             msg2 = nocolor.lstrip(u'\n')
@@ -163,9 +149,6 @@ class Display:
                 logger.error(msg2)
             else:
                 logger.info(msg2)
-
-    def v(self, msg, host=None):
-        return self.verbose(msg, host=host, caplevel=0)
 
     def vv(self, msg, host=None):
         return self.verbose(msg, host=host, caplevel=1)
@@ -219,15 +202,10 @@ class Display:
             self.display(new_msg.strip(), color=C.COLOR_DEPRECATE, stderr=True)
             self._deprecations[new_msg] = 1
 
-    def warning(self, msg, formatted=False):
-
-        if not formatted:
-            new_msg = "\n[WARNING]: %s" % msg
-            wrapped = textwrap.wrap(new_msg, self.columns)
-            new_msg = "\n".join(wrapped) + "\n"
-        else:
-            new_msg = "\n[WARNING]: \n%s" % msg
-
+    def warning(self, msg):
+        new_msg = "\n[WARNING]: %s" % msg
+        wrapped = textwrap.wrap(new_msg, self.columns)
+        new_msg = "\n".join(wrapped) + "\n"
         if new_msg not in self._warns:
             self.display(new_msg, color=C.COLOR_WARN, stderr=True)
             self._warns[new_msg] = 1

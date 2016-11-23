@@ -92,7 +92,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(required=True, no_log=True),
+            token=dict(required=True),
             app_name=dict(required=False),
             application_id=dict(required=False),
             changelog=dict(required=False),

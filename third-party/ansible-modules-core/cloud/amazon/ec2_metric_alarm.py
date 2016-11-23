@@ -115,6 +115,8 @@ EXAMPLES = '''
 
 '''
 
+import sys
+
 try:
     import boto.ec2.cloudwatch
     from boto.ec2.cloudwatch import CloudWatchConnection, MetricAlarm
@@ -268,11 +270,11 @@ def main():
     state = module.params.get('state')
 
     region, ec2_url, aws_connect_params = get_aws_connection_info(module)
-
+    
     if region:
         try:
             connection = connect_to_aws(boto.ec2.cloudwatch, region, **aws_connect_params)
-        except (boto.exception.NoAuthHandlerFound, AnsibleAWSError), e:
+        except (boto.exception.NoAuthHandlerFound, StandardError), e:
             module.fail_json(msg=str(e))
     else:
         module.fail_json(msg="region must be specified")
@@ -286,5 +288,4 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-if __name__ == '__main__':
-    main()
+main()

@@ -259,9 +259,9 @@ def main():
                                                 "light_gray", "none"]),
             style=dict(default="none", choices=["underline", "reverse", "bold", "italic", "none"]),
             channel=dict(required=False),
-            key=dict(no_log=True),
+            key=dict(),
             topic=dict(),
-            passwd=dict(no_log=True),
+            passwd=dict(),
             timeout=dict(type='int', default=30),
             part=dict(type='bool', default=True),
             use_ssl=dict(type='bool', default=False)

@@ -184,6 +184,7 @@ def main():
 
     command_required_param_map = dict(
         loaddata=('fixtures', ),
+        createcachetable=('cache_table', ),
         )
 
     # forces --noinput on every command that needs it

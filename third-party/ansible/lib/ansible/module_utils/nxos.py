@@ -16,51 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-import re
-
-from ansible.module_utils.basic import AnsibleModule, env_fallback, get_exception
-from ansible.module_utils.shell import Shell, ShellError, HAS_PARAMIKO
-from ansible.module_utils.netcfg import parse
-from ansible.module_utils.urls import fetch_url
-
 NET_PASSWD_RE = re.compile(r"[\r\n]?password: $", re.I)
 
 NET_COMMON_ARGS = dict(
     host=dict(required=True),
     port=dict(type='int'),
-    username=dict(fallback=(env_fallback, ['ANSIBLE_NET_USERNAME'])),
-    password=dict(no_log=True, fallback=(env_fallback, ['ANSIBLE_NET_PASSWORD'])),
-    ssh_keyfile=dict(fallback=(env_fallback, ['ANSIBLE_NET_SSH_KEYFILE']), type='path'),
-    transport=dict(default='cli', choices=['cli', 'nxapi']),
-    use_ssl=dict(default=False, type='bool'),
-    validate_certs=dict(default=True, type='bool'),
-    provider=dict(type='dict'),
-    timeout=dict(default=10, type='int')
+    username=dict(required=True),
+    password=dict(no_log=True),
+    transport=dict(choices=['cli', 'nxapi']),
+    use_ssl=dict(default=False, type='bool')
 )
 
 NXAPI_COMMAND_TYPES = ['cli_show', 'cli_show_ascii', 'cli_conf', 'bash']
-
 NXAPI_ENCODINGS = ['json', 'xml']
-
-CLI_PROMPTS_RE = [
-    re.compile(r'[\r\n]?[a-zA-Z]{1}[a-zA-Z0-9-]*[>|#|%](?:\s*)$'),
-    re.compile(r'[\r\n]?[a-zA-Z]{1}[a-zA-Z0-9-]*\(.+\)#(?:\s*)$')
-]
-
-CLI_ERRORS_RE = [
-    re.compile(r"% ?Error"),
-    re.compile(r"^% \w+", re.M),
-    re.compile(r"% ?Bad secret"),
-    re.compile(r"invalid input", re.I),
-    re.compile(r"(?:incomplete|ambiguous) command", re.I),
-    re.compile(r"connection timed out", re.I),
-    re.compile(r"[^\r\n]+ not found", re.I),
-    re.compile(r"'[^']' +returned error code: ?\d+"),
-    re.compile(r"syntax error"),
-    re.compile(r"unknown command")
-]
-
 
 def to_list(val):
     if isinstance(val, (list, tuple)):
@@ -69,7 +37,6 @@ def to_list(val):
         return [val]
     else:
         return list()
-
 
 class Nxapi(object):
 
@@ -81,18 +48,17 @@ class Nxapi(object):
         self.module.params['url_password'] = module.params['password']
 
         self.url = None
-        self._nxapi_auth = None
+        self.enable = None
 
-    def _get_body(self, commands, command_type, encoding, version='1.0', chunk='0', sid=None):
+    def _get_body(self, commands, command_type, encoding, version='1.2', chunk='0', sid=None):
         """Encodes a NXAPI JSON request message
         """
         if isinstance(commands, (list, set, tuple)):
             commands = ' ;'.join(commands)
 
         if encoding not in NXAPI_ENCODINGS:
-            msg = 'invalid encoding, received %s, exceped one of %s' % \
-                    (encoding, ','.join(NXAPI_ENCODINGS))
-            self.module_fail_json(msg=msg)
+            self.module.fail_json("Invalid encoding. Received %s. Expected one of %s" %
+                (encoding, ','.join(NXAPI_ENCODINGS)))
 
         msg = {
             'version': version,
@@ -125,37 +91,26 @@ class Nxapi(object):
         clist = to_list(commands)
 
         if command_type not in NXAPI_COMMAND_TYPES:
-            msg = 'invalid command_type, received %s, exceped one of %s' % \
-                    (command_type, ','.join(NXAPI_COMMAND_TYPES))
-            self.module_fail_json(msg=msg)
+            self.module.fail_json(msg="Invalid command_type. Received %s. Expected one of %s." %
+                (command_type, ','.join(NXAPI_COMMAND_TYPES)))
 
         data = self._get_body(clist, command_type, encoding)
         data = self.module.jsonify(data)
 
         headers = {'Content-Type': 'application/json'}
-        if self._nxapi_auth:
-            headers['Cookie'] = self._nxapi_auth
 
-        response, headers = fetch_url(self.module, self.url, data=data,
-                headers=headers, method='POST')
-
-        self._nxapi_auth = headers.get('set-cookie')
+        response, headers = fetch_url(self.module, self.url, data=data, headers=headers,
+                                      method='POST')
 
         if headers['status'] != 200:
             self.module.fail_json(**headers)
 
         response = self.module.from_json(response.read())
-        result = list()
+        if 'error' in response:
+            err = response['error']
+            self.module.fail_json(msg='json-rpc error % ' % str(err))
 
-        output = response['ins_api']['outputs']['output']
-        for item in to_list(output):
-            if item['code'] != '200':
-                self.module.fail_json(**item)
-            else:
-                result.append(item['body'])
-
-        return result
-
+        return response
 
 class Cli(object):
 
@@ -169,41 +124,19 @@ class Cli(object):
 
         username = self.module.params['username']
         password = self.module.params['password']
-        timeout = self.module.params['timeout']
-        key_filename = self.module.params['ssh_keyfile']
 
-        allow_agent = (key_filename is not None) or (key_filename is None and password is None)
-
-        try:
-            self.shell = Shell(kickstart=False, prompts_re=CLI_PROMPTS_RE,
-                    errors_re=CLI_ERRORS_RE)
-            self.shell.open(host, port=port, username=username,
-                    password=password, key_filename=key_filename,
-                    allow_agent=allow_agent, timeout=timeout)
-        except ShellError:
-            e = get_exception()
-            msg = 'failed to connect to %s:%s - %s' % (host, port, str(e))
-            self.module.fail_json(msg=msg)
+        self.shell = Shell()
+        self.shell.open(host, port=port, username=username, password=password)
 
     def send(self, commands, encoding='text'):
-        try:
-            return self.shell.send(commands)
-        except ShellError:
-            e = get_exception()
-            self.module.fail_json(msg=e.message, commands=commands)
+        return self.shell.send(commands)
 
-
-class NetworkModule(AnsibleModule):
+class NxosModule(AnsibleModule):
 
     def __init__(self, *args, **kwargs):
-        super(NetworkModule, self).__init__(*args, **kwargs)
+        super(NxosModule, self).__init__(*args, **kwargs)
         self.connection = None
         self._config = None
-        self._connected = False
-
-    @property
-    def connected(self):
-        return self._connected
 
     @property
     def config(self):
@@ -211,51 +144,36 @@ class NetworkModule(AnsibleModule):
             self._config = self.get_config()
         return self._config
 
-    def _load_params(self):
-        super(NetworkModule, self)._load_params()
-        provider = self.params.get('provider') or dict()
-        for key, value in provider.items():
-            if key in NET_COMMON_ARGS:
-                if self.params.get(key) is None and value is not None:
-                    self.params[key] = value
-
     def connect(self):
-        cls = globals().get(str(self.params['transport']).capitalize())
+        if self.params['transport'] == 'nxapi':
+            self.connection = Nxapi(self)
+        else:
+            self.connection = Cli(self)
+
         try:
-            self.connection = cls(self)
-        except TypeError:
-            e = get_exception()
-            self.fail_json(msg=e.message)
-
-        self.connection.connect()
-
-        if self.params['transport'] == 'cli':
-            self.connection.send('terminal length 0')
-
-        self._connected = True
+            self.connection.connect()
+            self.execute('terminal length 0')
+        except Exception, exc:
+            self.fail_json(msg=exc.message)
 
     def configure(self, commands):
         commands = to_list(commands)
         if self.params['transport'] == 'cli':
-            return self.configure_cli(commands)
+            commands.insert(0, 'configure terminal')
+            responses = self.execute(commands)
+            responses.pop(0)
         else:
-            return self.execute(commands, command_type='cli_conf')
-
-    def configure_cli(self, commands):
-        commands = to_list(commands)
-        commands.insert(0, 'configure')
-        responses = self.execute(commands)
-        responses.pop(0)
+            responses = self.execute(commands, command_type='cli_conf')
         return responses
 
     def execute(self, commands, **kwargs):
-        if not self.connected:
-            self.connect()
-        return self.connection.send(commands, **kwargs)
+        try:
+            return self.connection.send(commands, **kwargs)
+        except Exception, exc:
+            self.fail_json(msg=exc.message)
 
     def disconnect(self):
         self.connection.close()
-        self._connected = False
 
     def parse_config(self, cfg):
         return parse(cfg, indent=2)
@@ -264,21 +182,35 @@ class NetworkModule(AnsibleModule):
         cmd = 'show running-config'
         if self.params.get('include_defaults'):
             cmd += ' all'
-        response = self.execute(cmd)
-        return response[0]
-
+        if self.params['transport'] == 'cli':
+            return self.execute(cmd)[0]
+        else:
+            resp = self.execute(cmd)
+            if not resp.get('ins_api').get('outputs').get('output').get('body'):
+                self.fail_json(msg="Unrecognized response: %s" % str(resp))
+            return resp['ins_api']['outputs']['output']['body']
 
 def get_module(**kwargs):
-    """Return instance of NetworkModule
+    """Return instance of EosModule
     """
+
     argument_spec = NET_COMMON_ARGS.copy()
     if kwargs.get('argument_spec'):
         argument_spec.update(kwargs['argument_spec'])
     kwargs['argument_spec'] = argument_spec
+    kwargs['check_invalid_arguments'] = False
 
-    module = NetworkModule(**kwargs)
+    module = NxosModule(**kwargs)
 
+    # HAS_PARAMIKO is set by module_utils/shell.py
     if module.params['transport'] == 'cli' and not HAS_PARAMIKO:
         module.fail_json(msg='paramiko is required but does not appear to be installed')
+
+    # copy in values from local action.
+    params = json_dict_unicode_to_bytes(json.loads(MODULE_COMPLEX_ARGS))
+    for key, value in params.iteritems():
+        module.params[key] = value
+
+    module.connect()
 
     return module

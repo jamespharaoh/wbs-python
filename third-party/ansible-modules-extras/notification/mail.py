@@ -178,7 +178,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             username = dict(default=None),
-            password = dict(default=None, no_log=True),
+            password = dict(default=None),
             host = dict(default='localhost'),
             port = dict(default='25'),
             sender = dict(default='root', aliases=['from']),

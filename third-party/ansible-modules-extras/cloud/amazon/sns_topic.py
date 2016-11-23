@@ -21,9 +21,7 @@ short_description: Manages AWS SNS topics and subscriptions
 description:
     - The M(sns_topic) module allows you to create, delete, and manage subscriptions for AWS SNS topics.
 version_added: 2.0
-author:
-  - "Joel Thompson (@joelthompson)"
-  - "Fernando Jose Pando (@nand0p)"
+author: "Joel Thompson (@joelthompson)"
 options:
   name:
     description:
@@ -134,11 +132,11 @@ import json
 import re
 
 try:
+    import boto
     import boto.sns
-    from boto.exception import BotoServerError
-    HAS_BOTO = True
 except ImportError:
-    HAS_BOTO = False
+    print "failed=True msg='boto required for this module'"
+    sys.exit(1)
 
 
 def canonicalize_endpoint(protocol, endpoint):
@@ -148,15 +146,12 @@ def canonicalize_endpoint(protocol, endpoint):
     return endpoint
 
 
-def get_all_topics(connection, module):
+
+def get_all_topics(connection):
     next_token = None
     topics = []
     while True:
-        try:
-            response = connection.get_all_topics(next_token)
-        except BotoServerError, e:
-            module.fail_json(msg=e.message)
-
+        response = connection.get_all_topics(next_token)
         topics.extend(response['ListTopicsResponse']['ListTopicsResult']['Topics'])
         next_token = \
                 response['ListTopicsResponse']['ListTopicsResult']['NextToken']
@@ -165,15 +160,14 @@ def get_all_topics(connection, module):
     return [t['TopicArn'] for t in topics]
 
 
-def arn_topic_lookup(connection, short_topic, module):
+def arn_topic_lookup(connection, short_topic):
     # topic names cannot have colons, so this captures the full topic name
-    all_topics = get_all_topics(connection, module)
+    all_topics = get_all_topics(connection)
     lookup_topic = ':%s' % short_topic
     for topic in all_topics:
         if topic.endswith(lookup_topic):
             return topic
     return None
-
 
 def main():
     argument_spec = ec2_argument_spec()
@@ -185,15 +179,12 @@ def main():
             display_name=dict(type='str', required=False),
             policy=dict(type='dict', required=False),
             delivery_policy=dict(type='dict', required=False),
-            subscriptions=dict(default=[], type='list', required=False),
+            subscriptions=dict(type='list', required=False),
             purge_subscriptions=dict(type='bool', default=True),
         )
     )
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-
-    if not HAS_BOTO:
-        module.fail_json(msg='boto required for this module')
 
     name = module.params.get('name')
     state = module.params.get('state')
@@ -220,7 +211,7 @@ def main():
 
     # topics cannot contain ':', so thats the decider
     if ':' in name:
-        all_topics = get_all_topics(connection, module)
+        all_topics = get_all_topics(connection)
         if name in all_topics:
             arn_topic = name
         elif state == 'absent':
@@ -229,7 +220,7 @@ def main():
             module.fail_json(msg="specified an ARN for a topic but it doesn't"
                     " exist")
     else:
-        arn_topic = arn_topic_lookup(connection, name, module)
+        arn_topic = arn_topic_lookup(connection, name)
         if not arn_topic:
             if state == 'absent':
                 module.exit_json(changed=False)
@@ -240,22 +231,15 @@ def main():
             
             changed=True
             topic_created = True
-            try:
-                connection.create_topic(name)
-            except BotoServerError, e:
-                module.fail_json(msg=e.message)
-            arn_topic = arn_topic_lookup(connection, name, module)
+            connection.create_topic(name)
+            arn_topic = arn_topic_lookup(connection, name)
             while not arn_topic:
                 time.sleep(3)
-                arn_topic = arn_topic_lookup(connection, name, module)
+                arn_topic = arn_topic_lookup(connection, name)
     
     if arn_topic and state == "absent":
         if not check_mode:
-            try:
-                connection.delete_topic(arn_topic)
-            except BotoServerError, e:
-                module.fail_json(msg=e.message)
-
+            connection.delete_topic(arn_topic)
         module.exit_json(changed=True)
 
     topic_attributes = connection.get_topic_attributes(arn_topic) \
@@ -265,40 +249,30 @@ def main():
         changed = True
         attributes_set.append('display_name')
         if not check_mode:
-            try:
-                connection.set_topic_attributes(arn_topic, 'DisplayName', display_name)
-            except BotoServerError, e:
-                module.fail_json(msg=e.message)
+            connection.set_topic_attributes(arn_topic, 'DisplayName',
+                    display_name)
 
-    if policy and policy != json.loads(topic_attributes['Policy']):
+    if policy and policy != json.loads(topic_attributes['policy']):
         changed = True
         attributes_set.append('policy')
         if not check_mode:
-            try:
-                connection.set_topic_attributes(arn_topic, 'Policy', json.dumps(policy))
-            except BotoServerError, e:
-                module.fail_json(msg=e.message)
+            connection.set_topic_attributes(arn_topic, 'Policy',
+                    json.dumps(policy))
     
     if delivery_policy and ('DeliveryPolicy' not in topic_attributes or \
             delivery_policy != json.loads(topic_attributes['DeliveryPolicy'])):
         changed = True
         attributes_set.append('delivery_policy')
         if not check_mode:
-            try:
-                connection.set_topic_attributes(arn_topic, 'DeliveryPolicy',json.dumps(delivery_policy))
-            except BotoServerError, e:
-                module.fail_json(msg=e.message)
+            connection.set_topic_attributes(arn_topic, 'DeliveryPolicy',
+                    json.dumps(delivery_policy))
 
 
     next_token = None
     aws_subscriptions = []
     while True:
-        try:
-            response = connection.get_all_subscriptions_by_topic(arn_topic,
+        response = connection.get_all_subscriptions_by_topic(arn_topic,
                 next_token)
-        except BotoServerError, e:
-            module.fail_json(msg=e.message)
-
         aws_subscriptions.extend(response['ListSubscriptionsByTopicResponse'] \
                 ['ListSubscriptionsByTopicResult']['Subscriptions'])
         next_token = response['ListSubscriptionsByTopicResponse'] \
@@ -309,7 +283,6 @@ def main():
     desired_subscriptions = [(sub['protocol'],
         canonicalize_endpoint(sub['protocol'], sub['endpoint'])) for sub in
         subscriptions]
-    
     aws_subscriptions_list = []
 
     for sub in aws_subscriptions:
@@ -320,20 +293,14 @@ def main():
             changed = True
             subscriptions_deleted.append(sub_key)
             if not check_mode:
-                try:
-                    connection.unsubscribe(sub['SubscriptionArn'])
-                except BotoServerError, e:
-                    module.fail_json(msg=e.message)
+                connection.unsubscribe(sub['SubscriptionArn'])
 
     for (protocol, endpoint) in desired_subscriptions:
         if (protocol, endpoint) not in aws_subscriptions_list:
             changed = True
             subscriptions_added.append(sub)
             if not check_mode:
-                try:
-                    connection.subscribe(arn_topic, protocol, endpoint)
-                except BotoServerError, e:
-                    module.fail_json(msg=e.message)
+                connection.subscribe(arn_topic, protocol, endpoint)
 
     module.exit_json(changed=changed, topic_created=topic_created,
             attributes_set=attributes_set,
@@ -343,5 +310,4 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-if __name__ == '__main__':
-    main()
+main()

@@ -45,19 +45,9 @@ options:
       - User tags specified as comma delimited
     required: false
     default: null
-  permissions:
-    description:
-      - a list of dicts, each dict contains vhost, configure_priv, write_priv, and read_priv,
-        and represents a permission rule for that vhost.
-      - This option should be preferable when you care about all permissions of the user.
-      - You should use vhost, configure_priv, write_priv, and read_priv options instead
-        if you care about permissions for just some vhosts.
-    required: false
-    default: []
   vhost:
     description:
       - vhost to apply access privileges.
-      - This option will be ignored when permissions option is used.
     required: false
     default: /
   node:
@@ -71,7 +61,6 @@ options:
       - Regular expression to restrict configure actions on a resource
         for the specified vhost.
       - By default all actions are restricted.
-      - This option will be ignored when permissions option is used.
     required: false
     default: ^$
   write_priv:
@@ -79,7 +68,6 @@ options:
       - Regular expression to restrict configure actions on a resource
         for the specified vhost.
       - By default all actions are restricted.
-      - This option will be ignored when permissions option is used.
     required: false
     default: ^$
   read_priv:
@@ -87,7 +75,6 @@ options:
       - Regular expression to restrict configure actions on a resource
         for the specified vhost.
       - By default all actions are restricted.
-      - This option will be ignored when permissions option is used.
     required: false
     default: ^$
   force:
@@ -105,8 +92,7 @@ options:
 '''
 
 EXAMPLES = '''
-# Add user to server and assign full access control on / vhost.
-# The user might have permission rules for other vhost but you don't care.
+# Add user to server and assign full access control
 - rabbitmq_user: user=joe
                  password=changeme
                  vhost=/
@@ -114,18 +100,10 @@ EXAMPLES = '''
                  read_priv=.*
                  write_priv=.*
                  state=present
-
-# Add user to server and assign full access control on / vhost.
-# The user doesn't have permission rules for other vhosts
-- rabbitmq_user: user=joe
-                 password=changeme
-                 permissions=[{vhost='/', configure_priv='.*', read_priv='.*', write_priv='.*'}]
-                 state=present
 '''
 
 class RabbitMqUser(object):
-    def __init__(self, module, username, password, tags, permissions,
-                 node, bulk_permissions=False):
+    def __init__(self, module, username, password, tags, vhost, configure_priv, write_priv, read_priv, node):
         self.module = module
         self.username = username
         self.password = password
@@ -135,18 +113,21 @@ class RabbitMqUser(object):
         else:
             self.tags = tags.split(',')
 
+        permissions = dict(
+            vhost=vhost,
+            configure_priv=configure_priv,
+            write_priv=write_priv,
+            read_priv=read_priv
+        )
         self.permissions = permissions
-        self.bulk_permissions = bulk_permissions
 
         self._tags = None
-        self._permissions = []
+        self._permissions = None
         self._rabbitmqctl = module.get_bin_path('rabbitmqctl', True)
 
     def _exec(self, args, run_in_check_mode=False):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
-            cmd = [self._rabbitmqctl, '-q']
-            if self.node is not None:
-                cmd.extend(['-n', self.node])
+            cmd = [self._rabbitmqctl, '-q', '-n', self.node]
             rc, out, err = self.module.run_command(cmd + args, check_rc=True)
             return out.splitlines()
         return list()
@@ -176,18 +157,12 @@ class RabbitMqUser(object):
     def _get_permissions(self):
         perms_out = self._exec(['list_user_permissions', self.username], True)
 
-        perms_list = list()
         for perm in perms_out:
             vhost, configure_priv, write_priv, read_priv = perm.split('\t')
-            if not self.bulk_permissions:
-                if vhost == self.permissions[0]['vhost']:
-                    perms_list.append(dict(vhost=vhost, configure_priv=configure_priv,
-                                           write_priv=write_priv, read_priv=read_priv))
-                    break
-            else:
-                perms_list.append(dict(vhost=vhost, configure_priv=configure_priv,
-                                       write_priv=write_priv, read_priv=read_priv))
-        return perms_list
+            if vhost == self.permissions['vhost']:
+                return dict(vhost=vhost, configure_priv=configure_priv, write_priv=write_priv, read_priv=read_priv)
+
+        return dict()
 
     def add(self):
         if self.password is not None:
@@ -203,21 +178,14 @@ class RabbitMqUser(object):
         self._exec(['set_user_tags', self.username] + self.tags)
 
     def set_permissions(self):
-        for permission in self._permissions:
-            if permission not in self.permissions:
-                cmd = ['clear_permissions', '-p']
-                cmd.append(permission['vhost'])
-                cmd.append(self.username)
-                self._exec(cmd)
-        for permission in self.permissions:
-            if permission not in self._permissions:
-                cmd = ['set_permissions', '-p']
-                cmd.append(permission['vhost'])
-                cmd.append(self.username)
-                cmd.append(permission['configure_priv'])
-                cmd.append(permission['write_priv'])
-                cmd.append(permission['read_priv'])
-                self._exec(cmd)
+        cmd = ['set_permissions']
+        cmd.append('-p')
+        cmd.append(self.permissions['vhost'])
+        cmd.append(self.username)
+        cmd.append(self.permissions['configure_priv'])
+        cmd.append(self.permissions['write_priv'])
+        cmd.append(self.permissions['read_priv'])
+        self._exec(cmd)
 
     def has_tags_modifications(self):
         return set(self.tags) != set(self._tags)
@@ -230,14 +198,13 @@ def main():
         user=dict(required=True, aliases=['username', 'name']),
         password=dict(default=None),
         tags=dict(default=None),
-        permissions=dict(default=list(), type='list'),
         vhost=dict(default='/'),
         configure_priv=dict(default='^$'),
         write_priv=dict(default='^$'),
         read_priv=dict(default='^$'),
         force=dict(default='no', type='bool'),
         state=dict(default='present', choices=['present', 'absent']),
-        node=dict(default=None)
+        node=dict(default='rabbit')
     )
     module = AnsibleModule(
         argument_spec=arg_spec,
@@ -247,7 +214,6 @@ def main():
     username = module.params['user']
     password = module.params['password']
     tags = module.params['tags']
-    permissions = module.params['permissions']
     vhost = module.params['vhost']
     configure_priv = module.params['configure_priv']
     write_priv = module.params['write_priv']
@@ -256,19 +222,7 @@ def main():
     state = module.params['state']
     node = module.params['node']
 
-    bulk_permissions = True
-    if permissions == []:
-        perm = {
-            'vhost': vhost,
-            'configure_priv': configure_priv,
-            'write_priv': write_priv,
-            'read_priv': read_priv
-        }
-        permissions.append(perm)
-        bulk_permissions = False
-
-    rabbitmq_user = RabbitMqUser(module, username, password, tags, permissions,
-                                 node, bulk_permissions=bulk_permissions)
+    rabbitmq_user = RabbitMqUser(module, username, password, tags, vhost, configure_priv, write_priv, read_priv, node)
 
     changed = False
     if rabbitmq_user.get():

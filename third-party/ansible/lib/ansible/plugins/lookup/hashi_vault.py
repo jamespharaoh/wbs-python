@@ -45,7 +45,7 @@ class HashiVault:
         try:
             import hvac
         except ImportError:
-            raise AnsibleError("Please pip install hvac to use this module")
+            AnsibleError("Please pip install hvac to use this module")
 
         self.url = kwargs.pop('url')
         self.secret = kwargs.pop('secret')

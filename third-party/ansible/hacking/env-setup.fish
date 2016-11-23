@@ -8,15 +8,6 @@ set PREFIX_PYTHONPATH $ANSIBLE_HOME/lib
 set PREFIX_PATH $ANSIBLE_HOME/bin 
 set PREFIX_MANPATH $ANSIBLE_HOME/docs/man
 
-# set quiet flag
-if set -q argv
-    switch $argv
-    case '-q' '--quiet'
-        set QUIET "true"
-    case '*'
-    end
-end
-
 # Set PYTHONPATH
 if not set -q PYTHONPATH
     set -gx PYTHONPATH $PREFIX_PYTHONPATH
@@ -24,9 +15,7 @@ else
     switch PYTHONPATH
         case "$PREFIX_PYTHONPATH*"
         case "*"
-            if not [ $QUIET ]
-                echo "Appending PYTHONPATH"
-            end
+            echo "Appending PYTHONPATH"
             set -gx PYTHONPATH "$PREFIX_PYTHONPATH:$PYTHONPATH"
     end
 end
@@ -49,11 +38,7 @@ set -gx ANSIBLE_LIBRARY $ANSIBLE_HOME/library
 
 # Generate egg_info so that pkg_resources works
 pushd $ANSIBLE_HOME
-if [ $QUIET ]
-    python setup.py -q egg_info
-else
-    python setup.py egg_info
-end
+python setup.py egg_info
 if test -e $PREFIX_PYTHONPATH/ansible*.egg-info
     rm -r $PREFIX_PYTHONPATH/ansible*.egg-info
 end
@@ -62,19 +47,22 @@ find . -type f -name "*.pyc" -delete
 popd
 
 
-if not [ $QUIET ]
-    echo ""
-    echo "Setting up Ansible to run out of checkout..."
-    echo ""
-    echo "PATH=$PATH"
-    echo "PYTHONPATH=$PYTHONPATH"
-    echo "ANSIBLE_LIBRARY=$ANSIBLE_LIBRARY"
-    echo "MANPATH=$MANPATH"
-    echo ""
-    echo "Remember, you may wish to specify your host file with -i"
-    echo ""
-    echo "Done!"
-    echo ""
-end
+if set -q argv 
+    switch $argv
+    case '-q' '--quiet'
+    case '*'
+        echo ""
+        echo "Setting up Ansible to run out of checkout..."
+        echo ""
+        echo "PATH=$PATH"
+        echo "PYTHONPATH=$PYTHONPATH"
+        echo "ANSIBLE_LIBRARY=$ANSIBLE_LIBRARY"
+        echo "MANPATH=$MANPATH"
+        echo ""
 
-set -e QUIET
+        echo "Remember, you may wish to specify your host file with -i"
+        echo ""
+        echo "Done!"
+        echo ""
+   end
+end

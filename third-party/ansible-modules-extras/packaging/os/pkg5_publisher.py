@@ -77,8 +77,8 @@ def main():
         argument_spec=dict(
             name=dict(required=True, aliases=['publisher']),
             state=dict(default='present', choices=['present', 'absent']),
-            sticky=dict(type='bool'),
-            enabled=dict(type='bool'),
+            sticky=dict(choices=BOOLEANS),
+            enabled=dict(choices=BOOLEANS),
             # search_after=dict(),
             # search_before=dict(),
             origin=dict(type='list'),
@@ -180,14 +180,13 @@ def get_publishers(module):
             publishers[name]['origin'] = []
             publishers[name]['mirror'] = []
 
-        if values['type'] is not None:
-            publishers[name][values['type']].append(values['uri'])
+        publishers[name][values['type']].append(values['uri'])
 
     return publishers
 
 
 def unstringify(val):
-    if val == "-" or val == '':
+    if val == "-":
         return None
     elif val == "true":
         return True

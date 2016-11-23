@@ -60,9 +60,8 @@ import socket
 import random
 import time
 import codecs
+import ConfigParser
 import uuid
-from ansible.compat.six.moves import configparser
-
 try:
     import certifi
     HAS_CERTIFI = True
@@ -76,6 +75,10 @@ except ImportError:
     HAS_FLATDICT = False
 
 from ansible.plugins.callback import CallbackBase
+
+
+def to_unicode(ch):
+    return codecs.unicode_escape_decode(ch)[0]
 
 
 def is_unicode(ch):
@@ -102,7 +105,7 @@ class PlainTextSocketAppender(object):
         self.INVALID_TOKEN = ("\n\nIt appears the LOGENTRIES_TOKEN "
                               "parameter you entered is incorrect!\n\n")
         # Unicode Line separator character   \u2028
-        self.LINE_SEP = u'\u2028'
+        self.LINE_SEP = to_unicode('\u2028')
 
         self.verbose = verbose
         self._conn = None
@@ -209,7 +212,7 @@ class CallbackModule(CallbackBase):
                                  'Disabling the Logentries callback plugin.')
 
         config_path = os.path.abspath(os.path.dirname(__file__))
-        config = configparser.ConfigParser()
+        config = ConfigParser.ConfigParser()
         try:
             config.readfp(open(os.path.join(config_path, 'logentries.ini')))
             if config.has_option('logentries', 'api'):

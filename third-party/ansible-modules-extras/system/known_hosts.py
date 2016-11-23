@@ -85,7 +85,9 @@ def enforce_state(module, params):
     host = params["name"]
     key = params.get("key",None)
     port = params.get("port",None)
-    path = params.get("path")
+    #expand the path parameter; otherwise module.add_path_info
+    #(called by exit_json) unhelpfully says the unexpanded path is absent.
+    path = os.path.expanduser(params.get("path"))
     state = params.get("state")
     #Find the ssh-keygen binary
     sshkeygen = module.get_bin_path("ssh-keygen",True)
@@ -238,7 +240,7 @@ def main():
         argument_spec = dict(
             name      = dict(required=True,  type='str', aliases=['host']),
             key       = dict(required=False,  type='str'),
-            path      = dict(default="~/.ssh/known_hosts", type='path'),
+            path      = dict(default="~/.ssh/known_hosts", type='str'),
             state     = dict(default='present', choices=['absent','present']),
             ),
         supports_check_mode = True

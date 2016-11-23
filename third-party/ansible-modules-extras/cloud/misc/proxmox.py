@@ -20,7 +20,6 @@ module: proxmox
 short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
-  - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
 version_added: "2.0"
 options:
   api_host:
@@ -98,7 +97,7 @@ options:
       - specifies network interfaces for the container
     default: null
     required: false
-    type:  A hash/dictionary defining interfaces
+    type: string
   ip_address:
     description:
       - specifies the address the container will be assigned
@@ -171,9 +170,6 @@ EXAMPLES = '''
 # Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
 - proxmox: vmid=100 node='uk-mc02' api_user='root@pam' api_host='node1' password='123456' hostname='example.org' ostemplate='local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container with minimal options defining network interface with dhcp
-- proxmox: vmid=100 node='uk-mc02' api_user='root@pam' api_password='1q2w3e' api_host='node1' password='123456' hostname='example.org' ostemplate='local:vztmpl/ubuntu-14.04-x86_64.tar.gz' netif='{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
-
 # Start container
 - proxmox: vmid=100 api_user='root@pam' api_password='1q2w3e' api_host='node1' state=started
 
@@ -199,8 +195,6 @@ try:
 except ImportError:
   HAS_PROXMOXER = False
 
-VZ_TYPE=None
-
 def get_instance(proxmox, vmid):
   return [ vm for vm in proxmox.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid) ]
 
@@ -212,17 +206,8 @@ def node_check(proxmox, node):
 
 def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, **kwargs):
   proxmox_node = proxmox.nodes(node)
-  kwargs = dict((k,v) for k, v in kwargs.iteritems() if v is not None)
-  if VZ_TYPE =='lxc':
-      kwargs['cpulimit']=cpus
-      kwargs['rootfs']=disk
-      if 'netif' in kwargs:
-        kwargs.update(kwargs['netif'])
-        del kwargs['netif']
-  else:
-      kwargs['cpus']=cpus
-      kwargs['disk']=disk
-  taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
+  taskid = proxmox_node.openvz.create(vmid=vmid, storage=storage, memory=memory, swap=swap,
+                             cpus=cpus, disk=disk, **kwargs)
 
   while timeout:
     if ( proxmox_node.tasks(taskid).status.get()['status'] == 'stopped'
@@ -237,7 +222,7 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
   return False
 
 def start_instance(module, proxmox, vm, vmid, timeout):
-  taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.start.post()
+  taskid = proxmox.nodes(vm[0]['node']).openvz(vmid).status.start.post()
   while timeout:
     if ( proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped'
         and proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK' ):
@@ -252,9 +237,9 @@ def start_instance(module, proxmox, vm, vmid, timeout):
 
 def stop_instance(module, proxmox, vm, vmid, timeout, force):
   if force:
-    taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.shutdown.post(forceStop=1)
+    taskid = proxmox.nodes(vm[0]['node']).openvz(vmid).status.shutdown.post(forceStop=1)
   else:
-    taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.shutdown.post()
+    taskid = proxmox.nodes(vm[0]['node']).openvz(vmid).status.shutdown.post()
   while timeout:
     if ( proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped'
         and proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK' ):
@@ -268,7 +253,7 @@ def stop_instance(module, proxmox, vm, vmid, timeout, force):
   return False
 
 def umount_instance(module, proxmox, vm, vmid, timeout):
-  taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.umount.post()
+  taskid = proxmox.nodes(vm[0]['node']).openvz(vmid).status.umount.post()
   while timeout:
     if ( proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped'
         and proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK' ):
@@ -288,24 +273,24 @@ def main():
       api_user = dict(required=True),
       api_password = dict(no_log=True),
       vmid = dict(required=True),
-      validate_certs = dict(type='bool', default='no'),
+      validate_certs = dict(type='bool', choices=BOOLEANS, default='no'),
       node = dict(),
       password = dict(no_log=True),
       hostname = dict(),
       ostemplate = dict(),
-      disk = dict(type='str', default='3'),
+      disk = dict(type='int', default=3),
       cpus = dict(type='int', default=1),
       memory = dict(type='int', default=512),
       swap = dict(type='int', default=0),
-      netif = dict(type='dict'),
+      netif = dict(),
       ip_address = dict(),
-      onboot = dict(type='bool', default='no'),
+      onboot = dict(type='bool', choices=BOOLEANS, default='no'),
       storage = dict(default='local'),
       cpuunits = dict(type='int', default=1000),
       nameserver = dict(),
       searchdomain = dict(),
       timeout = dict(type='int', default=30),
-      force = dict(type='bool', default='no'),
+      force = dict(type='bool', choices=BOOLEANS, default='no'),
       state = dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
     )
   )
@@ -336,9 +321,6 @@ def main():
 
   try:
     proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
-    global VZ_TYPE
-    VZ_TYPE = 'openvz' if float(proxmox.version.get()['version']) < 4.0 else 'lxc'
-
   except Exception, e:
     module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
@@ -368,14 +350,14 @@ def main():
 
       module.exit_json(changed=True, msg="deployed VM %s from template %s"  % (vmid, module.params['ostemplate']))
     except Exception, e:
-      module.fail_json(msg="creation of %s VM %s failed with exception: %s" % ( VZ_TYPE, vmid, e ))
+      module.fail_json(msg="creation of VM %s failed with exception: %s" % ( vmid, e ))
 
   elif state == 'started':
     try:
       vm = get_instance(proxmox, vmid)
       if not vm:
         module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)
-      if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
+      if proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'running':
         module.exit_json(changed=False, msg="VM %s is already running" % vmid)
 
       if start_instance(module, proxmox, vm, vmid, timeout):
@@ -389,7 +371,7 @@ def main():
       if not vm:
         module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)
 
-      if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
+      if proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'mounted':
         if module.params['force']:
           if umount_instance(module, proxmox, vm, vmid, timeout):
             module.exit_json(changed=True, msg="VM %s is shutting down" % vmid)
@@ -397,7 +379,7 @@ def main():
           module.exit_json(changed=False, msg=("VM %s is already shutdown, but mounted. "
                                                "You can use force option to umount it.") % vmid)
 
-      if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
+      if proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'stopped':
         module.exit_json(changed=False, msg="VM %s is already shutdown" % vmid)
 
       if stop_instance(module, proxmox, vm, vmid, timeout, force = module.params['force']):
@@ -410,8 +392,8 @@ def main():
       vm = get_instance(proxmox, vmid)
       if not vm:
         module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)
-      if ( getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped'
-          or getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted' ):
+      if ( proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'stopped'
+          or proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'mounted' ):
         module.exit_json(changed=False, msg="VM %s is not running" % vmid)
 
       if ( stop_instance(module, proxmox, vm, vmid, timeout, force = module.params['force']) and
@@ -426,13 +408,13 @@ def main():
       if not vm:
         module.exit_json(changed=False, msg="VM %s does not exist" % vmid)
 
-      if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
+      if proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'running':
         module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
 
-      if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
+      if proxmox.nodes(vm[0]['node']).openvz(vmid).status.current.get()['status'] == 'mounted':
         module.exit_json(changed=False, msg="VM %s is mounted. Stop it with force option before deletion." % vmid)
 
-      taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
+      taskid = proxmox.nodes(vm[0]['node']).openvz.delete(vmid)
       while timeout:
         if ( proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped'
             and proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK' ):

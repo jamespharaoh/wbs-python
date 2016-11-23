@@ -32,6 +32,20 @@ requirements:
     - "python >= 2.6"
     - PyVmomi
 options:
+    hostname:
+        description:
+            - The hostname or IP address of the vSphere vCenter API server
+        required: True
+    username:
+        description:
+            - The username of the vSphere vCenter
+        required: True
+        aliases: ['user', 'admin']
+    password:
+        description:
+            - The password of the vSphere vCenter
+        required: True
+        aliases: ['pass', 'pwd']
     vm_name:
         description:
             - Name of the virtual machine to migrate to a dvSwitch
@@ -40,7 +54,6 @@ options:
         description:
             - Name of the portgroup to migrate to the virtual machine to
         required: True
-extends_documentation_fragment: vmware.documentation
 '''
 
 EXAMPLES = '''
@@ -61,81 +74,82 @@ except ImportError:
     HAS_PYVMOMI = False
 
 
-class VMwareVmVssDvsMigrate(object):
-    def __init__(self, module):
-        self.module = module
-        self.content = connect_to_api(module)
-        self.vm = None
-        self.vm_name = module.params['vm_name']
-        self.dvportgroup_name = module.params['dvportgroup_name']
+def _find_dvspg_by_name(content, pg_name):
 
-    def process_state(self):
-        vm_nic_states = {
-            'absent': self.migrate_network_adapter_vds,
-            'present': self.state_exit_unchanged,
-        }
+    vmware_distributed_port_group = get_all_objs(content, [vim.dvs.DistributedVirtualPortgroup])
+    for dvspg in vmware_distributed_port_group:
+        if dvspg.name == pg_name:
+            return dvspg
+    return None
 
-        vm_nic_states[self.check_vm_network_state()]()
 
-    def find_dvspg_by_name(self):
-        vmware_distributed_port_group = get_all_objs(self.content, [vim.dvs.DistributedVirtualPortgroup])
-        for dvspg in vmware_distributed_port_group:
-            if dvspg.name == self.dvportgroup_name:
-                return dvspg
-        return None
+def find_vm_by_name(content, vm_name):
 
-    def find_vm_by_name(self):
-        virtual_machines = get_all_objs(self.content, [vim.VirtualMachine])
-        for vm in virtual_machines:
-            if vm.name == self.vm_name:
-                return vm
-        return None
+    virtual_machines = get_all_objs(content, [vim.VirtualMachine])
+    for vm in virtual_machines:
+        if vm.name == vm_name:
+            return vm
+    return None
 
-    def migrate_network_adapter_vds(self):
-        vm_configspec = vim.vm.ConfigSpec()
-        nic = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-        port = vim.dvs.PortConnection()
-        devicespec = vim.vm.device.VirtualDeviceSpec()
 
-        pg = self.find_dvspg_by_name()
+def migrate_network_adapter_vds(module):
+    vm_name = module.params['vm_name']
+    dvportgroup_name = module.params['dvportgroup_name']
+    content = module.params['content']
 
-        if pg is None:
-            self.module.fail_json(msg="The standard portgroup was not found")
+    vm_configspec = vim.vm.ConfigSpec()
+    nic = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
+    port = vim.dvs.PortConnection()
+    devicespec = vim.vm.device.VirtualDeviceSpec()
 
-        dvswitch = pg.config.distributedVirtualSwitch
-        port.switchUuid = dvswitch.uuid
-        port.portgroupKey = pg.key
-        nic.port = port
+    pg = _find_dvspg_by_name(content, dvportgroup_name)
 
-        for device in self.vm.config.hardware.device:
+    if pg is None:
+        module.fail_json(msg="The standard portgroup was not found")
+
+    vm = find_vm_by_name(content, vm_name)
+    if vm is None:
+        module.fail_json(msg="The virtual machine was not found")
+
+    dvswitch = pg.config.distributedVirtualSwitch
+    port.switchUuid = dvswitch.uuid
+    port.portgroupKey = pg.key
+    nic.port = port
+
+    for device in vm.config.hardware.device:
+        if isinstance(device, vim.vm.device.VirtualEthernetCard):
+            devicespec.device = device
+            devicespec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+            devicespec.device.backing = nic
+            vm_configspec.deviceChange.append(devicespec)
+
+    task = vm.ReconfigVM_Task(vm_configspec)
+    changed, result = wait_for_task(task)
+    module.exit_json(changed=changed, result=result)
+
+
+def state_exit_unchanged(module):
+    module.exit_json(changed=False)
+
+
+def check_vm_network_state(module):
+    vm_name = module.params['vm_name']
+    try:
+        content = connect_to_api(module)
+        module.params['content'] = content
+        vm = find_vm_by_name(content, vm_name)
+        module.params['vm'] = vm
+        if vm is None:
+            module.fail_json(msg="A virtual machine with name %s does not exist" % vm_name)
+        for device in vm.config.hardware.device:
             if isinstance(device, vim.vm.device.VirtualEthernetCard):
-                devicespec.device = device
-                devicespec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
-                devicespec.device.backing = nic
-                vm_configspec.deviceChange.append(devicespec)
-
-        task = self.vm.ReconfigVM_Task(vm_configspec)
-        changed, result = wait_for_task(task)
-        self.module.exit_json(changed=changed, result=result)
-
-    def state_exit_unchanged(self):
-        self.module.exit_json(changed=False)
-
-    def check_vm_network_state(self):
-        try:
-            self.vm = self.find_vm_by_name()
-
-            if self.vm is None:
-                self.module.fail_json(msg="A virtual machine with name %s does not exist" % self.vm_name)
-            for device in self.vm.config.hardware.device:
-                if isinstance(device, vim.vm.device.VirtualEthernetCard):
-                    if isinstance(device.backing, vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo):
-                        return 'present'
-            return 'absent'
-        except vmodl.RuntimeFault as runtime_fault:
-            self.module.fail_json(msg=runtime_fault.msg)
-        except vmodl.MethodFault as method_fault:
-            self.module.fail_json(msg=method_fault.msg)
+                if isinstance(device.backing, vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo):
+                    return 'present'
+        return 'absent'
+    except vmodl.RuntimeFault as runtime_fault:
+        module.fail_json(msg=runtime_fault.msg)
+    except vmodl.MethodFault as method_fault:
+        module.fail_json(msg=method_fault.msg)
 
 
 def main():
@@ -148,8 +162,12 @@ def main():
     if not HAS_PYVMOMI:
         module.fail_json(msg='pyvmomi is required for this module')
 
-    vmware_vmnic_migrate = VMwareVmVssDvsMigrate(module)
-    vmware_vmnic_migrate.process_state()
+    vm_nic_states = {
+        'absent': migrate_network_adapter_vds,
+        'present': state_exit_unchanged,
+    }
+
+    vm_nic_states[check_vm_network_state(module)](module)
 
 from ansible.module_utils.vmware import *
 from ansible.module_utils.basic import *

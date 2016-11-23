@@ -127,11 +127,11 @@ def main():
         owner             = dict(default=None),
         min_disk          = dict(type='int', default=0),
         min_ram           = dict(type='int', default=0),
-        is_public         = dict(type='bool', default=False),
+        is_public         = dict(default=False),
         filename          = dict(default=None),
         ramdisk           = dict(default=None),
         kernel            = dict(default=None),
-        properties        = dict(type='dict', default={}),
+        properties        = dict(default={}),
         state             = dict(default='present', choices=['absent', 'present']),
     )
     module_kwargs = openstack_module_kwargs()
@@ -188,6 +188,4 @@ def main():
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *
 from ansible.module_utils.openstack import *
-
-if __name__ == "__main__":
-    main()
+main()
