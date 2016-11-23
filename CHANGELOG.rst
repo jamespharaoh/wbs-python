@@ -2,6 +2,65 @@
 CHANGELOG
 =========
 
+1.11.21
+=======
+
+* feature:``s3``: Update s3 command to latest version
+* feature:``glacier``: Update glacier command to latest version
+* feature:``cloudformation``: Update cloudformation command to latest version
+* feature:``route53``: Update route53 command to latest version
+
+
+1.11.20
+=======
+
+* feature:``ecs``: Update ecs command to latest version
+* feature:``cloudtrail``: Update cloudtrail command to latest version
+
+
+1.11.19
+=======
+
+* feature:``cloudformation deploy``: Add command to simplify deployments of cloudformation stack changes.
+* feature:``emr``: Update emr command to latest version
+* feature:``lambda``: Update lambda command to latest version
+* feature:``elastictranscoder``: Update elastictranscoder command to latest version
+* feature:``cloudformation package``: Add command to package source code for cloudfromation template.
+* feature:``gamelift``: Update gamelift command to latest version
+* feature:``application-autoscaling``: Update application-autoscaling command to latest version
+
+
+1.11.18
+=======
+
+* bugfix:Powershell: Properly set return code on Powershell.
+* feature:``cloudwatch``: Update cloudwatch command to latest version
+* feature:``sqs``: Update sqs command to latest version
+* feature:``apigateway``: Update apigateway command to latest version
+* feature:``meteringmarketplace``: Update meteringmarketplace command to latest version
+
+
+1.11.17
+=======
+
+* feature:``route53``: Update route53 command to latest version
+* feature:``servicecatalog``: Update servicecatalog command to latest version
+
+
+1.11.16
+=======
+
+* feature:``kinesis``: Update kinesis command to latest version
+* feature:``ds``: Update ds command to latest version
+* feature:``elasticache``: Update elasticache command to latest version
+
+
+1.11.15
+=======
+
+* feature:``cognito-idp``: Update cognito-idp command to latest version
+
+
 1.11.14
 =======
 
