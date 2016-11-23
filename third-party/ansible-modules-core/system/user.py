@@ -49,6 +49,11 @@ options:
             - Optionally when used with the -u option, this option allows to
               change the user ID to a non-unique value.
         version_added: "1.1"
+    seuser:
+        required: false
+        description:
+            - Optionally sets the seuser type (user_u) on selinux enabled systems.
+        version_added: "2.1"
     group:
         required: false
         description:
@@ -254,6 +259,7 @@ class User(object):
         self.name       = module.params['name']
         self.uid        = module.params['uid']
         self.non_unique  = module.params['non_unique']
+        self.seuser     = module.params['seuser']
         self.group      = module.params['group']
         self.groups     = module.params['groups']
         self.comment    = module.params['comment']
@@ -273,11 +279,8 @@ class User(object):
         self.ssh_comment = module.params['ssh_key_comment']
         self.ssh_passphrase = module.params['ssh_key_passphrase']
         self.update_password = module.params['update_password']
-        self.home    = None
+        self.home    = module.params['home']
         self.expires = None
-
-        if module.params['home'] is not None:
-            self.home = os.path.expanduser(module.params['home'])
 
         if module.params['expires']:
             try:
@@ -318,6 +321,9 @@ class User(object):
             if self.non_unique:
                 cmd.append('-o')
 
+        if self.seuser is not None:
+            cmd.append('-Z')
+            cmd.append(self.seuser)
         if self.group is not None:
             if not self.group_exists(self.group):
                 self.module.fail_json(msg="Group %s does not exist" % self.group)
@@ -2020,10 +2026,12 @@ def main():
             group=dict(default=None, type='str'),
             groups=dict(default=None, type='str'),
             comment=dict(default=None, type='str'),
-            home=dict(default=None, type='str'),
+            home=dict(default=None, type='path'),
             shell=dict(default=None, type='str'),
             password=dict(default=None, type='str', no_log=True),
             login_class=dict(default=None, type='str'),
+            # following options are specific to selinux
+            seuser=dict(default=None, type='str'),
             # following options are specific to userdel
             force=dict(default='no', type='bool'),
             remove=dict(default='no', type='bool'),
@@ -2038,7 +2046,7 @@ def main():
             generate_ssh_key=dict(type='bool'),
             ssh_key_bits=dict(default=ssh_defaults['bits'], type='str'),
             ssh_key_type=dict(default=ssh_defaults['type'], type='str'),
-            ssh_key_file=dict(default=None, type='str'),
+            ssh_key_file=dict(default=None, type='path'),
             ssh_key_comment=dict(default=ssh_defaults['comment'], type='str'),
             ssh_key_passphrase=dict(default=None, type='str', no_log=True),
             update_password=dict(default='always',choices=['always','on_create'],type='str'),

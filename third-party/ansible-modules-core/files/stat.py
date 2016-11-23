@@ -51,6 +51,15 @@ options:
     default: sha1
     aliases: [ 'checksum_algo', 'checksum' ]
     version_added: "2.0"
+  mime:
+    description:
+      - Use file magic and return data about the nature of the file. this uses the 'file' utility found on most Linux/Unix systems.
+      - This will add both `mime_type` and 'charset' fields to the return, if possible.
+    required: false
+    choices: [ Yes, No ]
+    default: No
+    version_added: "2.1"
+    aliases: [ 'mime_type', 'mime-type' ]
 author: "Bruce Pennypacker (@bpennypacker)"
 '''
 
@@ -275,6 +284,16 @@ stat:
             returned: success, path exists and user can read stats and installed python supports it
             type: string
             sample: www-data
+        mime_type:
+            description: file magic data or mime-type
+            returned: success, path exists and user can read stats and installed python supports it and the `mime` option was true, will return 'unknown' on error.
+            type: string
+            sample: PDF document, version 1.2
+        charset:
+            description: file character set or encoding
+            returned: success, path exists and user can read stats and installed python supports it and the `mime` option was true, will return 'unknown' on error.
+            type: string
+            sample: us-ascii
 '''
 
 import os
@@ -373,6 +392,19 @@ def main():
     except:
         pass
 
+    if module.params.get('mime'):
+        d['mime_type'] = 'unknown'
+        d['charset'] = 'unknown'
+
+        filecmd = [module.get_bin_path('file', True),'-i', path]
+        try:
+            rc, out, err = module.run_command(filecmd)
+            if rc == 0:
+                mtype, chset = out.split(':')[1].split(';')
+                d['mime_type'] = mtype.strip()
+                d['charset'] = chset.split('=')[1].strip()
+        except:
+            pass
 
     module.exit_json(changed=False, stat=d)
 

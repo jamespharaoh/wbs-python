@@ -164,7 +164,7 @@ def dup_check(module, iam, name, new_name, cert, orig_cert_names, orig_cert_bodi
                     elif orig_cert_bodies[c_index] != cert:
                         module.fail_json(changed=False, msg='A cert with the name %s already exists and'
                                                            ' has a different certificate body associated'
-                                                           ' with it. Certificates cannot have the same name')
+                                                           ' with it. Certificates cannot have the same name' % i_name)
             else:
                 update=True
                 break
@@ -232,7 +232,7 @@ def main():
         new_name=dict(default=None, required=False),
         path=dict(default='/', required=False),
         new_path=dict(default=None, required=False),
-        dup_ok=dict(default=False, required=False, choices=[False, True])
+        dup_ok=dict(default=False, required=False, type='bool')
     )
     )
 
@@ -248,7 +248,7 @@ def main():
 
     try:
         if region:
-            iam = boto.iam.connect_to_region(region, **aws_connect_kwargs)
+            iam = connect_to_aws(boto.iam, region, **aws_connect_kwargs)
         else:
             iam = boto.iam.connection.IAMConnection(**aws_connect_kwargs)
     except boto.exception.NoAuthHandlerFound, e:

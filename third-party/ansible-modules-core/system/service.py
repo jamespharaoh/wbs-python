@@ -496,6 +496,8 @@ class LinuxService(Service):
         (rc, out, err) = self.execute_command("%s is-enabled %s" % (self.enable_cmd, service_name,))
         if rc == 0:
             return True
+        elif out.startswith('disabled'):
+            return False
         elif sysv_exists(service_name):
             return sysv_is_enabled(service_name)
         else:
@@ -514,27 +516,30 @@ class LinuxService(Service):
         value_buffer = []
         status_dict = {}
         for line in out.splitlines():
-            if not key:
-                key, value = line.split('=', 1)
-                # systemd fields that are shell commands can be multi-line
-                # We take a value that begins with a "{" as the start of
-                # a shell command and a line that ends with "}" as the end of
-                # the command
-                if value.lstrip().startswith('{'):
-                    if value.rstrip().endswith('}'):
+            if '=' in line:
+                if not key:
+                    key, value = line.split('=', 1)
+                    # systemd fields that are shell commands can be multi-line
+                    # We take a value that begins with a "{" as the start of
+                    # a shell command and a line that ends with "}" as the end of
+                    # the command
+                    if value.lstrip().startswith('{'):
+                        if value.rstrip().endswith('}'):
+                            status_dict[key] = value
+                            key = None
+                        else:
+                            value_buffer.append(value)
+                    else:
                         status_dict[key] = value
+                        key = None
+                else:
+                    if line.rstrip().endswith('}'):
+                        status_dict[key] = '\n'.join(value_buffer)
                         key = None
                     else:
                         value_buffer.append(value)
-                else:
-                    status_dict[key] = value
-                    key = None
             else:
-                if line.rstrip().endswith('}'):
-                    status_dict[key] = '\n'.join(value_buffer)
-                    key = None
-                else:
-                    value_buffer.append(value)
+                value_buffer.append(value)
 
         return status_dict
 
@@ -1003,7 +1008,12 @@ class FreeBsdService(Service):
         if self.action == "reload":
             self.action = "onereload"
 
-        return self.execute_command("%s %s %s %s" % (self.svc_cmd, self.name, self.action, self.arguments))
+        ret = self.execute_command("%s %s %s %s" % (self.svc_cmd, self.name, self.action, self.arguments))
+
+        if self.sleep:
+            time.sleep(self.sleep)
+
+        return ret
 
 # ===========================================
 # Subclass: OpenBSD
@@ -1172,7 +1182,7 @@ class NetBsdService(Service):
     distribution = None
 
     def get_service_tools(self):
-        initpaths = [ '/etc/rc.d' ]		# better: $rc_directories - how to get in here? Run: sh -c '. /etc/rc.conf ; echo $rc_directories'
+        initpaths = [ '/etc/rc.d' ]  # better: $rc_directories - how to get in here? Run: sh -c '. /etc/rc.conf ; echo $rc_directories'
 
         for initdir in initpaths:
             initscript = "%s/%s" % (initdir,self.name)
@@ -1188,7 +1198,7 @@ class NetBsdService(Service):
         else:
             self.rcconf_value = "NO"
 
-        rcfiles = [ '/etc/rc.conf' ]		# Overkill?
+        rcfiles = [ '/etc/rc.conf' ]  # Overkill?
         for rcfile in rcfiles:
             if os.path.isfile(rcfile):
                 self.rcconf_file = rcfile
@@ -1328,9 +1338,9 @@ class SunOSService(Service):
         elif self.action == 'stop':
             subcmd = "disable -st"
         elif self.action == 'reload':
-            subcmd = "refresh"
+            subcmd = "refresh -s"
         elif self.action == 'restart' and status == 'online':
-            subcmd = "restart"
+            subcmd = "restart -s"
         elif self.action == 'restart' and status != 'online':
             subcmd = "enable -rst"
 

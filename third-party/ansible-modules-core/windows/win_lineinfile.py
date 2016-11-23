@@ -31,6 +31,7 @@ options:
     aliases: [ name, destfile ]
     description:
       - The path of the file to modify.
+      - Note that the Windows path delimiter '\' must be escaped as '\\' (see examples below)
   regexp:
     required: false
     description:
@@ -57,13 +58,13 @@ options:
     default: EOF
     description:
       - Used with C(state=present). If specified, the line will be inserted after the last match of specified regular expression. A special value is available; C(EOF) for inserting the line at the end of the file.
-      - If specified regular expresion has no matches, EOF will be used instead.  May not be used with C(backrefs).
+      - If specified regular expression has no matches, EOF will be used instead.  May not be used with C(backrefs).
     choices: [ 'EOF', '*regex*' ]
   insertbefore:
     required: false
     description:
       - Used with C(state=present). If specified, the line will be inserted before the last match of specified regular expression. A value is available; C(BOF) for inserting the line at the beginning of the file.
-      - If specified regular expresion has no matches, the line will be inserted at the end of the file.  May not be used with C(backrefs).
+      - If specified regular expression has no matches, the line will be inserted at the end of the file.  May not be used with C(backrefs).
     choices: [ 'BOF', '*regex*' ]
   create:
     required: false

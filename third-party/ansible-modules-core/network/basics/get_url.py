@@ -55,6 +55,14 @@ options:
         If C(dest) is a directory, the file will always be
         downloaded (regardless of the force option), but replaced only if the contents changed.
     required: true
+  tmp_dest:
+    description:
+      - absolute path of where temporary file is downloaded to.
+      - Defaults to TMPDIR, TEMP or TMP env variables or a platform specific value
+      - https://docs.python.org/2/library/tempfile.html#tempfile.tempdir
+    required: false
+    default: ''
+    version_added: '2.1'
   force:
     description:
       - If C(yes) and C(dest) is not a directory, will download the file every
@@ -67,6 +75,14 @@ options:
     choices: [ "yes", "no" ]
     default: "no"
     aliases: [ "thirsty" ]
+  backup:
+    description:
+      - Create a backup file including the timestamp information so you can get
+        the original file back if you somehow clobbered it incorrectly.
+    required: false
+    choices: [ "yes", "no" ]
+    default: "no"
+    version_added: '2.1'
   sha256sum:
     description:
       - If a SHA-256 checksum is passed to this parameter, the digest of the
@@ -82,8 +98,8 @@ options:
         destination file will be calculated after it is downloaded to ensure
         its integrity and verify that the transfer completed successfully.
         Format: <algorithm>:<checksum>, e.g.: checksum="sha256:D98291AC[...]B6DC7B97"
-        If you worry about portability, only the sha1 algorithm is available 
-        on all platforms and python versions.  The third party hashlib 
+        If you worry about portability, only the sha1 algorithm is available
+        on all platforms and python versions.  The third party hashlib
         library can be installed for access to additional algorithms.
         Additionaly, if a checksum is passed to this parameter, and the file exist under
         the C(dest) location, the destination_checksum would be calculated, and if
@@ -108,7 +124,7 @@ options:
     choices: ['yes', 'no']
   timeout:
     description:
-      - Timeout for URL request
+      - Timeout in seconds for URL request
     required: false
     default: 10
     version_added: '1.8'
@@ -178,7 +194,7 @@ def url_filename(url):
         return 'index.html'
     return fn
 
-def url_get(module, url, dest, use_proxy, last_mod_time, force, timeout=10, headers=None):
+def url_get(module, url, dest, use_proxy, last_mod_time, force, timeout=10, headers=None, tmp_dest=''):
     """
     Download data from the url and store in a temporary file.
 
@@ -190,11 +206,27 @@ def url_get(module, url, dest, use_proxy, last_mod_time, force, timeout=10, head
     if info['status'] == 304:
         module.exit_json(url=url, dest=dest, changed=False, msg=info.get('msg', ''))
 
-    # create a temporary file and copy content to do checksum-based replacement
-    if info['status'] != 200 and not url.startswith('file:/'):
+    # Exceptions in fetch_url may result in a status -1, the ensures a proper error to the user in all cases
+    if info['status'] == -1:
+        module.fail_json(msg=info['msg'], url=url, dest=dest)
+
+    if info['status'] != 200 and not url.startswith('file:/') and not (url.startswith('ftp:/') and info.get('msg', '').startswith('OK')):
         module.fail_json(msg="Request failed", status_code=info['status'], response=info['msg'], url=url, dest=dest)
 
-    fd, tempname = tempfile.mkstemp()
+    # create a temporary file and copy content to do checksum-based replacement
+    if tmp_dest != '':
+        # tmp_dest should be an existing dir
+        tmp_dest_is_dir = os.path.isdir(tmp_dest)
+        if not tmp_dest_is_dir:
+            if os.path.exists(tmp_dest):
+                module.fail_json(msg="%s is a file but should be a directory." % tmp_dest)
+            else:
+                module.fail_json(msg="%s directoy does not exist." % tmp_dest)
+
+        fd, tempname = tempfile.mkstemp(dir=tmp_dest)
+    else:
+        fd, tempname = tempfile.mkstemp()
+
     f = os.fdopen(fd, 'wb')
     try:
         shutil.copyfileobj(rsp, f)
@@ -233,10 +265,12 @@ def main():
     argument_spec.update(
         url = dict(required=True),
         dest = dict(required=True),
+        backup = dict(default=False, type='bool'),
         sha256sum = dict(default=''),
         checksum = dict(default=''),
         timeout = dict(required=False, type='int', default=10),
         headers = dict(required=False, default=None),
+        tmp_dest = dict(required=False, default=''),
     )
 
     module = AnsibleModule(
@@ -247,16 +281,18 @@ def main():
 
     url  = module.params['url']
     dest = os.path.expanduser(module.params['dest'])
+    backup = module.params['backup']
     force = module.params['force']
     sha256sum = module.params['sha256sum']
     checksum = module.params['checksum']
     use_proxy = module.params['use_proxy']
     timeout = module.params['timeout']
-    
+    tmp_dest = os.path.expanduser(module.params['tmp_dest'])
+
     # Parse headers to dict
     if module.params['headers']:
         try:
-            headers = dict(item.split(':') for item in module.params['headers'].split(','))
+            headers = dict(item.split(':', 1) for item in module.params['headers'].split(','))
         except:
             module.fail_json(msg="The header parameter requires a key:value,key:value syntax to be properly parsed.")
     else:
@@ -311,8 +347,13 @@ def main():
         mtime = os.path.getmtime(dest)
         last_mod_time = datetime.datetime.utcfromtimestamp(mtime)
 
+        # If the checksum does not match we have to force the download
+        # because last_mod_time may be newer than on remote
+        if checksum_mismatch:
+            force = True
+
     # download to tmpsrc
-    tmpsrc, info = url_get(module, url, dest, use_proxy, last_mod_time, force, timeout, headers)
+    tmpsrc, info = url_get(module, url, dest, use_proxy, last_mod_time, force, timeout, headers, tmp_dest)
 
     # Now the request has completed, we can finally generate the final
     # destination file name from the info dict.
@@ -353,8 +394,12 @@ def main():
             os.remove(tmpsrc)
             module.fail_json( msg="Destination %s not writable" % (os.path.dirname(dest)))
 
+    backup_file = None
     if checksum_src != checksum_dest:
         try:
+            if backup:
+                if os.path.exists(dest):
+                    backup_file = module.backup_local(dest)
             shutil.copyfile(tmpsrc, dest)
         except Exception, err:
             os.remove(tmpsrc)
@@ -384,9 +429,15 @@ def main():
     except ValueError:
         md5sum = None
 
+    res_args = dict(
+        url = url, dest = dest, src = tmpsrc, md5sum = md5sum, checksum_src = checksum_src,
+        checksum_dest = checksum_dest, changed = changed, msg = info.get('msg', '')
+    )
+    if backup_file:
+        res_args['backup_file'] = backup_file
+
     # Mission complete
-    module.exit_json(url=url, dest=dest, src=tmpsrc, md5sum=md5sum, checksum_src=checksum_src,
-        checksum_dest=checksum_dest, changed=changed, msg=info.get('msg', ''))
+    module.exit_json(**res_args)
 
 # import module snippets
 from ansible.module_utils.basic import *

@@ -22,6 +22,9 @@ try:
 except ImportError:
     HAS_SHADE = False
 
+from distutils.version import StrictVersion
+
+
 DOCUMENTATION = '''
 ---
 module: os_network
@@ -57,6 +60,34 @@ options:
      choices: ['present', 'absent']
      required: false
      default: present
+   provider_physical_network:
+     description:
+        - The physical network where this network object is implemented.
+     required: false
+     default: None
+     version_added: "2.1"
+   provider_network_type:
+     description:
+        - The type of physical network that maps to this network resource.
+     choices: ['flat', 'vlan', 'vxlan', 'gre']
+     required: false
+     default: None
+     version_added: "2.1"
+   provider_segmentation_id:
+     description:
+        - An isolated segment on the physical network. The I(network_type)
+          attribute defines the segmentation model. For example, if the
+          I(network_type) value is vlan, this ID is a vlan identifier. If
+          the I(network_type) value is gre, this ID is a gre key.
+     required: false
+     default: None
+     version_added: "2.1"
+   project:
+     description:
+        - Project name or ID containing the network (name admin-only)
+     required: false
+     default: None
+     version_added: "2.1"
 requirements: ["shade"]
 '''
 
@@ -115,6 +146,18 @@ network:
             description: The associated subnets.
             type: list
             sample: []
+        "provider:physical_network":
+            description: The physical network where this network object is implemented.
+            type: string
+            sample: my_vlan_net
+        "provider:network_type":
+            description: The type of physical network that maps to this network resource.
+            type: string
+            sample: vlan
+        "provider:segmentation_id":
+            description: An isolated segment on the physical network.
+            type: string
+            sample: 101
 '''
 
 
@@ -124,7 +167,12 @@ def main():
         shared=dict(default=False, type='bool'),
         admin_state_up=dict(default=True, type='bool'),
         external=dict(default=False, type='bool'),
+        provider_physical_network=dict(required=False),
+        provider_network_type=dict(required=False, default=None,
+                                   choices=['flat', 'vlan', 'vxlan', 'gre']),
+        provider_segmentation_id=dict(required=False),
         state=dict(default='present', choices=['absent', 'present']),
+        project=dict(default=None)
     )
 
     module_kwargs = openstack_module_kwargs()
@@ -133,19 +181,53 @@ def main():
     if not HAS_SHADE:
         module.fail_json(msg='shade is required for this module')
 
+    if (module.params['project'] and
+            StrictVersion(shade.__version__) < StrictVersion('1.6.0')):
+        module.fail_json(msg="To utilize project, the installed version of"
+                             "the shade library MUST be >=1.6.0")
+
     state = module.params['state']
     name = module.params['name']
     shared = module.params['shared']
     admin_state_up = module.params['admin_state_up']
     external = module.params['external']
+    provider_physical_network = module.params['provider_physical_network']
+    provider_network_type = module.params['provider_network_type']
+    provider_segmentation_id = module.params['provider_segmentation_id']
+    project = module.params.pop('project')
 
     try:
         cloud = shade.openstack_cloud(**module.params)
-        net = cloud.get_network(name)
+        if project is not None:
+            proj = cloud.get_project(project)
+            if proj is None:
+                module.fail_json(msg='Project %s could not be found' % project)
+            project_id = proj['id']
+            filters = {'tenant_id': project_id}
+        else:
+            project_id = None
+            filters = None
+        net = cloud.get_network(name, filters=filters)
 
         if state == 'present':
             if not net:
-                net = cloud.create_network(name, shared, admin_state_up, external)
+                provider = {}
+                if provider_physical_network:
+                    provider['physical_network'] = provider_physical_network
+                if provider_network_type:
+                    provider['network_type'] = provider_network_type
+                if provider_segmentation_id:
+                    provider['segmentation_id'] = provider_segmentation_id
+
+                if provider and StrictVersion(shade.__version__) < StrictVersion('1.5.0'):
+                    module.fail_json(msg="Shade >= 1.5.0 required to use provider options")
+
+                if project_id is not None:
+                    net = cloud.create_network(name, shared, admin_state_up,
+                                               external, provider, project_id)
+                else:
+                    net = cloud.create_network(name, shared, admin_state_up,
+                                               external, provider)
                 changed = True
             else:
                 changed = False

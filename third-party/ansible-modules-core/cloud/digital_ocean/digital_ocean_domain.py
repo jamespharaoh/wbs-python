@@ -57,25 +57,28 @@ requirements:
 EXAMPLES = '''
 # Create a domain record
 
-- digital_ocean_domain: >
-      state=present
-      name=my.digitalocean.domain
-      ip=127.0.0.1
+- digital_ocean_domain:
+    state: present
+    name: my.digitalocean.domain
+    ip: 127.0.0.1
 
 # Create a droplet and a corresponding domain record
 
-- digital_ocean: >
-      state=present
-      name=test_droplet
-      size_id=1gb
-      region_id=sgp1
-      image_id=ubuntu-14-04-x64
+- digital_ocean:
+    state: present
+    name: test_droplet
+    size_id: 1gb
+    region_id: sgp1
+    image_id: ubuntu-14-04-x64
+
+
   register: test_droplet
 
-- digital_ocean_domain: >
-      state=present
-      name={{ test_droplet.droplet.name }}.my.domain
-      ip={{ test_droplet.droplet.ip_address }}
+- digital_ocean_domain:
+    state: present
+    name: "{{ test_droplet.droplet.name }}.my.domain"
+    ip: "{{ test_droplet.droplet.ip_address }}"
+
 '''
 
 import os
@@ -122,10 +125,10 @@ class Domain(JsonfyMixIn):
         self.__dict__.update(domain_json)
 
     def destroy(self):
-        self.manager.destroy_domain(self.id)
+        self.manager.destroy_domain(self.name)
 
     def records(self):
-        json = self.manager.all_domain_records(self.id)
+        json = self.manager.all_domain_records(self.name)
         return map(DomainRecord, json)
 
     @classmethod
@@ -174,7 +177,6 @@ def core(module):
     except KeyError, e:
         module.fail_json(msg='Unable to load %s' % e.message)
 
-    changed = True
     state = module.params['state']
 
     Domain.setup(api_token)
@@ -192,12 +194,12 @@ def core(module):
             records = domain.records()
             at_record = None
             for record in records:
-                if record.name == "@" and record.record_type == 'A':
+                if record.name == "@" and record.type == 'A':
                     at_record = record
 
             if not at_record.data == getkeyordie("ip"):
                 record.update(data=getkeyordie("ip"), record_type='A')
-                module.exit_json(changed=True, domain=Domain.find(id=record.domain_id).to_json())
+                module.exit_json(changed=True, domain=Domain.find(id=record.id).to_json())
 
         module.exit_json(changed=False, domain=domain.to_json())
 

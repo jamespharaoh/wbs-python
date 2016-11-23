@@ -35,7 +35,7 @@ options:
   dest_port:
     description:
       - Port number for ssh on the destination host. Prior to ansible 2.0, the ansible_ssh_port inventory var took precedence over this value.
-    default: Value of ansible_ssh_port for this host, remote_port config setting, or 22 if none of those are set
+    default: Value of ansible_ssh_port for this host, remote_port config setting, or the value from ssh client configuration if none of those are set
     version_added: "1.5"
   mode:
     description:
@@ -141,7 +141,7 @@ options:
   use_ssh_args:
     description:
       - Use the ssh_args specified in ansible.cfg
-    default: "yes"
+    default: "no"
     choices:
       - "yes"
       - "no"
@@ -176,6 +176,8 @@ notes:
      are what was expected.
    - To exclude files and directories from being synchronized, you may add 
      C(.rsync-filter) files to the source directory.
+   - rsync daemon must be up and running with correct permission when using
+     rsync protocol in source or destination path.
 
 
 author: "Timothy Appnel (@tima)"
@@ -184,6 +186,22 @@ author: "Timothy Appnel (@tima)"
 EXAMPLES = '''
 # Synchronization of src on the control machine to dest on the remote hosts
 synchronize: src=some/relative/path dest=/some/absolute/path
+
+# Synchronization using rsync protocol (push)
+synchronize: src=some/relative/path/ dest=rsync://somehost.com/path/
+
+# Synchronization using rsync protocol (pull)
+synchronize: mode=pull src=rsync://somehost.com/path/ dest=/some/absolute/path/
+
+# Synchronization using rsync protocol on delegate host (push)
+synchronize: >
+    src=/some/absolute/path/ dest=rsync://somehost.com/path/
+    delegate_to: delegate.host
+
+# Synchronization using rsync protocol on delegate host (pull)
+synchronize: >
+    mode=pull src=rsync://somehost.com/path/ dest=/some/absolute/path/
+    delegate_to: delegate.host
 
 # Synchronization without any --archive options enabled
 synchronize: src=some/relative/path dest=/some/absolute/path archive=no
@@ -263,7 +281,7 @@ def main():
         argument_spec = dict(
             src = dict(required=True),
             dest = dict(required=True),
-            dest_port = dict(default=22),
+            dest_port = dict(default=None, type='int'),
             delete = dict(default='no', type='bool'),
             private_key = dict(default=None),
             rsync_path = dict(default=None),
@@ -389,10 +407,17 @@ def main():
     if ssh_args:
       ssh_opts = '%s %s' % (ssh_opts, ssh_args)
 
-    if dest_port != 22:
-        cmd += " --rsh '%s %s %s -o Port=%s'" % (ssh, private_key, ssh_opts, dest_port)
-    else:
-        cmd += " --rsh '%s %s %s'" % (ssh, private_key, ssh_opts)  # need ssh param
+    if source.startswith('"rsync://') and dest.startswith('"rsync://'):
+        module.fail_json(msg='either src or dest must be a localhost', rc=1)
+
+    if not source.startswith('"rsync://') and not dest.startswith('"rsync://'):
+        # If the user specified a port value
+        # Note:  The action plugin takes care of setting this to a port from
+        # inventory if the user didn't specify an explict dest_port
+        if dest_port is not None:
+            cmd += " --rsh 'ssh %s %s -o Port=%s'" % (private_key, ssh_opts, dest_port)
+        else:
+            cmd += " --rsh 'ssh %s %s'" % (private_key, ssh_opts)
 
     if rsync_path:
         cmd = cmd + " --rsync-path=%s" % (rsync_path)
@@ -423,8 +448,14 @@ def main():
         out_lines=out_clean.split('\n')
         while '' in out_lines: 
             out_lines.remove('')
-        return module.exit_json(changed=changed, msg=out_clean,
-                                rc=rc, cmd=cmdstr, stdout_lines=out_lines)
+        if module._diff:
+            diff = {'prepared': out_clean}
+            return module.exit_json(changed=changed, msg=out_clean,
+                                    rc=rc, cmd=cmdstr, stdout_lines=out_lines,
+                                    diff=diff)
+        else:
+            return module.exit_json(changed=changed, msg=out_clean,
+                                    rc=rc, cmd=cmdstr, stdout_lines=out_lines)
 
 # import module snippets
 from ansible.module_utils.basic import *

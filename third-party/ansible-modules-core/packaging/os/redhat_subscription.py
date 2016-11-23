@@ -1,5 +1,20 @@
 #!/usr/bin/python
 
+# James Laska (jlaska@redhat.com)
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
 DOCUMENTATION = '''
 ---
 module: redhat_subscription
@@ -36,7 +51,7 @@ options:
         default: Current value from C(/etc/rhsm/rhsm.conf) is the default
     server_insecure:
         description:
-            - Allow traffic over insecure http
+            - Enable or disable https server certificate verification when connecting to C(server_hostname)
         required: False
         default: Current value from C(/etc/rhsm/rhsm.conf) is the default
     rhsm_baseurl:
@@ -65,11 +80,33 @@ options:
             - Specify a subscription pool name to consume.  Regular expressions accepted.
         required: False
         default: '^$'
+    consumer_type:
+        description:
+            - The type of unit to register, defaults to system
+        required: False
+        default: null
+        version_added: "2.1"
+    consumer_name:
+        description:
+            - Name of the system to register, defaults to the hostname
+        required: False
+        default: null
+        version_added: "2.1"
+    consumer_id:
+        description:
+            - References an existing consumer ID to resume using a previous registration for this system. If the  system's identity certificate is lost or corrupted, this option allows it to resume using its previous identity and subscriptions. The default is to not specify a consumer ID so a new ID is created.
+        required: False
+        default: null
+        version_added: "2.1"
 '''
 
 EXAMPLES = '''
 # Register as user (joe_user) with password (somepass) and auto-subscribe to available content.
 - redhat_subscription: state=present username=joe_user password=somepass autosubscribe=true
+
+# Same as above but with pulling existing system data.
+- redhat_subscription: state=present username=joe_user password=somepass
+                       consumer_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 # Register with activationkey (1-222333444) and consume subscriptions matching
 # the names (Red hat Enterprise Server) and (Red Hat Virtualization)
@@ -209,7 +246,8 @@ class Rhsm(RegistrationBase):
         else:
             return False
 
-    def register(self, username, password, autosubscribe, activationkey, org_id):
+    def register(self, username, password, autosubscribe, activationkey, org_id,
+                 consumer_type, consumer_name, consumer_id):
         '''
             Register the current system to the provided RHN server
             Raises:
@@ -229,6 +267,12 @@ class Rhsm(RegistrationBase):
                 args.extend(['--username', username])
             if password:
                 args.extend(['--password', password])
+            if consumer_type:
+                args.extend(['--type', consumer_type])
+            if consumer_name:
+                args.extend(['--name', consumer_name])
+            if consumer_id:
+                args.extend(['--consumerid', consumer_id])
 
         rc, stderr, stdout = self.module.run_command(args, check_rc=True)
 
@@ -396,6 +440,9 @@ def main():
                     activationkey = dict(default=None, required=False),
                     org_id = dict(default=None, required=False),
                     pool = dict(default='^$', required=False, type='str'),
+                    consumer_type = dict(default=None, required=False),
+                    consumer_name = dict(default=None, required=False),
+                    consumer_id = dict(default=None, required=False),
                 )
             )
 
@@ -410,6 +457,9 @@ def main():
     activationkey = module.params['activationkey']
     org_id = module.params['org_id']
     pool = module.params['pool']
+    consumer_type = module.params["consumer_type"]
+    consumer_name = module.params["consumer_name"]
+    consumer_id = module.params["consumer_id"]
 
     # Ensure system is registered
     if state == 'present':
@@ -435,7 +485,8 @@ def main():
             try:
                 rhn.enable()
                 rhn.configure(**module.params)
-                rhn.register(username, password, autosubscribe, activationkey, org_id)
+                rhn.register(username, password, autosubscribe, activationkey, org_id,
+                             consumer_type, consumer_name, consumer_id)
                 subscribed_pool_ids = rhn.subscribe(pool)
             except Exception, e:
                 module.fail_json(msg="Failed to register with '%s': %s" % (server_hostname, e))

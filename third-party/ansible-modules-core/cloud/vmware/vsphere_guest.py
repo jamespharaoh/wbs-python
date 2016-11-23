@@ -34,6 +34,8 @@ try:
 except ImportError:
     pass
 
+import ssl
+
 DOCUMENTATION = '''
 ---
 module: vsphere_guest
@@ -48,6 +50,17 @@ options:
     required: true
     default: null
     aliases: []
+  validate_certs:
+    description:
+      - Validate SSL certs.  Note, if running on python without SSLContext
+        support (typically, python < 2.7.9) you will have to set this to C(no)
+        as pysphere does not support validating certificates on older python.
+        Prior to 2.1, this module would always validate on python >= 2.7.9 and
+        never validate on python <= 2.7.8.
+    required: false
+    default: yes
+    choices: ['yes', 'no']
+    version_added: 2.1
   guest:
     description:
       - The virtual server name you wish to manage.
@@ -79,7 +92,7 @@ options:
     default: null
   state:
     description:
-      - Indicate desired state of the vm. 'reconfigured' only applies changes to 'memory_mb' and 'num_cpus' in vm_hardware parameter, and only when hot-plugging is enabled for the guest.
+      - Indicate desired state of the vm. 'reconfigured' only applies changes to 'vm_cdrom', 'memory_mb', and 'num_cpus' in vm_hardware parameter. The 'memory_mb' and 'num_cpus' changes are applied to powered-on vms when hot-plugging is enabled for the guest.
     default: present
     choices: ['present', 'powered_off', 'absent', 'powered_on', 'restarted', 'reconfigured']
   from_template:
@@ -170,11 +183,16 @@ EXAMPLES = '''
       vcpu.hotadd: yes
       mem.hotadd:  yes
       notes: This is a test VM
+      folder: MyFolder
     vm_disk:
       disk1:
         size_gb: 10
         type: thin
         datastore: storage001
+        # VMs can be put into folders. The value given here is either the full path
+        # to the folder (e.g. production/customerA/lamp) or just the last component
+        # of the path (e.g. lamp):
+        folder: production/customerA/lamp
     vm_nic:
       nic1:
         type: vmxnet3
@@ -241,6 +259,8 @@ EXAMPLES = '''
     template_src: centosTemplate
     cluster: MainCluster
     resource_pool: "/Resources"
+    vm_extra_config:
+      folder: MyFolder
 
 # Task to gather facts from a vSphere cluster only if the system is a VMWare guest
 
@@ -266,8 +286,22 @@ EXAMPLES = '''
   hw_guest_id: "rhel6_64Guest"
   hw_memtotal_mb: 2048
   hw_name: "centos64Guest"
+  hw_power_status: "POWERED ON",
   hw_processor_count: 2
   hw_product_uuid: "ef50bac8-2845-40ff-81d9-675315501dac"
+
+hw_power_status will be one of the following values:
+  - POWERED ON
+  - POWERED OFF
+  - SUSPENDED
+  - POWERING ON
+  - POWERING OFF
+  - SUSPENDING
+  - RESETTING
+  - BLOCKED ON MSG
+  - REVERTING TO SNAPSHOT
+  - UNKNOWN
+as seen in the VMPowerState-Class of PySphere: http://git.io/vlwOq
 
 # Remove a vm from vSphere
 # The VM must be powered_off or you need to use force to force a shutdown
@@ -493,7 +527,7 @@ def find_datastore(module, s, datastore, config_target):
                 datastore = d.Datastore.Name
                 break
     else:
-        for ds_mor, ds_name in server.get_datastores().items():
+        for ds_mor, ds_name in s.get_datastores().items():
             ds_props = VIProperty(s, ds_mor)
             if (ds_props.summary.accessible and (datastore and ds_name == datastore)
                     or (not datastore)):
@@ -588,6 +622,26 @@ def spec_singleton(spec, request, vm):
         spec = request.new_spec()
     return spec
 
+def get_cdrom_params(module, s, vm_cdrom):
+    cdrom_type = None
+    cdrom_iso_path = None
+    try:
+        cdrom_type = vm_cdrom['type']
+    except KeyError:
+        s.disconnect()
+        module.fail_json(
+            msg="Error on %s definition. cdrom type needs to be"
+            " specified." % vm_cdrom)
+    if cdrom_type == 'iso':
+        try:
+            cdrom_iso_path = vm_cdrom['iso_path']
+        except KeyError:
+            s.disconnect()
+            module.fail_json(
+                msg="Error on %s definition. cdrom iso_path needs"
+                " to be specified." % vm_cdrom)
+
+    return cdrom_type, cdrom_iso_path
 
 def vmdisk_id(vm, current_datastore_name):
     id_list = []
@@ -597,7 +651,7 @@ def vmdisk_id(vm, current_datastore_name):
     return id_list
 
 
-def deploy_template(vsphere_client, guest, resource_pool, template_src, esxi, module, cluster_name, snapshot_to_clone, power_on_after_clone):
+def deploy_template(vsphere_client, guest, resource_pool, template_src, esxi, module, cluster_name, snapshot_to_clone, power_on_after_clone, vm_extra_config):
     vmTemplate = vsphere_client.get_vm_by_name(template_src)
     vmTarget = None
 
@@ -653,7 +707,7 @@ def deploy_template(vsphere_client, guest, resource_pool, template_src, esxi, mo
     elif resource_pool:
         try:
             cluster = [k for k,
-                       v in vsphere_client.get_clusters().items() if v == cluster_name][0]
+                       v in vsphere_client.get_clusters().items() if v == cluster_name][0] if cluster_name else None
         except IndexError, e:
             vsphere_client.disconnect()
             module.fail_json(msg="Cannot find Cluster named: %s" %
@@ -689,6 +743,10 @@ def deploy_template(vsphere_client, guest, resource_pool, template_src, esxi, mo
                 cloneArgs["linked"] = True
                 cloneArgs["snapshot"] = snapshot_to_clone
 
+            if vm_extra_config.get("folder") is not None:
+                # if a folder is specified, clone the VM into it
+                cloneArgs["folder"] = vm_extra_config.get("folder")
+
             vmTemplate.clone(guest, **cloneArgs)
             changed = True
         else:
@@ -701,18 +759,88 @@ def deploy_template(vsphere_client, guest, resource_pool, template_src, esxi, mo
             msg="Could not clone selected machine: %s" % e
         )
 
+# example from https://github.com/kalazzerx/pysphere/blob/master/examples/pysphere_create_disk_and_add_to_vm.py
+# was used.
+def update_disks(vsphere_client, vm, module, vm_disk, changes):
+    request = VI.ReconfigVM_TaskRequestMsg()
+    changed = False
+
+    for cnf_disk in vm_disk:
+        disk_id = re.sub("disk", "", cnf_disk)
+        found = False
+        for dev_key in vm._devices:
+            if vm._devices[dev_key]['type'] == 'VirtualDisk':
+                hdd_id = vm._devices[dev_key]['label'].split()[2]
+                if disk_id == hdd_id:
+                    found = True
+                    continue
+        if not found:
+            it = VI.ReconfigVM_TaskRequestMsg()
+            _this = request.new__this(vm._mor)
+            _this.set_attribute_type(vm._mor.get_attribute_type())
+            request.set_element__this(_this)
+
+            spec = request.new_spec()
+
+            dc = spec.new_deviceChange()
+            dc.Operation = "add"
+            dc.FileOperation = "create"
+
+            hd = VI.ns0.VirtualDisk_Def("hd").pyclass()
+            hd.Key = -100
+            hd.UnitNumber = int(disk_id)
+            hd.CapacityInKB = int(vm_disk[cnf_disk]['size_gb']) * 1024 * 1024
+            hd.ControllerKey = 1000
+
+            # module.fail_json(msg="peos : %s" % vm_disk[cnf_disk])
+            backing = VI.ns0.VirtualDiskFlatVer2BackingInfo_Def("backing").pyclass()
+            backing.FileName = "[%s]" % vm_disk[cnf_disk]['datastore']
+            backing.DiskMode = "persistent"
+            backing.Split = False
+            backing.WriteThrough = False
+            backing.ThinProvisioned = False
+            backing.EagerlyScrub = False
+            hd.Backing = backing
+
+            dc.Device = hd
+
+            spec.DeviceChange = [dc]
+            request.set_element_spec(spec)
+
+            ret = vsphere_client._proxy.ReconfigVM_Task(request)._returnval
+
+            # Wait for the task to finish
+            task = VITask(ret, vsphere_client)
+            status = task.wait_for_state([task.STATE_SUCCESS,
+                                          task.STATE_ERROR])
+
+            if status == task.STATE_SUCCESS:
+                changed = True
+                changes[cnf_disk] = vm_disk[cnf_disk]
+            elif status == task.STATE_ERROR:
+                module.fail_json(
+                    msg="Error reconfiguring vm: %s, [%s]" % (
+                        task.get_error_message(),
+                        vm_disk[cnf_disk]))
+    return changed, changes
+
 
 def reconfigure_vm(vsphere_client, vm, module, esxi, resource_pool, cluster_name, guest, vm_extra_config, vm_hardware, vm_disk, vm_nic, state, force):
     spec = None
     changed = False
     changes = {}
-    request = VI.ReconfigVM_TaskRequestMsg()
+    request = None
     shutdown = False
     poweron = vm.is_powered_on()
+    devices = []
 
     memoryHotAddEnabled = bool(vm.properties.config.memoryHotAddEnabled)
     cpuHotAddEnabled = bool(vm.properties.config.cpuHotAddEnabled)
     cpuHotRemoveEnabled = bool(vm.properties.config.cpuHotRemoveEnabled)
+
+    changed, changes = update_disks(vsphere_client, vm,
+                                    module, vm_disk, changes)
+    request = VI.ReconfigVM_TaskRequestMsg()
 
     # Change Memory
     if 'memory_mb' in vm_hardware:
@@ -747,7 +875,7 @@ def reconfigure_vm(vsphere_client, vm, module, esxi, resource_pool, cluster_name
     if vm_nic:
         changed = reconfigure_net(vsphere_client, vm, module, esxi, resource_pool, guest, vm_nic, cluster_name)
 
-    # ====( Config Memory )====#
+    # Change Num CPUs
     if 'num_cpus' in vm_hardware:
         if int(vm_hardware['num_cpus']) != vm.properties.config.hardware.numCPU:
             spec = spec_singleton(spec, request, vm)
@@ -778,6 +906,93 @@ def reconfigure_vm(vsphere_client, vm, module, esxi, resource_pool, cluster_name
 
             changes['cpu'] = vm_hardware['num_cpus']
 
+    # Change CDROM
+    if 'vm_cdrom' in vm_hardware:
+        spec = spec_singleton(spec, request, vm)
+
+        cdrom_type, cdrom_iso_path = get_cdrom_params(module, vsphere_client, vm_hardware['vm_cdrom'])
+
+        cdrom = None
+        current_devices = vm.properties.config.hardware.device
+
+        for dev in current_devices:
+            if dev._type == 'VirtualCdrom':
+                cdrom = dev._obj
+                break
+
+        if cdrom_type == 'iso':
+            iso_location = cdrom_iso_path.split('/', 1)
+            datastore, ds = find_datastore(
+                module, vsphere_client, iso_location[0], None)
+            iso_path = iso_location[1]
+            iso = VI.ns0.VirtualCdromIsoBackingInfo_Def('iso').pyclass()
+            iso.set_element_fileName('%s %s' % (datastore, iso_path))
+            cdrom.set_element_backing(iso)
+            cdrom.Connectable.set_element_connected(True)
+            cdrom.Connectable.set_element_startConnected(True)
+        elif cdrom_type == 'client':
+            client = VI.ns0.VirtualCdromRemoteAtapiBackingInfo_Def('client').pyclass()
+            client.set_element_deviceName("")
+            cdrom.set_element_backing(client)
+            cdrom.Connectable.set_element_connected(True)
+            cdrom.Connectable.set_element_startConnected(True)
+        else:
+            vsphere_client.disconnect()
+            module.fail_json(
+                msg="Error adding cdrom of type %s to vm spec. "
+                " cdrom type can either be iso or client" % (cdrom_type))
+
+        dev_change = spec.new_deviceChange()
+        dev_change.set_element_device(cdrom)
+        dev_change.set_element_operation('edit')
+        devices.append(dev_change)
+
+        changes['cdrom'] = vm_hardware['vm_cdrom']
+
+    # Resize hard drives
+    if vm_disk:
+        spec = spec_singleton(spec, request, vm)
+
+        # Get a list of the VM's hard drives
+        dev_list = [d for d in vm.properties.config.hardware.device if d._type=='VirtualDisk']
+        if len(vm_disk) > len(dev_list):
+            vsphere_client.disconnect()
+            module.fail_json(msg="Error in vm_disk definition. Too many disks defined in comparison to the VM's disk profile.")
+
+        disk_num = 0
+        dev_changes = []
+        disks_changed = {}
+        for disk in sorted(vm_disk.iterkeys()):
+            try:
+                disksize = int(vm_disk[disk]['size_gb'])
+                # Convert the disk size to kilobytes
+                disksize = disksize * 1024 * 1024
+            except (KeyError, ValueError):
+                vsphere_client.disconnect()
+                module.fail_json(msg="Error in '%s' definition. Size needs to be specified as an integer." % disk)
+            
+            # Make sure the new disk size is higher than the current value
+            dev = dev_list[disk_num]
+            if disksize < int(dev.capacityInKB):
+              vsphere_client.disconnect()
+              module.fail_json(msg="Error in '%s' definition. New size needs to be higher than the current value (%s GB)." % (disk, int(dev.capacityInKB) / 1024 / 1024))
+
+            # Set the new disk size
+            elif disksize > int(dev.capacityInKB):
+                dev_obj = dev._obj
+                dev_obj.set_element_capacityInKB(disksize)
+                dev_change = spec.new_deviceChange()
+                dev_change.set_element_operation("edit")
+                dev_change.set_element_device(dev_obj)
+                dev_changes.append(dev_change)
+                disks_changed[disk] = {'size_gb': int(vm_disk[disk]['size_gb'])}
+
+            disk_num = disk_num + 1
+
+        if dev_changes:
+            spec.set_element_deviceChange(dev_changes)
+            changes['disks'] = disks_changed
+
     if len(changes):
 
         if shutdown and vm.is_powered_on():
@@ -789,6 +1004,9 @@ def reconfigure_vm(vsphere_client, vm, module, esxi, resource_pool, cluster_name
                 module.fail_json(
                     msg='Failed to shutdown vm %s: %s' % (guest, e)
                 )
+
+        if len(devices):
+            spec.set_element_deviceChange(devices)
 
         request.set_element_spec(spec)
         ret = vsphere_client._proxy.ReconfigVM_Task(request)._returnval
@@ -915,6 +1133,48 @@ def reconfigure_net(vsphere_client, vm, module, esxi, resource_pool, guest, vm_n
         elif len(nics) == 0:
             return(False)
 
+
+def _build_folder_tree(nodes, parent):
+    tree = {}
+
+    for node in nodes:
+        if node['parent'] == parent:
+            tree[node['name']] = dict.copy(node)
+            tree[node['name']]['subfolders'] = _build_folder_tree(nodes, node['id'])
+            del tree[node['name']]['parent']
+
+    return tree
+
+
+def _find_path_in_tree(tree, path):
+    for name, o in tree.iteritems():
+        if name == path[0]:
+            if len(path) == 1:
+                return o
+            else:
+                return _find_path_in_tree(o['subfolders'], path[1:])
+
+    return None
+
+
+def _get_folderid_for_path(vsphere_client, datacenter, path):
+    content = vsphere_client._retrieve_properties_traversal(property_names=['name', 'parent'], obj_type=MORTypes.Folder)
+    if not content: return {}
+
+    node_list = [
+        {
+            'id': o.Obj,
+            'name': o.PropSet[0].Val,
+            'parent': (o.PropSet[1].Val if len(o.PropSet) > 1 else None)
+        } for o in content
+    ]
+
+    tree = _build_folder_tree(node_list, datacenter)
+    tree = _find_path_in_tree(tree, ['vm'])['subfolders']
+    folder = _find_path_in_tree(tree, path.split('/'))
+    return folder['id'] if folder else None
+
+
 def create_vm(vsphere_client, module, esxi, resource_pool, cluster_name, guest, vm_extra_config, vm_hardware, vm_disk, vm_nic, vm_hw_version, state):
 
     datacenter = esxi['datacenter']
@@ -935,13 +1195,19 @@ def create_vm(vsphere_client, module, esxi, resource_pool, cluster_name, guest, 
 
     # virtualmachineFolder managed object reference
     if vm_extra_config.get('folder'):
-        if vm_extra_config['folder'] not in vsphere_client._get_managed_objects(MORTypes.Folder).values():
+        # try to find the folder by its full path, e.g. 'production/customerA/lamp'
+        vmfmor = _get_folderid_for_path(vsphere_client, dcmor, vm_extra_config.get('folder'))
+
+        # try the legacy behaviour of just matching the folder name, so 'lamp' alone matches 'production/customerA/lamp'
+        if vmfmor is None:
+            for mor, name in vsphere_client._get_managed_objects(MORTypes.Folder).iteritems():
+                if name == vm_extra_config['folder']:
+                    vmfmor = mor
+
+        # if neither of strategies worked, bail out
+        if vmfmor is None:
             vsphere_client.disconnect()
             module.fail_json(msg="Cannot find folder named: %s" % vm_extra_config['folder'])
-
-        for mor, name in vsphere_client._get_managed_objects(MORTypes.Folder).iteritems():
-            if name == vm_extra_config['folder']:
-                vmfmor = mor
     else:
         vmfmor = dcprops.vmFolder._obj
 
@@ -983,7 +1249,7 @@ def create_vm(vsphere_client, module, esxi, resource_pool, cluster_name, guest, 
     if resource_pool:
         try:
             cluster = [k for k,
-                       v in vsphere_client.get_clusters().items() if v == cluster_name][0]
+                       v in vsphere_client.get_clusters().items() if v == cluster_name][0] if cluster_name else None
         except IndexError, e:
             vsphere_client.disconnect()
             module.fail_json(msg="Cannot find Cluster named: %s" %
@@ -1080,23 +1346,7 @@ def create_vm(vsphere_client, module, esxi, resource_pool, cluster_name, guest, 
             disk_num = disk_num + 1
             disk_key = disk_key + 1
     if 'vm_cdrom' in vm_hardware:
-        cdrom_iso_path = None
-        cdrom_type = None
-        try:
-            cdrom_type = vm_hardware['vm_cdrom']['type']
-        except KeyError:
-            vsphere_client.disconnect()
-            module.fail_json(
-                msg="Error on %s definition. cdrom type needs to be"
-                " specified." % vm_hardware['vm_cdrom'])
-        if cdrom_type == 'iso':
-            try:
-                cdrom_iso_path = vm_hardware['vm_cdrom']['iso_path']
-            except KeyError:
-                vsphere_client.disconnect()
-                module.fail_json(
-                    msg="Error on %s definition. cdrom iso_path needs"
-                    " to be specified." % vm_hardware['vm_cdrom'])
+        cdrom_type, cdrom_iso_path = get_cdrom_params(module, vsphere_client, vm_hardware['vm_cdrom'])
         # Add a CD-ROM device to the VM.
         add_cdrom(module, vsphere_client, config_target, config, devices,
                   default_devs, cdrom_type, cdrom_iso_path)
@@ -1180,9 +1430,10 @@ def create_vm(vsphere_client, module, esxi, resource_pool, cluster_name, guest, 
         # Power on the VM if it was requested
         power_state(vm, state, True)
 
+        vmfacts=gather_facts(vm)
         vsphere_client.disconnect()
         module.exit_json(
-            ansible_facts=gather_facts(vm),
+            ansible_facts=vmfacts,
             changed=True,
             changes="Created VM %s" % guest)
 
@@ -1276,6 +1527,7 @@ def gather_facts(vm):
     facts = {
         'module_hw': True,
         'hw_name': vm.properties.name,
+        'hw_power_status': vm.get_status(),
         'hw_guest_full_name':  vm.properties.config.guestFullName,
         'hw_guest_id': vm.properties.config.guestId,
         'hw_product_uuid': vm.properties.config.uuid,
@@ -1405,9 +1657,18 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            vcenter_hostname=dict(required=True, type='str'),
-            username=dict(required=True, type='str'),
-            password=dict(required=True, type='str', no_log=True),
+            vcenter_hostname=dict(
+                type='str',
+                default=os.environ.get('VMWARE_HOST')
+            ),
+            username=dict(
+                type='str',
+                default=os.environ.get('VMWARE_USER')
+            ),
+            password=dict(
+                type='str', no_log=True,
+                default=os.environ.get('VMWARE_PASSWORD')
+            ),
             state=dict(
                 required=False,
                 choices=[
@@ -1433,6 +1694,7 @@ def main():
             cluster=dict(required=False, default=None, type='str'),
             force=dict(required=False, type='bool', default=False),
             esxi=dict(required=False, type='dict', default={}),
+            validate_certs=dict(required=False, type='bool', default=True),
             power_on_after_clone=dict(required=False, type='bool', default=True)
 
 
@@ -1474,12 +1736,26 @@ def main():
     from_template = module.params['from_template']
     snapshot_to_clone = module.params['snapshot_to_clone']
     power_on_after_clone = module.params['power_on_after_clone']
+    validate_certs = module.params['validate_certs']
 
 
     # CONNECT TO THE SERVER
     viserver = VIServer()
+    if validate_certs and not hasattr(ssl, 'SSLContext') and not vcenter_hostname.startswith('http://'):
+        module.fail_json(msg='pysphere does not support verifying certificates with python < 2.7.9.  Either update python or set validate_certs=False on the task')
+
     try:
         viserver.connect(vcenter_hostname, username, password)
+    except ssl.SSLError as sslerr:
+        if '[SSL: CERTIFICATE_VERIFY_FAILED]' in sslerr.strerror:
+            if not validate_certs:
+                default_context = ssl._create_default_https_context
+                ssl._create_default_https_context = ssl._create_unverified_context
+                viserver.connect(vcenter_hostname, username, password)
+            else:
+                module.fail_json(msg='Unable to validate the certificate of the vcenter host %s' % vcenter_hostname)
+        else:
+            raise
     except VIApiException, err:
         module.fail_json(msg="Cannot connect to %s: %s" %
                          (vcenter_hostname, err))
@@ -1556,7 +1832,8 @@ def main():
                 module=module,
                 cluster_name=cluster,
                 snapshot_to_clone=snapshot_to_clone,
-                power_on_after_clone=power_on_after_clone
+                power_on_after_clone=power_on_after_clone,
+                vm_extra_config=vm_extra_config
             )
 
         if state in ['restarted', 'reconfigured']:
