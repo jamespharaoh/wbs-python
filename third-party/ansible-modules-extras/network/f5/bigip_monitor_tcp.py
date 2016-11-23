@@ -269,7 +269,7 @@ def check_integer_property(api, monitor, int_property):
 
 def set_integer_property(api, monitor, int_property):
 
-    api.LocalLB.Monitor.set_template_int_property(template_names=[monitor], values=[int_property])
+    api.LocalLB.Monitor.set_template_integer_property(template_names=[monitor], values=[int_property])
 
 
 def update_monitor_properties(api, module, monitor, template_string_properties, template_integer_properties):
@@ -469,5 +469,6 @@ def main():
 # import module snippets
 from ansible.module_utils.basic import *
 from ansible.module_utils.f5 import *
-main()
 
+if __name__ == '__main__':
+    main()
