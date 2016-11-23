@@ -140,6 +140,11 @@ class TestRequests:
                                    data=u"ööö".encode("utf-8")).prepare()
         assert isinstance(request.body, bytes)
 
+    def test_whitespaces_are_removed_from_url(self):
+        # Test for issue #3696
+        request = requests.Request('GET', ' http://example.com').prepare()
+        assert request.url == 'http://example.com/'
+
     @pytest.mark.parametrize('scheme', ('http://', 'HTTP://', 'hTTp://', 'HttP://'))
     def test_mixed_case_scheme_acceptable(self, httpbin, scheme):
         s = requests.Session()
@@ -474,6 +479,20 @@ class TestRequests:
         s.auth = auth
         r = s.get(url)
         assert r.status_code == 200
+
+    @pytest.mark.parametrize(
+        'username, password', (
+            ('user', 'pass'),
+            (u'имя'.encode('utf-8'), u'пароль'.encode('utf-8')),
+        ))
+    def test_set_basicauth(self, httpbin, username, password):
+        auth = (username, password)
+        url = httpbin('get')
+
+        r = requests.Request('GET', url, auth=auth)
+        p = r.prepare()
+
+        assert p.headers['Authorization'] == _basic_auth_str(username, password)
 
     @pytest.mark.parametrize(
         'url, exception', (
@@ -1568,10 +1587,15 @@ class TestRequests:
         self._patch_adapter_gzipped_redirect(s, url)
         s.get(url)
 
-    def test_basic_auth_str_is_always_native(self):
-        s = _basic_auth_str("test", "test")
+    @pytest.mark.parametrize(
+        'username, password, auth_str', (
+            ('test', 'test', 'Basic dGVzdDp0ZXN0'),
+            (u'имя'.encode('utf-8'), u'пароль'.encode('utf-8'), 'Basic 0LjQvNGPOtC/0LDRgNC+0LvRjA=='),
+        ))
+    def test_basic_auth_str_is_always_native(self, username, password, auth_str):
+        s = _basic_auth_str(username, password)
         assert isinstance(s, builtin_str)
-        assert s == "Basic dGVzdDp0ZXN0"
+        assert s == auth_str
 
     def test_requests_history_is_saved(self, httpbin):
         r = requests.get(httpbin('redirect/5'))
@@ -1871,7 +1895,7 @@ class TestTimeout:
     @pytest.mark.parametrize(
         'timeout, error_text', (
             ((3, 4, 5), '(connect, read)'),
-            ('foo', 'must be an int or float'),
+            ('foo', 'must be an int, float or None'),
         ))
     def test_invalid_timeout(self, httpbin, timeout, error_text):
         with pytest.raises(ValueError) as e:
@@ -2116,7 +2140,7 @@ class TestPreparingURLs(object):
         )
     )
     def test_preparing_url(self, url, expected):
-        r = requests.Request(url=url)
+        r = requests.Request('GET', url=url)
         p = r.prepare()
         assert p.url == expected
 
@@ -2130,6 +2154,23 @@ class TestPreparingURLs(object):
         )
     )
     def test_preparing_bad_url(self, url):
-        r = requests.Request(url=url)
+        r = requests.Request('GET', url=url)
         with pytest.raises(requests.exceptions.InvalidURL):
             r.prepare()
+
+    @pytest.mark.parametrize(
+        'protocol, url',
+        (
+            ("http+unix://", b"http+unix://%2Fvar%2Frun%2Fsocket/path"),
+            ("http+unix://", u"http+unix://%2Fvar%2Frun%2Fsocket/path"),
+            ("mailto", b"mailto:user@example.org"),
+            ("mailto", u"mailto:user@example.org"),
+            ("data", b"data:SSDimaUgUHl0aG9uIQ=="),
+        )
+    )
+    def test_url_passthrough(self, protocol, url):
+        session = requests.Session()
+        session.mount(protocol, HTTPAdapter())
+        p = requests.Request('GET', url=url)
+        p.prepare()
+        assert p.url == url
