@@ -118,16 +118,6 @@ class Role(Base, Become, Conditional, Taggable):
             if role_include.role not in play.ROLE_CACHE:
                 play.ROLE_CACHE[role_include.role] = dict()
 
-            if parent_role:
-                if parent_role.when:
-                    new_when = parent_role.when[:]
-                    new_when.extend(r.when or [])
-                    r.when = new_when
-                if parent_role.tags:
-                    new_tags = parent_role.tags[:]
-                    new_tags.extend(r.tags or [])
-                    r.tags = new_tags
-
             play.ROLE_CACHE[role_include.role][hashed_params] = r
             return r
 
@@ -176,16 +166,16 @@ class Role(Base, Become, Conditional, Taggable):
         task_data = self._load_role_yaml('tasks')
         if task_data:
             try:
-                self._task_blocks = load_list_of_blocks(task_data, play=self._play, role=self, loader=self._loader)
+                self._task_blocks = load_list_of_blocks(task_data, play=self._play, role=self, loader=self._loader, variable_manager=self._variable_manager)
             except AssertionError:
                 raise AnsibleParserError("The tasks/main.yml file for role '%s' must contain a list of tasks" % self._role_name , obj=task_data)
 
         handler_data = self._load_role_yaml('handlers')
         if handler_data:
             try:
-                self._handler_blocks = load_list_of_blocks(handler_data, play=self._play, role=self, use_handlers=True, loader=self._loader)
-            except:
-                raise AnsibleParserError("The handlers/main.yml file for role '%s' must contain a list of tasks" % self._role_name , obj=task_data)
+                self._handler_blocks = load_list_of_blocks(handler_data, play=self._play, role=self, use_handlers=True, loader=self._loader, variable_manager=self._variable_manager)
+            except AssertionError:
+                raise AnsibleParserError("The handlers/main.yml file for role '%s' must contain a list of tasks" % self._role_name , obj=handler_data)
 
         # vars and default vars are regular dictionaries
         self._role_vars  = self._load_role_yaml('vars')
@@ -252,10 +242,13 @@ class Role(Base, Become, Conditional, Taggable):
     def get_parents(self):
         return self._parents
 
-    def get_default_vars(self):
+    def get_default_vars(self, dep_chain=[]):
         default_vars = dict()
         for dep in self.get_all_dependencies():
             default_vars = combine_vars(default_vars, dep.get_default_vars())
+        if dep_chain:
+            for parent in dep_chain:
+                default_vars = combine_vars(default_vars, parent._default_vars)
         default_vars = combine_vars(default_vars, self._default_vars)
         return default_vars
 
@@ -308,12 +301,24 @@ class Role(Base, Become, Conditional, Taggable):
     def get_task_blocks(self):
         return self._task_blocks[:]
 
-    def get_handler_blocks(self):
+    def get_handler_blocks(self, play, dep_chain=None):
         block_list = []
+
+        # update the dependency chain here
+        if dep_chain is None:
+            dep_chain = []
+        new_dep_chain = dep_chain + [self]
+
         for dep in self.get_direct_dependencies():
-            dep_blocks = dep.get_handler_blocks()
+            dep_blocks = dep.get_handler_blocks(play=play, dep_chain=new_dep_chain)
             block_list.extend(dep_blocks)
-        block_list.extend(self._handler_blocks)
+
+        for task_block in self._handler_blocks:
+            new_task_block = task_block.copy()
+            new_task_block._dep_chain = new_dep_chain
+            new_task_block._play = play
+            block_list.append(new_task_block)
+
         return block_list
 
     def has_run(self, host):

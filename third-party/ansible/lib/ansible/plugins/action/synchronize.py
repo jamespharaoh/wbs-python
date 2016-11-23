@@ -51,6 +51,10 @@ class ActionModule(ActionBase):
         ''' formats rsync rsh target, escaping ipv6 addresses if needed '''
 
         user_prefix = ''
+
+        if path.startswith('rsync://'):
+            return path
+
         if user:
             user_prefix = '%s@' % (user, )
 
@@ -81,7 +85,15 @@ class ActionModule(ActionBase):
             alternative ssh port to a vagrant host.)
         """
         transport = self._connection.transport
-        if host not in C.LOCALHOST or transport != "local":
+        # If we're connecting to a remote host or we're delegating to another
+        # host or we're connecting to a different ssh instance on the
+        # localhost then we have to format the path as a remote rsync path
+        if host not in C.LOCALHOST or transport != "local" or \
+                (host in C.LOCALHOST and not port_matches_localhost_port):
+            # If we're delegating to non-localhost and but the
+            # inventory_hostname host is localhost then we need the module to
+            # fix up the rsync path to use the controller's public DNS/IP
+            # instead of "localhost"
             if port_matches_localhost_port and host in C.LOCALHOST:
                 self._task.args['_substitute_controller'] = True
             return self._format_rsync_rsh_target(host, path, user)
@@ -254,12 +266,13 @@ class ActionModule(ActionBase):
         # MUNGE SRC AND DEST PER REMOTE_HOST INFO
         src = self._task.args.get('src', None)
         dest = self._task.args.get('dest', None)
+        if src is None or dest is None:
+            return dict(failed=True,
+                    msg="synchronize requires both src and dest parameters are set")
+
         if not dest_is_local:
             # Private key handling
-            if use_delegate:
-                private_key = task_vars.get('ansible_ssh_private_key_file') or self._play_context.private_key_file
-            else:
-                private_key = task_vars.get('ansible_ssh_private_key_file') or self._play_context.private_key_file
+            private_key = self._play_context.private_key_file
 
             if private_key is not None:
                 private_key = os.path.expanduser(private_key)
@@ -318,7 +331,12 @@ class ActionModule(ActionBase):
             self._task.args['rsync_path'] = '"%s"' % rsync_path
 
         if use_ssh_args:
-            self._task.args['ssh_args'] = C.ANSIBLE_SSH_ARGS
+            ssh_args = [
+                getattr(self._play_context, 'ssh_args', ''),
+                getattr(self._play_context, 'ssh_common_args', ''),
+                getattr(self._play_context, 'ssh_extra_args', ''),
+            ]
+            self._task.args['ssh_args'] = ' '.join([a for a in ssh_args if a])
 
         # run the module and store the result
         result.update(self._execute_module('synchronize', task_vars=task_vars))

@@ -31,12 +31,18 @@ from ansible.compat.six import iteritems, string_types
 
 from jinja2.exceptions import UndefinedError
 
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleParserError, AnsibleUndefinedVariable
 from ansible.parsing.dataloader import DataLoader
 from ansible.playbook.attribute import Attribute, FieldAttribute
 from ansible.utils.boolean import boolean
 from ansible.utils.vars import combine_vars, isidentifier
 from ansible.utils.unicode import to_unicode
+
+try:
+    from __main__ import display
+except ImportError:
+    from ansible.utils.display import Display
+    display = Display()
 
 BASE_ATTRIBUTES = {}
 
@@ -80,6 +86,19 @@ class Base:
         # and init vars, avoid using defaults in field declaration as it lives across plays
         self.vars = dict()
 
+    def dump_me(self, depth=0):
+        if depth == 0:
+            print("DUMPING OBJECT ------------------------------------------------------")
+        print("%s- %s (%s, id=%s)" % (" " * depth, self.__class__.__name__, self, id(self)))
+        if hasattr(self, '_block') and self.__class__.__name__ == 'Task' and self._block:
+            self._block.dump_me(depth+2)
+        for attr_name in ('_parent_block', '_task_include'):
+            if hasattr(self, attr_name):
+                attr = getattr(self, attr_name)
+                if attr is not None:
+                    attr.dump_me(depth+2)
+        if hasattr(self, '_play') and self._play:
+            self._play.dump_me(depth+2)
 
     # The following three functions are used to programatically define data
     # descriptors (aka properties) for the Attributes of all of the playbook
@@ -153,7 +172,7 @@ class Base:
             setattr(Base, name, property(getter, setter, deleter))
 
             # Place the value into the instance so that the property can
-            # process and hold that value/
+            # process and hold that value.
             setattr(self, name, value.default)
 
     def preprocess_data(self, ds):
@@ -304,6 +323,8 @@ class Base:
                 method = getattr(self, '_post_validate_%s' % name, None)
                 if method:
                     value = method(attribute, getattr(self, name), templar)
+                elif attribute.isa == 'class':
+                    value = getattr(self, name)
                 else:
                     # if the attribute contains a variable, template it now
                     value = templar.template(getattr(self, name))
@@ -330,11 +351,15 @@ class Base:
                         if isinstance(value, string_types) and '%' in value:
                             value = value.replace('%', '')
                         value = float(value)
-                    elif attribute.isa == 'list':
+                    elif attribute.isa in ('list', 'barelist'):
                         if value is None:
                             value = []
                         elif not isinstance(value, list):
-                            if isinstance(value, string_types):
+                            if isinstance(value, string_types) and attribute.isa == 'barelist':
+                                display.deprecated(
+                                    "Using comma separated values for a list has been deprecated. " \
+                                    "You should instead use the correct YAML syntax for lists. " \
+                                )
                                 value = value.split(',')
                             else:
                                 value = [ value ]
@@ -363,6 +388,10 @@ class Base:
                             value = dict()
                         elif not isinstance(value, dict):
                             raise TypeError("%s is not a dictionary" % value)
+                    elif attribute.isa == 'class':
+                        if not isinstance(value, attribute.class_type):
+                            raise TypeError("%s is not a valid %s (got a %s instead)" % (name, attribute.class_type, type(value)))
+                        value.post_validate(templar=templar)
 
                 # and assign the massaged value back to the attribute field
                 setattr(self, name, value)
@@ -370,7 +399,7 @@ class Base:
             except (TypeError, ValueError) as e:
                 raise AnsibleParserError("the field '%s' has an invalid value (%s), and could not be converted to an %s."
                         " Error was: %s" % (name, value, attribute.isa, e), obj=self.get_ds())
-            except UndefinedError as e:
+            except (AnsibleUndefinedVariable, UndefinedError) as e:
                 if templar._fail_on_undefined_errors and name != 'name':
                     raise AnsibleParserError("the field '%s' has an invalid value, which appears to include a variable that is undefined."
                             " The error was: %s" % (name,e), obj=self.get_ds())

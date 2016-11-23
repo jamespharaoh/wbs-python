@@ -22,7 +22,7 @@ import random
 
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
-
+from ansible.utils.unicode import to_unicode
 
 class ActionModule(ActionBase):
 
@@ -38,8 +38,10 @@ class ActionModule(ActionBase):
             result['msg'] = 'check mode not supported for this module'
             return result
 
+        remote_user = task_vars.get('ansible_ssh_user') or self._play_context.remote_user
         if not tmp:
-            tmp = self._make_tmp_path()
+            tmp = self._make_tmp_path(remote_user)
+            self._cleanup_remote_tmp=True
 
         module_name = self._task.action
         async_module_path  = self._connection._shell.join_path(tmp, 'async_wrapper')
@@ -54,25 +56,47 @@ class ActionModule(ActionBase):
         # configure, upload, and chmod the target module
         (module_style, shebang, module_data) = self._configure_module(module_name=module_name, module_args=module_args, task_vars=task_vars)
         self._transfer_data(remote_module_path, module_data)
-        self._remote_chmod('a+rx', remote_module_path)
 
         # configure, upload, and chmod the async_wrapper module
         (async_module_style, shebang, async_module_data) = self._configure_module(module_name='async_wrapper', module_args=dict(), task_vars=task_vars)
         self._transfer_data(async_module_path, async_module_data)
-        self._remote_chmod('a+rx', async_module_path)
 
-        argsfile = self._transfer_data(self._connection._shell.join_path(tmp, 'arguments'), json.dumps(module_args))
+        argsfile = None
+        if module_style == 'non_native_want_json':
+            argsfile = self._transfer_data(self._connection._shell.join_path(tmp, 'arguments'), json.dumps(module_args))
+        elif module_style == 'old':
+            args_data = ""
+            for k, v in iteritems(module_args):
+                args_data += '%s="%s" ' % (k, pipes.quote(to_unicode(v)))
+            argsfile = self._transfer_data(self._connection._shell.join_path(tmp, 'arguments'), args_data)
+
+        remote_paths = tmp, remote_module_path, async_module_path
+
+        # argsfile doesn't need to be executable, but this saves an extra call to the remote host
+        if argsfile:
+            remote_paths += argsfile,
+
+        self._fixup_perms2(remote_paths, remote_user, execute=True)
 
         async_limit = self._task.async
         async_jid   = str(random.randint(0, 999999999999))
 
-        async_cmd = " ".join([str(x) for x in [env_string, async_module_path, async_jid, async_limit, remote_module_path, argsfile]])
+        async_cmd = [env_string, async_module_path, async_jid, async_limit, remote_module_path]
+        if argsfile:
+            async_cmd.append(argsfile)
+        async_cmd = " ".join([to_unicode(x) for x in async_cmd])
         result.update(self._low_level_execute_command(cmd=async_cmd))
 
         # clean up after
-        if tmp and "tmp" in tmp and not C.DEFAULT_KEEP_REMOTE_FILES:
-            self._remove_tmp_path(tmp)
+        self._remove_tmp_path(tmp)
 
         result['changed'] = True
+
+        if 'skipped' in result and result['skipped'] or 'failed' in result and result['failed']:
+            return result
+
+        # the async_wrapper module returns dumped JSON via its stdout
+        # response, so we parse it here and replace the result
+        result = self._parse_returned_data(result)
 
         return result

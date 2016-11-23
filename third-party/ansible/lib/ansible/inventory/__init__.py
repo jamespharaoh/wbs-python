@@ -34,17 +34,18 @@ from ansible.inventory.dir import InventoryDirectory, get_file_parser
 from ansible.inventory.group import Group
 from ansible.inventory.host import Host
 from ansible.plugins import vars_loader
-from ansible.utils.unicode import to_unicode
+from ansible.utils.unicode import to_unicode, to_bytes
 from ansible.utils.vars import combine_vars
 from ansible.parsing.utils.addresses import parse_address
-
-HOSTS_PATTERNS_CACHE = {}
+from ansible.utils.path import unfrackpath
 
 try:
     from __main__ import display
 except ImportError:
     from ansible.utils.display import Display
     display = Display()
+
+HOSTS_PATTERNS_CACHE = {}
 
 class Inventory(object):
     """
@@ -55,9 +56,10 @@ class Inventory(object):
 
         # the host file file, or script path, or list of hosts
         # if a list, inventory data will NOT be loaded
-        self.host_list = host_list
+        self.host_list = unfrackpath(host_list, follow=False)
         self._loader = loader
         self._variable_manager = variable_manager
+        self.localhost = None
 
         # caching to avoid repeated calculations, particularly with
         # external inventory scripts.
@@ -67,6 +69,12 @@ class Inventory(object):
         self._hosts_cache    = {}
         self._pattern_cache  = {}
         self._vars_plugins   = []
+
+        self._basedir = self.basedir()
+
+        # Contains set of filenames under group_vars directories
+        self._group_vars_files = self._find_group_vars_files(self._basedir)
+        self._host_vars_files = self._find_host_vars_files(self._basedir)
 
         # to be set by calling set_playbook_basedir by playbook code
         self._playbook_basedir = None
@@ -103,7 +111,7 @@ class Inventory(object):
         # Always create the 'all' and 'ungrouped' groups, even if host_list is
         # empty: in this case we will subsequently an the implicit 'localhost' to it.
 
-        ungrouped = Group(name='ungrouped')
+        ungrouped = Group('ungrouped')
         all = Group('all')
         all.add_child_group(ungrouped)
 
@@ -119,7 +127,15 @@ class Inventory(object):
                     display.vvv("Unable to parse address from hostname, leaving unchanged: %s" % to_unicode(e))
                     host = h
                     port = None
-                all.add_host(Host(host, port))
+
+                new_host = Host(host, port)
+                if h in C.LOCALHOST:
+                    # set default localhost from inventory to avoid creating an implicit one. Last localhost defined 'wins'.
+                    if self.localhost is not None:
+                        display.warning("A duplicate localhost-like entry was found (%s). First found localhost was %s" % (h, self.localhost.name))
+                    display.vvvv("Set default localhost to %s" % h)
+                    self.localhost = new_host
+                all.add_host(new_host)
         elif self._loader.path_exists(host_list):
             #TODO: switch this to a plugin loader and a 'condition' per plugin on which it should be tried, restoring 'inventory pllugins'
             if self.is_directory(host_list):
@@ -128,7 +144,7 @@ class Inventory(object):
                 self.parser = InventoryDirectory(loader=self._loader, groups=self.groups, filename=host_list)
             else:
                 self.parser = get_file_parser(host_list, self.groups, self._loader)
-                vars_loader.add_directory(self.basedir(), with_subdir=True)
+                vars_loader.add_directory(self._basedir, with_subdir=True)
 
             if not self.parser:
                 # should never happen, but JIC
@@ -138,13 +154,16 @@ class Inventory(object):
 
         self._vars_plugins = [ x for x in vars_loader.all(self) ]
 
-        # get group vars from group_vars/ files and vars plugins
-        for group in self.groups.values():
+        # set group vars from group_vars/ files and vars plugins
+        for g in self.groups:
+            group = self.groups[g]
             group.vars = combine_vars(group.vars, self.get_group_variables(group.name))
+            self.get_group_vars(group)
 
         # get host vars from host_vars/ files and vars plugins
-        for host in self.get_hosts():
+        for host in self.get_hosts(ignore_limits_and_restrictions=True):
             host.vars = combine_vars(host.vars, self.get_host_variables(host.name))
+            self.get_host_vars(host)
 
     def _match(self, str, pattern_str):
         try:
@@ -203,7 +222,7 @@ class Inventory(object):
 
                 # exclude hosts mentioned in any restriction (ex: failed hosts)
                 if self._restriction is not None:
-                    hosts = [ h for h in hosts if h in self._restriction ]
+                    hosts = [ h for h in hosts if h.name in self._restriction ]
 
             seen = set()
             HOSTS_PATTERNS_CACHE[pattern_hash] = [x for x in hosts if x not in seen and not seen.add(x)]
@@ -438,10 +457,14 @@ class Inventory(object):
         for group in groups.values():
             if pattern == 'all':
                 for host in group.get_hosts():
+                    if host.implicit:
+                        continue
                     __append_host_to_results(host)
             else:
                 if self._match(group.name, pattern) and group.name not in ('all', 'ungrouped'):
                     for host in group.get_hosts():
+                        if host.implicit:
+                            continue
                         __append_host_to_results(host)
                 else:
                     matching_hosts = self._match_list(group.get_hosts(), 'name', pattern)
@@ -454,13 +477,24 @@ class Inventory(object):
         return results
 
     def _create_implicit_localhost(self, pattern):
-        new_host = Host(pattern)
-        new_host.address = "127.0.0.1"
-        new_host.vars = self.get_host_vars(new_host)
-        new_host.set_variable("ansible_connection", "local")
-        if "ansible_python_interpreter" not in new_host.vars:
-            new_host.set_variable("ansible_python_interpreter", sys.executable)
-        self.get_group("ungrouped").add_host(new_host)
+
+        if self.localhost:
+            new_host = self.localhost
+        else:
+            new_host = Host(pattern)
+            new_host.address = "127.0.0.1"
+            new_host.implicit = True
+            new_host.vars = self.get_host_vars(new_host)
+            new_host.set_variable("ansible_connection", "local")
+            if "ansible_python_interpreter" not in new_host.vars:
+                py_interp = sys.executable
+                if not py_interp:
+                    # sys.executable is not set in some cornercases.  #13585
+                    display.warning('Unable to determine python interpreter from sys.executable. Using /usr/bin/python default. You can correct this by setting ansible_python_interpreter for localhost')
+                    py_interp = '/usr/bin/python'
+                new_host.set_variable("ansible_python_interpreter", py_interp)
+            self.get_group("ungrouped").add_host(new_host)
+            self.localhost = new_host
         return new_host
 
     def clear_pattern_cache(self):
@@ -481,23 +515,31 @@ class Inventory(object):
     def get_host(self, hostname):
         if hostname not in self._hosts_cache:
             self._hosts_cache[hostname] = self._get_host(hostname)
-            if hostname in C.LOCALHOST:
-                for host in C.LOCALHOST.difference((hostname,)):
-                    self._hosts_cache[host] = self._hosts_cache[hostname]
         return self._hosts_cache[hostname]
 
     def _get_host(self, hostname):
-        if hostname in C.LOCALHOST:
-            for host in self.get_group('all').get_hosts():
-                if host.name in C.LOCALHOST:
-                    return host
-            return self._create_implicit_localhost(hostname)
         matching_host = None
-        for group in self.groups.values():
-            for host in group.get_hosts():
-                if hostname == host.name:
-                    matching_host = host
-                self._hosts_cache[host.name] = host
+        if hostname in C.LOCALHOST:
+            if self.localhost:
+                matching_host= self.localhost
+            else:
+                for host in self.get_group('all').get_hosts():
+                    if host.name in C.LOCALHOST:
+                        matching_host = host
+                        break
+                if not matching_host:
+                    matching_host = self._create_implicit_localhost(hostname)
+                # update caches
+                self._hosts_cache[hostname] = matching_host
+                for host in C.LOCALHOST.difference((hostname,)):
+                    self._hosts_cache[host] = self._hosts_cache[hostname]
+        else:
+            for group in self.groups.values():
+                for host in group.get_hosts():
+                    if host not in self._hosts_cache:
+                        self._hosts_cache[host.name] = host
+                    if hostname == host.name:
+                        matching_host = host
         return matching_host
 
     def get_group(self, groupname):
@@ -566,9 +608,6 @@ class Inventory(object):
         if self.parser is not None:
             vars = combine_vars(vars, self.parser.get_host_variables(host))
 
-        # Read host_vars/ files
-        vars = combine_vars(vars, self.get_host_vars(host))
-
         return vars
 
     def add_group(self, group):
@@ -599,7 +638,7 @@ class Inventory(object):
             return
         elif not isinstance(restriction, list):
             restriction = [ restriction ]
-        self._restriction = restriction
+        self._restriction = [ h.name for h in restriction ]
 
     def subset(self, subset_pattern):
         """ 
@@ -679,6 +718,12 @@ class Inventory(object):
         """
         # Only update things if dir is a different playbook basedir
         if dir_name != self._playbook_basedir:
+            # we're changing the playbook basedir, so if we had set one previously
+            # clear the host/group vars entries from the VariableManager so they're
+            # not incorrectly used by playbooks from different directories
+            if self._playbook_basedir:
+                self._variable_manager.clear_playbook_hostgroup_vars_files(self._playbook_basedir)
+
             self._playbook_basedir = dir_name
             # get group vars from group_vars/ files
             # TODO: excluding the new_pb_basedir directory may result in group_vars
@@ -686,26 +731,51 @@ class Inventory(object):
             #       we do this shouldn't be too much of an issue. Still, this should
             #       be fixed at some point to allow a "first load" to touch all of the
             #       directories, then later runs only touch the new basedir specified
-            for group in self.groups.values():
-                #group.vars = combine_vars(group.vars, self.get_group_vars(group, new_pb_basedir=True))
-                group.vars = combine_vars(group.vars, self.get_group_vars(group))
-            # get host vars from host_vars/ files
-            for host in self.get_hosts():
-                #host.vars = combine_vars(host.vars, self.get_host_vars(host, new_pb_basedir=True))
-                host.vars = combine_vars(host.vars, self.get_host_vars(host))
+            found_group_vars = self._find_group_vars_files(self._playbook_basedir)
+            if found_group_vars:
+                self._group_vars_files = self._group_vars_files.union(found_group_vars)
+                for group in self.groups.values():
+                    self.get_group_vars(group)
+
+            found_host_vars = self._find_host_vars_files(self._playbook_basedir)
+            if found_host_vars:
+                self._host_vars_files = self._host_vars_files.union(found_host_vars)
+                # get host vars from host_vars/ files
+                for host in self.get_hosts():
+                    self.get_host_vars(host)
             # invalidate cache
             self._vars_per_host = {}
             self._vars_per_group = {}
 
-    def get_host_vars(self, host, new_pb_basedir=False):
+    def get_host_vars(self, host, new_pb_basedir=False, return_results=False):
         """ Read host_vars/ files """
-        return self._get_hostgroup_vars(host=host, group=None, new_pb_basedir=new_pb_basedir)
+        return self._get_hostgroup_vars(host=host, group=None, new_pb_basedir=new_pb_basedir, return_results=return_results)
 
-    def get_group_vars(self, group, new_pb_basedir=False):
+    def get_group_vars(self, group, new_pb_basedir=False, return_results=False):
         """ Read group_vars/ files """
-        return self._get_hostgroup_vars(host=None, group=group, new_pb_basedir=new_pb_basedir)
+        return self._get_hostgroup_vars(host=None, group=group, new_pb_basedir=new_pb_basedir, return_results=return_results)
 
-    def _get_hostgroup_vars(self, host=None, group=None, new_pb_basedir=False):
+    def _find_group_vars_files(self, basedir):
+        """ Find group_vars/ files """
+        if basedir in ('', None):
+            basedir = './'
+        path = os.path.realpath(os.path.join(basedir, 'group_vars'))
+        found_vars = set()
+        if os.path.exists(path):
+            found_vars = set(os.listdir(unicode(path)))
+        return found_vars
+
+    def _find_host_vars_files(self, basedir):
+        """ Find host_vars/ files """
+        if basedir in ('', None):
+            basedir = './'
+        path = os.path.realpath(os.path.join(basedir, 'host_vars'))
+        found_vars = set()
+        if os.path.exists(path):
+            found_vars = set(os.listdir(unicode(path)))
+        return found_vars
+
+    def _get_hostgroup_vars(self, host=None, group=None, new_pb_basedir=False, return_results=False):
         """
         Loads variables from group_vars/<groupname> and host_vars/<hostname> in directories parallel
         to the inventory base directory or in the same directory as the playbook.  Variables in the playbook
@@ -714,14 +784,15 @@ class Inventory(object):
 
         results = {}
         scan_pass = 0
-        _basedir = self.basedir()
+        _basedir = self._basedir
+        _playbook_basedir = self._playbook_basedir
 
         # look in both the inventory base directory and the playbook base directory
         # unless we do an update for a new playbook base dir
-        if not new_pb_basedir:
-            basedirs = [_basedir, self._playbook_basedir]
+        if not new_pb_basedir and _playbook_basedir:
+            basedirs = [_basedir, _playbook_basedir]
         else:
-            basedirs = [self._playbook_basedir]
+            basedirs = [_basedir]
 
         for basedir in basedirs:
             # this can happen from particular API usages, particularly if not run
@@ -736,17 +807,22 @@ class Inventory(object):
                 continue
 
             # save work of second scan if the directories are the same
-            if _basedir == self._playbook_basedir and scan_pass != 1:
+            if _basedir == _playbook_basedir and scan_pass != 1:
                 continue
 
-            if group and host is None:
+            # Before trying to load vars from file, check that the directory contains relvant file names
+            if host is None and any(map(lambda ext: group.name + ext in self._group_vars_files, C.YAML_FILENAME_EXTENSIONS)):
                 # load vars in dir/group_vars/name_of_group
-                base_path = os.path.abspath(os.path.join(to_unicode(basedir, errors='strict'), "group_vars/%s" % group.name))
-                results = combine_vars(results, self._variable_manager.add_group_vars_file(base_path, self._loader))
-            elif host and group is None:
+                base_path = to_unicode(os.path.abspath(os.path.join(to_bytes(basedir), b"group_vars/" + to_bytes(group.name))), errors='strict')
+                host_results = self._variable_manager.add_group_vars_file(base_path, self._loader)
+                if return_results:
+                    results = combine_vars(results, host_results)
+            elif group is None and any(map(lambda ext: host.name + ext in self._host_vars_files, C.YAML_FILENAME_EXTENSIONS)):
                 # same for hostvars in dir/host_vars/name_of_host
-                base_path = os.path.abspath(os.path.join(to_unicode(basedir, errors='strict'), "host_vars/%s" % host.name))
-                results = combine_vars(results, self._variable_manager.add_host_vars_file(base_path, self._loader))
+                base_path = to_unicode(os.path.abspath(os.path.join(to_bytes(basedir), b"host_vars/" + to_bytes(host.name))), errors='strict')
+                group_results = self._variable_manager.add_host_vars_file(base_path, self._loader)
+                if return_results:
+                    results = combine_vars(results, group_results)
 
         # all done, results is a dictionary of variables for this particular host.
         return results

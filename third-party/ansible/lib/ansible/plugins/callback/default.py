@@ -114,7 +114,19 @@ class CallbackModule(CallbackBase):
         self._display.banner("NO MORE HOSTS LEFT")
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self._display.banner("TASK [%s]" % task.get_name().strip())
+        args = ''
+        # args can be specified as no_log in several places: in the task or in
+        # the argument spec.  We can check whether the task is no_log but the
+        # argument spec can't be because that is only run on the target
+        # machine and we haven't run it thereyet at this time.
+        #
+        # So we give people a config option to affect display of the args so
+        # that they can secure this if they feel that their stdout is insecure
+        # (shoulder surfing, logging stdout straight to a file, etc).
+        if not task.no_log and C.DISPLAY_ARGS_TO_STDOUT:
+            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+            args = ' %s' % args
+        self._display.banner("TASK [%s%s]" % (task.get_name().strip(), args))
         if self._display.verbosity >= 2:
             path = task.get_path()
             if path:
@@ -138,11 +150,11 @@ class CallbackModule(CallbackBase):
     def v2_on_file_diff(self, result):
         if result._task.loop and 'results' in result._result:
             for res in result._result['results']:
-                if 'diff' in res and res['diff']:
+                if 'diff' in res and res['diff'] and res.get('changed', False):
                     diff = self._get_diff(res['diff'])
                     if diff:
                         self._display.display(diff)
-        elif 'diff' in result._result and result._result['diff']:
+        elif 'diff' in result._result and result._result['diff'] and result._result.get('changed', False):
             diff = self._get_diff(result._result['diff'])
             if diff:
                 self._display.display(diff)
@@ -186,9 +198,9 @@ class CallbackModule(CallbackBase):
 
         msg = "failed: "
         if delegated_vars:
-            msg += '[%s -> %s]' %  (result._host.get_name(), delegated_vars['ansible_host'])
+            msg += "[%s -> %s]" % (result._host.get_name(), delegated_vars['ansible_host'])
         else:
-            msg += '[%s]' % (result._host.get_name())
+            msg += "[%s]" % (result._host.get_name())
 
         self._display.display(msg + " (item=%s) => %s" % (self._get_item(result._result), self._dump_results(result._result)), color=C.COLOR_ERROR)
         self._handle_warnings(result._result)

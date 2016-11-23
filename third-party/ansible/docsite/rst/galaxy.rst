@@ -85,10 +85,6 @@ And here's an example showing some specific version downloads from multiple sour
     # from GitHub
     - src: https://github.com/bennojoy/nginx
 
-    # from GitHub installing to a relative path
-    - src: https://github.com/bennojoy/nginx
-      path: vagrant/roles/
-
     # from GitHub, overriding the name and specifying a specific tag
     - src: https://github.com/bennojoy/nginx
       version: master
@@ -110,7 +106,6 @@ And here's an example showing some specific version downloads from multiple sour
     - src: git@gitlab.company.com:mygroup/ansible-base.git
       scm: git
       version: 0.1.0
-      path: roles/
 
 As you can see in the above, there are a large amount of controls available
 to customize where roles can be pulled from, and what to save roles as.     
@@ -333,7 +328,7 @@ This only removes the role from Galaxy. It does not impact the actual GitHub rep
     `https://galaxy-qa.ansible.com <https://galaxy-qa.ansible.com>`_. You can also add a *server* definition in the [galaxy] 
     section of your ansible.cfg file.
 
-Setup Travis Integerations
+Setup Travis Integrations
 --------------------------
 
 Using the setup command you can enable notifications from `travis <http://travis-ci.org>`_. The setup command expects that the user previously authenticated with Galaxy using the login command.

@@ -97,15 +97,14 @@ class ActionModule(ActionBase):
             result['msg'] = "src and dest are required"
             return result
 
-        cleanup_remote_tmp = False
+        remote_user = task_vars.get('ansible_ssh_user') or self._play_context.remote_user
         if not tmp:
-            tmp = self._make_tmp_path()
-            cleanup_remote_tmp = True
+            tmp = self._make_tmp_path(remote_user)
+            self._cleanup_remote_tmp = True
 
         if boolean(remote_src):
             result.update(self._execute_module(tmp=tmp, task_vars=task_vars, delete_remote_tmp=False))
-            if cleanup_remote_tmp:
-                self._remove_tmp_path(tmp)
+            self._remove_tmp_path(tmp)
             return result
         elif self._task._role is not None:
             src = self._loader.path_dwim_relative(self._task._role._role_path, 'files', src)
@@ -146,16 +145,15 @@ class ActionModule(ActionBase):
         )
 
         if path_checksum != dest_stat['checksum']:
-            resultant = file(path).read()
 
             if self._play_context.diff:
                 diff = self._get_diff_data(dest, path, task_vars)
 
-            xfered = self._transfer_data('src', resultant)
+            remote_path = self._connection._shell.join_path(tmp, 'src')
+            xfered = self._transfer_file(path, remote_path)
 
             # fix file permissions when the copy is done as a different user
-            if self._play_context.become and self._play_context.become_user != 'root':
-                self._remote_chmod('a+r', xfered)
+            self._fixup_perms2((tmp, remote_path), remote_user)
 
             new_module_args.update( dict( src=xfered,))
 
@@ -166,7 +164,6 @@ class ActionModule(ActionBase):
         else:
             result.update(self._execute_module(module_name='file', module_args=new_module_args, task_vars=task_vars, tmp=tmp, delete_remote_tmp=False))
 
-        if tmp and cleanup_remote_tmp:
-            self._remove_tmp_path(tmp)
+        self._remove_tmp_path(tmp)
 
         return result
