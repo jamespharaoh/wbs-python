@@ -236,7 +236,7 @@ options:
   count_tag:
     version_added: "1.5"
     description:
-      - Used with 'exact_count' to determine how many nodes based on a specific tag criteria should be running.  This can be expressed in multiple ways and is shown in the EXAMPLES section.  For instance, one can request 25 servers that are tagged with "class=webserver".  Specified tag must already exist or also be created in instance_tags.
+      - Used with 'exact_count' to determine how many nodes based on a specific tag criteria should be running.  This can be expressed in multiple ways and is shown in the EXAMPLES section.  For instance, one can request 25 servers that are tagged with "class=webserver". The specified tag must already exist or be passed in as the 'instance_tags' option.
     required: false
     default: null
     aliases: []
@@ -247,6 +247,12 @@ options:
     required: false
     default: null
     aliases: ['network_interface']
+  spot_launch_group:
+    version_added: "2.1"
+    description:
+      - Launch group for spot request, see U(http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-spot-instances-work.html#spot-launch-group)
+    required: false
+    default: null
 
 author:
     - "Tim Gerla (@tgerla)"
@@ -374,6 +380,7 @@ EXAMPLES = '''
     wait: yes
     vpc_subnet_id: subnet-29e63245
     assign_public_ip: yes
+    spot_launch_group: report_generators
 
 # Examples using pre-existing network interfaces
 - ec2:
@@ -421,7 +428,7 @@ EXAMPLES = '''
 
 - name: Configure instance(s)
   hosts: launched
-  sudo: True
+  become: True
   gather_facts: True
   roles:
     - my_awesome_role
@@ -458,7 +465,7 @@ EXAMPLES = '''
         wait: True
         vpc_subnet_id: subnet-29e63245
         assign_public_ip: yes
-  role:
+  roles:
     - do_neat_stuff
     - do_more_neat_stuff
 
@@ -874,6 +881,7 @@ def create_instances(module, ec2, vpc, override_count=None):
     source_dest_check = module.boolean(module.params.get('source_dest_check'))
     termination_protection = module.boolean(module.params.get('termination_protection'))
     network_interfaces = module.params.get('network_interfaces')
+    spot_launch_group = module.params.get('spot_launch_group')
 
     # group_id and group_name are exclusive of each other
     if group_id and group_name:
@@ -1058,6 +1066,9 @@ def create_instances(module, ec2, vpc, override_count=None):
                 elif placement_group :
                         module.fail_json(
                             msg="placement_group parameter requires Boto version 2.3.0 or higher.")
+
+                if spot_launch_group and isinstance(spot_launch_group, basestring):
+                    params['launch_group'] = spot_launch_group
 
                 params.update(dict(
                     count = count_remaining,
@@ -1268,14 +1279,27 @@ def startstop_instances(module, ec2, instance_ids, state, instance_tags):
      # Check that our instances are not in the state we want to take
 
     # Check (and eventually change) instances attributes and instances state
-    running_instances_array = []
+    existing_instances_array = []
     for res in ec2.get_all_instances(instance_ids, filters=filters):
         for inst in res.instances:
 
             # Check "source_dest_check" attribute
-            if inst.get_attribute('sourceDestCheck')['sourceDestCheck'] != source_dest_check:
-                inst.modify_attribute('sourceDestCheck', source_dest_check)
-                changed = True
+            try:
+                if inst.vpc_id is not None and inst.get_attribute('sourceDestCheck')['sourceDestCheck'] != source_dest_check:
+                    inst.modify_attribute('sourceDestCheck', source_dest_check)
+                    changed = True
+            except boto.exception.EC2ResponseError as exc:
+                # instances with more than one Elastic Network Interface will
+                # fail, because they have the sourceDestCheck attribute defined
+                # per-interface
+                if exc.code == 'InvalidInstanceID':
+                    for interface in inst.interfaces:
+                        if interface.source_dest_check != source_dest_check:
+                            ec2.modify_network_interface_attribute(interface.id, "sourceDestCheck", source_dest_check)
+                            changed = True
+                else:
+                    module.fail_json(msg='Failed to handle source_dest_check state for instance {0}, error: {1}'.format(inst.id, exc),
+                                     exception=traceback.format_exc(exc))
 
             # Check "termination_protection" attribute
             if inst.get_attribute('disableApiTermination')['disableApiTermination'] != termination_protection:
@@ -1293,7 +1317,9 @@ def startstop_instances(module, ec2, instance_ids, state, instance_tags):
                 except EC2ResponseError, e:
                     module.fail_json(msg='Unable to change state for instance {0}, error: {1}'.format(inst.id, e))
                 changed = True
+            existing_instances_array.append(inst.id)
 
+    instance_ids = list(set(existing_instances_array + (instance_ids or [])))
     ## Wait for all the instances to finish starting or stopping
     wait_timeout = time.time() + wait_timeout
     while wait and wait_timeout > time.time():
@@ -1327,6 +1353,7 @@ def main():
             instance_type = dict(aliases=['type']),
             spot_price = dict(),
             spot_type = dict(default='one-time', choices=["one-time", "persistent"]),
+            spot_launch_group = dict(),
             image = dict(),
             kernel = dict(),
             count = dict(type='int', default='1'),
@@ -1378,7 +1405,7 @@ def main():
 
     if region:
         try:
-            vpc = boto.vpc.connect_to_region(region, **aws_connect_kwargs)
+            vpc = connect_to_aws(boto.vpc, region, **aws_connect_kwargs)
         except boto.exception.NoAuthHandlerFound, e:
             module.fail_json(msg = str(e))
     else:

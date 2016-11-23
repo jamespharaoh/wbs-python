@@ -47,7 +47,7 @@ options:
   volume_type:
     description:
       - Type of EBS volume; standard (magnetic), gp2 (SSD), io1 (Provisioned IOPS). "Standard" is the old EBS default
-        and continues to remain the Ansible default for backwards compatibility. 
+        and continues to remain the Ansible default for backwards compatibility.
     required: false
     default: standard
     version_added: "1.9"
@@ -67,9 +67,16 @@ options:
       - device id to override device mapping. Assumes /dev/sdf for Linux/UNIX and /dev/xvdf for Windows.
     required: false
     default: null
+  delete_on_termination:
+    description:
+      - When set to "yes", the volume will be deleted upon instance termination.
+    required: false
+    default: "no"
+    choices: ["yes", "no"]
+    version_added: "2.1"
   zone:
     description:
-      - zone in which to create the volume, if unset uses the zone the instance is in (if set) 
+      - zone in which to create the volume, if unset uses the zone the instance is in (if set)
     required: false
     default: null
     aliases: ['aws_zone', 'ec2_zone']
@@ -87,7 +94,7 @@ options:
     choices: ["yes", "no"]
     version_added: "1.5"
   state:
-    description: 
+    description:
       - whether to ensure the volume is present or absent, or to list existing volumes (The C(list) option was added in version 1.8).
     required: false
     default: present
@@ -101,15 +108,15 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # Simple attachment action
-- ec2_vol: 
-    instance: XXXXXX 
-    volume_size: 5 
+- ec2_vol:
+    instance: XXXXXX
+    volume_size: 5
     device_name: sdd
 
-# Example using custom iops params   
+# Example using custom iops params
 - ec2_vol:
-    instance: XXXXXX 
-    volume_size: 5 
+    instance: XXXXXX
+    volume_size: 5
     iops: 100
     device_name: sdd
 
@@ -118,15 +125,15 @@ EXAMPLES = '''
     instance: XXXXXX
     snapshot: "{{ snapshot }}"
 
-# Playbook example combined with instance launch 
+# Playbook example combined with instance launch
 - ec2:
     keypair: "{{ keypair }}"
     image: "{{ image }}"
-    wait: yes 
+    wait: yes
     count: 3
   register: ec2
 - ec2_vol:
-    instance: "{{ item.id }} " 
+    instance: "{{ item.id }} "
     volume_size: 5
   with_items: ec2.instances
   register: ec2_vol
@@ -173,6 +180,56 @@ EXAMPLES = '''
     volume_size: 50
     volume_type: gp2
     device_name: /dev/xvdf
+
+# Attach an existing volume to instance. The volume will be deleted upon instance termination.
+- ec2_vol:
+    instance: XXXXXX
+    id: XXXXXX
+    device_name: /dev/sdf
+    delete_on_termination: yes
+'''
+
+RETURN = '''
+device:
+    description: device name of attached volume
+    returned: when success
+    type: string
+    sample: "/def/sdf"
+volume_id:
+    description: the id of volume
+    returned: when success
+    type: string
+    sample: "vol-35b333d9"
+volume_type:
+    description: the volume type
+    returned: when success
+    type: string
+    sample: "standard"
+volume:
+    description: a dictionary containing detailed attributes of the volume
+    returned: when success
+    type: string
+    sample: {
+        "attachment_set": {
+            "attach_time": "2015-10-23T00:22:29.000Z",
+            "deleteOnTermination": "false",
+            "device": "/dev/sdf",
+            "instance_id": "i-8356263c",
+            "status": "attached"
+        },
+        "create_time": "2015-10-21T14:36:08.870Z",
+        "encrypted": false,
+        "id": "vol-35b333d9",
+        "iops": null,
+        "size": 1,
+        "snapshot_id": "",
+        "status": "in-use",
+        "tags": {
+            "env": "dev"
+        },
+        "type": "standard",
+        "zone": "us-east-1b"
+    }
 '''
 
 import time
@@ -182,6 +239,7 @@ from distutils.version import LooseVersion
 try:
     import boto.ec2
     from boto.exception import BotoServerError
+    from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
     HAS_BOTO = True
 except ImportError:
     HAS_BOTO = False
@@ -222,8 +280,9 @@ def get_volume(module, ec2):
         module.fail_json(msg="Found more than one volume in zone (if specified) with name: %s" % name)
     return vols[0]
 
+
 def get_volumes(module, ec2):
-    
+
     instance = module.params.get('instance')
 
     try:
@@ -235,6 +294,7 @@ def get_volumes(module, ec2):
         module.fail_json(msg = "%s: %s" % (e.error_code, e.error_message))
     return vols
 
+
 def delete_volume(module, ec2):
     volume_id = module.params['id']
     try:
@@ -245,6 +305,7 @@ def delete_volume(module, ec2):
             module.exit_json(changed=False)
         module.fail_json(msg=ec2_error.message)
 
+
 def boto_supports_volume_encryption():
     """
     Check if Boto library supports encryption of EBS volumes (added in 2.29.0)
@@ -254,12 +315,10 @@ def boto_supports_volume_encryption():
     """
     return hasattr(boto, 'Version') and LooseVersion(boto.Version) >= LooseVersion('2.29.0')
 
-    
+
 def create_volume(module, ec2, zone):
     changed = False
     name = module.params.get('name')
-    id = module.params.get('id')
-    instance = module.params.get('instance')
     iops = module.params.get('iops')
     encrypted = module.params.get('encrypted')
     volume_size = module.params.get('volume_size')
@@ -292,16 +351,17 @@ def create_volume(module, ec2, zone):
 
 
 def attach_volume(module, ec2, volume, instance):
-    
+
     device_name = module.params.get('device_name')
+    delete_on_termination = module.params.get('delete_on_termination')
     changed = False
-    
+
     # If device_name isn't set, make a choice based on best practices here:
     # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/block-device-mapping-concepts.html
-    
+
     # In future this needs to be more dynamic but combining block device mapping best practices
     # (bounds for devices, as above) with instance.block_device_mapping data would be tricky. For me ;)
-    
+
     # Use password data attribute to tell whether the instance is Windows or Linux
     if device_name is None:
         try:
@@ -311,12 +371,15 @@ def attach_volume(module, ec2, volume, instance):
                 device_name = '/dev/xvdf'
         except boto.exception.BotoServerError, e:
             module.fail_json(msg = "%s: %s" % (e.error_code, e.error_message))
-    
+
     if volume.attachment_state() is not None:
         adata = volume.attach_data
         if adata.instance_id != instance.id:
             module.fail_json(msg = "Volume %s is already attached to another instance: %s"
                              % (volume.id, adata.instance_id))
+        else:
+            # Volume is already attached to right instance
+            changed = modify_dot_attribute(module, ec2, instance, device_name)
     else:
         try:
             volume.attach(instance.id, device_name)
@@ -327,12 +390,45 @@ def attach_volume(module, ec2, volume, instance):
         except boto.exception.BotoServerError, e:
             module.fail_json(msg = "%s: %s" % (e.error_code, e.error_message))
 
+        modify_dot_attribute(module, ec2, instance, device_name)
+
     return volume, changed
 
-def detach_volume(module, ec2, volume):
-    
+
+def modify_dot_attribute(module, ec2, instance, device_name):
+    """ Modify delete_on_termination attribute """
+
+    delete_on_termination = module.params.get('delete_on_termination')
     changed = False
-    
+
+    try:
+        instance.update()
+        dot = instance.block_device_mapping[device_name].delete_on_termination
+    except boto.exception.BotoServerError, e:
+        module.fail_json(msg = "%s: %s" % (e.error_code, e.error_message))
+
+    if delete_on_termination != dot:
+        try:
+            bdt = BlockDeviceType(delete_on_termination=delete_on_termination)
+            bdm = BlockDeviceMapping()
+            bdm[device_name] = bdt
+
+            ec2.modify_instance_attribute(instance_id=instance.id, attribute='blockDeviceMapping', value=bdm)
+
+            while instance.block_device_mapping[device_name].delete_on_termination != delete_on_termination:
+                time.sleep(3)
+                instance.update()
+            changed = True
+        except boto.exception.BotoServerError, e:
+            module.fail_json(msg = "%s: %s" % (e.error_code, e.error_message))
+
+    return changed
+
+
+def detach_volume(module, ec2, volume):
+
+    changed = False
+
     if volume.attachment_state() is not None:
         adata = volume.attach_data
         volume.detach()
@@ -340,20 +436,22 @@ def detach_volume(module, ec2, volume):
             time.sleep(3)
             volume.update()
         changed = True
-        
+
     return volume, changed
-        
+
+
 def get_volume_info(volume, state):
-    
+
     # If we're just listing volumes then do nothing, else get the latest update for the volume
     if state != 'list':
         volume.update()
-    
+
     volume_info = {}
     attachment = volume.attach_data
 
     volume_info = {
                     'create_time': volume.create_time,
+                    'encrypted': volume.encrypted,
                     'id': volume.id,
                     'iops': volume.iops,
                     'size': volume.size,
@@ -369,8 +467,11 @@ def get_volume_info(volume, state):
                     },
                     'tags': volume.tags
                 }
-    
+    if hasattr(attachment, 'deleteOnTermination'):
+        volume_info['attachment_set']['deleteOnTermination'] = attachment.deleteOnTermination
+
     return volume_info
+
 
 def main():
     argument_spec = ec2_argument_spec()
@@ -383,6 +484,7 @@ def main():
             iops = dict(),
             encrypted = dict(type='bool', default=False),
             device_name = dict(),
+            delete_on_termination = dict(type='bool', default=False),
             zone = dict(aliases=['availability_zone', 'aws_zone', 'ec2_zone']),
             snapshot = dict(),
             state = dict(choices=['absent', 'present', 'list'], default='present')
@@ -397,34 +499,32 @@ def main():
     name = module.params.get('name')
     instance = module.params.get('instance')
     volume_size = module.params.get('volume_size')
-    volume_type = module.params.get('volume_type')
-    iops = module.params.get('iops')
     encrypted = module.params.get('encrypted')
     device_name = module.params.get('device_name')
     zone = module.params.get('zone')
     snapshot = module.params.get('snapshot')
     state = module.params.get('state')
-    
+
     # Ensure we have the zone or can get the zone
     if instance is None and zone is None and state == 'present':
         module.fail_json(msg="You must specify either instance or zone")
-    
+
     # Set volume detach flag
     if instance == 'None' or instance == '':
         instance = None
         detach_vol_flag = True
     else:
         detach_vol_flag = False
-        
+
     # Set changed flag
     changed = False
 
     region, ec2_url, aws_connect_params = get_aws_connection_info(module)
-    
+
     if region:
         try:
             ec2 = connect_to_aws(boto.ec2, region, **aws_connect_params)
-        except (boto.exception.NoAuthHandlerFound, StandardError), e:
+        except (boto.exception.NoAuthHandlerFound, AnsibleAWSError), e:
             module.fail_json(msg=str(e))
     else:
         module.fail_json(msg="region must be specified")
@@ -471,11 +571,11 @@ def main():
 
     if volume_size and (id or snapshot):
         module.fail_json(msg="Cannot specify volume_size together with id or snapshot")
-    
+
     if state == 'present':
         volume, changed = create_volume(module, ec2, zone)
         if detach_vol_flag:
-            volume, changed = detach_volume(module, ec2, volume)    
+            volume, changed = detach_volume(module, ec2, volume)
         elif inst is not None:
             volume, changed = attach_volume(module, ec2, volume, inst)
 
@@ -489,4 +589,5 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-main()
+if __name__ == '__main__':
+    main()
