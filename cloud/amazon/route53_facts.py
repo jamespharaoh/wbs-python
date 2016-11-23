@@ -160,7 +160,6 @@ EXAMPLES = '''
 
 '''
 try:
-    import json
     import boto
     import botocore
     HAS_BOTO = True
@@ -316,6 +315,9 @@ def record_sets_details(client, module):
         params['HostedZoneId'] = module.params.get('hosted_zone_id')
     else:
         module.fail_json(msg="Hosted Zone Id is required")
+
+    if module.params.get('max_items'):
+        params['MaxItems'] = module.params.get('max_items')
 
     if module.params.get('start_record_name'):
         params['StartRecordName'] = module.params.get('start_record_name')

@@ -111,7 +111,7 @@ def _needs_update(module, project):
     keys = ('description', 'enabled')
     for key in keys:
         if module.params[key] is not None and module.params[key] != project.get(key):
-            return True       
+            return True
 
     return False
 
@@ -156,13 +156,33 @@ def main():
 
     name = module.params['name']
     description = module.params['description']
-    domain = module.params['domain_id']
+    domain = module.params.pop('domain_id')
     enabled = module.params['enabled']
     state = module.params['state']
 
     try:
+        if domain:
+            opcloud = shade.operator_cloud(**module.params)
+            try:
+                # We assume admin is passing domain id
+                dom = opcloud.get_domain(domain)['id']
+                domain = dom
+            except:
+                # If we fail, maybe admin is passing a domain name.
+                # Note that domains have unique names, just like id.
+                try:
+                    dom = opcloud.search_domains(filters={'name': domain})[0]['id']
+                    domain = dom
+                except:
+                    # Ok, let's hope the user is non-admin and passing a sane id
+                    pass
+
         cloud = shade.openstack_cloud(**module.params)
-        project = cloud.get_project(name)
+
+        if domain:
+            project = cloud.get_project(name, domain_id=domain)
+        else:
+            project = cloud.get_project(name)
 
         if module.check_mode:
             module.exit_json(changed=_system_state_change(module, project))

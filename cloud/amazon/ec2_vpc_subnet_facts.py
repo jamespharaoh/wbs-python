@@ -19,7 +19,7 @@ module: ec2_vpc_subnet_facts
 short_description: Gather facts about ec2 VPC subnets in AWS
 description:
     - Gather facts about ec2 VPC subnets in AWS
-version_added: "2.0"
+version_added: "2.1"
 author: "Rob White (@wimnat)"
 options:
   filters:
@@ -111,7 +111,7 @@ def main():
     if region:
         try:
             connection = connect_to_aws(boto.vpc, region, **aws_connect_params)
-        except (boto.exception.NoAuthHandlerFound, StandardError), e:
+        except (boto.exception.NoAuthHandlerFound, AnsibleAWSError), e:
             module.fail_json(msg=str(e))
     else:
         module.fail_json(msg="region must be specified")

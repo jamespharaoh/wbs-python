@@ -34,6 +34,15 @@ if ($source) {$source = $source.Tolower()}
 
 $showlog = Get-Attr -obj $params -name showlog -default "false" | ConvertTo-Bool
 $state = Get-Attr -obj $params -name state -default "present"
+
+$installargs = Get-Attr -obj $params -name install_args -default $null
+$packageparams = Get-Attr -obj $params -name params -default $null
+$ignoredependencies = Get-Attr -obj $params -name ignore_dependencies -default "false" | ConvertTo-Bool
+
+# as of chocolatey 0.9.10, nonzero success exit codes can be returned
+# see https://github.com/chocolatey/choco/issues/512#issuecomment-214284461
+$successexitcodes = (0,1605,1614,1641,3010)
+
 if ("present","absent" -notcontains $state)
 {
     Fail-Json $result "state is $state; must be present or absent"
@@ -50,7 +59,12 @@ Function Chocolatey-Install-Upgrade
     if ($ChocoAlreadyInstalled -eq $null)
     {
         #We need to install chocolatey
-        iex ((new-object net.webclient).DownloadString("https://chocolatey.org/install.ps1"))
+        $install_output = (new-object net.webclient).DownloadString("https://chocolatey.org/install.ps1") | powershell -
+        if ($LASTEXITCODE -ne 0)
+        {
+            Set-Attr $result "choco_bootstrap_output" $install_output
+            Fail-Json $result "Chocolatey bootstrap installation failed."
+        }
         $result.changed = $true
         $script:executable = "C:\ProgramData\chocolatey\bin\choco.exe"
     }
@@ -58,7 +72,7 @@ Function Chocolatey-Install-Upgrade
     {
         $script:executable = "choco.exe"
 
-        if ((choco --version) -lt '0.9.9')
+        if ([Version](choco --version) -lt [Version]'0.9.9')
         {
             Choco-Upgrade chocolatey 
         }
@@ -106,7 +120,13 @@ Function Choco-Upgrade
         [Parameter(Mandatory=$false, Position=3)]
         [string]$source,
         [Parameter(Mandatory=$false, Position=4)]
-        [bool]$force
+        [bool]$force,
+        [Parameter(Mandatory=$false, Position=5)]
+        [string]$installargs,
+        [Parameter(Mandatory=$false, Position=6)]
+        [string]$packageparams,
+        [Parameter(Mandatory=$false, Position=7)]
+        [bool]$ignoredependencies
     )
 
     if (-not (Choco-IsInstalled $package))
@@ -131,9 +151,24 @@ Function Choco-Upgrade
         $cmd += " -force"
     }
 
+    if ($installargs)
+    {
+        $cmd += " -installargs '$installargs'"
+    }
+
+    if ($packageparams)
+    {
+        $cmd += " -params '$packageparams'"
+    }
+
+    if ($ignoredependencies)
+    {
+        $cmd += " -ignoredependencies"
+    }
+
     $results = invoke-expression $cmd
 
-    if ($LastExitCode -ne 0)
+    if ($LastExitCode -notin $successexitcodes)
     {
         Set-Attr $result "choco_error_cmd" $cmd
         Set-Attr $result "choco_error_log" "$results"
@@ -163,17 +198,30 @@ Function Choco-Install
         [Parameter(Mandatory=$false, Position=4)]
         [bool]$force,
         [Parameter(Mandatory=$false, Position=5)]
-        [bool]$upgrade
+        [bool]$upgrade,
+        [Parameter(Mandatory=$false, Position=6)]
+        [string]$installargs,
+        [Parameter(Mandatory=$false, Position=7)]
+        [string]$packageparams,
+        [Parameter(Mandatory=$false, Position=8)]
+        [bool]$ignoredependencies
     )
 
     if (Choco-IsInstalled $package)
     {
         if ($upgrade)
         {
-            Choco-Upgrade -package $package -version $version -source $source -force $force
+            Choco-Upgrade -package $package -version $version -source $source -force $force `
+                -installargs $installargs -packageparams $packageparams `
+                -ignoredependencies $ignoredependencies
+
+            return
         }
 
-        return
+        if (-not $force)
+        {
+            return
+        }
     }
 
     $cmd = "$executable install -dv -y $package"
@@ -193,9 +241,24 @@ Function Choco-Install
         $cmd += " -force"
     }
 
+    if ($installargs)
+    {
+        $cmd += " -installargs '$installargs'"
+    }
+
+    if ($packageparams)
+    {
+        $cmd += " -params '$packageparams'"
+    }
+
+    if ($ignoredependencies)
+    {
+        $cmd += " -ignoredependencies"
+    }
+
     $results = invoke-expression $cmd
 
-    if ($LastExitCode -ne 0)
+    if ($LastExitCode -notin $successexitcodes)
     {
         Set-Attr $result "choco_error_cmd" $cmd
         Set-Attr $result "choco_error_log" "$results"
@@ -237,7 +300,7 @@ Function Choco-Uninstall
 
     $results = invoke-expression $cmd
 
-    if ($LastExitCode -ne 0)
+    if ($LastExitCode -notin $successexitcodes)
     {
         Set-Attr $result "choco_error_cmd" $cmd
         Set-Attr $result "choco_error_log" "$results"
@@ -253,7 +316,8 @@ Try
     if ($state -eq "present")
     {
         Choco-Install -package $package -version $version -source $source `
-            -force $force -upgrade $upgrade
+            -force $force -upgrade $upgrade -installargs $installargs `
+            -packageparams $packageparams -ignoredependencies $ignoredependencies
     }
     else
     {

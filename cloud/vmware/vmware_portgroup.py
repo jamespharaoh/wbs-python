@@ -32,20 +32,6 @@ requirements:
     - "python >= 2.6"
     - PyVmomi
 options:
-    hostname:
-        description:
-            - The hostname or IP address of the ESXi server
-        required: True
-    username:
-        description:
-            - The username of the ESXi server
-        required: True
-        aliases: ['user', 'admin']
-    password:
-        description:
-            - The password of the ESXi server
-        required: True
-        aliases: ['pass', 'pwd']
     switch_name:
         description:
             - vSwitch to modify
@@ -58,6 +44,7 @@ options:
         description:
             - VLAN ID to assign to portgroup
         required: True
+extends_documentation_fragment: vmware.documentation
 '''
 
 EXAMPLES = '''
@@ -118,6 +105,9 @@ def main():
         if not host:
             raise SystemExit("Unable to locate Physical Host.")
         host_system = host.keys()[0]
+
+        if find_host_portgroup_by_name(host_system, portgroup_name):
+            module.exit_json(changed=False)
 
         changed = create_port_group(host_system, portgroup_name, vlan_id, switch_name)
 

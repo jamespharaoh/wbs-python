@@ -283,6 +283,7 @@ tenant_ip: "192.168.200.21/23"
 - name: install needed network manager libs
   yum: name={{ item }} state=installed
   with_items:
+    - NetworkManager-glib
     - libnm-qt-devel.x86_64
     - nm-connection-editor.x86_64
     - libsemanage-python
@@ -360,7 +361,7 @@ tenant_ip: "192.168.200.21/23"
 - nmcli: ctype=ethernet name=my-eth1 ifname="*" state=present
 
 # To change the property of a setting e.g. MTU, issue a command as follows:
-- nmcli: conn_name=my-eth1 mtu=9000 state=present
+- nmcli: conn_name=my-eth1 mtu=9000 type=ethernet state=present
 
     Exit Status's:
         - nmcli exits with status 0 if it succeeds, a value greater than 0 is
@@ -513,6 +514,12 @@ class Nmcli(object):
         return setting_list
         # print ""
 
+    def bool_to_string(self, boolean):
+        if boolean:
+            return "yes"
+        else:
+            return "no"
+
     def list_connection_info(self):
         # Ask the settings service for the list of connections it provides
         bus=dbus.SystemBus()
@@ -601,7 +608,7 @@ class Nmcli(object):
             cmd.append(self.gw6)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
         return cmd
 
     def modify_connection_team(self):
@@ -630,7 +637,7 @@ class Nmcli(object):
             cmd.append(self.dns6)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
             # Can't use MTU with team
         return cmd
 
@@ -703,7 +710,7 @@ class Nmcli(object):
             cmd.append(self.gw6)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
         if self.mode is not None:
             cmd.append('mode')
             cmd.append(self.mode)
@@ -750,7 +757,7 @@ class Nmcli(object):
             cmd.append(self.dns6)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
         return cmd
 
     def create_connection_bond_slave(self):
@@ -819,7 +826,7 @@ class Nmcli(object):
             cmd.append(self.gw6)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
         return cmd
 
     def modify_connection_ethernet(self):
@@ -854,7 +861,7 @@ class Nmcli(object):
             cmd.append(self.mtu)
         if self.autoconnect is not None:
             cmd.append('autoconnect')
-            cmd.append(self.autoconnect)
+            cmd.append(self.bool_to_string(self.autoconnect))
         return cmd
 
     def create_connection_bridge(self):
@@ -963,7 +970,7 @@ def main():
     # Parsing argument file
     module=AnsibleModule(
         argument_spec=dict(
-            autoconnect=dict(required=False, default=None, choices=['yes', 'no'], type='str'),
+            autoconnect=dict(required=False, default=None, type='bool'),
             state=dict(required=True, choices=['present', 'absent'], type='str'),
             conn_name=dict(required=True, type='str'),
             master=dict(required=False, default=None, type='str'),
@@ -986,7 +993,7 @@ def main():
             mtu=dict(required=False, default=None, type='str'),
             mac=dict(required=False, default=None, type='str'),
             # bridge specific vars
-            stp=dict(required=False, default='yes', choices=['yes', 'no'], type='str'),
+            stp=dict(required=False, default=True, type='bool'),
             priority=dict(required=False, default="128", type='str'),
             slavepriority=dict(required=False, default="32", type='str'),
             forwarddelay=dict(required=False, default="15", type='str'),

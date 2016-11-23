@@ -18,10 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
-import os
-import tempfile
-
 DOCUMENTATION = """
 ---
 module: blockinfile
@@ -38,6 +34,7 @@ description:
     surrounded by customizable marker lines.
 notes:
   - This module supports check mode.
+  - When using 'with_*' loops be aware that if you do not set a unique mark the block will be overwritten on each iteration.
 options:
   dest:
     aliases: [ name, destfile ]
@@ -102,6 +99,7 @@ options:
     choices: [ "yes", "no" ]
     description:
       - 'This flag indicates that filesystem links, if they exist, should be followed.'
+    version_added: "2.1"
 """
 
 EXAMPLES = r"""
@@ -135,7 +133,22 @@ EXAMPLES = r"""
     dest: /var/www/html/index.html
     marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
     content: ""
+
+- name: insert/update "Match User" configuation block in /etc/ssh/sshd_config
+  blockinfile:
+    dest: /etc/hosts
+    block: |
+      {{item.name}} {{item.ip}}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{item.name}}"
+  with_items:
+      - { name: host1, ip: 10.10.1.10 }
+      - { name: host2, ip: 10.10.1.11 }
+      - { name: host3, ip: 10.10.1.12 }
 """
+
+import re
+import os
+import tempfile
 
 
 def write_changes(module, contents, dest):
@@ -231,7 +244,7 @@ def main():
     marker1 = re.sub(r'{mark}', 'END', marker)
     if present and block:
         # Escape seqeuences like '\n' need to be handled in Ansible 1.x
-        if ANSIBLE_VERSION.startswith('1.'):
+        if module.ansible_version.startswith('1.'):
             block = re.sub('', block, '')
         blocklines = [marker0] + block.splitlines() + [marker1]
     else:
@@ -239,9 +252,9 @@ def main():
 
     n0 = n1 = None
     for i, line in enumerate(lines):
-        if line.startswith(marker0):
+        if line == marker0:
             n0 = i
-        if line.startswith(marker1):
+        if line == marker1:
             n1 = i
 
     if None in (n0, n1):
@@ -267,7 +280,9 @@ def main():
     lines[n0:n0] = blocklines
 
     if lines:
-        result = '\n'.join(lines)+'\n'
+        result = '\n'.join(lines)
+        if original is None or original.endswith('\n'):
+            result += '\n'
     else:
         result = ''
     if original == result:

@@ -128,7 +128,12 @@ import re
 try:
     import json
 except ImportError:
-    import simplejson as json
+    try:
+        import simplejson as json
+    except ImportError:
+        # Let snippet from module_utils/basic.py return a proper error in this case
+        pass
+
 
 def parse_out(string):
     return re.sub("\s+", " ", string).strip()
@@ -215,11 +220,11 @@ def main():
 
     if rc != 0:
         output = parse_out(err)
-        module.fail_json(msg=output)
+        module.fail_json(msg=output, stdout=err)
     else:
         # Composer version > 1.0.0-alpha9 now use stderr for standard notification messages
         output = parse_out(out + err)
-        module.exit_json(changed=has_changed(output), msg=output)
+        module.exit_json(changed=has_changed(output), msg=output, stdout=out+err)
 
 # import module snippets
 from ansible.module_utils.basic import *
