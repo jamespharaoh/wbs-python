@@ -330,8 +330,6 @@ def main():
 
     region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
-    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
-
     value_list = ()
 
     if type(value_in) is str:
