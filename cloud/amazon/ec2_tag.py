@@ -103,9 +103,24 @@ tasks:
   with_subelements: 
     - ec2_vol.results
     - volumes
+
+# Playbook example of listing tags on an instance
+tasks:
+- name: get ec2 facts
+  action: ec2_facts
+
+- name: list tags on an instance
+  ec2_tag:
+    region: "{{ ansible_ec2_placement_region }}"
+    resource: "{{ ansible_ec2_instance_id }}"
+    state: list
+  register: ec2_tags
+
+- name: list tags, such as Name, env if exist
+  shell: echo {{ ec2_tags.tags.Name }} {{ ec2_tags.tags.env }}
+
 '''
 
-import sys
 
 try:
     import boto.ec2
@@ -118,7 +133,7 @@ def main():
     argument_spec = ec2_argument_spec()
     argument_spec.update(dict(
             resource = dict(required=True),
-            tags = dict(),
+            tags = dict(type='dict'),
             state = dict(default='present', choices=['present', 'absent', 'list']),
         )
     )
@@ -175,10 +190,10 @@ def main():
 
     if state == 'list':
         module.exit_json(changed=False, tags=tagdict)
-    sys.exit(0)
 
 # import module snippets
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-main()
+if __name__ == '__main__':
+    main()

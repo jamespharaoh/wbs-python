@@ -73,19 +73,23 @@ def daemonize_self():
 
 def _run_module(wrapped_cmd, jid, job_path):
 
-    jobfile = open(job_path, "w")
-    jobfile.write(json.dumps({ "started" : 1, "ansible_job_id" : jid }))
+    tmp_job_path = job_path + ".tmp"
+    jobfile = open(tmp_job_path, "w")
+    jobfile.write(json.dumps({ "started" : 1, "finished" : 0, "ansible_job_id" : jid }))
     jobfile.close()
-    jobfile = open(job_path, "w")
+    os.rename(tmp_job_path, job_path)
+    jobfile = open(tmp_job_path, "w")
     result = {}
 
     outdata = ''
     try:
         cmd = shlex.split(wrapped_cmd)
-        script = subprocess.Popen(cmd, shell=False, stdin=None, stdout=jobfile, stderr=jobfile)
-        script.communicate()
-        outdata = file(job_path).read()
+        script = subprocess.Popen(cmd, shell=False, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (outdata, stderr) = script.communicate()
         result = json.loads(outdata)
+        if stderr:
+            result['stderr'] = stderr
+        jobfile.write(json.dumps(result))
 
     except (OSError, IOError), e:
         result = {
@@ -95,6 +99,7 @@ def _run_module(wrapped_cmd, jid, job_path):
         }
         result['ansible_job_id'] = jid
         jobfile.write(json.dumps(result))
+
     except:
         result = {
             "failed" : 1,
@@ -104,7 +109,9 @@ def _run_module(wrapped_cmd, jid, job_path):
         }
         result['ansible_job_id'] = jid
         jobfile.write(json.dumps(result))
+
     jobfile.close()
+    os.rename(tmp_job_path, job_path)
 
 
 ####################
@@ -122,8 +129,11 @@ if __name__ == '__main__':
     jid = "%s.%d" % (sys.argv[1], os.getpid())
     time_limit = sys.argv[2]
     wrapped_module = sys.argv[3]
-    argsfile = sys.argv[4]
-    cmd = "%s %s" % (wrapped_module, argsfile)
+    if len(sys.argv) >= 5:
+        argsfile = sys.argv[4]
+        cmd = "%s %s" % (wrapped_module, argsfile)
+    else:
+        cmd = wrapped_module
     step = 5
 
     # setup job output directory
@@ -151,7 +161,7 @@ if __name__ == '__main__':
             # this probably could be done with some IPC later.  Modules should always read
             # the argsfile at the very first start of their execution anyway
             notice("Return async_wrapper task started.")
-            print json.dumps({ "started" : 1, "ansible_job_id" : jid, "results_file" : job_path })
+            print(json.dumps({ "started" : 1, "finished" : 0, "ansible_job_id" : jid, "results_file" : job_path }))
             sys.stdout.flush()
             time.sleep(1)
             sys.exit(0)
@@ -193,10 +203,15 @@ if __name__ == '__main__':
                 notice("Module complete (%s)"%os.getpid())
                 sys.exit(0)
 
-    except Exception, err:
-        notice("error: %s"%(err))
-        print json.dumps({
+    except SystemExit, e:
+        # On python2.4, SystemExit is a subclass of Exception.
+        # This block makes python2.4 behave the same as python2.5+
+        sys.exit(e.code)
+
+    except Exception, e:
+        notice("error: %s"%(e))
+        print(json.dumps({
             "failed" : True,
-            "msg"    : "FATAL ERROR: %s" % str(err)
-        })
+            "msg"    : "FATAL ERROR: %s" % str(e)
+        }))
         sys.exit(1)

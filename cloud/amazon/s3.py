@@ -94,7 +94,7 @@ options:
     default: null
   permission:
     description:
-      - This option let's the user set the canned permissions on the object/bucket that are created. The permissions that can be set are 'private', 'public-read', 'public-read-write', 'authenticated-read'. Multiple permissions can be specified as a list.
+      - This option lets the user set the canned permissions on the object/bucket that are created. The permissions that can be set are 'private', 'public-read', 'public-read-write', 'authenticated-read'. Multiple permissions can be specified as a list.
     required: false
     default: private
     version_added: "2.0"
@@ -459,9 +459,11 @@ def main():
             walrus = urlparse.urlparse(s3_url).hostname
             s3 = boto.connect_walrus(walrus, **aws_connect_kwargs)
         else:
-            s3 = boto.s3.connect_to_region(location, is_secure=True, **aws_connect_kwargs)
-            # use this as fallback because connect_to_region seems to fail in boto + non 'classic' aws accounts in some cases
-            if s3 is None:
+            aws_connect_kwargs['is_secure'] = True
+            try:
+                s3 = connect_to_aws(boto.s3, location, **aws_connect_kwargs)
+            except AnsibleAWSError:
+                # use this as fallback because connect_to_region seems to fail in boto + non 'classic' aws accounts in some cases
                 s3 = boto.connect_s3(**aws_connect_kwargs)
 
     except boto.exception.NoAuthHandlerFound, e:
@@ -520,7 +522,6 @@ def main():
 
         # Use this snippet to debug through conditionals:
 #       module.exit_json(msg="Bucket return %s"%bucketrtn)
-#       sys.exit(0)
 
         # Lets check the src path.
         pathrtn = path_check(src)
