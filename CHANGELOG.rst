@@ -2,6 +2,64 @@
 CHANGELOG
 =========
 
+1.4.78
+======
+
+* feature:``s3``: Update s3 client to latest version
+* feature:``glacier``: Update glacier client to latest version
+* feature:``cloudformation``: Update cloudformation client to latest version
+* feature:``route53``: Update route53 client to latest version
+
+
+1.4.77
+======
+
+* feature:``cloudtrail``: Update cloudtrail client to latest version
+* feature:``ecs``: Update ecs client to latest version
+
+
+1.4.76
+======
+
+* feature:``application-autoscaling``: Update application-autoscaling client to latest version
+* feature:``elastictranscoder``: Update elastictranscoder client to latest version
+* feature:``lambda``: Update lambda client to latest version
+* feature:``emr``: Update emr client to latest version
+* feature:``gamelift``: Update gamelift client to latest version
+
+
+1.4.75
+======
+
+* feature:Loader: Support loading json extra files.
+* feature:``meteringmarketplace``: Update meteringmarketplace client to latest version
+* feature:``cloudwatch``: Update cloudwatch client to latest version
+* feature:``apigateway``: Update apigateway client to latest version
+* feature:``sqs``: Update sqs client to latest version
+
+
+1.4.74
+======
+
+* feature:``route53``: Update route53 client to latest version
+* feature:``servicecatalog``: Update servicecatalog client to latest version
+
+
+1.4.73
+======
+
+* feature:``kinesis``: Update kinesis client to latest version
+* feature:``ds``: Update ds client to latest version
+* feature:``elasticache``: Update elasticache client to latest version
+
+
+1.4.72
+======
+
+* feature:``cognito-idp``: Update cognito-idp client to latest version
+* feature:Paginator: Add paginators for AWS WAF
+
+
 1.4.71
 ======
 
