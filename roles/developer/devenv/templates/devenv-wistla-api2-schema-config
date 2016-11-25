@@ -12,10 +12,9 @@ schemas:
     host: "{{ deployment_name }}-postgresql-main-0"
     name: wistla
     exclude_tables:
-      - acl
       - config
       - dirty_pants
-      - feed_search
+      - test_fixtures
       - timezones
     path: ./schema.wistla.main.sql
     publish_changes: true
@@ -25,26 +24,10 @@ schemas:
     host: "{{ deployment_name }}-postgresql-cache-0"
     name: wistla
     exclude_tables:
-      - acl
       - config
       - dirty_pants
-      - feed_search
+      - test_fixtures
       - timezones
-      - device_push_tokens
-      - wistl_profile
-      - user_profile
-      - community_profile
-      - community_activity_counts
-      - user_aggregated_counts
-      - user_activity_counts
-      - user_communities_profile
-      - user_miscellaneous_counts
-      - user_notifications_profile
-      - user_relationship_counts
-      - user_relationships_profile
-      - wistl_activity_counts
-      - wistl_communities_profile
-      - geo_locations
     path: ./schema.wistla.cache.sql
     target_directory: ./schema.wistla.cache
     data_import_directory: ../shared
