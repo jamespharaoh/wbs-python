@@ -33,7 +33,9 @@ try:
 except ImportError:
     import __builtin__ as builtins
 
-from ansible import __version__ as ansible_version
+from nose.tools import eq_, raises
+
+from ansible.release import __version__ as ansible_version
 from ansible import constants as C
 from ansible.compat.six import text_type
 from ansible.compat.tests import unittest
@@ -52,7 +54,6 @@ python_module_replacers = b"""
 #!/usr/bin/python
 
 #ANSIBLE_VERSION = "<<ANSIBLE_VERSION>>"
-#MODULE_ARGS = "<<INCLUDE_ANSIBLE_MODULE_ARGS>>"
 #MODULE_COMPLEX_ARGS = "<<INCLUDE_ANSIBLE_MODULE_COMPLEX_ARGS>>"
 #SELINUX_SPECIAL_FS="<<SELINUX_SPECIAL_FILESYSTEMS>>"
 
@@ -61,7 +62,7 @@ from ansible.module_utils.basic import *
 """
 
 powershell_module_replacers = b"""
-WINDOWS_ARGS = "<<INCLUDE_ANSIBLE_MODULE_WINDOWS_ARGS>>"
+WINDOWS_ARGS = "<<INCLUDE_ANSIBLE_MODULE_JSON_ARGS>>"
 # POWERSHELL_COMMON
 """
 
@@ -213,14 +214,15 @@ class TestActionBase(unittest.TestCase):
 
         # test python module formatting
         with patch.object(builtins, 'open', mock_open(read_data=to_bytes(python_module_replacers.strip(), encoding='utf-8'))) as m:
-            mock_task.args = dict(a=1, foo='fö〩')
-            mock_connection.module_implementation_preferences = ('',)
-            (style, shebang, data) = action_base._configure_module(mock_task.action, mock_task.args)
-            self.assertEqual(style, "new")
-            self.assertEqual(shebang, b"#!/usr/bin/python")
+            with patch.object(os, 'rename') as m:
+                mock_task.args = dict(a=1, foo='fö〩')
+                mock_connection.module_implementation_preferences = ('',)
+                (style, shebang, data) = action_base._configure_module(mock_task.action, mock_task.args)
+                self.assertEqual(style, "new")
+                self.assertEqual(shebang, b"#!/usr/bin/python")
 
-            # test module not found
-            self.assertRaises(AnsibleError, action_base._configure_module, 'badmodule', mock_task.args)
+                # test module not found
+                self.assertRaises(AnsibleError, action_base._configure_module, 'badmodule', mock_task.args)
 
         # test powershell module formatting
         with patch.object(builtins, 'open', mock_open(read_data=to_bytes(powershell_module_replacers.strip(), encoding='utf-8'))) as m:
@@ -392,27 +394,27 @@ class TestActionBase(unittest.TestCase):
 
         action_base._low_level_execute_command = MagicMock()
         action_base._low_level_execute_command.return_value = dict(rc=0, stdout='/some/path')
-        self.assertEqual(action_base._make_tmp_path(), '/some/path/')
+        self.assertEqual(action_base._make_tmp_path('root'), '/some/path/')
 
         # empty path fails
         action_base._low_level_execute_command.return_value = dict(rc=0, stdout='')
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
 
         # authentication failure
         action_base._low_level_execute_command.return_value = dict(rc=5, stdout='')
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
 
         # ssh error
         action_base._low_level_execute_command.return_value = dict(rc=255, stdout='', stderr='')
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
         play_context.verbosity = 5
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
 
         # general error
         action_base._low_level_execute_command.return_value = dict(rc=1, stdout='some stuff here', stderr='')
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
         action_base._low_level_execute_command.return_value = dict(rc=1, stdout='some stuff here', stderr='No space left on device')
-        self.assertRaises(AnsibleError, action_base._make_tmp_path)
+        self.assertRaises(AnsibleError, action_base._make_tmp_path, 'root')
 
     def test_action_base__remove_tmp_path(self):
         # create our fake task
@@ -567,29 +569,29 @@ class TestActionBase(unittest.TestCase):
         action_base._make_tmp_path = MagicMock()
         action_base._transfer_data = MagicMock()
         action_base._compute_environment_string = MagicMock()
-        action_base._remote_chmod = MagicMock()
         action_base._low_level_execute_command = MagicMock()
+        action_base._fixup_perms2 = MagicMock()
 
         action_base._configure_module.return_value = ('new', '#!/usr/bin/python', 'this is the module data')
         action_base._late_needs_tmp_path.return_value = False
         action_base._compute_environment_string.return_value = ''
         action_base._connection.has_pipelining = True
         action_base._low_level_execute_command.return_value = dict(stdout='{"rc": 0, "stdout": "ok"}')
-        self.assertEqual(action_base._execute_module(module_name=None, module_args=None), dict(rc=0, stdout="ok", stdout_lines=['ok']))
-        self.assertEqual(action_base._execute_module(module_name='foo', module_args=dict(z=9, y=8, x=7), task_vars=dict(a=1)), dict(rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(module_name=None, module_args=None), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(module_name='foo', module_args=dict(z=9, y=8, x=7), task_vars=dict(a=1)), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
 
         # test with needing/removing a remote tmp path
         action_base._configure_module.return_value = ('old', '#!/usr/bin/python', 'this is the module data')
         action_base._late_needs_tmp_path.return_value = True
         action_base._make_tmp_path.return_value = '/the/tmp/path'
-        self.assertEqual(action_base._execute_module(), dict(rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
 
         action_base._configure_module.return_value = ('non_native_want_json', '#!/usr/bin/python', 'this is the module data')
-        self.assertEqual(action_base._execute_module(), dict(rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
 
         play_context.become = True
         play_context.become_user = 'foo'
-        self.assertEqual(action_base._execute_module(), dict(rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
 
         # test an invalid shebang return
         action_base._configure_module.return_value = ('new', '', 'this is the module data')
@@ -600,14 +602,17 @@ class TestActionBase(unittest.TestCase):
         # mode and once with support disabled to raise an error
         play_context.check_mode = True
         action_base._configure_module.return_value = ('new', '#!/usr/bin/python', 'this is the module data')
-        self.assertEqual(action_base._execute_module(), dict(rc=0, stdout="ok", stdout_lines=['ok']))
+        self.assertEqual(action_base._execute_module(), dict(_ansible_parsed=True, rc=0, stdout="ok", stdout_lines=['ok']))
         action_base._supports_check_mode = False
         self.assertRaises(AnsibleError, action_base._execute_module)
 
     def test_action_base_sudo_only_if_user_differs(self):
+        fake_loader = MagicMock()
+        fake_loader.get_basedir.return_value = os.getcwd()
         play_context = PlayContext()
-        action_base = DerivedActionBase(None, None, play_context, None, None, None)
+        action_base = DerivedActionBase(None, None, play_context, fake_loader, None, None)
         action_base._connection = MagicMock(exec_command=MagicMock(return_value=(0, '', '')))
+        action_base._connection._shell = MagicMock(append_command=MagicMock(return_value=('JOINED CMD')))
 
         play_context.become = True
         play_context.become_user = play_context.remote_user = 'root'
@@ -627,6 +632,45 @@ class TestActionBase(unittest.TestCase):
         try:
             play_context.remote_user = 'root'
             action_base._low_level_execute_command('ECHO SAME', sudoable=True)
-            play_context.make_become_cmd.assert_called_once_with("ECHO SAME", executable='/bin/sh')
+            play_context.make_become_cmd.assert_called_once_with("ECHO SAME", executable=None)
         finally:
             C.BECOME_ALLOW_SAME_USER = become_allow_same_user
+
+# Note: Using nose's generator test cases here so we can't inherit from
+# unittest.TestCase
+class TestFilterNonJsonLines(object):
+    parsable_cases = (
+            (u'{"hello": "world"}', u'{"hello": "world"}'),
+            (u'{"hello": "world"}\n', u'{"hello": "world"}'),
+            (u'{"hello": "world"} ', u'{"hello": "world"} '),
+            (u'{"hello": "world"} \n', u'{"hello": "world"} '),
+            (u'Message of the Day\n{"hello": "world"}', u'{"hello": "world"}'),
+            (u'{"hello": "world"}\nEpilogue', u'{"hello": "world"}'),
+            (u'Several\nStrings\nbefore\n{"hello": "world"}\nAnd\nAfter\n', u'{"hello": "world"}'),
+            (u'{"hello": "world",\n"olá": "mundo"}', u'{"hello": "world",\n"olá": "mundo"}'),
+            (u'\nPrecedent\n{"hello": "world",\n"olá": "mundo"}\nAntecedent', u'{"hello": "world",\n"olá": "mundo"}'),
+            )
+
+    unparsable_cases = (
+            u'No json here',
+            u'"olá": "mundo"',
+            u'{"No json": "ending"',
+            u'{"wrong": "ending"]',
+            u'["wrong": "ending"}',
+            )
+
+    def check_filter_non_json_lines(self, stdout_line, parsed):
+        eq_(parsed, ActionBase._filter_non_json_lines(stdout_line))
+
+    def test_filter_non_json_lines(self):
+        for stdout_line, parsed in self.parsable_cases:
+            yield self.check_filter_non_json_lines, stdout_line, parsed
+
+    @raises(ValueError)
+    def check_unparsable_filter_non_json_lines(self, stdout_line):
+        ActionBase._filter_non_json_lines(stdout_line)
+
+    def test_unparsable_filter_non_json_lines(self):
+        for stdout_line in self.unparsable_cases:
+            yield self.check_unparsable_filter_non_json_lines, stdout_line
+

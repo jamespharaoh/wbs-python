@@ -26,6 +26,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.executor.task_executor import TaskExecutor
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins import action_loader, lookup_loader
+from ansible.parsing.yaml.objects import AnsibleUnicode
 
 from units.mock.loader import DictDataLoader
 
@@ -180,8 +181,10 @@ class TestTaskExecutor(unittest.TestCase):
 
         mock_host = MagicMock()
 
+        loop_var = 'item'
+
         def _evaluate_conditional(templar, variables):
-            item = variables.get('item')
+            item = variables.get(loop_var)
             if item == 'b':
                 return False
             return True
@@ -212,27 +215,27 @@ class TestTaskExecutor(unittest.TestCase):
         # No replacement
         #
         mock_task.action = 'yum'
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, ['a', 'b', 'c'])
 
         mock_task.action = 'foo'
         mock_task.args={'name': '{{item}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, ['a', 'b', 'c'])
 
         mock_task.action = 'yum'
         mock_task.args={'name': 'static'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, ['a', 'b', 'c'])
 
         mock_task.action = 'yum'
         mock_task.args={'name': '{{pkg_mgr}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, ['a', 'b', 'c'])
 
         mock_task.action = '{{unknown}}'
         mock_task.args={'name': '{{item}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, ['a', 'b', 'c'])
 
         # Maybe should raise an error in this case.  The user would have to specify:
@@ -248,7 +251,7 @@ class TestTaskExecutor(unittest.TestCase):
         items = [['a', 'b'], ['foo', 'bar']]
         mock_task.action = 'yum'
         mock_task.args = {'name': '{{ packages[item] }}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, items)
 
         #
@@ -257,23 +260,22 @@ class TestTaskExecutor(unittest.TestCase):
         items = ['a', 'b', 'c']
         mock_task.action = 'yum'
         mock_task.args={'name': '{{item}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, [['a','c']])
 
         mock_task.action = '{{pkg_mgr}}'
         mock_task.args={'name': '{{item}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, [['a', 'c']])
 
-        # Loop var isn't present until 2.1.x
         # New loop_var
-        #mock_task.action = 'yum'
-        #mock_task.args = {'name': '{{a_loop_var_item}}'}
-        #mock_task.loop_control = {'loop_var': 'a_loop_var_item'}
-        #loop_var = 'a_loop_var_item'
-        #new_items = te._squash_items(items=items, loop_var='a_loop_var_item', variables=job_vars)
-        #self.assertEqual(new_items, [['a', 'c']])
-        #loop_var = 'item'
+        mock_task.action = 'yum'
+        mock_task.args = {'name': '{{a_loop_var_item}}'}
+        mock_task.loop_control = {'loop_var': 'a_loop_var_item'}
+        loop_var = 'a_loop_var_item'
+        new_items = te._squash_items(items=items, loop_var='a_loop_var_item', variables=job_vars)
+        self.assertEqual(new_items, [['a', 'c']])
+        loop_var = 'item'
 
         #
         # These are presently not optimized but could be in the future.
@@ -286,7 +288,7 @@ class TestTaskExecutor(unittest.TestCase):
         items = [['a', 'b'], ['foo', 'bar']]
         mock_task.action = 'yum'
         mock_task.args = {'name': '{{ item }}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         #self.assertEqual(new_items, [['a', 'b', 'foo', 'bar']])
         self.assertEqual(new_items, items)
 
@@ -294,7 +296,7 @@ class TestTaskExecutor(unittest.TestCase):
         items = ['a', 'b', 'foo']
         mock_task.action = 'yum'
         mock_task.args = {'name': '{{ packages[item] }}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         #self.assertEqual(new_items, [['foo', 'baz']])
         self.assertEqual(new_items, items)
 
@@ -303,7 +305,7 @@ class TestTaskExecutor(unittest.TestCase):
         items = [{'package': 'foo'}, {'package': 'bar'}]
         mock_task.action = 'yum'
         mock_task.args = {'name': '{{ item["package"] }}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         #self.assertEqual(new_items, [['foo', 'bar']])
         self.assertEqual(new_items, items)
 
@@ -312,7 +314,7 @@ class TestTaskExecutor(unittest.TestCase):
                 dict(name='c', state='present')]
         mock_task.action = 'yum'
         mock_task.args={'name': '{{item.name}}', 'state': '{{item.state}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, items)
         #self.assertEqual(new_items, [dict(name=['a', 'b', 'c'], state='present')])
 
@@ -321,7 +323,7 @@ class TestTaskExecutor(unittest.TestCase):
                 dict(name='c', state='absent')]
         mock_task.action = 'yum'
         mock_task.args={'name': '{{item.name}}', 'state': '{{item.state}}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, items)
         #self.assertEqual(new_items, [dict(name=['a', 'b'], state='present'),
         #        dict(name='c', state='absent')])
@@ -331,7 +333,7 @@ class TestTaskExecutor(unittest.TestCase):
         items = [ 'absent', 'latest' ]
         mock_task.action = 'yum'
         mock_task.args = {'name': '{{ packages }}', 'state': '{{ item }}'}
-        new_items = te._squash_items(items=items, variables=job_vars)
+        new_items = te._squash_items(items=items, loop_var='item', variables=job_vars)
         self.assertEqual(new_items, items)
 
 
@@ -354,6 +356,7 @@ class TestTaskExecutor(unittest.TestCase):
         # here: on Python 2 comparing MagicMock() > 0 returns True, and the
         # other reason is that if I specify 0 here, the test fails. ;)
         mock_task.async = 1
+        mock_task.poll = 0
 
         mock_play_context = MagicMock()
         mock_play_context.post_validate.return_value = None
@@ -387,11 +390,11 @@ class TestTaskExecutor(unittest.TestCase):
         mock_action.run.return_value = dict(ansible_facts=dict())
         res = te._execute()
 
-        mock_task.changed_when = "1 == 1"
+        mock_task.changed_when = MagicMock(return_value=AnsibleUnicode("1 == 1"))
         res = te._execute()
 
         mock_task.changed_when = None
-        mock_task.failed_when = "1 == 1"
+        mock_task.failed_when = MagicMock(return_value=AnsibleUnicode("1 == 1"))
         res = te._execute()
 
         mock_task.failed_when = None

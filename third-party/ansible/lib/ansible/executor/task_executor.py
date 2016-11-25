@@ -26,7 +26,7 @@ import sys
 import time
 import traceback
 
-from ansible.compat.six import iteritems, string_types
+from ansible.compat.six import iteritems, string_types, binary_type
 
 from ansible import constants as C
 from ansible.errors import AnsibleError, AnsibleParserError, AnsibleUndefinedVariable, AnsibleConnectionFailure
@@ -71,11 +71,14 @@ class TaskExecutor:
         self._shared_loader_obj = shared_loader_obj
         self._connection        = None
         self._rslt_q            = rslt_q
+        self._loop_eval_error   = None
 
     def run(self):
         '''
         The main executor entrypoint, where we determine if the specified
-        task requires looping and either runs the task with
+        task requires looping and either runs the task with self._run_loop()
+        or self._execute(). After that, the returned results are parsed and
+        returned as a dict.
         '''
 
         display.debug("in run()")
@@ -88,7 +91,13 @@ class TaskExecutor:
                 roledir = self._task._role._role_path
             self._job_vars['roledir'] = roledir
 
-            items = self._get_loop_items()
+            try:
+                items = self._get_loop_items()
+            except AnsibleUndefinedVariable as e:
+                # save the error raised here for use later
+                items = None
+                self._loop_eval_error = e
+
             if items is not None:
                 if len(items) > 0:
                     item_results = self._run_loop(items)
@@ -135,6 +144,8 @@ class TaskExecutor:
                         res[idx] = _clean_res(item)
                 elif isinstance(res, UnsafeProxy):
                     return res._obj
+                elif isinstance(res, binary_type):
+                    return to_unicode(res, errors='strict')
                 return res
 
             display.debug("dumping result to json")
@@ -186,8 +197,8 @@ class TaskExecutor:
                     try:
                         loop_terms = listify_lookup_plugin_terms(terms=self._task.loop_args, templar=templar, loader=self._loader, fail_on_undefined=True, convert_bare=True)
                     except AnsibleUndefinedVariable as e:
-                        loop_terms = []
                         display.deprecated("Skipping task due to undefined Error, in the future this will be a fatal error.: %s" % to_bytes(e))
+                        return None
                 items = self._shared_loader_obj.lookup_loader.get(self._task.loop, loader=self._loader, templar=templar).run(terms=loop_terms, variables=self._job_vars, wantlist=True)
             else:
                 raise AnsibleError("Unexpected failure in finding the lookup named '%s' in the available lookup plugins" % self._task.loop)
@@ -222,9 +233,17 @@ class TaskExecutor:
         #task_vars = self._job_vars.copy()
         task_vars = self._job_vars
 
-        items = self._squash_items(items, task_vars)
+        loop_var = 'item'
+        if self._task.loop_control:
+            # the value may be 'None', so we still need to default it back to 'item' 
+            loop_var = self._task.loop_control.loop_var or 'item'
+
+        if loop_var in task_vars:
+            display.warning("The loop variable '%s' is already in use. You should set the `loop_var` value in the `loop_control` option for the task to something else to avoid variable collisions and unexpected behavior." % loop_var)
+
+        items = self._squash_items(items, loop_var, task_vars)
         for item in items:
-            task_vars['item'] = item
+            task_vars[loop_var] = item
 
             try:
                 tmp_task = self._task.copy()
@@ -243,23 +262,22 @@ class TaskExecutor:
 
             # now update the result with the item info, and append the result
             # to the list of results
-            res['item'] = item
+            res[loop_var] = item
             res['_ansible_item_result'] = True
 
             self._rslt_q.put(TaskResult(self._host, self._task, res), block=False)
             results.append(res)
+            del task_vars[loop_var]
 
         return results
 
-    def _squash_items(self, items, variables):
+    def _squash_items(self, items, loop_var, variables):
         '''
         Squash items down to a comma-separated list for certain modules which support it
         (typically package management modules).
         '''
+        name = None
         try:
-            # Hack just for the backport to 2.0
-            loop_var = 'item'
-
             # _task.action could contain templatable strings (via action: and
             # local_action:)  Template it before comparing.  If we don't end up
             # optimizing it here, the templatable string might use template vars
@@ -274,7 +292,6 @@ class TaskExecutor:
                 if all(isinstance(o, string_types) for o in items):
                     final_items = []
 
-                    name = None
                     for allowed in ['name', 'pkg', 'package']:
                         name = self._task.args.pop(allowed, None)
                         if name is not None:
@@ -316,6 +333,10 @@ class TaskExecutor:
         except:
             # Squashing is an optimization.  If it fails for any reason,
             # simply use the unoptimized list of items.
+
+            # Restore the name parameter
+            if name is not None:
+                self._task.args['name'] = name
             pass
         return items
 
@@ -363,6 +384,11 @@ class TaskExecutor:
             if not self._task.evaluate_conditional(templar, variables):
                 display.debug("when evaluation failed, skipping this task")
                 return dict(changed=False, skipped=True, skip_reason='Conditional check failed', _ansible_no_log=self._play_context.no_log)
+            # since we're not skipping, if there was a loop evaluation error
+            # raised earlier we need to raise it now to halt the execution of
+            # this task
+            if self._loop_eval_error is not None:
+                raise self._loop_eval_error
         except AnsibleError:
             # skip conditional exception in the case of includes as the vars needed might not be avaiable except in the included tasks or due to tags
             if self._task.action != 'include':
@@ -395,7 +421,17 @@ class TaskExecutor:
         # get the connection and the handler for this execution
         if not self._connection or not getattr(self._connection, 'connected', False) or self._play_context.remote_addr != self._connection._play_context.remote_addr:
             self._connection = self._get_connection(variables=variables, templar=templar)
-            self._connection.set_host_overrides(host=self._host)
+            hostvars = variables.get('hostvars', None)
+            if hostvars:
+                try:
+                    target_hostvars = hostvars.raw_get(self._host.name)
+                except:
+                    # FIXME: this should catch the j2undefined error here
+                    #        specifically instead of all exceptions
+                    target_hostvars = dict()
+            else:
+                target_hostvars = dict()
+            self._connection.set_host_overrides(host=self._host, hostvars=target_hostvars)
         else:
             # if connection is reused, its _play_context is no longer valid and needs
             # to be replaced with the one templated above, in case other data changed
@@ -409,10 +445,14 @@ class TaskExecutor:
             self._task.args = dict((i[0], i[1]) for i in iteritems(self._task.args) if i[1] != omit_token)
 
         # Read some values from the task, so that we can modify them if need be
-        if self._task.until is not None:
+        if self._task.until:
             retries = self._task.retries
-            if retries <= 0:
+            if retries is None:
+                retries = 3
+            elif retries <= 0:
                 retries = 1
+            else:
+                retries += 1
         else:
             retries = 1
 
@@ -426,7 +466,7 @@ class TaskExecutor:
 
         display.debug("starting attempt loop")
         result = None
-        for attempt in range(retries):
+        for attempt in range(1, retries + 1):
             display.debug("running the handler")
             try:
                 result = self._handler.run(task_vars=variables)
@@ -443,17 +483,8 @@ class TaskExecutor:
                 vars_copy[self._task.register] = wrap_var(result.copy())
 
             if self._task.async > 0:
-                # the async_wrapper module returns dumped JSON via its stdout
-                # response, so we parse it here and replace the result
-                try:
-                    if 'skipped' in result and result['skipped'] or 'failed' in result and result['failed']:
-                        return result
-                    result = json.loads(result.get('stdout'))
-                except (TypeError, ValueError) as e:
-                    return dict(failed=True, msg=u"The async task did not return valid JSON: %s" % to_unicode(e))
-
                 if self._task.poll > 0:
-                    result = self._poll_async_result(result=result, templar=templar)
+                    result = self._poll_async_result(result=result, templar=templar, task_vars=vars_copy)
 
                 # ensure no log is preserved
                 result["_ansible_no_log"] = self._play_context.no_log
@@ -489,23 +520,23 @@ class TaskExecutor:
                 _evaluate_changed_when_result(result)
                 _evaluate_failed_when_result(result)
 
-            if attempt < retries - 1:
+            if retries > 1:
                 cond = Conditional(loader=self._loader)
                 cond.when = self._task.until
                 if cond.evaluate_conditional(templar, vars_copy):
                     break
                 else:
                     # no conditional check, or it failed, so sleep for the specified time
-                    result['attempts'] = attempt + 1
-                    result['retries'] = retries
-                    result['_ansible_retry'] = True
-                    display.debug('Retrying task, attempt %d of %d' % (attempt + 1, retries))
-                    self._rslt_q.put(TaskResult(self._host, self._task, result), block=False)
-                    time.sleep(delay)
+                    if attempt < retries:
+                        result['attempts'] = attempt
+                        result['_ansible_retry'] = True
+                        result['retries'] = retries
+                        display.debug('Retrying task, attempt %d of %d' % (attempt, retries))
+                        self._rslt_q.put(TaskResult(self._host, self._task, result), block=False)
+                        time.sleep(delay)
         else:
             if retries > 1:
                 # we ran out of attempts, so mark the result as failed
-                result['attempts'] = retries
                 result['failed'] = True
 
         # do the final update of the local variables here, for both registered
@@ -537,10 +568,13 @@ class TaskExecutor:
         display.debug("attempt loop complete, returning result")
         return result
 
-    def _poll_async_result(self, result, templar):
+    def _poll_async_result(self, result, templar, task_vars=None):
         '''
         Polls for the specified JID to be complete
         '''
+
+        if task_vars is None:
+            task_vars = self._job_vars
 
         async_jid = result.get('ansible_job_id')
         if async_jid is None:
@@ -569,14 +603,22 @@ class TaskExecutor:
         while time_left > 0:
             time.sleep(self._task.poll)
 
-            async_result = normal_handler.run()
-            if int(async_result.get('finished', 0)) == 1 or 'failed' in async_result or 'skipped' in async_result:
+            async_result = normal_handler.run(task_vars=task_vars)
+            # We do not bail out of the loop in cases where the failure
+            # is associated with a parsing error. The async_runner can
+            # have issues which result in a half-written/unparseable result
+            # file on disk, which manifests to the user as a timeout happening
+            # before it's time to timeout.
+            if int(async_result.get('finished', 0)) == 1 or ('failed' in async_result and async_result.get('_ansible_parsed', False)) or 'skipped' in async_result:
                 break
 
             time_left -= self._task.poll
 
         if int(async_result.get('finished', 0)) != 1:
-            return dict(failed=True, msg="async task did not complete within the requested time")
+            if async_result.get('_ansible_parsed'):
+                return dict(failed=True, msg="async task did not complete within the requested time")
+            else:
+                return dict(failed=True, msg="async task produced unparseable results", async_result=async_result)
         else:
             return async_result
 
@@ -590,14 +632,14 @@ class TaskExecutor:
             # since we're delegating, we don't want to use interpreter values
             # which would have been set for the original target host
             for i in variables.keys():
-                if i.startswith('ansible_') and i.endswith('_interpreter'):
+                if isinstance(i, string_types) and i.startswith('ansible_') and i.endswith('_interpreter'):
                     del variables[i]
             # now replace the interpreter values with those that may have come
             # from the delegated-to host
             delegated_vars = variables.get('ansible_delegated_vars', dict()).get(self._task.delegate_to, dict())
             if isinstance(delegated_vars, dict):
                 for i in delegated_vars:
-                    if i.startswith("ansible_") and i.endswith("_interpreter"):
+                    if isinstance(i, string_types) and i.startswith("ansible_") and i.endswith("_interpreter"):
                         variables[i] = delegated_vars[i]
 
         conn_type = self._play_context.connection
@@ -613,7 +655,8 @@ class TaskExecutor:
                 try:
                     cmd = subprocess.Popen(['ssh','-o','ControlPersist'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     (out, err) = cmd.communicate()
-                    if "Bad configuration option" in err or "Usage:" in err:
+                    err = to_unicode(err)
+                    if u"Bad configuration option" in err or u"Usage:" in err:
                         conn_type = "paramiko"
                 except OSError:
                     conn_type = "paramiko"
@@ -623,6 +666,8 @@ class TaskExecutor:
             raise AnsibleError("the connection plugin '%s' was not found" % conn_type)
 
         if self._play_context.accelerate:
+            # accelerate is deprecated as of 2.1...
+            display.deprecated('Accelerated mode is deprecated. Consider using SSH with ControlPersist and pipelining enabled instead')
             # launch the accelerated daemon here
             ssh_connection = connection
             handler = self._shared_loader_obj.action_loader.get(
@@ -651,7 +696,9 @@ class TaskExecutor:
             try:
                 connection._connect()
             except AnsibleConnectionFailure:
+                display.debug('connection failed, fallback to accelerate')
                 res = handler._execute_module(module_name='accelerate', module_args=accelerate_args, task_vars=variables, delete_remote_tmp=False)
+                display.debug(res)
                 connection._connect()
 
         return connection

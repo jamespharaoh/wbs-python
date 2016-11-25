@@ -28,6 +28,7 @@ from ansible.compat.six import string_types
 
 from ansible import constants as C
 from ansible.vars import strip_internal_keys
+from ansible.utils.color import stringc
 from ansible.utils.unicode import to_unicode
 
 try:
@@ -69,9 +70,20 @@ class CallbackBase:
             version = getattr(self, 'CALLBACK_VERSION', '1.0')
             self._display.vvvv('Loaded callback %s of type %s, v%s' % (name, ctype, version))
 
-    def _copy_result(self, result):
-        ''' helper for callbacks, so they don't all have to include deepcopy '''
-        return deepcopy(result)
+    ''' helper for callbacks, so they don't all have to include deepcopy '''
+    _copy_result = deepcopy
+
+    def _copy_result_exclude(self, result, exclude):
+        values = []
+        for e in exclude:
+            values.append(getattr(result, e))
+            setattr(result, e, None)
+
+        result_copy = deepcopy(result)
+        for i,e in enumerate(exclude):
+            setattr(result, e, values[i])
+
+        return result_copy
 
     def _dump_results(self, result, indent=None, sort_keys=True, keep_invocation=False):
         if result.get('_ansible_no_log', False):
@@ -86,6 +98,10 @@ class CallbackBase:
         # remove invocation unless specifically wanting it
         if not keep_invocation and self._display.verbosity < 3 and 'invocation' in result:
             del abridged_result['invocation']
+
+        # remove diff information from screen output
+        if self._display.verbosity < 3 and 'diff' in result:
+            del abridged_result['diff']
 
         return json.dumps(abridged_result, indent=indent, ensure_ascii=False, sort_keys=sort_keys)
 
@@ -132,10 +148,18 @@ class CallbackBase:
                                                       tofile=after_header,
                                                       fromfiledate='',
                                                       tofiledate='',
-                                                      n=10)
-                        difflines = list(differ)
-                        if difflines:
-                            ret.extend(difflines)
+                                                      n=C.DIFF_CONTEXT)
+                        has_diff = False
+                        for line in differ:
+                            has_diff = True
+                            if line.startswith('+'):
+                                line = stringc(line, C.COLOR_DIFF_ADD)
+                            elif line.startswith('-'):
+                                line = stringc(line, C.COLOR_DIFF_REMOVE)
+                            elif line.startswith('@@'):
+                                line = stringc(line, C.COLOR_DIFF_LINES)
+                            ret.append(line)
+                        if has_diff:
                             ret.append('\n')
                     if 'prepared' in diff:
                         ret.append(to_unicode(diff['prepared']))
@@ -285,7 +309,7 @@ class CallbackBase:
         self.playbook_on_no_hosts_remaining()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.playbook_on_task_start(task, is_conditional)
+        self.playbook_on_task_start(task.name, is_conditional)
 
     def v2_playbook_on_cleanup_task_start(self, task):
         pass #no v1 correspondance
@@ -314,8 +338,8 @@ class CallbackBase:
         self.playbook_on_stats(stats)
 
     def v2_on_file_diff(self, result):
-        host = result._host.get_name()
         if 'diff' in result._result:
+            host = result._host.get_name()
             self.on_file_diff(host, result._result['diff'])
 
     def v2_playbook_on_include(self, included_file):

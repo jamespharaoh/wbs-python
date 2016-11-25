@@ -30,6 +30,12 @@ from hashlib import sha256
 from binascii import hexlify
 from binascii import unhexlify
 
+try:
+    from __main__ import display
+except ImportError:
+    from ansible.utils.display import Display
+    display = Display()
+
 # Note: Only used for loading obsolete VaultAES files.  All files are written
 # using the newer VaultAES256 which does not require md5
 from hashlib import md5
@@ -70,6 +76,10 @@ try:
     HAS_PBKDF2HMAC = True
 except ImportError:
     pass
+except Exception as e:
+    display.warning("Optional dependency 'cryptography' raised an exception, falling back to 'Crypto'")
+    import traceback
+    display.debug("Traceback from import of cryptography was {0}".format(traceback.format_exc()))
 
 from ansible.compat.six import PY3
 from ansible.utils.unicode import to_unicode, to_bytes
@@ -104,6 +114,12 @@ class VaultLib:
             recognized as vault encrypted data
         :returns: True if it is recognized.  Otherwise, False.
         """
+
+        if hasattr(data, 'read'):
+            current_position = data.tell()
+            header_part = data.read(len(b_HEADER))
+            data.seek(current_position)
+            return self.is_encrypted(header_part)
 
         if to_bytes(data, errors='strict', encoding='utf-8').startswith(b_HEADER):
             return True
@@ -445,7 +461,7 @@ class VaultEditor:
             os.chown(dest, prev.st_uid, prev.st_gid)
 
     def _editor_shell_command(self, filename):
-        EDITOR = os.environ.get('EDITOR','vim')
+        EDITOR = os.environ.get('EDITOR','vi')
         editor = shlex.split(EDITOR)
         editor.append(filename)
 
@@ -471,7 +487,7 @@ class VaultFile(object):
     # VaultFile a context manager instead (implement __enter__ and __exit__)
     def __del__(self):
         self.filehandle.close()
-        os.unlink(self.tmplfile)
+        os.unlink(self.tmpfile)
 
     def is_encrypted(self):
         peak = self.filehandle.readline()

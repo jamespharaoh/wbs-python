@@ -55,7 +55,7 @@ class Connection(ConnectionBase):
         self._play_context.remote_user = getpass.getuser()
 
         if not self._connected:
-            display.vvv(u"ESTABLISH LOCAL CONNECTION FOR USER: {0}".format(self._play_context.remote_user, host=self._play_context.remote_addr))
+            display.vvv(u"ESTABLISH LOCAL CONNECTION FOR USER: {0}".format(self._play_context.remote_user), host=self._play_context.remote_addr)
             self._connected = True
         return self
 
@@ -68,8 +68,7 @@ class Connection(ConnectionBase):
 
         executable = C.DEFAULT_EXECUTABLE.split()[0] if C.DEFAULT_EXECUTABLE else None
 
-        display.vvv(u"{0} EXEC {1}".format(self._play_context.remote_addr, cmd))
-        # FIXME: cwd= needs to be set to the basedir of the playbook
+        display.vvv(u"EXEC {0}".format(cmd), host=self._play_context.remote_addr)
         display.debug("opening command with Popen()")
 
         if isinstance(cmd, (text_type, binary_type)):
@@ -79,7 +78,7 @@ class Connection(ConnectionBase):
 
         p = subprocess.Popen(
             cmd,
-            shell=isinstance(cmd, basestring),
+            shell=isinstance(cmd, (text_type, binary_type)),
             executable=executable, #cwd=...
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -106,7 +105,7 @@ class Connection(ConnectionBase):
                     raise AnsibleError('privilege output closed while waiting for password prompt:\n' + become_output)
                 become_output += chunk
             if not self.check_become_success(become_output):
-                p.stdin.write(self._play_context.become_pass + '\n')
+                p.stdin.write(to_bytes(self._play_context.become_pass, errors='strict') + b'\n')
             fcntl.fcntl(p.stdout, fcntl.F_SETFL, fcntl.fcntl(p.stdout, fcntl.F_GETFL) & ~os.O_NONBLOCK)
             fcntl.fcntl(p.stderr, fcntl.F_SETFL, fcntl.fcntl(p.stderr, fcntl.F_GETFL) & ~os.O_NONBLOCK)
 
@@ -122,7 +121,7 @@ class Connection(ConnectionBase):
 
         super(Connection, self).put_file(in_path, out_path)
 
-        display.vvv(u"{0} PUT {1} TO {2}".format(self._play_context.remote_addr, in_path, out_path))
+        display.vvv(u"PUT {0} TO {1}".format(in_path, out_path), host=self._play_context.remote_addr)
         if not os.path.exists(to_bytes(in_path, errors='strict')):
             raise AnsibleFileNotFound("file or module does not exist: {0}".format(to_str(in_path)))
         try:
@@ -137,7 +136,7 @@ class Connection(ConnectionBase):
 
         super(Connection, self).fetch_file(in_path, out_path)
 
-        display.vvv(u"{0} FETCH {1} TO {2}".format(self._play_context.remote_addr, in_path, out_path))
+        display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self._play_context.remote_addr)
         self.put_file(in_path, out_path)
 
     def close(self):

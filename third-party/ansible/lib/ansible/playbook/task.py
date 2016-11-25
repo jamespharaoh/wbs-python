@@ -32,6 +32,7 @@ from ansible.playbook.base import Base
 from ansible.playbook.become import Become
 from ansible.playbook.block import Block
 from ansible.playbook.conditional import Conditional
+from ansible.playbook.loop_control import LoopControl
 from ansible.playbook.role import Role
 from ansible.playbook.taggable import Taggable
 
@@ -78,11 +79,12 @@ class Task(Base, Conditional, Taggable, Become):
     _first_available_file = FieldAttribute(isa='list')
     _loop                 = FieldAttribute(isa='string', private=True)
     _loop_args            = FieldAttribute(isa='list', private=True)
+    _loop_control         = FieldAttribute(isa='class', class_type=LoopControl)
     _name                 = FieldAttribute(isa='string', default='')
     _notify               = FieldAttribute(isa='list')
     _poll                 = FieldAttribute(isa='int')
     _register             = FieldAttribute(isa='string')
-    _retries              = FieldAttribute(isa='int', default=3)
+    _retries              = FieldAttribute(isa='int')
     _until                = FieldAttribute(isa='list', default=[])
 
     def __init__(self, block=None, role=None, task_include=None):
@@ -103,7 +105,7 @@ class Task(Base, Conditional, Taggable, Become):
     def get_name(self):
         ''' return the name of the task '''
 
-        if self._role and self.name:
+        if self._role and self.name and ("%s : " % self._role._role_name) not in self.name:
             return "%s : %s" % (self._role.get_name(), self.name)
         elif self.name:
             return self.name
@@ -134,7 +136,7 @@ class Task(Base, Conditional, Taggable, Become):
 
     def __repr__(self):
         ''' returns a human readable representation of the task '''
-        if self.get_name() == 'meta ':
+        if self.get_name() == 'meta':
             return "TASK: meta (%s)" % self.args['_raw_params']
         else:
             return "TASK: %s" % self.get_name()
@@ -194,7 +196,7 @@ class Task(Base, Conditional, Taggable, Become):
         if 'vars' in ds:
             # _load_vars is defined in Base, and is used to load a dictionary
             # or list of dictionaries in a standard way
-            new_ds['vars'] = self._load_vars(None, ds.pop('vars'))
+            new_ds['vars'] = self._load_vars(None, ds.get('vars'))
         else:
             new_ds['vars'] = dict()
 
@@ -220,6 +222,16 @@ class Task(Base, Conditional, Taggable, Become):
 
         return super(Task, self).preprocess_data(new_ds)
 
+    def _load_loop_control(self, attr, ds):
+        if not isinstance(ds, dict):
+           raise AnsibleParserError(
+               "the `loop_control` value must be specified as a dictionary and cannot " \
+               "be a variable itself (though it can contain variables)",
+               obj=ds,
+           )
+
+        return LoopControl.load(data=ds, variable_manager=self._variable_manager, loader=self._loader)
+
     def post_validate(self, templar):
         '''
         Override of base class post_validate, to also do final validation on
@@ -232,13 +244,6 @@ class Task(Base, Conditional, Taggable, Become):
             self._task_include.post_validate(templar)
 
         super(Task, self).post_validate(templar)
-
-    def _post_validate_register(self, attr, value, templar):
-        '''
-        Override post validation for the register args field, which is not
-        supposed to be templated
-        '''
-        return value
 
     def _post_validate_loop_args(self, attr, value, templar):
         '''
@@ -441,4 +446,43 @@ class Task(Base, Conditional, Taggable, Become):
         Override for the 'tags' getattr fetcher, used from Base.
         '''
         return self._get_parent_attribute('any_errors_fatal')
+
+    def _get_attr_loop(self):
+        return self._attributes['loop']
+
+    def _get_attr_loop_control(self):
+        return self._attributes['loop_control']
+
+    def get_dep_chain(self):
+        if self._parent:
+            return self._parent.get_dep_chain()
+        else:
+            return None
+
+    def get_search_path(self):
+        '''
+        Return the list of paths you should search for files, in order.
+        This follows role/playbook dependency chain.
+        '''
+        path_stack = []
+
+        dep_chain =  self.get_dep_chain()
+        # inside role: add the dependency chain from current to dependant
+        if dep_chain:
+            path_stack.extend(reversed([x._role_path for x in dep_chain]))
+
+        # add path of task itself, unless it is already in the list
+        task_dir = os.path.dirname(self.get_path())
+        if task_dir not in path_stack:
+            path_stack.append(task_dir)
+
+        return path_stack
+
+    def all_parents_static(self):
+        if self._task_include and not self._task_include.statically_loaded:
+            return False
+        elif self._block:
+            return self._block.all_parents_static()
+
+        return True
 

@@ -23,7 +23,7 @@ VAULT_PASSWORD_FILE = vault-password
 CONSUL_RUNNING := $(shell python consul_running.py)
 EUID := $(shell id -u -r)
 
-all: setup test_test_infra parsing test_var_precedence unicode test_templating_settings environment non_destructive destructive includes pull check_mode test_hash test_handlers test_group_by test_vault test_tags test_lookup_paths no_log test_connection
+all: setup test_test_infra parsing test_var_precedence unicode test_templating_settings environment test_connection test_async_conditional non_destructive destructive includes blocks pull check_mode test_hash test_handlers test_group_by test_vault test_tags test_lookup_paths no_log test_gathering_facts test_hosts_field
 
 test_test_infra:
 	# ensure fail/assert work locally and can stop execution with non-zero exit code
@@ -82,17 +82,40 @@ environment: setup
 non_destructive: setup
 	ansible-playbook non_destructive.yml -i $(INVENTORY) -e outputdir=$(TEST_DIR) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
 
+# For our Docker images, which identify themselves with "ENV container=docker", automatically run the test_async target.
+# Otherwise, skip it, since we don't know if local ssh is available. You can always run the test_async target manually.
+ifeq ($(container),docker)
+test_async_conditional: test_async
+else
+test_async_conditional:
+endif
+
+# For our Docker images, which identify themselves with "ENV container=docker", use the test_docker inventory group.
+# Otherwise use the test_default inventory group, which runs fewer tests, but should work on any system.
+ifeq ($(container),docker)
+TEST_CONNECTION_FILTER := 'test_docker'
+else
+TEST_CONNECTION_FILTER := 'test_default'
+endif
+
 # Skip connection plugins which require root when not running as root.
 ifneq ($(EUID),0)
-TEST_CONNECTION_FILTER := !chroot
+TEST_CONNECTION_FILTER += !chroot
 endif
 
 # Connection plugin test command to repeat with each locale setting.
-TEST_CONNECTION_CMD = $(1) ansible-playbook test_connection.yml -i test_connection.inventory -l '!skip-during-build $(TEST_CONNECTION_FILTER)' $(TEST_FLAGS)
+TEST_CONNECTION_CMD = $(1) ansible-playbook test_connection.yml -i test_connection.inventory -l '$(TEST_CONNECTION_FILTER)' $(TEST_FLAGS)
 
 test_connection: setup
 	$(call TEST_CONNECTION_CMD)
 	$(call TEST_CONNECTION_CMD, LC_ALL=C LANG=C)
+
+# Connection plugin test command to repeat with each locale setting. WinRM specific version.
+TEST_CONNECTION_WINRM_CMD = $(1) ansible-playbook test_connection_winrm.yml -i inventory.winrm $(TEST_FLAGS)
+
+test_connection_winrm: setup
+	$(call TEST_CONNECTION_WINRM_CMD)
+	$(call TEST_CONNECTION_WINRM_CMD, LC_ALL=C LANG=C)
 
 destructive: setup
 	ansible-playbook destructive.yml -i $(INVENTORY) -e outputdir=$(TEST_DIR) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)
@@ -122,17 +145,17 @@ test_handlers:
 	[ "$$(ansible-playbook test_force_handlers.yml --force-handlers --tags force_false_in_play -i inventory.handlers -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) | egrep -o CALLED_HANDLER_. | sort | uniq | xargs)" = "CALLED_HANDLER_B" ]
 
 test_hash:
-	ANSIBLE_HASH_BEHAVIOUR=replace ansible-playbook test_hash.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v -e '{"test_hash":{"extra_args":"this is an extra arg"}}'
-	ANSIBLE_HASH_BEHAVIOUR=merge ansible-playbook test_hash.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v -e '{"test_hash":{"extra_args":"this is an extra arg"}}'
+	ANSIBLE_HASH_BEHAVIOUR=replace ansible-playbook test_hash.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) -e '{"test_hash":{"extra_args":"this is an extra arg"}}'
+	ANSIBLE_HASH_BEHAVIOUR=merge ansible-playbook test_hash.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) -e '{"test_hash":{"extra_args":"this is an extra arg"}}'
 
 test_var_precedence: setup
 	ansible-playbook test_var_precedence.yml -i $(INVENTORY) $(CREDENTIALS_ARG) $(TEST_FLAGS) -v -e outputdir=$(TEST_DIR) -e 'extra_var=extra_var' -e 'extra_var_override=extra_var_override'
 
 test_vault: setup
-	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --list-tasks -e outputdir=$(TEST_DIR)
-	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --list-hosts -e outputdir=$(TEST_DIR)
-	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --syntax-check -e outputdir=$(TEST_DIR)
-	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) -e outputdir=$(TEST_DIR)
+	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --list-tasks -e outputdir=$(TEST_DIR) -e @$(VARS_FILE)
+	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --list-hosts -e outputdir=$(TEST_DIR)  -e @$(VARS_FILE)
+	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) --syntax-check -e outputdir=$(TEST_DIR)  -e @$(VARS_FILE)
+	ansible-playbook test_vault.yml -i $(INVENTORY) $(CREDENTIALS_ARG) -v $(TEST_FLAGS) --vault-password-file $(VAULT_PASSWORD_FILE) -e outputdir=$(TEST_DIR) -e @$(VARS_FILE)
 
 # test_delegate_to does not work unless we have permission to ssh to localhost.
 # Would take some more effort on our test systems to implement that -- probably
@@ -219,6 +242,11 @@ cloudstack:
 	RC=$$? ; \
 	exit $$RC;
 
+cloudflare: $(CREDENTIALS_FILE)
+	ansible-playbook cloudflare.yml -i $(INVENTORY) -e @$(VARS_FILE) -e @$(CREDENTIALS_FILE) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
+	RC=$$? ; \
+	exit $$RC;
+
 $(CONSUL_RUNNING):
 
 consul:
@@ -264,3 +292,39 @@ test_lookup_paths: setup
 no_log: setup
 	# This test expects 7 loggable vars and 0 non loggable ones, if either mismatches it fails, run the ansible-playbook command to debug
 	[ "$$(ansible-playbook no_log_local.yml -i $(INVENTORY) -e outputdir=$(TEST_DIR) -vvvvv | awk --source 'BEGIN { logme = 0; nolog = 0; } /LOG_ME/ { logme += 1;} /DO_NOT_LOG/ { nolog += 1;} END { printf "%d/%d", logme, nolog; }')" = "6/0" ]
+
+test_async:
+	# Verify that extra data before module JSON output during async call is ignored.
+	ANSIBLE_DEBUG=0 LC_ALL=bogus ansible-playbook test_async.yml -i localhost, -e ansible_connection=ssh -v $(TEST_FLAGS)
+	# Verify that the warning exists by examining debug output.
+	ANSIBLE_DEBUG=1 LC_ALL=bogus ansible-playbook test_async.yml -i localhost, -e ansible_connection=ssh -v $(TEST_FLAGS) \
+	| grep -q 'bash: warning: setlocale: LC_ALL: cannot change locale (bogus)'
+
+test_hosts_field:
+	# Hosts in playbook has a list of strings consisting solely of digits
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t string_digit_host_in_list -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 1
+	# Hosts taken from kv extra_var on the CLI
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t hosts_from_kv_string -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 1
+	# hosts is taken from an all digit json extra_vars string on the CLI
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t hosts_from_cli_json_string -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 1
+	# hosts is taken from a json list in extra_vars on the CLI
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t hosts_from_cli_json_list -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	grep 'Running on localhost' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 2
+	# hosts is taken from a json string in an extra_vars file
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t hosts_from_json_file_string -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 1
+	# hosts is taken from a json list in an extra_vars file
+	ansible-playbook test_hosts_field.yml -i inventory.hosts_field -e'target_kv=42' -e'{ "target_json_cli": "42", "target_json_cli_list": ["42", "localhost"] }' -e "@test_hosts_field.json" -t hosts_from_json_file_list -v $(TEST_FLAGS) | tee test_hosts_field.out
+	grep 'Running on 42' test_hosts_field.out 2>&1
+	grep 'Running on localhost' test_hosts_field.out 2>&1
+	test `grep -c 'ok=1' test_hosts_field.out` = 2
+	rm test_hosts_field.out

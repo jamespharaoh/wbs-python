@@ -29,7 +29,7 @@ import traceback
 
 from ansible import constants as C
 from ansible.errors import AnsibleError
-from ansible.plugins.connection import ConnectionBase
+from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.utils.unicode import to_bytes
 
 try:
@@ -37,8 +37,6 @@ try:
 except ImportError:
     from ansible.utils.display import Display
     display = Display()
-
-BUFSIZE = 65536
 
 
 class Connection(ConnectionBase):
@@ -88,7 +86,12 @@ class Connection(ConnectionBase):
         return the process's exit code immediately.
         '''
         executable = C.DEFAULT_EXECUTABLE.split()[0] if C.DEFAULT_EXECUTABLE else '/bin/sh'
-        local_cmd = [self.virsh, '-q', '-c', 'lxc:///', 'lxc-enter-namespace', self.lxc, '--', executable , '-c', cmd]
+        local_cmd = [self.virsh, '-q', '-c', 'lxc:///', 'lxc-enter-namespace']
+
+        if C.DEFAULT_LIBVIRT_LXC_NOSECLABEL:
+            local_cmd += ['--noseclabel']
+
+        local_cmd += [self.lxc, '--', executable, '-c', cmd]
 
         display.vvv("EXEC %s" % (local_cmd,), host=self.lxc)
         local_cmd = [to_bytes(i, errors='strict') for i in local_cmd]
