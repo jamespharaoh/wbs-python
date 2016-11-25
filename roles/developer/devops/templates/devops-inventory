@@ -512,7 +512,8 @@ if (
 			{%- if (
 				instance_name in hostvars
 			) and (
-				hostvars [instance_name].amazon_instance_state in [
+				hostvars [instance_name].amazon_instance_state
+				| default ('') in [
 					'running',
 					'standby',
 				]
