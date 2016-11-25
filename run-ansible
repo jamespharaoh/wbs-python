@@ -460,6 +460,26 @@ def update_config ():
 		os.mkdir (
 			"work/inventory")
 
+	if not os.path.islink ("work/inventory/host_vars"):
+
+		write_message ([
+			"Creating work/inventory/host_vars link",
+		])
+
+		os.symlink (
+			"../../data/hosts",
+			"work/inventory/hosts_vars")
+
+	if not os.path.islink ("work/inventory/group_vars"):
+
+		write_message ([
+			"Creating work/inventory/group_vars link",
+		])
+
+		os.symlink (
+			"../../data/groups",
+			"work/inventory/group_vars")
+
 	if CONFIG ["deployment_mode"] == "vagrant":
 
 		if not os.path.islink (
@@ -518,9 +538,9 @@ def update_config ():
 				"# ex: et ts=2 filetype=yaml",
 			]) + "\n")
 
-	if not os.path.exists ("group_vars/all"):
+	if not os.path.exists ("data/groups/all"):
 
-		with open ("group_vars/all", "w") as file_handle:
+		with open ("data/groups/all", "w") as file_handle:
 
 			pass
 
@@ -545,7 +565,7 @@ def update_config ():
 			wbs.file_hash_sha1,
 			[
 				"config/overrides.yml",
-				"group_vars/all",
+				"data/groups/all",
 				"work/inventory/generated",
 			]);
 

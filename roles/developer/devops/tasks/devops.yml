@@ -8,28 +8,21 @@
     dest: "{{ deployment_home }}/wistla-devops/config/overrides.yml"
     src: "devops-overrides"
 
-#- name: "link group_vars/all"
-#  action:
-#
-#    module: "file"
-#    path: "{{ deployment_home }}/wistla-devops/group_vars/all"
-#    state: "link"
-#
-#    force: "yes"
-#    src: "/run/shm/wistla-devops-{{ deployment_name }}-all"
+- name: "link data/groups/all"
+  action:
 
-#- name: "create group_vars/all"
-#  action:
-#
-#    module: "template"
-#    dest: "/run/shm/wistla-devops-{{ deployment_name }}-all"
-#    src: "devops-group-all"
+    module: "file"
+    path: "{{ deployment_home }}/wistla-devops/data/groups/all"
+    state: "link"
 
-- name: "create group_vars/all"
+    force: "yes"
+    src: "/run/shm/wistla-devops-{{ deployment_name }}-all"
+
+- name: "create data/groups/all"
   action:
 
     module: "template"
-    dest: "{{ deployment_home }}/wistla-devops/group_vars/all"
+    dest: "/run/shm/wistla-devops-{{ deployment_name }}-all"
     src: "devops-group-all"
 
 - name: "create inventory"
