@@ -403,6 +403,10 @@ class ThirdPartySetup (object):
 		if self.stashed:
 			return
 
+		if not self.git_repo.is_dirty () \
+		and not self.git_repo.untracked_files:
+			return
+
 		self.interrupted = False
 
 		saved_signal = (
