@@ -1,0 +1,133 @@
+---
+
+amazon_instance_state: "running"
+amazon_instance_type_running: "m3.medium"
+etcd: 
+  
+  installed_version: "2.2.2"
+  needs_restart: "no"
+  state: "enabled"
+
+etcd_installed_version: "2.2.2"
+etcd_needs_restart: "no"
+etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "no"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "no"
+heka_state: "enabled"
+icinga: 
+  
+  certificate: "/authority/icinga/issue/29/certificate"
+  installed_version: "2.4.2-1"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/29/key"
+  state: "enabled"
+
+icinga_certificate: "/authority/icinga/issue/29/certificate"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/64/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/64/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/64/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/64/key"
+icinga_core_state: "enabled"
+icinga_installed_version: "2.4.2-1"
+icinga_needs_restart: "no"
+icinga_private_key: "/authority/icinga/issue/29/key"
+icinga_state: "enabled"
+instance_id: "i-ef12a951"
+mysql: 
+  
+  installed_from: "distro"
+  needs_restart: "no"
+  root_password: "ezjiyqvlewyeeldkwdld"
+  state: "enabled"
+
+mysql_installed_from: "distro"
+mysql_needs_restart: "no"
+mysql_root_password: "ezjiyqvlewyeeldkwdld"
+mysql_state: "enabled"
+nginx: 
+  
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.10.0"
+  installed_version: "1.10.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.10.0"
+nginx_installed_version: "1.10.0"
+nginx_needs_restart: "yes"
+nginx_state: "enabled"
+php: 
+  
+  fpm_socket: "/var/run/php5-fpm.sock"
+  installed_from: "distro"
+  installed_service: "php5-fpm"
+  installed_version: "5"
+  needs_restart: "yes"
+  state: "enabled"
+
+php_fpm_socket: "/var/run/php5-fpm.sock"
+php_installed_from: "distro"
+php_installed_service: "php5-fpm"
+php_installed_version: "5"
+php_needs_restart: "yes"
+php_state: "enabled"
+python: 
+  
+  installed_version: "2.7.11"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "2.7.11/0.9.3-1"
+  state: "installed"
+
+python_apt_installed_version: "2.7.11/0.9.3-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.11"
+python_pip: 
+  
+  installed_version: "2.7.11/8.1.1"
+  state: "installed"
+
+python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH11bW4UB17zrjUN3w/qDWkkH/t46t4P+dePmAcK8PpwB0HV/jgGieylU2npwb1DTIMbu1KO+OtAaq3GgZSQ+U4="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDsbcJt1PamT2zFaHtwDz6/nL6vEE7yI82uff5z0y0SsPr9O47gQG6KVc3M05xyahHwQV66oJ7JH4Db27tla2TFkaIszEFtto49CrX4Dwig/njXoQVVqBt6ZL80IavF+od4VX9nXEpbQe7XTvvLPUJ2CUSYVGh6c5s6J1mz8FwfrNoDgfiBAbjjlIRSIon7eSUDyKJnU5+X2wXkCquYBMOD1ZflTWS+DhYZJn3qJCxDz+9MgczK1cFMbk8JSWJfzFhkFzUiZ4ZfOATAprc8l4/tkmmfQUCHd98n/DtAJgvXSf1BS2TUO8ky3yzT8ysJFNENYP0ir68g/zHN/mexq4b"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH11bW4UB17zrjUN3w/qDWkkH/t46t4P+dePmAcK8PpwB0HV/jgGieylU2npwb1DTIMbu1KO+OtAaq3GgZSQ+U4="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDsbcJt1PamT2zFaHtwDz6/nL6vEE7yI82uff5z0y0SsPr9O47gQG6KVc3M05xyahHwQV66oJ7JH4Db27tla2TFkaIszEFtto49CrX4Dwig/njXoQVVqBt6ZL80IavF+od4VX9nXEpbQe7XTvvLPUJ2CUSYVGh6c5s6J1mz8FwfrNoDgfiBAbjjlIRSIon7eSUDyKJnU5+X2wXkCquYBMOD1ZflTWS+DhYZJn3qJCxDz+9MgczK1cFMbk8JSWJfzFhkFzUiZ4ZfOATAprc8l4/tkmmfQUCHd98n/DtAJgvXSf1BS2TUO8ky3yzT8ysJFNENYP0ir68g/zHN/mexq4b"
+volume_ids: 
+  
+  system: "vol-7e958c92"
+
+volume_ids_system: "vol-7e958c92"
+vpn_server: 
+  
+  certificate: "/authority/ops-vpn/issue/21/certificate"
+  private_key: "/authority/ops-vpn/issue/21/key"
+
+vpn_server_certificate: "/authority/ops-vpn/issue/21/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/21/key"
+
+
+# ex: et ts=2 filetype=yaml
