@@ -468,7 +468,7 @@ def update_config ():
 
 		os.symlink (
 			"../../data/hosts",
-			"work/inventory/hosts_vars")
+			"work/inventory/host_vars")
 
 	if not os.path.islink ("work/inventory/group_vars"):
 
