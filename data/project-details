@@ -278,6 +278,7 @@
   depends:
 
     - "wistla-util"
+    - "wistla-data-process"
 
   build_steps:
 
