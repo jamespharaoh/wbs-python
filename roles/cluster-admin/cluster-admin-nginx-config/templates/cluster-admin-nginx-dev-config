@@ -2,7 +2,8 @@
 
 {% import 'cluster-admin-nginx-macros' as macros with context %}
 
-{% set dev_deployment = item %}
+{% set dev_deployment_name = item %}
+{% set dev_deployment = dev_deployments [dev_deployment_name] %}
 
 upstream {{ dev_deployment.name }}-host {
 	server {{ dev_deployment.bridge_network }}.0.1;
