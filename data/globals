@@ -76,14 +76,8 @@ deployments_by_cluster: "{{
   | to_dict
 }}"
 
-dev_deployments: "{{
-  deployments_by_cluster.dev
-}}"
-
 dev_deployment_names: "{{
-  dev_deployments
-  | map (attribute = 'name')
-  | list
+  dev_deployments | keys
 }}"
 
 global_system_packages:
