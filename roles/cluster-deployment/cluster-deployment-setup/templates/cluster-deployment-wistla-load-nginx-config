@@ -35,9 +35,9 @@ http {
 		'$http_x_wistla_client_request_id',
 	] | join (' ') }}';
 
-	access_log /shared/log/nginx-access.log;
-	access_log /shared/log/nginx-times.log times;
-	error_log /shared/log/nginx-error.log;
+	access_log /shared/log/load-nginx-access.log;
+	access_log /shared/log/load-nginx-times.log times;
+	error_log /shared/log/load-nginx-error.log;
 
 	# compression
 
@@ -68,7 +68,8 @@ http {
 
 		{%- print '\tupstream ', name, ' {\n' -%}
 
-		{%- for node_index in range (0, cluster_deployment.node_instance_count [name] | int) -%}
+		{%- for node_index
+		in range (0, cluster_deployment.node_instance_count [name] | int) -%}
 
 			{%- print
 				'\t\tserver ',
@@ -164,7 +165,7 @@ http {
 
 		server_name web.{{ inventory_hostname }};
 
-{% if cluster_deployment.type == 'alias' %}
+{% if cluster_deployment.type in [ 'alias', 'alias2' ] %}
 		server_name {{ cluster_deployment_alias.web_domain }};
 		server_name {{ cluster_deployment_alias.main_domain }};
 {% endif %}
@@ -207,7 +208,7 @@ http {
 
 		server_name {{ cluster_deployment.admin_domain }};
 
-{% if cluster_deployment.type == 'alias' %}
+{% if cluster_deployment.type in [ 'alias', 'alias2' ] %}
 		server_name {{ cluster_deployment_alias.admin_domain }};
 {% endif %}
 
@@ -234,7 +235,7 @@ http {
 
 		server_name short.{{ inventory_hostname }};
 
-{% if cluster_deployment.type == 'alias' %}
+{% if cluster_deployment.type in [ 'alias', 'alias2' ] %}
 		server_name {{ cluster_deployment_alias.short_domain }};
 {% endif %}
 
@@ -279,7 +280,7 @@ http {
 
 		server_name assets.{{ inventory_hostname }};
 
-{% if cluster_deployment.type == 'alias' %}
+{% if cluster_deployment.type in [ 'alias', 'alias2' ] %}
 		server_name {{ cluster_deployment_alias.assets_domain }};
 		server_name {{ cluster_deployment_alias.assets_origin_domain }};
 {% endif %}
