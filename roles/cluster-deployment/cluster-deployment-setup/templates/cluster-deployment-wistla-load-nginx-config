@@ -136,9 +136,11 @@ http {
 			proxy_set_header Connection "";
 			proxy_connect_timeout 10ms;
 
-			add_header Access-Control-Allow-Origin "{{ [
-				'www.staging.wistla.com',
-			] | join (' ') }}";
+{% if 'cors_whitelist_origins' in cluster_deployment %}
+
+			add_header Access-Control-Allow-Origin "{{
+				cluster_deployment.cors_whitelist_origins | join (', ')
+			}}";
 
 			add_header Access-Control-Allow-Methods "{{ [
 				'OPTIONS',
@@ -159,6 +161,10 @@ http {
 			] | join (', ') }}";
 
 			add_header Access-Control-Max-Age {{ 60 * 60 * 24 * 7 }};
+
+			add_header Access-Control-Allow-Credentials true;
+
+{% endif %}
 
 		}
 
