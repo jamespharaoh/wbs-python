@@ -96,5 +96,6 @@ project_data:
   deployment_modes: "deployment-modes"
   node_templates: "node-templates"
   node_types: "node-types"
+  vpn_clients: "vpn-clients"
 
 # ex: et ts=2 filetype=yaml

@@ -99,6 +99,11 @@
       cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"
+      from_port: "5432"
+      to_port: "5432"
+      cidr_ip: "10.0.0.0/8"
+
+    - proto: "tcp"
       from_port: "8443"
       to_port: "8443"
       cidr_ip: "10.0.0.0/8"
@@ -111,7 +116,7 @@
     - proto: "tcp"
       from_port: "27017"
       to_port: "27017"
-      group_id: "{{ security_group_id_data }}"
+      cidr_ip: "10.0.0.0/8"
 
 - name: "balancer"
   rules:
@@ -160,22 +165,22 @@
     - proto: "tcp"
       from_port: "5432"
       to_port: "5432"
-      group_id: "{{ security_group_id_app }}"
+      cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"
       from_port: "5672"
       to_port: "5672"
-      group_id: "{{ security_group_id_app }}"
+      cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"
       from_port: "9092"
       to_port: "9092"
-      group_id: "{{ security_group_id_app }}"
+      cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"
       from_port: "27017"
       to_port: "27017"
-      group_id: "{{ security_group_id_app }}"
+      cidr_ip: "10.0.0.0/8"
 
 - name: "jenkins"
   rules:
