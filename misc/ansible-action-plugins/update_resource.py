@@ -27,15 +27,15 @@ class ActionModule (ActionBase):
 
 		# read in the existing file
 
-		if not os.path.isdir ("data/runtime"):
-			os.mkdir ("data/runtime")
+		if not os.path.isdir ("data/hosts"):
+			os.mkdir ("data/hosts")
 
 		filename = (
-			"data/runtime/%s" % (
+			"data/hosts/%s" % (
 				task_vars.get ("inventory_hostname")))
 
 		filename_temp = (
-			"data/runtime/.%s.temp" % (
+			"data/hosts/.%s.temp" % (
 				task_vars.get ("inventory_hostname")))
 
 		if os.path.isfile (filename):
