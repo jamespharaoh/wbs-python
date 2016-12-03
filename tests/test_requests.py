@@ -1094,6 +1094,10 @@ class TestRequests:
         total_seconds = ((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6)
         assert total_seconds > 0.0
 
+    def test_empty_response_has_content_none(self):
+        r = requests.Response()
+        assert r.content is None
+
     def test_response_is_iterable(self):
         r = requests.Response()
         io = StringIO.StringIO('abc')
@@ -2117,6 +2121,7 @@ class TestPreparingURLs(object):
         (
             ('http://google.com', 'http://google.com/'),
             (u'http://ジェーピーニック.jp', u'http://xn--hckqz9bzb1cyrb.jp/'),
+            (u'http://xn--n3h.net/', u'http://xn--n3h.net/'),
             (
                 u'http://ジェーピーニック.jp'.encode('utf-8'),
                 u'http://xn--hckqz9bzb1cyrb.jp/'
@@ -2137,6 +2142,18 @@ class TestPreparingURLs(object):
                 u'http://Königsgäßchen.de/straße'.encode('utf-8'),
                 u'http://xn--knigsgchen-b4a3dun.de/stra%C3%9Fe'
             ),
+            (
+                b'http://xn--n3h.net/',
+                u'http://xn--n3h.net/'
+            ),
+            (
+                b'http://[1200:0000:ab00:1234:0000:2552:7777:1313]:12345/',
+                u'http://[1200:0000:ab00:1234:0000:2552:7777:1313]:12345/'
+            ),
+            (
+                u'http://[1200:0000:ab00:1234:0000:2552:7777:1313]:12345/',
+                u'http://[1200:0000:ab00:1234:0000:2552:7777:1313]:12345/'
+            )
         )
     )
     def test_preparing_url(self, url, expected):
@@ -2151,6 +2168,7 @@ class TestPreparingURLs(object):
             b"http://*",
             u"http://*.google.com",
             u"http://*",
+            u"http://☃.net/"
         )
     )
     def test_preparing_bad_url(self, url):
@@ -2159,18 +2177,72 @@ class TestPreparingURLs(object):
             r.prepare()
 
     @pytest.mark.parametrize(
-        'protocol, url',
+        'input, expected',
         (
-            ("http+unix://", b"http+unix://%2Fvar%2Frun%2Fsocket/path"),
-            ("http+unix://", u"http+unix://%2Fvar%2Frun%2Fsocket/path"),
-            ("mailto", b"mailto:user@example.org"),
-            ("mailto", u"mailto:user@example.org"),
-            ("data", b"data:SSDimaUgUHl0aG9uIQ=="),
+            (
+                b"http+unix://%2Fvar%2Frun%2Fsocket/path",
+                u"http+unix://%2fvar%2frun%2fsocket/path",
+            ),
+            (
+                u"http+unix://%2Fvar%2Frun%2Fsocket/path",
+                u"http+unix://%2fvar%2frun%2fsocket/path",
+            ),
+            (
+                b"mailto:user@example.org",
+                u"mailto:user@example.org",
+            ),
+            (
+                u"mailto:user@example.org",
+                u"mailto:user@example.org",
+            ),
+            (
+                b"data:SSDimaUgUHl0aG9uIQ==",
+                u"data:SSDimaUgUHl0aG9uIQ==",
+            )
         )
     )
-    def test_url_passthrough(self, protocol, url):
-        session = requests.Session()
-        session.mount(protocol, HTTPAdapter())
-        p = requests.Request('GET', url=url)
-        p.prepare()
-        assert p.url == url
+    def test_url_mutation(self, input, expected):
+        """
+        This test validates that we correctly exclude some URLs from
+        preparation, and that we handle others. Specifically, it tests that
+        any URL whose scheme doesn't begin with "http" is left alone, and
+        those whose scheme *does* begin with "http" are mutated.
+        """
+        r = requests.Request('GET', url=input)
+        p = r.prepare()
+        assert p.url == expected
+
+    @pytest.mark.parametrize(
+        'input, params, expected',
+        (
+            (
+                b"http+unix://%2Fvar%2Frun%2Fsocket/path",
+                {"key": "value"},
+                u"http+unix://%2fvar%2frun%2fsocket/path?key=value",
+            ),
+            (
+                u"http+unix://%2Fvar%2Frun%2Fsocket/path",
+                {"key": "value"},
+                u"http+unix://%2fvar%2frun%2fsocket/path?key=value",
+            ),
+            (
+                b"mailto:user@example.org",
+                {"key": "value"},
+                u"mailto:user@example.org",
+            ),
+            (
+                u"mailto:user@example.org",
+                {"key": "value"},
+                u"mailto:user@example.org",
+            ),
+        )
+    )
+    def test_parameters_for_nonstandard_schemes(self, input, params, expected):
+        """
+        Setting paramters for nonstandard schemes is allowed if those schemes
+        begin with "http", and is forbidden otherwise.
+        """
+        r = requests.Request('GET', url=input, params=params)
+        p = r.prepare()
+        assert p.url == expected
+
