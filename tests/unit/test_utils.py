@@ -125,6 +125,12 @@ class TestTransformName(unittest.TestCase):
     def test_special_case_ends_with_s(self):
         self.assertEqual(xform_name('GatewayARNs', '-'), 'gateway-arns')
 
+    def test_partial_rename(self):
+        transformed = xform_name('IPV6', '-')
+        self.assertEqual(transformed, 'ipv6')
+        transformed = xform_name('IPV6', '_')
+        self.assertEqual(transformed, 'ipv6')
+
 
 class TestValidateJMESPathForSet(unittest.TestCase):
     def setUp(self):
@@ -371,12 +377,14 @@ class TestArgumentGenerator(unittest.TestCase):
                 'B': {'type': 'integer'},
                 'C': {'type': 'float'},
                 'D': {'type': 'boolean'},
+                'E': {'type': 'timestamp'}
             },
             generated_skeleton={
                 'A': '',
                 'B': 0,
                 'C': 0.0,
                 'D': True,
+                'E': datetime.datetime(1970, 1, 1, 0, 0, 0)
             }
         )
 
@@ -396,6 +404,33 @@ class TestArgumentGenerator(unittest.TestCase):
                 'D': True,
             }
         )
+
+    def test_will_use_member_names_for_string_values_of_list(self):
+        self.arg_generator = ArgumentGenerator(use_member_names=True)
+        # We're not using assert_skeleton_from_model_is
+        # because we can't really control the name of strings shapes
+        # being used in the DenormalizedStructureBuilder. We can only
+        # control the name of structures and list shapes.
+        shape_map = ShapeResolver({
+            'InputShape': {
+                'type': 'structure',
+                'members': {
+                    'StringList': {'shape': 'StringList'},
+                }
+            },
+            'StringList': {
+                'type': 'list',
+                'member': {'shape': 'StringType'},
+            },
+            'StringType': {
+                'type': 'string',
+            }
+        })
+        shape = shape_map.get_shape_by_name('InputShape')
+        actual = self.arg_generator.generate_skeleton(shape)
+
+        expected = {'StringList': ['StringType']}
+        self.assertEqual(actual, expected)
 
     def test_generate_nested_structure(self):
         self.assert_skeleton_from_model_is(
