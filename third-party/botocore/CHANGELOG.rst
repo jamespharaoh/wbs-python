@@ -2,6 +2,43 @@
 CHANGELOG
 =========
 
+1.4.81
+======
+
+* feature:parameter: Automatically inject an idempotency token into parameters marked with the idempotencyToken trait
+* feature:``appstream``: Update appstream client to latest version
+* feature:``directconnect``: Update directconnect client to latest version
+* feature:``elasticbeanstalk``: Update elasticbeanstalk client to latest version
+* feature:``shield``: Update shield client to latest version
+* feature:``opsworkscm``: Update opsworkscm client to latest version
+* feature:``lambda``: Update lambda client to latest version
+* feature:``codebuild``: Update codebuild client to latest version
+* feature:``xray``: Update xray client to latest version
+* feature:``stepfunctions``: Update stepfunctions client to latest version
+* feature:``ssm``: Update ssm client to latest version
+* feature:``health``: Update health client to latest version
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``apigateway``: Update apigateway client to latest version
+* feature:``pinpoint``: Update pinpoint client to latest version
+
+
+1.4.80
+======
+
+* feature:``lightsail``: Update lightsail client to latest version
+* feature:``polly``: Update polly client to latest version
+* feature:``snowball``: Update snowball client to latest version
+* feature:``rekognition``: Update rekognition client to latest version
+
+
+1.4.79
+======
+
+* bugfix:s3: fixes `#1059 <https://github.com/boto/botocore/issues/1059>`__ (presigned s3v4 URL bug related to blank query parameters being filtered incorrectly)
+* feature:``s3``: Update s3 client to latest version
+* bugfix:Presigner: Support presigning rest-json services.
+
+
 1.4.78
 ======
 
