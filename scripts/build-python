@@ -1,0 +1,134 @@
+#!/bin/bash
+
+set -euf -o pipefail
+
+source "/etc/lsb-release"
+
+# ---------- command line options
+
+if test "$#" != "3"; then
+
+	cat <<-END
+
+		Usage: $0 VERSION OUTPUT PREFIX
+
+		Outions:
+
+		  VERSION - Version of python to download and build
+		  OUTPUT - Output archive base name
+		  PREFIX - Installation prefix
+
+	END
+
+	if test "$#" == "0"; then
+		exit 0
+	else
+		exit 1
+	fi
+
+fi
+
+version="$1"
+output="$2"
+prefix="$3"
+
+# ---------- general configuration
+
+mirror="https://www.python.org/ftp/python"
+directory="Python-$version"
+archive="$directory.tar.xz"
+url="$mirror/$version/$archive"
+
+system_dependencies=(
+	"build-essential"
+	"libbz2-dev"
+	"libffi-dev"
+	"libgdm-dev"
+	"liblzma-dev"
+	"libncursesw5-dev"
+	"libreadline-dev"
+	"libssl-dev"
+	"libsqlite3-dev"
+	"zlib1g-dev"
+)
+
+build_configure_flags=(
+	"--enable-shared"
+	"--enable-ipv6"
+	"--enable-unicode=ucs4"
+	"--with-dbmliborder=bdb:gdbm"
+	"--with-fpectl"
+)
+
+build_cc="x86_64-linux-gnu-gcc"
+
+build_c_flags=(
+	"-g"
+	"-D_FORTIFY_SOURCE=2"
+	"-fstack-protector"
+	"--param=ssp-buffer-size=4"
+	"-Wformat"
+	"-Werror=format-security"
+)
+
+build_ld_flags=(
+	"-Wl,-Bsymbolic-functions"
+	"-Wl,-z,relro"
+	"-Wl,--rpath=$prefix/lib"
+)
+
+# ---------- prepare for build
+
+sudo apt install -y "$system_dependencies"
+
+mkdir -p "work"
+cd "work"
+
+# ---------- download python
+
+rm -f "$archive"
+wget "$url"
+
+# ---------- extract python
+
+rm -rf "$directory"
+tar --extract --xz --file "$archive"
+cd "$directory"
+
+# ---------- build and install python
+
+echo ./configure \
+	--prefix="$prefix" \
+	"${build_configure_flags[@]}" \
+	CC="$build_cc" \
+	CFLAGS="${build_c_flags[*]}" \
+	LDFLAGS="${build_ld_flags[*]}"
+
+exit
+
+./configure \
+	--prefix="$prefix" \
+	"${build_configure_flags[@]}" \
+	CC="$build_cc" \
+	CFLAGS="${build_c_flags[*]}" \
+	LDFLAGS="${build_ld_flags[*]}"
+
+make
+sudo make install
+
+# ---------- install pip
+
+curl "https://bootstrap.pypa.io/get-pip.py" \
+| sudo "$prefix/bin/python"
+
+# ---------- create archive
+
+cd ..
+rsync --archive "$prefix/" "$output/"
+sudo rm -rf "$prefix"
+
+tar --create --xz \
+	--file "$output.tar.xz" \
+	"$output"
+
+# ex: noet ts=4 filetype=sh
