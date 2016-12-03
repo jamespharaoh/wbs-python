@@ -1,7 +1,7 @@
 ---
 
-- name: "install wistla cron"
-  notify: "restart cron"
+- name: "cluster app cron config"
+  register: "cluster_app_cron_config_result"
   become: "yes"
   action:
 
@@ -9,12 +9,13 @@
     src: "cluster-app-wistla-cron"
     dest: "/etc/cron.d/wistla-cron"
 
-- name: "reload cron"
+- name: "cluster app cron restart"
   become: "yes"
+  changed_when: "cluster_app_cron_config_result | changed"
   action:
 
     module: "service"
     name: "cron"
-    state: "reloaded"
+    state: "restarted"
 
 # ex: et ts=2 filetype=yaml

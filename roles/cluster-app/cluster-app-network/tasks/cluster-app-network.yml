@@ -28,7 +28,7 @@
     ifup dummy0;
 
 - name: "create firewall rules"
-  notify: "reload firewall rules"
+  register: "cluster_app_network_firewall_config_result"
   become: "yes"
   action:
 
@@ -36,6 +36,11 @@
     dest: "/etc/network/firewall-rules"
     src: "cluster-app-firewall-rules"
     mode: "0755"
+
+- name: "cluster app network firewall reload"
+  when: "cluster_app_network_firewall_config_result | changed"
+  become: "yes"
+  command: "/etc/network/firewall-rules"
 
 - name: "run firewall rules on if-up"
   become: "yes"
@@ -45,7 +50,5 @@
     state: "link"
     path: "/etc/network/if-up.d/firewall-rules"
     src: "/etc/network/firewall-rules"
-
-- meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml

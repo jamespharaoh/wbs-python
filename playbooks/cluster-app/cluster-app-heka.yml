@@ -1,0 +1,8 @@
+---
+
+- hosts: "cluster-app"
+  roles:
+
+    - "wistla-heka-agent"
+
+# ex: et ts=2 filetype=yaml

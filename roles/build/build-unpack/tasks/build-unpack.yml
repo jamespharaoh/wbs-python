@@ -1,5 +1,15 @@
 ---
 
+- name: "build unpack rzbackup start"
+  delegate_to: "localhost"
+  run_once: "yes"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "rzbackup"
+    state: "started"
+
 - name: "build unpack server reindex"
   delegate_to: "localhost"
   run_once: "yes"

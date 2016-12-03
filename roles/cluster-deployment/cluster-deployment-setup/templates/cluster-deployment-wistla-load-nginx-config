@@ -92,13 +92,12 @@ http {
 
 {% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 	{{ upstream ('api', 7000) }}
+	{{ upstream ('browser', 3000) }}
 {% endif %}
 
 {% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
 	{{ upstream ('api2', 3000) }}
 {% endif %}
-
-	{{ upstream ('browser', 3000) }}
 
 	# api
 
@@ -219,13 +218,13 @@ http {
 			proxy_set_header Connection "";
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /in {
 			proxy_pass http://browser;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
 
-{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
@@ -278,6 +277,7 @@ http {
 			return 307 https://{{ cluster_deployment_alias.main_domain }}/;
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /robots.txt {
 			alias /home/ubuntu/wistla-browser/static/robots.txt;
 		}
@@ -294,7 +294,6 @@ http {
 			proxy_set_header Connection "";
 		}
 
-{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;

@@ -1,22 +1,17 @@
 ---
 
-# ========== app
+- include: "cluster-app/cluster-app-create.yml"
 
 - hosts: "cluster-app"
   roles:
 
-    - "cluster-create"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
-
     - "cluster-system"
+    - "setup-dns"
     - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
-    - "setup-dns"
     - "setup-system"
     - "setup-logging"
-
     - "cluster-ssh"
     - "system-packages-install"
     - "install-kernel"
@@ -24,9 +19,11 @@
     - "cluster-volumes"
     - "cluster-user"
 
-    - "wistla-heka-agent"
+- include: "cluster-app/cluster-app-heka.yml"
+- include: "cluster-app/cluster-app-python.yml"
 
-    - "python"
+- hosts: "cluster-app"
+  roles:
 
     - "cluster-app-network"
 
@@ -55,8 +52,7 @@
     - "cluster-app-lxc"
     - "cluster-app-cron"
 
-    - "rzbackup"
-
+- include: "cluster-app/cluster-app-rzbackup.yml"
 - include: "cluster-app/cluster-app-activate.yml"
 
 # ex: et ts=2 filetype=yaml

@@ -64,21 +64,21 @@ ubuntu_apt_proxy_url: "http://wistla-{{ cluster_name }}-admin-{{ instance_zone }
 ubuntu_sources_default:
 
   - url: "{{ ubuntu_main_url }}"
-    source: "trusty"
+    source: "{{ ubuntu_release }}"
     repositories:
 
       - "main"
       - "universe"
 
   - url: "{{ ubuntu_main_url }}"
-    source: "trusty-updates"
+    source: "{{ ubuntu_release }}-updates"
     repositories:
 
       - "main"
       - "universe"
 
   - url: "{{ ubuntu_security_url }}"
-    source: "trusty-security"
+    source: "{{ ubuntu_release }}-security"
     repositories:
 
       - "main"
@@ -90,6 +90,9 @@ ubuntu_sources: "{{ []
   | union (ubuntu_sources_default)
   | union (ubuntu_sources_extra)
 }}"
+
+ubuntu_release: "{{ cluster.ubuntu_release }}"
+system_init: "{{ cluster.system_init }}"
 
 icinga_core_install: "yes"
 icinga_core_install_version: "2.4.10-12-trusty"

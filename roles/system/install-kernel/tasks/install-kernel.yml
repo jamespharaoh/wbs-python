@@ -20,9 +20,9 @@
   when: "install_kernel_result.changed"
   tags: "reboot"
   become: "yes"
-  command: "shutdown -r now"
+  command: "shutdown -r"
 
-- name: "waiting for server to reboot"
+- name: "waiting for server to start"
   when: "install_kernel_result.changed"
   tags: "reboot"
   connection: "local"
@@ -32,6 +32,6 @@
     host: "{{ ansible_ssh_host }}"
     state: "started"
     port: "22"
-    delay: "10"
+    delay: "90"
 
 # ex: et ts=2 filetype=yaml

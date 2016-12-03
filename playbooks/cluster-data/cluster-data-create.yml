@@ -1,0 +1,11 @@
+---
+
+- hosts: "cluster-data:&cluster-instance-active"
+  roles:
+
+    - "cluster-stop"
+    - "cluster-create"
+    - "wait-for-ssh"
+    - "scan-ssh-key"
+
+# ex: et ts=2 filetype=yaml

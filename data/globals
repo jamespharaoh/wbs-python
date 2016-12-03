@@ -144,10 +144,7 @@ zone_colours:
   b: "99"
   c: "105"
 
-ubuntu_release: "trusty"
 ubuntu_mirror: "http:/"
-
-system_init: "upstart"
 
 my_system_packages: []
 
@@ -235,7 +232,6 @@ python_pip:
 
 python_apt:
 
-  version: "0.9.3-1"
   url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
@@ -336,7 +332,7 @@ zbackup_cache_size: "512mb"
 builds_path: "{{ (
   deployment_home + '/builds'
 ) if deployment_mode == 'vagrant' else (
-  '/home/ubuntu/builds'
+  '/data/builds'
 ) }}"
 
 fixtures_host_suffix: "{{
