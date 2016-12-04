@@ -10,6 +10,15 @@ etcd:
 etcd_installed_version: "2.2.2"
 etcd_needs_restart: "yes"
 etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "yes"
+heka_state: "enabled"
 instance_id: "i-8ea9734e"
 mysql: 
   
