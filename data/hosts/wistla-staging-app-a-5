@@ -1,6 +1,7 @@
 ---
 
-amazon_instance_type_running: "m3.medium"
+amazon_instance_state: "standby"
+amazon_instance_type_running: "t2.micro"
 heka: 
   
   installed_version: "0.10.0"

@@ -33,10 +33,11 @@
         'a': 1,
         'b': 2,
         'c': 3,
+        'd': 4,
       } [instance_zone]
     }}"
 
-- name: "cluster admin zookeeper reload"
+- name: "cluster admin zookeeper restart"
   changed_when: "
     cluster_admin_zookeeper_config_result | changed
     or cluster_admin_zookeeper_server_id_result | changed
@@ -46,6 +47,6 @@
 
     module: "service"
     name: "zookeeper"
-    state: "reloaded"
+    state: "restarted"
 
 # ex: et ts=2 filetype=yaml
