@@ -33,6 +33,6 @@
 
     module: "service"
     name: "cron"
-    state: "reloaded"
+    state: "restarted"
 
 # ex: et ts=2 filetype=yaml
