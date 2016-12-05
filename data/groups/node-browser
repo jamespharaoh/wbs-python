@@ -8,18 +8,6 @@ my_system_packages:
   - name: "npm"
     state: "present"
 
-#nodejs_packages:
-#
-#  - name: "node-gyp"
-#    version: "3.2.1"
-#
-#  - name: "node-inspector"
-#    version: "0.12.5"
-
-#network_route_localnet: "{{
-#  [ 'eth0' ] if dev_debug | default ('no') == #'yes' else []
-#}}"
-
 node_deploy_projects:
 
   - name: "wistla-browser"
@@ -44,5 +32,18 @@ node_deploy_projects:
     type: "nodejs"
 
 nodejs_version: "{{ deployment.nodejs_version_legacy }}"
+
+nodejs_packages: []
+#
+#  - name: "node-gyp"
+#    version: "3.2.1"
+#
+#  - name: "node-inspector"
+#    version: "0.12.5"
+
+#network_route_localnet: "{{
+#  [ 'eth0' ] if dev_debug | default ('no') == #'yes' else []
+#}}"
+
 
 # ex: et ts=2 filetype=yaml

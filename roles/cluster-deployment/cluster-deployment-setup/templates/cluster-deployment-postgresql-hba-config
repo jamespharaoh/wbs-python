@@ -21,3 +21,9 @@ host replication all {{ other_deployment.bridge_network }}.0.0/16 trust
 
 {% endif %}
 {% endfor %}
+
+{% for vpn_client in vpn_clients %}
+{% for vpn_network in cluster.vpn_networks | values %}
+host all all {{ vpn_network }}.{{ vpn_client.vpn_ip }}/32 trust
+{% endfor %}
+{% endfor %}

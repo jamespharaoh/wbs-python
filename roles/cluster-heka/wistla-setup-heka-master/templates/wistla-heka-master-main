@@ -88,6 +88,9 @@ message_matcher = 'Fields[Category] == "system"'
 encoder = "encoder-simple"
 
 {% for log_name in [
+	'load-nginx-access',
+	'load-nginx-error',
+	'load-nginx-times',
 	'service',
 	'wistla-api',
 	'wistla-api-server',

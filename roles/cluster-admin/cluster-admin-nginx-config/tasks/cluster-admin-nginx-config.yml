@@ -56,15 +56,22 @@
     src: "{{ item.template }}"
 
 - name: "create nginx dev configs"
-  with_items: "{{ dev_deployments }}"
+  with_items: "{{ dev_deployment_names }}"
   when: "
-    item.type == 'simple'
-    and item.main_domain in cluster.admin_certificates
+    dev_deployments [item].type == 'simple'
+    and dev_deployments [item].main_domain in cluster.admin_certificates
   "
   action:
 
     module: "template"
-    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/sites/dev-{{ item.name }}.conf"
+    dest: "{{ [
+      WORK,
+      '/cluster/',
+      cluster_name,
+      '/nginx/sites/dev-',
+      dev_deployments [item].name,
+      '.conf',
+    ] | join }}"
     src: "cluster-admin-nginx-dev-config"
 
     mode: "0644"
