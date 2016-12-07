@@ -144,7 +144,7 @@
   depends:
 
     - "wistla-db"
-#    - "wistla-email"
+    - "wistla-email"
     - "wistla-notifications"
     - "wistla-pubsub"
     - "wistla-util"
