@@ -115,6 +115,17 @@
 
     - "npm install"
 
+- name: "wistla-email"
+  default_branch: "development"
+  npm_name: "@wistla/email"
+  description:
+
+    TODO
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-media-daemon"
   default_branch: "development"
   npm_name: "@wistla/media-daemon"

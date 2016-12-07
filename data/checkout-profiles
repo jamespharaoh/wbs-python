@@ -23,6 +23,9 @@ developer_full:
   - name: "wistla-db-daemon"
     branch: "development"
 
+  - name: "wistla-email"
+    branch: "development"
+
   - name: "wistla-media-daemon"
     branch: "development"
 
@@ -153,6 +156,9 @@ developer_jenkins:
     branch: "development"
 
   - name: "wistla-db-schema"
+    branch: "development"
+
+  - name: "wistla-email"
     branch: "development"
 
   - name: "wistla-i18n"
