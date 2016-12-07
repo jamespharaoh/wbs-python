@@ -144,6 +144,7 @@
   depends:
 
     - "wistla-db"
+#    - "wistla-email"
     - "wistla-notifications"
     - "wistla-pubsub"
     - "wistla-util"
@@ -219,6 +220,23 @@
   short: "send push notifications"
   default_branch: "development"
   npm_name: "@wistla/notifications"
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-i18n"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-email"
+  short: "sending emails et al"
+  default_branch: "development"
+  npm_name: "@wistla/email"
 
   depends:
 

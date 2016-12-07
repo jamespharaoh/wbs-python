@@ -47,6 +47,9 @@ developer_full:
   - name: "wistla-db-schema"
     branch: "development"
 
+  - name: "wistla-email"
+    branch: "development"
+
   - name: "wistla-raml-api"
     branch: "development"
 
@@ -153,6 +156,9 @@ developer_jenkins:
     branch: "development"
 
   - name: "wistla-db-schema"
+    branch: "development"
+
+  - name: "wistla-email"
     branch: "development"
 
   - name: "wistla-i18n"
