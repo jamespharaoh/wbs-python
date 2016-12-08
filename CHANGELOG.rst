@@ -2,6 +2,31 @@
 CHANGELOG
 =========
 
+1.4.84
+======
+
+* feature:``config``: Update config client to latest version
+* feature:health: Add paginators for Health.
+* feature:``sqs``: Update sqs client to latest version
+* feature:``s3``: Update s3 client to latest version
+
+
+1.4.83
+======
+
+* feature:``pinpoint``: Update pinpoint client to latest version
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``sts``: Update sts client to latest version
+* feature:``config``: Update config client to latest version
+
+
+1.4.82
+======
+
+* bugfix:Exceptions: Allow parsing of json error responses with non-json bodies.
+* feature:opsworks-cm: Added waiter for Opsworks CM
+
+
 1.4.81
 ======
 
