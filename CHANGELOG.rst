@@ -2,6 +2,29 @@
 CHANGELOG
 =========
 
+1.11.27
+=======
+
+* feature:``config``: Update config command to latest version
+* feature:``sqs``: Update sqs command to latest version
+* feature:``s3``: Update s3 command to latest version
+
+
+1.11.26
+=======
+
+* feature:``sts``: Update sts command to latest version
+* feature:``config``: Update config command to latest version
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``pinpoint``: Update pinpoint command to latest version
+
+
+1.11.25
+=======
+
+* bugfix:opsworks-cm: Rename opsworkscm to opsworks-cm, keeping support for opsworkscm.
+
+
 1.11.24
 =======
 
