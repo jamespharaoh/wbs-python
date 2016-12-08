@@ -127,7 +127,6 @@
     - "{{ cluster.vpn_upstream_clusters }}"
     - [ "a", "b", "c" ]
 
-  notify: "restart openvpn"
   become: "yes"
   action:
 
@@ -141,6 +140,13 @@
     ] | join }}"
     src: "openvpn-config-client"
 
-- meta: "flush_handlers"
+- name: "restart openvpn"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "openvpn"
+    state: "restarted"
+    enabled: "yes"
 
 # ex: et ts=2 filetype=yaml
