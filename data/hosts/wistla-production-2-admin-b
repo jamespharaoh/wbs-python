@@ -1,7 +1,83 @@
 ---
 
 amazon_instance_type_running: "m4.large"
+etcd: 
+  
+  installed_version: "2.2.2"
+  needs_restart: "yes"
+  state: "enabled"
+
+etcd_installed_version: "2.2.2"
+etcd_needs_restart: "yes"
+etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "yes"
+heka_state: "enabled"
 instance_id: "i-6ead11f6"
+mysql: 
+  
+  installed_from: "distro"
+  needs_restart: "no"
+  state: "enabled"
+
+mysql_installed_from: "distro"
+mysql_needs_restart: "no"
+mysql_state: "enabled"
+nginx: 
+  
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.9.14"
+  installed_version: "1.9.14"
+  needs_restart: "yes"
+  state: "enabled"
+
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.9.14"
+nginx_installed_version: "1.9.14"
+nginx_needs_restart: "yes"
+nginx_state: "enabled"
+php: 
+  
+  fpm_socket: "/run/php/php7.0-fpm.sock"
+  installed_from: "distro"
+  installed_service: "php7.0-fpm"
+  installed_version: "7.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+php_fpm_socket: "/run/php/php7.0-fpm.sock"
+php_installed_from: "distro"
+php_installed_service: "php7.0-fpm"
+php_installed_version: "7.0"
+php_needs_restart: "yes"
+php_state: "enabled"
+python: 
+  
+  installed_version: "2.7.11"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "2.7.11/1.1.0~beta1-1"
+  state: "installed"
+
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.11"
+python_pip: 
+  
+  installed_version: "2.7.11/8.1.1"
+  state: "installed"
+
+python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_state: "installed"
+python_state: "installed"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBE8iIRw6hyo82I1NqAmxIItKZQzpDee+X9Awo1YysPQ8o3PEov/yo/2wzHQ6rh9UK8l6O+wnNlYT7Yo/APljyws="
@@ -9,6 +85,18 @@ ssh:
 
 ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBE8iIRw6hyo82I1NqAmxIItKZQzpDee+X9Awo1YysPQ8o3PEov/yo/2wzHQ6rh9UK8l6O+wnNlYT7Yo/APljyws="
 ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+1Lzp82+EJUxKE2bJ9hUh1nSg4s+zVoou0EzAN3OzRHdUakcUU3s0+G8/UH8GlNVVPi8Xe3ZW2bX4d7cUDr2cFQBFdPJZIMFaA6h0nkzlOuZWA5JxqDxpGwvynS0sApVQ2TAaV1QuNFl2oLZa5MUvMikZ0s5SR3A2GQgODHREe/pMYlKUE4IYsqkELQ5OoX3RACfm4G+2lVyHVf1j+cGlCKul3vwCCjFPxZrtudP3s9r9aug19XsGnAxiuajwYI4s/2LfQqXfwccOYQljvH97dDYZSietMeUvhYhOuRefK+hcXT+M0jwTnNWDE8frUAktuw8qhcZxMw3i0qme6IsJ"
+volume_ids: 
+  
+  system: "vol-62e521fd"
+
+volume_ids_system: "vol-62e521fd"
+vpn_server: 
+  
+  certificate: "/authority/ops-vpn/issue/49/certificate"
+  private_key: "/authority/ops-vpn/issue/49/key"
+
+vpn_server_certificate: "/authority/ops-vpn/issue/49/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/49/key"
 
 
 # ex: et ts=2 filetype=yaml

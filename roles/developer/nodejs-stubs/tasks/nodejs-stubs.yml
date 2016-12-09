@@ -51,7 +51,9 @@
     fi;
 
 - name: "create stubs for nodejs legacy bins"
-  when: "nodejs_version_legacy is defined"
+  when: "
+    nodejs_version_legacy != ''
+  "
   register: "nodejs_legacy_stubs_result"
   changed_when: "
     nodejs_legacy_stubs_result.stdout | default ('') != 'UNCHANGED'

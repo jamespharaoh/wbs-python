@@ -34,11 +34,17 @@
     - "nodejs-packages-install"
 
     - role: "nodejs-install"
-      when: "nodejs_version != nodejs_version_legacy"
+      when: "
+        nodejs_version_legacy != ''
+        and nodejs_version != nodejs_version_legacy
+      "
       nodejs_version: "{{ nodejs_version_legacy }}"
 
     - role: "nodejs-packages-install"
-      when: "nodejs_version != nodejs_version_legacy"
+      when: "
+        nodejs_version_legacy != ''
+        and nodejs_version != nodejs_version_legacy
+      "
       nodejs_version: "{{ nodejs_version_legacy }}"
       nodejs_packages: "{{ nodejs_packages_legacy }}"
 

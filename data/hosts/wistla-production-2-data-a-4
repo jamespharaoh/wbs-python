@@ -1,7 +1,63 @@
 ---
 
 amazon_instance_type_running: "m4.large"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "yes"
+heka_state: "enabled"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/110/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "yes"
+  private_key: "/authority/icinga/issue/110/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/110/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "yes"
+icinga_core_private_key: "/authority/icinga/issue/110/key"
+icinga_core_state: "enabled"
 instance_id: "i-3505d322"
+python: 
+  
+  installed_version: "2.7.11"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "2.7.11/1.1.0~beta1-1"
+  state: "installed"
+
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.11"
+python_pip: 
+  
+  installed_version: "2.7.11/8.1.1"
+  state: "installed"
+
+python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_state: "installed"
+python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+  installed_version: "2.0.7-trusty"
+  needs_restart: "no"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-trusty"
+rzbackup_installed_version: "2.0.7-trusty"
+rzbackup_needs_restart: "no"
+rzbackup_state: "enabled"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIW09aKrf7NN940Kwn8GOrRbJvxN9f26Th0oDyf5H94QyJIl3I843Ag3eZk1auzfvCM2Ft46RjSBhtq47UAixjw="
@@ -9,6 +65,13 @@ ssh:
 
 ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIW09aKrf7NN940Kwn8GOrRbJvxN9f26Th0oDyf5H94QyJIl3I843Ag3eZk1auzfvCM2Ft46RjSBhtq47UAixjw="
 ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPtG5CNkC6JH/yDdzxLMW9rrx70Z14m92HonWS/V/ZPdeuxefiDYGQLxb8Y2mCTqNt9I5RT5sUqdc4KN5l2Bgke3wK/zcOs5QNPmqvARngtWdY3ErbC/oClhY9IuiAViNjVZlThT3+ROc3JwKu5Qa4vSM4bDf/UZ3bM/l4jeHlug6mpQmjXKl2oD7HxXfHMQHO1affTDlr0XcjuUjr/SjS0EsQB4NNp8v2IaR4aBP5+Hy2eNTK89nUYTdICXeqyH/VPP86GRb/meo1eh2Thogv5bOl8HGkdd0LJsJhyfhlpugwAbnkkFnLNHx4XydYbFJP3hh7nR/ubcOMtmVWBrfL"
+volume_ids: 
+  
+  data: "vol-31fa42a2"
+  system: "vol-effa427c"
+
+volume_ids_data: "vol-31fa42a2"
+volume_ids_system: "vol-effa427c"
 
 
 # ex: et ts=2 filetype=yaml
