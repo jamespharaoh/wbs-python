@@ -85,12 +85,15 @@ http {
 # upstream servers per deployment
 #
 
+{% for deployment_group_name in cluster.deployment_group_names %}
+
+	upstream deployment-{{ deployment_group_name }}-1 {
+
 {% for proxy_deployment_name in cluster.proxy_deployment_names %}
 {% set proxy_deployment = deployments [proxy_deployment_name] %}
-{% if proxy_deployment.type in [ 'alias', 'alias2', 'simple', 'simple2' ] %}
+{% if deployment_group_name in proxy_deployment.group_names %}
+{% if proxy_deployment.type in [ 'alias', 'simple' ] %}
 {% set proxy_deployment_cluster = clusters [proxy_deployment.cluster_name] %}
-
-	upstream deployment-{{ proxy_deployment_name }} {
 
 {% for index in proxy_deployment_cluster.instance_formation.app.indices %}
 {% for zone in proxy_deployment_cluster.instance_formation.app.zones %}
@@ -106,11 +109,44 @@ http {
 {% endfor %}
 {% endfor %}
 
+{% endif %}
+{% endif %}
+{% endfor %}
+
 		keepalive 32;
 
 	}
 
+	upstream deployment-{{ deployment_group_name }}-2 {
+
+{% for proxy_deployment_name in cluster.proxy_deployment_names %}
+{% set proxy_deployment = deployments [proxy_deployment_name] %}
+{% if deployment_group_name in proxy_deployment.group_names %}
+{% if proxy_deployment.type in [ 'alias2', 'simple2' ] %}
+{% set proxy_deployment_cluster = clusters [proxy_deployment.cluster_name] %}
+
+{% for index in proxy_deployment_cluster.instance_formation.app.indices %}
+{% for zone in proxy_deployment_cluster.instance_formation.app.zones %}
+		server {{ [
+			[
+				proxy_deployment_name,
+				'load',
+				zone,
+				index,
+			] | join ('-'),
+			'fail_timeout=60s;',
+		] | join (' ') }}
+{% endfor %}
+{% endfor %}
+
 {% endif %}
+{% endif %}
+{% endfor %}
+
+		keepalive 32;
+
+	}
+
 {% endfor %}
 
 {# ###################### default site for test #}
@@ -214,36 +250,11 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.main_domain }}";
 			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
-
-		}
-
-		location /keystone {
-
-			auth_basic "Restricted";
-			auth_basic_user_file {{ nginx_config }}/htpasswd;
-
-			proxy_pass http://deployment-{{ target }}/keystone;
-			proxy_http_version 1.1;
-			proxy_set_header Connection "";
-			proxy_set_header Host "{{ deployment.main_domain }}";
-			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
-
-		}
-
-		location /TEST {
-
-			proxy_pass http://deployment-{{ target }};
-			proxy_http_version 1.1;
-			proxy_set_header Connection "";
-			proxy_set_header Host "{{ deployment.main_domain }}";
-			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
-
-{{ restrictions }}
 
 		}
 
@@ -286,7 +297,17 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "api.{{ deployment.main_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+		}
+
+		location /v2 {
+
+			proxy_pass http://deployment-{{ target }}-2/v2;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "api.{{ deployment.main_domain }}";
@@ -296,7 +317,7 @@ http {
 
 		location /TEST {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "api.{{ deployment.main_domain }}";
@@ -351,7 +372,7 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "admin.{{ deployment.main_domain }}";
@@ -361,7 +382,7 @@ http {
 
 		location /TEST {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "admin.{{ deployment.main_domain }}";
@@ -417,7 +438,7 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.short_domain }}";
@@ -427,7 +448,7 @@ http {
 
 		location /TEST {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.short_domain }}";
@@ -485,7 +506,7 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_domain }}";
@@ -495,7 +516,7 @@ http {
 
 		location /TEST {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_domain }}";
@@ -530,7 +551,7 @@ http {
 
 		location / {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_origin_domain }}";
@@ -540,7 +561,7 @@ http {
 
 		location /TEST {
 
-			proxy_pass http://deployment-{{ target }};
+			proxy_pass http://deployment-{{ target }}-1;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_set_header Host "{{ deployment.assets_origin_domain }}";

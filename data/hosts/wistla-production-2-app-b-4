@@ -45,6 +45,17 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-2.0.7-xenial"
+  installed_version: "2.0.7-xenial"
+  needs_restart: "no"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-xenial"
+rzbackup_installed_version: "2.0.7-xenial"
+rzbackup_needs_restart: "no"
+rzbackup_state: "enabled"
 ssh: 
   
   host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEUT9aftr7Oqes23KhxfwKOczHtetbkk27r1T+kbfMKg9jiKGHjj7REzzHuuR4oyY1aDR9cDls1TD67lEYhYCsI="

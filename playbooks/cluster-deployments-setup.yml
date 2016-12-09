@@ -2,6 +2,8 @@
 
 # TODO generate this file
 
+# ----------- production-1
+
 - hosts: "cluster-production-app:&cluster-instance-active"
   roles:
 
@@ -19,6 +21,28 @@
     - role: "cluster-deployment-setup"
       cluster_deployment_name: "production"
       tags: [ "cluster-deployment", "production" ]
+
+# ----------- production-2
+
+- hosts: "cluster-production-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "production-2-a"
+      tags: [ "cluster-deployment", "production-2-a" ]
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "production-2-b"
+      tags: [ "cluster-deployment", "production-2-b" ]
+
+- hosts: "cluster-production-2-data:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      cluster_deployment_name: "production-2"
+      tags: [ "cluster-deployment", "production-2" ]
+
+# ----------- etc
 
 - hosts: "cluster-staging-app:&cluster-instance-active"
   roles:
