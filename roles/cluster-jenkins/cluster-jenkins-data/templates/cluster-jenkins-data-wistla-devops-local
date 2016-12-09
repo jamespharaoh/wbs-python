@@ -60,6 +60,7 @@ deployments:
   'kafka',
   'kafka_version',
   'mailchimp_api_key',
+  'mailchimp_list_id',
   'main_domain',
   'mandrill_api_key',
   'node_memory',
