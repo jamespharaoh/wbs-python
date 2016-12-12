@@ -36,7 +36,7 @@
     kafka:
       client_id: "db-audit-log"
       max_batch_size: 16
-      url: "wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka" 
+      url: "wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka"
       urls:
         - "wistla-{{ deployment_name }}-dev/wistla-{{ deployment_name }}-dev/kafka"
 
@@ -46,6 +46,14 @@
 
     level: "trace"
     time_level: "trace"
+
+# @wistla/email config
+  email:
+    mailchimp:
+      list_id: "{{ deployment.mailchimp_list_id }}"
+      api_key: "{{ deployment.mailchimp_api_key }}"
+    mandrill:
+      api_key: "{{ deployment.mandrill_api_key }}"
 
 # @wistla/notifications config
   notifications:

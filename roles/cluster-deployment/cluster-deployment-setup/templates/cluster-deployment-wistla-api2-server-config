@@ -84,6 +84,14 @@
     level: "trace"
     time_level: "trace"
 
+# @wistla/email config
+  email:
+    mailchimp:
+      list_id: "{{ cluster_deployment.mailchimp_list_id }}"
+      api_key: "{{ cluster_deployment.mailchimp_api_key }}"
+    mandrill:
+      api_key: "{{ cluster_deployment.mandrill_api_key }}"
+
 # @wistla/notifications config
   notifications:
     enabled: true
