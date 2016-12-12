@@ -99,4 +99,13 @@
 - network: "10.176"
   deployment: "staging-2-b"
 
+- network: "10.177"
+  deployment: "production-2"
+
+- network: "10.178"
+  deployment: "production-2-a"
+
+- network: "10.179"
+  deployment: "production-2-b"
+
 # ex: et ts=2 filetype=yaml
