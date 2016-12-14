@@ -484,6 +484,8 @@ class TestRequests:
         'username, password', (
             ('user', 'pass'),
             (u'имя'.encode('utf-8'), u'пароль'.encode('utf-8')),
+            (42, 42),
+            (None, None),
         ))
     def test_set_basicauth(self, httpbin, username, password):
         auth = (username, password)
@@ -493,6 +495,16 @@ class TestRequests:
         p = r.prepare()
 
         assert p.headers['Authorization'] == _basic_auth_str(username, password)
+
+    def test_basicauth_encodes_byte_strings(self):
+        """Ensure b'test' formats as the byte string "test" rather
+        than the unicode string "b'test'" in Python 3.
+        """
+        auth = (b'\xc5\xafsername', b'test\xc6\xb6')
+        r = requests.Request('GET', 'http://localhost', auth=auth)
+        p = r.prepare()
+
+        assert p.headers['Authorization'] == 'Basic xa9zZXJuYW1lOnRlc3TGtg=='
 
     @pytest.mark.parametrize(
         'url, exception', (
@@ -1692,6 +1704,42 @@ class TestRequests:
         assert not resp.raw.closed
         resp.close()
         assert resp.raw.closed
+
+    def test_empty_stream_with_auth_does_not_set_content_length_header(self, httpbin):
+        """Ensure that a byte stream with size 0 will not set both a Content-Length
+        and Transfer-Encoding header.
+        """
+        auth = ('user', 'pass')
+        url = httpbin('post')
+        file_obj = io.BytesIO(b'')
+        r = requests.Request('POST', url, auth=auth, data=file_obj)
+        prepared_request = r.prepare()
+        assert 'Transfer-Encoding' in prepared_request.headers
+        assert 'Content-Length' not in prepared_request.headers
+
+    def test_stream_with_auth_does_not_set_transfer_encoding_header(self, httpbin):
+        """Ensure that a byte stream with size > 0 will not set both a Content-Length
+        and Transfer-Encoding header.
+        """
+        auth = ('user', 'pass')
+        url = httpbin('post')
+        file_obj = io.BytesIO(b'test data')
+        r = requests.Request('POST', url, auth=auth, data=file_obj)
+        prepared_request = r.prepare()
+        assert 'Transfer-Encoding' not in prepared_request.headers
+        assert 'Content-Length' in prepared_request.headers
+
+    def test_chunked_upload_does_not_set_content_length_header(self, httpbin):
+        """Ensure that requests with a generator body stream using
+        Transfer-Encoding: chunked, not a Content-Length header.
+        """
+        data = (i for i in [b'a', b'b', b'c'])
+        url = httpbin('post')
+        r = requests.Request('POST', url, data=data)
+        prepared_request = r.prepare()
+        assert 'Transfer-Encoding' in prepared_request.headers
+        assert 'Content-Length' not in prepared_request.headers
+
 
 class TestCaseInsensitiveDict:
 
