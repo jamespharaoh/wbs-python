@@ -232,6 +232,7 @@ python_pip:
 
 python_apt:
 
+  version: "0.9.3-1"
   url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
