@@ -32,7 +32,6 @@
 
 - name: "create wistla icinga configuration"
   with_items: "wistla_icinga_slave_config_templates"
-  notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
   action:
 
@@ -45,7 +44,6 @@
 
 - name: "create wistla security configuration"
   with_items: "wistla_icinga_security_config"
-  notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
   action:
 
