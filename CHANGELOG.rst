@@ -2,6 +2,39 @@
 CHANGELOG
 =========
 
+1.4.85
+======
+
+* feature:cloudfront: Add lambda function associations to cache behaviors.
+* feature:rds: Add cluster create data to DBCluster APIs.
+* feature:waf-regional: With this new feature, customers can use AWS WAF directly on Application Load Balancers in a VPC within available regions to protect their websites and web services from malicious attacks such as SQL injection, Cross Site Scripting, bad bots, etc.
+
+
+1.4.84
+======
+
+* feature:``config``: Update config client to latest version
+* feature:health: Add paginators for Health.
+* feature:``sqs``: Update sqs client to latest version
+* feature:``s3``: Update s3 client to latest version
+
+
+1.4.83
+======
+
+* feature:``pinpoint``: Update pinpoint client to latest version
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``sts``: Update sts client to latest version
+* feature:``config``: Update config client to latest version
+
+
+1.4.82
+======
+
+* bugfix:Exceptions: Allow parsing of json error responses with non-json bodies.
+* feature:opsworks-cm: Added waiter for Opsworks CM
+
+
 1.4.81
 ======
 
