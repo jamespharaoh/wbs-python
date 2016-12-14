@@ -5,11 +5,11 @@ amazon_instance_type_running: "m3.medium"
 etcd: 
   
   installed_version: "2.2.2"
-  needs_restart: "no"
+  needs_restart: "yes"
   state: "enabled"
 
 etcd_installed_version: "2.2.2"
-etcd_needs_restart: "no"
+etcd_needs_restart: "yes"
 etcd_state: "enabled"
 graphite_carbon: 
   

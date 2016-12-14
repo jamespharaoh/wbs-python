@@ -17,7 +17,6 @@ iptables \
 iptables \
 	--table nat \
 	--append POSTROUTING \
-	--out-interface ens3 \
 	--source {{ cluster.cluster_network }}.0.0/16 \
 	! --destination 10.0.0.0/8 \
 	--jump MASQUERADE
