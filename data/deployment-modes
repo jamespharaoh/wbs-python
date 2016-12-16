@@ -79,7 +79,7 @@ jenkins:
 
 cluster-shared:
 
-  build_secret_path: "/data/builds"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
@@ -97,7 +97,7 @@ cluster-shared:
 
 cluster-shared2:
 
-  build_secret_path: "/data/builds"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
@@ -120,7 +120,7 @@ cluster-shared2:
 
 cluster-alias:
 
-  build_secret_path: "/data/builds"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
@@ -141,7 +141,7 @@ cluster-alias:
 
 cluster-alias2:
 
-  build_secret_path: "/data/builds"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
@@ -164,7 +164,7 @@ cluster-alias2:
 
 cluster-simple:
 
-  build_secret_path: "/data/builds"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
