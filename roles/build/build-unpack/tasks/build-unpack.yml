@@ -49,15 +49,32 @@
 
     sudo btrfs subvolume create "$build_target/rootfs";
 
-    {
-      rzbackup-client restore
-        "localhost:4152"
-        "/{{ node_template }}-{{ deployment.deployed_build }}.tar";
-    } | {
-      sudo tar
-        --extract
-        --directory "$build_target/rootfs";
-    };
+    if false; then
+
+      {
+        rzbackup-client restore
+          "localhost:4152"
+          "/{{ node_template }}-{{ deployment.deployed_build }}.tar";
+      } | {
+        sudo tar
+          --extract
+          --directory "$build_target/rootfs";
+      };
+
+    else
+
+      {
+        zbackup restore
+          --password-file "{{ deployment_build_secret_path }}"
+          --silent
+          "/data/builds/backups/{{ node_template }}-{{ deployment.deployed_build }}.tar";
+      } | {
+        sudo tar
+          --extract
+          --directory "$build_target/rootfs";
+      };
+
+    fi;
 
 - name: "create lxc config"
   delegate_to: "localhost"

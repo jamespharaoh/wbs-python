@@ -25,10 +25,11 @@ schemas:
     ] | join }}"
     name: "wistla"
     exclude_tables:
-#      - computed_table_updates_map
       - config
+      - computed_table_updates_map
       - dirty_pants
-#      - test_fixtures
+      - table_weights
+      - test_fixtures
       - timezones
     path: ./schema.wistla.main.sql
     publish_changes: true
@@ -43,10 +44,11 @@ schemas:
     ] | join }}"
     name: "wistla"
     exclude_tables:
-#      - computed_table_updates_map
       - config
+#      - computed_table_updates_map
 #      - dirty_pants
-#      - test_fixtures
+      - table_weights
+      - test_fixtures
       - timezones
     path: "./schema.wistla.cache.sql"
     target_directory: "./schema.wistla.cache"
