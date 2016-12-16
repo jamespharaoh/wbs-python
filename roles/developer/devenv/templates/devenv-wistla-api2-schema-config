@@ -12,10 +12,11 @@ schemas:
     host: "{{ deployment_name }}-postgresql-main-0"
     name: wistla
     exclude_tables:
-#      - computed_table_updates_map
       - config
+      - computed_table_updates_map
       - dirty_pants
-#      - test_fixtures
+      - table_weights
+      - test_fixtures
       - timezones
     path: ./schema.wistla.main.sql
     publish_changes: true
@@ -25,10 +26,11 @@ schemas:
     host: "{{ deployment_name }}-postgresql-cache-0"
     name: wistla
     exclude_tables:
-#      - computed_table_updates_map
       - config
+#      - computed_table_updates_map
 #      - dirty_pants
-#      - test_fixtures
+      - table_weights
+      - test_fixtures
       - timezones
     path: ./schema.wistla.cache.sql
     target_directory: ./schema.wistla.cache
