@@ -6,7 +6,6 @@
     - "build-download"
 
 - hosts: "node-template-concrete"
-  serial: "1"
   roles:
 
     - "build-unpack"
