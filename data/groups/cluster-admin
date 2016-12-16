@@ -90,7 +90,10 @@ icinga_core_database_password: "{{ cluster_network.icinga_database_password }}"
 
 icinga_web_core_database_type: "mysql"
 icinga_web_core_database_hostname: "wistla-{{ cluster_name }}-admin-a"
-icinga_web_core_database_password: "{{ cluster_network.icinga_web_database_password }}"
+
+icinga_web_core_database_password: "{{
+  cluster_network.icinga_web_database_password
+}}"
 
 load_balancer_name: "{{ cluster_name }}-admin"
 
@@ -145,22 +148,44 @@ etcd_initial_cluster: "{{ [
   ] | join,
 ] | join (',') }}"
 
-etcd_peer_ca_certificate: "{{ cluster.etcd_credentials.peer_ca_certificate }}"
-etcd_peer_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].peer_certificate }}"
-etcd_peer_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].peer_private_key }}"
+etcd_peer_ca_certificate: "{{
+  cluster.etcd_credentials.peer_ca_certificate
+}}"
 
-etcd_client_ca_certificate: "{{ cluster.etcd_credentials.client_ca_certificate }}"
-etcd_client_certificate: "{{ cluster.etcd_credentials.admin [instance_zone].client_certificate }}"
-etcd_client_private_key: "{{ cluster.etcd_credentials.admin [instance_zone].client_private_key }}"
+etcd_peer_certificate: "{{
+  cluster.etcd_credentials.admin [instance_zone].peer_certificate
+}}"
+
+etcd_peer_private_key: "{{
+  cluster.etcd_credentials.admin [instance_zone].peer_private_key
+}}"
+
+etcd_client_ca_certificate: "{{
+  cluster.etcd_credentials.client_ca_certificate
+}}"
+
+etcd_client_certificate: "{{
+  cluster.etcd_credentials.admin [instance_zone].client_certificate
+}}"
+
+etcd_client_private_key: "{{
+  cluster.etcd_credentials.admin [instance_zone].client_private_key
+}}"
 
 php_install_from: "distro"
-php_install_version: "5"
+
+php_install_version: "{{
+  {
+    'trusty': '5',
+    'xenial': '7.0',
+  } [ubuntu_release]
+}}"
 
 php_packages:
 
-  - "php5-cli"
-  - "php5-fpm"
-  - "php5-mysql"
+  - "php{{ php_install_version }}-cli"
+  - "php{{ php_install_version }}-fpm"
+  - "php{{ php_install_version }}-mysql"
 
 nodejs_packages:
 

@@ -144,10 +144,7 @@ zone_colours:
   b: "99"
   c: "105"
 
-ubuntu_release: "trusty"
 ubuntu_mirror: "http:/"
-
-system_init: "upstart"
 
 my_system_packages: []
 
@@ -336,7 +333,7 @@ zbackup_cache_size: "512mb"
 builds_path: "{{ (
   deployment_home + '/builds'
 ) if deployment_mode == 'vagrant' else (
-  '/home/ubuntu/builds'
+  '/data/builds'
 ) }}"
 
 fixtures_host_suffix: "{{

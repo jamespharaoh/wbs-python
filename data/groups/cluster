@@ -18,11 +18,25 @@ node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
 nodejs_version: "{{ cluster.nodejs_version }}"
-nodejs_version_legacy: "{{ cluster.nodejs_version_legacy }}"
+nodejs_version_legacy: "{{ cluster.nodejs_version_legacy | default ('') }}"
 
 region_code: "{{ cluster.region_code }}"
 
 postfix_always_bcc: "{{ cluster.bcc_email }}"
+
+# ---------- amazon stuff
+
+amazon_access_key: "{{
+  amazon_credentials [amazon_account_name].access_key
+}}"
+
+amazon_secret_key: "{{
+  amazon_credentials [amazon_account_name].secret_key
+}}"
+
+amazon_session_token: "{{
+  amazon_credentials [amazon_account_name].session_token
+}}"
 
 # ---------- repository urls
 

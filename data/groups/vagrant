@@ -7,6 +7,10 @@ vagrant_home: "{{ deployment_home }}"
 
 devbox_mailchimp_account: "{{ mailchimp_accounts.test }}"
 
+system_init: "upstart"
+
+ubuntu_release: "trusty"
+
 ubuntu_apt_proxy_url: "http://localhost:3142"
 
 ubuntu_sources:

@@ -7,7 +7,7 @@ instance_type_colour: "202"
 ubuntu_sources_extra:
 
   - url: "http://apt.postgresql.org/pub/repos/apt/"
-    source: "trusty-pgdg"
+    source: "{{ ubuntu_release }}-pgdg"
     repositories:
 
       - "main"
@@ -202,7 +202,7 @@ cluster_create_volumes:
 
 nginx_install_version: "{{ supercluster.app_nginx_version }}"
 
-rzbackup_install_version: "2.0.7-trusty"
+rzbackup_install_version: "2.0.7-{{ ubuntu_release }}"
 rzbackup_user: "ubuntu"
 rzbackup_repository: "/home/ubuntu/builds"
 rzbackup_password_file: "/run/wistla-build-secret"
