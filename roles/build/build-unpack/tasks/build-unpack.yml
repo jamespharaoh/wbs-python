@@ -57,7 +57,7 @@
         zbackup restore
           --password-file "{{ deployment_build_secret_path }}"
           --silent
-          "/{{ node_template }}-{{ deployment.deployed_build }}.tar";
+          "/data/builds/backups/{{ node_template }}-{{ deployment.deployed_build }}.tar";
       } | {
         sudo tar
           --extract
