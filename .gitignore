@@ -3,6 +3,7 @@
 /.state
 /accounts
 /config
+/data/groups/all
 /data/runtime/*
 !/data/runtime/wistla-ops-*
 !/data/runtime/wistla-production-*
