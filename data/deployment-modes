@@ -189,7 +189,7 @@ cluster-simple:
 
 cluster-simple2:
 
-  build_secret_path: "/run/user/1000/wistla-build-secret"
+  build_secret_path: "/run/wistla-build-secret"
 
   node_templates:
 
