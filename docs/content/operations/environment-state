@@ -21,7 +21,7 @@ and paste the commands below. The rabbitmq passwords must match what are
 configured in the deployment resource.
 
 ```sh
-ssh wistla-test-app-a-4
+ssh wistla-test-app-$INSTANCE_ZONE
 
 deployment_name="test-xxx"
 rabbitmq_api_password="password"
@@ -31,24 +31,24 @@ rabbitmq_admin_password="password"
 Setup the main postgresql cluster:
 
 ```sh
-$deployment_name-postgresql-main-a-4 \
+$deployment_name-postgresql-main-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/initdb \
 	--pgdata "/var/lib/postgresql/9.5/main" \
 	--encoding "utf-8"
 
-$deployment_name-postgresql-main-a-4 \
+$deployment_name-postgresql-main-$INSTANCE_ZONE \
 sudo service postgresql start
 
-$deployment_name-postgresql-main-a-4 \
+$deployment_name-postgresql-main-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
-$deployment_name-postgresql-main-a-4 \
+$deployment_name-postgresql-main-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
 
-$deployment_name-postgresql-main-a-4 \
+$deployment_name-postgresql-main-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
 ```
@@ -56,24 +56,24 @@ sudo -H -u "postgres" \
 And the cache cluster:
 
 ```sh
-$deployment_name-postgresql-cache-a-4 \
+$deployment_name-postgresql-cache-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/initdb \
 	--pgdata "/var/lib/postgresql/9.5/main" \
 	--encoding "utf-8"
 
-$deployment_name-postgresql-cache-a-4 \
+$deployment_name-postgresql-cache-$INSTANCE_ZONE \
 sudo service postgresql start
 
-$deployment_name-postgresql-cache-a-4 \
+$deployment_name-postgresql-cache-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "ubuntu" --superuser
 
-$deployment_name-postgresql-cache-a-4 \
+$deployment_name-postgresql-cache-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "vagrant" --superuser
 
-$deployment_name-postgresql-cache-a-4 \
+$deployment_name-postgresql-cache-$INSTANCE_ZONE \
 sudo -H -u "postgres" \
 /usr/lib/postgresql/9.5/bin/createuser "wistla" --superuser
 ```
@@ -81,25 +81,25 @@ sudo -H -u "postgres" \
 Then rabbitmq:
 
 ```sh
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmq-plugins enable "rabbitmq_management"
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl add_user api "$rabbitmq_api_password"
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl set_user_tags "api" "management"
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl set_permissions "api" '.*' '.*' '.*'
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl add_user "admin" "$rabbitmq_admin_password"
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl set_user_tags "admin" "management"
 
-$deployment_name-rabbit-a-4 \
+$deployment_name-rabbit-$INSTANCE_ZONE \
 sudo rabbitmqctl set_permissions "admin" '.*' '.*' '.*'
 ```
 
