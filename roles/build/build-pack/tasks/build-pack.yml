@@ -92,6 +92,7 @@
         --create
         --one-file-system
         --directory "$build_source"
+        --exclude "/var/cache/apt/*"
         ".";
     } | {
       zbackup backup "$build_target.temp"
