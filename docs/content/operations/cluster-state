@@ -90,6 +90,35 @@ run `devbox-ssh`, then run the playbook again.
 This time, hopefully, the playbook should complete, and the instance should be
 available to use.
 
+## Starting, stopping and resizing instances
+
+Instances can be started and stopped using a playbook. This is often used, for
+example, in staging, which we may want to turn off when it is not being used, in
+order to save money.
+
+The process for resizing instances (ie changing the AWS instance type) is
+closely related, since this is achieved by stopping the instance, then starting
+it with the new instance type. This is automatically performed by the `start`
+playbook, if it detects that the instance type has been reconfigured for the
+cluster.
+
+TODO document this
+
 ## Standby instances
 
-TODO
+So that we can quickly scale up and down the number of instances in a cluster,
+we have the concept of standby instances. These are running instances of an
+extremely low-powered (ie cheap) instance type.
+
+They are included in all configuration and deployment operations, and so should
+always be up-to-date, but they will not run any containers, and they will not be
+activated in the Amazon load balancers and so won't perform any HTTP2
+termination.
+
+There are simple scripts to put an instance into standby mode. The start script
+will take an instance out of standby into normal active mode. In production, you
+must perform these operations on individual instance, and provide an extra
+variable on the command line with the instance name, to prevent accidentally
+taking all of the servers out at once.
+
+TODO document this
