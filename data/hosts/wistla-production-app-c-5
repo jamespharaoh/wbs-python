@@ -1,45 +1,16 @@
 ---
 
-amazon_instance_state: "standby"
-amazon_instance_type_running: "t2.micro"
+amazon_instance_type_running: "c4.large"
 heka: 
   
   installed_version: "0.10.0"
-  needs_restart: "no"
+  needs_restart: "yes"
   state: "enabled"
 
 heka_installed_version: "0.10.0"
-heka_needs_restart: "no"
+heka_needs_restart: "yes"
 heka_state: "enabled"
-icinga: 
-  
-  certificate: "/authority/icinga/issue/50/certificate"
-  installed_version: "2.4.2-1"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/50/key"
-  state: "enabled"
-
-icinga_certificate: "/authority/icinga/issue/50/certificate"
-icinga_core: 
-  
-  certificate: "/authority/icinga/issue/87/certificate"
-  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-  installed_version: "2.4.10-12-trusty"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/87/key"
-  state: "enabled"
-
-icinga_core_certificate: "/authority/icinga/issue/87/certificate"
-icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-icinga_core_installed_version: "2.4.10-12-trusty"
-icinga_core_needs_restart: "no"
-icinga_core_private_key: "/authority/icinga/issue/87/key"
-icinga_core_state: "enabled"
-icinga_installed_version: "2.4.2-1"
-icinga_needs_restart: "no"
-icinga_private_key: "/authority/icinga/issue/50/key"
-icinga_state: "enabled"
-instance_id: "i-95ef831d"
+instance_id: "i-0e84f50b9ee569a6f"
 nginx: 
   
   installed_from: "source"
@@ -60,10 +31,10 @@ python:
 
 python_apt: 
   
-  installed_version: "2.7.11/0.9.3-1"
+  installed_version: "2.7.11/1.1.0~beta1-1"
   state: "installed"
 
-python_apt_installed_version: "2.7.11/0.9.3-1"
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
 python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
@@ -74,20 +45,31 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-3.0.0-xenial"
+  installed_version: "3.0.0-xenial"
+  needs_restart: "no"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-3.0.0-xenial"
+rzbackup_installed_version: "3.0.0-xenial"
+rzbackup_needs_restart: "no"
+rzbackup_state: "enabled"
 ssh: 
   
-  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG8AYQ545kCpgGN+1p0u2Qu2JknmFlnFbnnienxXtWbqCrz8w1b7FjAdarA0oL+B1RvxfaD7EPzLvBzf5Ph6WoM="
-  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDABejyB03EXA+kiFIgBLkrG+BXg/8XyMyRagQNKQCwvugM8Vrz2XeRiseolyKl+9/af65QSXF3qCvQQ0yfkI9pV9yjcwBmFOhUQpnbEyW1Eg97jlr2O6rySnflMMcuXkF5z7yXyLAQRpb2fZmezH8TwE2Lp6vDeTXbEQ1JSJ2gqo3X59pg37tK/pdSXSoxr6LznmzNRSrQx3ROeVDMsB4n68rc9MDjRa1o6eP4ESNQ/8kE/jxpk43rIA30ehPTB7jcjWWMGjsfkPt6jNYWGaHnLAaoWvy4vTRsCl0kenl8PVKRJlwvM0RY5XS+gZblrxyr6mvJCQsDb+t79d8KuvON"
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCPXBzH6H9jGYnPFDyXiokqQ2l6W6gi2gwgaAfaovUOd3ccWU14P04KWiyg28UIlmSG9n/5dv4ZoB9Ojw1jeYkc="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDR52lWag1A+c/yKsxAdyW//UAl8NseZAe9y/WbrMoebfDWfofgxAoEC4iPWiKO0vzVjv1Zns2xDDMLGMnwJ0kWV9VGg3wCvGghbYtVBNgvop80PDhvH1lYmWgO7uIx6DEog9u2jrYFaXibTN+P8Qxb+RgsTC9z30zr9GnPiuosxG3A9Pp12LQrI8kUQhMbo1Whg0L1KQj5za+kIsS1/ttky1jqc/ax4M594QgIcgVDs4sR4YNY3xo8eJ176KDsq4fDoXaSZVQR/e6P5nb6IWrPtqtefKzmJIUA1yCOQpFK9scJZaVL7UBC/B9VQA34iMkrieMQ7lR2t5LGek4azWfV"
 
-ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG8AYQ545kCpgGN+1p0u2Qu2JknmFlnFbnnienxXtWbqCrz8w1b7FjAdarA0oL+B1RvxfaD7EPzLvBzf5Ph6WoM="
-ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDABejyB03EXA+kiFIgBLkrG+BXg/8XyMyRagQNKQCwvugM8Vrz2XeRiseolyKl+9/af65QSXF3qCvQQ0yfkI9pV9yjcwBmFOhUQpnbEyW1Eg97jlr2O6rySnflMMcuXkF5z7yXyLAQRpb2fZmezH8TwE2Lp6vDeTXbEQ1JSJ2gqo3X59pg37tK/pdSXSoxr6LznmzNRSrQx3ROeVDMsB4n68rc9MDjRa1o6eP4ESNQ/8kE/jxpk43rIA30ehPTB7jcjWWMGjsfkPt6jNYWGaHnLAaoWvy4vTRsCl0kenl8PVKRJlwvM0RY5XS+gZblrxyr6mvJCQsDb+t79d8KuvON"
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCPXBzH6H9jGYnPFDyXiokqQ2l6W6gi2gwgaAfaovUOd3ccWU14P04KWiyg28UIlmSG9n/5dv4ZoB9Ojw1jeYkc="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDR52lWag1A+c/yKsxAdyW//UAl8NseZAe9y/WbrMoebfDWfofgxAoEC4iPWiKO0vzVjv1Zns2xDDMLGMnwJ0kWV9VGg3wCvGghbYtVBNgvop80PDhvH1lYmWgO7uIx6DEog9u2jrYFaXibTN+P8Qxb+RgsTC9z30zr9GnPiuosxG3A9Pp12LQrI8kUQhMbo1Whg0L1KQj5za+kIsS1/ttky1jqc/ax4M594QgIcgVDs4sR4YNY3xo8eJ176KDsq4fDoXaSZVQR/e6P5nb6IWrPtqtefKzmJIUA1yCOQpFK9scJZaVL7UBC/B9VQA34iMkrieMQ7lR2t5LGek4azWfV"
 volume_ids: 
   
-  data: "vol-6ba686a9"
-  system: "vol-eba78729"
+  data: "vol-0be6ba1b7995ec876"
+  system: "vol-0de447835556cb9c1"
 
-volume_ids_data: "vol-6ba686a9"
-volume_ids_system: "vol-eba78729"
+volume_ids_data: "vol-0be6ba1b7995ec876"
+volume_ids_system: "vol-0de447835556cb9c1"
 
 
 # ex: et ts=2 filetype=yaml
