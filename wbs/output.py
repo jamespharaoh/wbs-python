@@ -5,6 +5,16 @@ from __future__ import unicode_literals
 
 import sys
 
+__all__ = [
+
+	"ConsoleLog",
+	"WithStatus",
+
+	"log",
+	"uprint",
+
+]
+
 class ConsoleLog (object):
 
 	def __init__ (
@@ -115,5 +125,9 @@ class WithStatus (object):
 			log.clear_status ()
 
 log = ConsoleLog ()
+
+def uprint (message):
+
+	print (message.encode ("utf-8"))
 
 # ex: noet ts=4 filetype=pyton
