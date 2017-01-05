@@ -2,6 +2,81 @@
 CHANGELOG
 =========
 
+1.11.36
+=======
+
+* feature:``config``: Update config command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``efs``: Update efs command to latest version
+* feature:``marketplacecommerceanalytics``: Update marketplacecommerceanalytics command to latest version
+* feature:``lambda``: Update lambda command to latest version
+* feature:``dynamodbstreams``: Update dynamodbstreams command to latest version
+* feature:``rekognition``: Update rekognition command to latest version
+* feature:``iam``: Update iam command to latest version
+
+
+1.11.35
+=======
+
+* feature:``codedeploy``: Update codedeploy command to latest version
+* bugfix:s3: Catch and warn on overflow errors when getting a file stat.
+* feature:``ecs``: Update ecs command to latest version
+
+
+1.11.34
+=======
+
+* feature:``elasticbeanstalk``: Update elasticbeanstalk command to latest version
+* feature:``ds``: Update ds command to latest version
+* feature:``iam``: Update iam command to latest version
+* feature:``kms``: Update kms command to latest version
+* feature:``apigateway``: Update apigateway command to latest version
+
+
+1.11.33
+=======
+
+* feature:``rds``: Update rds command to latest version
+* feature:``ecr``: Update ecr command to latest version
+
+
+1.11.32
+=======
+
+* feature:``storagegateway``: Update storagegateway command to latest version
+* feature:``firehose``: Update firehose command to latest version
+* feature:``route53``: Update route53 command to latest version
+
+
+1.11.31
+=======
+
+* feature:``cognito-identity``: Update cognito-identity command to latest version
+* feature:``inspector``: Update inspector command to latest version
+* feature:``cloudformation``: Update cloudformation command to latest version
+* feature:``sqs``: Update sqs command to latest version
+* feature:``discovery``: Update discovery command to latest version
+
+
+1.11.30
+=======
+
+* feature:``ssm``: Update ssm command to latest version
+* feature:``cognito-idp``: Update cognito-idp command to latest version
+
+
+1.11.29
+=======
+
+* feature:``batch``: Update batch command to latest version
+* feature:``logs``: Update logs command to latest version
+* feature:``rds``: Update rds command to latest version
+* feature:``dms``: Update dms command to latest version
+* feature:``marketplacecommerceanalytics``: Update marketplacecommerceanalytics command to latest version
+* feature:``elasticbeanstalk``: Update elasticbeanstalk command to latest version
+* feature:``sts``: Update sts command to latest version
+
+
 1.11.28
 =======
 
