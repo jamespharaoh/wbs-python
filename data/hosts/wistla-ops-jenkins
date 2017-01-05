@@ -73,6 +73,17 @@ python_pip:
 python_pip_installed_version: "2.7.11/8.1.1"
 python_pip_state: "installed"
 python_state: "installed"
+rzbackup: 
+  
+  installed_prefix: "/opt/rzbackup-3.1.0-trusty"
+  installed_version: "3.1.0-trusty"
+  needs_restart: "yes"
+  state: "enabled"
+
+rzbackup_installed_prefix: "/opt/rzbackup-3.1.0-trusty"
+rzbackup_installed_version: "3.1.0-trusty"
+rzbackup_needs_restart: "yes"
+rzbackup_state: "enabled"
 skypebot_client_id: "0601dfa4-cb9a-4632-9202-f246ce7a5c3e"
 skypebot_client_secret: "6aReRurg4dvjdmUa3W5cjF1"
 skypebot_database_hostname: "localhost"
