@@ -18,7 +18,7 @@ from jinja2.defaults import BLOCK_START_STRING, \
      COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
      LINE_COMMENT_PREFIX, TRIM_BLOCKS, NEWLINE_SEQUENCE, \
      DEFAULT_FILTERS, DEFAULT_TESTS, DEFAULT_NAMESPACE, \
-     KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
+     DEFAULT_POLICIES, KEEP_TRAILING_NEWLINE, LSTRIP_BLOCKS
 from jinja2.lexer import get_lexer, TokenStream
 from jinja2.parser import Parser
 from jinja2.nodes import EvalContext
@@ -28,7 +28,7 @@ from jinja2.runtime import Undefined, new_context, Context
 from jinja2.exceptions import TemplateSyntaxError, TemplateNotFound, \
      TemplatesNotFound, TemplateRuntimeError
 from jinja2.utils import import_string, LRUCache, Markup, missing, \
-     concat, consume, internalcode
+     concat, consume, internalcode, have_async_gen
 from jinja2._compat import imap, ifilter, string_types, iteritems, \
      text_type, reraise, implements_iterator, implements_to_string, \
      encode_filename, PY2, PYPY
@@ -217,6 +217,11 @@ class Environment(object):
             have to be parsed if they were not changed.
 
             See :ref:`bytecode-cache` for more information.
+
+        `enable_async`
+            If set to true this enables async template execution which allows
+            you to take advantage of newer Python features.  This requires
+            Python 3.6 or later.
     """
 
     #: if this environment is sandboxed.  Modifying this variable won't make
@@ -268,7 +273,8 @@ class Environment(object):
                  loader=None,
                  cache_size=400,
                  auto_reload=True,
-                 bytecode_cache=None):
+                 bytecode_cache=None,
+                 enable_async=False):
         # !!Important notice!!
         #   The constructor accepts quite a few arguments that should be
         #   passed by keyword rather than position.  However it's important to
@@ -311,8 +317,14 @@ class Environment(object):
         self.bytecode_cache = bytecode_cache
         self.auto_reload = auto_reload
 
+        # configurable policies
+        self.policies = DEFAULT_POLICIES.copy()
+
         # load extensions
         self.extensions = load_extensions(self, extensions)
+
+        self.enable_async = enable_async
+        self.is_async = self.enable_async and have_async_gen
 
         _environment_sanity_check(self)
 
@@ -388,7 +400,7 @@ class Environment(object):
         """Get an item or attribute of an object but prefer the item."""
         try:
             return obj[argument]
-        except (TypeError, LookupError):
+        except (AttributeError, TypeError, LookupError):
             if isinstance(argument, string_types):
                 try:
                     attr = str(argument)
@@ -417,6 +429,11 @@ class Environment(object):
     def call_filter(self, name, value, args=None, kwargs=None,
                     context=None, eval_ctx=None):
         """Invokes a filter on a value the same way the compiler does it.
+
+        Note that on Python 3 this might return a coroutine in case the
+        filter is running from an environment in async mode and the filter
+        supports async execution.  It's your responsibility to await this
+        if needed.
 
         .. versionadded:: 2.7
         """
@@ -908,14 +925,15 @@ class Template(object):
                 optimized=True,
                 undefined=Undefined,
                 finalize=None,
-                autoescape=False):
+                autoescape=False,
+                enable_async=False):
         env = get_spontaneous_environment(
             block_start_string, block_end_string, variable_start_string,
             variable_end_string, comment_start_string, comment_end_string,
             line_statement_prefix, line_comment_prefix, trim_blocks,
             lstrip_blocks, newline_sequence, keep_trailing_newline,
             frozenset(extensions), optimized, undefined, finalize, autoescape,
-            None, 0, False, None)
+            None, 0, False, None, enable_async)
         return env.from_string(source, template_class=cls)
 
     @classmethod
@@ -981,6 +999,19 @@ class Template(object):
             exc_info = sys.exc_info()
         return self.environment.handle_exception(exc_info, True)
 
+    def render_async(self, *args, **kwargs):
+        """This works similar to :meth:`render` but returns a coroutine
+        that when awaited returns the entire rendered template string.  This
+        requires the async feature to be enabled.
+
+        Example usage::
+
+            await template.render_async(knights='that say nih; asynchronously')
+        """
+        # see asyncsupport for the actual implementation
+        raise NotImplementedError('This feature is not available for this '
+                                  'version of Python')
+
     def stream(self, *args, **kwargs):
         """Works exactly like :meth:`generate` but returns a
         :class:`TemplateStream`.
@@ -1005,6 +1036,14 @@ class Template(object):
             return
         yield self.environment.handle_exception(exc_info, True)
 
+    def generate_async(self, *args, **kwargs):
+        """An async version of :meth:`generate`.  Works very similarly but
+        returns an async iterator instead.
+        """
+        # see asyncsupport for the actual implementation
+        raise NotImplementedError('This feature is not available for this '
+                                  'version of Python')
+
     def new_context(self, vars=None, shared=False, locals=None):
         """Create a new :class:`Context` for this template.  The vars
         provided will be passed to the template.  Per default the globals
@@ -1025,6 +1064,23 @@ class Template(object):
         """
         return TemplateModule(self, self.new_context(vars, shared, locals))
 
+    def make_module_async(self, vars=None, shared=False, locals=None):
+        """As template module creation can invoke template code for
+        asynchronous exections this method must be used instead of the
+        normal :meth:`make_module` one.  Likewise the module attribute
+        becomes unavailable in async mode.
+        """
+        # see asyncsupport for the actual implementation
+        raise NotImplementedError('This feature is not available for this '
+                                  'version of Python')
+
+    @internalcode
+    def _get_default_module(self):
+        if self._module is not None:
+            return self._module
+        self._module = rv = self.make_module()
+        return rv
+
     @property
     def module(self):
         """The template as module.  This is used for imports in the
@@ -1036,11 +1092,10 @@ class Template(object):
         '23'
         >>> t.module.foo() == u'42'
         True
+
+        This attribute is not available if async mode is enabled.
         """
-        if self._module is not None:
-            return self._module
-        self._module = rv = self.make_module()
-        return rv
+        return self._get_default_module()
 
     def get_corresponding_lineno(self, lineno):
         """Return the source line number of a line number in the
@@ -1079,8 +1134,15 @@ class TemplateModule(object):
     converting it into an unicode- or bytestrings renders the contents.
     """
 
-    def __init__(self, template, context):
-        self._body_stream = list(template.root_render_func(context))
+    def __init__(self, template, context, body_stream=None):
+        if body_stream is None:
+            if context.environment.is_async:
+                raise RuntimeError('Async mode requires a body stream '
+                                   'to be passed to a template module.  Use '
+                                   'the async methods of the API you are '
+                                   'using.')
+            body_stream = list(template.root_render_func(context))
+        self._body_stream = body_stream
         self.__dict__.update(context.get_exported())
         self.__name__ = template.name
 

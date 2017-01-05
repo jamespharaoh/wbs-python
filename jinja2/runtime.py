@@ -280,24 +280,16 @@ class BlockReference(object):
         return rv
 
 
-class LoopContext(object):
+class LoopContextBase(object):
     """A loop context for dynamic iteration."""
 
-    def __init__(self, iterable, recurse=None, depth0=0):
-        self._iterator = iter(iterable)
+    _after = _last_iteration
+    _length = None
+
+    def __init__(self, recurse=None, depth0=0):
         self._recurse = recurse
-        self._after = self._safe_next()
         self.index0 = -1
         self.depth0 = depth0
-
-        # try to get the length of the iterable early.  This must be done
-        # here because there are some broken iterators around where there
-        # __len__ is the number of iterations left (i'm looking at your
-        # listreverseiterator!).
-        try:
-            self._length = len(iterable)
-        except (TypeError, AttributeError):
-            self._length = None
 
     def cycle(self, *args):
         """Cycles among the arguments with the current loop index."""
@@ -315,15 +307,6 @@ class LoopContext(object):
     def __len__(self):
         return self.length
 
-    def __iter__(self):
-        return LoopContextIterator(self)
-
-    def _safe_next(self):
-        try:
-            return next(self._iterator)
-        except StopIteration:
-            return _last_iteration
-
     @internalcode
     def loop(self, iterable):
         if self._recurse is None:
@@ -335,6 +318,30 @@ class LoopContext(object):
     # the the loop without or with too many arguments.
     __call__ = loop
     del loop
+
+    def __repr__(self):
+        return '<%s %r/%r>' % (
+            self.__class__.__name__,
+            self.index,
+            self.length
+        )
+
+
+class LoopContext(LoopContextBase):
+
+    def __init__(self, iterable, recurse=None, depth0=0):
+        LoopContextBase.__init__(self, recurse, depth0)
+        self._iterator = iter(iterable)
+
+        # try to get the length of the iterable early.  This must be done
+        # here because there are some broken iterators around where there
+        # __len__ is the number of iterations left (i'm looking at your
+        # listreverseiterator!).
+        try:
+            self._length = len(iterable)
+        except (TypeError, AttributeError):
+            self._length = None
+        self._after = self._safe_next()
 
     @property
     def length(self):
@@ -349,12 +356,14 @@ class LoopContext(object):
             self._length = len(iterable) + iterations_done
         return self._length
 
-    def __repr__(self):
-        return '<%s %r/%r>' % (
-            self.__class__.__name__,
-            self.index,
-            self.length
-        )
+    def __iter__(self):
+        return LoopContextIterator(self)
+
+    def _safe_next(self):
+        try:
+            return next(self._iterator)
+        except StopIteration:
+            return _last_iteration
 
 
 @implements_iterator
@@ -498,8 +507,8 @@ class Undefined(object):
         __truediv__ = __rtruediv__ = __floordiv__ = __rfloordiv__ = \
         __mod__ = __rmod__ = __pos__ = __neg__ = __call__ = \
         __getitem__ = __lt__ = __le__ = __gt__ = __ge__ = __int__ = \
-        __float__ = __complex__ = __pow__ = __rpow__ = \
-        _fail_with_undefined_error
+        __float__ = __complex__ = __pow__ = __rpow__ = __sub__ = \
+        __rsub__ = _fail_with_undefined_error
 
     def __eq__(self, other):
         return type(self) is type(other)
