@@ -38,6 +38,15 @@ if hasattr(dict, 'iteritems'):
 else:
     dict_item_iter = 'items'
 
+code_features = ['division']
+
+# does this python version support generator stops? (PEP 0479)
+try:
+    exec('from __future__ import generator_stop')
+    code_features.append('generator_stop')
+except SyntaxError:
+    pass
+
 
 # does if 0: dummy(x) get us x into the scope?
 def unoptimize_before_dead_code():
@@ -639,6 +648,11 @@ class CodeGenerator(NodeVisitor):
             #   a = 42; b = lambda: a; del a
             self.writeline(' = '.join(to_delete) + ' = missing')
 
+    def func(self, name):
+        if self.environment.is_async:
+            return 'async def %s' % name
+        return 'def %s' % name
+
     def function_scoping(self, node, frame, children=None,
                          find_special=True):
         """In Jinja a few statements require the help of anonymous
@@ -723,7 +737,7 @@ class CodeGenerator(NodeVisitor):
         # and assigned.
         if 'loop' in frame.identifiers.declared:
             args = args + ['l_loop=l_loop']
-        self.writeline('def macro(%s):' % ', '.join(args), node)
+        self.writeline('%s(%s):' % (self.func('macro'), ', '.join(args)), node)
         self.indent()
         self.buffer(frame)
         self.pull_locals(frame)
@@ -763,10 +777,14 @@ class CodeGenerator(NodeVisitor):
         eval_ctx = EvalContext(self.environment, self.name)
 
         from jinja2.runtime import __all__ as exported
-        self.writeline('from __future__ import division')
+        self.writeline('from __future__ import %s' % ', '.join(code_features))
         self.writeline('from jinja2.runtime import ' + ', '.join(exported))
         if not unoptimize_before_dead_code:
             self.writeline('dummy = lambda *x: None')
+
+        if self.environment.is_async:
+            self.writeline('from jinja2.asyncsupport import auto_await, '
+                           'auto_aiter, make_async_loop_context')
 
         # if we want a deferred initialization we cannot move the
         # environment into a local name
@@ -798,7 +816,7 @@ class CodeGenerator(NodeVisitor):
         self.writeline('name = %r' % self.name)
 
         # generate the root render function.
-        self.writeline('def root(context%s):' % envenv, extra=1)
+        self.writeline('%s(context%s):' % (self.func('root'), envenv), extra=1)
 
         # process the root
         frame = Frame(eval_ctx)
@@ -833,7 +851,7 @@ class CodeGenerator(NodeVisitor):
             block_frame = Frame(eval_ctx)
             block_frame.inspect(block.body)
             block_frame.block = name
-            self.writeline('def block_%s(context%s):' % (name, envenv),
+            self.writeline('%s(context%s):' % (self.func('block_' + name), envenv),
                            block, 1)
             self.indent()
             undeclared = find_undeclared(block.body, ('self', 'super'))
@@ -870,8 +888,10 @@ class CodeGenerator(NodeVisitor):
                 self.indent()
                 level += 1
         context = node.scoped and 'context.derived(locals())' or 'context'
-        self.writeline('for event in context.blocks[%r][0](%s):' % (
-                       node.name, context), node)
+
+        loop = self.environment.is_async and 'async for' or 'for'
+        self.writeline('%s event in context.blocks[%r][0](%s):' % (
+                       loop, node.name, context), node)
         self.indent()
         self.simple_write('event', frame)
         self.outdent(level)
@@ -953,11 +973,17 @@ class CodeGenerator(NodeVisitor):
             self.indent()
 
         if node.with_context:
-            self.writeline('for event in template.root_render_func('
+            loop = self.environment.is_async and 'async for' or 'for'
+            self.writeline('%s event in template.root_render_func('
                            'template.new_context(context.parent, True, '
-                           'locals())):')
+                           'locals())):' % loop)
+        elif self.environment.is_async:
+            self.writeline('for event in (await '
+                           'template._get_default_module_async())'
+                           '._body_stream:')
         else:
-            self.writeline('for event in template.module._body_stream:')
+            self.writeline('for event in template._get_default_module()'
+                           '._body_stream:')
 
         self.indent()
         self.simple_write('event', frame)
@@ -973,13 +999,18 @@ class CodeGenerator(NodeVisitor):
         self.writeline('l_%s = ' % node.target, node)
         if frame.toplevel:
             self.write('context.vars[%r] = ' % node.target)
+        if self.environment.is_async:
+            self.write('await ')
         self.write('environment.get_template(')
         self.visit(node.template, frame)
         self.write(', %r).' % self.name)
         if node.with_context:
-            self.write('make_module(context.parent, True, locals())')
+            self.write('make_module%s(context.parent, True, locals())'
+                       % (self.environment.is_async and '_async' or ''))
+        elif self.environment.is_async:
+            self.write('_get_default_module_async()')
         else:
-            self.write('module')
+            self.write('_get_default_module()')
         if frame.toplevel and not node.target.startswith('_'):
             self.writeline('context.exported_vars.discard(%r)' % node.target)
         frame.assigned_names.add(node.target)
@@ -987,13 +1018,17 @@ class CodeGenerator(NodeVisitor):
     def visit_FromImport(self, node, frame):
         """Visit named imports."""
         self.newline(node)
-        self.write('included_template = environment.get_template(')
+        self.write('included_template = %senvironment.get_template('
+                   % (self.environment.is_async and 'await ' or ''))
         self.visit(node.template, frame)
         self.write(', %r).' % self.name)
         if node.with_context:
-            self.write('make_module(context.parent, True)')
+            self.write('make_module%s(context.parent, True)'
+                       % (self.environment.is_async and '_async' or ''))
+        elif self.environment.is_async:
+            self.write('_get_default_module_async()')
         else:
-            self.write('module')
+            self.write('_get_default_module()')
 
         var_names = []
         discarded_names = []
@@ -1063,7 +1098,8 @@ class CodeGenerator(NodeVisitor):
 
         # otherwise we set up a buffer and add a function def
         else:
-            self.writeline('def loop(reciter, loop_render_func, depth=0):', node)
+            self.writeline('%s(reciter, loop_render_func, depth=0):' %
+                           self.func('loop'), node)
             self.indent()
             self.buffer(loop_frame)
             aliases = {}
@@ -1095,22 +1131,32 @@ class CodeGenerator(NodeVisitor):
                  "loop it's undefined.  Happened in loop on %s" %
                  self.position(node)))
 
-        self.writeline('for ', node)
+        self.writeline(self.environment.is_async and 'async for ' or 'for ', node)
         self.visit(node.target, loop_frame)
-        self.write(extended_loop and ', l_loop in LoopContext(' or ' in ')
+        if extended_loop:
+            if self.environment.is_async:
+                self.write(', l_loop in await make_async_loop_context(')
+            else:
+                self.write(', l_loop in LoopContext(')
+        else:
+            self.write(' in ')
 
         # if we have an extened loop and a node test, we filter in the
         # "outer frame".
         if extended_loop and node.test is not None:
             self.write('(')
             self.visit(node.target, loop_frame)
-            self.write(' for ')
+            self.write(self.environment.is_async and ' async for ' or ' for ')
             self.visit(node.target, loop_frame)
             self.write(' in ')
             if node.recursive:
                 self.write('reciter')
             else:
+                if self.environment.is_async:
+                    self.write('auto_aiter(')
                 self.visit(node.iter, loop_frame)
+                if self.environment.is_async:
+                    self.write(')')
             self.write(' if (')
             test_frame = loop_frame.copy()
             self.visit(node.test, test_frame)
@@ -1119,7 +1165,11 @@ class CodeGenerator(NodeVisitor):
         elif node.recursive:
             self.write('reciter')
         else:
+            if self.environment.is_async and not extended_loop:
+                self.write('auto_aiter(')
             self.visit(node.iter, loop_frame)
+            if self.environment.is_async and not extended_loop:
+                self.write(')')
 
         if node.recursive:
             self.write(', loop_render_func, depth):')
@@ -1158,8 +1208,14 @@ class CodeGenerator(NodeVisitor):
             self.return_buffer_contents(loop_frame)
             self.outdent()
             self.start_write(frame, node)
+            if self.environment.is_async:
+                self.write('await ')
             self.write('loop(')
+            if self.environment.is_async:
+                self.write('auto_aiter(')
             self.visit(node.iter, frame)
+            if self.environment.is_async:
+                self.write(')')
             self.write(', loop)')
             self.end_write(frame)
 
@@ -1402,6 +1458,10 @@ class CodeGenerator(NodeVisitor):
 
     def visit_AssignBlock(self, node, frame):
         block_frame = frame.inner()
+        # This is a special case.  Since a set block always captures we
+        # will disable output checks.  This way one can use set blocks
+        # toplevel even in extended templates.
+        block_frame.require_output_check = False
         block_frame.inspect(node.body)
         aliases = self.push_scope(block_frame)
         self.pull_locals(block_frame)
@@ -1559,6 +1619,8 @@ class CodeGenerator(NodeVisitor):
             self.visit(node.step, frame)
 
     def visit_Filter(self, node, frame):
+        if self.environment.is_async:
+            self.write('await auto_await(')
         self.write(self.filters[node.name] + '(')
         func = self.environment.filters.get(node.name)
         if func is None:
@@ -1584,6 +1646,8 @@ class CodeGenerator(NodeVisitor):
             self.write('concat(%s)' % frame.buffer)
         self.signature(node, frame)
         self.write(')')
+        if self.environment.is_async:
+            self.write(')')
 
     def visit_Test(self, node, frame):
         self.write(self.tests[node.name] + '(')
@@ -1610,6 +1674,8 @@ class CodeGenerator(NodeVisitor):
         self.write(')')
 
     def visit_Call(self, node, frame, forward_caller=False):
+        if self.environment.is_async:
+            self.write('await auto_await(')
         if self.environment.sandboxed:
             self.write('environment.call(context, ')
         else:
@@ -1618,6 +1684,8 @@ class CodeGenerator(NodeVisitor):
         extra_kwargs = forward_caller and {'caller': 'caller'} or None
         self.signature(node, frame, extra_kwargs)
         self.write(')')
+        if self.environment.is_async:
+            self.write(')')
 
     def visit_Keyword(self, node, frame):
         self.write(node.key + '=')

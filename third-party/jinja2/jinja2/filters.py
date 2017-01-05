@@ -21,8 +21,8 @@ from jinja2.exceptions import FilterArgumentError
 from jinja2._compat import imap, string_types, text_type, iteritems
 
 
-_word_re = re.compile(r'\w+(?u)')
-_word_beginning_split_re = re.compile(r'([-\s\(\{\[\<]+)(?u)')
+_word_re = re.compile(r'\w+', re.UNICODE)
+_word_beginning_split_re = re.compile(r'([-\s\(\{\[\<]+)', re.UNICODE)
 
 
 def contextfilter(f):
@@ -409,7 +409,7 @@ def do_pprint(value, verbose=False):
 
 @evalcontextfilter
 def do_urlize(eval_ctx, value, trim_url_limit=None, nofollow=False,
-              target=None):
+              target=None, rel=None):
     """Converts URLs in plain text into clickable links.
 
     If you pass the filter an additional integer it will shorten the urls
@@ -431,7 +431,15 @@ def do_urlize(eval_ctx, value, trim_url_limit=None, nofollow=False,
     .. versionchanged:: 2.8+
        The *target* parameter was added.
     """
-    rv = urlize(value, trim_url_limit, nofollow, target)
+    policies = eval_ctx.environment.policies
+    rel = set((rel or '').split() or [])
+    if nofollow:
+        rel.add('nofollow')
+    rel.update((policies['urlize.rel'] or '').split())
+    if target is None:
+        target = policies['urlize.target']
+    rel = ' '.join(sorted(rel)) or None
+    rv = urlize(value, trim_url_limit, rel=rel, target=target)
     if eval_ctx.autoescape:
         rv = Markup(rv)
     return rv
@@ -821,24 +829,7 @@ def do_map(*args, **kwargs):
 
     .. versionadded:: 2.7
     """
-    context = args[0]
-    seq = args[1]
-
-    if len(args) == 2 and 'attribute' in kwargs:
-        attribute = kwargs.pop('attribute')
-        if kwargs:
-            raise FilterArgumentError('Unexpected keyword argument %r' %
-                next(iter(kwargs)))
-        func = make_attrgetter(context.environment, attribute)
-    else:
-        try:
-            name = args[2]
-            args = args[3:]
-        except LookupError:
-            raise FilterArgumentError('map requires a filter argument')
-        func = lambda item: context.environment.call_filter(
-            name, item, args, kwargs, context=context)
-
+    seq, func = prepare_map(args, kwargs)
     if seq:
         for item in seq:
             yield func(item)
@@ -860,7 +851,7 @@ def do_select(*args, **kwargs):
 
     .. versionadded:: 2.7
     """
-    return _select_or_reject(args, kwargs, lambda x: x, False)
+    return select_or_reject(args, kwargs, lambda x: x, False)
 
 
 @contextfilter
@@ -878,7 +869,7 @@ def do_reject(*args, **kwargs):
 
     .. versionadded:: 2.7
     """
-    return _select_or_reject(args, kwargs, lambda x: not x, False)
+    return select_or_reject(args, kwargs, lambda x: not x, False)
 
 
 @contextfilter
@@ -899,7 +890,7 @@ def do_selectattr(*args, **kwargs):
 
     .. versionadded:: 2.7
     """
-    return _select_or_reject(args, kwargs, lambda x: x, True)
+    return select_or_reject(args, kwargs, lambda x: x, True)
 
 
 @contextfilter
@@ -918,10 +909,32 @@ def do_rejectattr(*args, **kwargs):
 
     .. versionadded:: 2.7
     """
-    return _select_or_reject(args, kwargs, lambda x: not x, True)
+    return select_or_reject(args, kwargs, lambda x: not x, True)
 
 
-def _select_or_reject(args, kwargs, modfunc, lookup_attr):
+def prepare_map(args, kwargs):
+    context = args[0]
+    seq = args[1]
+
+    if len(args) == 2 and 'attribute' in kwargs:
+        attribute = kwargs.pop('attribute')
+        if kwargs:
+            raise FilterArgumentError('Unexpected keyword argument %r' %
+                next(iter(kwargs)))
+        func = make_attrgetter(context.environment, attribute)
+    else:
+        try:
+            name = args[2]
+            args = args[3:]
+        except LookupError:
+            raise FilterArgumentError('map requires a filter argument')
+        func = lambda item: context.environment.call_filter(
+            name, item, args, kwargs, context=context)
+
+    return seq, func
+
+
+def prepare_select_or_reject(args, kwargs, modfunc, lookup_attr):
     context = args[0]
     seq = args[1]
     if lookup_attr:
@@ -943,9 +956,14 @@ def _select_or_reject(args, kwargs, modfunc, lookup_attr):
     except LookupError:
         func = bool
 
+    return seq, lambda item: modfunc(func(transfunc(item)))
+
+
+def select_or_reject(args, kwargs, modfunc, lookup_attr):
+    seq, func = prepare_select_or_reject(args, kwargs, modfunc, lookup_attr)
     if seq:
         for item in seq:
-            if modfunc(func(transfunc(item))):
+            if func(item):
                 yield item
 
 

@@ -154,6 +154,12 @@ useful if you want to dig deeper into Jinja2 or :ref:`develop extensions
         to modify this dict.  For more details see :ref:`global-namespace`.
         For valid object names have a look at :ref:`identifier-naming`.
 
+    .. attribute:: policies
+
+        A dictionary with :ref:`policies`.  These can be reconfigured to
+        change the runtime behavior or certain template features.  Usually
+        these are security related.
+
     .. attribute:: code_generator_class
 
        The class used for code generation.  This should not be changed
@@ -228,6 +234,10 @@ useful if you want to dig deeper into Jinja2 or :ref:`develop extensions
     .. automethod:: generate([context])
 
     .. automethod:: stream([context])
+
+    .. automethod:: render_async([context])
+
+    .. automethod:: generate_async([context])
 
 
 .. autoclass:: jinja2.environment.TemplateStream()
@@ -495,6 +505,65 @@ Builtin bytecode caches:
 .. autoclass:: jinja2.FileSystemBytecodeCache
 
 .. autoclass:: jinja2.MemcachedBytecodeCache
+
+
+Async Support
+-------------
+
+Starting with version 2.9, Jinja2 also supports the Python `async` and
+`await` constructs.  As far as template designers go this feature is
+entirely opaque to them however as a developer you should be aware of how
+it's implemented as it influences what type of APIs you can safely expose
+to the template environment.
+
+First you need to be aware that by default async support is disabled as
+enabling it will generate different template code behind the scenes which
+passes everything through the asyncio event loop.  This is important to
+understand because it has some impact to what you are doing:
+
+*   template rendering will require an event loop to be set for the
+    current thread (``asyncio.get_event_loop`` needs to return one)
+*   all template generation code internally runs async generators which
+    means that you will pay a performance penalty even if the non sync
+    methods are used!
+*   The sync methods are based on async methods if the async mode is
+    enabled which means that `render` for instance will internally invoke
+    `render_async` and run it as part of the current event loop until the
+    execution finished.
+
+Awaitable objects can be returned from functions in templates and any
+function call in a template will automatically await the result.  This
+means that you can let provide a method that asynchronously loads data
+from a database if you so desire and from the template designer's point of
+view this is just another function they can call.  This means that the
+``await`` you would normally issue in Python is implied.  However this
+only applies to function calls.  If an attribute for instance would be an
+avaitable object then this would not result in the expected behavior.
+
+Likewise iterations with a `for` loop support async iterators.
+
+.. _policies:
+
+Policies
+--------
+
+Starting with Jinja 2.9 policies can be configured on the environment
+which can slightly influence how filters and other template constructs
+behave.  They can be configured with the
+:attr:`~jinja2.Environment.policies` attribute.
+
+Example::
+
+    env.policies['urlize.rel'] = 'nofollow noopener'
+
+``urlize.rel``:
+    A string that defines the items for the `rel` attribute of generated
+    links with the `urlize` filter.  These items are always added.  The
+    default is `noopener`.
+
+``urlize.target``:
+    The default target that is issued for links from the `urlize` filter
+    if no other target is defined by the call explicitly.
 
 
 Utilities
