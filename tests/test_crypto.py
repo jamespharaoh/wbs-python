@@ -43,7 +43,7 @@ from OpenSSL.crypto import CRL, Revoked, dump_crl, load_crl
 from OpenSSL.crypto import NetscapeSPKI, NetscapeSPKIType
 from OpenSSL.crypto import (
     sign, verify, get_elliptic_curve, get_elliptic_curves)
-from OpenSSL._util import native, lib
+from OpenSSL._util import native
 
 from .util import (
     EqualityTestsMixin, is_consistent_type, TestCase, WARNING_TYPE_EXPECTED
@@ -3115,8 +3115,7 @@ class NetscapeSPKITests(TestCase, _PKeyInteractionTestsMixin):
 
 class TestRevoked(object):
     """
-    Please add test cases for the Revoked class here if possible. This class
-    holds the new py.test style tests.
+    Tests for `OpenSSL.crypto.Revoked`.
     """
     def test_ignores_unsupported_revoked_cert_extension_get_reason(self):
         """
@@ -3136,111 +3135,81 @@ class TestRevoked(object):
         reason = revoked[1].get_reason()
         assert reason is None
 
-
-class RevokedTests(TestCase):
-    """
-    Tests for :py:obj:`OpenSSL.crypto.Revoked`. Please add test cases to
-    TestRevoked above if possible.
-    """
-
     def test_construction(self):
         """
-        Confirm we can create :py:obj:`OpenSSL.crypto.Revoked`.  Check
-        that it is empty.
+        Confirm we can create `OpenSSL.crypto.Revoked`.  Check that it is
+        empty.
         """
         revoked = Revoked()
-        self.assertTrue(isinstance(revoked, Revoked))
-        self.assertEquals(type(revoked), Revoked)
-        self.assertEquals(revoked.get_serial(), b'00')
-        self.assertEquals(revoked.get_rev_date(), None)
-        self.assertEquals(revoked.get_reason(), None)
-
-    def test_construction_wrong_args(self):
-        """
-        Calling :py:obj:`OpenSSL.crypto.Revoked` with any arguments results
-        in a :py:obj:`TypeError` being raised.
-        """
-        self.assertRaises(TypeError, Revoked, None)
-        self.assertRaises(TypeError, Revoked, 1)
-        self.assertRaises(TypeError, Revoked, "foo")
+        assert isinstance(revoked, Revoked)
+        assert type(revoked) == Revoked
+        assert revoked.get_serial() == b'00'
+        assert revoked.get_rev_date() is None
+        assert revoked.get_reason() is None
 
     def test_serial(self):
         """
         Confirm we can set and get serial numbers from
-        :py:obj:`OpenSSL.crypto.Revoked`.  Confirm errors are handled
-        with grace.
+        `OpenSSL.crypto.Revoked`.  Confirm errors are handled with grace.
         """
         revoked = Revoked()
         ret = revoked.set_serial(b'10b')
-        self.assertEquals(ret, None)
+        assert ret is None
         ser = revoked.get_serial()
-        self.assertEquals(ser, b'010B')
+        assert ser == b'010B'
 
         revoked.set_serial(b'31ppp')  # a type error would be nice
         ser = revoked.get_serial()
-        self.assertEquals(ser, b'31')
+        assert ser == b'31'
 
-        self.assertRaises(ValueError, revoked.set_serial, b'pqrst')
-        self.assertRaises(TypeError, revoked.set_serial, 100)
-        self.assertRaises(TypeError, revoked.get_serial, 1)
-        self.assertRaises(TypeError, revoked.get_serial, None)
-        self.assertRaises(TypeError, revoked.get_serial, "")
+        with pytest.raises(ValueError):
+            revoked.set_serial(b'pqrst')
+        with pytest.raises(TypeError):
+            revoked.set_serial(100)
 
     def test_date(self):
         """
         Confirm we can set and get revocation dates from
-        :py:obj:`OpenSSL.crypto.Revoked`.  Confirm errors are handled
-        with grace.
+        `OpenSSL.crypto.Revoked`.  Confirm errors are handled with grace.
         """
         revoked = Revoked()
         date = revoked.get_rev_date()
-        self.assertEquals(date, None)
+        assert date is None
 
         now = datetime.now().strftime("%Y%m%d%H%M%SZ").encode("ascii")
         ret = revoked.set_rev_date(now)
-        self.assertEqual(ret, None)
+        assert ret is None
         date = revoked.get_rev_date()
-        self.assertEqual(date, now)
+        assert date == now
 
     def test_reason(self):
         """
         Confirm we can set and get revocation reasons from
-        :py:obj:`OpenSSL.crypto.Revoked`.  The "get" need to work
-        as "set".  Likewise, each reason of all_reasons() must work.
+        `OpenSSL.crypto.Revoked`.  The "get" need to work as "set".
+        Likewise, each reason of all_reasons() must work.
         """
         revoked = Revoked()
         for r in revoked.all_reasons():
             for x in range(2):
                 ret = revoked.set_reason(r)
-                self.assertEquals(ret, None)
+                assert ret is None
                 reason = revoked.get_reason()
-                self.assertEquals(
-                    reason.lower().replace(b' ', b''),
+                assert (
+                    reason.lower().replace(b' ', b'') ==
                     r.lower().replace(b' ', b''))
                 r = reason  # again with the resp of get
 
         revoked.set_reason(None)
-        self.assertEqual(revoked.get_reason(), None)
+        assert revoked.get_reason() is None
 
-    def test_set_reason_wrong_arguments(self):
+    def test_set_reason_invalid_reason(self):
         """
-        Calling :py:obj:`OpenSSL.crypto.Revoked.set_reason` with other than
-        one argument, or an argument which isn't a valid reason,
-        results in :py:obj:`TypeError` or :py:obj:`ValueError` being raised.
+        Calling `OpenSSL.crypto.Revoked.set_reason` with an argument which
+        isn't a valid reason results in `ValueError` being raised.
         """
         revoked = Revoked()
-        self.assertRaises(TypeError, revoked.set_reason, 100)
-        self.assertRaises(ValueError, revoked.set_reason, b'blue')
-
-    def test_get_reason_wrong_arguments(self):
-        """
-        Calling :py:obj:`OpenSSL.crypto.Revoked.get_reason` with any
-        arguments results in :py:obj:`TypeError` being raised.
-        """
-        revoked = Revoked()
-        self.assertRaises(TypeError, revoked.get_reason, None)
-        self.assertRaises(TypeError, revoked.get_reason, 1)
-        self.assertRaises(TypeError, revoked.get_reason, "foo")
+        with pytest.raises(ValueError):
+            revoked.set_reason(b'blue')
 
 
 class CRLTests(TestCase):
@@ -3864,52 +3833,34 @@ class SignVerifyTests(TestCase):
         sign(priv_key, content, "sha1")
 
 
-class EllipticCurveTests(TestCase):
+class TestEllipticCurve(object):
     """
-    Tests for :py:class:`_EllipticCurve`, :py:obj:`get_elliptic_curve`, and
-    :py:obj:`get_elliptic_curves`.
+    Tests for `_EllipticCurve`, `get_elliptic_curve`, and
+    `get_elliptic_curves`.
     """
 
     def test_set(self):
         """
-        :py:obj:`get_elliptic_curves` returns a :py:obj:`set`.
+        `get_elliptic_curves` returns a `set`.
         """
-        self.assertIsInstance(get_elliptic_curves(), set)
-
-    def test_some_curves(self):
-        """
-        If :py:mod:`cryptography` has elliptic curve support then the set
-        returned by :py:obj:`get_elliptic_curves` has some elliptic curves in
-        it.
-
-        There could be an OpenSSL that violates this assumption.  If so, this
-        test will fail and we'll find out.
-        """
-        curves = get_elliptic_curves()
-        if lib.Cryptography_HAS_EC:
-            self.assertTrue(curves)
-        else:
-            self.assertFalse(curves)
+        assert isinstance(get_elliptic_curves(), set)
 
     def test_a_curve(self):
         """
-        :py:obj:`get_elliptic_curve` can be used to retrieve a particular
-        supported curve.
+        `get_elliptic_curve` can be used to retrieve a particular supported
+        curve.
         """
         curves = get_elliptic_curves()
-        if curves:
-            curve = next(iter(curves))
-            self.assertEqual(curve.name, get_elliptic_curve(curve.name).name)
-        else:
-            self.assertRaises(ValueError, get_elliptic_curve, u"prime256v1")
+        curve = next(iter(curves))
+        assert curve.name == get_elliptic_curve(curve.name).name
 
     def test_not_a_curve(self):
         """
-        :py:obj:`get_elliptic_curve` raises :py:class:`ValueError` if called
-        with a name which does not identify a supported curve.
+        `get_elliptic_curve` raises `ValueError` if called with a name which
+        does not identify a supported curve.
         """
-        self.assertRaises(
-            ValueError, get_elliptic_curve, u"this curve was just invented")
+        with pytest.raises(ValueError):
+            get_elliptic_curve(u"this curve was just invented")
 
     def test_repr(self):
         """
@@ -3917,22 +3868,20 @@ class EllipticCurveTests(TestCase):
         object is a curve and what its name is.
         """
         curves = get_elliptic_curves()
-        if curves:
-            curve = next(iter(curves))
-            self.assertEqual("<Curve %r>" % (curve.name,), repr(curve))
+        curve = next(iter(curves))
+        assert "<Curve %r>" % (curve.name,) == repr(curve)
 
     def test_to_EC_KEY(self):
         """
         The curve object can export a version of itself as an EC_KEY* via the
-        private :py:meth:`_EllipticCurve._to_EC_KEY`.
+        private `_EllipticCurve._to_EC_KEY`.
         """
         curves = get_elliptic_curves()
-        if curves:
-            curve = next(iter(curves))
-            # It's not easy to assert anything about this object.  However, see
-            # leakcheck/crypto.py for a test that demonstrates it at least does
-            # not leak memory.
-            curve._to_EC_KEY()
+        curve = next(iter(curves))
+        # It's not easy to assert anything about this object.  However, see
+        # leakcheck/crypto.py for a test that demonstrates it at least does
+        # not leak memory.
+        curve._to_EC_KEY()
 
 
 class EllipticCurveFactory(object):
@@ -3942,16 +3891,13 @@ class EllipticCurveFactory(object):
 
     def __init__(self):
         curves = iter(get_elliptic_curves())
-        try:
-            self.curve_name = next(curves).name
-            self.another_curve_name = next(curves).name
-        except StopIteration:
-            self.curve_name = self.another_curve_name = None
+        self.curve_name = next(curves).name
+        self.another_curve_name = next(curves).name
 
 
-class EllipticCurveEqualityTests(TestCase, EqualityTestsMixin):
+class TestEllipticCurveEquality(EqualityTestsMixin):
     """
-    Tests :py:type:`_EllipticCurve`\ 's implementation of ``==`` and ``!=``.
+    Tests `_EllipticCurve`\ 's implementation of ``==`` and ``!=``.
     """
     curve_factory = EllipticCurveFactory()
 
@@ -3972,10 +3918,10 @@ class EllipticCurveEqualityTests(TestCase, EqualityTestsMixin):
         return get_elliptic_curve(self.curve_factory.another_curve_name)
 
 
-class EllipticCurveHashTests(TestCase):
+class TestEllipticCurveHash(object):
     """
-    Tests for :py:type:`_EllipticCurve`\ 's implementation of hashing (thus use
-    as an item in a :py:type:`dict` or :py:type:`set`).
+    Tests for `_EllipticCurve`'s implementation of hashing (thus use as
+    an item in a `dict` or `set`).
     """
     curve_factory = EllipticCurveFactory()
 
@@ -3984,20 +3930,20 @@ class EllipticCurveHashTests(TestCase):
 
     def test_contains(self):
         """
-        The ``in`` operator reports that a :py:type:`set` containing a curve
-        does contain that curve.
+        The ``in`` operator reports that a `set` containing a curve does
+        contain that curve.
         """
         curve = get_elliptic_curve(self.curve_factory.curve_name)
         curves = set([curve])
-        self.assertIn(curve, curves)
+        assert curve in curves
 
     def test_does_not_contain(self):
         """
-        The ``in`` operator reports that a :py:type:`set` not containing a
-        curve does not contain that curve.
+        The ``in`` operator reports that a `set` not containing a curve
+        does not contain that curve.
         """
         curve = get_elliptic_curve(self.curve_factory.curve_name)
         curves = set([
             get_elliptic_curve(self.curve_factory.another_curve_name)
         ])
-        self.assertNotIn(curve, curves)
+        assert curve not in curves
