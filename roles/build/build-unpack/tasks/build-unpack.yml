@@ -49,7 +49,7 @@
 
     sudo btrfs subvolume create "$build_target/rootfs";
 
-    if false; then
+    if true; then
 
       {
         rzbackup-client restore
