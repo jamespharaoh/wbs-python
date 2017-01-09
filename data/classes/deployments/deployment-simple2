@@ -38,6 +38,10 @@ deployment:
   rabbit_admin_user: "admin"
   rabbit_api_user: "api"
 
+  media_cache_enabled: "yes"
+  media_cache_size: "1g"
+  media_cache_keys_zone_size: "8m"
+
   kafka:
 
     num_network_threads: "3"
