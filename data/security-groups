@@ -94,6 +94,11 @@
       cidr_ip: "10.0.0.0/8"
 
     - proto: "tcp"
+      from_port: "3000"
+      to_port: "3099"
+      cidr_ip: "10.0.0.0/8"
+
+    - proto: "tcp"
       from_port: "8080"
       to_port: "8080"
       cidr_ip: "10.0.0.0/8"
