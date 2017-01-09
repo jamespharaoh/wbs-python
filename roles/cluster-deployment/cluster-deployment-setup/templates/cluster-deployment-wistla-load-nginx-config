@@ -321,27 +321,27 @@ http {
 
 		expires max;
 
-		location /robots.txt {
+		location = /robots.txt {
 			alias /etc/nginx/robots-txt-assets;
 		}
 
 {% for location_char in [ '1', '2' ] %}
 {% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 
-		location /{{ location_char }}/images {
-			proxy_pass http://api/images;
+		location /{{ location_char }}/images/ {
+			proxy_pass http://api/images/;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
 
-		location /{{ location_char }}/audio {
-			proxy_pass http://api/audio;
+		location /{{ location_char }}/audio/ {
+			proxy_pass http://api/audio/;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
 
-		location /{{ location_char }}/video {
-			proxy_pass http://api/video;
+		location /{{ location_char }}/video/ {
+			proxy_pass http://api/video/;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
@@ -349,37 +349,46 @@ http {
 {% endif %}
 {% endfor %}
 
-		location /api/emails {
-			alias /home/ubuntu/content-api/emails;
+		location /api/emails/ {
+			alias /home/ubuntu/content-api/emails/;
 		}
 
-		location /browser/assets {
-			alias /home/ubuntu/content-browser/assets;
+		location /browser/assets/ {
+			alias /home/ubuntu/content-browser/assets/;
 		}
 
-		location /browser/fonts {
-			alias /home/ubuntu/content-browser/fonts;
+		location /browser/fonts/ {
+			alias /home/ubuntu/content-browser/fonts/;
 		}
 
-		location /common/emails/assets {
-			alias /home/ubuntu/content-common/emails/assets;
+		location /common/emails/assets/ {
+			alias /home/ubuntu/content-common/emails/assets/;
 		}
 
-		location /common/favicon {
-			alias /home/ubuntu/content-common/favicon;
+		location /common/favicon/ {
+			alias /home/ubuntu/content-common/favicon/;
 		}
 
-		location /web/assets {
-			alias /home/ubuntu/content-web/assets;
+		location /web/assets/ {
+			alias /home/ubuntu/content-web/assets/;
 		}
 
-		location /web/videos {
-			alias /home/ubuntu/content-web/videos;
+		location /web/videos/ {
+			alias /home/ubuntu/content-web/videos/;
 		}
 
-		location /web/fonts {
-			alias /home/ubuntu/content-web/fonts;
+		location /web/fonts/ {
+			alias /home/ubuntu/content-web/fonts/;
 		}
+
+{% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
+		location ~ ^/v2/media/([0-9A-Z]+)-size-([0-9]+)-ar-([0-9]+:[0-9]+)$ {
+			proxy_pass http://api2/v2/media/$1?size=$2&ar=$3;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_connect_timeout 10ms;
+		}
+{% endif %}
 
 	}
 
