@@ -48,6 +48,9 @@ node_deploy_projects:
       - target: "local.yaml"
         source: "wistla-media-daemon-local.yaml"
 
+  - name: "wistla-logging"
+    type: "nodejs"
+
   - name: "wistla-blob"
     type: "nodejs"
 
