@@ -493,7 +493,17 @@ http {
 
 		}
 
-		location /TEST {
+		location /v2/ {
+
+			proxy_pass http://deployment-{{ deployment.supercluster_name }}-2;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_set_header Host "{{ deployment.assets_domain }}";
+			proxy_set_header X-Wistla-Entry-Region "{{ region_code }}";
+
+		}
+
+		location /TEST/ {
 
 			proxy_pass http://deployment-{{ target }};
 			proxy_http_version 1.1;
