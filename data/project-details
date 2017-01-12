@@ -29,6 +29,18 @@
 
 #    - "npm install"
 
+- name: "wistla-logging"
+  short: "logging module"
+  default_branch: "development"
+  npm_name: "@wistla/logging"
+  description:
+
+    logging module
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-util"
   short: "generic helpers that are used across @wistla/* modules"
   default_branch: "development"
@@ -68,6 +80,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-util"
     - "wistla-test"
 
@@ -82,6 +95,7 @@
 
     - "wistla-data-process"
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-media"
     - "wistla-pubsub"
     - "wistla-raml-api"
@@ -107,20 +121,10 @@
   depends:
 
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-email"
-  default_branch: "development"
-  npm_name: "@wistla/email"
-  description:
-
-    TODO
 
   build_steps:
 
@@ -136,6 +140,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-media"
     - "wistla-pubsub"
     - "wistla-util"
@@ -156,6 +161,7 @@
 
     - "wistla-db"
     - "wistla-email"
+    - "wistla-logging"
     - "wistla-notifications"
     - "wistla-pubsub"
     - "wistla-util"
@@ -171,6 +177,7 @@
 
   depends:
 
+    - "wistla-logging"
     - "wistla-test"
     - "wistla-util"
 
@@ -219,6 +226,7 @@
 
     - "wistla-blob"
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
@@ -236,6 +244,7 @@
 
     - "wistla-db"
     - "wistla-i18n"
+    - "wistla-logging"
     - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
@@ -253,6 +262,7 @@
 
     - "wistla-db"
     - "wistla-i18n"
+    - "wistla-logging"
     - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
@@ -268,6 +278,7 @@
   depends:
 
     - "wistla-db"
+    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-util"
@@ -288,6 +299,7 @@
 
   depends:
 
+    - "wistla-logging"
     - "wistla-util"
     - "wistla-test"
 
@@ -340,6 +352,7 @@
 
   depends:
 
+    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-test"
@@ -360,6 +373,7 @@
 
   depends:
 
+    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-test"
     - "wistla-util"

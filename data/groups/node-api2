@@ -55,6 +55,9 @@ node_deploy_projects:
   - name: "wistla-blob"
     type: "nodejs"
 
+  - name: "wistla-logging"
+    type: "nodejs"
+
   - name: "wistla-media"
     type: "nodejs"
 
