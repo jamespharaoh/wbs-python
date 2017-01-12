@@ -87,6 +87,9 @@
 
     set -euf -o pipefail;
 
+    exec 200>{{ builds_path }}/lock;
+    flock --exclusive 200;
+
     {
       sudo tar
         --create
