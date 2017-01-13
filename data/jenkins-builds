@@ -1,0 +1,157 @@
+---
+
+mainline:
+
+  name: "mainline"
+  projects:
+
+    - name: "content-common"
+      branch: "master"
+
+    - name: "wistla-api-server"
+      branch: "development"
+
+    - name: "wistla-blob"
+      branch: "development"
+
+    - name: "wistla-data-export"
+      branch: "development"
+
+    - name: "wistla-data-import"
+      branch: "development"
+
+    - name: "wistla-data-process"
+      branch: "development"
+
+    - name: "wistla-db"
+      branch: "development"
+
+    - name: "wistla-db-daemon"
+      branch: "development"
+
+    - name: "wistla-db-schema"
+      branch: "development"
+
+    - name: "wistla-devops"
+      branch: "development"
+
+    - name: "wistla-email"
+      branch: "development"
+
+    - name: "wistla-i18n"
+      branch: "development"
+
+    - name: "wistla-integration"
+      branch: "development"
+
+    - name: "wistla-logging"
+      branch: "development"
+
+    - name: "wistla-media"
+      branch: "development"
+
+    - name: "wistla-media-daemon"
+      branch: "development"
+
+    - name: "wistla-notification-daemon"
+      branch: "development"
+
+    - name: "wistla-notifications"
+      branch: "development"
+
+    - name: "wistla-pubsub"
+      branch: "development"
+
+    - name: "wistla-raml-api"
+      branch: "development"
+
+    - name: "wistla-raml-server"
+      branch: "development"
+
+    - name: "wistla-raml-to-api"
+      branch: "development"
+
+    - name: "wistla-test"
+      branch: "development"
+
+    - name: "wistla-util"
+      branch: "development"
+
+version-1:
+
+  name: "version-1"
+  projects:
+
+    - name: "content-common"
+      branch: "version-1"
+
+    - name: "wistla-api-server"
+      branch: "version-1"
+
+    - name: "wistla-blob"
+      branch: "version-1"
+
+    - name: "wistla-data-export"
+      branch: "version-1"
+
+    - name: "wistla-data-import"
+      branch: "version-1"
+
+    - name: "wistla-data-process"
+      branch: "version-1"
+
+    - name: "wistla-db"
+      branch: "version-1"
+
+    - name: "wistla-db-daemon"
+      branch: "version-1"
+
+    - name: "wistla-db-schema"
+      branch: "version-1"
+
+    - name: "wistla-devops"
+      branch: "version-1"
+
+    - name: "wistla-email"
+      branch: "version-1"
+
+    - name: "wistla-i18n"
+      branch: "version-1"
+
+    - name: "wistla-integration"
+      branch: "version-1"
+
+    - name: "wistla-logging"
+      branch: "version-1"
+
+    - name: "wistla-media"
+      branch: "version-1"
+
+    - name: "wistla-media-daemon"
+      branch: "version-1"
+
+    - name: "wistla-notification-daemon"
+      branch: "version-1"
+
+    - name: "wistla-notifications"
+      branch: "version-1"
+
+    - name: "wistla-pubsub"
+      branch: "version-1"
+
+    - name: "wistla-raml-api"
+      branch: "version-1"
+
+    - name: "wistla-raml-server"
+      branch: "version-1"
+
+    - name: "wistla-raml-to-api"
+      branch: "version-1"
+
+    - name: "wistla-test"
+      branch: "version-1"
+
+    - name: "wistla-util"
+      branch: "version-1"
+
+# ex: et ts=2 filetype=yaml

@@ -28,6 +28,7 @@
 
     - "python"
     - "nodejs"
+    - "etcd-client"
 
     - "install-mongodb"
     - "install-tools"

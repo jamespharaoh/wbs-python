@@ -49,7 +49,7 @@
   deployment: "montblanc"
 
 - network: "10.160"
-  deployment: "jenkins-latest"
+  deployment: "jenkins-0"
 
 - network: "10.161"
   deployment: "optimus"
@@ -107,5 +107,26 @@
 
 - network: "10.179"
   deployment: "production-2-b"
+
+- network: "10.180"
+  deployment: "jenkins-1"
+
+- network: "10.181"
+  deployment: "jenkins-2"
+
+- network: "10.182"
+  deployment: "jenkins-3"
+
+- network: "10.183"
+  deployment: "jenkins-4"
+
+- network: "10.184"
+  deployment: "jenkins-5"
+
+- network: "10.185"
+  deployment: "jenkins-6"
+
+- network: "10.186"
+  deployment: "jenkins-7"
 
 # ex: et ts=2 filetype=yaml

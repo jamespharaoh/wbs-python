@@ -214,6 +214,7 @@ ansible_notice:
   ";": "{{ ansible_notice_generic | replace ('SEP', ';') }}"
   "//": "{{ ansible_notice_generic | replace ('SEP', '//') }}"
   "--": "{{ ansible_notice_generic | replace ('SEP', '--') }}"
+  "<!--": "{{ [ '<!--', ansible_warning_lines, '-->' ] | join }}"
 
 wistla_dist_url: "https://dist.ops.wistla.com"
 

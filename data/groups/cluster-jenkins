@@ -213,4 +213,10 @@ rzbackup_max_compressed_filesystem_cache_entries: "1048576"
 ubuntu_release: "trusty"
 system_init: "upstart"
 
+etcd_version: "2.2.2"
+etcd_clustered: "no"
+etcd_secured: "yes"
+etcd_client_authority: "ops-etcd-client"
+etcd_peer_authority: "ops-etcd-peer"
+
 # ex: et ts=2 filetype=yaml

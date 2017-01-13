@@ -2,6 +2,17 @@
 
 amazon_instance_state: "running"
 amazon_instance_type_running: "c4.xlarge"
+etcd: 
+  
+  client_certificate: "/authority/ops-etcd-client/issue/11/certificate"
+  client_private_key: "/authority/ops-etcd-client/issue/11/key"
+  installed_version: "2.2.2"
+  state: "installed"
+
+etcd_client_certificate: "/authority/ops-etcd-client/issue/11/certificate"
+etcd_client_private_key: "/authority/ops-etcd-client/issue/11/key"
+etcd_installed_version: "2.2.2"
+etcd_state: "installed"
 heka: 
   
   installed_version: "0.10.0"

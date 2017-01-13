@@ -7,6 +7,9 @@ developer_full:
   - name: "wistla-devops"
     branch: "development"
 
+  - name: "wistla-jenkins-config"
+    branch: "master"
+
   # ---------- integration
 
   - name: "wistla-integration"

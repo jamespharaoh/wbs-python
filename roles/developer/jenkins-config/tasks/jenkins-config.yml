@@ -1,0 +1,136 @@
+---
+
+- name: "jenkins config pre integration job directories"
+  with_items: "{{ jenkins_builds | values | flatten_hash ('projects') }}"
+  action:
+
+    module: "file"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.outer.name,
+      '-0-pre-integration-',
+      item.projects.name,
+    ] | join }}"
+    state: "directory"
+
+- name: "jenkins config pre integration job configuration"
+  with_items: "{{ jenkins_builds | values | flatten_hash ('projects') }}"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.outer.name,
+      '-0-pre-integration-',
+      item.projects.name,
+      '/config.xml',
+    ] | join }}"
+    src: "jenkins-config-pre-integration-job"
+
+- name: "jenkins config prepare integration job directory"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "file"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-1-prepare-integration',
+    ] | join }}"
+    state: "directory"
+
+- name: "jenkins config prepare integration job configuration"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-1-prepare-integration/config.xml',
+    ] | join }}"
+    src: "jenkins-config-prepare-integration-job"
+
+- name: "jenkins config merge integration job directory"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "file"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-2-merge-integration',
+    ] | join }}"
+    state: "directory"
+
+- name: "jenkins config merge integration job configuration"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-2-merge-integration/config.xml',
+    ] | join }}"
+    src: "jenkins-config-merge-integration-job"
+
+- name: "jenkins config build integration job directory"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "file"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-3-build-integration',
+    ] | join }}"
+    state: "directory"
+
+- name: "jenkins config build integration job configuration"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-3-build-integration/config.xml',
+    ] | join }}"
+    src: "jenkins-config-build-integration-job"
+
+- name: "jenkins config post integration job directory"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "file"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-4-post-integration',
+    ] | join }}"
+    state: "directory"
+
+- name: "jenkins config post integration job configuration"
+  with_items: "{{ jenkins_builds | values }}"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      deployment_home,
+      '/wistla-jenkins-config/jobs/',
+      item.name,
+      '-4-post-integration/config.xml',
+    ] | join }}"
+    src: "jenkins-config-post-integration-job"
+
+# ex: et ts=2 filetype=yaml

@@ -84,6 +84,11 @@ etcd_directories:
   - path: "/etc/etcd"
     mode: "0755"
 
+etcd_client_directories:
+
+  - path: "/etc/etcd"
+    mode: "0755"
+
 etcd_security_config:
 
   - source: "{{ etcd_peer_ca_certificate | default ('ERROR') }}"
@@ -110,6 +115,20 @@ etcd_security_config:
     target: "client-{{ etcd_name }}.key"
     mode: "0600"
 
+etcd_client_security_config:
+
+  - source: "{{ etcd_client_ca_certificate | default ('ERROR') }}"
+    target: "client-ca.cert"
+    mode: "0644"
+
+  - source: "{{ etcd_client_certificate | default ('ERROR') }}"
+    target: "client-{{ etcd_name }}.cert"
+    mode: "0644"
+
+  - source: "{{ etcd_client_private_key | default ('ERROR') }}"
+    target: "client-{{ etcd_name }}.key"
+    mode: "0600"
+
 etcd_config_templates:
 
   - target: "/etc/etcd/etcd-environment"
@@ -123,5 +142,7 @@ etcd_config_templates:
     user: "root"
     group: "root"
     mode: "0755"
+
+etcd_client_config_templates: []
 
 # ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

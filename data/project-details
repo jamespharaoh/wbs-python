@@ -10,83 +10,19 @@
     - "data/runtime"
     - "security"
 
+  jenkins_build_steps:
+
+    - "scripts/setup-project build"
+
+- name: "wistla-jenkins-config"
+  default_branch: "master"
+
 # ---------- integration
 
 - name: "wistla-integration"
   default_branch: "development"
 
 # ---------- modules
-
-#- name: "api-stub-server"
-#  short: "stub server for basic testing"
-#  default_branch: "development"
-#  npm_name: "@wistla/api-stub-server"
-#  depends:
-
-#    - "wistla-raml-server"
-
-#  build_steps:
-
-#    - "npm install"
-
-- name: "wistla-logging"
-  short: "logging module"
-  default_branch: "development"
-  npm_name: "@wistla/logging"
-  description:
-
-    logging module
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-util"
-  short: "generic helpers that are used across @wistla/* modules"
-  default_branch: "development"
-  npm_name: "@wistla/util"
-  description:
-
-    generic helpers that are used across @wistla/* modules
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-i18n"
-  short: "internationalisation"
-  default_branch: "development"
-  npm_name: "@wistla/i18n"
-  description:
-
-    internationalisation
-
-  depends:
-
-    - "wistla-util"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-pubsub"
-  short: "wistla pub/sub message queue razzamatazz"
-  default_branch: "development"
-  npm_name: "@wistla/pubsub"
-  description:
-
-    wistla pub/sub message queue razzamatazz
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
 
 - name: "wistla-api-server"
   default_branch: "development"
@@ -95,7 +31,6 @@
 
     - "wistla-data-process"
     - "wistla-db"
-    - "wistla-logging"
     - "wistla-media"
     - "wistla-pubsub"
     - "wistla-raml-api"
@@ -111,73 +46,12 @@
     - "npm install"
     - "npm run build"
 
-- name: "wistla-db-daemon"
-  default_branch: "development"
-  npm_name: "@wistla/db-daemon"
-  description:
-
-    brokers changes from main db to cache dbs
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-media-daemon"
-  default_branch: "development"
-  npm_name: "@wistla/media-daemon"
-  description:
-
-    listens for media uploads and does what's necessary to survive
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-media"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-notification-daemon"
-  default_branch: "development"
-  npm_name: "@wistla/notification-daemon"
-  description:
-
-    listens for notifications and does what's necessary to survive
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-email"
-    - "wistla-logging"
-    - "wistla-notifications"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
 - name: "wistla-blob"
   default_branch: "development"
   npm_name: "@wistla/blob"
 
   depends:
 
-    - "wistla-logging"
     - "wistla-test"
     - "wistla-util"
 
@@ -217,60 +91,6 @@
     - "wistla-test"
     - "wistla-util"
 
-- name: "wistla-media"
-  short: "media handling"
-  default_branch: "development"
-  npm_name: "@wistla/media"
-
-  depends:
-
-    - "wistla-blob"
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-notifications"
-  short: "send push notifications"
-  default_branch: "development"
-  npm_name: "@wistla/notifications"
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-i18n"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-email"
-  short: "sending emails et al"
-  default_branch: "development"
-  npm_name: "@wistla/email"
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-i18n"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
 - name: "wistla-data-process"
   short: "transform sql resultset into json for api"
   default_branch: "development"
@@ -278,7 +98,6 @@
   depends:
 
     - "wistla-db"
-    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-util"
@@ -299,7 +118,24 @@
 
   depends:
 
-    - "wistla-logging"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-db-daemon"
+  default_branch: "development"
+  npm_name: "@wistla/db-daemon"
+  description:
+
+    brokers changes from main db to cache dbs
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-pubsub"
     - "wistla-util"
     - "wistla-test"
 
@@ -320,6 +156,154 @@
 
     - "wistla-util"
     - "wistla-data-process"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-email"
+  short: "sending emails et al"
+  default_branch: "development"
+  npm_name: "@wistla/email"
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-i18n"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-media"
+  short: "media handling"
+  default_branch: "development"
+  npm_name: "@wistla/media"
+
+  depends:
+
+    - "wistla-blob"
+    - "wistla-db"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-util"
+  short: "generic helpers that are used across @wistla/* modules"
+  default_branch: "development"
+  npm_name: "@wistla/util"
+  description:
+
+    generic helpers that are used across @wistla/* modules
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-i18n"
+  short: "internationalisation"
+  default_branch: "development"
+  npm_name: "@wistla/i18n"
+  description:
+
+    internationalisation
+
+  depends:
+
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-logging"
+  short: "internationalisation"
+  default_branch: "development"
+  npm_name: "@wistla/logging"
+  description:
+
+    logging
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-media-daemon"
+  default_branch: "development"
+  npm_name: "@wistla/media-daemon"
+  description:
+
+    listens for media uploads and does what's necessary to survive
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-media"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-notification-daemon"
+  default_branch: "development"
+  npm_name: "@wistla/notification-daemon"
+  description:
+
+    listens for notifications and does what's necessary to survive
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-email"
+    - "wistla-notifications"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-notifications"
+  short: "send push notifications"
+  default_branch: "development"
+  npm_name: "@wistla/notifications"
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-i18n"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-pubsub"
+  short: "wistla pub/sub message queue razzamatazz"
+  default_branch: "development"
+  npm_name: "@wistla/pubsub"
+  description:
+
+    wistla pub/sub message queue razzamatazz
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-util"
+    - "wistla-test"
 
   build_steps:
 
@@ -352,7 +336,6 @@
 
   depends:
 
-    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-raml-to-api"
     - "wistla-test"
@@ -373,7 +356,6 @@
 
   depends:
 
-    - "wistla-logging"
     - "wistla-raml-api"
     - "wistla-test"
     - "wistla-util"

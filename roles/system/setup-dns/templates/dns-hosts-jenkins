@@ -1,0 +1,68 @@
+{%- for network in networks -%}
+{%- if (
+	'deployment' in network
+	and network.deployment | starts_with ('jenkins-')
+) -%}
+
+	{%- print '\n# ---------- deployment ', network.deployment, '\n\n' -%}
+
+	{%- print [
+		network.network + '.0.1',
+		'wistla-' + network.deployment + '-dev',
+	] | join (' '), '\n' -%}
+
+	{%- for node_type in [
+		'api',
+		'api2',
+		'browser',
+		'db-daemon',
+		'kafka',
+		'load',
+		'media',
+		'mongo',
+		'notifications',
+		'postgresql',
+		'postgresql-cache',
+		'postgresql-main',
+		'rabbit',
+		'web',
+	] -%}
+	{%- for node_index in range (4) -%}
+
+		{%- print [
+			[
+				network.network,
+				node_index | string,
+				node_type_indices [node_type] | string,
+			] | join ('.'),
+			[
+				network.deployment,
+				node_type,
+				node_index | string,
+			] | join ('-'),
+		] | join (' ') + '\n' -%}
+
+		{%- if node_type == 'load' -%}
+
+			{%- print [
+				[
+					network.network,
+					node_index | string,
+					node_type_indices [node_type] | string,
+				] | join ('.'),
+			] | union (
+				[ 'api', 'web', 'short', 'assets' ]
+				| append_list ('.' + [
+					network.deployment,
+					node_type,
+					node_index | string,
+				] | join ('-'))
+			) | join (' ') + '\n' -%}
+
+		{%- endif -%}
+
+	{%- endfor -%}
+	{%- endfor -%}
+
+{%- endif -%}
+{%- endfor -%}
