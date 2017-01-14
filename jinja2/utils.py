@@ -5,10 +5,11 @@
 
     Utility functions.
 
-    :copyright: (c) 2010 by the Jinja Team.
+    :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import re
+import json
 import errno
 from collections import deque
 from threading import Lock
@@ -36,6 +37,8 @@ missing = type('MissingType', (), {'__repr__': lambda x: 'missing'})()
 internal_code = set()
 
 concat = u''.join
+
+_slash_escape = '\\/' not in json.dumps('/')
 
 
 def contextfunction(f):
@@ -483,6 +486,88 @@ try:
     MutableMapping.register(LRUCache)
 except ImportError:
     pass
+
+
+def select_autoescape(enabled_extensions=('html', 'htm', 'xml'),
+                      disabled_extensions=(),
+                      default_for_string=True,
+                      default=False):
+    """Intelligently sets the initial value of autoescaping based on the
+    filename of the template.  This is the recommended way to configure
+    autoescaping if you do not want to write a custom function yourself.
+
+    If you want to enable it for all templates created from strings or
+    for all templates with `.html` and `.xml` extensions::
+
+        from jinja2 import Environment, select_autoescape
+        env = Environment(autoescape=select_autoescape(
+            enabled_extensions=('html', 'xml'),
+            default_for_string=True,
+        ))
+
+    Example configuration to turn it on at all times except if the template
+    ends with `.txt`::
+
+        from jinja2 import Environment, select_autoescape
+        env = Environment(autoescape=select_autoescape(
+            disabled_extensions=('txt',),
+            default_for_string=True,
+            default=True,
+        ))
+
+    The `enabled_extensions` is an iterable of all the extensions that
+    autoescaping should be enabled for.  Likewise `disabled_extensions` is
+    a list of all templates it should be disabled for.  If a template is
+    loaded from a string then the default from `default_for_string` is used.
+    If nothing matches then the initial value of autoescaping is set to the
+    value of `default`.
+
+    For security reasons this function operates case insensitive.
+
+    .. versionadded:: 2.9
+    """
+    enabled_patterns = tuple('.' + x.lstrip('.').lower()
+                             for x in enabled_extensions)
+    disabled_patterns = tuple('.' + x.lstrip('.').lower()
+                              for x in disabled_extensions)
+    def autoescape(template_name):
+        if template_name is None:
+            return default_for_string
+        template_name = template_name.lower()
+        if template_name.endswith(enabled_patterns):
+            return True
+        if template_name.endswith(disabled_patterns):
+            return False
+        return default
+    return autoescape
+
+
+def htmlsafe_json_dumps(obj, dumper=None, **kwargs):
+    """Works exactly like :func:`dumps` but is safe for use in ``<script>``
+    tags.  It accepts the same arguments and returns a JSON string.  Note that
+    this is available in templates through the ``|tojson`` filter which will
+    also mark the result as safe.  Due to how this function escapes certain
+    characters this is safe even if used outside of ``<script>`` tags.
+
+    The following characters are escaped in strings:
+
+    -   ``<``
+    -   ``>``
+    -   ``&``
+    -   ``'``
+
+    This makes it safe to embed such strings in any place in HTML with the
+    notable exception of double quoted attributes.  In that case single
+    quote your attributes or HTML escape it in addition.
+    """
+    if dumper is None:
+        dumper = json.dumps
+    rv = dumper(obj, **kwargs) \
+        .replace(u'<', u'\\u003c') \
+        .replace(u'>', u'\\u003e') \
+        .replace(u'&', u'\\u0026') \
+        .replace(u"'", u'\\u0027')
+    return rv
 
 
 @implements_iterator

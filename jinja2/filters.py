@@ -5,7 +5,7 @@
 
     Bundled jinja filters.
 
-    :copyright: (c) 2010 by the Jinja Team.
+    :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import re
@@ -15,10 +15,10 @@ from random import choice
 from itertools import groupby
 from collections import namedtuple
 from jinja2.utils import Markup, escape, pformat, urlize, soft_unicode, \
-     unicode_urlencode
+     unicode_urlencode, htmlsafe_json_dumps
 from jinja2.runtime import Undefined
 from jinja2.exceptions import FilterArgumentError
-from jinja2._compat import imap, string_types, text_type, iteritems
+from jinja2._compat import imap, string_types, text_type, iteritems, PY2
 
 
 _word_re = re.compile(r'\w+', re.UNICODE)
@@ -463,31 +463,40 @@ def do_indent(s, width=4, indentfirst=False):
     return rv
 
 
-def do_truncate(s, length=255, killwords=False, end='...'):
+@environmentfilter
+def do_truncate(env, s, length=255, killwords=False, end='...', leeway=None):
     """Return a truncated copy of the string. The length is specified
     with the first parameter which defaults to ``255``. If the second
     parameter is ``true`` the filter will cut the text at length. Otherwise
     it will discard the last word. If the text was in fact
     truncated it will append an ellipsis sign (``"..."``). If you want a
     different ellipsis sign than ``"..."`` you can specify it using the
-    third parameter.
+    third parameter. Strings that only exceed the length by the tolerance
+    margin given in the fourth parameter will not be truncated.
 
     .. sourcecode:: jinja
 
-        {{ "foo bar baz"|truncate(9) }}
-            -> "foo ..."
-        {{ "foo bar baz"|truncate(9, True) }}
+        {{ "foo bar baz qux"|truncate(9) }}
+            -> "foo..."
+        {{ "foo bar baz qux"|truncate(9, True) }}
             -> "foo ba..."
+        {{ "foo bar baz qux"|truncate(11) }}
+            -> "foo bar baz qux"
+        {{ "foo bar baz qux"|truncate(11, False, '...', 0) }}
+            -> "foo bar..."
 
+    The default leeway on newer Jinja2 versions is 5 and was 0 before but
+    can be reconfigured globally.
     """
-    if len(s) <= length:
+    if leeway is None:
+        leeway = env.policies['truncate.leeway']
+    assert length >= len(end), 'expected length >= %s, got %s' % (len(end), length)
+    assert leeway >= 0, 'expected leeway >= 0, got %s' % leeway
+    if len(s) <= length + leeway:
         return s
-    elif killwords:
+    if killwords:
         return s[:length - len(end)] + end
-
     result = s[:length - len(end)].rsplit(' ', 1)[0]
-    if len(result) < length:
-        result += ' '
     return result + end
 
 
@@ -679,7 +688,14 @@ def do_round(value, precision=0, method='common'):
     return func(value * (10 ** precision)) / (10 ** precision)
 
 
+# Use a regular tuple repr here.  This is what we did in the past and we
+# really want to hide this custom type as much as possible.  In particular
+# we do not want to accidentally expose an auto generated repr in case
+# people start to print this out in comments or something similar for
+# debugging.
 _GroupTuple = namedtuple('_GroupTuple', ['grouper', 'list'])
+_GroupTuple.__repr__ = tuple.__repr__
+_GroupTuple.__str__ = tuple.__str__
 
 @environmentfilter
 def do_groupby(environment, value, attribute):
@@ -721,7 +737,8 @@ def do_groupby(environment, value, attribute):
        attribute of another attribute.
     """
     expr = make_attrgetter(environment, attribute)
-    return [_GroupTuple(key, list(values)) for key, values in groupby(sorted(value, key=expr), expr)]
+    return [_GroupTuple(key, list(values)) for key, values
+            in groupby(sorted(value, key=expr), expr)]
 
 
 @environmentfilter
@@ -912,6 +929,41 @@ def do_rejectattr(*args, **kwargs):
     return select_or_reject(args, kwargs, lambda x: not x, True)
 
 
+@evalcontextfilter
+def do_tojson(eval_ctx, value, indent=None):
+    """Dumps a structure to JSON so that it's safe to use in ``<script>``
+    tags.  It accepts the same arguments and returns a JSON string.  Note that
+    this is available in templates through the ``|tojson`` filter which will
+    also mark the result as safe.  Due to how this function escapes certain
+    characters this is safe even if used outside of ``<script>`` tags.
+
+    The following characters are escaped in strings:
+
+    -   ``<``
+    -   ``>``
+    -   ``&``
+    -   ``'``
+
+    This makes it safe to embed such strings in any place in HTML with the
+    notable exception of double quoted attributes.  In that case single
+    quote your attributes or HTML escape it in addition.
+
+    The indent parameter can be used to enable pretty printing.  Set it to
+    the number of spaces that the structures should be indented with.
+
+    Note that this filter is for use in HTML contexts only.
+
+    .. versionadded:: 2.9
+    """
+    policies = eval_ctx.environment.policies
+    dumper = policies['json.dumps_function']
+    options = policies['json.dumps_kwargs']
+    if indent is not None:
+        options = dict(options)
+        options['indent'] = indent
+    return htmlsafe_json_dumps(value, dumper=dumper, **options)
+
+
 def prepare_map(args, kwargs):
     context = args[0]
     seq = args[1]
@@ -1017,4 +1069,5 @@ FILTERS = {
     'wordcount':            do_wordcount,
     'wordwrap':             do_wordwrap,
     'xmlattr':              do_xmlattr,
+    'tojson':               do_tojson,
 }

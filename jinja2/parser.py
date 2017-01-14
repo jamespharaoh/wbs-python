@@ -5,7 +5,7 @@
 
     Implements the template parser.
 
-    :copyright: (c) 2010 by the Jinja Team.
+    :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 from jinja2 import nodes
@@ -16,7 +16,7 @@ from jinja2._compat import imap
 
 _statement_keywords = frozenset(['for', 'if', 'block', 'extends', 'print',
                                  'macro', 'include', 'from', 'import',
-                                 'set'])
+                                 'set', 'with', 'autoescape'])
 _compare_operators = frozenset(['eq', 'ne', 'lt', 'lteq', 'gt', 'gteq'])
 
 _math_nodes = {
@@ -223,6 +223,34 @@ class Parser(object):
                 node.else_ = []
             break
         return result
+
+    def parse_with(self):
+        node = nodes.With(lineno=next(self.stream).lineno)
+        targets = []
+        values = []
+        while self.stream.current.type != 'block_end':
+            lineno = self.stream.current.lineno
+            if targets:
+                self.stream.expect('comma')
+            target = self.parse_assign_target()
+            target.set_ctx('param')
+            targets.append(target)
+            self.stream.expect('assign')
+            values.append(self.parse_expression())
+        node.targets = targets
+        node.values = values
+        node.body = self.parse_statements(('name:endwith',),
+                                          drop_needle=True)
+        return node
+
+    def parse_autoescape(self):
+        node = nodes.ScopedEvalContextModifier(lineno=next(self.stream).lineno)
+        node.options = [
+            nodes.Keyword('autoescape', self.parse_expression())
+        ]
+        node.body = self.parse_statements(('name:endautoescape',),
+                                            drop_needle=True)
+        return nodes.Scope([node])
 
     def parse_block(self):
         node = nodes.Block(lineno=next(self.stream).lineno)
@@ -806,7 +834,7 @@ class Parser(object):
                                            'name:and')):
             if self.stream.current.test('name:is'):
                 self.fail('You cannot chain multiple tests with is')
-            args = [self.parse_expression()]
+            args = [self.parse_primary()]
         else:
             args = []
         node = nodes.Test(node, name, args, kwargs, dyn_args,
