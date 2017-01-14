@@ -10,11 +10,10 @@ from wbs.hash import *
 from wbs.httpclient import *
 from wbs.lazy import *
 from wbs.login import *
+from wbs.output import *
 from wbs.project import *
 from wbs.random import *
 from wbs.schema import *
 from wbs.table import *
-
-from wbs import output
 
 # ex: noet ts=4 filetype=python
