@@ -77,13 +77,13 @@ python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 
   
-  installed_prefix: "/opt/rzbackup-2.0.8-trusty"
-  installed_version: "2.0.8-trusty"
+  installed_prefix: "/opt/rzbackup-3.1.0-trusty"
+  installed_version: "3.1.0-trusty"
   needs_restart: "yes"
   state: "enabled"
 
-rzbackup_installed_prefix: "/opt/rzbackup-2.0.8-trusty"
-rzbackup_installed_version: "2.0.8-trusty"
+rzbackup_installed_prefix: "/opt/rzbackup-3.1.0-trusty"
+rzbackup_installed_version: "3.1.0-trusty"
 rzbackup_needs_restart: "yes"
 rzbackup_state: "enabled"
 ssh: 
