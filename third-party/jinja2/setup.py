@@ -40,7 +40,7 @@ from setuptools import setup
 
 setup(
     name='Jinja2',
-    version='2.9.dev',
+    version='2.10.dev',
     url='http://jinja.pocoo.org/',
     license='BSD',
     author='Armin Ronacher',
@@ -69,7 +69,7 @@ setup(
         'Topic :: Text Processing :: Markup :: HTML'
     ],
     packages=['jinja2'],
-    install_requires=['MarkupSafe'],
+    install_requires=['MarkupSafe>=0.23'],
     extras_require={'i18n': ['Babel>=0.8']},
     include_package_data=True,
     entry_points="""

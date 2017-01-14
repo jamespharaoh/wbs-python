@@ -5,17 +5,18 @@
 
     Checks the sandbox and other security features.
 
-    :copyright: (c) 2010 by the Jinja Team.
+    :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import pytest
 
 from jinja2 import Environment
 from jinja2.sandbox import SandboxedEnvironment, \
-     ImmutableSandboxedEnvironment, unsafe, has_format
+     ImmutableSandboxedEnvironment, unsafe
 from jinja2 import Markup, escape
 from jinja2.exceptions import SecurityError, TemplateSyntaxError, \
      TemplateRuntimeError
+from jinja2.nodes import EvalContext
 from jinja2._compat import text_type
 
 
@@ -41,7 +42,7 @@ class PublicStuff(object):
 
 
 @pytest.mark.sandbox
-class TestSandbox():
+class TestSandbox(object):
 
     def test_unsafe(self, env):
         env = SandboxedEnvironment()
@@ -119,7 +120,10 @@ class TestSandbox():
         assert text_type(t.module) == escaped_out
         assert escape(t.module) == escaped_out
         assert t.module.say_hello('<blink>foo</blink>') == escaped_out
-        assert escape(t.module.say_hello('<blink>foo</blink>')) == escaped_out
+        assert escape(t.module.say_hello(
+            EvalContext(env), '<blink>foo</blink>')) == escaped_out
+        assert escape(t.module.say_hello(
+            '<blink>foo</blink>')) == escaped_out
 
     def test_attr_filter(self, env):
         env = SandboxedEnvironment()
@@ -162,7 +166,6 @@ class TestSandbox():
 
 
 @pytest.mark.sandbox
-@pytest.mark.skipif(not has_format, reason='No format support')
 class TestStringFormat(object):
 
     def test_basic_format_safety(self):
