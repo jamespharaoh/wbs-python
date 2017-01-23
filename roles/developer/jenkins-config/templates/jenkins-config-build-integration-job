@@ -26,7 +26,7 @@
     </com.synopsys.arc.jenkinsci.plugins.jobrestrictions.jobs.JobRestrictionProperty>
     <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@1.10">
       <durationName>hour</durationName>
-      <count>20</count>
+      <count>12</count>
     </jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.5.3">
