@@ -95,6 +95,7 @@
         --create
         --one-file-system
         --directory "$build_source"
+        --exclude "./var/apt/lists/*"
         --exclude "./var/cache/apt/*"
         ".";
     } | {
