@@ -1,12 +1,19 @@
 ---
 
+- name: "wait for mongo"
+  wait_for:
+
+    host: "{{ deployment_name }}-mongo-{{ fixtures_host_suffix }}"
+    port: "27017"
+    delay: "1"
+    timeout: "60"
+
 - name: "initialise replica set"
   args:
 
     creates: "{{ deployment_home }}/shared/flags/mongo-replica-set"
 
   shell: "{{ [
-    'sleep 2',
     [
       'mongo',
       '--host',
@@ -14,7 +21,6 @@
       '--eval',
       '\"rs.initiate ()\"',
     ] | join (' '),
-    'sleep 2',
     'touch ' + deployment_home + '/shared/flags/mongo-replica-set',
   ] | join (' && ') }}"
 
