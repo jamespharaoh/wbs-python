@@ -10,6 +10,9 @@
 
     set -euf -o pipefail;
 
+    exec 200>{{ builds_path }}/lock;
+    flock --exclusive 200;
+
     if test "{{ deployment_mode }}" = "vagrant"; then
       eval $(misc/amazon-auth ops);
     fi;
