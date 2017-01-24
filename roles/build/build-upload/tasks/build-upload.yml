@@ -17,6 +17,7 @@
     aws s3 sync
       "{{ builds_path }}"
       "s3://wistla-builds/zbackup"
+      --size-only
       --exclude 'snapshots/*';
 
 # ex: et ts=2 filetype=yaml
