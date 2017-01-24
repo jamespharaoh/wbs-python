@@ -82,7 +82,7 @@ jenkins_deployment_names:
 python_packages:
 
   - name: "awscli"
-    version: "1.7.31"
+    version: "1.11.41"
 
   - name: "boto"
     version: "2.38.0"
