@@ -206,7 +206,7 @@ rzbackup_install_version: "3.1.0-{{ ubuntu_release }}"
 rzbackup_user: "ubuntu"
 rzbackup_repository: "/home/ubuntu/builds"
 rzbackup_password_file: "/run/wistla-build-secret"
-rzbackup_max_compressed_filesystem_cache_entries: "65536"
+rzbackup_max_compressed_filesystem_cache_entries: "262144"
 
 icinga_certificate: ""
 

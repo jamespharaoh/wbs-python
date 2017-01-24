@@ -16,11 +16,23 @@
       eval $({{ HOME }}/misc/amazon-auth ops);
     fi;
 
-    aws s3 sync
-      --size-only
-      --delete
-      --exclude 'snapshots/*'
-      "s3://wistla-builds/zbackup"
-      "{{ builds_path }}";
+    if test "{{ deployment_mode }}" = "jenkins"; then
+
+      aws s3 sync
+        --size-only
+        --exclude 'snapshots/*'
+        "s3://wistla-builds/zbackup"
+        "{{ builds_path }}";
+
+    else
+
+      aws s3 sync
+        --size-only
+        --delete
+        --exclude 'snapshots/*'
+        "s3://wistla-builds/zbackup"
+        "{{ builds_path }}";
+
+    fi;
 
 # ex: et ts=2 filetype=yaml

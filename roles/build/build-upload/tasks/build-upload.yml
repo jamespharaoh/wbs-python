@@ -10,6 +10,9 @@
 
     set -euf -o pipefail;
 
+    exec 200>{{ builds_path }}/lock;
+    flock --exclusive 200;
+
     if test "{{ deployment_mode }}" = "vagrant"; then
       eval $(misc/amazon-auth ops);
     fi;
@@ -17,6 +20,7 @@
     aws s3 sync
       "{{ builds_path }}"
       "s3://wistla-builds/zbackup"
+      --size-only
       --exclude 'snapshots/*';
 
 # ex: et ts=2 filetype=yaml

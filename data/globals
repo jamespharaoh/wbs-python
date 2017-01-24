@@ -227,7 +227,7 @@ python:
 
 python_pip:
 
-  version: "8.1.1"
+  version: "9.0.2"
   archive: "get-pip-{{ python_pip_version }}.py"
   url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
 
