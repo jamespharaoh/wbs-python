@@ -8,13 +8,15 @@
 [Service]
 
 	Type = notify
-	KillMode = process
-	Restart = on-failure
+
+	Restart = always
+	RestartSec = 10s
 
 	EnvironmentFile = /etc/etcd/etcd-environment
 
 	ExecStart = {{ etcd_target }}/etcd
-	ExecReload = /bin/kill -HUP $MAINPID
+
+	LimitNOFILE=40000
 
 [Install]
 

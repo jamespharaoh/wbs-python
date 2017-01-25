@@ -1,10 +1,11 @@
 ---
 
 - include: "build-haskell-cabal.yml"
+  when: "haskell_cabal_install == 'yes'"
   tags:
 
-    - "haskell"
+    - "haskell-cabal-build"
     - "haskell-cabal"
-    - "build-haskell-cabal"
+    - "haskell"
 
 # ex: et ts=2 filetype=yaml
