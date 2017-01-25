@@ -6,6 +6,12 @@
     - "build-essential"
     - "libapt-pkg-dev"
 
+  when: "
+    python_apt_installed_version != [
+      python_version,
+      python_apt_version,
+    ] | join ('/')
+  "
   become: "yes"
   action:
 
@@ -27,7 +33,7 @@
     module: "pip"
     name: "{{ item }}"
 
-- name: "build python-apt"
+- name: "python apt build from source"
   when: "
     python_apt_installed_version != [
       python_version,
@@ -47,7 +53,8 @@
 
     set -euf -o pipefail;
 
-    echo "PATH - $PATH";
+    pip install
+      sphinx;
 
     rm -rf "{{ python_temp }}";
     mkdir -p "{{ python_temp }}";
