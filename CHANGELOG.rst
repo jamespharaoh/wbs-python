@@ -2,6 +2,53 @@
 CHANGELOG
 =========
 
+1.5.5
+=====
+
+* feature:``codebuild``: Update codebuild client to latest version
+* feature:``ecs``: Update ecs client to latest version
+* feature:``codecommit``: Update codecommit client to latest version
+
+
+1.5.4
+=====
+
+* feature:``health``: Update health client to latest version
+* feature:``acm``: Update acm client to latest version
+
+
+1.5.3
+=====
+
+* feature:``ec2``: Update ec2 client to latest version
+
+
+1.5.2
+=====
+
+* feature:``rds``: Update rds client to latest version
+
+
+1.5.1
+=====
+
+* feature:``glacier``: Update glacier client to latest version
+* feature:``dynamodb``: Update dynamodb client to latest version
+* feature:``route53``: Update route53 client to latest version
+* feature:``polly``: Update polly client to latest version
+* feature:``rekognition``: Update rekognition client to latest version
+
+
+1.5.0
+=====
+
+* feature:Exceptions: Add modeled exceptions on client via ``Client.exceptions`` property
+* feature:``dynamodb``: Update dynamodb client to latest version
+* feature:``config``: Update config client to latest version
+* feature:``cur``: Update cur client to latest version
+* feature:``elasticache``: Update elasticache client to latest version
+
+
 1.4.93
 ======
 
