@@ -1,0 +1,93 @@
+---
+
+- name: "btrfs dedupe install"
+  when: "btrfs_dedupe_installed_version != btrfs_dedupe_install_version"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf "{{ btrfs_dedupe_install_temp }}";
+    mkdir -p "{{ btrfs_dedupe_install_temp }}";
+    cd "{{ btrfs_dedupe_install_temp }}";
+
+    wget "{{ btrfs_dedupe_install_url }}";
+
+    tar --extract --xz
+      --file "{{ btrfs_dedupe_install_archive }}";
+
+    rsync --recursive
+      "{{ btrfs_dedupe_install_directory }}/"
+      "{{ btrfs_dedupe_install_target }}/";
+
+    ln -sfn
+      "$( basename "{{ btrfs_dedupe_install_target }}" )"
+      "$( dirname "{{ btrfs_dedupe_install_target }}" )/rzbackup";
+
+    cd "/";
+    rm -rf "{{ btrfs_dedupe_install_temp }}";
+
+- name: "btrfs dedupe install files"
+  with_items: "{{ btrfs_dedupe_install_files }}"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "{{ item.target }}"
+    src: "{{ item.source }}"
+
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "btrfs dedupe install bin links"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    binaries=(
+      btrfs-dedupe
+    )
+
+    cd "/usr/local/bin";
+    for binary in "${binaries[@]}"; do
+
+      if ! test -x "/opt/{{ btrfs_dedupe_install_directory }}/$binary";
+      then
+        continue;
+      fi;
+
+      ln -sfn
+        "../../../opt/{{ btrfs_dedupe_install_directory }}/$binary"
+        "/usr/local/bin/$binary";
+
+    done;
+
+- name: "set btrfs_dedupe.state to 'installed'"
+  when: "btrfs_dedupe_state == ''"
+  update_resource:
+
+    btrfs_dedupe.state: "installed"
+
+- name: "set btrfs_dedupe.installed_version"
+  when: "btrfs_dedupe_installed_version != btrfs_dedupe_install_version"
+  update_resource:
+
+    btrfs_dedupe.installed_version: "{{ btrfs_dedupe_install_version }}"
+
+- name: "set btrfs_dedupe.installed_prefix"
+  when: "btrfs_dedupe_installed_prefix != btrfs_dedupe_install_target"
+  update_resource:
+
+    btrfs_dedupe.installed_prefix: "{{ btrfs_dedupe_install_target }}"
+
+# ex: et ts=2 filetype=yaml# ex: et ts=2 filetype=yaml

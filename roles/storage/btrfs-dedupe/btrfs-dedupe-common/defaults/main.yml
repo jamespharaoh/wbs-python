@@ -1,0 +1,60 @@
+---
+
+# ---------- state
+
+btrfs_dedupe_state: ""
+
+btrfs_dedupe_installed_version: ""
+btrfs_dedupe_installed_prefix: ""
+
+# ---------- configuration
+
+btrfs_dedupe_log: "/var/log/btrfs-dedupe.log"
+
+btrfs_dedupe_tasks:
+
+  - name: "main"
+    user: "root"
+    schedule: "10 23 * * *"
+    database_path: "/var/cache/btrfs-dedupe/database.json.gz"
+    dedupe_paths: [ "/" ]
+
+# ---------- installation details
+
+btrfs_dedupe_install: "{{ default_install | default ('yes') }}"
+btrfs_dedupe_install_version: ""
+btrfs_dedupe_install_mirror: "https://dist.wellbehavedsoftware.com/btrfs-dedupe"
+btrfs_dedupe_install_target: "/opt/{{ btrfs_dedupe_install_directory }}"
+btrfs_dedupe_install_link: "/opt/btrfs-dedupe"
+
+btrfs_dedupe_install_directory: "btrfs-dedupe-{{ btrfs_dedupe_install_version }}"
+btrfs_dedupe_install_archive: "{{ btrfs_dedupe_install_directory }}.tar.xz"
+btrfs_dedupe_install_url: "{{ btrfs_dedupe_install_mirror }}/{{ btrfs_dedupe_install_archive }}"
+btrfs_dedupe_install_temp: "/tmp/btrfs-dedupe-install"
+
+btrfs_dedupe_install_files:
+
+  - target: "/usr/local/bin/btrfs-dedupe-script"
+    source: "btrfs-dedupe-script"
+    user: "root"
+    group: "root"
+    mode: "0755"
+
+# ---------- setup
+
+btrfs_dedupe_setup_directories:
+
+  - directory: "/var/cache/btrfs-dedupe"
+    user: "root"
+    group: "root"
+    mode: "0750"
+
+btrfs_dedupe_setup_templates:
+
+  - target: "/etc/btrfs-dedupe-config"
+    source: "btrfs-dedupe-config"
+    user: "root"
+    group: "root"
+    mode: "0755"
+
+# ex: et ts=2 filetype=yaml

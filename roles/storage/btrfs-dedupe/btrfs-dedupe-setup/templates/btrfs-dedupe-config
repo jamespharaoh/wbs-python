@@ -1,0 +1,30 @@
+{{ ansible_warning ['#'] }}
+
+general:
+
+  log_path: "{{ btrfs_dedupe_log }}"
+
+{% if btrfs_dedupe_tasks %}
+tasks:
+{% for task in btrfs_dedupe_tasks %}
+
+  - name: "{{ task.name }}"
+{% for key in [
+  'database_path',
+  'quota_disable_path',
+] %}
+{% if key in task %}
+    {{ key }}: "{{ task [key] }}"
+{% endif %}
+{% endfor %}
+    dedupe_paths:
+
+{% for path in task.dedupe_paths %}
+      - "{{ path }}"
+{% endfor %}
+{% endfor %}
+{% else %}
+tasks: []
+{% endif %}
+
+# ex: et ts=2 filetype=yaml

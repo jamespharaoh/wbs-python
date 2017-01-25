@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import glob
+import os
+import subprocess
+import sys
+import time
+import yaml
+
+# load config
+
+config = yaml.safe_load (open (sys.argv [1]))
+task_names = sys.argv [2 : ]
+
+# redirect stdout and stderr to log file
+
+log_file = (
+	open (
+		config ["general"] ["log_path"],
+		"a"))
+
+os.dup2 (log_file.fileno (), 1)
+os.dup2 (log_file.fileno (), 2)
+
+def log_write (message):
+
+	log_file.write (
+		message)
+
+	log_file.flush ()
+
+# execute the named tasks
+
+for task_name in task_names:
+
+	task_config = (
+		filter (
+			lambda task: task ["name"] == task_name,
+			config ["tasks"])
+	) [0]
+
+	log_write (
+		"\n%s ===== Starting deduplication %s ===\n\n" % (
+			time.strftime (
+				"%Y-%m-%d %H:%M:%S",
+				time.gmtime ()),
+			task_name))
+
+	if "quota_disable_path" in task_config:
+
+		log_write (
+			"Disabling quotas for %s\n\n" % (
+				task_config ["quota_disable_path"]))
+
+		subprocess.call (
+			[
+				"btrfs",
+				"quota",
+				"disable",
+				task_config ["quota_disable_path"],
+			])
+	dedupe_paths = [
+		real_path
+		for glob_path in task_config ["dedupe_paths"]
+		for real_path in glob.iglob (glob_path)
+		if os.path.isdir (real_path)
+	]
+
+	subprocess.check_call (
+		[
+			"btrfs-dedupe",
+			"dedupe",
+			"--database",
+			task_config ["database_path"],
+		] + dedupe_paths)
+
+	if "quota_disable_path" in task_config:
+
+		log_write (
+			"\nEnabling quotas for %s\n" % (
+				task_config ["quota_disable_path"]))
+
+		subprocess.call (
+			[
+				"btrfs",
+				"quota",
+				"enable",
+				task_config ["quota_disable_path"],
+			])
+
+	log_write (
+		"\n%s ===== Completed deduplication %s ===\n\n" % (
+			time.strftime (
+				"%Y-%m-%d %H:%M:%S",
+				time.gmtime ()),
+			task_name))
+
+# ex: noet ts=4 filetype=python
