@@ -41,17 +41,26 @@
 
     set -euf -o pipefail;
 
-    cd "/usr/local/bin";
-    for binary in client convert decrypt restore server; do
+    binaries=(
+      rzbackup
+      rzbackup-client
+      rzbackup-convert
+      rzbackup-decrypt
+      rzbackup-restore
+      rzbackup-server
+    )
 
-      if ! test -x "/opt/{{ rzbackup_install_directory }}/rzbackup-$binary";
+    cd "/usr/local/bin";
+    for binary in "${binaries[@]}"; do
+
+      if ! test -x "/opt/{{ rzbackup_install_directory }}/$binary";
       then
         continue;
       fi;
 
       ln -sfn
-        "../../../opt/{{ rzbackup_install_directory }}/rzbackup-$binary"
-        "/usr/local/bin/rzbackup-$binary";
+        "../../../opt/{{ rzbackup_install_directory }}/$binary"
+        "/usr/local/bin/$binary";
 
     done;
 

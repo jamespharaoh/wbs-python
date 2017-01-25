@@ -1,0 +1,39 @@
+---
+
+- name: "btrfs dedupe control cron enable"
+  when: "btrfs_dedupe_state == 'enabled'"
+  register: "btrfs_dedupe_control_cron_enable_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/cron.d/btrfs-dedupe"
+    src: "btrfs-dedupe-cron"
+
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "btrfs dedupe control cron disable"
+  when: "btrfs_dedupe_state == 'disabled'"
+  register: "btrfs_dedupe_control_cron_disable_result"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/cron.d/btrfs-dedupe"
+    state: "absent"
+
+- name: "btrfs dedupe control cron restart"
+  changed_when: "
+    btrfs_dedupe_control_cron_enable_result | changed
+    or btrfs_dedupe_control_cron_disable_result | changed
+  "
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "cron"
+    state: "restarted"
+
+# ex: et ts=2 filetype=yaml

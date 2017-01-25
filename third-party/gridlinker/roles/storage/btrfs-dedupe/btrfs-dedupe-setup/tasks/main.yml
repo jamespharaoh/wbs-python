@@ -1,0 +1,10 @@
+---
+
+- include: "btrfs-dedupe-setup.yml"
+  when: "btrfs_dedupe_state in [ 'installed', 'enabled' ]"
+  tags:
+
+    - "btrfs-dedupe-setup"
+    - "btrfs-dedupe"
+
+# ex: et ts=2 filetype=yaml

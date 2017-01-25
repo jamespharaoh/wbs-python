@@ -1,5 +1,7 @@
 #!/bin/bash
 
+{{ ansible_warning ['#'] }}
+
 set -euf -o pipefail
 
 export MALLOC_CONF="narenas:1"

@@ -1,0 +1,10 @@
+---
+
+dependencies:
+
+  - "btrfs-dedupe-common"
+  - "btrfs-dedupe-install"
+  - "btrfs-dedupe-setup"
+  - "btrfs-dedupe-control"
+
+# ex: et ts=2 filetype=yaml

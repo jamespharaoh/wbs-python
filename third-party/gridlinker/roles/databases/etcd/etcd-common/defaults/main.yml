@@ -26,9 +26,10 @@ etcd_peer_url: "{{ [
   etcd_peer_port,
 ] | join }}"
 
-etcd_peer_urls: "{{ etcd_peer_hostnames
-  | prepend_list (etcd_peer_protocol + '://')
-  | append_list (':' + etcd_peer_port)
+etcd_peer_urls: "{{
+  etcd_peer_hostnames
+    | prepend_list (etcd_peer_protocol + '://')
+    | append_list (':' + etcd_peer_port)
 }}"
 
 etcd_client_hostname: "{{ etcd_hostname }}"
@@ -36,10 +37,13 @@ etcd_client_hostnames: [ "{{ etcd_client_hostname }}" ]
 etcd_client_ips: "{{ etcd_ips }}"
 etcd_client_protocol: "{{ 'https' if etcd_secured == 'yes' else 'http' }}"
 etcd_client_port: "2379"
+
 etcd_client_url: "{{ etcd_client_protocol }}://{{ etcd_client_hostname }}:{{ etcd_client_port }}"
-etcd_client_urls: "{{ etcd_client_hostnames
-  | prepend_list (etcd_client_protocol + '://')
-  | append_list (':' + etcd_client_port)
+
+etcd_client_urls: "{{
+  etcd_client_hostnames
+    | prepend_list (etcd_client_protocol + '://')
+    | append_list (':' + etcd_client_port)
 }}"
 
 etcd_user_email: "{{ identity.name }}" 

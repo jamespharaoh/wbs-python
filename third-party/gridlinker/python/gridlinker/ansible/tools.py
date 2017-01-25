@@ -1,6 +1,9 @@
 from __future__ import absolute_import
+from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import with_statement
 
+import collections
 import json
 import os
 import subprocess
@@ -196,89 +199,9 @@ def do_inventory_list (context):
 		output ["all"] ["vars"] [key] = (
 			context.local_data [value])
 
-	for key, value \
-	in context.project_metadata ["resource_data"].items ():
-
-		if "section" in value:
-
-			if value ["group"] in inventory.group_members:
-
-				output ["all"] ["vars"] [key] = dict ([
-
-					(
-
-						inventory.resolve_value_or_fail (
-							resource,
-							value ["key"]),
-
-						resource.get (
-							value ["section"]),
-
-					)
-
-					for resource_name
-					in inventory.group_members [value ["group"]]
-
-					for resource
-					in [ inventory.resources [resource_name] ]
-
-				])
-
-			elif value ["group"] in inventory.namespaces:
-
-				output ["all"] ["vars"] [key] = dict ([
-
-					(
-
-						inventory.resolve_value_or_fail (
-							resource,
-							value ["key"]),
-
-						resource.get (
-							value ["section"]),
-
-					)
-
-					for resource_name
-					in inventory.namespaces [value ["group"]]
-
-					for resource
-					in [ inventory.resources [resource_name] ]
-
-				])
-
-			else:
-
-				raise Exception ("".join ([
-					"Invalid group or namespace '%s' " % value ["group"],
-					"referenced in resource_data for '%s'" % key,
-				]))
-
-		else:
-
-			if not value ["group"] in inventory.namespaces:
-
-				raise Exception ("".join ([
-					"Invalid namespace '%s' " % value ["group"],
-					"referenced in resource_data for '%s'" % key,
-				]))
-
-			output ["all"] ["vars"] [key] = dict ([
-
-				(
-					inventory.resolve_value_or_fail (
-						resource,
-						value ["key"]),
-					resource.combined,
-				)
-
-				for resource_name
-				in inventory.namespaces [value ["group"]]
-
-				for resource
-				in [ inventory.resources [resource_name] ]
-
-			])
+	resolve_resource_data (
+		context,
+		output)
 
 	output ["localhost"] = {
 		"ansible_connection": "local",
@@ -292,6 +215,105 @@ def do_inventory_list (context):
 
 	print_json (output)
 
+def resolve_resource_data (context, output):
+
+	inventory = context.inventory
+
+	for resource_data_key, resource_data_value \
+	in context.project_metadata ["resource_data"].items ():
+
+		if resource_data_key in output ["all"] ["vars"]:
+			raise Exception ()
+
+		# find resources
+
+		if resource_data_value ["group"] in inventory.group_members:
+
+			resources = map (
+				lambda resource_name:
+					inventory.resources [resource_name],
+				inventory.group_members [resource_data_value ["group"]])
+
+		elif resource_data_value ["group"] in inventory.namespaces:
+
+			resources = (
+				inventory.namespaces [resource_data_value ["group"]])
+
+		else:
+
+			raise Exception ("".join ([
+				"Invalid group or namespace '%s' " % (
+					resource_data_value ["group"]),
+				"referenced in resource_data for '%s'" % (
+					resource_data_key),
+			]))
+
+		# resolve section
+
+		if "section" in resource_data_value:
+
+			entries = [
+				(
+					inventory.resolve_value_or_fail (
+						resource,
+						resource_data_value ["key"]),
+					resource.get (
+						resource_data_value ["section"]),
+				)
+				for resource in resources
+			]
+
+		else:
+
+			entries = [
+				(
+					inventory.resolve_value_or_fail (
+						resource,
+						resource_data_value ["key"]),
+					resource.combined,
+				)
+				for resource in resources
+			]
+
+		# sort by key
+
+		entries.sort (
+			key = lambda entry: entry [0])
+
+		# store data
+
+		resource_data_dict = (
+			collections.OrderedDict ())
+
+		output ["all"] ["vars"] [resource_data_key] = (
+			resource_data_dict)
+
+		for entry_key, entry_value in entries:
+
+			if entry_key == "":
+				continue
+
+			if resource_data_value.get ("format") == "list":
+
+				resource_data_dict.setdefault (
+					entry_key,
+					list ())
+
+				resource_data_dict [entry_key].append (
+					entry_value)
+
+			else:
+
+				if entry_key in resource_data_dict:
+
+					raise Exception (
+						"Duplicated key '%s' in resource data '%s'" % (
+							entry_key,
+							resource_data_key))
+
+				resource_data_dict [entry_key] = (
+					entry_value)
+
 def do_inventory_host (context, host_name):
 
 	raise Exception ("TODO")
@@ -302,10 +324,11 @@ def do_inventory_display (context):
 
 def print_json (data):
 
-	print json.dumps (
-		data,
-		sort_keys = True,
-		indent = 4,
-		separators = (", ", ": "))
+	print (
+		json.dumps (
+			data,
+			sort_keys = True,
+			indent = 4,
+			separators = (", ", ": ")))
 
 # ex: noet ts=4 filetype=python
