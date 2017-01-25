@@ -10,8 +10,9 @@ python:
   # - "pypy"  -- appears to hang
   # - "pypy3"
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install: "make"
 # command to run tests
-script: make test
+script:
+  - make coverage
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - pipenv run codecov
