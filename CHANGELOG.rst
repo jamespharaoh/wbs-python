@@ -2,6 +2,56 @@
 CHANGELOG
 =========
 
+1.11.42
+=======
+
+* feature:``codecommit``: Update codecommit command to latest version
+* feature:``ecs``: Update ecs command to latest version
+* feature:``codebuild``: Update codebuild command to latest version
+
+
+1.11.41
+=======
+
+* feature:``acm``: Update acm command to latest version
+* feature:``health``: Update health command to latest version
+
+
+1.11.40
+=======
+
+* feature:``ec2``: Update ec2 command to latest version
+
+
+1.11.39
+=======
+
+* feature:``rds``: Update rds command to latest version
+
+
+1.11.38
+=======
+
+* feature:``dynamodb``: Update dynamodb command to latest version
+* feature:``polly``: Update polly command to latest version
+* feature:``glacier``: Update glacier command to latest version
+* feature:``route53``: Update route53 command to latest version
+* feature:``rekognition``: Update rekognition command to latest version
+
+
+1.11.37
+=======
+
+* feature:``cur``: Update cur command to latest version
+* bugfix:``cloudformation deploy``: ``deploy`` command must not override parameters with default values
+* feature:``dynamodb``: Update dynamodb command to latest version
+* bug:``cloudformation package``: Only generate S3BodyLocation when needed `#2320 <https://github.com/aws/aws-cli/issues/2320>`__
+* feature:``elasticache``: Update elasticache command to latest version
+* feature:``config``: Update config command to latest version
+* bugfix:``cloudformation``: Fix yaml parsing error for ``!GetAtt`` `#2332 <https://github.com/aws/aws-cli/issues/2332>`__
+* bugfix:``cloudformation package``: ``package`` command must use Path-style S3 URL when packaging AWS
+
+
 1.11.36
 =======
 
