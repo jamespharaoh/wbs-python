@@ -3,6 +3,6 @@
 - hosts: "cluster-app"
   roles:
 
-    - "cluster-system"
+    - "setup-dns"
 
 # ex: et ts=2 filetype=yaml
