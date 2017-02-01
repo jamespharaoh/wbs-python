@@ -236,8 +236,12 @@ def resolve_resource_data (context, output):
 
 		elif resource_data_value ["group"] in inventory.namespaces:
 
-			resources = (
-				inventory.namespaces [resource_data_value ["group"]])
+			resources = map (
+				lambda resource:
+					inventory.resources [resource.unique_name],
+				inventory.namespaces [
+					resource_data_value ["group"]
+				].resources)
 
 		else:
 

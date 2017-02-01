@@ -37,10 +37,10 @@ python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
   state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 

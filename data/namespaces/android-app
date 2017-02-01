@@ -1,0 +1,8 @@
+---
+
+identity:
+
+  name: "android-app"
+  type: "namespace"
+
+# ex: et ts=2 filetype=yaml
