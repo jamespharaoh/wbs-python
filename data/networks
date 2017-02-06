@@ -129,4 +129,13 @@
 - network: "10.186"
   deployment: "jenkins-7"
 
+- network: "10.187"
+  cluster: "test-1"
+
+- network: "10.188"
+  cluster: "test-2"
+
+- network: "10.189"
+  deployment: "test-2-snowdon"
+
 # ex: et ts=2 filetype=yaml

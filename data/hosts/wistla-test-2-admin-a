@@ -1,0 +1,102 @@
+---
+
+amazon_instance_type_running: "m3.medium"
+etcd: 
+  
+  installed_version: "2.2.2"
+  needs_restart: "no"
+  state: "enabled"
+
+etcd_installed_version: "2.2.2"
+etcd_needs_restart: "no"
+etcd_state: "enabled"
+heka: 
+  
+  installed_version: "0.10.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+heka_installed_version: "0.10.0"
+heka_needs_restart: "yes"
+heka_state: "enabled"
+instance_id: "i-0905cbb2057e52fb6"
+mysql: 
+  
+  installed_from: "distro"
+  needs_restart: "no"
+  state: "enabled"
+
+mysql_installed_from: "distro"
+mysql_needs_restart: "no"
+mysql_state: "enabled"
+nginx: 
+  
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.9.14"
+  installed_version: "1.9.14"
+  needs_restart: "yes"
+  state: "enabled"
+
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.9.14"
+nginx_installed_version: "1.9.14"
+nginx_needs_restart: "yes"
+nginx_state: "enabled"
+php: 
+  
+  fpm_socket: "/run/php/php7.0-fpm.sock"
+  installed_from: "distro"
+  installed_service: "php7.0-fpm"
+  installed_version: "7.0"
+  needs_restart: "yes"
+  state: "enabled"
+
+php_fpm_socket: "/run/php/php7.0-fpm.sock"
+php_installed_from: "distro"
+php_installed_service: "php7.0-fpm"
+php_installed_version: "7.0"
+php_needs_restart: "yes"
+php_state: "enabled"
+python: 
+  
+  installed_version: "2.7.11"
+  state: "installed"
+
+python_apt: 
+  
+  installed_version: "2.7.11/1.1.0~beta1-1"
+  state: "installed"
+
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
+python_apt_state: "installed"
+python_installed_version: "2.7.11"
+python_pip: 
+  
+  installed_version: "2.7.11/9.0.1"
+  state: "installed"
+
+python_pip_installed_version: "2.7.11/9.0.1"
+python_pip_state: "installed"
+python_state: "installed"
+ssh: 
+  
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBB49ZKzO/T83WYYwnGVkFsFIlq5XE6SWB8Iff9BEa8g6ixWBQSAKKq37TLreBsdA3skkGaqlczH6HhET0l4qbCA="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz46V84CMF/nsx4NetKZ5FKKofCPwjepe8cVu/5CA33MCex474BgPnwJzuBMF2VY8/73lSQQjejDRULsEgCj7o2DozC3hJJfXfOLtm5w+S9KyD1X45osklcjHDTyI5wmpC6zVduy69IOc+WNncD24UaRr2cjpgLGx4/Kf5oy1LCqlgHgXeF54QAg3cOy+ZEE7Y8fbISqbEaAJlUOpQraDk0I+AglTtlsc4FddE00vZsMLdNrcf5mPg8SD9xukU2RZs0ioCq/hxHBGHgGNhpa1UhFE522fqX7qmZZi+vW0dli0kCcuNiG63FSB2Lbrc1yDwMwz5mxACWlA+aaImMb01"
+
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBB49ZKzO/T83WYYwnGVkFsFIlq5XE6SWB8Iff9BEa8g6ixWBQSAKKq37TLreBsdA3skkGaqlczH6HhET0l4qbCA="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz46V84CMF/nsx4NetKZ5FKKofCPwjepe8cVu/5CA33MCex474BgPnwJzuBMF2VY8/73lSQQjejDRULsEgCj7o2DozC3hJJfXfOLtm5w+S9KyD1X45osklcjHDTyI5wmpC6zVduy69IOc+WNncD24UaRr2cjpgLGx4/Kf5oy1LCqlgHgXeF54QAg3cOy+ZEE7Y8fbISqbEaAJlUOpQraDk0I+AglTtlsc4FddE00vZsMLdNrcf5mPg8SD9xukU2RZs0ioCq/hxHBGHgGNhpa1UhFE522fqX7qmZZi+vW0dli0kCcuNiG63FSB2Lbrc1yDwMwz5mxACWlA+aaImMb01"
+volume_ids: 
+  
+  system: "vol-0c3391197e10bb7f6"
+
+volume_ids_system: "vol-0c3391197e10bb7f6"
+vpn_server: 
+  
+  certificate: "/authority/ops-vpn/issue/52/certificate"
+  private_key: "/authority/ops-vpn/issue/52/key"
+
+vpn_server_certificate: "/authority/ops-vpn/issue/52/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/52/key"
+
+
+# ex: et ts=2 filetype=yaml

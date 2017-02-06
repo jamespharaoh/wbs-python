@@ -1,13 +1,13 @@
 ---
 
 - name: "create security groups"
-  with_items: "{{ amazon_security_groups }}"
+  with_items: "{{ amazon_security_group_names }}"
   register: "create_group"
   action:
 
     module: "ec2_group"
-    name: "{{ cluster_name }}-{{ item.name }}"
-    description: "Security group {{ cluster_name }}-{{ item.name }}"
+    name: "{{ cluster_name }}-{{ item }}"
+    description: "Security group {{ cluster_name }}-{{ item }}"
 
     vpc_id: "{{ vpc_id }}"
     purge_rules: "no"

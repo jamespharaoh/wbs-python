@@ -53,6 +53,7 @@
 - name: "create stubs for nodejs legacy bins"
   when: "
     nodejs_version_legacy != ''
+    and nodejs_version != nodejs_version_legacy
   "
   register: "nodejs_legacy_stubs_result"
   changed_when: "

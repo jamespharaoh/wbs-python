@@ -1,13 +1,6 @@
 ---
 
-- hosts: "cluster-admin"
-  tasks:
-    - debug:
-        var: "nodejs_version"
-    - debug:
-        var: "nodejs_version_legacy"
-
-- hosts: "cluster-admin"
+- hosts: "cluster-app"
   roles:
 
     - role: "nodejs-install"

@@ -264,6 +264,14 @@ local_build_target: "/builds/{{ local_build_name }}"
 
 amazon_credentials: "{{ lookup ('file', HOME + '/work/amazon-credentials') | from_yaml }}"
 
+amazon_security_group_names:
+
+  - "admin"
+  - "app"
+  - "balancer"
+  - "data"
+  - "jenkins"
+
 default:
 
   dist: "https://dist.ops.wistla.com"

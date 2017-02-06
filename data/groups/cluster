@@ -18,6 +18,7 @@ node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 
 nodejs_version: "{{ cluster.nodejs_version }}"
+nodejs_version_regular: "{{ cluster.nodejs_version }}"
 nodejs_version_legacy: "{{ cluster.nodejs_version_legacy | default ('') }}"
 
 region_code: "{{ cluster.region_code }}"

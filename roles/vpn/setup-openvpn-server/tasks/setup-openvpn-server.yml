@@ -135,13 +135,21 @@
     ] | join }}"
     src: "openvpn-config-client"
 
-- name: "restart openvpn"
+- name: "openvpn server stop"
   become: "yes"
   action:
 
     module: "service"
     name: "openvpn"
-    state: "restarted"
+    state: "stopped"
+
+- name: "openvpn server start"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "openvpn"
+    state: "started"
     enabled: "yes"
 
 # ex: et ts=2 filetype=yaml
