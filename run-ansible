@@ -389,7 +389,7 @@ def find_playbook (playbook_path):
 	if os.path.exists ("playbooks/%s" % playbook_path):
 		return "playbooks/%s" % playbook_path
 
-	for subdir in listdir ("playbooks"):
+	for subdir in os.listdir ("playbooks"):
 
 		if not os.path.isdir ("playbooks/%s" % subdir):
 			continue
