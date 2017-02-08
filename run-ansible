@@ -1059,12 +1059,12 @@ def actually_pause ():
 		return
 
 	write_message ([
-		"(annoying three second pause)\n",
+		"(annoying one second pause)\n",
 	])
 
 	auto_newline ()
 
-	time.sleep (3)
+	time.sleep (1)
 
 def run_given_playbook ():
 
