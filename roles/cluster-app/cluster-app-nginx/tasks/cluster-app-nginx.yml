@@ -21,6 +21,15 @@
     - target: "{{ nginx_config }}/nginx.conf"
       template: "cluster-app-nginx-config"
 
+    - target: "{{ nginx_config }}/default.conf"
+      template: "cluster-app-nginx-default-config"
+
+    - target: "{{ nginx_config }}/deployments.conf"
+      template: "cluster-app-nginx-deployments-config"
+
+    - target: "{{ nginx_config }}/upstream.conf"
+      template: "cluster-app-nginx-upstream-config"
+
   become: "yes"
   action:
 

@@ -1,0 +1,39 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+{% for cluster_deployment in deployments | dictsort | values %}
+{% if cluster_deployment.cluster_name != 'dev' %}
+
+{% if cluster_deployment.type in [ 'simple2', 'shared2' ] %}
+- hosts: "cluster-{{ cluster_deployment.cluster_name }}-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "{{ cluster_deployment.name }} clean zookeeper"
+      tags: "{{ cluster_deployment.name }}"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ '{{' }} [
+{% for zone in [ 'a', 'b', 'c' ] %}
+          'wistla-{{ cluster_deployment.cluster_name }}-admin-{{ zone }}:2181',
+{% endfor %}
+        ] | join (',') {{ '}}' }}"
+        name: "/{{ cluster_deployment.name }}/kafka"
+        state: "absent"
+        recursive: "yes"
+{% endif %}
+
+- hosts: "cluster-{{ cluster_deployment.cluster_name }}-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "{{ cluster_deployment.name }}"
+      cluster_deployment_name: "{{ cluster_deployment.name }}"
+      cluster_deployment_playbook_name: "clean-data"
+
+{% endif %}
+{% endfor %}
+
+# ex: et ts=2 filetype=yaml

@@ -52,7 +52,7 @@ resource_data:
   clusters:
 
     group: "cluster"
-    key: "{{ identity_name }}"
+    key: "{{ cluster_name }}"
     section: "cluster"
 
   superclusters:

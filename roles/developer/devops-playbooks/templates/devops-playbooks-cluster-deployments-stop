@@ -1,0 +1,19 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+{% for cluster_deployment in deployments | dictsort | values %}
+{% if cluster_deployment.cluster_name != 'dev' %}
+
+- hosts: "cluster-{{ cluster_deployment.cluster_name }}-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "{{ cluster_deployment.name }}"
+      cluster_deployment_name: "{{ cluster_deployment.name }}"
+      cluster_deployment_playbook_name: "node-stop"
+
+{% endif %}
+{% endfor %}
+
+# ex: et ts=2 filetype=yaml

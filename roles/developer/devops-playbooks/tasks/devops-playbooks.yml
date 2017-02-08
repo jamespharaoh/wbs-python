@@ -1,0 +1,20 @@
+---
+
+- name: "devops playbooks create"
+  with_items:
+
+    - "build-down"
+    - "clean"
+    - "fixtures"
+    - "restart"
+    - "setup"
+    - "start"
+    - "stop"
+
+  action:
+
+    module: "template"
+    dest: "{{ HOME }}/playbooks/cluster-deployments/cluster-deployments-{{ item }}.yml"
+    src: "devops-playbooks-cluster-deployments-{{ item }}"
+
+# ex: et ts=2 filetype=yaml

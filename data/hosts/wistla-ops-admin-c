@@ -19,6 +19,15 @@ heka:
 heka_installed_version: "0.10.0"
 heka_needs_restart: "yes"
 heka_state: "enabled"
+icinga_core: 
+  
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  state: "installed"
+
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_state: "installed"
 instance_id: "i-d8575030"
 nginx: 
   

@@ -1,0 +1,352 @@
+---
+
+######################################################################
+##################  THIS FILE IS MANAGED BY ANSIBLE  #################
+######################################################################
+#                                                                    #
+#  Please do not make changes to this file, since they will be       #
+#  automatically overwritten. If you need to change any values in    #
+#  this file, this should be done by modifying the inputs to         #
+#  ansible, by modifying the ansible scripts themselves, or by       #
+#  overriding them in an unmanaged file.                             #
+#                                                                    #
+######################################################################
+
+
+
+- hosts: "cluster-production-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production"
+      cluster_deployment_name: "production"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-production-2-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "production-2 clean zookeeper"
+      tags: "production-2"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-production-2-admin-a:2181',
+          'wistla-production-2-admin-b:2181',
+          'wistla-production-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/production-2/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-production-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production-2"
+      cluster_deployment_name: "production-2"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-production-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production-2-a"
+      cluster_deployment_name: "production-2-a"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-production-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production-2-b"
+      cluster_deployment_name: "production-2-b"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-production-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production-a"
+      cluster_deployment_name: "production-a"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-production-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "production-b"
+      cluster_deployment_name: "production-b"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-staging-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging"
+      cluster_deployment_name: "staging"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-staging-2-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "staging-2 clean zookeeper"
+      tags: "staging-2"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-staging-2-admin-a:2181',
+          'wistla-staging-2-admin-b:2181',
+          'wistla-staging-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/staging-2/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-staging-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging-2"
+      cluster_deployment_name: "staging-2"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-staging-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging-2-a"
+      cluster_deployment_name: "staging-2-a"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-staging-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging-2-b"
+      cluster_deployment_name: "staging-2-b"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-staging-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging-a"
+      cluster_deployment_name: "staging-a"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-staging-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "staging-b"
+      cluster_deployment_name: "staging-b"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test"
+      cluster_deployment_name: "test"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2"
+      cluster_deployment_name: "test-2"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-2-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-2-snowdon clean zookeeper"
+      tags: "test-2-snowdon"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-2-admin-a:2181',
+          'wistla-test-2-admin-b:2181',
+          'wistla-test-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-2-snowdon/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-snowdon"
+      cluster_deployment_name: "test-2-snowdon"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-erebus clean zookeeper"
+      tags: "test-erebus"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-admin-a:2181',
+          'wistla-test-admin-b:2181',
+          'wistla-test-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-erebus/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-erebus"
+      cluster_deployment_name: "test-erebus"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-everest clean zookeeper"
+      tags: "test-everest"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-admin-a:2181',
+          'wistla-test-admin-b:2181',
+          'wistla-test-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-everest/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-everest"
+      cluster_deployment_name: "test-everest"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-fitzroy clean zookeeper"
+      tags: "test-fitzroy"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-admin-a:2181',
+          'wistla-test-admin-b:2181',
+          'wistla-test-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-fitzroy/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-fitzroy"
+      cluster_deployment_name: "test-fitzroy"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-k2 clean zookeeper"
+      tags: "test-k2"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-admin-a:2181',
+          'wistla-test-admin-b:2181',
+          'wistla-test-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-k2/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-k2"
+      cluster_deployment_name: "test-k2"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-montblanc clean zookeeper"
+      tags: "test-montblanc"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-admin-a:2181',
+          'wistla-test-admin-b:2181',
+          'wistla-test-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-montblanc/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-montblanc"
+      cluster_deployment_name: "test-montblanc"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+# ex: et ts=2 filetype=yaml
