@@ -17,6 +17,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production"
       cluster_deployment_name: "production"
       cluster_deployment_playbook_name: "fixtures"
@@ -26,6 +27,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production-2"
       cluster_deployment_name: "production-2"
       cluster_deployment_playbook_name: "fixtures"
@@ -35,6 +37,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production-2-a"
       cluster_deployment_name: "production-2-a"
       cluster_deployment_playbook_name: "fixtures"
@@ -44,6 +47,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production-2-b"
       cluster_deployment_name: "production-2-b"
       cluster_deployment_playbook_name: "fixtures"
@@ -53,6 +57,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production-a"
       cluster_deployment_name: "production-a"
       cluster_deployment_playbook_name: "fixtures"
@@ -62,6 +67,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "production-b"
       cluster_deployment_name: "production-b"
       cluster_deployment_playbook_name: "fixtures"
@@ -71,6 +77,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging"
       cluster_deployment_name: "staging"
       cluster_deployment_playbook_name: "fixtures"
@@ -80,6 +87,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging-2"
       cluster_deployment_name: "staging-2"
       cluster_deployment_playbook_name: "fixtures"
@@ -89,6 +97,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging-2-a"
       cluster_deployment_name: "staging-2-a"
       cluster_deployment_playbook_name: "fixtures"
@@ -98,6 +107,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging-2-b"
       cluster_deployment_name: "staging-2-b"
       cluster_deployment_playbook_name: "fixtures"
@@ -107,6 +117,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging-a"
       cluster_deployment_name: "staging-a"
       cluster_deployment_playbook_name: "fixtures"
@@ -116,6 +127,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "staging-b"
       cluster_deployment_name: "staging-b"
       cluster_deployment_playbook_name: "fixtures"
@@ -125,6 +137,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test"
       cluster_deployment_name: "test"
       cluster_deployment_playbook_name: "fixtures"
@@ -134,6 +147,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-2"
       cluster_deployment_name: "test-2"
       cluster_deployment_playbook_name: "fixtures"
@@ -143,6 +157,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-2-snowdon"
       cluster_deployment_name: "test-2-snowdon"
       cluster_deployment_playbook_name: "fixtures"
@@ -152,6 +167,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-erebus"
       cluster_deployment_name: "test-erebus"
       cluster_deployment_playbook_name: "fixtures"
@@ -161,6 +177,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-everest"
       cluster_deployment_name: "test-everest"
       cluster_deployment_playbook_name: "fixtures"
@@ -170,6 +187,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-fitzroy"
       cluster_deployment_name: "test-fitzroy"
       cluster_deployment_playbook_name: "fixtures"
@@ -179,6 +197,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-k2"
       cluster_deployment_name: "test-k2"
       cluster_deployment_playbook_name: "fixtures"
@@ -188,6 +207,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-montblanc"
       cluster_deployment_name: "test-montblanc"
       cluster_deployment_playbook_name: "fixtures"

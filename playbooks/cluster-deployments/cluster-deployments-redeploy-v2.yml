@@ -8,9 +8,8 @@
         msg: "This operation is not allowed in production"
 
 - include: "cluster-deployments-stop.yml"
-- include: "cluster-deployments-clean.yml"
 - include: "cluster-deployments-setup.yml"
+- include: "cluster-deployments-build-down.yml"
 - include: "cluster-deployments-start.yml"
-- include: "cluster-deployments-fixtures.yml"
 
 # ex: et ts=2 filetype=yaml

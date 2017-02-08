@@ -14,6 +14,12 @@
       cluster_deployment_name: "{{ cluster_deployment.name }}"
       cluster_deployment_playbook_name: "node-start"
 
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'standby'"
+      tags: "{{ cluster_deployment.name }}"
+      cluster_deployment_name: "{{ cluster_deployment.name }}"
+      cluster_deployment_playbook_name: "node-stop"
+
 {% endif %}
 {% endfor %}
 

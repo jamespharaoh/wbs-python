@@ -9,6 +9,7 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "{{ cluster_deployment.name }}"
       cluster_deployment_name: "{{ cluster_deployment.name }}"
       cluster_deployment_playbook_name: "node-restart"

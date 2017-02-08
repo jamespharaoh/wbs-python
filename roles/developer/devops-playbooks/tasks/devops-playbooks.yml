@@ -3,6 +3,7 @@
 - name: "devops playbooks create"
   with_items:
 
+    - "auto"
     - "build-down"
     - "clean"
     - "fixtures"
@@ -10,6 +11,8 @@
     - "setup"
     - "start"
     - "stop"
+    - "templates"
+    - "templates-update"
 
   action:
 
