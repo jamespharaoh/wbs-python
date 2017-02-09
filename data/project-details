@@ -17,77 +17,6 @@
 
 # ---------- modules
 
-#- name: "api-stub-server"
-#  short: "stub server for basic testing"
-#  default_branch: "development"
-#  npm_name: "@wistla/api-stub-server"
-#  depends:
-
-#    - "wistla-raml-server"
-
-#  build_steps:
-
-#    - "npm install"
-
-- name: "wistla-logging"
-  short: "logging module"
-  default_branch: "development"
-  npm_name: "@wistla/logging"
-  description:
-
-    logging module
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-util"
-  short: "generic helpers that are used across @wistla/* modules"
-  default_branch: "development"
-  npm_name: "@wistla/util"
-  description:
-
-    generic helpers that are used across @wistla/* modules
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-i18n"
-  short: "internationalisation"
-  default_branch: "development"
-  npm_name: "@wistla/i18n"
-  description:
-
-    internationalisation
-
-  depends:
-
-    - "wistla-util"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-pubsub"
-  short: "wistla pub/sub message queue razzamatazz"
-  default_branch: "development"
-  npm_name: "@wistla/pubsub"
-  description:
-
-    wistla pub/sub message queue razzamatazz
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
 - name: "wistla-api-server"
   default_branch: "development"
   npm_name: "@wistla/api-server"
@@ -111,6 +40,88 @@
     - "npm install"
     - "npm run build"
 
+- name: "wistla-blob"
+  default_branch: "development"
+  npm_name: "@wistla/blob"
+
+  depends:
+
+    - "wistla-logging"
+    - "wistla-test"
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-data-export"
+  short: "export legacy mongo to json files"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-data-export"
+  description:
+
+    extracts data from mongo into individual json files per postgres
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-test"
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-data-import"
+  short: "import legacy json into postgres"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-data-import"
+  description:
+
+    reads files exported using wistla-data-export and imports them into postgres
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-test"
+    - "wistla-util"
+
+- name: "wistla-data-process"
+  short: "transform sql resultset into json for api"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-data-process"
+  depends:
+
+    - "wistla-db"
+    - "wistla-logging"
+    - "wistla-raml-api"
+    - "wistla-raml-to-api"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+    - "npm run build-api"
+
+- name: "wistla-db"
+  short: "database connection abstractions for mongo and postgres"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-db"
+  description:
+
+    lower level module that handles connecting to mongo/postgres
+
+  depends:
+
+    - "wistla-logging"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-db-daemon"
   default_branch: "development"
   npm_name: "@wistla/db-daemon"
@@ -120,6 +131,88 @@
 
   depends:
 
+    - "wistla-db"
+    - "wistla-logging"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-db-schema"
+  short: "sql schema definitions"
+  default_branch: "development"
+  npm_name: "@wistla/wistla-db-schema"
+  description:
+
+    the postgres db schema and helper scripts to import/export and
+    assemble/split the schema
+
+  depends:
+
+    - "wistla-util"
+    - "wistla-data-process"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-email"
+  short: "sending emails et al"
+  default_branch: "development"
+  npm_name: "@wistla/email"
+
+  depends:
+
+    - "wistla-db"
+    - "wistla-i18n"
+    - "wistla-logging"
+    - "wistla-pubsub"
+    - "wistla-util"
+    - "wistla-test"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-i18n"
+  short: "internationalisation"
+  default_branch: "development"
+  npm_name: "@wistla/i18n"
+  description:
+
+    internationalisation
+
+  depends:
+
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-logging"
+  short: "logging module"
+  default_branch: "development"
+  npm_name: "@wistla/logging"
+  description:
+
+    logging module
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-media"
+  short: "media handling"
+  default_branch: "development"
+  npm_name: "@wistla/media"
+
+  depends:
+
+    - "wistla-blob"
     - "wistla-db"
     - "wistla-logging"
     - "wistla-pubsub"
@@ -171,70 +264,6 @@
 
     - "npm install"
 
-- name: "wistla-blob"
-  default_branch: "development"
-  npm_name: "@wistla/blob"
-
-  depends:
-
-    - "wistla-logging"
-    - "wistla-test"
-    - "wistla-util"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-data-export"
-  short: "export legacy mongo to json files"
-  default_branch: "development"
-  npm_name: "@wistla/wistla-data-export"
-  description:
-
-    extracts data from mongo into individual json files per postgres
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-test"
-    - "wistla-util"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-data-import"
-  short: "import legacy json into postgres"
-  default_branch: "development"
-  npm_name: "@wistla/wistla-data-import"
-  description:
-
-    reads files exported using wistla-data-export and imports them into postgres
-
-  depends:
-
-    - "wistla-db"
-    - "wistla-test"
-    - "wistla-util"
-
-- name: "wistla-media"
-  short: "media handling"
-  default_branch: "development"
-  npm_name: "@wistla/media"
-
-  depends:
-
-    - "wistla-blob"
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
 - name: "wistla-notifications"
   short: "send push notifications"
   default_branch: "development"
@@ -253,73 +282,20 @@
 
     - "npm install"
 
-- name: "wistla-email"
-  short: "sending emails et al"
+- name: "wistla-pubsub"
+  short: "wistla pub/sub message queue razzamatazz"
   default_branch: "development"
-  npm_name: "@wistla/email"
+  npm_name: "@wistla/pubsub"
+  description:
+
+    wistla pub/sub message queue razzamatazz
 
   depends:
 
     - "wistla-db"
-    - "wistla-i18n"
-    - "wistla-logging"
-    - "wistla-pubsub"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-data-process"
-  short: "transform sql resultset into json for api"
-  default_branch: "development"
-  npm_name: "@wistla/wistla-data-process"
-  depends:
-
-    - "wistla-db"
-    - "wistla-logging"
-    - "wistla-raml-api"
-    - "wistla-raml-to-api"
-    - "wistla-util"
-    - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-    - "npm run build-api"
-
-- name: "wistla-db"
-  short: "database connection abstractions for mongo and postgres"
-  default_branch: "development"
-  npm_name: "@wistla/wistla-db"
-  description:
-
-    lower level module that handles connecting to mongo/postgres
-
-  depends:
-
     - "wistla-logging"
     - "wistla-util"
     - "wistla-test"
-
-  build_steps:
-
-    - "npm install"
-
-- name: "wistla-db-schema"
-  short: "sql schema definitions"
-  default_branch: "development"
-  npm_name: "@wistla/wistla-db-schema"
-  description:
-
-    the postgres db schema and helper scripts to import/export and
-    assemble/split the schema
-
-  depends:
-
-    - "wistla-util"
-    - "wistla-data-process"
 
   build_steps:
 
@@ -409,6 +385,18 @@
   depends:
 
     - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
+- name: "wistla-util"
+  short: "generic helpers that are used across @wistla/* modules"
+  default_branch: "development"
+  npm_name: "@wistla/util"
+  description:
+
+    generic helpers that are used across @wistla/* modules
 
   build_steps:
 
