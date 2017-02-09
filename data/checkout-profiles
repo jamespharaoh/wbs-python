@@ -74,6 +74,9 @@ developer_full:
   - name: "wistla-raml-to-api"
     branch: "development"
 
+  - name: "wistla-share"
+    branch: "development"
+
   - name: "wistla-util"
     branch: "development"
 
