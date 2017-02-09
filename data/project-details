@@ -364,6 +364,25 @@
 
     - "npm install"
 
+- name: "wistla-share"
+  short: "dynamic website content for sharing etc"
+  default_branch: "development"
+  npm_name: "@wistla/share"
+  description:
+
+    server for dynamic web content used when sharing wistls, and possibly for
+    more in the future
+
+  depends:
+
+    - "wistla-logging"
+    - "wistla-test"
+    - "wistla-util"
+
+  build_steps:
+
+    - "npm install"
+
 - name: "wistla-test"
   short: "testing related shizzle"
   default_branch: "development"
