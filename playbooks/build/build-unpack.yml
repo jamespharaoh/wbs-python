@@ -1,10 +1,5 @@
 ---
 
-- hosts: "localhost"
-  roles:
-
-    - "build-download"
-
 - hosts: "node-template-concrete"
   roles:
 
