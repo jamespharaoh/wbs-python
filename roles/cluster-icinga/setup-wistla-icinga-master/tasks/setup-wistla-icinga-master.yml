@@ -35,7 +35,6 @@
 
 - name: "create wistla icinga configuration files"
   with_items: "{{ wistla_icinga_master_config_files }}"
-  notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
   action:
 
@@ -48,7 +47,6 @@
 
 - name: "create wistla icinga configuration templates"
   with_items: "{{ wistla_icinga_master_config_templates }}"
-  notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
   action:
 
@@ -61,7 +59,6 @@
 
 - name: "create wistla security configuration"
   with_items: "{{ wistla_icinga_security_config }}"
-  notify: "set icinga.needs_restart to 'yes'"
   become: "yes"
   action:
 

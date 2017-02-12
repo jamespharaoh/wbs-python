@@ -10,6 +10,13 @@
     - "data/runtime"
     - "security"
 
+  jenkins_build_steps:
+
+    - "scripts/setup-project build"
+
+- name: "wistla-jenkins-config"
+  default_branch: "master"
+
 # ---------- integration
 
 - name: "wistla-integration"

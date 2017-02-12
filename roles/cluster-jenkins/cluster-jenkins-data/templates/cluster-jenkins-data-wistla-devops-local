@@ -33,53 +33,7 @@ clusters:
 {% endif %}
 {% endfor %}
 
-deployments:
-
-{% for other_deployment_name, other_deployment in deployments.items () %}
-{% if other_deployment.name | starts_with ('jenkins-') %}
-  {{ other_deployment_name }}:
-{% for key in [
-  'name',
-  'admin_domain',
-  'android_app',
-  'api_domain',
-  'assets_domain',
-  'assets_origin_domain',
-  'aws_s3_access_key',
-  'aws_s3_bucket_name',
-  'aws_s3_region',
-  'aws_s3_secret_key',
-  'bridge_network',
-  'bridge_name',
-  'bridge_mac',
-  'deployed_build',
-  'email_domain',
-  'enabled',
-  'facebook_app',
-  'google_project',
-  'kafka',
-  'kafka_version',
-  'main_domain',
-  'node_memory',
-  'nodejs_version',
-  'nodejs_version_legacy',
-  'rabbit_admin_password',
-  'rabbit_admin_user',
-  'rabbit_api_password',
-  'rabbit_api_user',
-  'short_domain',
-  'url_scheme',
-  'v1_enabled',
-  'v2_enabled',
-  'web_domain',
-  'web_upstream',
-] %}
-{% if key in other_deployment %}
-    {{ key }}: {{ other_deployment [key] | to_json }}
-{% endif %}
-{% endfor %}
-{% endif %}
-{% endfor %}
+{deployments}
 
 deployment_modes:
 

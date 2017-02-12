@@ -1,0 +1,8 @@
+---
+
+- hosts: "cluster-jenkins"
+  roles:
+
+    - "cluster-jenkins-skypebot"
+
+# ex: et ts=2 filetype=yaml

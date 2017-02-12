@@ -375,12 +375,37 @@ def mount_secrets ():
 
 	subprocess.check_call ("./mount-secrets")
 
+def find_playbook (playbook_path):
+
+	if not playbook_path.endswith (".yml"):
+		return playbook_path
+
+	if os.path.exists (playbook_path):
+		return playbook_path
+
+	if playbook_path.startswith ("playbooks/"):
+		playbook_path = playbook_path [10:]
+
+	if os.path.exists ("playbooks/%s" % playbook_path):
+		return "playbooks/%s" % playbook_path
+
+	for subdir in os.listdir ("playbooks"):
+
+		if not os.path.isdir ("playbooks/%s" % subdir):
+			continue
+
+		if os.path.exists ("playbooks/%s/%s" % (subdir, playbook_path)):
+			return "playbooks/%s/%s" % (subdir, playbook_path)
+
+	print ("Can't find playbook: %s" % playbook_path)
+
+	sys.exit (1)
+
 def run_playbook (args):
 
-	playbook_path = "playbooks/%s" % args [0]
-
-	if not os.path.exists (args [0]) and os.path.exists (playbook_path):
-		args [0] = playbook_path
+	args = map (
+		find_playbook,
+		args)
 
 	subprocess.check_call (
 		[
@@ -1034,12 +1059,12 @@ def actually_pause ():
 		return
 
 	write_message ([
-		"(annoying three second pause)\n",
+		"(annoying one second pause)\n",
 	])
 
 	auto_newline ()
 
-	time.sleep (3)
+	time.sleep (1)
 
 def run_given_playbook ():
 

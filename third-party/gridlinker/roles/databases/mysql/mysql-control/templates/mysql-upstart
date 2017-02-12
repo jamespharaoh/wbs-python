@@ -20,6 +20,16 @@ env MYSQL_HOME=/usr
 
 umask 007
 
+pre-start script
+
+	set -e
+
+	mkdir -p /var/run/mysqld
+	chown mysql:root /var/run/mysqld
+	chmod 0755 /var/run/mysqld
+
+end script
+
 exec $MYSQL_HOME/bin/mysqld_safe \
 	--defaults-file=$MYSQL_ETC/$MYSQL_INSTANCE.cnf \
 	>>/tmp/x.out &

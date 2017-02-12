@@ -118,7 +118,15 @@ def keys (item):
 
 def values (source):
 
-	return source.values ()
+	if isinstance (source, list):
+
+		return map (
+			lambda item: item [1],
+			source)
+
+	else:
+
+		return source.values ()
 
 def items (item):
 

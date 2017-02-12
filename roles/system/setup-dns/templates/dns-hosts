@@ -16,3 +16,4 @@
 {%- include 'dns-hosts-dev' %}
 {%- include 'dns-hosts-deployments' %}
 {%- include 'dns-hosts-clusters' %}
+{%- include 'dns-hosts-jenkins' %}

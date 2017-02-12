@@ -1,6 +1,11 @@
 ---
 
 - include: "setup-haskell-ghc-bin-links.yml"
-  tags: [ "haskell", "haskell-ghc", "setup-haskell-ghc-bin-links" ]
+  when: "haskell_ghc_install == 'yes'"
+  tags:
+
+    - "haskell-ghc-bin-links"
+    - "haskell-ghc"
+    - "haskell"
 
 # ex: et ts=2 filetype=yaml

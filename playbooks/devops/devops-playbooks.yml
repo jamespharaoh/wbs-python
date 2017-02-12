@@ -1,0 +1,8 @@
+---
+
+- hosts: "localhost"
+  roles:
+
+    - "devops-playbooks"
+
+# ex: et ts=2 filetype=yaml

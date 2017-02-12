@@ -1,22 +1,17 @@
 ---
 
-# ========== app
+- include: "cluster-app/cluster-app-create.yml"
+- include: "cluster-app/cluster-app-system.yml"
+- include: "cluster-app/cluster-app-setup-dns.yml"
 
 - hosts: "cluster-app"
   roles:
 
-    - "cluster-create"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
-
-    - "cluster-system"
     - "system-apt-setup"
     - "setup-common-users"
     - "setup-hostname"
-    - "setup-dns"
     - "setup-system"
     - "setup-logging"
-
     - "cluster-ssh"
     - "system-packages-install"
     - "install-kernel"
@@ -24,39 +19,16 @@
     - "cluster-volumes"
     - "cluster-user"
 
-    - "wistla-heka-agent"
-
-    - "python"
-
-    - "cluster-app-network"
-
-    - "install-mongodb"
-    - "install-tools"
-
-    - "nodejs-install"
-    - "nodejs-packages-install"
-
-    - role: "nodejs-install"
-      when: "nodejs_version != nodejs_version_legacy"
-      nodejs_version: "{{ nodejs_version_legacy }}"
-
-    - role: "nodejs-packages-install"
-      when: "nodejs_version != nodejs_version_legacy"
-      nodejs_version: "{{ nodejs_version_legacy }}"
-      nodejs_packages: "{{ nodejs_packages_legacy }}"
-
-    - "nodejs-stubs"
-
+- include: "cluster-app/cluster-app-heka.yml"
+- include: "cluster-app/cluster-app-python.yml"
+- include: "cluster-app/cluster-app-network.yml"
+- include: "cluster-app/cluster-app-mongodb.yml"
+- include: "cluster-app/cluster-app-tools.yml"
+- include: "cluster-app/cluster-app-nodejs.yml"
 - include: "cluster-app/cluster-app-nginx.yml"
-
-- hosts: "cluster-app"
-  roles:
-
-    - "cluster-app-lxc"
-    - "cluster-app-cron"
-
-    - "rzbackup"
-
+- include: "cluster-app/cluster-app-lxc.yml"
+- include: "cluster-app/cluster-app-cron.yml"
+- include: "cluster-app/cluster-app-rzbackup.yml"
 - include: "cluster-app/cluster-app-activate.yml"
 
 # ex: et ts=2 filetype=yaml

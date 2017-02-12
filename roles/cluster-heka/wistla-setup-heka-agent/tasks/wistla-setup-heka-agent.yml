@@ -15,7 +15,7 @@
 
 - name: "create wistla heka agent templates"
   with_items: "{{ wistla_heka_agent_templates }}"
-  notify: "set heka.needs_restart to 'yes'"
+  register: "wistla_setup_heka_agent_config_result"
   become: "yes"
   action:
 
@@ -26,6 +26,12 @@
     owner: "{{ item.user }}"
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
+
+- name: "set heka.needs_restart to 'yes'"
+  when: "wistla_setup_heka_agent_config_result | changed"
+  update_resource:
+
+    heka.needs_restart: "yes"
 
 - name: "set heka.state to 'enabled'"
   when: "heka_state == 'installed'"

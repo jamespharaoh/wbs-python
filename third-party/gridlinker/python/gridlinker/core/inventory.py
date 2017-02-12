@@ -1,15 +1,46 @@
 from __future__ import absolute_import
+from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import with_statement
 
 import collections
 import re
 import wbs
 
 from wbs import ReportableError
+from wbs import uprint
 
 __all__ = [
 	"Inventory",
 ]
+
+class ResourceNamespace (object):
+
+	__slots__ = [
+
+		"name",
+		"data",
+
+		"groups",
+		"resources",
+
+	]
+
+	def __init__ (self, name, data):
+
+		assert data ["identity"] ["type"] == "namespace"
+		assert data ["identity"] ["name"] == name
+
+		self.name = name
+		self.data = data
+
+		self.groups = data.get ("namespace", {}).get ("groups", [])
+		self.resources = list ()
+
+	def add_resource (self, resource):
+
+		self.resources.append (
+			resource)
 
 class ResourceClass (object):
 
@@ -35,8 +66,8 @@ class ResourceClass (object):
 
 		self.name = data ["identity"] ["name"]
 
-		self.groups = data ["class"].get ("groups", [])
 		self.namespace = data ["class"] ["namespace"]
+		self.groups = data ["class"].get ("groups", [])
 
 		self.parent_namespace = (
 			data ["class"].get (
@@ -75,6 +106,7 @@ class Resource (object):
 		"identity_parent",
 
 		"resource_class",
+		"resource_namespace",
 
 		"unresolved",
 		"not_yet_resolved",
@@ -95,6 +127,9 @@ class Resource (object):
 			inventory.classes [self.identity_class])
 
 		self.identity_namespace = self.resource_class.namespace
+
+		self.resource_namespace = (
+			inventory.namespaces [self.identity_namespace])
 
 		self.unique_name = "/".join ([
 			self.identity_namespace,
@@ -172,6 +207,64 @@ class Resource (object):
 				full_name = (
 					"%s_%s" % (
 						class_prefix,
+						section_name))
+
+				self.unresolved [full_name] = (
+					section_value)
+
+				self.combined [full_name] = (
+					section_value)
+
+		# add namespace data
+
+		for namespace_prefix, namespace_data \
+		in self.resource_namespace.data.items ():
+
+			if namespace_prefix in [ "identity", "namespace" ]:
+				continue
+
+			if not namespace_prefix in self.unresolved:
+
+				self.unresolved [namespace_prefix] = (
+					collections.OrderedDict ())
+
+			if not namespace_prefix in self.not_yet_resolved:
+
+				self.not_yet_resolved [namespace_prefix] = (
+					collections.OrderedDict ())
+
+			if not namespace_prefix in self.combined:
+
+				self.combined [namespace_prefix] = (
+					collections.OrderedDict ())
+
+			if not isinstance (
+				self.unresolved [namespace_prefix],
+				dict):
+
+				raise Exception (
+					"Not a dictionary: %s.%s" % (
+						self.unique_name,
+						namespace_prefix))
+
+			for section_name, section_value \
+			in namespace_data.items ():
+
+				if section_name in self.unresolved [namespace_prefix]:
+					continue
+
+				self.unresolved [namespace_prefix] [section_name] = (
+					section_value)
+
+				self.not_yet_resolved [namespace_prefix] [section_name] = (
+					section_value)
+
+				self.combined [namespace_prefix] [section_name] = (
+					section_value)
+
+				full_name = (
+					"%s_%s" % (
+						namespace_prefix,
 						section_name))
 
 				self.unresolved [full_name] = (
@@ -330,8 +423,7 @@ class Resource (object):
 		else:
 
 			raise Exception (
-				"Can't find resolved or unresolved '%s' in '%s' for resource '%s'" % (
-					name_part,
+				"Can't find resolved or unresolved '%s' for resource '%s'" % (
 					".".join (name_parts),
 					self.unique_name))
 
@@ -351,6 +443,10 @@ class Resource (object):
 	def items (self):
 
 		return self.combined.items ()
+
+	def __unicode__ (self):
+
+		return self.unique_name
 
 class Inventory (object):
 
@@ -417,6 +513,7 @@ class Inventory (object):
 					for name, value in data.items ():
 						self.all [prefix + "_" + name] = value
 
+		self.load_namespaces ()
 		self.load_classes ()
 		self.load_resources_1 ()
 		self.load_resources_2 ()
@@ -426,6 +523,16 @@ class Inventory (object):
 		self.resolve_back_references ()
 		self.resolve_resource_values ()
 		self.load_resources_5 ()
+
+	def load_namespaces (self):
+
+		for namespace_name, namespace_data \
+		in self.context.namespaces.items ():
+
+			self.namespaces [namespace_name] = (
+				ResourceNamespace (
+					namespace_name,
+					namespace_data))
 
 	def load_classes (self):
 
@@ -473,8 +580,6 @@ class Inventory (object):
 		self.world [class_name] = resource_class
 		self.classes [class_name] = resource_class
 
-		self.namespaces.setdefault (resource_class.namespace, [])
-
 	def load_resources_1 (self):
 
 		for resource_name, resource_data \
@@ -519,8 +624,15 @@ class Inventory (object):
 		self.group_members [resource.identity_class].append (
 			resource.unique_name)
 
-		self.namespaces [resource.identity_namespace].append (
-			resource.unique_name)
+		if not resource.identity_namespace in self.namespaces:
+
+			raise Exception (
+				"Resource '%s' has invalid namespace '%s'" % (
+					resource.unique_name,
+					resource.identity_namespace))
+
+		self.namespaces [resource.identity_namespace].add_resource (
+			resource)
 
 	def load_resources_2 (self):
 
@@ -573,7 +685,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"resolve_resource_values () pass %s" % (
 						pass_count + 1))
 
@@ -601,7 +713,7 @@ class Inventory (object):
 
 					if self.trace:
 
-						print (
+						uprint (
 							"  resolve %s.%s.%s" % (
 								resource.unique_name,
 								prefix,
@@ -625,7 +737,7 @@ class Inventory (object):
 
 						if self.trace:
 
-							print (
+							uprint (
 								"    failed to resolve")
 
 						continue
@@ -636,7 +748,7 @@ class Inventory (object):
 
 					if self.trace:
 
-						print (
+						uprint (
 							"    resolved successfully")
 
 					num_resolved += 1
@@ -645,7 +757,7 @@ class Inventory (object):
 
 				if self.trace:
 
-					print (
+					uprint (
 						"  resolve %s.%s" % (
 							resource.unique_name,
 							prefix))
@@ -665,7 +777,7 @@ class Inventory (object):
 
 				if self.trace:
 
-					print (
+					uprint (
 						"    resolved successfully")
 
 				num_resolved += 1
@@ -764,11 +876,8 @@ class Inventory (object):
 
 					values = []
 
-					for other_resource_name in self.namespaces [namespace]:
-
-						other_resource = (
-							self.resources [
-								other_resource_name])
+					for other_resource \
+					in self.namespaces [namespace].resources:
 
 						if not other_resource.has (field):
 							continue
@@ -799,7 +908,32 @@ class Inventory (object):
 		for resource_name, resource \
 		in self.resources.items ():
 
-			# groups
+			# namespace groups
+
+			for group_template \
+			in resource.resource_namespace.groups:
+
+				group_name = (
+					self.resolve_value_or_none (
+						resource_name,
+						group_template,
+						""))
+
+				if not group_name:
+					continue
+
+				if not group_name in self.class_groups:
+
+					if group_name in self.world:
+						raise Exception ()
+
+					self.class_groups.add (
+						group_name)
+
+				self.group_members [group_name].append (
+					resource_name)
+
+			# class groups
 
 			for group_template \
 			in resource.resource_class.groups:
@@ -952,7 +1086,7 @@ class Inventory (object):
 			raise Exception (
 				"Unable to resolve '%s' for resource '%s'" % (
 					value,
-					resource.name))
+					resource.unique_name))
 
 		return resolved
 
@@ -1010,7 +1144,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sresolve_value (%s, %s)" % (
 					indent,
 					resource.unique_name,
@@ -1028,7 +1162,7 @@ class Inventory (object):
 					self.resolve_value_real (
 						resource,
 						item,
-						indent))
+						indent + "  "))
 
 				if not success:
 					return False, None
@@ -1043,10 +1177,11 @@ class Inventory (object):
 
 			for key, item in value.items ():
 
-				success, resolved = self.resolve_value_real (
-					resource,
-					item,
-					indent)
+				success, resolved = (
+					self.resolve_value_real (
+						resource,
+						item,
+						indent + "  "))
 
 				if not success:
 					return False, None
@@ -1068,7 +1203,7 @@ class Inventory (object):
 				return self.resolve_expression (
 					resource,
 					match.group (1),
-					indent)
+					indent + "  ")
 
 			else:
 
@@ -1083,12 +1218,12 @@ class Inventory (object):
 						self.resolve_expression (
 							resource,
 							match.group (1),
-							indent))
+							indent + "  "))
 
 					if not success:
 						return False, None
 
-					ret += str (resolved)
+					ret += unicode (resolved)
 
 					last_pos = match.end ()
 
@@ -1112,7 +1247,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sresolve_expression (%s, %s)" % (
 					indent,
 					resource.unique_name,
@@ -1127,7 +1262,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%stokenize failed" % (
 						indent))
 
@@ -1135,7 +1270,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%stokens: '%s'" % (
 					indent,
 					"', '".join (tokens)))
@@ -1147,13 +1282,13 @@ class Inventory (object):
 				tokens,
 				token_index,
 				resource,
-				indent))
+				indent + "  "))
 
 		if not success:
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%sparse failed" % (
 						indent))
 
@@ -1163,7 +1298,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%sonly used %s/%s tokens" % (
 						indent,
 						token_index,
@@ -1173,7 +1308,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%ssuccess: %s" % (
 					indent,
 					value))
@@ -1193,7 +1328,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sparse_expression ([ '%s' ], %s, %s)" % (
 					indent,
 					"', '".join (tokens),
@@ -1207,7 +1342,7 @@ class Inventory (object):
 				tokens,
 				token_index,
 				resource,
-				indent))
+				indent + "  "))
 
 		if not success:
 
@@ -1216,6 +1351,12 @@ class Inventory (object):
 		while token_index < len (tokens):
 
 			if tokens [token_index] == ".":
+
+				if self.trace:
+
+					uprint (
+						"%sparse simple attribute - x.y" % (
+							indent))
 
 				token_index += 1
 				token = tokens [token_index]
@@ -1226,9 +1367,18 @@ class Inventory (object):
 						value_type,
 						value,
 						token,
-						indent))
+						indent + "  "))
 
 				if success:
+
+					if self.trace:
+
+						uprint (
+							"%sresult - .%s = %s: %s" % (
+								indent,
+								token,
+								value_type,
+								value))
 
 					continue
 
@@ -1236,7 +1386,7 @@ class Inventory (object):
 
 					if self.trace:
 
-						print (
+						uprint (
 							"%svalue not present: %s" % (
 								indent,
 								token))
@@ -1246,16 +1396,6 @@ class Inventory (object):
 			elif tokens [token_index] == "|":
 
 				token_index += 1
-
-				if tokens [token_index] == "join" \
-				and value_type == "value" \
-				and isinstance (value, list):
-
-					token_index += 1
-
-					value = "".join (value)
-
-					continue
 
 				if tokens [token_index] == "keys" \
 				and value_type == "value":
@@ -1272,6 +1412,67 @@ class Inventory (object):
 					token_index += 1
 
 					value = value.values ()
+
+					continue
+
+				if tokens [token_index] == "join" \
+				and value_type == "value" \
+				and isinstance (value, list):
+
+					token_index += 1
+
+					value = "".join (value)
+
+					continue
+
+				if tokens [token_index + 0] == "union" \
+				and tokens [token_index + 1] == "(" \
+				and value_type == "value" \
+				and isinstance (value, list):
+
+					token_index += 2
+
+					success, token_index, union_value = (
+						self.parse_expression (
+							tokens,
+							token_index,
+							resource,
+							indent + "  "))
+
+					if not success:
+
+						return False, None, None
+
+					if not isinstance (union_value, list):
+
+						return False, None, None
+
+					if tokens [token_index] != ")":
+
+						return False, None, None
+
+					token_index += 1
+
+					item_set = set ()
+
+					new_value = list ()
+
+					for item in value + union_value:
+
+						if isinstance (item, dict):
+
+							new_value.append (
+								item)
+
+						elif item not in item_set:
+
+							new_value.append (
+								item)
+
+							item_set.add (
+								item)
+
+					value = new_value
 
 					continue
 
@@ -1297,18 +1498,186 @@ class Inventory (object):
 
 					raise Exception ()
 
+				if tokens [token_index + 0] == "not_empty_string" \
+				and value_type == "value":
+
+					token_index += 1
+
+					string_value = (
+						unicode (
+							value))
+
+					if string_value != "":
+
+						value = string_value
+
+					else:
+
+						return False, None, None
+
+					continue
+
+				if tokens [token_index + 0] == "default" \
+				and tokens [token_index + 1] == "(" \
+				and value_type == "value":
+
+					token_index += 2
+
+					success, token_index, default_value = (
+						self.parse_expression (
+							tokens,
+							token_index,
+							resource,
+							indent + "  "))
+
+					if not success:
+
+						return False, None, None
+
+					if tokens [token_index] != ")":
+
+						return False, None, None
+
+					token_index += 1
+
+					if value is None:
+
+						value = default_value
+
+					continue
+
 				return False, None, None
 
-			elif tokens [token_index] == "[":
+			elif tokens [token_index + 0] == "if" \
+			and value_type == "value":
 
 				token_index += 1
 
-				success, token_index, unresolved_value = (
+				success, token_index, test_value = (	
 					self.parse_expression (
 						tokens,
 						token_index,
 						resource,
-						indent))
+						indent + "  "))
+
+				if not success:
+
+					return False, None, None
+
+				if tokens [token_index] != "else":
+
+					return False, None, None
+
+				token_index += 1
+
+				success, token_index, false_value = (
+					self.parse_expression (
+						tokens,
+						token_index,
+						resource,
+						indent + "  "))
+
+				if not success:
+
+					return False, None, None
+
+				if not test_value:
+
+					value = false_value
+
+				continue
+
+			elif tokens [token_index + 0] == "==" \
+			and value_type == "value":
+
+				token_index += 1
+
+				success, token_index, right_value = (
+					self.parse_expression (
+						tokens,
+						token_index,
+						resource,
+						indent + "  "))
+
+				if not success:
+
+					return False, None, None
+
+				value = (value == right_value)
+
+				continue
+
+			elif tokens [token_index + 0] == "!=" \
+			and value_type == "value":
+
+				token_index += 1
+
+				success, token_index, right_value = (
+					self.parse_expression (
+						tokens,
+						token_index,
+						resource,
+						indent + "  "))
+
+				if not success:
+
+					return False, None, None
+
+				value = (value != right_value)
+
+				continue
+
+			elif tokens [token_index + 0] == "+" \
+			and value_type == "value":
+
+				if self.trace:
+
+					uprint (
+						"%sparse addition - %s + ?" % (
+							indent,
+							value))
+
+				token_index += 1
+
+				success, token_index, right_value = (
+					self.parse_expression (
+						tokens,
+						token_index,
+						resource,
+						indent + "  "))
+
+				if not success:
+
+					return False, None, None
+
+				value = (value + right_value)
+
+				if self.trace:
+
+					uprint (
+						"%sresult: + %s = %s" % (
+							indent,
+							right_value,
+							value))
+
+				continue
+
+			elif tokens [token_index] == "[":
+
+				if self.trace:
+
+					uprint (
+						"%sparse dynamic attribute - x [y]" % (
+							indent))
+
+				token_index += 1
+
+				success, token_index, resolved_value = (
+					self.parse_expression (
+						tokens,
+						token_index,
+						resource,
+						indent + "  "))
 
 				if not success:
 
@@ -1320,15 +1689,12 @@ class Inventory (object):
 
 				token_index += 1
 
-				success, resolved_value = (
-					self.resolve_value_real (
-						resource,
-						unresolved_value,
-						indent))
+				if self.trace:
 
-				if not success:
-
-					return False, None, None
+					uprint (
+						"%sresolved index: %s" % (
+							indent,
+							resolved_value))
 
 				if value_type == "resource":
 
@@ -1336,9 +1702,18 @@ class Inventory (object):
 						self.dereference_resource (
 						value,
 						resolved_value,
-						indent))
+						indent + "  "))
 
 					if success:
+
+						if self.trace:
+
+							uprint (
+								"%sresult: [%s] = %s" % (
+									indent,
+									resolved_value,
+									value))
+
 						continue
 
 				elif value_type == "value":
@@ -1347,11 +1722,27 @@ class Inventory (object):
 
 						value = value [resolved_value]
 
+						if self.trace:
+
+							uprint (
+								"%sresult: [%s] = %s" % (
+									indent,
+									resolved_value,
+									value))
+
 						continue
 
 					elif str (resolved_value) in value:
 
 						value = value [str (resolved_value)]
+
+						if self.trace:
+
+							uprint (
+								"%sresult: [%s] = %s" % (
+									indent,
+									resolved_value,
+									value))
 
 						continue
 
@@ -1362,14 +1753,22 @@ class Inventory (object):
 						value_type = "resource"
 						value = resolved_value
 
+						if self.trace:
+
+							uprint (
+								"%sresult: [%s] = resource: %s" % (
+									indent,
+									resolved_value,
+									value))
+
 						continue
 
 				if self.trace:
 
-					print (
+					uprint (
 						"%svalue not present: %s" % (
 							indent,
-							token))
+							resolved_value))
 
 				return False, None, None
 
@@ -1385,6 +1784,17 @@ class Inventory (object):
 			token_index,
 			resource_source,
 			indent):
+
+		if self.trace:
+
+			uprint (
+				"%sparse_simple ([ '%s' ], %s, %s)" % (
+					indent,
+					"', '".join (tokens),
+					token_index,
+					resource_source))
+
+			indent = indent + "  "
 
 		token = (
 			tokens [token_index])
@@ -1403,7 +1813,35 @@ class Inventory (object):
 
 			return True, token_index + 1, "value", string_value
 
+		if token == "(":
+
+			new_token_index = (
+				token_index + 1)
+
+			success, new_token_index, value = (
+				self.parse_expression (
+					tokens,
+					new_token_index,
+					resource,
+					indent + "  "))
+
+			if not success:
+
+				return False, token_index, None, None
+
+			if tokens [new_token_index] != ")":
+
+				return False, token_index, None, None
+
+			return True, new_token_index + 1, "value", value
+
 		if token == "[":
+
+			if self.trace:
+
+				uprint (
+					"%sparse dynamic lookup - x [y]" % (
+						indent))
 
 			new_token_index = (
 				token_index + 1)
@@ -1440,7 +1878,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%srecurse hostvars" % (
 						indent))
 
@@ -1450,7 +1888,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%sfound in project data: %s" % (
 						indent,
 						token))
@@ -1485,7 +1923,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sunable to resolve: %s" % (
 					indent,
 					token))
@@ -1501,7 +1939,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sdereference (%s, %s, %s)" % (
 					indent,
 					reference_type,
@@ -1515,7 +1953,7 @@ class Inventory (object):
 			return self.dereference_resource (
 				reference_value,
 				token,
-				indent)
+				indent + "  ")
 
 		elif reference_type == "resource-section":
 
@@ -1525,7 +1963,7 @@ class Inventory (object):
 			return self.dereference_resource (
 				value_resource_name,
 				value_section_name + "_" + token,
-				indent)
+				indent + "  ")
 
 		elif reference_type == "value":
 
@@ -1554,7 +1992,7 @@ class Inventory (object):
 
 		elif self.trace:
 
-			print (
+			uprint (
 				"%svalue not present: %s" % (
 					indent,
 					token))
@@ -1573,7 +2011,7 @@ class Inventory (object):
 
 		if self.trace:
 
-			print (
+			uprint (
 				"%sdereference_resource (%s, %s)" % (
 					indent,
 					resource.unique_name,
@@ -1589,11 +2027,14 @@ class Inventory (object):
 
 			if reference ["type"] == "resource":
 
-				target_name = (
-					self.resolve_value_or_fail (
+				target_success, target_name = (
+					self.resolve_value_real (
 						resource,
 						reference ["value"],
-						indent))
+						indent + "  "))
+
+				if not target_success:
+					return False, None, None
 
 				if not target_name in self.resources:
 					raise Exception ()
@@ -1610,7 +2051,7 @@ class Inventory (object):
 
 					if self.trace:
 
-						print (
+						uprint (
 							"%sfound resource class section reference: %s" % (
 								indent,
 								token))
@@ -1630,7 +2071,7 @@ class Inventory (object):
 
 					if self.trace:
 
-						print (
+						uprint (
 							"%sfound resource class reference: %s" % (
 								indent,
 								token))
@@ -1645,7 +2086,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%sfound in resource: %s" % (
 						indent,
 						token))
@@ -1665,7 +2106,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%srecurse parent: %s" % (
 						indent,
 						parent_name))
@@ -1676,7 +2117,7 @@ class Inventory (object):
 
 			if self.trace:
 
-				print (
+				uprint (
 					"%sfound in globals: %s" % (
 						indent,
 						token))
@@ -1688,7 +2129,7 @@ class Inventory (object):
 				self.resolve_value_real (
 					resource,
 					unresolved_value,
-					indent))
+					indent + "  "))
 
 			if success:
 
@@ -1703,6 +2144,7 @@ class Inventory (object):
 	tokenize_re = re.compile ("\s*((?:" + ")|(?:".join ([
 		r"$",
 		r"[][.,|()]",
+		r"==|!=|\+",
 		r"[a-zA-Z][a-zA-Z0-9_]*",
 		r"'(?:[^'\\]|\\\\|\\\')*'",
 	]) + "))")

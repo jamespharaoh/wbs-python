@@ -43,7 +43,7 @@ User Testimonials
 
 The NSA, Her Majesty's Government, Amazon, Google, Twilio, Runscope, Mozilla, Heroku,
 PayPal, NPR, Obama for America, Transifex, Native Instruments, The Washington
-Post, Twitter, SoundCloud, Kippt, Readability, Sony, and Federal U.S.
+Post, Twitter, SoundCloud, Kippt, Sony, and Federal U.S.
 Institutions that prefer to be unnamed claim to use Requests internally.
 
 **Armin Ronacher**
@@ -56,7 +56,7 @@ Institutions that prefer to be unnamed claim to use Requests internally.
 
 **Daniel Greenfeld**
     Nuked a 1200 LOC spaghetti code library with 10 lines of code thanks to
-    @kennethreitz's request library. Today has been AWESOME.
+    `@kennethreitz <https://twitter.com/kennethreitz>`_'s request library. Today has been AWESOME.
 
 **Kenny Meyers**
     Python HTTP: When in doubt, or when not in doubt, use Requests. Beautiful,
@@ -87,7 +87,7 @@ Requests is ready for today's web.
 - Chunked Requests
 - Thread-safety
 
-Requests officially supports Python 2.6–2.7 & 3.3–3.5, and runs great on PyPy.
+Requests officially supports Python 2.6–2.7 & 3.3–3.7, and runs great on PyPy.
 
 
 The User Guide

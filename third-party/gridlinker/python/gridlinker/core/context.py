@@ -1,5 +1,7 @@
 from __future__ import absolute_import
+from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import with_statement
 
 import os
 import re
@@ -132,6 +134,7 @@ class GenericContext (object):
 
 			return EtcdClient (
 				servers = self.connection_config ["etcd_servers"],
+				port = self.etcd_port,
 				secure = True,
 				client_ca_cert = ca_cert_path,
 				client_cert = cert_path,
@@ -142,6 +145,7 @@ class GenericContext (object):
 
 			return EtcdClient (
 				servers = self.connection_config ["etcd_servers"],
+				port = self.etcd_port,
 				prefix = self.connection_config ["etcd_prefix"])
 
 		else:
@@ -156,6 +160,14 @@ class GenericContext (object):
 			self.ansible_env)
 
 	@lazy_property
+	def etcd_port (self):
+
+		return int (
+			self.connection_config.get (
+				"etcd_port",
+				"2379"))
+
+	@lazy_property
 	def etcdctl_env (self):
 
 		if self.connection_config ["etcd_secure"] == "yes":
@@ -163,8 +175,11 @@ class GenericContext (object):
 			return {
 
 				"ETCDCTL_PEERS": ",".join ([
-					"https://%s:2379" % server
-					for server in self.connection_config ["etcd_servers"]
+					"https://%s:%s" % (
+						etcd_server,
+						self.etcd_port)
+					for etcd_server
+					in self.connection_config ["etcd_servers"]
 				]),
 
 				"ETCDCTL_CA_FILE": "%s/config/%s-ca.cert" % (
@@ -189,8 +204,11 @@ class GenericContext (object):
 			return {
 
 				"ETCDCTL_PEERS": ",".join ([
-					"http://%s:2379" % server
-					for server in self.connection_config ["etcd_servers"]
+					"http://%s:%s" % (
+						etcd_server,
+						self.etcd_port)
+					for etcd_server
+					in self.connection_config ["etcd_servers"]
 				]),
 
 			}
@@ -630,6 +648,15 @@ class GenericContext (object):
 			(key, value)
 			for directory in self.local_data ["classes"].values ()
 			for key, value in directory.items ()
+		])
+
+	@lazy_property
+	def namespaces (self):
+
+		return dict ([
+			(key, wbs.freeze (value))
+			for key, value
+			in self.local_data ["namespaces"].items ()
 		])
 
 	@lazy_property

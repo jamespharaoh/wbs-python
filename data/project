@@ -52,7 +52,7 @@ resource_data:
   clusters:
 
     group: "cluster"
-    key: "{{ identity_name }}"
+    key: "{{ cluster_name }}"
     section: "cluster"
 
   superclusters:
@@ -94,6 +94,8 @@ resource_data:
 project_data:
 
   deployment_modes: "deployment-modes"
+  jenkins_builds: "jenkins-builds"
+  networks: "networks"
   node_templates: "node-templates"
   node_types: "node-types"
   vpn_clients: "vpn-clients"

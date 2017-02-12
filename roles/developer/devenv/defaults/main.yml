@@ -18,6 +18,7 @@ devenv_config_directories:
   - "config/postgresql-main"
   - "config/postgresql-cache"
   - "config/rabbit"
+  - "config/web2"
 
 devenv_config_files:
 

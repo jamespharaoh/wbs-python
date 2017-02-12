@@ -1,0 +1,9 @@
+---
+
+- include: "jenkins-config.yml"
+  tags:
+
+    - "jenkins-config"
+    - "jenkins"
+
+# ex: et ts=2 filetype=yaml

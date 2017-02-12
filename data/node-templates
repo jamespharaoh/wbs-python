@@ -72,4 +72,8 @@
   type: "concrete"
   parent: "node"
 
+- name: "web2"
+  type: "concrete"
+  parent: "nodejs"
+
 # ex: et ts=2 filetype=yaml

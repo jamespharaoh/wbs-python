@@ -10,6 +10,21 @@ heka:
 heka_installed_version: "0.10.0"
 heka_needs_restart: "yes"
 heka_state: "enabled"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/124/certificate"
+  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+  installed_version: "2.4.10-12-trusty"
+  needs_restart: "yes"
+  private_key: "/authority/icinga/issue/124/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/124/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
+icinga_core_installed_version: "2.4.10-12-trusty"
+icinga_core_needs_restart: "yes"
+icinga_core_private_key: "/authority/icinga/issue/124/key"
+icinga_core_state: "enabled"
 instance_id: "i-ba5b8bad"
 nginx: 
   
@@ -47,13 +62,13 @@ python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 
   
-  installed_prefix: "/opt/rzbackup-2.0.7-xenial"
-  installed_version: "2.0.7-xenial"
+  installed_prefix: "/opt/rzbackup-3.0.0-xenial"
+  installed_version: "3.0.0-xenial"
   needs_restart: "no"
   state: "enabled"
 
-rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-xenial"
-rzbackup_installed_version: "2.0.7-xenial"
+rzbackup_installed_prefix: "/opt/rzbackup-3.0.0-xenial"
+rzbackup_installed_version: "3.0.0-xenial"
 rzbackup_needs_restart: "no"
 rzbackup_state: "enabled"
 ssh: 

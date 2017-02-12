@@ -53,8 +53,6 @@
     dest: "/var/lib/lxc/{{ inventory_hostname }}/rootfs/MANIFEST/{{ item.key }}"
     content: "{{ item.value }}\n"
 
-# ex: noet ts=2 filetype=sh
-
 - name: "create package"
   delegate_to: "localhost"
   environment:

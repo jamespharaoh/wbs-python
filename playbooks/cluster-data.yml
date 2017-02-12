@@ -1,27 +1,10 @@
 ---
 
+- include: "cluster-data/cluster-data-create.yml"
+- include: "cluster-data/cluster-data-system.yml"
+
 - hosts: "cluster-data:&cluster-instance-active"
   roles:
-
-    - "cluster-stop"
-    - "cluster-create"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
-
-    - "cluster-system"
-    - "system-apt-setup"
-    - "setup-common-users"
-    - "setup-hostname"
-    - "setup-dns"
-    - "setup-system"
-    - "setup-logging"
-
-    - "cluster-ssh"
-    - "system-packages-install"
-    - "install-kernel"
-    - "install-postfix"
-    - "cluster-volumes"
-    - "cluster-user"
 
     - "wistla-heka-agent"
 

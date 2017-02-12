@@ -1,15 +1,36 @@
 ---
 
-- hosts: "cluster-network"
-  roles:
-
-    - "cluster-admin-nginx-config"
+- hosts: "cluster-admin"
+  tasks:
+    - debug:
+        var: "nodejs_version"
+    - debug:
+        var: "nodejs_version_legacy"
 
 - hosts: "cluster-admin"
   roles:
 
-    - "nodejs-install"
-    - "nodejs-packages-install"
+    - role: "nodejs-install"
+      nodejs_version: "{{ nodejs_version_regular }}"
+
+    - role: "nodejs-packages-install"
+      nodejs_version: "{{ nodejs_version_regular }}"
+
+    - role: "nodejs-install"
+      when: "
+        nodejs_version_legacy != ''
+        and nodejs_version_legacy != nodejs_version_regular
+      "
+      nodejs_version: "{{ nodejs_version_legacy }}"
+
+    - role: "nodejs-packages-install"
+      when: "
+        nodejs_version_legacy != ''
+        and nodejs_version_legacy != nodejs_version_regular
+      "
+      nodejs_version: "{{ nodejs_version_regular }}"
+      nodejs_packages: "{{ nodejs_packages_legacy }}"
+
     - "nodejs-stubs"
 
 # ex: et ts=2 filetype=yaml

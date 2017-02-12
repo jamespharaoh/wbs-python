@@ -1,0 +1,26 @@
+{{ ansible_warning ['#'] }}
+
+[Unit]
+
+	Description = Etcd daemon
+	After = network.target
+
+[Service]
+
+	Type = notify
+
+	Restart = always
+	RestartSec = 10s
+
+	EnvironmentFile = /etc/etcd/etcd-environment
+
+	ExecStart = {{ etcd_target }}/etcd
+
+	LimitNOFILE=40000
+
+[Install]
+
+	WantedBy = mult-user.target
+	Alias = etcd.service
+
+# ex: et ts=4 filetype=systemd

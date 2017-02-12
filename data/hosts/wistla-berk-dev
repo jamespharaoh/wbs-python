@@ -37,20 +37,22 @@ python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
   state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 
   
-  installed_prefix: "/opt/rzbackup-2.0.7-trusty"
-  installed_version: "2.0.7-trusty"
+  installed_prefix: "/opt/rzbackup-3.0.0-trusty"
+  installed_version: "3.0.0-trusty"
+  needs_restart: "yes"
   state: "enabled"
 
-rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-trusty"
-rzbackup_installed_version: "2.0.7-trusty"
+rzbackup_installed_prefix: "/opt/rzbackup-3.0.0-trusty"
+rzbackup_installed_version: "3.0.0-trusty"
+rzbackup_needs_restart: "yes"
 rzbackup_state: "enabled"
 
 

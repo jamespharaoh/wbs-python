@@ -197,9 +197,10 @@
   become: "yes"
   action:
 
-    module: "file"
-    path: "{{ cluster_deployment_home }}/{{ item.log }}"
-    state: "touch"
+    module: "copy"
+    dest: "{{ cluster_deployment_home }}/{{ item.log }}"
+    content: ""
+    force: "no"
 
     owner: "{{ item.user }}"
     group: "ubuntu"

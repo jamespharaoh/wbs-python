@@ -21,6 +21,12 @@ node_type_indices:
   media: 7
   notifications: 8
   db-daemon: 9
+  web2: 10
+  # unused: 11
+  # unused: 12
+  # unused: 13
+  # unused: 14
+  # broadcast: 15
 
   # data_network: 16
   # data_instance: 17
@@ -30,6 +36,14 @@ node_type_indices:
   kafka: 21
   postgresql-main: 22
   postgresql-cache: 23
+  # unused: 24
+  # unused: 25
+  # unused: 26
+  # unused: 27
+  # unused: 28
+  # unused: 29
+  # unused: 30
+  # broadcast: 31
 
 cluster_zone_indices:
 
@@ -214,6 +228,7 @@ ansible_notice:
   ";": "{{ ansible_notice_generic | replace ('SEP', ';') }}"
   "//": "{{ ansible_notice_generic | replace ('SEP', '//') }}"
   "--": "{{ ansible_notice_generic | replace ('SEP', '--') }}"
+  "<!--": "{{ [ '<!--', ansible_warning_lines, '-->' ] | join }}"
 
 wistla_dist_url: "https://dist.ops.wistla.com"
 
@@ -226,13 +241,12 @@ python:
 
 python_pip:
 
-  version: "9.0.2"
+  version: "9.0.1"
   archive: "get-pip-{{ python_pip_version }}.py"
   url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
 
 python_apt:
 
-  version: "0.9.3-1"
   url: "{{ wistla_dist_url }}/python/{{ python_apt_archive }}"
 
 etcd_url: "{{ wistla_dist_url }}/etcd/{{ etcd_archive }}"
@@ -263,6 +277,14 @@ local_build_bucket: "wistla-builds"
 local_build_target: "/builds/{{ local_build_name }}"
 
 amazon_credentials: "{{ lookup ('file', HOME + '/work/amazon-credentials') | from_yaml }}"
+
+amazon_security_group_names:
+
+  - "admin"
+  - "app"
+  - "balancer"
+  - "data"
+  - "jenkins"
 
 default:
 

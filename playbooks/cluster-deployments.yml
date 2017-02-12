@@ -1,6 +1,0 @@
----
-
-- include: "cluster-deployments-setup.yml"
-- include: "cluster-deployments-templates.yml"
-
-# ex: et ts=2 filetype=yaml

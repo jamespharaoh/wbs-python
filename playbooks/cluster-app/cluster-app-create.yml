@@ -1,0 +1,10 @@
+---
+
+- hosts: "cluster-app"
+  roles:
+
+    - "cluster-create"
+    - "wait-for-ssh"
+    - "scan-ssh-key"
+
+# ex: et ts=2 filetype=yaml

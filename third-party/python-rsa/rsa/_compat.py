@@ -18,6 +18,7 @@
 
 from __future__ import absolute_import
 
+import itertools
 import sys
 from struct import pack
 
@@ -25,6 +26,8 @@ MAX_INT = sys.maxsize
 MAX_INT64 = (1 << 63) - 1
 MAX_INT32 = (1 << 31) - 1
 MAX_INT16 = (1 << 15) - 1
+
+PY2 = sys.version_info[0] == 2
 
 # Determine the word size of the processor.
 if MAX_INT == MAX_INT64:
@@ -37,19 +40,26 @@ else:
     # Else we just assume 64-bit processor keeping up with modern times.
     MACHINE_WORD_SIZE = 64
 
-# Range generator.
-try:
-    # < Python3
-    range = xrange
-except NameError:
-    # Python3
-    range = range
-
-# ``long`` is no more. Do type detection using this instead.
-try:
+if PY2:
     integer_types = (int, long)
-except NameError:
-    integer_types = (int,)
+    range = xrange
+    zip = itertools.izip
+else:
+    integer_types = (int, )
+    range = range
+    zip = zip
+
+
+def write_to_stdout(data):
+    """Writes bytes to stdout
+
+    :type data: bytes
+    """
+    if PY2:
+        sys.stdout.write(data)
+    else:
+        # On Py3 we must use the buffer interface to write bytes.
+        sys.stdout.buffer.write(data)
 
 
 def is_bytes(obj):
@@ -90,6 +100,27 @@ def byte(num):
         A single byte.
     """
     return pack("B", num)
+
+
+def xor_bytes(b1, b2):
+    """
+    Returns the bitwise XOR result between two bytes objects, b1 ^ b2.
+
+    Bitwise XOR operation is commutative, so order of parameters doesn't
+    generate different results. If parameters have different length, extra
+    length of the largest one is ignored.
+
+    :param b1:
+        First bytes object.
+    :param b2:
+        Second bytes object.
+    :returns:
+        Bytes object, result of XOR operation.
+    """
+    if PY2:
+        return ''.join(byte(ord(x) ^ ord(y)) for x, y in zip(b1, b2))
+
+    return bytes(x ^ y for x, y in zip(b1, b2))
 
 
 def get_word_alignment(num, force_arch=64,

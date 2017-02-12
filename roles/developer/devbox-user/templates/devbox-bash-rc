@@ -78,4 +78,42 @@ function comma () { echo "$@" | tr ' ' ,; }
 
 export PGHOST="{{ deployment_name }}-postgresql-0"
 
+# auto-completion for run-ansible
+
+function _run_ansible {
+
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+	case "$cur" in
+
+		(playbooks/*)
+
+			COMPREPLY=($(
+				find playbooks \
+					-type f \
+					-name "${cur#playbooks/}*" \
+					-printf 'playbooks/%f\n'
+			))
+
+			;;
+
+		(*)
+
+			COMPREPLY=($(
+				find playbooks \
+					-type f \
+					-name "${cur}*" \
+					-printf '%f\n'
+			))
+
+			;;
+
+	esac
+
+}
+
+complete -F _run_ansible run-ansible
+
 # ex: noet ts=4 filetype=sh

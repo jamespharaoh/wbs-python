@@ -7,5 +7,6 @@
     module: "service"
     name: "dnsmasq"
     state: "restarted"
+    enabled: "yes"
 
 # ex: et ts=2 filetype=yaml

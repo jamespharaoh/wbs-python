@@ -26,4 +26,8 @@ deployment:
 
   api_server_db_query_timeout_ms: "120000"
 
+  media_cache_enabled: "yes"
+  media_cache_size: "1g"
+  media_cache_keys_zone_size: "8m"
+
 # ex: et ts=2 filetype=yaml

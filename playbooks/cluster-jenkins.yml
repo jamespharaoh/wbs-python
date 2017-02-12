@@ -28,6 +28,7 @@
 
     - "python"
     - "nodejs"
+    - "etcd-client"
 
     - "install-mongodb"
     - "install-tools"
@@ -38,7 +39,10 @@
     - "cluster-jenkins-network"
     - "cluster-jenkins-install"
     - "cluster-jenkins-nginx"
-    - "cluster-jenkins-data"
-    - "cluster-jenkins-skypebot"
+
+- include: "cluster-jenkins/cluster-jenkins-rzbackup.yml"
+
+- include: "cluster-jenkins/cluster-jenkins-data.yml"
+- include: "cluster-jenkins/cluster-jenkins-skypebot.yml"
 
 # ex: et ts=2 filetype=yaml

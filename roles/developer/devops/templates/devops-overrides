@@ -59,6 +59,7 @@ dev_node_count:
   postgresql-cache: "{{ (dev_node_count | default ({})) ['postgresql-cache'] | default ('1') }}"
   rabbit: "{{ (dev_node_count | default ({})).rabbit | default ('1') }}"
   web: "{{ (dev_node_count | default ({})).web | default ('1') }}"
+  web2: "{{ (dev_node_count | default ({})).web | default ('1') }}"
 
 dev_node_instance_count:
 
@@ -69,6 +70,7 @@ dev_node_instance_count:
   notifications: "{{ (dev_node_instance_count | default ({})).notifications | default ('1') }}"
   browser: "{{ (dev_node_instance_count | default ({})).browser | default ('1') }}"
   web: "{{ (dev_node_instance_count | default ({})).web | default ('1') }}"
+  web2: "{{ (dev_node_instance_count | default ({})).web | default ('1') }}"
 
 dev_node_memory:
 
@@ -85,6 +87,7 @@ dev_node_memory:
   postgresql-cache: "{{ (dev_node_memory | default ({})) ['postgresql-cache'] | default ('512') }}"
   rabbit: "{{ (dev_node_memory | default ({})).rabbit | default ('512') }}"
   web: "{{ (dev_node_memory | default ({})).web | default ('512') }}"
+  web2: "{{ (dev_node_memory | default ({})).web | default ('512') }}"
 
 dev_api_use_s3: "{{ dev_api_use_s3 | default ('no') }}"
 dev_web_use_s3: "{{ dev_web_use_s3 | default ('no') }}"

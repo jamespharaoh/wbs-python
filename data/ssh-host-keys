@@ -60,19 +60,19 @@ ops:
   admin:
 
     a:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWW"
-      - "RZ1BMluvsGrWy7VMgZnqrgY="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWWRZ1B"
+      - "MluvsGrWy7VMgZnqrgY="
 
     b:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBJyFE6x9xMsjS7ZUC2Ms1l5PUHhhgUpzAQNuE0WQ0K6M/yZ+NiMjbG6aaGo4bOns"
-      - "Wm1rMh+j4oSY+eI8fVZInkc="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBJyFE6x9xMsjS7ZUC2Ms1l5PUHhhgUpzAQNuE0WQ0K6M/yZ+NiMjbG6aaGo4bOnsWm1r"
+      - "Mh+j4oSY+eI8fVZInkc="
 
     c:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBHeatnHoZzbiQWjfsBFDY3qyScraqtDkiHBi3dCqeoV/fk4kX6JJV+tdV746DLZ+"
-      - "Qowmb2YsLz9I19RQaNAyjH0="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBHeatnHoZzbiQWjfsBFDY3qyScraqtDkiHBi3dCqeoV/fk4kX6JJV+tdV746DLZ+Qowm"
+      - "b2YsLz9I19RQaNAyjH0="
 
   jenkins:
 
@@ -86,77 +86,96 @@ production:
   admin:
 
     a:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBGMotUSVBtSkpHjiMry24Lf3kx+e/Qg9wPFcgfEjlt3L6nCiVuWHtyEMgdqganD/"
-      - "cwqjfALbSdjtQJltHWskT/o="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBGMotUSVBtSkpHjiMry24Lf3kx+e/Qg9wPFcgfEjlt3L6nCiVuWHtyEMgdqganD/cwqj"
+      - "fALbSdjtQJltHWskT/o="
 
     b:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl5"
-      - "5/WYqOUgrOOcO9lpWGx6NeI="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBJlQB0mcbKInu2/iq8xezTJVpkD0d/kBsiZxy7PeO0WtAsvKQTxb39CQlFzpSzl55/WY"
+      - "qOUgrOOcO9lpWGx6NeI="
 
     c:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBH2YVvk6OoR/w1LH7IAnQef8vyEa+Seo6uprK0lGX/yW5FoqLxZbRFYhUK34HriU"
-      - "LgMZdYAwTK/Vc+Hetpfqgd4="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBH2YVvk6OoR/w1LH7IAnQef8vyEa+Seo6uprK0lGX/yW5FoqLxZbRFYhUK34HriULgMZ"
+      - "dYAwTK/Vc+Hetpfqgd4="
 
   app:
 
     a-4:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBDHrOpSnCfrp9obpLEFrf2OJKpgrKfpClxqlMU9/JotGaPdl1RNl98gxj4t6+Y45"
-      - "RRGRG5JcR3PSPy8blwtDq8E="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBDHrOpSnCfrp9obpLEFrf2OJKpgrKfpClxqlMU9/JotGaPdl1RNl98gxj4t6+Y45RRGR"
+      - "G5JcR3PSPy8blwtDq8E="
 
 staging:
 
   admin:
 
     a:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBKib31QEve7hmGq6xr40htcV4nM0KjzWa0Ip3Wge/lDQaV0LbvjC3SVjoaFk9R0s"
-      - "216BN5HITaM813sPF6xd9+Q="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBKib31QEve7hmGq6xr40htcV4nM0KjzWa0Ip3Wge/lDQaV0LbvjC3SVjoaFk9R0s216B"
+      - "N5HITaM813sPF6xd9+Q="
 
     b:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBPjzCRpJtIDUQB7hrZy0tbgncBF13cvps96zXkhxWg5x/pJUZcrBkEMuKGu7OuPO"
-      - "wgbUyB9EeuXq9Lqz7YRJy/Q="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBPjzCRpJtIDUQB7hrZy0tbgncBF13cvps96zXkhxWg5x/pJUZcrBkEMuKGu7OuPOwgbU"
+      - "yB9EeuXq9Lqz7YRJy/Q="
 
     c:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBO2k2rQhU3izrmsYrDS2vyBdriOYCJFG2qwraLYENiE8b7+xBk/gZyyT6zUiuRzH"
-      - "xeNDLgN5X6+KPY+vziMwAwE="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBO2k2rQhU3izrmsYrDS2vyBdriOYCJFG2qwraLYENiE8b7+xBk/gZyyT6zUiuRzHxeND"
+      - "LgN5X6+KPY+vziMwAwE="
 
   app:
 
     a-4:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBDQNC/7Je/NsvIro1NKcxrQTj+heC7kkgcmxErPQRtnTPtxbbvt+/flXrPfDLQyw"
-      - "LHepIMI07potMfF3pe7OcW0="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBDQNC/7Je/NsvIro1NKcxrQTj+heC7kkgcmxErPQRtnTPtxbbvt+/flXrPfDLQywLHep"
+      - "IMI07potMfF3pe7OcW0="
 
 test:
 
   admin:
 
     a:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBMeq+PPPmODmYI8CuEc1eMp54yaZmOvI+cmKh+l9czHA3xHYQVeBr4nwM9KW9MVA"
-      - "NuSzlRYhrBx4GsVvMD4RYoM="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBMeq+PPPmODmYI8CuEc1eMp54yaZmOvI+cmKh+l9czHA3xHYQVeBr4nwM9KW9MVANuSz"
+      - "lRYhrBx4GsVvMD4RYoM="
 
     b:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBKY61a8LNCF6IGEh+tbQhn0zdl8PZClpJ1zu6AmR7rLw/0+X7LCSL2Vu/nZhs/M0"
-      - "alY+8K2mUFPYtKwZPkiOV2I="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBKY61a8LNCF6IGEh+tbQhn0zdl8PZClpJ1zu6AmR7rLw/0+X7LCSL2Vu/nZhs/M0alY+"
+      - "8K2mUFPYtKwZPkiOV2I="
 
     c:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBF6eL6yeV3PSONj6inmZsGjSutZsvq4PtvuQvaWKKrJ9GTHqV/lcgaTcSo/9p91R"
-      - "C5LY8y5IRKHWp7DkguqsQFc="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBF6eL6yeV3PSONj6inmZsGjSutZsvq4PtvuQvaWKKrJ9GTHqV/lcgaTcSo/9p91RC5LY"
+      - "8y5IRKHWp7DkguqsQFc="
 
   app:
 
     a-4:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYA"
-      - "AABBBAp/89Q3qndZqdbADzuVdQHIqCHlaxBo1K0x65EpWF8Lwz7mbA4Bt55sGrIWZvt8"
-      - "tT10PXpfAX/t4K8SXktZZJQ="
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBAp/89Q3qndZqdbADzuVdQHIqCHlaxBo1K0x65EpWF8Lwz7mbA4Bt55sGrIWZvt8tT10"
+      - "PXpfAX/t4K8SXktZZJQ="
+
+test-2:
+
+  admin:
+
+    a:
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBB49ZKzO/T83WYYwnGVkFsFIlq5XE6SWB8Iff9BEa8g6ixWBQSAKKq37TLreBsdA3skk"
+      - "GaqlczH6HhET0l4qbCA="
+
+    b:
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBFwGxlvYECKsY4Z5e7Ipg0hsqWUqyFDapQkxfWfL6Yq4ERdQp0L12fNcIIcICMtlO+Ka"
+      - "ljY3PSeMSMptREnvG/Y="
+
+    c:
+      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
+      - "BBBH2/Y1xo14oDx+GHwIyexIB9pbvk8sQB+a0u7i0vppLgBN8zejq0m9n5SMKF7XdNEahu"
+      - "ElVXOVMsZkZ5NQVR+yI="
 
 # ex: et ts=2 filetype=yaml

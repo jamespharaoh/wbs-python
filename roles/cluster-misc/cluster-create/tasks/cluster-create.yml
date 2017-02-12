@@ -29,9 +29,9 @@
 
         region: "{{ amazon_region_name }}"
 
-        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+        aws_access_key: "{{ amazon_access_key }}"
+        aws_secret_key: "{{ amazon_secret_key }}"
+        security_token: "{{ amazon_session_token }}"
 
     - name: "stop cluster instance"
       local_action:
@@ -41,9 +41,10 @@
         state: "stopped"
 
         region: "{{ amazon_region_name }}"
-        aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-        aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-        security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+
+        aws_access_key: "{{ amazon_access_key }}"
+        aws_secret_key: "{{ amazon_secret_key }}"
+        security_token: "{{ amazon_session_token }}"
 
         wait: "yes"
 
@@ -74,9 +75,16 @@
 
     region: "{{ amazon_region_name }}"
 
-    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+    aws_access_key: "{{ amazon_access_key }}"
+    aws_secret_key: "{{ amazon_secret_key }}"
+    security_token: "{{ amazon_session_token }}"
+
+    user_data: "{{ [
+      '#!/bin/bash',
+      'apt update -y',
+      'apt dist-upgrade -y',
+      'apt install python -y',
+    ] | join ('\n') }}"
 
     wait: "yes"
 
@@ -99,9 +107,9 @@
 
     region: "{{ amazon_region_name }}"
 
-    aws_access_key: "{{ amazon_credentials [amazon_account_name].access_key }}"
-    aws_secret_key: "{{ amazon_credentials [amazon_account_name].secret_key }}"
-    security_token: "{{ amazon_credentials [amazon_account_name].session_token }}"
+    aws_access_key: "{{ amazon_access_key }}"
+    aws_secret_key: "{{ amazon_secret_key }}"
+    security_token: "{{ amazon_session_token }}"
 
 - name: "set amazon_instance_type_running"
   when: "

@@ -1,0 +1,22 @@
+{{ ansible_warning ['#'] }}
+
+PATH="{{ [
+  '/usr/local/sbin',
+  '/usr/local/bin',
+  '/usr/sbin',
+  '/usr/bin',
+  '/sbin',
+  '/bin',
+] | join (':') }}"
+
+{% for task in btrfs_dedupe_tasks %}
+{{ [
+  task.schedule,
+  task.user,
+  'btrfs-dedupe-script',
+  '/etc/btrfs-dedupe-config',
+  task.name,
+] | join (' ') }}
+{% endfor %}
+
+# ex: et ts=2 filetype=cron

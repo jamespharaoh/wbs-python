@@ -18,6 +18,13 @@ node_load_deploy_projects:
       - "--include /static"
       - "--exclude /'*'"
 
+  - name: "wistla-share"
+    when: "v2_enabled"
+    filters:
+
+      - "--include /lib"
+      - "--exclude /'*'"
+
   - name: "content-api"
     when: "v1_enabled"
     filters:

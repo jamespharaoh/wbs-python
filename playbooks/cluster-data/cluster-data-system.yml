@@ -1,0 +1,20 @@
+---
+
+- hosts: "cluster-data:&cluster-instance-active"
+  roles:
+
+    - "cluster-system"
+    - "setup-hostname"
+    - "setup-dns"
+    - "system-apt-setup"
+    - "setup-common-users"
+    - "setup-system"
+    - "setup-logging"
+    - "cluster-ssh"
+    - "system-packages-install"
+    - "install-kernel"
+    - "install-postfix"
+    - "cluster-volumes"
+    - "cluster-user"
+
+# ex: et ts=2 filetype=yaml

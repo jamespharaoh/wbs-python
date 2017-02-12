@@ -1,6 +1,39 @@
 ---
 
-- name: "build python-apt"
+- name: "python apt build install system packages"
+  with_items:
+
+    - "build-essential"
+    - "libapt-pkg-dev"
+
+  when: "
+    python_apt_installed_version != [
+      python_version,
+      python_apt_version,
+    ] | join ('/')
+  "
+  become: "yes"
+  action:
+
+    module: "apt"
+    name: "{{ item }}"
+
+- name: "python apt build install pip packages"
+  with_items:
+
+    - "sphinx"
+
+  become: "yes"
+  environment:
+
+    PATH: "{{ python_target }}/bin:{{ lookup ('env', 'PATH') }}"
+
+  action:
+
+    module: "pip"
+    name: "{{ item }}"
+
+- name: "python apt build from source"
   when: "
     python_apt_installed_version != [
       python_version,
@@ -19,12 +52,6 @@
   shell:
 
     set -euf -o pipefail;
-
-    echo "PATH - $PATH";
-
-    apt-get install -y
-      build-essential
-      libapt-pkg-dev;
 
     pip install
       sphinx;

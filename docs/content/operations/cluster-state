@@ -1,0 +1,124 @@
+Short-title: Cluster state
+Long-title: Wistla cluster state operations
+Description: Operational documentation to manage the state of Wistla's various
+	clusters
+
+This document contains various operational documentation for management of
+Wistla's clusters. This includes configuration of AWS resources including EC2
+instances etc, and also configuration and management of running instances.
+
+## Resources
+
+There are two main resource classes which control the clusters:
+
+* *`supercluster`* — These correspond to the separate AWS accounts, and can span
+multiple regions. They are currently `production`, `staging`, `test` and `ops`.
+They contain common values for clusters across AWS regions.
+
+* *`cluster`* — These represent a self-contained cluster in a `supercluster`,
+and are linked to an Amazon region. For a multicluster region the name should be
+the supercluster name, followed by a hyphen, then the region code, which is a
+single digit, 1 for Ireland and 2 for Virginia. Currently `staging` and
+`production` exist in place of `staging-2` and `production-2`, which will be
+rectified at some point.
+
+TODO document other resource types
+
+## Instance formation
+
+The instance formation, along with some hard-coded logic, manages what instances
+are present in a cluster. This consists of a list of zones and indices for each
+type of machine.
+
+For example, the admin instances are always configured with zones `a`, `b` and
+`c`, and the only index is `4`. This results in `a-4`, `b-4` and `c-4`. The
+reason for starting the numbering at `4` is that AWS networking reserves IP
+addresses 0 to 3 in a network, and this allows us to match the IP address of the
+instance to its index.
+
+If you change the instance formation, you will need to run `setup-dns` across
+all hosts in the supercluster. This will also need to be run on your devbox.
+
+```
+./run-ansible playbooks/devbox-host.yml \
+    --tags setup-dns
+
+./run-ansible playbooks/cluster.yml \
+	--limit supercluster-xxx \
+	--tags setup-dns
+```
+
+Once the instance formation has been changed, you will need to create any new
+instances by running the appropriate playbooks, or remove any deleted instances
+manually.
+
+## Instance creation
+
+To create a new instance, or to recreate one if it needs to be reinstalled, you
+must run the corresponding playbooks. Please ensure that you have run
+`setup-dns`, if you changed the instance formation, as described above.
+
+If you want to reinstall an instance, terminate the instance manually using the
+AWS console, and then remove the instance's state information from `data/hosts`.
+
+To create an instance, you can use the `cluster-instance-start` playbook. This
+will fail to connect to the host the first time, because the SSH key will not be
+recognised. You need to abort the script, run `devbox-ssh` locally, then run the
+playbook again. We also need to run `cluster-config.yml`, which creates certain
+config files locally which are then synced up to the hosts.
+
+```
+./run-ansible playbooks/cluster-config.yml \
+	--limit cluster-xxx
+
+./run-ansible playbooks/cluster-instance-start.yml \
+	--limit wistla-xxx
+```
+
+Once `store host key edcsa` has completed, and the playbook is hanging on the
+first task which requires a connection to the instance, type `ctrl-c` to cancel,
+run `devbox-ssh`, then run the playbook again.
+
+```
+./run-ansible playbooks/devbox-host.yml \
+	--tags devbox-ssh
+
+./run-ansible playbooks/cluster-instance-start.yml \
+	--limit wistla-xxx
+```
+
+This time, hopefully, the playbook should complete, and the instance should be
+available to use.
+
+## Starting, stopping and resizing instances
+
+Instances can be started and stopped using a playbook. This is often used, for
+example, in staging, which we may want to turn off when it is not being used, in
+order to save money.
+
+The process for resizing instances (ie changing the AWS instance type) is
+closely related, since this is achieved by stopping the instance, then starting
+it with the new instance type. This is automatically performed by the `start`
+playbook, if it detects that the instance type has been reconfigured for the
+cluster.
+
+TODO document this
+
+## Standby instances
+
+So that we can quickly scale up and down the number of instances in a cluster,
+we have the concept of standby instances. These are running instances of an
+extremely low-powered (ie cheap) instance type.
+
+They are included in all configuration and deployment operations, and so should
+always be up-to-date, but they will not run any containers, and they will not be
+activated in the Amazon load balancers and so won't perform any HTTP2
+termination.
+
+There are simple scripts to put an instance into standby mode. The start script
+will take an instance out of standby into normal active mode. In production, you
+must perform these operations on individual instance, and provide an extra
+variable on the command line with the instance name, to prevent accidentally
+taking all of the servers out at once.
+
+TODO document this

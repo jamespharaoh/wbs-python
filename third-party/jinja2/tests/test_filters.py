@@ -5,7 +5,7 @@
 
     Tests for the jinja filters.
 
-    :copyright: (c) 2010 by the Jinja Team.
+    :copyright: (c) 2017 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import pytest
@@ -14,7 +14,7 @@ from jinja2._compat import text_type, implements_to_string
 
 
 @pytest.mark.filter
-class TestFilter():
+class TestFilter(object):
 
     def test_filter_calling(self, env):
         rv = env.call_filter('sum', [1, 2, 3])
@@ -239,7 +239,7 @@ class TestFilter():
         out = tmpl.render(data='foobar baz bar' * 1000,
                           smalldata='foobar baz bar')
         msg = 'Current output: %s' % out
-        assert out == 'foobar baz b>>>|foobar baz >>>|foobar baz bar', msg
+        assert out == 'foobar baz b>>>|foobar baz>>>|foobar baz bar', msg
 
     def test_truncate_very_short(self, env):
         tmpl = env.from_string(
@@ -247,12 +247,12 @@ class TestFilter():
             '{{ "foo bar baz"|truncate(9, true) }}'
         )
         out = tmpl.render()
-        assert out == 'foo ...|foo ba...', out
+        assert out == 'foo bar baz|foo bar baz', out
 
     def test_truncate_end_length(self, env):
-        tmpl = env.from_string('{{ "Joel is a slug"|truncate(9, true) }}')
+        tmpl = env.from_string('{{ "Joel is a slug"|truncate(7, true) }}')
         out = tmpl.render()
-        assert out == 'Joel i...', 'Current output: %s' % out
+        assert out == 'Joel...', 'Current output: %s' % out
 
     def test_upper(self, env):
         tmpl = env.from_string('{{ "foo"|upper }}')
@@ -261,21 +261,28 @@ class TestFilter():
     def test_urlize(self, env):
         tmpl = env.from_string(
             '{{ "foo http://www.example.com/ bar"|urlize }}')
-        assert tmpl.render() == 'foo <a href="http://www.example.com/">'\
-                                'http://www.example.com/</a> bar'
+        assert tmpl.render() == (
+            'foo <a href="http://www.example.com/" rel="noopener">'
+            'http://www.example.com/</a> bar'
+        )
+
+    def test_urlize_rel_policy(self):
+        env = Environment()
+        env.policies['urlize.rel'] = None
+        tmpl = env.from_string(
+            '{{ "foo http://www.example.com/ bar"|urlize }}')
+        assert tmpl.render() == (
+            'foo <a href="http://www.example.com/">'
+            'http://www.example.com/</a> bar'
+        )
 
     def test_urlize_target_parameter(self, env):
         tmpl = env.from_string(
             '{{ "foo http://www.example.com/ bar"|urlize(target="_blank") }}'
         )
         assert tmpl.render() \
-            == 'foo <a href="http://www.example.com/" target="_blank">'\
+            == 'foo <a href="http://www.example.com/" rel="noopener" target="_blank">'\
             'http://www.example.com/</a> bar'
-        tmpl = env.from_string(
-            '{{ "foo http://www.example.com/ bar"|urlize(target=42) }}'
-        )
-        assert tmpl.render() == 'foo <a href="http://www.example.com/">'\
-                                'http://www.example.com/</a> bar'
 
     def test_wordcount(self, env):
         tmpl = env.from_string('{{ "foo bar baz"|wordcount }}')
@@ -569,3 +576,16 @@ class TestFilter():
         tmpl = env.from_string('{{ users|rejectattr("id", "odd")|'
                                'map(attribute="name")|join("|") }}')
         assert tmpl.render(users=users) == 'jane'
+
+    def test_json_dump(self):
+        env = Environment(autoescape=True)
+        t = env.from_string('{{ x|tojson }}')
+        assert t.render(x={'foo': 'bar'}) == '{&#34;foo&#34;: &#34;bar&#34;}'
+        assert t.render(x='"bar\'') == r'&#34;\&#34;bar\u0027&#34;'
+
+        def my_dumps(value, **options):
+            assert options == {'foo': 'bar'}
+            return '42'
+        env.policies['json.dumps_function'] = my_dumps
+        env.policies['json.dumps_kwargs'] = {'foo': 'bar'}
+        assert t.render(x=23) == '42'

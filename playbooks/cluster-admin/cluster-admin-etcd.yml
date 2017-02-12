@@ -1,0 +1,8 @@
+---
+
+- hosts: "cluster-admin"
+  roles:
+
+    - "etcd"
+
+# ex: et ts=2 filetype=yaml

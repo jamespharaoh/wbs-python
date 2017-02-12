@@ -4,8 +4,8 @@ dependencies:
 
   - "heka-common"
   - "wistla-heka-common"
-  - "install-heka"
+  - "heka-install"
   - "wistla-setup-heka-master"
-  - "control-heka"
+  - "heka-control"
 
 # ex: et ts=2 filetype=yaml

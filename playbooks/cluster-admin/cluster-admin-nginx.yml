@@ -1,5 +1,10 @@
 ---
 
+- hosts: "cluster-network"
+  roles:
+
+    - "cluster-admin-nginx-config"
+
 - hosts: "cluster-admin"
   roles:
 

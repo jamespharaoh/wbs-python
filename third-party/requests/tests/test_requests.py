@@ -20,7 +20,7 @@ from requests.compat import (
     Morsel, cookielib, getproxies, str, urlparse,
     builtin_str, OrderedDict)
 from requests.cookies import (
-    cookiejar_from_dict, morsel_to_cookie, merge_cookies)
+    cookiejar_from_dict, morsel_to_cookie)
 from requests.exceptions import (
     ConnectionError, ConnectTimeout, InvalidSchema, InvalidURL,
     MissingSchema, ReadTimeout, Timeout, RetryError, TooManyRedirects,
@@ -632,7 +632,7 @@ class TestRequests:
         post1 = requests.post(url, data={'some': 'data'})
         assert post1.status_code == 200
 
-        with open('requirements.txt') as f:
+        with open('Pipfile') as f:
             post2 = requests.post(url, files={'some': f})
         assert post2.status_code == 200
 
@@ -692,7 +692,7 @@ class TestRequests:
         post1 = requests.post(url, data={'some': 'data'})
         assert post1.status_code == 200
 
-        with open('requirements.txt') as f:
+        with open('Pipfile') as f:
             post2 = requests.post(url, data={'some': 'data'}, files={'some': f})
         assert post2.status_code == 200
 
@@ -729,7 +729,7 @@ class TestRequests:
 
     def test_conflicting_post_params(self, httpbin):
         url = httpbin('post')
-        with open('requirements.txt') as f:
+        with open('Pipfile') as f:
             pytest.raises(ValueError, "requests.post(url, data='[{\"some\": \"data\"}]', files={'some': f})")
             pytest.raises(ValueError, "requests.post(url, data=u('[{\"some\": \"data\"}]'), files={'some': f})")
 
@@ -2293,4 +2293,3 @@ class TestPreparingURLs(object):
         r = requests.Request('GET', url=input, params=params)
         p = r.prepare()
         assert p.url == expected
-

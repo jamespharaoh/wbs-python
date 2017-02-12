@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 {% if nginx_default_site_enabled == 'yes' %}
 server {
 

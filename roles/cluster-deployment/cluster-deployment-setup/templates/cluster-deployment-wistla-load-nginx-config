@@ -92,13 +92,32 @@ http {
 
 {% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 	{{ upstream ('api', 7000) }}
+	{{ upstream ('browser', 3000) }}
 {% endif %}
 
 {% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
 	{{ upstream ('api2', 3000) }}
 {% endif %}
 
-	{{ upstream ('browser', 3000) }}
+	# cache storage
+
+{% if cluster_deployment.media_cache_enabled | default ('no') == 'yes' %}
+	proxy_cache_path
+		{{ [
+			'/shared/',
+			cluster_deployment_name,
+			'-load-',
+			instance_zone,
+			'-',
+			instance_index,
+			'/nginx-media-cache',
+		] | join }}
+		levels=2:2
+		keys_zone=media:32m
+		max_size={{ cluster_deployment.media_cache_size }}
+		inactive=30d
+		{# use_temp_path=off - not supported in current nginx version #};
+{% endif %}
 
 	# api
 
@@ -135,6 +154,93 @@ http {
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_connect_timeout 10ms;
+
+{% if 'cors_whitelist_origins' in cluster_deployment %}
+
+			add_header Access-Control-Allow-Origin "{{
+				cluster_deployment.cors_whitelist_origins | join (', ')
+			}}";
+
+			add_header Access-Control-Allow-Methods "{{ [
+				'OPTIONS',
+				'GET',
+				'POST',
+			] | join (', ') }}";
+
+			add_header Access-Control-Allow-Headers "{{ [
+				'Authorization',
+				'Cache-Control',
+				'Content-Accept',
+				'Content-Type',
+				'DNT',
+				'If-Modified-Since',
+				'Keep-Alive',
+				'User-Agent',
+				'X-Requested-With',
+			] | join (', ') }}";
+
+			add_header Access-Control-Max-Age {{ 60 * 60 * 24 * 7 }};
+
+			add_header Access-Control-Allow-Credentials true;
+
+{% endif %}
+
+		}
+
+		location = /v2/media {
+
+			proxy_pass http://api2;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_connect_timeout 10ms;
+
+{% if 'cors_whitelist_origins' in cluster_deployment %}
+
+			add_header Access-Control-Allow-Origin "{{
+				cluster_deployment.cors_whitelist_origins | join (', ')
+			}}";
+
+			add_header Access-Control-Allow-Methods "{{ [
+				'OPTIONS',
+				'GET',
+				'POST',
+			] | join (', ') }}";
+
+			add_header Access-Control-Allow-Headers "{{ [
+				'Authorization',
+				'Cache-Control',
+				'Content-Accept',
+				'Content-Type',
+				'DNT',
+				'If-Modified-Since',
+				'Keep-Alive',
+				'User-Agent',
+				'X-Requested-With',
+			] | join (', ') }}";
+
+			add_header Access-Control-Max-Age {{ 60 * 60 * 24 * 7 }};
+
+			add_header Access-Control-Allow-Credentials true;
+
+{% endif %}
+
+		}
+
+		location /v2/media/ {
+
+			proxy_pass http://api2;
+			proxy_http_version 1.1;
+			proxy_set_header Connection "";
+			proxy_connect_timeout 10ms;
+
+{% if cluster_deployment.media_cache_enabled | default ('no') == 'yes' %}
+			proxy_cache media;
+			proxy_cache_valid any 30d;
+			add_header Cache-Control public;
+			add_header X-Wistla-Load-Cache-Status $upstream_cache_status;
+			expires 30d;
+			if_modified_since before;
+{% endif %}
 
 {% if 'cors_whitelist_origins' in cluster_deployment %}
 
@@ -219,13 +325,13 @@ http {
 			proxy_set_header Connection "";
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /in {
 			proxy_pass http://browser;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 		}
 
-{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
@@ -278,6 +384,7 @@ http {
 			return 307 https://{{ cluster_deployment_alias.main_domain }}/;
 		}
 
+{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /robots.txt {
 			alias /home/ubuntu/wistla-browser/static/robots.txt;
 		}
@@ -294,7 +401,6 @@ http {
 			proxy_set_header Connection "";
 		}
 
-{% if cluster_deployment.type in [ 'alias', 'simple' ] %}
 		location /analytics {
 			proxy_pass http://api;
 			proxy_http_version 1.1;
@@ -384,10 +490,21 @@ http {
 
 {% if cluster_deployment.type in [ 'alias2', 'simple2' ] %}
 		location ~ ^/v2/media/([0-9A-Z]+)-size-([0-9]+)-ar-([0-9]+:[0-9]+)$ {
+
 			proxy_pass http://api2/v2/media/$1?size=$2&ar=$3;
 			proxy_http_version 1.1;
 			proxy_set_header Connection "";
 			proxy_connect_timeout 10ms;
+
+{% if cluster_deployment.media_cache_enabled | default ('no') == 'yes' %}
+			proxy_cache media;
+			proxy_cache_valid any 30d;
+			add_header Cache-Control public;
+			add_header X-Wistla-Load-Cache-Status $upstream_cache_status;
+			expires 30d;
+			if_modified_since before;
+{% endif %}
+
 		}
 {% endif %}
 

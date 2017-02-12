@@ -3,6 +3,27 @@
 Release History
 ---------------
 
+2.13.0 (2017-01-24)
++++++++++++++++++++
+
+**Features**
+
+- Only load the ``idna`` library when we've determined we need it. This will
+  save some memory for users.
+
+**Miscellaneous**
+
+- Updated bundled urllib3 to 1.20.
+- Updated bundled idna to 2.2.
+
+2.12.5 (2017-01-18)
++++++++++++++++++++
+
+**Bugfixes**
+
+- Fixed an issue with JSON encoding detection, specifically detecting
+  big-endian UTF-32 with BOM.
+
 2.12.4 (2016-12-14)
 +++++++++++++++++++
 
