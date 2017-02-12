@@ -42,4 +42,7 @@
 - name: "web"
   template: "web"
 
+- name: "web2"
+  template: "web2"
+
 # ex: et ts=2 filetype=yaml

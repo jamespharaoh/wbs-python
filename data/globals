@@ -21,6 +21,12 @@ node_type_indices:
   media: 7
   notifications: 8
   db-daemon: 9
+  web2: 10
+  # unused: 11
+  # unused: 12
+  # unused: 13
+  # unused: 14
+  # broadcast: 15
 
   # data_network: 16
   # data_instance: 17
@@ -30,6 +36,14 @@ node_type_indices:
   kafka: 21
   postgresql-main: 22
   postgresql-cache: 23
+  # unused: 24
+  # unused: 25
+  # unused: 26
+  # unused: 27
+  # unused: 28
+  # unused: 29
+  # unused: 30
+  # broadcast: 31
 
 cluster_zone_indices:
 
