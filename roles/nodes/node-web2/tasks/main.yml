@@ -1,0 +1,8 @@
+---
+
+- include: "node-web2.yml"
+  tags:
+
+    - "node-web2"
+
+# ex: et ts=2 filetype=yaml

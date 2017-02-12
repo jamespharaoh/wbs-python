@@ -137,4 +137,11 @@
     - "nodejs"
     - "deploy-nodejs-node"
 
+- hosts: "node-web2-template"
+  roles:
+
+    - "node-web2"
+    - "nodejs"
+    - "deploy-nodejs-node"
+
 # ex: et ts=2 filetype=yaml
