@@ -370,6 +370,7 @@ cluster_deployment_types:
       - "load"
       - "media"
       - "notifications"
+      - "web2"
 
     config_files: []
 
@@ -433,6 +434,14 @@ cluster_deployment_types:
 
       - template: "cluster-deployment-wistla-admin-config"
         target: "config/load/wistla-admin-config.local.js"
+
+      # web2
+
+      - template: "cluster-deployment-wistla-web2-server-config"
+        target: "config/api2/wistla-web2-local.yaml"
+
+      - template: "cluster-deployment-wistla-web2-environment"
+        target: "config/web2/environment"
 
     shared_directories:
 
@@ -664,6 +673,7 @@ cluster_deployment_types:
       - "postgresql-main"
       - "postgresql-cache"
       - "rabbit"
+      - "web2"
 
     config_files: []
 
@@ -786,6 +796,14 @@ cluster_deployment_types:
         owner: "rabbitmq"
         group: "root"
         mode: "0400"
+
+      # web2
+
+      - template: "cluster-deployment-wistla-web2-server-config"
+        target: "config/api2/wistla-web2-local.yaml"
+
+      - template: "cluster-deployment-wistla-web2-environment"
+        target: "config/web2/environment"
 
     config_links:
 

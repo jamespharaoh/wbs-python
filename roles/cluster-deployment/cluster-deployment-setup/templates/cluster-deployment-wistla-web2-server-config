@@ -1,0 +1,27 @@
+---
+
+{{ ansible_warning ['#'] }}
+
+base_uri:
+
+  api: "{{ [
+    'http://api.',
+    cluster_deployment.name,
+    '-load-',
+    instance_zone,
+    '-',
+    instance_index,
+  ] | join }}"
+
+  web: "{{ [
+    'https://',
+    cluster_deployment.short_domain,
+  ] | join }}"
+
+server:
+
+  protocol: "http:"
+  hostname: "127.0.0.1"
+  port: 3001
+
+# ex: et ts=2 filetype=yaml
