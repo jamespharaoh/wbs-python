@@ -261,6 +261,7 @@
 
     - "wistla-db"
     - "wistla-email"
+    - "wistla-i18n"
     - "wistla-logging"
     - "wistla-notifications"
     - "wistla-pubsub"
