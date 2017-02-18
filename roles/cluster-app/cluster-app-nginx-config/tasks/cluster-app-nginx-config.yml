@@ -1,0 +1,49 @@
+---
+
+- name: "cluster app nginx config directories"
+  with_items:
+
+    - directory: "/nginx"
+      mode: "0755"
+
+    - directory: "/nginx/ssl"
+      mode: "0755"
+
+    - directory: "/nginx/sites"
+      mode: "0755"
+
+  action:
+
+    module: "file"
+    path: "{{ WORK }}/cluster/{{ cluster_name }}{{ item.directory }}"
+    state: "directory"
+
+    mode: "{{ item.mode }}"
+
+- name: "cluster app nginx config ssl certificate bundles"
+  with_items: "{{ supercluster.app_certificates | default ([]) }}"
+  action:
+
+    module: "template"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/ssl/{{ item }}.cert"
+    src: "cluster-app-nginx-ssl-bundle"
+
+    mode: "0644"
+
+- name: "cluster app nginx config ssl private keys"
+  with_items: "{{ supercluster.app_certificates | default ([]) }}"
+  action:
+
+    module: "copy"
+    dest: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/ssl/{{ item }}.key"
+    content: "{{ lookup ('etcd', [
+      '/certificate/',
+      supercluster_name,
+      '-ssl/subjects/',
+      item,
+      '/current/key',
+    ] | join ('')) + '\n' }}"
+
+    mode: "0600"
+
+# ex: et ts=2 filetype=yaml
