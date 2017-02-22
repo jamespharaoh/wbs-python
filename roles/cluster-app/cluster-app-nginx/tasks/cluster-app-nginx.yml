@@ -37,32 +37,16 @@
     dest: "{{ item.target }}"
     src: "{{ item.template }}"
 
-- name: "write nginx certificates"
-  with_items: "{{ supercluster.app_certificates | default ([]) }}"
+- name: "cluster app nginx ssl config upload"
   become: "yes"
   action:
 
-    module: "template"
-    dest: "{{ nginx_config }}/ssl/{{ item }}.cert"
-    src: "cluster-app-ssl-bundle"
+    module: "synchronize"
+    dest: "{{ nginx_config }}/ssl/"
+    src: "{{ WORK }}/cluster/{{ cluster_name }}/nginx/ssl/"
 
-- name: "write nginx private keys"
-  with_items: "{{ supercluster.app_certificates | default ([]) }}"
-  become: "yes"
-  action:
-
-    module: "copy"
-    dest: "{{ nginx_config }}/ssl/{{ item }}.key"
-
-    content: "{{ lookup ('etcd', [
-      '/certificate/',
-      supercluster_name,
-      '-ssl/subjects/',
-      item,
-      '/current/key',
-    ] | join ('')) + '\n' }}"
-
-    mode: "0600"
+    recursive: "yes"
+    perms: "yes"
 
 - name: "write nginx htpasswd"
   become: "yes"
