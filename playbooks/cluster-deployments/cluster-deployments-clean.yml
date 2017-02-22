@@ -190,6 +190,87 @@
 - hosts: "cluster-test-2-admin:&cluster-instance-active"
   tasks:
 
+    - name: "test-2-fitzroy clean zookeeper"
+      tags: "test-2-fitzroy"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-2-admin-a:2181',
+          'wistla-test-2-admin-b:2181',
+          'wistla-test-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-2-fitzroy/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-fitzroy"
+      cluster_deployment_name: "test-2-fitzroy"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-2-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-2-k2 clean zookeeper"
+      tags: "test-2-k2"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-2-admin-a:2181',
+          'wistla-test-2-admin-b:2181',
+          'wistla-test-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-2-k2/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-k2"
+      cluster_deployment_name: "test-2-k2"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-2-admin:&cluster-instance-active"
+  tasks:
+
+    - name: "test-2-montblanc clean zookeeper"
+      tags: "test-2-montblanc"
+      run_once: "yes"
+      action:
+
+        module: "znode"
+        hosts: "{{ [
+          'wistla-test-2-admin-a:2181',
+          'wistla-test-2-admin-b:2181',
+          'wistla-test-2-admin-c:2181',
+        ] | join (',') }}"
+        name: "/test-2-montblanc/kafka"
+        state: "absent"
+        recursive: "yes"
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-montblanc"
+      cluster_deployment_name: "test-2-montblanc"
+      cluster_deployment_playbook_name: "clean-data"
+
+
+- hosts: "cluster-test-2-admin:&cluster-instance-active"
+  tasks:
+
     - name: "test-2-snowdon clean zookeeper"
       tags: "test-2-snowdon"
       run_once: "yes"
@@ -265,87 +346,6 @@
     - role: "cluster-deployment-playbook"
       tags: "test-everest"
       cluster_deployment_name: "test-everest"
-      cluster_deployment_playbook_name: "clean-data"
-
-
-- hosts: "cluster-test-admin:&cluster-instance-active"
-  tasks:
-
-    - name: "test-fitzroy clean zookeeper"
-      tags: "test-fitzroy"
-      run_once: "yes"
-      action:
-
-        module: "znode"
-        hosts: "{{ [
-          'wistla-test-admin-a:2181',
-          'wistla-test-admin-b:2181',
-          'wistla-test-admin-c:2181',
-        ] | join (',') }}"
-        name: "/test-fitzroy/kafka"
-        state: "absent"
-        recursive: "yes"
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-fitzroy"
-      cluster_deployment_name: "test-fitzroy"
-      cluster_deployment_playbook_name: "clean-data"
-
-
-- hosts: "cluster-test-admin:&cluster-instance-active"
-  tasks:
-
-    - name: "test-k2 clean zookeeper"
-      tags: "test-k2"
-      run_once: "yes"
-      action:
-
-        module: "znode"
-        hosts: "{{ [
-          'wistla-test-admin-a:2181',
-          'wistla-test-admin-b:2181',
-          'wistla-test-admin-c:2181',
-        ] | join (',') }}"
-        name: "/test-k2/kafka"
-        state: "absent"
-        recursive: "yes"
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-k2"
-      cluster_deployment_name: "test-k2"
-      cluster_deployment_playbook_name: "clean-data"
-
-
-- hosts: "cluster-test-admin:&cluster-instance-active"
-  tasks:
-
-    - name: "test-montblanc clean zookeeper"
-      tags: "test-montblanc"
-      run_once: "yes"
-      action:
-
-        module: "znode"
-        hosts: "{{ [
-          'wistla-test-admin-a:2181',
-          'wistla-test-admin-b:2181',
-          'wistla-test-admin-c:2181',
-        ] | join (',') }}"
-        name: "/test-montblanc/kafka"
-        state: "absent"
-        recursive: "yes"
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-montblanc"
-      cluster_deployment_name: "test-montblanc"
       cluster_deployment_playbook_name: "clean-data"
 
 

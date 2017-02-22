@@ -131,6 +131,33 @@
   roles:
 
     - role: "cluster-deployment-setup"
+      tags: "test-2-fitzroy"
+      cluster_deployment_name: "test-2-fitzroy"
+
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      tags: "test-2-k2"
+      cluster_deployment_name: "test-2-k2"
+
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-setup"
+      tags: "test-2-montblanc"
+      cluster_deployment_name: "test-2-montblanc"
+
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-setup"
       tags: "test-2-snowdon"
       cluster_deployment_name: "test-2-snowdon"
 
@@ -151,33 +178,6 @@
     - role: "cluster-deployment-setup"
       tags: "test-everest"
       cluster_deployment_name: "test-everest"
-
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-setup"
-      tags: "test-fitzroy"
-      cluster_deployment_name: "test-fitzroy"
-
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-setup"
-      tags: "test-k2"
-      cluster_deployment_name: "test-k2"
-
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-setup"
-      tags: "test-montblanc"
-      cluster_deployment_name: "test-montblanc"
 
 
 

@@ -242,6 +242,54 @@
 
     - role: "cluster-deployment-playbook"
       when: "amazon_instance_state == 'running'"
+      tags: "test-2-fitzroy"
+      cluster_deployment_name: "test-2-fitzroy"
+      cluster_deployment_playbook_name: "node-start"
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'standby'"
+      tags: "test-2-fitzroy"
+      cluster_deployment_name: "test-2-fitzroy"
+      cluster_deployment_playbook_name: "node-stop"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      tags: "test-2-k2"
+      cluster_deployment_name: "test-2-k2"
+      cluster_deployment_playbook_name: "node-start"
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'standby'"
+      tags: "test-2-k2"
+      cluster_deployment_name: "test-2-k2"
+      cluster_deployment_playbook_name: "node-stop"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
+      tags: "test-2-montblanc"
+      cluster_deployment_name: "test-2-montblanc"
+      cluster_deployment_playbook_name: "node-start"
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'standby'"
+      tags: "test-2-montblanc"
+      cluster_deployment_name: "test-2-montblanc"
+      cluster_deployment_playbook_name: "node-stop"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      when: "amazon_instance_state == 'running'"
       tags: "test-2-snowdon"
       cluster_deployment_name: "test-2-snowdon"
       cluster_deployment_playbook_name: "node-start"
@@ -282,54 +330,6 @@
       when: "amazon_instance_state == 'standby'"
       tags: "test-everest"
       cluster_deployment_name: "test-everest"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "test-fitzroy"
-      cluster_deployment_name: "test-fitzroy"
-      cluster_deployment_playbook_name: "node-start"
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'standby'"
-      tags: "test-fitzroy"
-      cluster_deployment_name: "test-fitzroy"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "test-k2"
-      cluster_deployment_name: "test-k2"
-      cluster_deployment_playbook_name: "node-start"
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'standby'"
-      tags: "test-k2"
-      cluster_deployment_name: "test-k2"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "test-montblanc"
-      cluster_deployment_name: "test-montblanc"
-      cluster_deployment_playbook_name: "node-start"
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'standby'"
-      tags: "test-montblanc"
-      cluster_deployment_name: "test-montblanc"
       cluster_deployment_playbook_name: "node-stop"
 
 

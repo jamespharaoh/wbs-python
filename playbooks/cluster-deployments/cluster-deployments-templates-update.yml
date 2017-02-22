@@ -143,6 +143,33 @@
   roles:
 
     - role: "cluster-deployment-playbook"
+      tags: "test-2-fitzroy"
+      cluster_deployment_name: "test-2-fitzroy"
+      cluster_deployment_playbook_name: "node-templates-update"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-k2"
+      cluster_deployment_name: "test-2-k2"
+      cluster_deployment_playbook_name: "node-templates-update"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "test-2-montblanc"
+      cluster_deployment_name: "test-2-montblanc"
+      cluster_deployment_playbook_name: "node-templates-update"
+
+
+- hosts: "cluster-test-2-app:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
       tags: "test-2-snowdon"
       cluster_deployment_name: "test-2-snowdon"
       cluster_deployment_playbook_name: "node-templates-update"
@@ -163,33 +190,6 @@
     - role: "cluster-deployment-playbook"
       tags: "test-everest"
       cluster_deployment_name: "test-everest"
-      cluster_deployment_playbook_name: "node-templates-update"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-fitzroy"
-      cluster_deployment_name: "test-fitzroy"
-      cluster_deployment_playbook_name: "node-templates-update"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-k2"
-      cluster_deployment_name: "test-k2"
-      cluster_deployment_playbook_name: "node-templates-update"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-montblanc"
-      cluster_deployment_name: "test-montblanc"
       cluster_deployment_playbook_name: "node-templates-update"
 
 
