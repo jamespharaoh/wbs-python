@@ -13,6 +13,11 @@
 	ExecReload = /bin/kill -HUP $MAINPID
 	ExecStop = /bin/kill -TERM $MAINPID
 
+	Restart = always
+	RestartSec = 10
+
+	OOMScoreAdjust = -100
+
 [Install]
 
 	WantedBy = multi-user.target
