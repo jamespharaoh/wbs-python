@@ -1,33 +1,33 @@
 ---
 
-- name: "create bridge network interface"
-  with_items: "{{ jenkins_deployment_names }}"
-  become: "yes"
-  action:
+#- name: "create bridge network interface"
+#  with_items: "{{ jenkins_deployment_names }}"
+#  become: "yes"
+#  action:
+#
+#    module: "template"
+#    dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
+#    src: "cluster-jenkins-interface-bridge"
 
-    module: "template"
-    dest: "/etc/network/interfaces.d/{{ deployments [item].bridge_name }}.cfg"
-    src: "cluster-jenkins-interface-bridge"
-
-- name: "start network bridge"
-  with_items: "{{ jenkins_deployment_names }}"
-  register: "ifup_result"
-  changed_when: "ifup_result.stdout != 'UNCHANGED'"
-  args:
-
-    executable: "/bin/bash"
-
-  become: "yes"
-  shell:
-
-    set -euf -o pipefail;
-
-    if ifquery --state {{ deployments [item].bridge_name }} >/dev/null; then
-      echo "UNCHANGED";
-      exit;
-    fi;
-
-    ifup {{ deployments [item].bridge_name }};
+#- name: "start network bridge"
+#  with_items: "{{ jenkins_deployment_names }}"
+#  register: "ifup_result"
+#  changed_when: "ifup_result.stdout != 'UNCHANGED'"
+#  args:
+#
+#    executable: "/bin/bash"
+#
+#  become: "yes"
+#  shell:
+#
+#    set -euf -o pipefail;
+#
+#    if ifquery --state {{ deployments [item].bridge_name }} >/dev/null; then
+#      echo "UNCHANGED";
+#      exit;
+#    fi;
+#
+#    ifup {{ deployments [item].bridge_name }};
 
 - name: "create dummy network interface"
   become: "yes"
