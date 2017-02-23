@@ -39,7 +39,7 @@
     else
 
       lxc-copy
-        --backingtorage "btrfs"
+        --backingstorage "btrfs"
         --name "{{ node_clone_from }}"
         --newname "{{ inventory_hostname }}";
 
