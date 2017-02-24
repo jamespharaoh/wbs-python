@@ -52,12 +52,19 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command><![CDATA[{{ [
+      <command>{{ [
         '#!/bin/bash',
         '',
         'set -euf -o pipefail',
         '',
-        'git checkout "' + item.name + '-prepared"',
+        [
+          'git branch',
+          '--force',
+          item.name + '-prepared',
+          'origin/' + item.name + '-prepared',
+        ] | join (' '),
+        '',
+        'git checkout ' + item.name + '-prepared',
         '',
         [
           'git merge',
@@ -69,12 +76,12 @@
         'exec jenkins-scripts/1-prepare-integration ' + item.name,
         '',
         '# ex: noet ts=4 filetype=sh',
-      ] | join ('\n') }}]]></command>
+      ] | join ('\n') }}</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@0.4.2">
+    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@0.4.3">
       <colorMapName>xterm</colorMapName>
     </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
   </buildWrappers>
