@@ -19,19 +19,16 @@
     chdir: "{{ deployment_home }}/{{ item.name }}"
 
   shell: "{{
+    'ssh 10.190.0.2 bash -c ',
+    \"'\",
+    'cd ',
+    lookup ('env', 'WORKSPACE'),
+    '/',
+    item.name,
+    ' && ',
     item.build_steps
       | default (['true'])
-      | prepend_list ([
-        'ssh 10.190.0.2 bash -c ',
-        \"'\",
-        'cd ',
-        lookup ('env', 'WORKSPACE'),
-        '/',
-        item.name,
-        ' && ',
-      ] | join)
-      | append_list (\"'\")
-      | join (' && ')
-  }}"
+      | join (' && '),
+  ] | join }}"
 
 # ex: et ts=2 filetype=yaml
