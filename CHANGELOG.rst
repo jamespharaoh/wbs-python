@@ -2,6 +2,91 @@
 CHANGELOG
 =========
 
+1.5.17
+======
+
+* api-change:``ec2``: Update ec2 client to latest version
+
+
+1.5.16
+======
+
+* api-change:``clouddirectory``: Update clouddirectory client to latest version
+* api-change:``gamelift``: Update gamelift client to latest version
+* api-change:``elasticbeanstalk``: Update elasticbeanstalk client to latest version
+* api-change:``route53``: Update route53 client to latest version
+
+
+1.5.15
+======
+
+* api-change:``ec2``: Update ec2 client to latest version
+
+
+1.5.14
+======
+
+* api-change:``directconnect``: Update directconnect client to latest version
+
+
+1.5.13
+======
+
+* api-change:``config``: Update config client to latest version
+* api-change:``cognito-identity``: Update cognito-identity client to latest version
+
+
+1.5.12
+======
+
+* feature:``kms``: Update kms client to latest version
+
+
+1.5.11
+======
+
+* feature:``ec2``: Update ec2 client to latest version
+
+
+1.5.10
+======
+
+* feature:``storagegateway``: Update storagegateway client to latest version
+* feature:Waiter: Adds several new waiters.
+* feature:``clouddirectory``: Update clouddirectory client to latest version
+* feature:``lex-runtime``: Update lex-runtime client to latest version
+
+
+1.5.9
+=====
+
+* feature:``rekognition``: Update rekognition client to latest version
+* feature:``ec2``: Update ec2 client to latest version
+
+
+1.5.8
+=====
+
+* feature:``lex-runtime``: Update lex-runtime client to latest version
+* feature:Paginator: Added paginators for multiple services
+
+
+1.5.7
+=====
+
+* feature:``ec2``: Update ec2 client to latest version
+* feature:``clouddirectory``: Update clouddirectory client to latest version
+* feature:``codedeploy``: Update codedeploy client to latest version
+* feature:``rds``: Update rds client to latest version
+
+
+1.5.6
+=====
+
+* feature:``elbv2``: Update elbv2 client to latest version
+* feature:``rds``: Update rds client to latest version
+
+
 1.5.5
 =====
 
