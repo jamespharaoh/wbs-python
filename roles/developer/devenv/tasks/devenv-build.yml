@@ -21,7 +21,13 @@
   shell: "{{
     item.build_steps
       | default (['true'])
-      | prepend_list ('ssh 10.190.0.2 bash -c \\\\'cd {{ deployment_home }}/{{ item.name }} && ')
+      | prepend_list ([
+        'ssh 10.190.0.2 bash -c \\\\'cd ',
+        deployment_home,
+        '/',
+        item.name,
+        ' && ',
+      ] | join),
       | append_list ('\\\\'')
       | join (' && ')
   }}"
