@@ -25,7 +25,7 @@
         'ssh 10.190.0.2 bash -c ',
         \"'\",
         'cd ',
-        deployment_home,
+        lookup ('env', 'WORKSPACE'),
         '/',
         item.name,
         ' && ',
