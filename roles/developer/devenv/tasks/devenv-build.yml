@@ -24,10 +24,10 @@
     lookup ('env', 'WORKSPACE'),
     '/',
     item.name,
-    " '&&' ",
+    \" '&&' \",
     item.build_steps
       | default (['true'])
-      | join (" '&&' "),
+      | join (\" '&&' \"),
   ] | join }}"
 
 # ex: et ts=2 filetype=yaml
