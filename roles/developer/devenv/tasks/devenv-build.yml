@@ -29,6 +29,7 @@
     item.build_steps
       | default (['true'])
       | join (' && '),
+    \"'\",
   ] | join }}"
 
 # ex: et ts=2 filetype=yaml
