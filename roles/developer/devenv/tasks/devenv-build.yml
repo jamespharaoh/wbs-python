@@ -30,7 +30,7 @@
         item.name,
         ' && ',
       ] | join)
-      | append_list ("\'")
+      | append_list (\"'\")
       | join (' && ')
   }}"
 
