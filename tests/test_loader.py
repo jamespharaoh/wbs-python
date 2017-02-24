@@ -5,7 +5,7 @@
 
     Test the loaders.
 
-    :copyright: (c) 2017 by the Jinja Team.
+    :copyright: (c) 2010 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import os
@@ -13,7 +13,6 @@ import sys
 import tempfile
 import shutil
 import pytest
-import weakref
 
 from jinja2 import Environment, loaders
 from jinja2._compat import PYPY, PY2
@@ -22,7 +21,7 @@ from jinja2.exceptions import TemplateNotFound
 
 
 @pytest.mark.loaders
-class TestLoaders(object):
+class TestLoaders():
 
     def test_dict_loader(self, dict_loader):
         env = Environment(loader=dict_loader)
@@ -79,32 +78,19 @@ class TestLoaders(object):
         assert tmpl is not env.get_template('template')
         changed = False
 
-    def test_no_cache(self):
-        mapping = {'foo': 'one'}
-        env = Environment(loader=loaders.DictLoader(mapping), cache_size=0)
-        assert env.get_template('foo') is not env.get_template('foo')
+        env = Environment(loader=TestLoader(), cache_size=0)
+        assert env.get_template('template') \
+            is not env.get_template('template')
 
-    def test_limited_size_cache(self):
-        mapping = {'one': 'foo', 'two': 'bar', 'three': 'baz'}
-        loader = loaders.DictLoader(mapping)
-        env = Environment(loader=loader, cache_size=2)
+        env = Environment(loader=TestLoader(), cache_size=2)
         t1 = env.get_template('one')
         t2 = env.get_template('two')
         assert t2 is env.get_template('two')
         assert t1 is env.get_template('one')
         t3 = env.get_template('three')
-        loader_ref = weakref.ref(loader)
-        assert (loader_ref, 'one') in env.cache
-        assert (loader_ref, 'two') not in env.cache
-        assert (loader_ref, 'three') in env.cache
-
-    def test_cache_loader_change(self):
-        loader1 = loaders.DictLoader({'foo': 'one'})
-        loader2 = loaders.DictLoader({'foo': 'two'})
-        env = Environment(loader=loader1, cache_size=2)
-        assert env.get_template('foo').render() == 'one'
-        env.loader = loader2
-        assert env.get_template('foo').render() == 'two'
+        assert 'one' in env.cache
+        assert 'two' not in env.cache
+        assert 'three' in env.cache
 
     def test_dict_loader_cache_invalidates(self):
         mapping = {'foo': "one"}
@@ -121,7 +107,7 @@ class TestLoaders(object):
 
 @pytest.mark.loaders
 @pytest.mark.moduleloader
-class TestModuleLoader(object):
+class TestModuleLoader():
     archive = None
 
     def compile_down(self, prefix_loader, zip='deflated', py_compile=False):

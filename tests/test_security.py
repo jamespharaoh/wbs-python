@@ -5,18 +5,17 @@
 
     Checks the sandbox and other security features.
 
-    :copyright: (c) 2017 by the Jinja Team.
+    :copyright: (c) 2010 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import pytest
 
 from jinja2 import Environment
 from jinja2.sandbox import SandboxedEnvironment, \
-     ImmutableSandboxedEnvironment, unsafe
+     ImmutableSandboxedEnvironment, unsafe, has_format
 from jinja2 import Markup, escape
 from jinja2.exceptions import SecurityError, TemplateSyntaxError, \
      TemplateRuntimeError
-from jinja2.nodes import EvalContext
 from jinja2._compat import text_type
 
 
@@ -42,7 +41,7 @@ class PublicStuff(object):
 
 
 @pytest.mark.sandbox
-class TestSandbox(object):
+class TestSandbox():
 
     def test_unsafe(self, env):
         env = SandboxedEnvironment()
@@ -120,10 +119,7 @@ class TestSandbox(object):
         assert text_type(t.module) == escaped_out
         assert escape(t.module) == escaped_out
         assert t.module.say_hello('<blink>foo</blink>') == escaped_out
-        assert escape(t.module.say_hello(
-            EvalContext(env), '<blink>foo</blink>')) == escaped_out
-        assert escape(t.module.say_hello(
-            '<blink>foo</blink>')) == escaped_out
+        assert escape(t.module.say_hello('<blink>foo</blink>')) == escaped_out
 
     def test_attr_filter(self, env):
         env = SandboxedEnvironment()
@@ -166,6 +162,7 @@ class TestSandbox(object):
 
 
 @pytest.mark.sandbox
+@pytest.mark.skipif(not has_format, reason='No format support')
 class TestStringFormat(object):
 
     def test_basic_format_safety(self):
@@ -178,12 +175,12 @@ class TestStringFormat(object):
         t = env.from_string('{{ "a{0.foo}b".format({"foo": 42}) }}')
         assert t.render() == 'a42b'
 
-    def test_safe_format_safety(self):
+    def test_basic_format_safety(self):
         env = SandboxedEnvironment()
         t = env.from_string('{{ ("a{0.__class__}b{1}"|safe).format(42, "<foo>") }}')
         assert t.render() == 'ab&lt;foo&gt;'
 
-    def test_safe_format_all_okay(self):
+    def test_basic_format_all_okay(self):
         env = SandboxedEnvironment()
         t = env.from_string('{{ ("a{0.foo}b{1}"|safe).format({"foo": 42}, "<foo>") }}')
         assert t.render() == 'a42b&lt;foo&gt;'
