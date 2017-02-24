@@ -10,6 +10,24 @@
 
   shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
 
+- set_fact:
+  cmd: "{{
+    item.build_steps
+      | default (['true'])
+      | prepend_list ([
+        'ssh 10.190.0.2 bash -c \\\'cd ',
+        deployment_home,
+        '/',
+        item.name,
+        ' && ',
+      ] | join)
+      | append_list ('\\\'')
+      | join (' && ')
+  }}"
+
+- debug:
+    var: "cmd"
+
 - name: "run build steps"
   when: "deployment_mode == 'jenkins'"
   with_items: "{{ devenv_checkouts }}"
@@ -22,13 +40,13 @@
     item.build_steps
       | default (['true'])
       | prepend_list ([
-        'ssh 10.190.0.2 bash -c \\\\'cd ',
+        'ssh 10.190.0.2 bash -c \\\\\\'cd ',
         deployment_home,
         '/',
         item.name,
         ' && ',
       ] | join),
-      | append_list ('\\\\'')
+      | append_list ('\\\\\\'')
       | join (' && ')
   }}"
 
