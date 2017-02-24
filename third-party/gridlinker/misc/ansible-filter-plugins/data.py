@@ -7,6 +7,8 @@ import itertools
 import re
 import types
 
+from wbs import yamlx
+
 __all__ = [
 	"FilterModule",
 ]
@@ -166,6 +168,10 @@ def bytes (source):
 
 	return size * scale
 
+def to_yamlx (value):
+
+	return yamlx.encode_simple (None, value)
+
 def to_dict (items):
 
 	return dict (items)
@@ -186,6 +192,8 @@ class FilterModule (object):
 			"values": values,
 			"items": items,
 			"to_dict": to_dict,
+
+			"to_yamlx": to_yamlx,
 
 			"bytes": bytes,
 

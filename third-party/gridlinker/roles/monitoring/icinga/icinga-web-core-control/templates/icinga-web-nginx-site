@@ -1,8 +1,5 @@
 {% if icinga_web_core_state == 'enabled' %}
 
-{% set icinga_web_core_base = '/opt/icinga-web-' + icinga_web_core_version %}
-{% set icinga_web_core_public = icinga_web_core_base + '/public' %}
-
 {% macro gubbins () %}
 
 	location ~ ^/icingaweb2/index\.php(.*)$ {
@@ -12,7 +9,10 @@
 
 		include fastcgi_params;
 
-		fastcgi_param SCRIPT_FILENAME {{ icinga_web_core_public }}/index.php;
+		fastcgi_param SCRIPT_FILENAME {{ [
+			icinga_web_core_installed_prefix,
+			'/public/index.php',
+		] | join }};
 		fastcgi_param ICINGAWEB_CONFIGDIR /etc/icingaweb2;
 		fastcgi_param REMOTE_USER $remote_user;
 
@@ -20,7 +20,10 @@
 
 	location ~ ^/icingaweb2(.+)? {
 
-		alias {{ icinga_web_core_public }};
+		alias {{ [
+			icinga_web_core_installed_prefix,
+			'/public',
+		] | join }};
 
 		index index.php;
 		try_files $1 $uri $uri/ /icingaweb2/index.php$is_args$args;

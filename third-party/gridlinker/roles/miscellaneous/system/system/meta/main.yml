@@ -14,6 +14,6 @@ dependencies:
   - "setup-system-groups"
   - "setup-system-users"
 
-  - "install-system-packages"
+  - "system-packages-install"
 
 # ex: et ts=2 filetype=yaml

@@ -21,7 +21,7 @@
     name: "{{ item }}"
 
 - name: "build python"
-  when: "python_installed_version != python_version"
+  when: "python_installed_version != python_install_version"
   become: "yes"
   args:
 
@@ -67,10 +67,10 @@
     rm -rf "{{ python_temp }}"
 
 - name: "set python.installed_version"
-  when: "python_version != python_installed_version"
+  when: "python_install_version != python_installed_version"
   update_resource:
 
-    python.installed_version: "{{ python_version }}"
+    python.installed_version: "{{ python_install_version }}"
 
 - name: "set python.state to 'installed'"
   when: "python_state == ''"

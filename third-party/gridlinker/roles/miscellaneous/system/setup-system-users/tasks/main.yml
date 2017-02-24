@@ -1,6 +1,7 @@
 ---
 
 - include: "setup-system-users.yml"
+  when: "system_users_group_name in groups"
   tags:
 
     - "system"

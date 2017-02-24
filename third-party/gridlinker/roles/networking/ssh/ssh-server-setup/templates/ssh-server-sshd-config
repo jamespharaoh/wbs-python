@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 # communication
 
 Port 22
@@ -42,6 +44,16 @@ PrintLastLog yes
 
 # misc
 
-AcceptEnv LANG LC_*
+AcceptEnv {{ [
+	'GIT_COMMITTER_EMAIL',
+	'GIT_COMMITTER_NAME',
+	'GIT_AUTHOR_EMAIL',
+	'GIT_AUTHOR_NAME',
+	'LANG',
+	'LC_*',
+] | join (' ') }}
+
 Subsystem sftp /usr/lib/openssh/sftp-server
 UsePAM yes
+
+# ex: noet ts=4 filetype=ssh

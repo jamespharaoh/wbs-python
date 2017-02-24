@@ -1,7 +1,6 @@
 ---
 
 - name: "create jenkins service config"
-  notify: "restart jenkins"
   become: "yes"
   action:
 
@@ -42,7 +41,5 @@
     module: "copy"
     dest: "/etc/sudoers.d/jenkins"
     content: "jenkins ALL=(ALL) NOPASSWD: ALL{{ '\n' }}"
-
-- meta: "flush_handlers"
 
 # ex: et ts=2 filetype=yaml

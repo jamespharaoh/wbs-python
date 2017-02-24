@@ -1,0 +1,83 @@
+<?php
+
+{{ ansible_warning ['//'] }}
+
+// set memory limit
+
+define ("WP_MEMORY_LIMIT", "128M");
+
+// database
+
+define ("DB_NAME", "{{ website.database_name | php_escape }}");
+define ("DB_USER", "{{ website.database_user | php_escape }}");
+define ("DB_PASSWORD", "{{ website.database_password | php_escape }}");
+define ("DB_HOST", "localhost");
+define ("DB_CHARSET", "utf8");
+define ("DB_COLLATE", "");
+
+$table_prefix = "wp_";
+
+// security
+
+{% for secure_constant in [
+	"AUTH_KEY",
+	"SECURE_AUTH_KEY",
+	"LOGGED_IN_KEY",
+	"NONCE_KEY",
+	"AUTH_SALT",
+	"SECURE_AUTH_SALT",
+	"LOGGED_IN_SALT",
+	"NONCE_SALT",
+] %}
+
+define ("{{ secure_constant }}", "{{
+	(secure_constant ~ website.wordpress_secure) | md5 | php_escape
+}}");
+
+{% endfor %}
+
+// other settings
+
+define ("WPLANG", "");
+
+{% if website.wordpress_debug | default ('no') == 'yes' %}
+
+define ("WP_DEBUG", true);
+define ("SCRIPT_DEBUG", true);
+
+{% else %}
+
+define ("WP_DEBUG", false);
+define ("SCRIPT_DEBUG", false);
+
+{% endif %}
+
+define ("ABSPATH", "{{ website.path | php_escape }}/");
+
+// ssl
+
+if (
+	isset ($_SERVER ["HTTP_X_FORWARDED_PROTO"])
+	&& $_SERVER ["HTTP_X_FORWARDED_PROTO"] == "https"
+) {
+
+    $_SERVER ["HTTPS"] = "on";
+
+}
+
+// internal settings
+
+require_once (ABSPATH . "wp-settings.php");
+
+// misc config
+
+{% for extra_define_name, extra_define_value
+	in (website.wordpress_extra_defines | default ({})).items () %}
+define ("{{
+	extra_define_name | php_escape
+}}", "{{
+	extra_define_value | php_escape
+}}");
+{% endfor %}
+
+// ex: noet ts=4 filetype=php

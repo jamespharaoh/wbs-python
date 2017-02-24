@@ -1,6 +1,7 @@
 ---
 
 - include: "setup-system-groups.yml"
+  when: "system_groups_group_name in groups"
   tags:
 
     - "system"

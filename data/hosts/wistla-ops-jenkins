@@ -1,56 +1,27 @@
 ---
 
-amazon_instance_state: "running"
 amazon_instance_type_running: "c4.2xlarge"
 etcd: 
   
-  client_certificate: "/authority/ops-etcd-client/issue/11/certificate"
-  client_private_key: "/authority/ops-etcd-client/issue/11/key"
+  client_certificate: "/authority/ops-etcd-client/issue/12/certificate"
+  client_private_key: "/authority/ops-etcd-client/issue/12/key"
   installed_version: "2.2.2"
   state: "installed"
 
-etcd_client_certificate: "/authority/ops-etcd-client/issue/11/certificate"
-etcd_client_private_key: "/authority/ops-etcd-client/issue/11/key"
+etcd_client_certificate: "/authority/ops-etcd-client/issue/12/certificate"
+etcd_client_private_key: "/authority/ops-etcd-client/issue/12/key"
 etcd_installed_version: "2.2.2"
 etcd_state: "installed"
 heka: 
   
   installed_version: "0.10.0"
-  needs_restart: "no"
+  needs_restart: "yes"
   state: "enabled"
 
 heka_installed_version: "0.10.0"
-heka_needs_restart: "no"
+heka_needs_restart: "yes"
 heka_state: "enabled"
-icinga: 
-  
-  certificate: "/authority/icinga/issue/17/certificate"
-  installed_version: "2.4.10-12-trusty"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/17/key"
-  state: "enabled"
-
-icinga_certificate: "/authority/icinga/issue/17/certificate"
-icinga_core: 
-  
-  certificate: "/authority/icinga/issue/105/certificate"
-  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-  installed_version: "2.4.10-12-trusty"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/105/key"
-  state: "enabled"
-
-icinga_core_certificate: "/authority/icinga/issue/105/certificate"
-icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-icinga_core_installed_version: "2.4.10-12-trusty"
-icinga_core_needs_restart: "no"
-icinga_core_private_key: "/authority/icinga/issue/105/key"
-icinga_core_state: "enabled"
-icinga_installed_version: "2.4.10-12-trusty"
-icinga_needs_restart: "no"
-icinga_private_key: "/authority/icinga/issue/17/key"
-icinga_state: "enabled"
-instance_id: "i-cb357b61"
+instance_id: "i-049cee96a86d0cf81"
 nginx: 
   
   installed_from: "source"
@@ -66,34 +37,35 @@ nginx_needs_restart: "yes"
 nginx_state: "enabled"
 python: 
   
-  apt_installed_version: "0.9.3-1"
-  apt_state: "installed"
   installed_version: "2.7.11"
+  state: "installed"
 
 python_apt: 
   
-  installed_version: "2.7.11/0.9.3-1"
+  installed_version: "2.7.11/1.1.0~beta1-1"
+  state: "installed"
 
-python_apt_installed_version: "2.7.11/0.9.3-1"
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
 python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
+  state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 
   
-  installed_prefix: "/opt/rzbackup-3.1.0-trusty"
-  installed_version: "3.1.0-trusty"
-  needs_restart: "yes"
+  installed_prefix: "/opt/rzbackup-3.1.0-xenial"
+  installed_version: "3.1.0-xenial"
+  needs_restart: "no"
   state: "enabled"
 
-rzbackup_installed_prefix: "/opt/rzbackup-3.1.0-trusty"
-rzbackup_installed_version: "3.1.0-trusty"
-rzbackup_needs_restart: "yes"
+rzbackup_installed_prefix: "/opt/rzbackup-3.1.0-xenial"
+rzbackup_installed_version: "3.1.0-xenial"
+rzbackup_needs_restart: "no"
 rzbackup_state: "enabled"
 skypebot_client_id: "0601dfa4-cb9a-4632-9202-f246ce7a5c3e"
 skypebot_client_secret: "6aReRurg4dvjdmUa3W5cjF1"
@@ -103,18 +75,18 @@ skypebot_database_password: "tcqjfzcwhidmsskrcsdp"
 skypebot_database_username: "skypebot"
 ssh: 
   
-  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKq2xHvh99CssSn3KkUzmSV02PwCNR90BqGH+iUnAJwUQFDgUKwE4PcUIEv8YzncXeTxA1jL5IzXIWGT56vw6pE="
-  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBAb85xzGnRdl3vLlO02ZpxGTUZkp5uMNyReyNq2aAM10GHgMb7qjqkEINZN8VSTNJ99KAJXf95zaCW6F4e9B8tl1884Plbm4WJSL9LEVm9tlqZiksp1Jl023DiZNXDiuh7RZroQI1Tm10S8Sg3PCJNYMbNH8/YLPy53arjYr+7uxO/hJZhkNt9DlkPDmQwQAJICpn9jbdLCE64SDnbr02RzKz+4+U8cZsGYZA+SaGXbPySeORzn8HJU4ouffdWF6Huju+G46IFJMF+DxFjrJcTwQg6OWQa4NWJlN6TjCYDm1cQ8vYUNl4MREIhy30Xra8qTNic9G6LkD/YzbOKXFx"
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKIH2VAq84nCDoIZjMyZfvAI9t91kEdtH1J7iRgAtFneSktBiArROAZjdaWOi6wTmbVby7gwFt+JXAFunlL2FoY="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCw2kAvdGuwcSWY5dEx+BsR6G/35wy/tuImwLF8JIZcZnu7PhfixsToEYhCvAvw/9lDUNMNwymPy+p1wgguCwJOBj+eS1wVLaLT11CV9BBDUGt84eZz1rAjVVVVw+DgE9xkn1+5eQmk8Jc53d4Wf8TCjURolYh3L7KbsVEPo7hR91Dh9nGep/2RsxdJmxLrgUw5yHFV0PkTQOikxrV5HW6+bh0zyGYH/NQz+tD7yc+x4d+GG2/DQAHXCIKZfnu78yRyhngkAmHEvtYqvSMH2DIlginvUT+wAnwSRzf5nx9g8dc2uiAadEyBVeVR914oSJi2tcxI434cnmxPrLi0kiy5"
 
-ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKq2xHvh99CssSn3KkUzmSV02PwCNR90BqGH+iUnAJwUQFDgUKwE4PcUIEv8YzncXeTxA1jL5IzXIWGT56vw6pE="
-ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBAb85xzGnRdl3vLlO02ZpxGTUZkp5uMNyReyNq2aAM10GHgMb7qjqkEINZN8VSTNJ99KAJXf95zaCW6F4e9B8tl1884Plbm4WJSL9LEVm9tlqZiksp1Jl023DiZNXDiuh7RZroQI1Tm10S8Sg3PCJNYMbNH8/YLPy53arjYr+7uxO/hJZhkNt9DlkPDmQwQAJICpn9jbdLCE64SDnbr02RzKz+4+U8cZsGYZA+SaGXbPySeORzn8HJU4ouffdWF6Huju+G46IFJMF+DxFjrJcTwQg6OWQa4NWJlN6TjCYDm1cQ8vYUNl4MREIhy30Xra8qTNic9G6LkD/YzbOKXFx"
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKIH2VAq84nCDoIZjMyZfvAI9t91kEdtH1J7iRgAtFneSktBiArROAZjdaWOi6wTmbVby7gwFt+JXAFunlL2FoY="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCw2kAvdGuwcSWY5dEx+BsR6G/35wy/tuImwLF8JIZcZnu7PhfixsToEYhCvAvw/9lDUNMNwymPy+p1wgguCwJOBj+eS1wVLaLT11CV9BBDUGt84eZz1rAjVVVVw+DgE9xkn1+5eQmk8Jc53d4Wf8TCjURolYh3L7KbsVEPo7hR91Dh9nGep/2RsxdJmxLrgUw5yHFV0PkTQOikxrV5HW6+bh0zyGYH/NQz+tD7yc+x4d+GG2/DQAHXCIKZfnu78yRyhngkAmHEvtYqvSMH2DIlginvUT+wAnwSRzf5nx9g8dc2uiAadEyBVeVR914oSJi2tcxI434cnmxPrLi0kiy5"
 volume_ids: 
   
   data: "vol-7178cd62"
-  system: "vol-78cb2d6b"
+  system: "vol-030f2b9d0deb42c8e"
 
 volume_ids_data: "vol-7178cd62"
-volume_ids_system: "vol-78cb2d6b"
+volume_ids_system: "vol-030f2b9d0deb42c8e"
 
 
 # ex: et ts=2 filetype=yaml

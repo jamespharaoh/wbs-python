@@ -5,7 +5,7 @@
 
     Tests for the extensions.
 
-    :copyright: (c) 2017 by the Jinja Team.
+    :copyright: (c) 2010 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import re
@@ -19,7 +19,7 @@ from jinja2._compat import BytesIO, itervalues, text_type
 
 importable_object = 23
 
-_gettext_re = re.compile(r'_\((.*?)\)', re.DOTALL)
+_gettext_re = re.compile(r'_\((.*?)\)(?s)')
 
 
 i18n_templates = {
@@ -99,7 +99,7 @@ newstyle_i18n_env = Environment(
 newstyle_i18n_env.install_gettext_callables(gettext, ngettext, newstyle=True)
 
 
-class ExampleExtension(Extension):
+class TestExtension(Extension):
     tags = set(['test'])
     ext_attr = 42
 
@@ -160,7 +160,7 @@ class StreamFilterExtension(Extension):
 
 
 @pytest.mark.ext
-class TestExtensions(object):
+class TestExtensions():
 
     def test_extend_late(self):
         env = Environment()
@@ -195,16 +195,27 @@ class TestExtensions(object):
             {%- endfor %}{{ items|join(', ') }}''')
         assert tmpl.render() == '0f, 1o, 2o'
 
+    def test_with(self):
+        env = Environment(extensions=['jinja2.ext.with_'])
+        tmpl = env.from_string('''\
+        {% with a=42, b=23 -%}
+            {{ a }} = {{ b }}
+        {% endwith -%}
+            {{ a }} = {{ b }}\
+        ''')
+        assert [x.strip() for x in tmpl.render(a=1, b=2).splitlines()] \
+            == ['42 = 23', '1 = 2']
+
     def test_extension_nodes(self):
-        env = Environment(extensions=[ExampleExtension])
+        env = Environment(extensions=[TestExtension])
         tmpl = env.from_string('{% test %}')
         assert tmpl.render() == 'False|42|23|{}'
 
     def test_identifier(self):
-        assert ExampleExtension.identifier == __name__ + '.ExampleExtension'
+        assert TestExtension.identifier == __name__ + '.TestExtension'
 
     def test_rebinding(self):
-        original = Environment(extensions=[ExampleExtension])
+        original = Environment(extensions=[TestExtension])
         overlay = original.overlay()
         for env in original, overlay:
             for ext in itervalues(env.extensions):
@@ -235,7 +246,7 @@ class TestExtensions(object):
 
 
 @pytest.mark.ext
-class TestInternationalization(object):
+class TestInternationalization():
 
     def test_trans(self):
         tmpl = i18n_env.get_template('child.html')
@@ -304,40 +315,7 @@ class TestInternationalization(object):
 
 
 @pytest.mark.ext
-class TestScope(object):
-
-    def test_basic_scope_behavior(self):
-        # This is what the old with statement compiled down to
-        class ScopeExt(Extension):
-            tags = set(['scope'])
-
-            def parse(self, parser):
-                node = nodes.Scope(lineno=next(parser.stream).lineno)
-                assignments = []
-                while parser.stream.current.type != 'block_end':
-                    lineno = parser.stream.current.lineno
-                    if assignments:
-                        parser.stream.expect('comma')
-                    target = parser.parse_assign_target()
-                    parser.stream.expect('assign')
-                    expr = parser.parse_expression()
-                    assignments.append(nodes.Assign(target, expr, lineno=lineno))
-                node.body = assignments + \
-                    list(parser.parse_statements(('name:endscope',),
-                                                 drop_needle=True))
-                return node
-
-        env = Environment(extensions=[ScopeExt])
-        tmpl = env.from_string('''\
-        {%- scope a=1, b=2, c=b, d=e, e=5 -%}
-            {{ a }}|{{ b }}|{{ c }}|{{ d }}|{{ e }}
-        {%- endscope -%}
-        ''')
-        assert tmpl.render(b=3, e=4) == '1|2|2|4|5'
-
-
-@pytest.mark.ext
-class TestNewstyleInternationalization(object):
+class TestNewstyleInternationalization():
 
     def test_trans(self):
         tmpl = newstyle_i18n_env.get_template('child.html')
@@ -377,14 +355,6 @@ class TestNewstyleInternationalization(object):
         assert t.render(ae=True) == '<strong>Wert: &lt;test&gt;</strong>'
         assert t.render(ae=False) == '<strong>Wert: <test></strong>'
 
-    def test_autoescape_macros(self):
-        env = Environment(autoescape=False, extensions=['jinja2.ext.autoescape'])
-        template = (
-            '{% macro m() %}<html>{% endmacro %}'
-            '{% autoescape true %}{{ m() }}{% endautoescape %}'
-        )
-        assert env.from_string(template).render() == '<html>'
-
     def test_num_used_twice(self):
         tmpl = newstyle_i18n_env.get_template('ngettext_long.html')
         assert tmpl.render(apples=5, LANGUAGE='de') == u'5 Äpfel'
@@ -398,7 +368,7 @@ class TestNewstyleInternationalization(object):
         # that the generated code does not pass num twice (although that
         # would work) for better performance.  This only works on the
         # newstyle gettext of course
-        assert re.search(r"u?'\%\(num\)s apple', u?'\%\(num\)s "
+        assert re.search(r"l_ngettext, u?'\%\(num\)s apple', u?'\%\(num\)s "
                          r"apples', 3", source) is not None
 
     def test_trans_vars(self):
@@ -419,7 +389,7 @@ class TestNewstyleInternationalization(object):
 
 
 @pytest.mark.ext
-class TestAutoEscape(object):
+class TestAutoEscape():
 
     def test_scoped_setting(self):
         env = Environment(extensions=['jinja2.ext.autoescape'],
@@ -495,26 +465,3 @@ class TestAutoEscape(object):
                           autoescape=True)
         pysource = env.compile(tmplsource, raw=True)
         assert '&lt;testing&gt;\\n' in pysource
-
-    def test_overlay_scopes(self):
-        class MagicScopeExtension(Extension):
-            tags = set(['overlay'])
-            def parse(self, parser):
-                node = nodes.OverlayScope(lineno=next(parser.stream).lineno)
-                node.body = list(parser.parse_statements(('name:endoverlay',),
-                                                         drop_needle=True))
-                node.context = self.call_method('get_scope')
-                return node
-            def get_scope(self):
-                return {'x': [1, 2, 3]}
-
-        env = Environment(extensions=[MagicScopeExtension])
-
-        tmpl = env.from_string('''
-            {{- x }}|{% set z = 99 %}
-            {%- overlay %}
-                {{- y }}|{{ z }}|{% for item in x %}[{{ item }}]{% endfor %}
-            {%- endoverlay %}|
-            {{- x -}}
-        ''')
-        assert tmpl.render(x=42, y=23) == '42|23|99|[1][2][3]|42'

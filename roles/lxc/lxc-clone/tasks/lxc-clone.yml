@@ -12,6 +12,8 @@
 
     set -euf -o pipefail;
 
+    source /etc/lsb-release;
+
     source {{ deployment_home }}/wistla-devops/misc/locking ansible;
 
     exlock;
@@ -27,10 +29,21 @@
       set -e;
     fi;
 
-    lxc-clone
-      --backingstore btrfs
-      {{ node_clone_from }}
-      {{ inventory_hostname }};
+    if test "$DISTRIB_CODENAME" = "trusty"; then
+
+      lxc-clone
+        --backingstore "btrfs"
+        "{{ node_clone_from }}"
+        "{{ inventory_hostname }}";
+
+    else
+
+      lxc-copy
+        --backingstorage "btrfs"
+        --name "{{ node_clone_from }}"
+        --newname "{{ inventory_hostname }}";
+
+    fi;
 
     chgrp {{ deployment_user }} /var/lib/lxc/{{ inventory_hostname }};
 

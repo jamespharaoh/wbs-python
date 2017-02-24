@@ -109,7 +109,7 @@ ipaddress:
 jinja2:
 
   url: "git@github.com:mitsuhiko/jinja2.git"
-  branch: "master"
+  branch: "2.8-maintenance"
   auto: "python"
 
 jmespath:

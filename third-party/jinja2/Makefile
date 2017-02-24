@@ -1,5 +1,5 @@
 test:
-	py.test tests --tb=short
+	py.test
 
 develop:
 	pip install --editable .

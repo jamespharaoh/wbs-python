@@ -6,6 +6,7 @@ Unit tests for :mod:`OpenSSL.SSL`.
 """
 
 import datetime
+import sys
 import uuid
 
 from gc import collect, get_referrers
@@ -15,7 +16,7 @@ from socket import MSG_PEEK, SHUT_RDWR, error, socket
 from os import makedirs
 from os.path import join
 from weakref import ref
-from warnings import catch_warnings, simplefilter
+from warnings import simplefilter
 
 import pytest
 
@@ -81,8 +82,7 @@ try:
 except ImportError:
     SSL_ST_INIT = SSL_ST_BEFORE = SSL_ST_OK = SSL_ST_RENEGOTIATE = None
 
-from .util import (
-    WARNING_TYPE_EXPECTED, NON_ASCII, TestCase, is_consistent_type)
+from .util import WARNING_TYPE_EXPECTED, NON_ASCII, is_consistent_type
 from .test_crypto import (
     cleartextCertificatePEM, cleartextPrivateKeyPEM,
     client_cert_pem, client_key_pem, server_cert_pem, server_key_pem,
@@ -222,46 +222,40 @@ def _create_certificate_chain():
     return [(cakey, cacert), (ikey, icert), (skey, scert)]
 
 
-class _LoopbackMixin(object):
+def loopback_client_factory(socket):
+    client = Connection(Context(TLSv1_METHOD), socket)
+    client.set_connect_state()
+    return client
+
+
+def loopback_server_factory(socket):
+    ctx = Context(TLSv1_METHOD)
+    ctx.use_privatekey(load_privatekey(FILETYPE_PEM, server_key_pem))
+    ctx.use_certificate(load_certificate(FILETYPE_PEM, server_cert_pem))
+    server = Connection(ctx, socket)
+    server.set_accept_state()
+    return server
+
+
+def loopback(server_factory=None, client_factory=None):
     """
-    Helper mixin which defines methods for creating a connected socket pair and
-    for forcing two connected SSL sockets to talk to each other via memory
-    BIOs.
+    Create a connected socket pair and force two connected SSL sockets
+    to talk to each other via memory BIOs.
     """
-    def _loopbackClientFactory(self, socket):
-        client = Connection(Context(TLSv1_METHOD), socket)
-        client.set_connect_state()
-        return client
+    if server_factory is None:
+        server_factory = loopback_server_factory
+    if client_factory is None:
+        client_factory = loopback_client_factory
 
-    def _loopbackServerFactory(self, socket):
-        ctx = Context(TLSv1_METHOD)
-        ctx.use_privatekey(load_privatekey(FILETYPE_PEM, server_key_pem))
-        ctx.use_certificate(load_certificate(FILETYPE_PEM, server_cert_pem))
-        server = Connection(ctx, socket)
-        server.set_accept_state()
-        return server
+    (server, client) = socket_pair()
+    server = server_factory(server)
+    client = client_factory(client)
 
-    def _loopback(self, serverFactory=None, clientFactory=None):
-        if serverFactory is None:
-            serverFactory = self._loopbackServerFactory
-        if clientFactory is None:
-            clientFactory = self._loopbackClientFactory
+    handshake(client, server)
 
-        (server, client) = socket_pair()
-        server = serverFactory(server)
-        client = clientFactory(client)
-
-        handshake(client, server)
-
-        server.setblocking(True)
-        client.setblocking(True)
-        return server, client
-
-    def _interactInMemory(self, client_conn, server_conn):
-        return interact_in_memory(client_conn, server_conn)
-
-    def _handshakeInMemory(self, client_conn, server_conn):
-        return handshake_in_memory(client_conn, server_conn)
+    server.setblocking(True)
+    client.setblocking(True)
+    return server, client
 
 
 def interact_in_memory(client_conn, server_conn):
@@ -326,32 +320,30 @@ def handshake_in_memory(client_conn, server_conn):
     interact_in_memory(client_conn, server_conn)
 
 
-class VersionTests(TestCase):
+class TestVersion(object):
     """
-    Tests for version information exposed by
-    :py:obj:`OpenSSL.SSL.SSLeay_version` and
-    :py:obj:`OpenSSL.SSL.OPENSSL_VERSION_NUMBER`.
+    Tests for version information exposed by `OpenSSL.SSL.SSLeay_version` and
+    `OpenSSL.SSL.OPENSSL_VERSION_NUMBER`.
     """
     def test_OPENSSL_VERSION_NUMBER(self):
         """
-        :py:obj:`OPENSSL_VERSION_NUMBER` is an integer with status in the low
-        byte and the patch, fix, minor, and major versions in the
-        nibbles above that.
+        `OPENSSL_VERSION_NUMBER` is an integer with status in the low byte and
+        the patch, fix, minor, and major versions in the nibbles above that.
         """
-        self.assertTrue(isinstance(OPENSSL_VERSION_NUMBER, int))
+        assert isinstance(OPENSSL_VERSION_NUMBER, int)
 
     def test_SSLeay_version(self):
         """
-        :py:obj:`SSLeay_version` takes a version type indicator and returns
-        one of a number of version strings based on that indicator.
+        `SSLeay_version` takes a version type indicator and returns one of a
+        number of version strings based on that indicator.
         """
         versions = {}
         for t in [SSLEAY_VERSION, SSLEAY_CFLAGS, SSLEAY_BUILT_ON,
                   SSLEAY_PLATFORM, SSLEAY_DIR]:
             version = SSLeay_version(t)
             versions[version] = t
-            self.assertTrue(isinstance(version, bytes))
-        self.assertEqual(len(versions), 5)
+            assert isinstance(version, bytes)
+        assert len(versions) == 5
 
 
 @pytest.fixture
@@ -1956,9 +1948,9 @@ class TestSession(object):
         assert isinstance(new_session, Session)
 
 
-class ConnectionTests(TestCase, _LoopbackMixin):
+class TestConnection(object):
     """
-    Unit tests for :class:`OpenSSL.SSL.Connection`.
+    Unit tests for `OpenSSL.SSL.Connection`.
     """
     # XXX get_peer_certificate -> None
     # XXX sock_shutdown
@@ -1976,57 +1968,47 @@ class ConnectionTests(TestCase, _LoopbackMixin):
 
     def test_type(self):
         """
-        :py:obj:`Connection` and :py:obj:`ConnectionType` refer to the same
-        type object and can be used to create instances of that type.
+        `Connection` and `ConnectionType` refer to the same type object and
+        can be used to create instances of that type.
         """
-        self.assertIdentical(Connection, ConnectionType)
+        assert Connection is ConnectionType
         ctx = Context(TLSv1_METHOD)
-        self.assertConsistentType(Connection, 'Connection', ctx, None)
+        assert is_consistent_type(Connection, 'Connection', ctx, None)
 
     def test_get_context(self):
         """
-        :py:obj:`Connection.get_context` returns the :py:obj:`Context` instance
-        used to construct the :py:obj:`Connection` instance.
+        `Connection.get_context` returns the `Context` instance used to
+        construct the `Connection` instance.
         """
         context = Context(TLSv1_METHOD)
         connection = Connection(context, None)
-        self.assertIdentical(connection.get_context(), context)
-
-    def test_get_context_wrong_args(self):
-        """
-        :py:obj:`Connection.get_context` raises :py:obj:`TypeError` if called
-        with any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.get_context, None)
+        assert connection.get_context() is context
 
     def test_set_context_wrong_args(self):
         """
-        :py:obj:`Connection.set_context` raises :py:obj:`TypeError` if called
-        with a non-:py:obj:`Context` instance argument or with any number of
-        arguments other than 1.
+        `Connection.set_context` raises `TypeError` if called with a
+        non-`Context` instance argument,
         """
         ctx = Context(TLSv1_METHOD)
         connection = Connection(ctx, None)
-        self.assertRaises(TypeError, connection.set_context)
-        self.assertRaises(TypeError, connection.set_context, object())
-        self.assertRaises(TypeError, connection.set_context, "hello")
-        self.assertRaises(TypeError, connection.set_context, 1)
-        self.assertRaises(TypeError, connection.set_context, 1, 2)
-        self.assertRaises(
-            TypeError, connection.set_context, Context(TLSv1_METHOD), 2)
-        self.assertIdentical(ctx, connection.get_context())
+        with pytest.raises(TypeError):
+            connection.set_context(object())
+        with pytest.raises(TypeError):
+            connection.set_context("hello")
+        with pytest.raises(TypeError):
+            connection.set_context(1)
+        assert ctx is connection.get_context()
 
     def test_set_context(self):
         """
-        :py:obj:`Connection.set_context` specifies a new :py:obj:`Context`
-        instance to be used for the connection.
+        `Connection.set_context` specifies a new `Context` instance to be
+        used for the connection.
         """
         original = Context(SSLv23_METHOD)
         replacement = Context(TLSv1_METHOD)
         connection = Connection(original, None)
         connection.set_context(replacement)
-        self.assertIdentical(replacement, connection.get_context())
+        assert replacement is connection.get_context()
         # Lose our references to the contexts, just in case the Connection
         # isn't properly managing its own contributions to their reference
         # counts.
@@ -2035,88 +2017,52 @@ class ConnectionTests(TestCase, _LoopbackMixin):
 
     def test_set_tlsext_host_name_wrong_args(self):
         """
-        If :py:obj:`Connection.set_tlsext_host_name` is called with a non-byte
-        string argument or a byte string with an embedded NUL or other than one
-        argument, :py:obj:`TypeError` is raised.
+        If `Connection.set_tlsext_host_name` is called with a non-byte string
+        argument or a byte string with an embedded NUL, `TypeError` is raised.
         """
         conn = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, conn.set_tlsext_host_name)
-        self.assertRaises(TypeError, conn.set_tlsext_host_name, object())
-        self.assertRaises(TypeError, conn.set_tlsext_host_name, 123, 456)
-        self.assertRaises(
-            TypeError, conn.set_tlsext_host_name, b"with\0null")
+        with pytest.raises(TypeError):
+            conn.set_tlsext_host_name(object())
+        with pytest.raises(TypeError):
+            conn.set_tlsext_host_name(b"with\0null")
 
         if PY3:
             # On Python 3.x, don't accidentally implicitly convert from text.
-            self.assertRaises(
-                TypeError,
-                conn.set_tlsext_host_name, b"example.com".decode("ascii"))
-
-    def test_get_servername_wrong_args(self):
-        """
-        :py:obj:`Connection.get_servername` raises :py:obj:`TypeError` if
-        called with any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.get_servername, object())
-        self.assertRaises(TypeError, connection.get_servername, 1)
-        self.assertRaises(TypeError, connection.get_servername, "hello")
+            with pytest.raises(TypeError):
+                conn.set_tlsext_host_name(b"example.com".decode("ascii"))
 
     def test_pending(self):
         """
-        :py:obj:`Connection.pending` returns the number of bytes available for
+        `Connection.pending` returns the number of bytes available for
         immediate read.
         """
         connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertEquals(connection.pending(), 0)
-
-    def test_pending_wrong_args(self):
-        """
-        :py:obj:`Connection.pending` raises :py:obj:`TypeError` if called with
-        any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.pending, None)
+        assert connection.pending() == 0
 
     def test_peek(self):
         """
-        :py:obj:`Connection.recv` peeks into the connection if
-        :py:obj:`socket.MSG_PEEK` is passed.
+        `Connection.recv` peeks into the connection if `socket.MSG_PEEK` is
+        passed.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         server.send(b'xy')
-        self.assertEqual(client.recv(2, MSG_PEEK), b'xy')
-        self.assertEqual(client.recv(2, MSG_PEEK), b'xy')
-        self.assertEqual(client.recv(2), b'xy')
+        assert client.recv(2, MSG_PEEK) == b'xy'
+        assert client.recv(2, MSG_PEEK) == b'xy'
+        assert client.recv(2) == b'xy'
 
     def test_connect_wrong_args(self):
         """
-        :py:obj:`Connection.connect` raises :py:obj:`TypeError` if called with
-        a non-address argument or with the wrong number of arguments.
+        `Connection.connect` raises `TypeError` if called with a non-address
+        argument.
         """
         connection = Connection(Context(TLSv1_METHOD), socket())
-        self.assertRaises(TypeError, connection.connect, None)
-        self.assertRaises(TypeError, connection.connect)
-        self.assertRaises(
-            TypeError, connection.connect, ("127.0.0.1", 1), None
-        )
-
-    def test_connection_undefined_attr(self):
-        """
-        :py:obj:`Connection.connect` raises :py:obj:`TypeError` if called with
-        a non-address argument or with the wrong number of arguments.
-        """
-
-        def attr_access_test(connection):
-            return connection.an_attribute_which_is_not_defined
-
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(AttributeError, attr_access_test, connection)
+        with pytest.raises(TypeError):
+            connection.connect(None)
 
     def test_connect_refused(self):
         """
-        :py:obj:`Connection.connect` raises :py:obj:`socket.error` if the
-        underlying socket connect method raises it.
+        `Connection.connect` raises `socket.error` if the underlying socket
+        connect method raises it.
         """
         client = socket()
         context = Context(TLSv1_METHOD)
@@ -2131,8 +2077,7 @@ class ConnectionTests(TestCase, _LoopbackMixin):
 
     def test_connect(self):
         """
-        :py:obj:`Connection.connect` establishes a connection to the specified
-        address.
+        `Connection.connect` establishes a connection to the specified address.
         """
         port = socket()
         port.bind(('', 0))
@@ -2148,8 +2093,8 @@ class ConnectionTests(TestCase, _LoopbackMixin):
     )
     def test_connect_ex(self):
         """
-        If there is a connection error, :py:obj:`Connection.connect_ex`
-        returns the errno instead of raising an exception.
+        If there is a connection error, `Connection.connect_ex` returns the
+        errno instead of raising an exception.
         """
         port = socket()
         port.bind(('', 0))
@@ -2159,22 +2104,13 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         clientSSL.setblocking(False)
         result = clientSSL.connect_ex(port.getsockname())
         expected = (EINPROGRESS, EWOULDBLOCK)
-        self.assertTrue(
-            result in expected, "%r not in %r" % (result, expected))
-
-    def test_accept_wrong_args(self):
-        """
-        :py:obj:`Connection.accept` raises :py:obj:`TypeError` if called with
-        any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), socket())
-        self.assertRaises(TypeError, connection.accept, None)
+        assert result in expected
 
     def test_accept(self):
         """
-        :py:obj:`Connection.accept` accepts a pending connection attempt and
-        returns a tuple of a new :py:obj:`Connection` (the accepted client) and
-        the address the connection originated from.
+        `Connection.accept` accepts a pending connection attempt and returns a
+        tuple of a new `Connection` (the accepted client) and the address the
+        connection originated from.
         """
         ctx = Context(TLSv1_METHOD)
         ctx.use_privatekey(load_privatekey(FILETYPE_PEM, server_key_pem))
@@ -2192,58 +2128,53 @@ class ConnectionTests(TestCase, _LoopbackMixin):
 
         serverSSL, address = portSSL.accept()
 
-        self.assertTrue(isinstance(serverSSL, Connection))
-        self.assertIdentical(serverSSL.get_context(), ctx)
-        self.assertEquals(address, clientSSL.getsockname())
+        assert isinstance(serverSSL, Connection)
+        assert serverSSL.get_context() is ctx
+        assert address == clientSSL.getsockname()
 
     def test_shutdown_wrong_args(self):
         """
-        :py:obj:`Connection.shutdown` raises :py:obj:`TypeError` if called with
-        the wrong number of arguments or with arguments other than integers.
+        `Connection.set_shutdown` raises `TypeError` if called with arguments
+        other than integers.
         """
         connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.shutdown, None)
-        self.assertRaises(TypeError, connection.get_shutdown, None)
-        self.assertRaises(TypeError, connection.set_shutdown)
-        self.assertRaises(TypeError, connection.set_shutdown, None)
-        self.assertRaises(TypeError, connection.set_shutdown, 0, 1)
+        with pytest.raises(TypeError):
+            connection.set_shutdown(None)
 
     def test_shutdown(self):
         """
-        :py:obj:`Connection.shutdown` performs an SSL-level connection
-        shutdown.
+        `Connection.shutdown` performs an SSL-level connection shutdown.
         """
-        server, client = self._loopback()
-        self.assertFalse(server.shutdown())
-        self.assertEquals(server.get_shutdown(), SENT_SHUTDOWN)
-        self.assertRaises(ZeroReturnError, client.recv, 1024)
-        self.assertEquals(client.get_shutdown(), RECEIVED_SHUTDOWN)
+        server, client = loopback()
+        assert not server.shutdown()
+        assert server.get_shutdown() == SENT_SHUTDOWN
+        with pytest.raises(ZeroReturnError):
+            client.recv(1024)
+        assert client.get_shutdown() == RECEIVED_SHUTDOWN
         client.shutdown()
-        self.assertEquals(
-            client.get_shutdown(), SENT_SHUTDOWN | RECEIVED_SHUTDOWN
-        )
-        self.assertRaises(ZeroReturnError, server.recv, 1024)
-        self.assertEquals(
-            server.get_shutdown(), SENT_SHUTDOWN | RECEIVED_SHUTDOWN
-        )
+        assert client.get_shutdown() == (SENT_SHUTDOWN | RECEIVED_SHUTDOWN)
+        with pytest.raises(ZeroReturnError):
+            server.recv(1024)
+        assert server.get_shutdown() == (SENT_SHUTDOWN | RECEIVED_SHUTDOWN)
 
     def test_shutdown_closed(self):
         """
-        If the underlying socket is closed, :py:obj:`Connection.shutdown`
-        propagates the write error from the low level write call.
+        If the underlying socket is closed, `Connection.shutdown` propagates
+        the write error from the low level write call.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         server.sock_shutdown(2)
-        exc = self.assertRaises(SysCallError, server.shutdown)
-        if platform == "win32":
-            self.assertEqual(exc.args[0], ESHUTDOWN)
-        else:
-            self.assertEqual(exc.args[0], EPIPE)
+        with pytest.raises(SysCallError) as exc:
+            server.shutdown()
+            if platform == "win32":
+                assert exc.value.args[0] == ESHUTDOWN
+            else:
+                assert exc.value.args[0] == EPIPE
 
     def test_shutdown_truncated(self):
         """
-        If the underlying connection is truncated, :obj:`Connection.shutdown`
-        raises an :obj:`Error`.
+        If the underlying connection is truncated, `Connection.shutdown`
+        raises an `Error`.
         """
         server_ctx = Context(TLSv1_METHOD)
         client_ctx = Context(TLSv1_METHOD)
@@ -2253,39 +2184,41 @@ class ConnectionTests(TestCase, _LoopbackMixin):
             load_certificate(FILETYPE_PEM, server_cert_pem))
         server = Connection(server_ctx, None)
         client = Connection(client_ctx, None)
-        self._handshakeInMemory(client, server)
-        self.assertEqual(server.shutdown(), False)
-        self.assertRaises(WantReadError, server.shutdown)
+        handshake_in_memory(client, server)
+        assert not server.shutdown()
+        with pytest.raises(WantReadError):
+            server.shutdown()
         server.bio_shutdown()
-        self.assertRaises(Error, server.shutdown)
+        with pytest.raises(Error):
+            server.shutdown()
 
     def test_set_shutdown(self):
         """
-        :py:obj:`Connection.set_shutdown` sets the state of the SSL connection
+        `Connection.set_shutdown` sets the state of the SSL connection
         shutdown process.
         """
         connection = Connection(Context(TLSv1_METHOD), socket())
         connection.set_shutdown(RECEIVED_SHUTDOWN)
-        self.assertEquals(connection.get_shutdown(), RECEIVED_SHUTDOWN)
+        assert connection.get_shutdown() == RECEIVED_SHUTDOWN
 
     @skip_if_py3
     def test_set_shutdown_long(self):
         """
-        On Python 2 :py:obj:`Connection.set_shutdown` accepts an argument
-        of type :py:obj:`long` as well as :py:obj:`int`.
+        On Python 2 `Connection.set_shutdown` accepts an argument
+        of type `long` as well as `int`.
         """
         connection = Connection(Context(TLSv1_METHOD), socket())
         connection.set_shutdown(long(RECEIVED_SHUTDOWN))
-        self.assertEquals(connection.get_shutdown(), RECEIVED_SHUTDOWN)
+        assert connection.get_shutdown() == RECEIVED_SHUTDOWN
 
     def test_state_string(self):
         """
-        :meth:`Connection.state_string` verbosely describes the current
-        state of the :class:`Connection`.
+        `Connection.state_string` verbosely describes the current state of
+        the `Connection`.
         """
         server, client = socket_pair()
-        server = self._loopbackServerFactory(server)
-        client = self._loopbackClientFactory(client)
+        server = loopback_server_factory(server)
+        client = loopback_client_factory(client)
 
         assert server.get_state_string() in [
             b"before/accept initialization", b"before SSL initialization"
@@ -2294,22 +2227,11 @@ class ConnectionTests(TestCase, _LoopbackMixin):
             b"before/connect initialization", b"before SSL initialization"
         ]
 
-    def test_app_data_wrong_args(self):
-        """
-        :py:obj:`Connection.set_app_data` raises :py:obj:`TypeError` if called
-        with other than one argument.  :py:obj:`Connection.get_app_data` raises
-        :py:obj:`TypeError` if called with any arguments.
-        """
-        conn = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, conn.get_app_data, None)
-        self.assertRaises(TypeError, conn.set_app_data)
-        self.assertRaises(TypeError, conn.set_app_data, None, None)
-
     def test_app_data(self):
         """
         Any object can be set as app data by passing it to
-        :py:obj:`Connection.set_app_data` and later retrieved with
-        :py:obj:`Connection.get_app_data`.
+        `Connection.set_app_data` and later retrieved with
+        `Connection.get_app_data`.
         """
         conn = Connection(Context(TLSv1_METHOD), None)
         assert None is conn.get_app_data()
@@ -2319,26 +2241,16 @@ class ConnectionTests(TestCase, _LoopbackMixin):
 
     def test_makefile(self):
         """
-        :py:obj:`Connection.makefile` is not implemented and calling that
-        method raises :py:obj:`NotImplementedError`.
+        `Connection.makefile` is not implemented and calling that
+        method raises `NotImplementedError`.
         """
         conn = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(NotImplementedError, conn.makefile)
-
-    def test_get_peer_cert_chain_wrong_args(self):
-        """
-        :py:obj:`Connection.get_peer_cert_chain` raises :py:obj:`TypeError` if
-        called with any arguments.
-        """
-        conn = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, conn.get_peer_cert_chain, 1)
-        self.assertRaises(TypeError, conn.get_peer_cert_chain, "foo")
-        self.assertRaises(TypeError, conn.get_peer_cert_chain, object())
-        self.assertRaises(TypeError, conn.get_peer_cert_chain, [])
+        with pytest.raises(NotImplementedError):
+            conn.makefile()
 
     def test_get_peer_cert_chain(self):
         """
-        :py:obj:`Connection.get_peer_cert_chain` returns a list of certificates
+        `Connection.get_peer_cert_chain` returns a list of certificates
         which the connected server returned for the certification verification.
         """
         chain = _create_certificate_chain()
@@ -2358,21 +2270,18 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         client = Connection(clientContext, None)
         client.set_connect_state()
 
-        self._interactInMemory(client, server)
+        interact_in_memory(client, server)
 
         chain = client.get_peer_cert_chain()
-        self.assertEqual(len(chain), 3)
-        self.assertEqual(
-            "Server Certificate", chain[0].get_subject().CN)
-        self.assertEqual(
-            "Intermediate Certificate", chain[1].get_subject().CN)
-        self.assertEqual(
-            "Authority Certificate", chain[2].get_subject().CN)
+        assert len(chain) == 3
+        assert "Server Certificate" == chain[0].get_subject().CN
+        assert "Intermediate Certificate" == chain[1].get_subject().CN
+        assert "Authority Certificate" == chain[2].get_subject().CN
 
     def test_get_peer_cert_chain_none(self):
         """
-        :py:obj:`Connection.get_peer_cert_chain` returns :py:obj:`None` if the
-        peer sends no certificate chain.
+        `Connection.get_peer_cert_chain` returns `None` if the peer sends
+        no certificate chain.
         """
         ctx = Context(TLSv1_METHOD)
         ctx.use_privatekey(load_privatekey(FILETYPE_PEM, server_key_pem))
@@ -2381,71 +2290,57 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         server.set_accept_state()
         client = Connection(Context(TLSv1_METHOD), None)
         client.set_connect_state()
-        self._interactInMemory(client, server)
-        self.assertIdentical(None, server.get_peer_cert_chain())
-
-    def test_get_session_wrong_args(self):
-        """
-        :py:obj:`Connection.get_session` raises :py:obj:`TypeError` if called
-        with any arguments.
-        """
-        ctx = Context(TLSv1_METHOD)
-        server = Connection(ctx, None)
-        self.assertRaises(TypeError, server.get_session, 123)
-        self.assertRaises(TypeError, server.get_session, "hello")
-        self.assertRaises(TypeError, server.get_session, object())
+        interact_in_memory(client, server)
+        assert None is server.get_peer_cert_chain()
 
     def test_get_session_unconnected(self):
         """
-        :py:obj:`Connection.get_session` returns :py:obj:`None` when used with
-        an object which has not been connected.
+        `Connection.get_session` returns `None` when used with an object
+        which has not been connected.
         """
         ctx = Context(TLSv1_METHOD)
         server = Connection(ctx, None)
         session = server.get_session()
-        self.assertIdentical(None, session)
+        assert None is session
 
     def test_server_get_session(self):
         """
-        On the server side of a connection, :py:obj:`Connection.get_session`
-        returns a :py:class:`Session` instance representing the SSL session for
-        that connection.
+        On the server side of a connection, `Connection.get_session` returns a
+        `Session` instance representing the SSL session for that connection.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         session = server.get_session()
-        self.assertIsInstance(session, Session)
+        assert isinstance(session, Session)
 
     def test_client_get_session(self):
         """
-        On the client side of a connection, :py:obj:`Connection.get_session`
-        returns a :py:class:`Session` instance representing the SSL session for
+        On the client side of a connection, `Connection.get_session`
+        returns a `Session` instance representing the SSL session for
         that connection.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         session = client.get_session()
-        self.assertIsInstance(session, Session)
+        assert isinstance(session, Session)
 
     def test_set_session_wrong_args(self):
         """
-        If called with an object that is not an instance of
-        :py:class:`Session`, or with other than one argument,
-        :py:obj:`Connection.set_session` raises :py:obj:`TypeError`.
+        `Connection.set_session` raises `TypeError` if called with an object
+        that is not an instance of `Session`.
         """
         ctx = Context(TLSv1_METHOD)
         connection = Connection(ctx, None)
-        self.assertRaises(TypeError, connection.set_session)
-        self.assertRaises(TypeError, connection.set_session, 123)
-        self.assertRaises(TypeError, connection.set_session, "hello")
-        self.assertRaises(TypeError, connection.set_session, object())
-        self.assertRaises(
-            TypeError, connection.set_session, Session(), Session())
+        with pytest.raises(TypeError):
+            connection.set_session(123)
+        with pytest.raises(TypeError):
+            connection.set_session("hello")
+        with pytest.raises(TypeError):
+            connection.set_session(object())
 
     def test_client_set_session(self):
         """
-        :py:obj:`Connection.set_session`, when used prior to a connection being
-        established, accepts a :py:class:`Session` instance and causes an
-        attempt to re-use the session it represents when the SSL handshake is
-        performed.
+        `Connection.set_session`, when used prior to a connection being
+        established, accepts a `Session` instance and causes an attempt to
+        re-use the session it represents when the SSL handshake is performed.
         """
         key = load_privatekey(FILETYPE_PEM, server_key_pem)
         cert = load_certificate(FILETYPE_PEM, server_cert_pem)
@@ -2459,17 +2354,17 @@ class ConnectionTests(TestCase, _LoopbackMixin):
             server.set_accept_state()
             return server
 
-        originalServer, originalClient = self._loopback(
-            serverFactory=makeServer)
+        originalServer, originalClient = loopback(
+            server_factory=makeServer)
         originalSession = originalClient.get_session()
 
         def makeClient(socket):
-            client = self._loopbackClientFactory(socket)
+            client = loopback_client_factory(socket)
             client.set_session(originalSession)
             return client
-        resumedServer, resumedClient = self._loopback(
-            serverFactory=makeServer,
-            clientFactory=makeClient)
+        resumedServer, resumedClient = loopback(
+            server_factory=makeServer,
+            client_factory=makeClient)
 
         # This is a proxy: in general, we have no access to any unique
         # identifier for the session (new enough versions of OpenSSL expose
@@ -2477,15 +2372,13 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         # Instead, exploit the fact that the master key is re-used if the
         # session is re-used.  As long as the master key for the two
         # connections is the same, the session was re-used!
-        self.assertEqual(
-            originalServer.master_key(), resumedServer.master_key())
+        assert originalServer.master_key() == resumedServer.master_key()
 
     def test_set_session_wrong_method(self):
         """
-        If :py:obj:`Connection.set_session` is passed a :py:class:`Session`
-        instance associated with a context using a different SSL method than
-        the :py:obj:`Connection` is using, a :py:class:`OpenSSL.SSL.Error` is
-        raised.
+        If `Connection.set_session` is passed a `Session` instance associated
+        with a context using a different SSL method than the `Connection`
+        is using, a `OpenSSL.SSL.Error` is raised.
         """
         # Make this work on both OpenSSL 1.0.0, which doesn't support TLSv1.2
         # and also on OpenSSL 1.1.0 which doesn't support SSLv3. (SSL_ST_INIT
@@ -2514,8 +2407,8 @@ class ConnectionTests(TestCase, _LoopbackMixin):
             client.set_connect_state()
             return client
 
-        originalServer, originalClient = self._loopback(
-            serverFactory=makeServer, clientFactory=makeOriginalClient)
+        originalServer, originalClient = loopback(
+            server_factory=makeServer, client_factory=makeOriginalClient)
         originalSession = originalClient.get_session()
 
         def makeClient(socket):
@@ -2525,14 +2418,13 @@ class ConnectionTests(TestCase, _LoopbackMixin):
             client.set_session(originalSession)
             return client
 
-        self.assertRaises(
-            Error,
-            self._loopback, clientFactory=makeClient, serverFactory=makeServer)
+        with pytest.raises(Error):
+            loopback(client_factory=makeClient, server_factory=makeServer)
 
     def test_wantWriteError(self):
         """
-        :py:obj:`Connection` methods which generate output raise
-        :py:obj:`OpenSSL.SSL.WantWriteError` if writing to the connection's BIO
+        `Connection` methods which generate output raise
+        `OpenSSL.SSL.WantWriteError` if writing to the connection's BIO
         fail indicating a should-write state.
         """
         client_socket, server_socket = socket_pair()
@@ -2551,57 +2443,57 @@ class ConnectionTests(TestCase, _LoopbackMixin):
                     break
                 raise
         else:
-            self.fail(
+            pytest.fail(
                 "Failed to fill socket buffer, cannot test BIO want write")
 
         ctx = Context(TLSv1_METHOD)
         conn = Connection(ctx, client_socket)
         # Client's speak first, so make it an SSL client
         conn.set_connect_state()
-        self.assertRaises(WantWriteError, conn.do_handshake)
+        with pytest.raises(WantWriteError):
+            conn.do_handshake()
 
     # XXX want_read
 
     def test_get_finished_before_connect(self):
         """
-        :py:obj:`Connection.get_finished` returns :py:obj:`None` before TLS
-        handshake is completed.
+        `Connection.get_finished` returns `None` before TLS handshake
+        is completed.
         """
         ctx = Context(TLSv1_METHOD)
         connection = Connection(ctx, None)
-        self.assertEqual(connection.get_finished(), None)
+        assert connection.get_finished() is None
 
     def test_get_peer_finished_before_connect(self):
         """
-        :py:obj:`Connection.get_peer_finished` returns :py:obj:`None` before
-        TLS handshake is completed.
+        `Connection.get_peer_finished` returns `None` before TLS handshake
+        is completed.
         """
         ctx = Context(TLSv1_METHOD)
         connection = Connection(ctx, None)
-        self.assertEqual(connection.get_peer_finished(), None)
+        assert connection.get_peer_finished() is None
 
     def test_get_finished(self):
         """
-        :py:obj:`Connection.get_finished` method returns the TLS Finished
-        message send from client, or server. Finished messages are send during
+        `Connection.get_finished` method returns the TLS Finished message send
+        from client, or server. Finished messages are send during
         TLS handshake.
         """
+        server, client = loopback()
 
-        server, client = self._loopback()
-
-        self.assertNotEqual(server.get_finished(), None)
-        self.assertTrue(len(server.get_finished()) > 0)
+        assert server.get_finished() is not None
+        assert len(server.get_finished()) > 0
 
     def test_get_peer_finished(self):
         """
-        :py:obj:`Connection.get_peer_finished` method returns the TLS Finished
+        `Connection.get_peer_finished` method returns the TLS Finished
         message received from client, or server. Finished messages are send
         during TLS handshake.
         """
-        server, client = self._loopback()
+        server, client = loopback()
 
-        self.assertNotEqual(server.get_peer_finished(), None)
-        self.assertTrue(len(server.get_peer_finished()) > 0)
+        assert server.get_peer_finished() is not None
+        assert len(server.get_peer_finished()) > 0
 
     def test_tls_finished_message_symmetry(self):
         """
@@ -2611,1017 +2503,108 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         The TLS Finished message send by client must be the TLS Finished
         message received by server.
         """
-        server, client = self._loopback()
+        server, client = loopback()
 
-        self.assertEqual(server.get_finished(), client.get_peer_finished())
-        self.assertEqual(client.get_finished(), server.get_peer_finished())
+        assert server.get_finished() == client.get_peer_finished()
+        assert client.get_finished() == server.get_peer_finished()
 
     def test_get_cipher_name_before_connect(self):
         """
-        :py:obj:`Connection.get_cipher_name` returns :py:obj:`None` if no
-        connection has been established.
+        `Connection.get_cipher_name` returns `None` if no connection
+        has been established.
         """
         ctx = Context(TLSv1_METHOD)
         conn = Connection(ctx, None)
-        self.assertIdentical(conn.get_cipher_name(), None)
+        assert conn.get_cipher_name() is None
 
     def test_get_cipher_name(self):
         """
-        :py:obj:`Connection.get_cipher_name` returns a :py:class:`unicode`
-        string giving the name of the currently used cipher.
+        `Connection.get_cipher_name` returns a `unicode` string giving the
+        name of the currently used cipher.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         server_cipher_name, client_cipher_name = \
             server.get_cipher_name(), client.get_cipher_name()
 
-        self.assertIsInstance(server_cipher_name, text_type)
-        self.assertIsInstance(client_cipher_name, text_type)
+        assert isinstance(server_cipher_name, text_type)
+        assert isinstance(client_cipher_name, text_type)
 
-        self.assertEqual(server_cipher_name, client_cipher_name)
+        assert server_cipher_name == client_cipher_name
 
     def test_get_cipher_version_before_connect(self):
         """
-        :py:obj:`Connection.get_cipher_version` returns :py:obj:`None` if no
-        connection has been established.
+        `Connection.get_cipher_version` returns `None` if no connection
+        has been established.
         """
         ctx = Context(TLSv1_METHOD)
         conn = Connection(ctx, None)
-        self.assertIdentical(conn.get_cipher_version(), None)
+        assert conn.get_cipher_version() is None
 
     def test_get_cipher_version(self):
         """
-        :py:obj:`Connection.get_cipher_version` returns a :py:class:`unicode`
-        string giving the protocol name of the currently used cipher.
+        `Connection.get_cipher_version` returns a `unicode` string giving
+        the protocol name of the currently used cipher.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         server_cipher_version, client_cipher_version = \
             server.get_cipher_version(), client.get_cipher_version()
 
-        self.assertIsInstance(server_cipher_version, text_type)
-        self.assertIsInstance(client_cipher_version, text_type)
+        assert isinstance(server_cipher_version, text_type)
+        assert isinstance(client_cipher_version, text_type)
 
-        self.assertEqual(server_cipher_version, client_cipher_version)
+        assert server_cipher_version == client_cipher_version
 
     def test_get_cipher_bits_before_connect(self):
         """
-        :py:obj:`Connection.get_cipher_bits` returns :py:obj:`None` if no
-        connection has been established.
+        `Connection.get_cipher_bits` returns `None` if no connection has
+        been established.
         """
         ctx = Context(TLSv1_METHOD)
         conn = Connection(ctx, None)
-        self.assertIdentical(conn.get_cipher_bits(), None)
+        assert conn.get_cipher_bits() is None
 
     def test_get_cipher_bits(self):
         """
-        :py:obj:`Connection.get_cipher_bits` returns the number of secret bits
+        `Connection.get_cipher_bits` returns the number of secret bits
         of the currently used cipher.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         server_cipher_bits, client_cipher_bits = \
             server.get_cipher_bits(), client.get_cipher_bits()
 
-        self.assertIsInstance(server_cipher_bits, int)
-        self.assertIsInstance(client_cipher_bits, int)
+        assert isinstance(server_cipher_bits, int)
+        assert isinstance(client_cipher_bits, int)
 
-        self.assertEqual(server_cipher_bits, client_cipher_bits)
+        assert server_cipher_bits == client_cipher_bits
 
     def test_get_protocol_version_name(self):
         """
-        :py:obj:`Connection.get_protocol_version_name()` returns a string
-        giving the protocol version of the current connection.
+        `Connection.get_protocol_version_name()` returns a string giving the
+        protocol version of the current connection.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         client_protocol_version_name = client.get_protocol_version_name()
         server_protocol_version_name = server.get_protocol_version_name()
 
-        self.assertIsInstance(server_protocol_version_name, text_type)
-        self.assertIsInstance(client_protocol_version_name, text_type)
+        assert isinstance(server_protocol_version_name, text_type)
+        assert isinstance(client_protocol_version_name, text_type)
 
-        self.assertEqual(
-            server_protocol_version_name, client_protocol_version_name
-        )
+        assert server_protocol_version_name == client_protocol_version_name
 
     def test_get_protocol_version(self):
         """
-        :py:obj:`Connection.get_protocol_version()` returns an integer
+        `Connection.get_protocol_version()` returns an integer
         giving the protocol version of the current connection.
         """
-        server, client = self._loopback()
+        server, client = loopback()
         client_protocol_version = client.get_protocol_version()
         server_protocol_version = server.get_protocol_version()
 
-        self.assertIsInstance(server_protocol_version, int)
-        self.assertIsInstance(client_protocol_version, int)
+        assert isinstance(server_protocol_version, int)
+        assert isinstance(client_protocol_version, int)
 
-        self.assertEqual(server_protocol_version, client_protocol_version)
+        assert server_protocol_version == client_protocol_version
 
-
-class ConnectionGetCipherListTests(TestCase):
-    """
-    Tests for :py:obj:`Connection.get_cipher_list`.
-    """
-    def test_wrong_args(self):
-        """
-        :py:obj:`Connection.get_cipher_list` raises :py:obj:`TypeError` if
-        called with any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.get_cipher_list, None)
-
-    def test_result(self):
-        """
-        :py:obj:`Connection.get_cipher_list` returns a :py:obj:`list` of
-        :py:obj:`bytes` giving the names of the ciphers which might be used.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        ciphers = connection.get_cipher_list()
-        self.assertTrue(isinstance(ciphers, list))
-        for cipher in ciphers:
-            self.assertTrue(isinstance(cipher, str))
-
-
-class ConnectionSendTests(TestCase, _LoopbackMixin):
-    """
-    Tests for :py:obj:`Connection.send`
-    """
-    def test_wrong_args(self):
-        """
-        When called with arguments other than string argument for its first
-        parameter or more than two arguments, :py:obj:`Connection.send` raises
-        :py:obj:`TypeError`.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.send)
-        self.assertRaises(TypeError, connection.send, object())
-        self.assertRaises(TypeError, connection.send, "foo", object(), "bar")
-
-    def test_short_bytes(self):
-        """
-        When passed a short byte string, :py:obj:`Connection.send` transmits
-        all of it and returns the number of bytes sent.
-        """
-        server, client = self._loopback()
-        count = server.send(b'xy')
-        self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b'xy')
-
-    def test_text(self):
-        """
-        When passed a text, :py:obj:`Connection.send` transmits all of it and
-        returns the number of bytes sent. It also raises a DeprecationWarning.
-        """
-        server, client = self._loopback()
-        with catch_warnings(record=True) as w:
-            simplefilter("always")
-            count = server.send(b"xy".decode("ascii"))
-            self.assertEqual(
-                "{0} for buf is no longer accepted, use bytes".format(
-                    WARNING_TYPE_EXPECTED
-                ),
-                str(w[-1].message)
-            )
-            self.assertIs(w[-1].category, DeprecationWarning)
-        self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b"xy")
-
-    @skip_if_py26
-    def test_short_memoryview(self):
-        """
-        When passed a memoryview onto a small number of bytes,
-        :py:obj:`Connection.send` transmits all of them and returns the number
-        of bytes sent.
-        """
-        server, client = self._loopback()
-        count = server.send(memoryview(b'xy'))
-        self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b'xy')
-
-    @skip_if_py3
-    def test_short_buffer(self):
-        """
-        When passed a buffer containing a small number of bytes,
-        :py:obj:`Connection.send` transmits all of them and returns the number
-        of bytes sent.
-        """
-        server, client = self._loopback()
-        count = server.send(buffer(b'xy'))
-        self.assertEquals(count, 2)
-        self.assertEquals(client.recv(2), b'xy')
-
-
-def _make_memoryview(size):
-    """
-    Create a new ``memoryview`` wrapped around a ``bytearray`` of the given
-    size.
-    """
-    return memoryview(bytearray(size))
-
-
-class ConnectionRecvIntoTests(TestCase, _LoopbackMixin):
-    """
-    Tests for :py:obj:`Connection.recv_into`
-    """
-    def _no_length_test(self, factory):
-        """
-        Assert that when the given buffer is passed to
-        ``Connection.recv_into``, whatever bytes are available to be received
-        that fit into that buffer are written into that buffer.
-        """
-        output_buffer = factory(5)
-
-        server, client = self._loopback()
-        server.send(b'xy')
-
-        self.assertEqual(client.recv_into(output_buffer), 2)
-        self.assertEqual(output_buffer, bytearray(b'xy\x00\x00\x00'))
-
-    def test_bytearray_no_length(self):
-        """
-        :py:obj:`Connection.recv_into` can be passed a ``bytearray`` instance
-        and data in the receive buffer is written to it.
-        """
-        self._no_length_test(bytearray)
-
-    def _respects_length_test(self, factory):
-        """
-        Assert that when the given buffer is passed to ``Connection.recv_into``
-        along with a value for ``nbytes`` that is less than the size of that
-        buffer, only ``nbytes`` bytes are written into the buffer.
-        """
-        output_buffer = factory(10)
-
-        server, client = self._loopback()
-        server.send(b'abcdefghij')
-
-        self.assertEqual(client.recv_into(output_buffer, 5), 5)
-        self.assertEqual(
-            output_buffer, bytearray(b'abcde\x00\x00\x00\x00\x00')
-        )
-
-    def test_bytearray_respects_length(self):
-        """
-        When called with a ``bytearray`` instance,
-        :py:obj:`Connection.recv_into` respects the ``nbytes`` parameter and
-        doesn't copy in more than that number of bytes.
-        """
-        self._respects_length_test(bytearray)
-
-    def _doesnt_overfill_test(self, factory):
-        """
-        Assert that if there are more bytes available to be read from the
-        receive buffer than would fit into the buffer passed to
-        :py:obj:`Connection.recv_into`, only as many as fit are written into
-        it.
-        """
-        output_buffer = factory(5)
-
-        server, client = self._loopback()
-        server.send(b'abcdefghij')
-
-        self.assertEqual(client.recv_into(output_buffer), 5)
-        self.assertEqual(output_buffer, bytearray(b'abcde'))
-        rest = client.recv(5)
-        self.assertEqual(b'fghij', rest)
-
-    def test_bytearray_doesnt_overfill(self):
-        """
-        When called with a ``bytearray`` instance,
-        :py:obj:`Connection.recv_into` respects the size of the array and
-        doesn't write more bytes into it than will fit.
-        """
-        self._doesnt_overfill_test(bytearray)
-
-    def test_bytearray_really_doesnt_overfill(self):
-        """
-        When called with a ``bytearray`` instance and an ``nbytes`` value that
-        is too large, :py:obj:`Connection.recv_into` respects the size of the
-        array and not the ``nbytes`` value and doesn't write more bytes into
-        the buffer than will fit.
-        """
-        self._doesnt_overfill_test(bytearray)
-
-    def test_peek(self):
-        server, client = self._loopback()
-        server.send(b'xy')
-
-        for _ in range(2):
-            output_buffer = bytearray(5)
-            self.assertEqual(
-                client.recv_into(output_buffer, flags=MSG_PEEK), 2)
-            self.assertEqual(output_buffer, bytearray(b'xy\x00\x00\x00'))
-
-    @skip_if_py26
-    def test_memoryview_no_length(self):
-        """
-        :py:obj:`Connection.recv_into` can be passed a ``memoryview``
-        instance and data in the receive buffer is written to it.
-        """
-        self._no_length_test(_make_memoryview)
-
-    @skip_if_py26
-    def test_memoryview_respects_length(self):
-        """
-        When called with a ``memoryview`` instance,
-        :py:obj:`Connection.recv_into` respects the ``nbytes`` parameter
-        and doesn't copy more than that number of bytes in.
-        """
-        self._respects_length_test(_make_memoryview)
-
-    @skip_if_py26
-    def test_memoryview_doesnt_overfill(self):
-        """
-        When called with a ``memoryview`` instance,
-        :py:obj:`Connection.recv_into` respects the size of the array and
-        doesn't write more bytes into it than will fit.
-        """
-        self._doesnt_overfill_test(_make_memoryview)
-
-    @skip_if_py26
-    def test_memoryview_really_doesnt_overfill(self):
-        """
-        When called with a ``memoryview`` instance and an ``nbytes`` value
-        that is too large, :py:obj:`Connection.recv_into` respects the size
-        of the array and not the ``nbytes`` value and doesn't write more
-        bytes into the buffer than will fit.
-        """
-        self._doesnt_overfill_test(_make_memoryview)
-
-
-class ConnectionSendallTests(TestCase, _LoopbackMixin):
-    """
-    Tests for :py:obj:`Connection.sendall`.
-    """
-    def test_wrong_args(self):
-        """
-        When called with arguments other than a string argument for its first
-        parameter or with more than two arguments, :py:obj:`Connection.sendall`
-        raises :py:obj:`TypeError`.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.sendall)
-        self.assertRaises(TypeError, connection.sendall, object())
-        self.assertRaises(
-            TypeError, connection.sendall, "foo", object(), "bar")
-
-    def test_short(self):
-        """
-        :py:obj:`Connection.sendall` transmits all of the bytes in the string
-        passed to it.
-        """
-        server, client = self._loopback()
-        server.sendall(b'x')
-        self.assertEquals(client.recv(1), b'x')
-
-    def test_text(self):
-        """
-        :py:obj:`Connection.sendall` transmits all the content in the string
-        passed to it raising a DeprecationWarning in case of this being a text.
-        """
-        server, client = self._loopback()
-        with catch_warnings(record=True) as w:
-            simplefilter("always")
-            server.sendall(b"x".decode("ascii"))
-            self.assertEqual(
-                "{0} for buf is no longer accepted, use bytes".format(
-                    WARNING_TYPE_EXPECTED
-                ),
-                str(w[-1].message)
-            )
-            self.assertIs(w[-1].category, DeprecationWarning)
-        self.assertEquals(client.recv(1), b"x")
-
-    @skip_if_py26
-    def test_short_memoryview(self):
-        """
-        When passed a memoryview onto a small number of bytes,
-        :py:obj:`Connection.sendall` transmits all of them.
-        """
-        server, client = self._loopback()
-        server.sendall(memoryview(b'x'))
-        self.assertEquals(client.recv(1), b'x')
-
-    @skip_if_py3
-    def test_short_buffers(self):
-        """
-        When passed a buffer containing a small number of bytes,
-        :py:obj:`Connection.sendall` transmits all of them.
-        """
-        server, client = self._loopback()
-        server.sendall(buffer(b'x'))
-        self.assertEquals(client.recv(1), b'x')
-
-    def test_long(self):
-        """
-        :py:obj:`Connection.sendall` transmits all of the bytes in the string
-        passed to it even if this requires multiple calls of an underlying
-        write function.
-        """
-        server, client = self._loopback()
-        # Should be enough, underlying SSL_write should only do 16k at a time.
-        # On Windows, after 32k of bytes the write will block (forever
-        # - because no one is yet reading).
-        message = b'x' * (1024 * 32 - 1) + b'y'
-        server.sendall(message)
-        accum = []
-        received = 0
-        while received < len(message):
-            data = client.recv(1024)
-            accum.append(data)
-            received += len(data)
-        self.assertEquals(message, b''.join(accum))
-
-    def test_closed(self):
-        """
-        If the underlying socket is closed, :py:obj:`Connection.sendall`
-        propagates the write error from the low level write call.
-        """
-        server, client = self._loopback()
-        server.sock_shutdown(2)
-        exc = self.assertRaises(SysCallError, server.sendall, b"hello, world")
-        if platform == "win32":
-            self.assertEqual(exc.args[0], ESHUTDOWN)
-        else:
-            self.assertEqual(exc.args[0], EPIPE)
-
-
-class ConnectionRenegotiateTests(TestCase, _LoopbackMixin):
-    """
-    Tests for SSL renegotiation APIs.
-    """
-    def test_renegotiate_wrong_args(self):
-        """
-        :py:obj:`Connection.renegotiate` raises :py:obj:`TypeError` if called
-        with any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.renegotiate, None)
-
-    def test_total_renegotiations_wrong_args(self):
-        """
-        :py:obj:`Connection.total_renegotiations` raises :py:obj:`TypeError` if
-        called with any arguments.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertRaises(TypeError, connection.total_renegotiations, None)
-
-    def test_total_renegotiations(self):
-        """
-        :py:obj:`Connection.total_renegotiations` returns :py:obj:`0` before
-        any renegotiations have happened.
-        """
-        connection = Connection(Context(TLSv1_METHOD), None)
-        self.assertEquals(connection.total_renegotiations(), 0)
-
-    def test_renegotiate(self):
-        """
-        Go through a complete renegotiation cycle.
-        """
-        server, client = self._loopback()
-
-        server.send(b"hello world")
-
-        assert b"hello world" == client.recv(len(b"hello world"))
-
-        assert 0 == server.total_renegotiations()
-        assert False is server.renegotiate_pending()
-
-        assert True is server.renegotiate()
-
-        assert True is server.renegotiate_pending()
-
-        server.setblocking(False)
-        client.setblocking(False)
-
-        client.do_handshake()
-        server.do_handshake()
-
-        assert 1 == server.total_renegotiations()
-        while False is server.renegotiate_pending():
-            pass
-
-
-class ErrorTests(TestCase):
-    """
-    Unit tests for :py:obj:`OpenSSL.SSL.Error`.
-    """
-    def test_type(self):
-        """
-        :py:obj:`Error` is an exception type.
-        """
-        self.assertTrue(issubclass(Error, Exception))
-        self.assertEqual(Error.__name__, 'Error')
-
-
-class ConstantsTests(TestCase):
-    """
-    Tests for the values of constants exposed in :py:obj:`OpenSSL.SSL`.
-
-    These are values defined by OpenSSL intended only to be used as flags to
-    OpenSSL APIs.  The only assertions it seems can be made about them is
-    their values.
-    """
-    @pytest.mark.skipif(
-        OP_NO_QUERY_MTU is None,
-        reason="OP_NO_QUERY_MTU unavailable - OpenSSL version may be too old"
-    )
-    def test_op_no_query_mtu(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.OP_NO_QUERY_MTU` is 0x1000, the value
-        of :py:const:`SSL_OP_NO_QUERY_MTU` defined by :file:`openssl/ssl.h`.
-        """
-        self.assertEqual(OP_NO_QUERY_MTU, 0x1000)
-
-    @pytest.mark.skipif(
-        OP_COOKIE_EXCHANGE is None,
-        reason="OP_COOKIE_EXCHANGE unavailable - "
-        "OpenSSL version may be too old"
-    )
-    def test_op_cookie_exchange(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.OP_COOKIE_EXCHANGE` is 0x2000, the
-        value of :py:const:`SSL_OP_COOKIE_EXCHANGE` defined by
-        :file:`openssl/ssl.h`.
-        """
-        self.assertEqual(OP_COOKIE_EXCHANGE, 0x2000)
-
-    @pytest.mark.skipif(
-        OP_NO_TICKET is None,
-        reason="OP_NO_TICKET unavailable - OpenSSL version may be too old"
-    )
-    def test_op_no_ticket(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.OP_NO_TICKET` is 0x4000, the value of
-        :py:const:`SSL_OP_NO_TICKET` defined by :file:`openssl/ssl.h`.
-        """
-        self.assertEqual(OP_NO_TICKET, 0x4000)
-
-    @pytest.mark.skipif(
-        OP_NO_COMPRESSION is None,
-        reason="OP_NO_COMPRESSION unavailable - OpenSSL version may be too old"
-    )
-    def test_op_no_compression(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.OP_NO_COMPRESSION` is 0x20000, the
-        value of :py:const:`SSL_OP_NO_COMPRESSION` defined by
-        :file:`openssl/ssl.h`.
-        """
-        self.assertEqual(OP_NO_COMPRESSION, 0x20000)
-
-    def test_sess_cache_off(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_OFF` 0x0, the value of
-        :py:obj:`SSL_SESS_CACHE_OFF` defined by ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x0, SESS_CACHE_OFF)
-
-    def test_sess_cache_client(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_CLIENT` 0x1, the value of
-        :py:obj:`SSL_SESS_CACHE_CLIENT` defined by ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x1, SESS_CACHE_CLIENT)
-
-    def test_sess_cache_server(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_SERVER` 0x2, the value of
-        :py:obj:`SSL_SESS_CACHE_SERVER` defined by ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x2, SESS_CACHE_SERVER)
-
-    def test_sess_cache_both(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_BOTH` 0x3, the value of
-        :py:obj:`SSL_SESS_CACHE_BOTH` defined by ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x3, SESS_CACHE_BOTH)
-
-    def test_sess_cache_no_auto_clear(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_NO_AUTO_CLEAR` 0x80, the
-        value of :py:obj:`SSL_SESS_CACHE_NO_AUTO_CLEAR` defined by
-        ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x80, SESS_CACHE_NO_AUTO_CLEAR)
-
-    def test_sess_cache_no_internal_lookup(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_NO_INTERNAL_LOOKUP` 0x100,
-        the value of :py:obj:`SSL_SESS_CACHE_NO_INTERNAL_LOOKUP` defined by
-        ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x100, SESS_CACHE_NO_INTERNAL_LOOKUP)
-
-    def test_sess_cache_no_internal_store(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_NO_INTERNAL_STORE` 0x200,
-        the value of :py:obj:`SSL_SESS_CACHE_NO_INTERNAL_STORE` defined by
-        ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x200, SESS_CACHE_NO_INTERNAL_STORE)
-
-    def test_sess_cache_no_internal(self):
-        """
-        The value of :py:obj:`OpenSSL.SSL.SESS_CACHE_NO_INTERNAL` 0x300, the
-        value of :py:obj:`SSL_SESS_CACHE_NO_INTERNAL` defined by
-        ``openssl/ssl.h``.
-        """
-        self.assertEqual(0x300, SESS_CACHE_NO_INTERNAL)
-
-
-class MemoryBIOTests(TestCase, _LoopbackMixin):
-    """
-    Tests for :py:obj:`OpenSSL.SSL.Connection` using a memory BIO.
-    """
-    def _server(self, sock):
-        """
-        Create a new server-side SSL :py:obj:`Connection` object wrapped around
-        :py:obj:`sock`.
-        """
-        # Create the server side Connection.  This is mostly setup boilerplate
-        # - use TLSv1, use a particular certificate, etc.
-        server_ctx = Context(TLSv1_METHOD)
-        server_ctx.set_options(OP_NO_SSLv2 | OP_NO_SSLv3 | OP_SINGLE_DH_USE)
-        server_ctx.set_verify(
-            VERIFY_PEER | VERIFY_FAIL_IF_NO_PEER_CERT | VERIFY_CLIENT_ONCE,
-            verify_cb
-        )
-        server_store = server_ctx.get_cert_store()
-        server_ctx.use_privatekey(
-            load_privatekey(FILETYPE_PEM, server_key_pem))
-        server_ctx.use_certificate(
-            load_certificate(FILETYPE_PEM, server_cert_pem))
-        server_ctx.check_privatekey()
-        server_store.add_cert(load_certificate(FILETYPE_PEM, root_cert_pem))
-        # Here the Connection is actually created.  If None is passed as the
-        # 2nd parameter, it indicates a memory BIO should be created.
-        server_conn = Connection(server_ctx, sock)
-        server_conn.set_accept_state()
-        return server_conn
-
-    def _client(self, sock):
-        """
-        Create a new client-side SSL :py:obj:`Connection` object wrapped around
-        :py:obj:`sock`.
-        """
-        # Now create the client side Connection.  Similar boilerplate to the
-        # above.
-        client_ctx = Context(TLSv1_METHOD)
-        client_ctx.set_options(OP_NO_SSLv2 | OP_NO_SSLv3 | OP_SINGLE_DH_USE)
-        client_ctx.set_verify(
-            VERIFY_PEER | VERIFY_FAIL_IF_NO_PEER_CERT | VERIFY_CLIENT_ONCE,
-            verify_cb
-        )
-        client_store = client_ctx.get_cert_store()
-        client_ctx.use_privatekey(
-            load_privatekey(FILETYPE_PEM, client_key_pem))
-        client_ctx.use_certificate(
-            load_certificate(FILETYPE_PEM, client_cert_pem))
-        client_ctx.check_privatekey()
-        client_store.add_cert(load_certificate(FILETYPE_PEM, root_cert_pem))
-        client_conn = Connection(client_ctx, sock)
-        client_conn.set_connect_state()
-        return client_conn
-
-    def test_memoryConnect(self):
-        """
-        Two :py:obj:`Connection`s which use memory BIOs can be manually
-        connected by reading from the output of each and writing those bytes to
-        the input of the other and in this way establish a connection and
-        exchange application-level bytes with each other.
-        """
-        server_conn = self._server(None)
-        client_conn = self._client(None)
-
-        # There should be no key or nonces yet.
-        self.assertIdentical(server_conn.master_key(), None)
-        self.assertIdentical(server_conn.client_random(), None)
-        self.assertIdentical(server_conn.server_random(), None)
-
-        # First, the handshake needs to happen.  We'll deliver bytes back and
-        # forth between the client and server until neither of them feels like
-        # speaking any more.
-        self.assertIdentical(
-            self._interactInMemory(client_conn, server_conn), None)
-
-        # Now that the handshake is done, there should be a key and nonces.
-        self.assertNotIdentical(server_conn.master_key(), None)
-        self.assertNotIdentical(server_conn.client_random(), None)
-        self.assertNotIdentical(server_conn.server_random(), None)
-        self.assertEquals(
-            server_conn.client_random(), client_conn.client_random())
-        self.assertEquals(
-            server_conn.server_random(), client_conn.server_random())
-        self.assertNotEquals(
-            server_conn.client_random(), server_conn.server_random())
-        self.assertNotEquals(
-            client_conn.client_random(), client_conn.server_random())
-
-        # Here are the bytes we'll try to send.
-        important_message = b'One if by land, two if by sea.'
-
-        server_conn.write(important_message)
-        self.assertEquals(
-            self._interactInMemory(client_conn, server_conn),
-            (client_conn, important_message))
-
-        client_conn.write(important_message[::-1])
-        self.assertEquals(
-            self._interactInMemory(client_conn, server_conn),
-            (server_conn, important_message[::-1]))
-
-    def test_socketConnect(self):
-        """
-        Just like :py:obj:`test_memoryConnect` but with an actual socket.
-
-        This is primarily to rule out the memory BIO code as the source of any
-        problems encountered while passing data over a :py:obj:`Connection` (if
-        this test fails, there must be a problem outside the memory BIO code,
-        as no memory BIO is involved here).  Even though this isn't a memory
-        BIO test, it's convenient to have it here.
-        """
-        server_conn, client_conn = self._loopback()
-
-        important_message = b"Help me Obi Wan Kenobi, you're my only hope."
-        client_conn.send(important_message)
-        msg = server_conn.recv(1024)
-        self.assertEqual(msg, important_message)
-
-        # Again in the other direction, just for fun.
-        important_message = important_message[::-1]
-        server_conn.send(important_message)
-        msg = client_conn.recv(1024)
-        self.assertEqual(msg, important_message)
-
-    def test_socketOverridesMemory(self):
-        """
-        Test that :py:obj:`OpenSSL.SSL.bio_read` and
-        :py:obj:`OpenSSL.SSL.bio_write` don't work on
-        :py:obj:`OpenSSL.SSL.Connection`() that use sockets.
-        """
-        context = Context(TLSv1_METHOD)
-        client = socket()
-        clientSSL = Connection(context, client)
-        self.assertRaises(TypeError, clientSSL.bio_read, 100)
-        self.assertRaises(TypeError, clientSSL.bio_write, "foo")
-        self.assertRaises(TypeError, clientSSL.bio_shutdown)
-
-    def test_outgoingOverflow(self):
-        """
-        If more bytes than can be written to the memory BIO are passed to
-        :py:obj:`Connection.send` at once, the number of bytes which were
-        written is returned and that many bytes from the beginning of the input
-        can be read from the other end of the connection.
-        """
-        server = self._server(None)
-        client = self._client(None)
-
-        self._interactInMemory(client, server)
-
-        size = 2 ** 15
-        sent = client.send(b"x" * size)
-        # Sanity check.  We're trying to test what happens when the entire
-        # input can't be sent.  If the entire input was sent, this test is
-        # meaningless.
-        self.assertTrue(sent < size)
-
-        receiver, received = self._interactInMemory(client, server)
-        self.assertIdentical(receiver, server)
-
-        # We can rely on all of these bytes being received at once because
-        # _loopback passes 2 ** 16 to recv - more than 2 ** 15.
-        self.assertEquals(len(received), sent)
-
-    def test_shutdown(self):
-        """
-        :py:obj:`Connection.bio_shutdown` signals the end of the data stream
-        from which the :py:obj:`Connection` reads.
-        """
-        server = self._server(None)
-        server.bio_shutdown()
-        e = self.assertRaises(Error, server.recv, 1024)
-        # We don't want WantReadError or ZeroReturnError or anything - it's a
-        # handshake failure.
-        assert type(e) in [Error, SysCallError]
-
-    def test_unexpectedEndOfFile(self):
-        """
-        If the connection is lost before an orderly SSL shutdown occurs,
-        :py:obj:`OpenSSL.SSL.SysCallError` is raised with a message of
-        "Unexpected EOF".
-        """
-        server_conn, client_conn = self._loopback()
-        client_conn.sock_shutdown(SHUT_RDWR)
-        exc = self.assertRaises(SysCallError, server_conn.recv, 1024)
-        self.assertEqual(exc.args, (-1, "Unexpected EOF"))
-
-    def _check_client_ca_list(self, func):
-        """
-        Verify the return value of the :py:obj:`get_client_ca_list` method for
-        server and client connections.
-
-        :param func: A function which will be called with the server context
-            before the client and server are connected to each other.  This
-            function should specify a list of CAs for the server to send to the
-            client and return that same list.  The list will be used to verify
-            that :py:obj:`get_client_ca_list` returns the proper value at
-            various times.
-        """
-        server = self._server(None)
-        client = self._client(None)
-        self.assertEqual(client.get_client_ca_list(), [])
-        self.assertEqual(server.get_client_ca_list(), [])
-        ctx = server.get_context()
-        expected = func(ctx)
-        self.assertEqual(client.get_client_ca_list(), [])
-        self.assertEqual(server.get_client_ca_list(), expected)
-        self._interactInMemory(client, server)
-        self.assertEqual(client.get_client_ca_list(), expected)
-        self.assertEqual(server.get_client_ca_list(), expected)
-
-    def test_set_client_ca_list_errors(self):
-        """
-        :py:obj:`Context.set_client_ca_list` raises a :py:obj:`TypeError` if
-        called with a non-list or a list that contains objects other than
-        X509Names.
-        """
-        ctx = Context(TLSv1_METHOD)
-        self.assertRaises(TypeError, ctx.set_client_ca_list, "spam")
-        self.assertRaises(TypeError, ctx.set_client_ca_list, ["spam"])
-        self.assertIdentical(ctx.set_client_ca_list([]), None)
-
-    def test_set_empty_ca_list(self):
-        """
-        If passed an empty list, :py:obj:`Context.set_client_ca_list`
-        configures the context to send no CA names to the client and, on both
-        the server and client sides, :py:obj:`Connection.get_client_ca_list`
-        returns an empty list after the connection is set up.
-        """
-        def no_ca(ctx):
-            ctx.set_client_ca_list([])
-            return []
-        self._check_client_ca_list(no_ca)
-
-    def test_set_one_ca_list(self):
-        """
-        If passed a list containing a single X509Name,
-        :py:obj:`Context.set_client_ca_list` configures the context to send
-        that CA name to the client and, on both the server and client sides,
-        :py:obj:`Connection.get_client_ca_list` returns a list containing that
-        X509Name after the connection is set up.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        cadesc = cacert.get_subject()
-
-        def single_ca(ctx):
-            ctx.set_client_ca_list([cadesc])
-            return [cadesc]
-        self._check_client_ca_list(single_ca)
-
-    def test_set_multiple_ca_list(self):
-        """
-        If passed a list containing multiple X509Name objects,
-        :py:obj:`Context.set_client_ca_list` configures the context to send
-        those CA names to the client and, on both the server and client sides,
-        :py:obj:`Connection.get_client_ca_list` returns a list containing those
-        X509Names after the connection is set up.
-        """
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        sedesc = secert.get_subject()
-        cldesc = clcert.get_subject()
-
-        def multiple_ca(ctx):
-            L = [sedesc, cldesc]
-            ctx.set_client_ca_list(L)
-            return L
-        self._check_client_ca_list(multiple_ca)
-
-    def test_reset_ca_list(self):
-        """
-        If called multiple times, only the X509Names passed to the final call
-        of :py:obj:`Context.set_client_ca_list` are used to configure the CA
-        names sent to the client.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        cadesc = cacert.get_subject()
-        sedesc = secert.get_subject()
-        cldesc = clcert.get_subject()
-
-        def changed_ca(ctx):
-            ctx.set_client_ca_list([sedesc, cldesc])
-            ctx.set_client_ca_list([cadesc])
-            return [cadesc]
-        self._check_client_ca_list(changed_ca)
-
-    def test_mutated_ca_list(self):
-        """
-        If the list passed to :py:obj:`Context.set_client_ca_list` is mutated
-        afterwards, this does not affect the list of CA names sent to the
-        client.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        cadesc = cacert.get_subject()
-        sedesc = secert.get_subject()
-
-        def mutated_ca(ctx):
-            L = [cadesc]
-            ctx.set_client_ca_list([cadesc])
-            L.append(sedesc)
-            return [cadesc]
-        self._check_client_ca_list(mutated_ca)
-
-    def test_add_client_ca_errors(self):
-        """
-        :py:obj:`Context.add_client_ca` raises :py:obj:`TypeError` if called
-        with a non-X509 object or with a number of arguments other than one.
-        """
-        ctx = Context(TLSv1_METHOD)
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        self.assertRaises(TypeError, ctx.add_client_ca)
-        self.assertRaises(TypeError, ctx.add_client_ca, "spam")
-        self.assertRaises(TypeError, ctx.add_client_ca, cacert, cacert)
-
-    def test_one_add_client_ca(self):
-        """
-        A certificate's subject can be added as a CA to be sent to the client
-        with :py:obj:`Context.add_client_ca`.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        cadesc = cacert.get_subject()
-
-        def single_ca(ctx):
-            ctx.add_client_ca(cacert)
-            return [cadesc]
-        self._check_client_ca_list(single_ca)
-
-    def test_multiple_add_client_ca(self):
-        """
-        Multiple CA names can be sent to the client by calling
-        :py:obj:`Context.add_client_ca` with multiple X509 objects.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        cadesc = cacert.get_subject()
-        sedesc = secert.get_subject()
-
-        def multiple_ca(ctx):
-            ctx.add_client_ca(cacert)
-            ctx.add_client_ca(secert)
-            return [cadesc, sedesc]
-        self._check_client_ca_list(multiple_ca)
-
-    def test_set_and_add_client_ca(self):
-        """
-        A call to :py:obj:`Context.set_client_ca_list` followed by a call to
-        :py:obj:`Context.add_client_ca` results in using the CA names from the
-        first call and the CA name from the second call.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        cadesc = cacert.get_subject()
-        sedesc = secert.get_subject()
-        cldesc = clcert.get_subject()
-
-        def mixed_set_add_ca(ctx):
-            ctx.set_client_ca_list([cadesc, sedesc])
-            ctx.add_client_ca(clcert)
-            return [cadesc, sedesc, cldesc]
-        self._check_client_ca_list(mixed_set_add_ca)
-
-    def test_set_after_add_client_ca(self):
-        """
-        A call to :py:obj:`Context.set_client_ca_list` after a call to
-        :py:obj:`Context.add_client_ca` replaces the CA name specified by the
-        former call with the names specified by the latter call.
-        """
-        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
-        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
-        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
-
-        cadesc = cacert.get_subject()
-        sedesc = secert.get_subject()
-
-        def set_replaces_add_ca(ctx):
-            ctx.add_client_ca(clcert)
-            ctx.set_client_ca_list([cadesc])
-            ctx.add_client_ca(secert)
-            return [cadesc, sedesc]
-        self._check_client_ca_list(set_replaces_add_ca)
-
-
-class TestConnection(object):
-    """
-    Tests for `Connection.bio_read` and `Connection.bio_write`.
-    """
     def test_wantReadError(self):
         """
         `Connection.bio_read` raises `OpenSSL.SSL.WantReadError` if there are
@@ -3664,7 +2647,886 @@ class TestConnection(object):
         assert 2 == len(data)
 
 
-class InfoConstantTests(TestCase):
+class TestConnectionGetCipherList(object):
+    """
+    Tests for `Connection.get_cipher_list`.
+    """
+    def test_result(self):
+        """
+        `Connection.get_cipher_list` returns a list of `bytes` giving the
+        names of the ciphers which might be used.
+        """
+        connection = Connection(Context(TLSv1_METHOD), None)
+        ciphers = connection.get_cipher_list()
+        assert isinstance(ciphers, list)
+        for cipher in ciphers:
+            assert isinstance(cipher, str)
+
+
+class VeryLarge(bytes):
+    """
+    Mock object so that we don't have to allocate 2**31 bytes
+    """
+    def __len__(self):
+        return 2**31
+
+
+class TestConnectionSend(object):
+    """
+    Tests for `Connection.send`.
+    """
+    def test_wrong_args(self):
+        """
+        When called with arguments other than string argument for its first
+        parameter, `Connection.send` raises `TypeError`.
+        """
+        connection = Connection(Context(TLSv1_METHOD), None)
+        with pytest.raises(TypeError):
+            connection.send(object())
+
+    def test_short_bytes(self):
+        """
+        When passed a short byte string, `Connection.send` transmits all of it
+        and returns the number of bytes sent.
+        """
+        server, client = loopback()
+        count = server.send(b'xy')
+        assert count == 2
+        assert client.recv(2) == b'xy'
+
+    def test_text(self):
+        """
+        When passed a text, `Connection.send` transmits all of it and
+        returns the number of bytes sent. It also raises a DeprecationWarning.
+        """
+        server, client = loopback()
+        with pytest.warns(DeprecationWarning) as w:
+            simplefilter("always")
+            count = server.send(b"xy".decode("ascii"))
+            assert (
+                "{0} for buf is no longer accepted, use bytes".format(
+                    WARNING_TYPE_EXPECTED
+                ) == str(w[-1].message))
+        assert count == 2
+        assert client.recv(2) == b'xy'
+
+    @skip_if_py26
+    def test_short_memoryview(self):
+        """
+        When passed a memoryview onto a small number of bytes,
+        `Connection.send` transmits all of them and returns the number
+        of bytes sent.
+        """
+        server, client = loopback()
+        count = server.send(memoryview(b'xy'))
+        assert count == 2
+        assert client.recv(2) == b'xy'
+
+    @skip_if_py3
+    def test_short_buffer(self):
+        """
+        When passed a buffer containing a small number of bytes,
+        `Connection.send` transmits all of them and returns the number
+        of bytes sent.
+        """
+        server, client = loopback()
+        count = server.send(buffer(b'xy'))
+        assert count == 2
+        assert client.recv(2) == b'xy'
+
+    @pytest.mark.skipif(
+        sys.maxsize < 2**31,
+        reason="sys.maxsize < 2**31 - test requires 64 bit"
+    )
+    def test_buf_too_large(self):
+        """
+        When passed a buffer containing >= 2**31 bytes,
+        `Connection.send` bails out as SSL_write only
+        accepts an int for the buffer length.
+        """
+        connection = Connection(Context(TLSv1_METHOD), None)
+        with pytest.raises(ValueError) as exc_info:
+            connection.send(VeryLarge())
+        exc_info.match(r"Cannot send more than .+ bytes at once")
+
+
+def _make_memoryview(size):
+    """
+    Create a new ``memoryview`` wrapped around a ``bytearray`` of the given
+    size.
+    """
+    return memoryview(bytearray(size))
+
+
+class TestConnectionRecvInto(object):
+    """
+    Tests for `Connection.recv_into`.
+    """
+    def _no_length_test(self, factory):
+        """
+        Assert that when the given buffer is passed to `Connection.recv_into`,
+        whatever bytes are available to be received that fit into that buffer
+        are written into that buffer.
+        """
+        output_buffer = factory(5)
+
+        server, client = loopback()
+        server.send(b'xy')
+
+        assert client.recv_into(output_buffer) == 2
+        assert output_buffer == bytearray(b'xy\x00\x00\x00')
+
+    def test_bytearray_no_length(self):
+        """
+        `Connection.recv_into` can be passed a `bytearray` instance and data
+        in the receive buffer is written to it.
+        """
+        self._no_length_test(bytearray)
+
+    def _respects_length_test(self, factory):
+        """
+        Assert that when the given buffer is passed to `Connection.recv_into`
+        along with a value for `nbytes` that is less than the size of that
+        buffer, only `nbytes` bytes are written into the buffer.
+        """
+        output_buffer = factory(10)
+
+        server, client = loopback()
+        server.send(b'abcdefghij')
+
+        assert client.recv_into(output_buffer, 5) == 5
+        assert output_buffer == bytearray(b'abcde\x00\x00\x00\x00\x00')
+
+    def test_bytearray_respects_length(self):
+        """
+        When called with a `bytearray` instance, `Connection.recv_into`
+        respects the `nbytes` parameter and doesn't copy in more than that
+        number of bytes.
+        """
+        self._respects_length_test(bytearray)
+
+    def _doesnt_overfill_test(self, factory):
+        """
+        Assert that if there are more bytes available to be read from the
+        receive buffer than would fit into the buffer passed to
+        `Connection.recv_into`, only as many as fit are written into it.
+        """
+        output_buffer = factory(5)
+
+        server, client = loopback()
+        server.send(b'abcdefghij')
+
+        assert client.recv_into(output_buffer) == 5
+        assert output_buffer == bytearray(b'abcde')
+        rest = client.recv(5)
+        assert b'fghij' == rest
+
+    def test_bytearray_doesnt_overfill(self):
+        """
+        When called with a `bytearray` instance, `Connection.recv_into`
+        respects the size of the array and doesn't write more bytes into it
+        than will fit.
+        """
+        self._doesnt_overfill_test(bytearray)
+
+    def test_bytearray_really_doesnt_overfill(self):
+        """
+        When called with a `bytearray` instance and an `nbytes` value that is
+        too large, `Connection.recv_into` respects the size of the array and
+        not the `nbytes` value and doesn't write more bytes into the buffer
+        than will fit.
+        """
+        self._doesnt_overfill_test(bytearray)
+
+    def test_peek(self):
+        server, client = loopback()
+        server.send(b'xy')
+
+        for _ in range(2):
+            output_buffer = bytearray(5)
+            assert client.recv_into(output_buffer, flags=MSG_PEEK) == 2
+            assert output_buffer == bytearray(b'xy\x00\x00\x00')
+
+    @skip_if_py26
+    def test_memoryview_no_length(self):
+        """
+        `Connection.recv_into` can be passed a `memoryview` instance and data
+        in the receive buffer is written to it.
+        """
+        self._no_length_test(_make_memoryview)
+
+    @skip_if_py26
+    def test_memoryview_respects_length(self):
+        """
+        When called with a `memoryview` instance, `Connection.recv_into`
+        respects the ``nbytes`` parameter and doesn't copy more than that
+        number of bytes in.
+        """
+        self._respects_length_test(_make_memoryview)
+
+    @skip_if_py26
+    def test_memoryview_doesnt_overfill(self):
+        """
+        When called with a `memoryview` instance, `Connection.recv_into`
+        respects the size of the array and doesn't write more bytes into it
+        than will fit.
+        """
+        self._doesnt_overfill_test(_make_memoryview)
+
+    @skip_if_py26
+    def test_memoryview_really_doesnt_overfill(self):
+        """
+        When called with a `memoryview` instance and an `nbytes` value that is
+        too large, `Connection.recv_into` respects the size of the array and
+        not the `nbytes` value and doesn't write more bytes into the buffer
+        than will fit.
+        """
+        self._doesnt_overfill_test(_make_memoryview)
+
+
+class TestConnectionSendall(object):
+    """
+    Tests for `Connection.sendall`.
+    """
+    def test_wrong_args(self):
+        """
+        When called with arguments other than a string argument for its first
+        parameter, `Connection.sendall` raises `TypeError`.
+        """
+        connection = Connection(Context(TLSv1_METHOD), None)
+        with pytest.raises(TypeError):
+            connection.sendall(object())
+
+    def test_short(self):
+        """
+        `Connection.sendall` transmits all of the bytes in the string
+        passed to it.
+        """
+        server, client = loopback()
+        server.sendall(b'x')
+        assert client.recv(1) == b'x'
+
+    def test_text(self):
+        """
+        `Connection.sendall` transmits all the content in the string passed
+        to it, raising a DeprecationWarning in case of this being a text.
+        """
+        server, client = loopback()
+        with pytest.warns(DeprecationWarning) as w:
+            simplefilter("always")
+            server.sendall(b"x".decode("ascii"))
+            assert (
+                "{0} for buf is no longer accepted, use bytes".format(
+                    WARNING_TYPE_EXPECTED
+                ) == str(w[-1].message))
+        assert client.recv(1) == b"x"
+
+    @skip_if_py26
+    def test_short_memoryview(self):
+        """
+        When passed a memoryview onto a small number of bytes,
+        `Connection.sendall` transmits all of them.
+        """
+        server, client = loopback()
+        server.sendall(memoryview(b'x'))
+        assert client.recv(1) == b'x'
+
+    @skip_if_py3
+    def test_short_buffers(self):
+        """
+        When passed a buffer containing a small number of bytes,
+        `Connection.sendall` transmits all of them.
+        """
+        server, client = loopback()
+        server.sendall(buffer(b'x'))
+        assert client.recv(1) == b'x'
+
+    def test_long(self):
+        """
+        `Connection.sendall` transmits all the bytes in the string passed to it
+        even if this requires multiple calls of an underlying write function.
+        """
+        server, client = loopback()
+        # Should be enough, underlying SSL_write should only do 16k at a time.
+        # On Windows, after 32k of bytes the write will block (forever
+        # - because no one is yet reading).
+        message = b'x' * (1024 * 32 - 1) + b'y'
+        server.sendall(message)
+        accum = []
+        received = 0
+        while received < len(message):
+            data = client.recv(1024)
+            accum.append(data)
+            received += len(data)
+        assert message == b''.join(accum)
+
+    def test_closed(self):
+        """
+        If the underlying socket is closed, `Connection.sendall` propagates the
+        write error from the low level write call.
+        """
+        server, client = loopback()
+        server.sock_shutdown(2)
+        with pytest.raises(SysCallError) as err:
+            server.sendall(b"hello, world")
+        if platform == "win32":
+            assert err.value.args[0] == ESHUTDOWN
+        else:
+            assert err.value.args[0] == EPIPE
+
+
+class TestConnectionRenegotiate(object):
+    """
+    Tests for SSL renegotiation APIs.
+    """
+    def test_total_renegotiations(self):
+        """
+        `Connection.total_renegotiations` returns `0` before any renegotiations
+        have happened.
+        """
+        connection = Connection(Context(TLSv1_METHOD), None)
+        assert connection.total_renegotiations() == 0
+
+    def test_renegotiate(self):
+        """
+        Go through a complete renegotiation cycle.
+        """
+        server, client = loopback()
+
+        server.send(b"hello world")
+
+        assert b"hello world" == client.recv(len(b"hello world"))
+
+        assert 0 == server.total_renegotiations()
+        assert False is server.renegotiate_pending()
+
+        assert True is server.renegotiate()
+
+        assert True is server.renegotiate_pending()
+
+        server.setblocking(False)
+        client.setblocking(False)
+
+        client.do_handshake()
+        server.do_handshake()
+
+        assert 1 == server.total_renegotiations()
+        while False is server.renegotiate_pending():
+            pass
+
+
+class TestError(object):
+    """
+    Unit tests for `OpenSSL.SSL.Error`.
+    """
+    def test_type(self):
+        """
+        `Error` is an exception type.
+        """
+        assert issubclass(Error, Exception)
+        assert Error.__name__ == 'Error'
+
+
+class TestConstants(object):
+    """
+    Tests for the values of constants exposed in `OpenSSL.SSL`.
+
+    These are values defined by OpenSSL intended only to be used as flags to
+    OpenSSL APIs.  The only assertions it seems can be made about them is
+    their values.
+    """
+    @pytest.mark.skipif(
+        OP_NO_QUERY_MTU is None,
+        reason="OP_NO_QUERY_MTU unavailable - OpenSSL version may be too old"
+    )
+    def test_op_no_query_mtu(self):
+        """
+        The value of `OpenSSL.SSL.OP_NO_QUERY_MTU` is 0x1000, the value
+        of `SSL_OP_NO_QUERY_MTU` defined by `openssl/ssl.h`.
+        """
+        assert OP_NO_QUERY_MTU == 0x1000
+
+    @pytest.mark.skipif(
+        OP_COOKIE_EXCHANGE is None,
+        reason="OP_COOKIE_EXCHANGE unavailable - "
+        "OpenSSL version may be too old"
+    )
+    def test_op_cookie_exchange(self):
+        """
+        The value of `OpenSSL.SSL.OP_COOKIE_EXCHANGE` is 0x2000, the
+        value of `SSL_OP_COOKIE_EXCHANGE` defined by `openssl/ssl.h`.
+        """
+        assert OP_COOKIE_EXCHANGE == 0x2000
+
+    @pytest.mark.skipif(
+        OP_NO_TICKET is None,
+        reason="OP_NO_TICKET unavailable - OpenSSL version may be too old"
+    )
+    def test_op_no_ticket(self):
+        """
+        The value of `OpenSSL.SSL.OP_NO_TICKET` is 0x4000, the value of
+        `SSL_OP_NO_TICKET` defined by `openssl/ssl.h`.
+        """
+        assert OP_NO_TICKET == 0x4000
+
+    @pytest.mark.skipif(
+        OP_NO_COMPRESSION is None,
+        reason="OP_NO_COMPRESSION unavailable - OpenSSL version may be too old"
+    )
+    def test_op_no_compression(self):
+        """
+        The value of `OpenSSL.SSL.OP_NO_COMPRESSION` is 0x20000, the
+        value of `SSL_OP_NO_COMPRESSION` defined by `openssl/ssl.h`.
+        """
+        assert OP_NO_COMPRESSION == 0x20000
+
+    def test_sess_cache_off(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_OFF` 0x0, the value of
+        `SSL_SESS_CACHE_OFF` defined by `openssl/ssl.h`.
+        """
+        assert 0x0 == SESS_CACHE_OFF
+
+    def test_sess_cache_client(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_CLIENT` 0x1, the value of
+        `SSL_SESS_CACHE_CLIENT` defined by `openssl/ssl.h`.
+        """
+        assert 0x1 == SESS_CACHE_CLIENT
+
+    def test_sess_cache_server(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_SERVER` 0x2, the value of
+        `SSL_SESS_CACHE_SERVER` defined by `openssl/ssl.h`.
+        """
+        assert 0x2 == SESS_CACHE_SERVER
+
+    def test_sess_cache_both(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_BOTH` 0x3, the value of
+        `SSL_SESS_CACHE_BOTH` defined by `openssl/ssl.h`.
+        """
+        assert 0x3 == SESS_CACHE_BOTH
+
+    def test_sess_cache_no_auto_clear(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_NO_AUTO_CLEAR` 0x80, the
+        value of `SSL_SESS_CACHE_NO_AUTO_CLEAR` defined by
+        `openssl/ssl.h`.
+        """
+        assert 0x80 == SESS_CACHE_NO_AUTO_CLEAR
+
+    def test_sess_cache_no_internal_lookup(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_NO_INTERNAL_LOOKUP` 0x100,
+        the value of `SSL_SESS_CACHE_NO_INTERNAL_LOOKUP` defined by
+        `openssl/ssl.h`.
+        """
+        assert 0x100 == SESS_CACHE_NO_INTERNAL_LOOKUP
+
+    def test_sess_cache_no_internal_store(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_NO_INTERNAL_STORE` 0x200,
+        the value of `SSL_SESS_CACHE_NO_INTERNAL_STORE` defined by
+        `openssl/ssl.h`.
+        """
+        assert 0x200 == SESS_CACHE_NO_INTERNAL_STORE
+
+    def test_sess_cache_no_internal(self):
+        """
+        The value of `OpenSSL.SSL.SESS_CACHE_NO_INTERNAL` 0x300, the
+        value of `SSL_SESS_CACHE_NO_INTERNAL` defined by
+        `openssl/ssl.h`.
+        """
+        assert 0x300 == SESS_CACHE_NO_INTERNAL
+
+
+class TestMemoryBIO(object):
+    """
+    Tests for `OpenSSL.SSL.Connection` using a memory BIO.
+    """
+    def _server(self, sock):
+        """
+        Create a new server-side SSL `Connection` object wrapped around `sock`.
+        """
+        # Create the server side Connection.  This is mostly setup boilerplate
+        # - use TLSv1, use a particular certificate, etc.
+        server_ctx = Context(TLSv1_METHOD)
+        server_ctx.set_options(OP_NO_SSLv2 | OP_NO_SSLv3 | OP_SINGLE_DH_USE)
+        server_ctx.set_verify(
+            VERIFY_PEER | VERIFY_FAIL_IF_NO_PEER_CERT | VERIFY_CLIENT_ONCE,
+            verify_cb
+        )
+        server_store = server_ctx.get_cert_store()
+        server_ctx.use_privatekey(
+            load_privatekey(FILETYPE_PEM, server_key_pem))
+        server_ctx.use_certificate(
+            load_certificate(FILETYPE_PEM, server_cert_pem))
+        server_ctx.check_privatekey()
+        server_store.add_cert(load_certificate(FILETYPE_PEM, root_cert_pem))
+        # Here the Connection is actually created.  If None is passed as the
+        # 2nd parameter, it indicates a memory BIO should be created.
+        server_conn = Connection(server_ctx, sock)
+        server_conn.set_accept_state()
+        return server_conn
+
+    def _client(self, sock):
+        """
+        Create a new client-side SSL `Connection` object wrapped around `sock`.
+        """
+        # Now create the client side Connection.  Similar boilerplate to the
+        # above.
+        client_ctx = Context(TLSv1_METHOD)
+        client_ctx.set_options(OP_NO_SSLv2 | OP_NO_SSLv3 | OP_SINGLE_DH_USE)
+        client_ctx.set_verify(
+            VERIFY_PEER | VERIFY_FAIL_IF_NO_PEER_CERT | VERIFY_CLIENT_ONCE,
+            verify_cb
+        )
+        client_store = client_ctx.get_cert_store()
+        client_ctx.use_privatekey(
+            load_privatekey(FILETYPE_PEM, client_key_pem))
+        client_ctx.use_certificate(
+            load_certificate(FILETYPE_PEM, client_cert_pem))
+        client_ctx.check_privatekey()
+        client_store.add_cert(load_certificate(FILETYPE_PEM, root_cert_pem))
+        client_conn = Connection(client_ctx, sock)
+        client_conn.set_connect_state()
+        return client_conn
+
+    def test_memory_connect(self):
+        """
+        Two `Connection`s which use memory BIOs can be manually connected by
+        reading from the output of each and writing those bytes to the input of
+        the other and in this way establish a connection and exchange
+        application-level bytes with each other.
+        """
+        server_conn = self._server(None)
+        client_conn = self._client(None)
+
+        # There should be no key or nonces yet.
+        assert server_conn.master_key() is None
+        assert server_conn.client_random() is None
+        assert server_conn.server_random() is None
+
+        # First, the handshake needs to happen.  We'll deliver bytes back and
+        # forth between the client and server until neither of them feels like
+        # speaking any more.
+        assert interact_in_memory(client_conn, server_conn) is None
+
+        # Now that the handshake is done, there should be a key and nonces.
+        assert server_conn.master_key() is not None
+        assert server_conn.client_random() is not None
+        assert server_conn.server_random() is not None
+        assert server_conn.client_random() == client_conn.client_random()
+        assert server_conn.server_random() == client_conn.server_random()
+        assert server_conn.client_random() != server_conn.server_random()
+        assert client_conn.client_random() != client_conn.server_random()
+
+        # Here are the bytes we'll try to send.
+        important_message = b'One if by land, two if by sea.'
+
+        server_conn.write(important_message)
+        assert (
+            interact_in_memory(client_conn, server_conn) ==
+            (client_conn, important_message))
+
+        client_conn.write(important_message[::-1])
+        assert (
+            interact_in_memory(client_conn, server_conn) ==
+            (server_conn, important_message[::-1]))
+
+    def test_socket_connect(self):
+        """
+        Just like `test_memory_connect` but with an actual socket.
+
+        This is primarily to rule out the memory BIO code as the source of any
+        problems encountered while passing data over a `Connection` (if
+        this test fails, there must be a problem outside the memory BIO code,
+        as no memory BIO is involved here).  Even though this isn't a memory
+        BIO test, it's convenient to have it here.
+        """
+        server_conn, client_conn = loopback()
+
+        important_message = b"Help me Obi Wan Kenobi, you're my only hope."
+        client_conn.send(important_message)
+        msg = server_conn.recv(1024)
+        assert msg == important_message
+
+        # Again in the other direction, just for fun.
+        important_message = important_message[::-1]
+        server_conn.send(important_message)
+        msg = client_conn.recv(1024)
+        assert msg == important_message
+
+    def test_socket_overrides_memory(self):
+        """
+        Test that `OpenSSL.SSL.bio_read` and `OpenSSL.SSL.bio_write` don't
+        work on `OpenSSL.SSL.Connection`() that use sockets.
+        """
+        context = Context(TLSv1_METHOD)
+        client = socket()
+        clientSSL = Connection(context, client)
+        with pytest.raises(TypeError):
+            clientSSL.bio_read(100)
+        with pytest.raises(TypeError):
+            clientSSL.bio_write("foo")
+        with pytest.raises(TypeError):
+            clientSSL.bio_shutdown()
+
+    def test_outgoing_overflow(self):
+        """
+        If more bytes than can be written to the memory BIO are passed to
+        `Connection.send` at once, the number of bytes which were written is
+        returned and that many bytes from the beginning of the input can be
+        read from the other end of the connection.
+        """
+        server = self._server(None)
+        client = self._client(None)
+
+        interact_in_memory(client, server)
+
+        size = 2 ** 15
+        sent = client.send(b"x" * size)
+        # Sanity check.  We're trying to test what happens when the entire
+        # input can't be sent.  If the entire input was sent, this test is
+        # meaningless.
+        assert sent < size
+
+        receiver, received = interact_in_memory(client, server)
+        assert receiver is server
+
+        # We can rely on all of these bytes being received at once because
+        # loopback passes 2 ** 16 to recv - more than 2 ** 15.
+        assert len(received) == sent
+
+    def test_shutdown(self):
+        """
+        `Connection.bio_shutdown` signals the end of the data stream
+        from which the `Connection` reads.
+        """
+        server = self._server(None)
+        server.bio_shutdown()
+        with pytest.raises(Error) as err:
+            server.recv(1024)
+        # We don't want WantReadError or ZeroReturnError or anything - it's a
+        # handshake failure.
+        assert type(err.value) in [Error, SysCallError]
+
+    def test_unexpected_EOF(self):
+        """
+        If the connection is lost before an orderly SSL shutdown occurs,
+        `OpenSSL.SSL.SysCallError` is raised with a message of
+        "Unexpected EOF".
+        """
+        server_conn, client_conn = loopback()
+        client_conn.sock_shutdown(SHUT_RDWR)
+        with pytest.raises(SysCallError) as err:
+            server_conn.recv(1024)
+        assert err.value.args == (-1, "Unexpected EOF")
+
+    def _check_client_ca_list(self, func):
+        """
+        Verify the return value of the `get_client_ca_list` method for
+        server and client connections.
+
+        :param func: A function which will be called with the server context
+            before the client and server are connected to each other.  This
+            function should specify a list of CAs for the server to send to the
+            client and return that same list.  The list will be used to verify
+            that `get_client_ca_list` returns the proper value at
+            various times.
+        """
+        server = self._server(None)
+        client = self._client(None)
+        assert client.get_client_ca_list() == []
+        assert server.get_client_ca_list() == []
+        ctx = server.get_context()
+        expected = func(ctx)
+        assert client.get_client_ca_list() == []
+        assert server.get_client_ca_list() == expected
+        interact_in_memory(client, server)
+        assert client.get_client_ca_list() == expected
+        assert server.get_client_ca_list() == expected
+
+    def test_set_client_ca_list_errors(self):
+        """
+        `Context.set_client_ca_list` raises a `TypeError` if called with a
+        non-list or a list that contains objects other than X509Names.
+        """
+        ctx = Context(TLSv1_METHOD)
+        with pytest.raises(TypeError):
+            ctx.set_client_ca_list("spam")
+        with pytest.raises(TypeError):
+            ctx.set_client_ca_list(["spam"])
+
+    def test_set_empty_ca_list(self):
+        """
+        If passed an empty list, `Context.set_client_ca_list` configures the
+        context to send no CA names to the client and, on both the server and
+        client sides, `Connection.get_client_ca_list` returns an empty list
+        after the connection is set up.
+        """
+        def no_ca(ctx):
+            ctx.set_client_ca_list([])
+            return []
+        self._check_client_ca_list(no_ca)
+
+    def test_set_one_ca_list(self):
+        """
+        If passed a list containing a single X509Name,
+        `Context.set_client_ca_list` configures the context to send
+        that CA name to the client and, on both the server and client sides,
+        `Connection.get_client_ca_list` returns a list containing that
+        X509Name after the connection is set up.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        cadesc = cacert.get_subject()
+
+        def single_ca(ctx):
+            ctx.set_client_ca_list([cadesc])
+            return [cadesc]
+        self._check_client_ca_list(single_ca)
+
+    def test_set_multiple_ca_list(self):
+        """
+        If passed a list containing multiple X509Name objects,
+        `Context.set_client_ca_list` configures the context to send
+        those CA names to the client and, on both the server and client sides,
+        `Connection.get_client_ca_list` returns a list containing those
+        X509Names after the connection is set up.
+        """
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        sedesc = secert.get_subject()
+        cldesc = clcert.get_subject()
+
+        def multiple_ca(ctx):
+            L = [sedesc, cldesc]
+            ctx.set_client_ca_list(L)
+            return L
+        self._check_client_ca_list(multiple_ca)
+
+    def test_reset_ca_list(self):
+        """
+        If called multiple times, only the X509Names passed to the final call
+        of `Context.set_client_ca_list` are used to configure the CA
+        names sent to the client.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        cadesc = cacert.get_subject()
+        sedesc = secert.get_subject()
+        cldesc = clcert.get_subject()
+
+        def changed_ca(ctx):
+            ctx.set_client_ca_list([sedesc, cldesc])
+            ctx.set_client_ca_list([cadesc])
+            return [cadesc]
+        self._check_client_ca_list(changed_ca)
+
+    def test_mutated_ca_list(self):
+        """
+        If the list passed to `Context.set_client_ca_list` is mutated
+        afterwards, this does not affect the list of CA names sent to the
+        client.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        cadesc = cacert.get_subject()
+        sedesc = secert.get_subject()
+
+        def mutated_ca(ctx):
+            L = [cadesc]
+            ctx.set_client_ca_list([cadesc])
+            L.append(sedesc)
+            return [cadesc]
+        self._check_client_ca_list(mutated_ca)
+
+    def test_add_client_ca_wrong_args(self):
+        """
+        `Context.add_client_ca` raises `TypeError` if called with
+        a non-X509 object.
+        """
+        ctx = Context(TLSv1_METHOD)
+        with pytest.raises(TypeError):
+            ctx.add_client_ca("spam")
+
+    def test_one_add_client_ca(self):
+        """
+        A certificate's subject can be added as a CA to be sent to the client
+        with `Context.add_client_ca`.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        cadesc = cacert.get_subject()
+
+        def single_ca(ctx):
+            ctx.add_client_ca(cacert)
+            return [cadesc]
+        self._check_client_ca_list(single_ca)
+
+    def test_multiple_add_client_ca(self):
+        """
+        Multiple CA names can be sent to the client by calling
+        `Context.add_client_ca` with multiple X509 objects.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        cadesc = cacert.get_subject()
+        sedesc = secert.get_subject()
+
+        def multiple_ca(ctx):
+            ctx.add_client_ca(cacert)
+            ctx.add_client_ca(secert)
+            return [cadesc, sedesc]
+        self._check_client_ca_list(multiple_ca)
+
+    def test_set_and_add_client_ca(self):
+        """
+        A call to `Context.set_client_ca_list` followed by a call to
+        `Context.add_client_ca` results in using the CA names from the
+        first call and the CA name from the second call.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        cadesc = cacert.get_subject()
+        sedesc = secert.get_subject()
+        cldesc = clcert.get_subject()
+
+        def mixed_set_add_ca(ctx):
+            ctx.set_client_ca_list([cadesc, sedesc])
+            ctx.add_client_ca(clcert)
+            return [cadesc, sedesc, cldesc]
+        self._check_client_ca_list(mixed_set_add_ca)
+
+    def test_set_after_add_client_ca(self):
+        """
+        A call to `Context.set_client_ca_list` after a call to
+        `Context.add_client_ca` replaces the CA name specified by the
+        former call with the names specified by the latter call.
+        """
+        cacert = load_certificate(FILETYPE_PEM, root_cert_pem)
+        secert = load_certificate(FILETYPE_PEM, server_cert_pem)
+        clcert = load_certificate(FILETYPE_PEM, server_cert_pem)
+
+        cadesc = cacert.get_subject()
+        sedesc = secert.get_subject()
+
+        def set_replaces_add_ca(ctx):
+            ctx.add_client_ca(clcert)
+            ctx.set_client_ca_list([cadesc])
+            ctx.add_client_ca(secert)
+            return [cadesc, sedesc]
+        self._check_client_ca_list(set_replaces_add_ca)
+
+
+class TestInfoConstants(object):
     """
     Tests for assorted constants exposed for use in info callbacks.
     """
@@ -3733,7 +3595,7 @@ class TestRequires(object):
         assert results == []
 
 
-class TestOCSP(_LoopbackMixin):
+class TestOCSP(object):
     """
     Tests for PyOpenSSL's OCSP stapling support.
     """
@@ -3790,7 +3652,7 @@ class TestOCSP(_LoopbackMixin):
             callback=ocsp_callback, data=None, request_ocsp=False
         )
         server = self._server_connection(callback=ocsp_callback, data=None)
-        self._handshakeInMemory(client, server)
+        handshake_in_memory(client, server)
 
         assert not called
 
@@ -3806,8 +3668,8 @@ class TestOCSP(_LoopbackMixin):
             return True
 
         client = self._client_connection(callback=ocsp_callback, data=None)
-        server = self._loopbackServerFactory(socket=None)
-        self._handshakeInMemory(client, server)
+        server = loopback_server_factory(socket=None)
+        handshake_in_memory(client, server)
 
         assert len(called) == 1
         assert called[0] == b''
@@ -3827,7 +3689,7 @@ class TestOCSP(_LoopbackMixin):
 
         client = self._client_connection(callback=client_callback, data=None)
         server = self._server_connection(callback=server_callback, data=None)
-        self._handshakeInMemory(client, server)
+        handshake_in_memory(client, server)
 
         assert len(calls) == 1
         assert calls[0] == self.sample_ocsp_data
@@ -3849,7 +3711,7 @@ class TestOCSP(_LoopbackMixin):
 
         client = self._client_connection(callback=client_callback, data=None)
         server = self._server_connection(callback=server_callback, data=None)
-        self._handshakeInMemory(client, server)
+        handshake_in_memory(client, server)
 
         assert len(client_calls) == 1
         assert len(server_calls) == 1
@@ -3879,7 +3741,7 @@ class TestOCSP(_LoopbackMixin):
         server = self._server_connection(
             callback=server_callback, data=sentinel
         )
-        self._handshakeInMemory(client, server)
+        handshake_in_memory(client, server)
 
         assert len(calls) == 2
         assert calls[0][-1] is sentinel
@@ -3901,7 +3763,7 @@ class TestOCSP(_LoopbackMixin):
 
         client = self._client_connection(callback=client_callback, data=None)
         server = self._server_connection(callback=server_callback, data=None)
-        self._handshakeInMemory(client, server)
+        handshake_in_memory(client, server)
 
         assert len(client_calls) == 1
         assert client_calls[0] == b''
@@ -3920,7 +3782,7 @@ class TestOCSP(_LoopbackMixin):
         server = self._server_connection(callback=server_callback, data=None)
 
         with pytest.raises(Error):
-            self._handshakeInMemory(client, server)
+            handshake_in_memory(client, server)
 
     def test_exceptions_in_client_bubble_up(self):
         """
@@ -3939,7 +3801,7 @@ class TestOCSP(_LoopbackMixin):
         server = self._server_connection(callback=server_callback, data=None)
 
         with pytest.raises(SentinelException):
-            self._handshakeInMemory(client, server)
+            handshake_in_memory(client, server)
 
     def test_exceptions_in_server_bubble_up(self):
         """
@@ -3958,7 +3820,7 @@ class TestOCSP(_LoopbackMixin):
         server = self._server_connection(callback=server_callback, data=None)
 
         with pytest.raises(SentinelException):
-            self._handshakeInMemory(client, server)
+            handshake_in_memory(client, server)
 
     def test_server_must_return_bytes(self):
         """
@@ -3974,4 +3836,4 @@ class TestOCSP(_LoopbackMixin):
         server = self._server_connection(callback=server_callback, data=None)
 
         with pytest.raises(TypeError):
-            self._handshakeInMemory(client, server)
+            handshake_in_memory(client, server)

@@ -19,10 +19,9 @@ from wbs import LazyDictionary
 from wbs import ReportableError
 from wbs import SchemaDatabase
 
+from gridlinker.ansible.misc import *;
 from gridlinker.certificate.authority import CertificateAuthority
-
 from gridlinker.core.inventory import Inventory
-
 from gridlinker.etcd import GenericCollection
 from gridlinker.etcd import EtcdClient
 
@@ -35,6 +34,25 @@ class GenericContext (object):
 		self.project_metadata = project_metadata
 
 		self.trace = False
+
+	@lazy_property
+	def project_metadata_stripped (self):
+
+		return dict ([
+			(section_name, ansible_escape (section_data))
+			for section_name, section_data
+			in self.project_metadata.items ()
+		])
+
+	@lazy_property
+	def project_globals (self):
+
+		return self.local_data ["globals"]
+
+	@lazy_property
+	def project_defaults (self):
+
+		return self.local_data ["defaults"]
 
 	@lazy_property
 	def config (self):
