@@ -1,6 +1,0 @@
----
-
-- include: "wait-for-ssh.yml"
-  tags: [ "ssh", "wait-for-ssh" ]
-
-# ex: et ts=2 filetype=yaml

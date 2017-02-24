@@ -1,6 +1,0 @@
----
-
-- include: "setup-ssh-server.yml"
-  tags: [ "ssh", "setup-ssh-server" ]
-
-# ex: et ts=2 filetype=yaml

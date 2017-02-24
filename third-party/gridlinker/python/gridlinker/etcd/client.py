@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import codecs
 import collections
 import httplib
 import itertools
@@ -11,10 +12,13 @@ import os
 import random
 import re
 import ssl
+import threading
 import time
 import urllib
 import wbs
 
+from wbs import log
+from wbs import uprint
 from wbs import yamlx
 
 __all__ = [
@@ -33,11 +37,13 @@ class EtcdClient:
 		"client_cert",
 		"client_key",
 		"prefix",
+		"cache_path",
 
 		"connection",
-		"ssl_context",
-		"server_url",
 		"pid",
+		"modified_index",
+		"cache_metadata",
+		"watch_thread",
 
 	]
 
@@ -50,6 +56,7 @@ class EtcdClient:
 		client_cert = None,
 		client_key = None,
 		prefix = "",
+		cache_path = None,
 	):
 
 		self.servers = servers
@@ -59,56 +66,207 @@ class EtcdClient:
 		self.client_cert = client_cert
 		self.client_key = client_key
 		self.prefix = prefix
+		self.cache_path = cache_path
 
-		self.connection = None
+		self.connection = threading.local ()
+		self.connection.value = None
+		self.connection.ssl_context = None
+		self.connection.servers = list (self.servers)
+
 		self.pid = None
 
-		random.shuffle (self.servers)
+		random.shuffle (self.connection.servers)
 
 		if self.secure:
 
-			self.server_url = "https://%s:%s" % (self.servers [0], self.port)
+			self.connection.server_url = (
+				"https://%s:%s" % (
+					self.connection.servers [0],
+					self.port))
 
 			if hasattr (ssl, "SSLContext"):
 
-				self.ssl_context = ssl.SSLContext (
+				self.connection.ssl_context = ssl.SSLContext (
 					ssl.PROTOCOL_TLSv1_2)
 
-				self.ssl_context.verify_mode = ssl.CERT_REQUIRED
-				self.ssl_context.check_hostname = False
+				self.connection.ssl_context.verify_mode = ssl.CERT_REQUIRED
+				self.connection.ssl_context.check_hostname = False
 
-				self.ssl_context.load_verify_locations (
+				self.connection.ssl_context.load_verify_locations (
 					cafile = self.client_ca_cert)
 
 			else:
 
-				self.ssl_context = None
+				self.connection.ssl_context = None
 
 		else:
 
-			self.server_url = "http://%s:%s" % (self.servers [0], self.port)
+			self.connection.server_url = (
+				"http://%s:%s" % (
+					self.connection.servers [0],
+					self.port))
+
+		if self.cache_path:
+
+			self.init_cache ()
+
+	def init_cache (self):
+
+		if not os.path.exists (
+			self.cache_path):
+
+			os.mkdir (
+				self.cache_path)
+
+		if os.path.exists (
+			"%s/metadata" % self.cache_path):
+
+			self.cache_metadata = (
+				yamlx.load_data (
+					"%s/metadata" % self.cache_path))
+
+			self.modified_index = int (
+				self.cache_metadata ["modified-index"])
+
+		else:
+
+			with log.status (
+				"Priming etcd cache",
+			) as log_status:
+
+				result, data, modified_index = (
+					self.make_request (
+						method = "GET",
+						url = self.key_url (""),
+						query_data = {
+							"recursive": "true",
+						},
+						accept_response = [ 200 ]))
+
+			self.cache_metadata = {
+				"nodes": {},
+			}
+
+			self.update_cache (
+				data ["node"],
+				"")
+
+			self.modified_index = (
+				modified_index)
+
+			self.write_cache_metadata ()
+
+		self.watch_thread = (
+			threading.Thread (
+				target = self.watch_thread))
+
+		self.watch_thread.daemon = True
+
+		self.watch_thread.start ()
+
+	def write_cache_metadata (self):
+
+		self.cache_metadata ["modified-index"] = (
+			unicode (self.modified_index))
+
+		with open ("%s/metadata.temp" % self.cache_path, "w") \
+		as file_handle:
+
+			file_handle.write (
+				yamlx.encode (
+					None,
+					self.cache_metadata))
+
+		os.rename (
+			"%s/metadata.temp" % self.cache_path,
+			"%s/metadata" % self.cache_path)
+
+	def watch_thread (self):
+
+		self.connection.value = None
+		self.connection.ssl_context = None
+		self.connection.servers = list (self.servers)
+
+		while True:
+
+			result, data, modified_index = (
+				self.make_request (
+					method = "GET",
+					url = self.key_url (""),
+					query_data = {
+						"recursive": "true",
+						"wait": "true",
+						"waitIndex": unicode (self.modified_index + 1),
+					},
+					accept_response = [ 200 ]))
+
+			log.output (
+				yamlx.encode (None, data))
+
+			self.cache_metadata ["modified-index"] = (
+				modified_index)
+
+			self.update_cache (
+				data ["node"],
+				"")
+
+	def update_cache (self, data, prefix):
+
+		if data.get ("dir"):
+
+			for node in data.get ("nodes", []):
+
+				self.update_cache (
+					node,
+					data ["key"])
+
+		else:
+
+			self.cache_metadata ["nodes"] [data ["key"]] = (
+				data ["modifiedIndex"])
+
+			node_cache_path = (
+				"%s/data%s" % (
+					self.cache_path,
+					data ["key"]))
+
+			node_cache_dir_path = (
+				os.path.dirname (
+					node_cache_path))
+
+			if not os.path.isdir (
+				node_cache_dir_path):
+
+				os.makedirs (
+					node_cache_dir_path)
+
+			with codecs.open (node_cache_path, "w", encoding = "utf-8") \
+			as file_handle:
+
+				file_handle.write (
+					data ["value"])
 
 	def get_connection (self):
 
-		if os.getpid () == self.pid and self.connection:
-			return self.connection
+		if os.getpid () == self.pid and self.connection.value:
+			return self.connection.value
 
 		if self.secure:
 
-			if self.ssl_context:
+			if self.connection.ssl_context:
 
 				connection = httplib.HTTPSConnection (
-					host = self.servers [0],
+					host = self.connection.servers [0],
 					port = self.port,
 					key_file = self.client_key,
 					cert_file = self.client_cert,
-					context = self.ssl_context,
+					context = self.connection.ssl_context,
 					timeout = 4)
 
 			else:
 
 				connection = httplib.HTTPSConnection (
-					host = self.servers [0],
+					host = self.connection.servers [0],
 					port = self.port,
 					key_file = self.client_key,
 					cert_file = self.client_cert,
@@ -116,7 +274,7 @@ class EtcdClient:
 
 			connection.connect ()
 
-			if self.ssl_context:
+			if self.connection.ssl_context:
 
 				peer_certificate = connection.sock.getpeercert ()
 				peer_alt_names = peer_certificate ["subjectAltName"]
@@ -125,11 +283,11 @@ class EtcdClient:
 
 				if re.match (
 					r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$",
-					self.servers [0]):
+					self.connection.servers [0]):
 
 					# match ip addresses with custom code
 
-					if not self.servers [0] in [
+					if not self.connection.servers [0] in [
 						alt_value
 						for alt_type, alt_value in peer_alt_names
 						if alt_type == 'IP Address'
@@ -137,7 +295,7 @@ class EtcdClient:
 
 						raise Exception ("".join ([
 							"Etcd server certificate failed to match IP address ",
-							"'%s'" % self.servers [0],
+							"'%s'" % self.connection.servers [0],
 						]))
 
 				else:
@@ -146,23 +304,23 @@ class EtcdClient:
 
 					ssl.match_hostname (
 						peer_certificate,
-						self.servers [0])
+						self.connection.servers [0])
 
-			self.connection = connection
+			self.connection.value = connection
 
 		else:
 
 			connection = httplib.HTTPConnection (
-				host = self.servers [0],
+				host = self.connection.servers [0],
 				port = self.port)
 
 			connection.connect ()
 
-			self.connection = connection
+			self.connection.value = connection
 
 		self.pid = os.getpid ()
 
-		return self.connection
+		return self.connection.value
 
 	def key_url (self, key):
 
@@ -173,10 +331,11 @@ class EtcdClient:
 
 	def exists (self, key):
 
-		result, _ = self.make_request (
-			method = "GET",
-			url = self.key_url (key),
-			accept_response = [ 200, 404 ])
+		result, data, modified_index = (
+			self.make_request (
+				method = "GET",
+				url = self.key_url (key),
+				accept_response = [ 200, 404 ]))
 
 		if result == 200:
 			return True
@@ -188,7 +347,7 @@ class EtcdClient:
 
 	def get_raw_item (self, key):
 
-		result, data = (
+		result, data, modified_index = (
 			self.make_request (
 				method = "GET",
 				url = self.key_url (key),
@@ -205,7 +364,7 @@ class EtcdClient:
 
 	def get_raw (self, key):
 
-		result, data = self.make_request (
+		result, data, modified_index = self.make_request (
 			method = "GET",
 			url = self.key_url (key),
 			accept_response = [ 200, 404 ])
@@ -219,7 +378,7 @@ class EtcdClient:
 
 	def get_raw_or_none (self, key):
 
-		result, data = (
+		result, data, modified_index = (
 			self.make_request (
 				method = "GET",
 				url = self.key_url (key),
@@ -233,7 +392,7 @@ class EtcdClient:
 
 	def set_raw_if_not_modified (self, key, value, index):
 
-		result, data = (
+		result, data, modified_index = (
 			self.make_request (
 				method = "PUT",
 				url = self.key_url (key),
@@ -263,12 +422,12 @@ class EtcdClient:
 
 			except (httplib.HTTPException, IOError):
 
-				if self.connection:
+				if self.connection.value:
 
-					self.connection.close ()
-					self.connection = None
+					self.connection.value.close ()
+					self.connection.value = None
 
-				random.shuffle (self.servers)
+				random.shuffle (self.connection.servers)
 
 				time.sleep (1)
 
@@ -343,12 +502,14 @@ class EtcdClient:
 			return (
 				response.status,
 				json.loads (response_bytes.decode ("utf-8")),
+				response.getheader ("X-Etcd-Index"),
 			)
 
 		else:
 
 			return (
 				response.status,
+				None,
 				None,
 			)
 
@@ -365,14 +526,15 @@ class EtcdClient:
 
 	def create_raw (self, key, value):
 
-		status, data = self.make_request (
-			method = "PUT",
-			url = self.key_url (key),
-			payload_data = {
-				"value": value,
-				"prevExist": "false",
-			},
-			accept_response = [ 201, 412 ])
+		status, data, modified_index = (
+			self.make_request (
+				method = "PUT",
+				url = self.key_url (key),
+				payload_data = {
+					"value": value,
+					"prevExist": "false",
+				},
+				accept_response = [ 201, 412 ]))
 
 		if status == 412:
 
@@ -390,13 +552,14 @@ class EtcdClient:
 
 	def get_tree (self, key):
 
-		status, data = self.make_request (
-			method = "GET",
-			url = self.key_url (key),
-			query_data = {
-				"recursive": "true",
-			},
-			accept_response = [ 200, 201, 404 ])
+		status, data, modified_index = (
+			self.make_request (
+				method = "GET",
+				url = self.key_url (key),
+				query_data = {
+					"recursive": "true",
+				},
+				accept_response = [ 200, 201, 404 ]))
 
 		if status == 404:
 			return []
@@ -463,13 +626,14 @@ class EtcdClient:
 
 	def mkdir_queue (self, key):
 
-		status, data = self.make_request (
-			method = "POST",
-			url = self.key_url (key),
-			query_data = {
-				"dir": "true",
-			},
-			accept_response = [ 201 ])
+		status, data, modified_index = (
+			self.make_request (
+				method = "POST",
+				url = self.key_url (key),
+				query_data = {
+					"dir": "true",
+				},
+				accept_response = [ 201 ]))
 
 		return (
 			data ["node"] ["key"] [len (self.prefix) : ],
@@ -516,10 +680,11 @@ class EtcdClient:
 
 	def ls (self, key):
 
-		status, data = self.make_request (
-			method = "GET",
-			url = self.key_url (key),
-			accept_response = [ 200 ])
+		status, data, modified_index = (
+			self.make_request (
+				method = "GET",
+				url = self.key_url (key),
+				accept_response = [ 200 ]))
 
 		if not "nodes" in data ["node"]:
 			raise Exception ()

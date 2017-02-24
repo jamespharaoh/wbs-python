@@ -1,0 +1,233 @@
+---
+
+- set_fact:
+
+    website_name: "{{ item }}"
+
+    website: "{{
+      hostvars
+        [inventory_hostname]
+        [wordpress_server_websites_mapping]
+        [item]
+    }}"
+
+- name: "wordpress webserver setup database create"
+  tags: "config"
+  action:
+
+    module: "mysql_db"
+    login_user: "root"
+    login_password: "{{ mysql_root_password }}"
+    name: "{{ website.database_name }}"
+
+- name: "wordpress webserver setup database user create"
+  tags: "config"
+  action:
+
+    module: "mysql_user"
+    name: "{{ website.database_user }}"
+    password: "{{ website.database_password }}"
+    update_password: "always"
+    priv: "{{ website.database_name }}.*:ALL"
+    host: "%"
+
+- name: "wordpress webserver setup nginx site create"
+  tags: "config"
+  register: "wordpress_webserver_setup_nginx_site_create"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ [
+      nginx_installed_prefix,
+      '/conf/sites/',
+      wordpress_server_prefix,
+      '-',
+      website_name,
+      '.conf',
+    ] | join }}"
+    src: "wordpress-webserver-nginx-site"
+
+- name: "set nginx.needs_restart to 'yes'"
+  when: "wordpress_webserver_setup_nginx_site_create | changed"
+  update_resource:
+
+    nginx.need_restart: "yes"
+
+- name: "wordpress webserver setup nginx restart"
+  when: "nginx.state == 'enabled' and nginx.needs_restart == 'yes'"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "nginx"
+    state: "restarted"
+
+- name: "set nginx.needs_restart to 'no'"
+  update_resource:
+
+    nginx.needs_restart: "no"
+
+- name: "create directory"
+  tags: "deploy"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ website.path }}"
+    state: "directory"
+    owner: "ubuntu"
+    group: "www-data"
+    mode: "0755"
+
+- name: "deploy code"
+  tags: "deploy"
+  action:
+
+    module: "git"
+    dest: "{{ website.path }}"
+    repo: "{{ website.source_repository }}"
+    version: "{{ website.source_branch }}"
+
+- name: "create wp-config.php"
+  tags: "config"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ website.path }}/wp-config.php"
+    src: "wordpress-webserver-wp-config"
+
+    owner: "ubuntu"
+    group: "www-data"
+    mode: "0640"
+
+- name: "fix database urls"
+  tags: "data"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    mysql "{{ website.database_name }}" --execute "
+
+      UPDATE wp_options
+      SET option_value = '{{ website.url }}'
+      WHERE option_name IN (
+        'home',
+        'siteurl'
+      );
+
+    " || true;
+
+- name: "fix database emails"
+  tags: "data"
+  args:
+    executable: "/bin/bash"
+  shell:
+
+    set -euf -o pipefail;
+
+    mysql "{{ website.database_name }}" --execute "
+
+      UPDATE wp_options
+      SET option_value = '{{ website.email }}'
+      WHERE option_name IN (
+        'admin_email',
+        'woocommerce_stock_email_recipient',
+        'woocommerce_email_from_address'
+      );
+
+    " || true;
+
+- name: "fix main permissions"
+  tags: "perms"
+  become: "yes"
+  shell:
+
+    set -e;
+
+    cd {{ website.path }};
+
+    mkdir -p {{ []
+      | union (website.create_directories)
+      | join (' ')
+    }};
+
+    find . \( {{ []
+      | union (website.private_paths)
+      | union (website.web_paths)
+      | prepend_list ('-name ')
+      | join (' ')
+    }} \) -prune -o \(
+      -user ubuntu
+      -group www-data
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chown ubuntu:www-data;
+
+    find . \( {{ []
+      | union (website.private_paths)
+      | union (website.web_paths)
+      | prepend_list ('-name ')
+      | join (' ')
+    }} \) -prune -o \(
+      ! -type f
+    \) -o \(
+      -perm 0640
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chmod 0640;
+
+    find . \( {{ []
+      | union (website.private_paths)
+      | union (website.web_paths)
+      | prepend_list ('-name ')
+      | join (' ')
+    }} \) -prune -o \(
+      ! -type d
+    \) -o \(
+      -perm 0750
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chmod 0750;
+
+- name: "fix dynamic permissions"
+  tags: "perms"
+  become: "yes"
+  shell:
+
+    set -e;
+
+    cd {{ website.path }};
+
+    find ./{{ website.web_paths | join (' ./') }}
+    \(
+      -user www-data
+      -group ubuntu
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chown www-data:ubuntu;
+
+    find ./{{ website.web_paths | join (' ./') }}
+    \(
+      ! -type f
+    \) -o \(
+      -perm 0660
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chmod 0660;
+
+    find ./{{ website.web_paths | join (' ./') }}
+    \(
+      ! -type d
+    \) -o \(
+      -perm 0770
+    \) -o -print0
+    | xargs --null --no-run-if-empty
+    chmod 0770;
+
+# ex: et ts=2 filetype=yaml

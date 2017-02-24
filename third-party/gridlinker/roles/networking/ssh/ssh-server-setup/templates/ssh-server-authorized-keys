@@ -29,6 +29,16 @@
 
 		{%- endif -%}
 
+	{%- elif ssh_key is sequence and ssh_key [0] is string -%}
+
+		{%- print ssh_key | join, '\n' -%}
+
+	{%- elif ssh_key is sequence -%}
+
+		{%- for child in ssh_key -%}
+			{%- print do_key (child) -%}
+		{%- endfor -%}
+
 	{%- else -%}
 
 		{%- print ssh_key, '\n' -%}

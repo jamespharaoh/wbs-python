@@ -21,11 +21,11 @@ python_mirror: "https://www.python.org/ftp/python"
 python_default: "yes"
 
 python_temp: "/tmp/python-install"
-python_target: "/opt/python-{{ python_version }}"
+python_target: "/opt/python-{{ python_install_version }}"
 
-python_name: "Python-{{ python_version }}"
+python_name: "Python-{{ python_install_version }}"
 python_archive: "{{ python_name }}.tar.xz"
-python_url: "{{ python_mirror }}/{{ python_version }}/{{ python_archive }}"
+python_url: "{{ python_mirror }}/{{ python_install_version }}/{{ python_archive }}"
 
 python_pip_mirror: "https://bootstrap.pypa.io/"
 

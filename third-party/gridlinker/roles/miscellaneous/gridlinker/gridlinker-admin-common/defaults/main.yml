@@ -54,7 +54,7 @@ gridlinker_admin_credentials:
 # ---------- installation
 
 gridlinker_admin_name: "{{ NAME }}"
-gridlinker_admin_repository: "{{ METADATA.project.repository }}"
+gridlinker_admin_repository: "{{ PROJECT.repository }}"
 gridlinker_admin_branch: "master"
 gridlinker_admin_target: "/home/ubuntu/{{ gridlinker_admin_name }}"
 

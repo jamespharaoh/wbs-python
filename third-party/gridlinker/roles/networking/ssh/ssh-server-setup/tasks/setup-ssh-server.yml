@@ -1,13 +1,22 @@
 ---
 
-- name: "configure ssh daemon"
-  notify: "restart sshd"
+- name: "ssh server setup sshd config create"
+  register: "ssh_server_setup_sshd_config_create"
   become: "yes"
   action:
 
     module: "template"
     src: "ssh-server-sshd-config"
     dest: "/etc/ssh/sshd_config"
+
+- name: "ssh server setup sshd restart"
+  when: "ssh_server_setup_sshd_config_create | changed"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "ssh"
+    state: "restarted"
 
 - name: "create root ssh directory"
   become: "yes"
