@@ -43,10 +43,10 @@
   deployment: "everest"
 
 - network: "10.158"
-  deployment: "k2"
+  deployment: "test-2-k2"
 
 - network: "10.159"
-  deployment: "montblanc"
+  deployment: "test-2-montblanc"
 
 - network: "10.160"
   deployment: "jenkins-0"
@@ -67,7 +67,7 @@
   deployment: "erebus"
 
 - network: "10.166"
-  deployment: "fitzroy"
+  deployment: "test-2-fitzroy"
 
 - network: "10.167"
   deployment: "chuggington"
@@ -137,5 +137,8 @@
 
 - network: "10.189"
   deployment: "test-2-snowdon"
+
+- network: "10.190"
+  misc: "jenkins-lxc"
 
 # ex: et ts=2 filetype=yaml
