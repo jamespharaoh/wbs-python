@@ -1,6 +1,7 @@
 ---
 
 - name: "run build steps"
+  when: "deployment_mode == 'vagrant'"
   with_items: "{{ devenv_checkouts }}"
   args:
 
@@ -8,5 +9,20 @@
     chdir: "{{ deployment_home }}/{{ item.name }}"
 
   shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
+
+- name: "run build steps"
+  when: "deployment_mode == 'jenkins'"
+  with_items: "{{ devenv_checkouts }}"
+  args:
+
+    executable: "/bin/bash"
+    chdir: "{{ deployment_home }}/{{ item.name }}"
+
+  shell: "{{
+    item.build_steps
+      | default (['true'])
+      | prepend_list ('ssh 10.190.0.2 bash -c \'cd {{ deployment_home }}/{{ item.name }} && ')
+      | join (' && \'')
+  }}"
 
 # ex: et ts=2 filetype=yaml
