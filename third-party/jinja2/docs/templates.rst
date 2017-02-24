@@ -606,10 +606,10 @@ Inside of a for-loop block, you can access some special variables:
 | `loop.cycle`          | A helper function to cycle between a list of      |
 |                       | sequences.  See the explanation below.            |
 +-----------------------+---------------------------------------------------+
-| `loop.depth`          | Indicates how deep in a recursive loop            |
+| `loop.depth`          | Indicates how deep in deep in a recursive loop    |
 |                       | the rendering currently is.  Starts at level 1    |
 +-----------------------+---------------------------------------------------+
-| `loop.depth0`         | Indicates how deep in a recursive loop            |
+| `loop.depth0`         | Indicates how deep in deep in a recursive loop    |
 |                       | the rendering currently is.  Starts at level 0    |
 +-----------------------+---------------------------------------------------+
 
@@ -674,12 +674,6 @@ have more than one level of loops, we can rebind the variable `loop` by
 writing `{% set outer_loop = loop %}` after the loop that we want to
 use recursively. Then, we can call it using `{{ outer_loop(...) }}`
 
-Please note that assignments in loops will be cleared at the end of the
-iteration and cannot outlive the loop scope.  Older versions of Jinja2 had
-a bug where in some circumstances it appeared that assignments would work.
-This is not supported.  See :ref:`assignments` for more information about
-how to deal with this.
-
 .. _if:
 
 If
@@ -687,7 +681,7 @@ If
 
 The `if` statement in Jinja is comparable with the Python if statement.
 In the simplest form, you can use it to test if a variable is defined, not
-empty and not false::
+empty or not false::
 
     {% if users %}
     <ul>
@@ -849,31 +843,6 @@ Assignments use the `set` tag and can have multiple targets::
 
     {% set navigation = [('index.html', 'Index'), ('about.html', 'About')] %}
     {% set key, value = call_something() %}
-
-.. admonition:: Scoping Behavior
-
-    Please keep in mind that it is not possible to set variables inside a
-    block and have them show up outside of it.  This also applies to
-    loops.  The only exception to that rule are if statements which do not
-    introduce a scope.  As a result the following template is not going
-    to do what you might expect::
-
-        {% set iterated = false %}
-        {% for item in seq %}
-            {{ item }}
-            {% set iterated = true %}
-        {% endfor %}
-        {% if not iterated %} did not iterate {% endif %}
-
-    It is not possible with Jinja syntax to do this.  Instead use
-    alternative constructs like the loop else block or the special `loop`
-    variable::
-
-        {% for item in seq %}
-            {{ item }}
-        {% else %}
-            did not iterate
-        {% endfor %}
 
 
 Block Assignments
@@ -1491,8 +1460,10 @@ With Statement
 
 .. versionadded:: 2.3
 
-The with statement makes it possible to create a new inner scope.
-Variables set within this scope are not visible outside of the scope.
+If the application enables the :ref:`with-extension`, it is possible to
+use the `with` keyword in templates.  This makes it possible to create
+a new inner scope.  Variables set within this scope are not visible
+outside of the scope.
 
 With in a nutshell::
 
@@ -1515,38 +1486,15 @@ are equivalent::
         {{ foo }}
     {% endwith %}
 
-An important note on scoping here.  In Jinja versions before 2.9 the
-behavior of referencing one variable to another had some unintended
-consequences.  In particular one variable could refer to another defined
-in the same with block's opening statement.  This caused issues with the
-cleaned up scoping behavior and has since been improved.  In particular
-in newer Jinja2 versions the following code always refers to the variable
-`a` from outside the `with` block::
-
-    {% with a={}, b=a.attribute %}...{% endwith %}
-
-In earlier Jinja versions the `b` attribute would refer to the results of
-the first attribute.  If you depend on this behavior you can rewrite it to
-use the ``set`` tag::
-
-    {% with a={} %}
-        {% set b = a.attribute %}
-    {% endwith %}
-
-.. admonition:: Extension
-
-   In older versions of Jinja (before 2.9) it was required to enable this
-   feature with an extension.  It's now enabled by default.
-
 .. _autoescape-overrides:
 
-Autoescape Overrides
+Autoescape Extension
 --------------------
 
 .. versionadded:: 2.4
 
-If you want you can activate and deactivate the autoescaping from within
-the templates.
+If the application enables the :ref:`autoescape-extension`, one can
+activate and deactivate the autoescaping from within the templates.
 
 Example::
 
@@ -1559,8 +1507,3 @@ Example::
     {% endautoescape %}
 
 After an `endautoescape` the behavior is reverted to what it was before.
-
-.. admonition:: Extension
-
-   In older versions of Jinja (before 2.9) it was required to enable this
-   feature with an extension.  It's now enabled by default.

@@ -9,7 +9,7 @@
 
     The behavior can be changed by subclassing the environment.
 
-    :copyright: (c) 2017 by the Jinja Team.
+    :copyright: (c) 2010 by the Jinja Team.
     :license: BSD.
 """
 import types
@@ -17,11 +17,14 @@ import operator
 from collections import Mapping
 from jinja2.environment import Environment
 from jinja2.exceptions import SecurityError
-from jinja2._compat import string_types, PY2
+from jinja2._compat import string_types, text_type, PY2
 from jinja2.utils import Markup
 
-from markupsafe import EscapeFormatter
-from string import Formatter
+has_format = False
+if hasattr(text_type, 'format'):
+    from markupsafe import EscapeFormatter
+    from string import Formatter
+    has_format = True
 
 
 #: maximum number of items a range may produce
@@ -79,11 +82,13 @@ except ImportError:
     pass
 
 #: register Python 2.6 abstract base classes
-from collections import MutableSet, MutableMapping, MutableSequence
-_mutable_set_types += (MutableSet,)
-_mutable_mapping_types += (MutableMapping,)
-_mutable_sequence_types += (MutableSequence,)
-
+try:
+    from collections import MutableSet, MutableMapping, MutableSequence
+    _mutable_set_types += (MutableSet,)
+    _mutable_mapping_types += (MutableMapping,)
+    _mutable_sequence_types += (MutableSequence,)
+except ImportError:
+    pass
 
 _mutable_spec = (
     (_mutable_set_types, frozenset([
@@ -135,6 +140,8 @@ class _MagicFormatMapping(Mapping):
 
 
 def inspect_format_method(callable):
+    if not has_format:
+        return None
     if not isinstance(callable, (types.MethodType,
                                  types.BuiltinMethodType)) or \
        callable.__name__ != 'format':
@@ -439,37 +446,35 @@ class ImmutableSandboxedEnvironment(SandboxedEnvironment):
         return not modifies_known_mutable(obj, attr)
 
 
-# This really is not a public API apparenlty.
-try:
-    from _string import formatter_field_name_split
-except ImportError:
-    def formatter_field_name_split(field_name):
-        return field_name._formatter_field_name_split()
+if has_format:
+    # This really is not a public API apparenlty.
+    try:
+        from _string import formatter_field_name_split
+    except ImportError:
+        def formatter_field_name_split(field_name):
+            return field_name._formatter_field_name_split()
 
+    class SandboxedFormatterMixin(object):
 
-class SandboxedFormatterMixin(object):
+        def __init__(self, env):
+            self._env = env
 
-    def __init__(self, env):
-        self._env = env
+        def get_field(self, field_name, args, kwargs):
+            first, rest = formatter_field_name_split(field_name)
+            obj = self.get_value(first, args, kwargs)
+            for is_attr, i in rest:
+                if is_attr:
+                    obj = self._env.getattr(obj, i)
+                else:
+                    obj = self._env.getitem(obj, i)
+            return obj, first
 
-    def get_field(self, field_name, args, kwargs):
-        first, rest = formatter_field_name_split(field_name)
-        obj = self.get_value(first, args, kwargs)
-        for is_attr, i in rest:
-            if is_attr:
-                obj = self._env.getattr(obj, i)
-            else:
-                obj = self._env.getitem(obj, i)
-        return obj, first
+    class SandboxedFormatter(SandboxedFormatterMixin, Formatter):
+        def __init__(self, env):
+            SandboxedFormatterMixin.__init__(self, env)
+            Formatter.__init__(self)
 
-class SandboxedFormatter(SandboxedFormatterMixin, Formatter):
-
-    def __init__(self, env):
-        SandboxedFormatterMixin.__init__(self, env)
-        Formatter.__init__(self)
-
-class SandboxedEscapeFormatter(SandboxedFormatterMixin, EscapeFormatter):
-
-    def __init__(self, env, escape):
-        SandboxedFormatterMixin.__init__(self, env)
-        EscapeFormatter.__init__(self, escape)
+    class SandboxedEscapeFormatter(SandboxedFormatterMixin, EscapeFormatter):
+        def __init__(self, env, escape):
+            SandboxedFormatterMixin.__init__(self, env)
+            EscapeFormatter.__init__(self, escape)

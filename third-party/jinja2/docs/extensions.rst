@@ -107,7 +107,7 @@ The usage of the `i18n` extension for template designers is covered as part
 :ref:`of the template documentation <i18n-in-templates>`.
 
 .. _gettext: http://docs.python.org/dev/library/gettext
-.. _Babel: http://babel.pocoo.org/
+.. _Babel: http://babel.edgewall.org/
 
 .. _newstyle-gettext:
 
@@ -183,9 +183,12 @@ With Statement
 
 **Import name:** `jinja2.ext.with_`
 
-.. versionchanged:: 2.9
+.. versionadded:: 2.3
 
-This extension is now built-in and no longer does anything.
+This extension adds support for the with keyword.  Using this keyword it
+is possible to enforce a nested scope in a template.  Variables can be
+declared directly in the opening block of the with statement or using a
+standard `set` statement directly within.
 
 .. _autoescape-extension:
 
@@ -194,10 +197,12 @@ Autoescape Extension
 
 **Import name:** `jinja2.ext.autoescape`
 
-.. versionchanged:: 2.9
+.. versionadded:: 2.4
 
-This extension was removed and is now built-in.  Enabling the extension
-no longer does anything.
+The autoescape extension allows you to toggle the autoescape feature from
+within the template.  If the environment's :attr:`~Environment.autoescape`
+setting is set to `False` it can be activated, if it's `True` it can be
+deactivated.  The setting overriding is scoped.
 
 
 .. _writing-extensions:

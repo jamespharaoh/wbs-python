@@ -5,7 +5,7 @@
 
     All the unittests regarding lexing, parsing and syntax.
 
-    :copyright: (c) 2017 by the Jinja Team.
+    :copyright: (c) 2010 by the Jinja Team.
     :license: BSD, see LICENSE for more details.
 """
 import pytest
@@ -27,7 +27,7 @@ else:
 
 @pytest.mark.lexnparse
 @pytest.mark.tokenstream
-class TestTokenStream(object):
+class TestTokenStream():
     test_tokens = [Token(1, TOKEN_BLOCK_BEGIN, ''),
                    Token(2, TOKEN_BLOCK_END, ''),
                    ]
@@ -55,7 +55,7 @@ class TestTokenStream(object):
 
 @pytest.mark.lexnparse
 @pytest.mark.lexer
-class TestLexer(object):
+class TestLexer():
 
     def test_raw1(self, env):
         tmpl = env.from_string(
@@ -129,7 +129,7 @@ class TestLexer(object):
 
 @pytest.mark.lexnparse
 @pytest.mark.parser
-class TestParser(object):
+class TestParser():
 
     def test_php_syntax(self, env):
         env = Environment('<?', '?>', '<?=', '?>', '<!--', '-->')
@@ -246,7 +246,7 @@ and bar comment #}
 
 @pytest.mark.lexnparse
 @pytest.mark.syntax
-class TestSyntax(object):
+class TestSyntax():
 
     def test_call(self, env):
         env = Environment()
@@ -395,10 +395,6 @@ class TestSyntax(object):
         tmpl = env.from_string('''{{ not 42 in bar }}''')
         assert tmpl.render(bar=bar) == text_type(not 42 in bar)
 
-    def test_operator_precedence(self, env):
-        tmpl = env.from_string('''{{ 2 * 3 + 4 % 2 + 1 - 2 }}''')
-        assert tmpl.render() == text_type(2 * 3 + 4 % 2 + 1 - 2)
-
     def test_implicit_subscribed_tuple(self, env):
         class Foo(object):
             def __getitem__(self, x):
@@ -442,7 +438,7 @@ class TestSyntax(object):
 
 @pytest.mark.lexnparse
 @pytest.mark.lstripblocks
-class TestLstripBlocks(object):
+class TestLstripBlocks():
 
     def test_lstrip(self, env):
         env = Environment(lstrip_blocks=True, trim_blocks=False)
