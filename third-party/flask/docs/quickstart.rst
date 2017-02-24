@@ -102,9 +102,9 @@ docs to see the alternative method for running a server.
 Invalid Import Name
 ```````````````````
 
-The ``FLASK_APP`` environment variable is the name of the module to import at 
-:command:`flask run`. In case that module is incorrectly named you will get an 
-import error upon start (or if debug is enabled when you navigate to the 
+The ``FLASK_APP`` environment variable is the name of the module to import at
+:command:`flask run`. In case that module is incorrectly named you will get an
+import error upon start (or if debug is enabled when you navigate to the
 application). It will tell you what it tried to import and why it failed.
 
 The most common reason is a typo or because you did not actually create an
@@ -306,9 +306,9 @@ can be changed by providing the ``methods`` argument to the
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
-            do_the_login()
+            return do_the_login()
         else:
-            show_the_login_form()
+            return show_the_login_form()
 
 If ``GET`` is present, ``HEAD`` will be added automatically for you.  You
 don't have to deal with that.  It will also make sure that ``HEAD`` requests
@@ -367,7 +367,7 @@ HTTP has become quite popular lately and browsers are no longer the only
 clients that are using HTTP. For instance, many revision control systems
 use it.
 
-.. _HTTP RFC: http://www.ietf.org/rfc/rfc2068.txt
+.. _HTTP RFC: https://www.ietf.org/rfc/rfc2068.txt
 
 Static Files
 ------------
