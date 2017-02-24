@@ -18,7 +18,7 @@
     executable: "/bin/bash"
     chdir: "{{ deployment_home }}/{{ item.name }}"
 
-  shell: "{{
+  shell: "{{ [
     'ssh 10.190.0.2 bash -c ',
     \"'\",
     'cd ',
