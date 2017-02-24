@@ -1,6 +1,7 @@
 ---
 
 - include: "build-python.yml"
+  when: "python_install == 'yes'"
   tags:
 
     - "python-install"

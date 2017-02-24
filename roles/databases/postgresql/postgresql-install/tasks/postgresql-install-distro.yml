@@ -11,6 +11,17 @@
     module: "apt"
     name: "{{ item }}"
 
+- name: "postgresql install distro python packages"
+  become: "yes"
+  with_items:
+
+    - "psycopg2"
+
+  action:
+
+    module: "pip"
+    name: "{{ item }}"
+
 - name: "disable postgresql sysv init"
   changed_when: "postgresql_sysv_result.stdout != 'UNCHANGED'"
   register: "postgresql_sysv_result"

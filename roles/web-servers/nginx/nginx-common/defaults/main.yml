@@ -143,6 +143,7 @@ nginx_build_configure_options:
   - "--with-debug"
   - "--with-pcre-jit"
   - "--with-ipv6"
+  - "--with-http_auth_request_module"
   - "--with-http_gzip_static_module"
   - "--with-http_ssl_module"
   - "--with-http_stub_status_module"

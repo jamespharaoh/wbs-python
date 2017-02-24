@@ -8,7 +8,7 @@
 
   when: "
     python_apt_installed_version != [
-      python_version,
+      python_installed_version,
       python_apt_version,
     ] | join ('/')
   "
@@ -36,7 +36,7 @@
 - name: "python apt build from source"
   when: "
     python_apt_installed_version != [
-      python_version,
+      python_installed_version,
       python_apt_version,
     ] | join ('/')
   "
@@ -80,14 +80,14 @@
 - name: "set python_apt.installed_version"
   when: "
     python_apt_installed_version != [
-      python_version,
+      python_installed_version,
       python_apt_version,
     ] | join ('/')
   "
   update_resource:
 
     python_apt.installed_version: "{{ [
-      python_version,
+      python_installed_version,
       python_apt_version,
     ] | join ('/') }}"
 

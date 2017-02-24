@@ -1,6 +1,6 @@
 <?php
 
-{% set environment = item %}
+{{ ansible_warning ['//'] }}
 
 // set memory limit
 
@@ -8,9 +8,9 @@ define ("WP_MEMORY_LIMIT", "128M");
 
 // database
 
-define ("DB_NAME", "{{ environment.database.name | php_escape }}");
-define ("DB_USER", "{{ environment.database.user | php_escape }}");
-define ("DB_PASSWORD", "{{ environment.database.password | php_escape }}");
+define ("DB_NAME", "{{ website.database_name | php_escape }}");
+define ("DB_USER", "{{ website.database_user | php_escape }}");
+define ("DB_PASSWORD", "{{ website.database_password | php_escape }}");
 define ("DB_HOST", "localhost");
 define ("DB_CHARSET", "utf8");
 define ("DB_COLLATE", "");
@@ -31,7 +31,7 @@ $table_prefix = "wp_";
 ] %}
 
 define ("{{ secure_constant }}", "{{
-	(secure_constant ~ environment.wordpress.secure) | md5 | php_escape
+	(secure_constant ~ website.wordpress_secure) | md5 | php_escape
 }}");
 
 {% endfor %}
@@ -40,7 +40,7 @@ define ("{{ secure_constant }}", "{{
 
 define ("WPLANG", "");
 
-{% if environment.wordpress.debug | default ('no') == 'yes' %}
+{% if website.wordpress_debug | default ('no') == 'yes' %}
 
 define ("WP_DEBUG", true);
 define ("SCRIPT_DEBUG", true);
@@ -52,7 +52,7 @@ define ("SCRIPT_DEBUG", false);
 
 {% endif %}
 
-define ("ABSPATH", "{{ environment.website.path | php_escape }}/");
+define ("ABSPATH", "{{ website.path | php_escape }}/");
 
 // ssl
 
@@ -72,7 +72,7 @@ require_once (ABSPATH . "wp-settings.php");
 // misc config
 
 {% for extra_define_name, extra_define_value
-	in (environment.wordpress_extra_defines | default ({})).items () %}
+	in (website.wordpress_extra_defines | default ({})).items () %}
 define ("{{
 	extra_define_name | php_escape
 }}", "{{

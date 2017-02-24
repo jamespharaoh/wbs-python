@@ -1,0 +1,11 @@
+---
+
+- include: "wordpress-webserver-setup.yml"
+  with_items: "{{ wordpress_server_websites }}"
+  tags:
+
+    - "wordpress-webserver-setup"
+    - "wordpress-webserver"
+    - "wordpress"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,38 @@
+{%- print [
+	ansible_warning ['#'],
+] | join, '\n' -%}
+
+{%- for known_host in ssh_known_hosts | dictsort | values -%}
+{%- if known_host.hostnames | default ([]) -%}
+
+	{%- print '\n', [
+		'# ',
+		known_host.name,
+	] | join, '\n' -%} 
+
+	{%- for known_host_key in known_host.public_keys | default ([]) -%}
+
+		{%- if known_host_key is mapping -%}
+
+			{%- print [
+				known_host.hostnames | join (','),
+				known_host_key.type,
+				known_host_key.data | join,
+			] | join (' '), '\n' -%}
+
+		{%- else -%}
+
+			{%- print [
+				known_host.hostnames | join (','),
+				known_host_key,
+			] | join (' '), '\n' -%}
+
+		{%- endif -%}
+
+	{%- endfor -%}
+
+
+{%- endif -%}
+{%- endfor -%}
+
+{# ex: noet ts=4 filetype=jinja2 #}

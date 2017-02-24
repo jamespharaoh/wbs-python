@@ -2,10 +2,7 @@
 
 dependencies:
 
-  - "ssh-common"
-  - "wait-for-ssh"
-  - "scan-ssh-key"
-  - "setup-ssh-server"
-  - "setup-ssh-client"
+  - "ssh-server"
+  - "ssh-client"
 
 # ex: et ts=2 filetype=yaml

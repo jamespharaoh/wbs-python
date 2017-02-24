@@ -1,0 +1,10 @@
+---
+
+- include: "ssh-server-wait.yml"
+  tags:
+
+    - "ssh-server-wait"
+    - "ssh-server"
+    - "ssh"
+
+# ex: et ts=2 filetype=yaml

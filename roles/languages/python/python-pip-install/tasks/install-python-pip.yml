@@ -3,8 +3,8 @@
 - name: "install pip"
   when: "
     python_pip_installed_version != [
-      python_version,
-      python_pip_version,
+      python_installed_version,
+      python_pip_install_version,
     ] | join ('/')
   "
   become: "yes"
@@ -40,15 +40,15 @@
 - name: "set python_pip.installed_version"
   when: "
     python_pip_installed_version != [
-      python_version,
-      python_pip_version,
+      python_installed_version,
+      python_pip_install_version,
     ] | join ('/')
   "
   update_resource:
 
     python_pip.installed_version: "{{ [
-      python_version,
-      python_pip_version,
+      python_installed_version,
+      python_pip_install_version,
     ] | join ('/') }}"
 
 # ex: et ts=2 filetype=yaml

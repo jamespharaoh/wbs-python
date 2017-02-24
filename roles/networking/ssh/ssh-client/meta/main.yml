@@ -3,5 +3,6 @@
 dependencies:
 
   - "ssh-common"
+  - "ssh-client-setup"
 
 # ex: et ts=2 filetype=yaml

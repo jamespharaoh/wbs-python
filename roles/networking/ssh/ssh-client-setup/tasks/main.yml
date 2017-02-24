@@ -1,0 +1,10 @@
+---
+
+- include: "ssh-client-setup.yml"
+  tags:
+
+    - "ssh-client-setup"
+    - "ssh-client"
+    - "ssh"
+
+# ex: et ts=2 filetype=yaml
