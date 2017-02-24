@@ -20,7 +20,7 @@
 
   shell: "{{ [
     'ssh 10.190.0.2 bash -c ',
-    \"\\'\",
+    \"\\\\'\",
     'cd ',
     lookup ('env', 'WORKSPACE'),
     '/',
@@ -29,7 +29,7 @@
     item.build_steps
       | default (['true'])
       | join (' && '),
-    \"\\'\",
+    \"\\\\'\",
   ] | join }}"
 
 # ex: et ts=2 filetype=yaml
