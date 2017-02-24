@@ -2,6 +2,91 @@
 CHANGELOG
 =========
 
+1.11.54
+=======
+
+* bugfix:cloudformation: Fixes awslabs/serverless-application-model`#93 <https://github.com/aws/aws-cli/issues/93>`__
+* api-change:``ec2``: Update ec2 command to latest version
+
+
+1.11.53
+=======
+
+* api-change:``elasticbeanstalk``: Update elasticbeanstalk command to latest version
+* api-change:``gamelift``: Update gamelift command to latest version
+* api-change:``route53``: Update route53 command to latest version
+* api-change:``clouddirectory``: Update clouddirectory command to latest version
+
+
+1.11.52
+=======
+
+* api-change:``ec2``: Update ec2 command to latest version
+
+
+1.11.51
+=======
+
+* api-change:``directconnect``: Update directconnect command to latest version
+
+
+1.11.50
+=======
+
+* api-change:``config``: Update config command to latest version
+* api-change:``cognito-identity``: Update cognito-identity command to latest version
+
+
+1.11.49
+=======
+
+* feature:``kms``: Update kms command to latest version
+
+
+1.11.48
+=======
+
+* feature:``ec2``: Update ec2 command to latest version
+
+
+1.11.47
+=======
+
+* feature:``clouddirectory``: Update clouddirectory command to latest version
+* feature:``lex-runtime``: Update lex-runtime command to latest version
+* feature:``storagegateway``: Update storagegateway command to latest version
+
+
+1.11.46
+=======
+
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``rekognition``: Update rekognition command to latest version
+
+
+1.11.45
+=======
+
+* feature:``lex-runtime``: Update lex-runtime command to latest version
+
+
+1.11.44
+=======
+
+* feature:``clouddirectory``: Update clouddirectory command to latest version
+* feature:Configuration: Adds a new option to the configuration file 'cli_timestamp_format' to change the timestamp output format displayed by the CLI.
+* feature:``ec2``: Update ec2 command to latest version
+* feature:``codedeploy``: Update codedeploy command to latest version
+* feature:``rds``: Update rds command to latest version
+
+
+1.11.43
+=======
+
+* feature:``elbv2``: Update elbv2 command to latest version
+* feature:``rds``: Update rds command to latest version
+
+
 1.11.42
 =======
 
