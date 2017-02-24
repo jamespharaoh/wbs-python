@@ -23,10 +23,15 @@ def ansible_escape (value):
 			for item in value
 		])
 
-	else:
+	elif isinstance (value, str) \
+	or isinstance (value, unicode):
 
 		return value.replace (
 			"{{",
 			"{{ '{{' }}")
+
+	else:
+
+		return value
 
 # ex: noet ts=4 filetype=python
