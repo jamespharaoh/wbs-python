@@ -272,7 +272,7 @@ git_base_url: "{{ dev_git_base_url }}"
 
 wistla_dist_url: "{{ dev_wistla_dist_url }}"
 
-nodejs_version: "6.3.0"
+nodejs_version: "7.7.1"
 nodejs_version_legacy: "5.6.0"
 
 nodejs_npm_registry: "http://localhost:8081"
