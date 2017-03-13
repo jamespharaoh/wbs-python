@@ -92,6 +92,12 @@ icinga_web_core_config_templates:
     group: "www-data"
     mode: "0640"
 
+  - template: "icinga-web-groups-ini"
+    target: "/etc/icingaweb2/groups.ini"
+    owner: "root"
+    group: "www-data"
+    mode: "0640"
+
   - template: "icinga-web-resources-ini"
     target: "/etc/icingaweb2/resources.ini"
     owner: "root"

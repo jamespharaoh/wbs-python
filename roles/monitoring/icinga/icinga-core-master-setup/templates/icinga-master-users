@@ -1,3 +1,5 @@
+{{ ansible_warning ['#'] }}
+
 template User "generic-user" {
 
 	enable_notifications = true
@@ -8,33 +10,32 @@ template UserGroup "generic-group" {
 
 }
 
-{% for user_name in groups [icinga_master_users] %}
-{% set user = hostvars [user_name] %}
+{% for user in icinga_core_master_config_users %}
 
-object User "{{ user.identity_name }}" {
+object User "{{ user.name }}" {
 
 	import "generic-user"
 
-	display_name = "{{ user.icinga_user_display_name }}"
-	email = "{{ user.icinga_user_email }}"
-	pager = "{{ user.icinga_user_pager }}"
+	display_name = "{{ user.display_name }}"
+	email = "{{ user.email }}"
+	pager = "{{ user.pager }}"
 
 	groups = [
-{% for group in user.icinga_user_groups %}
+{% for group in user.groups %}
 		"{{ group }}",
 {% endfor %}
 	]
 
-	period = "{{ user.icinga_user_period }}"
+	period = "{{ user.period }}"
 
 	states = [
-{% for state in user.icinga_user_states %}
+{% for state in user.states %}
 		{{ state }},
 {% endfor %}
 	]
 
 	types = [
-{% for type in user.icinga_user_types %}
+{% for type in user.types %}
 		{{ type }},
 {% endfor %}
 	]
@@ -43,13 +44,14 @@ object User "{{ user.identity_name }}" {
 
 {% endfor %}
 
-{% for group_unique_name in groups [icinga_master_groups] %}
-{% set group = hostvars [group_unique_name] %}
+{% for group in icinga_core_master_config_groups %}
 
-object UserGroup "{{ group.identity_name }}" {
+object UserGroup "{{ group.name }}" {
 
 	import "generic-group"
 
 }
 
 {% endfor %}
+
+# ex: noet ts=4 filetype=icinga2

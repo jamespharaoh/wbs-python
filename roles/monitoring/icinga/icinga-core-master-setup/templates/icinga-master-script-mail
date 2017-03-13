@@ -123,7 +123,7 @@ def create_email (
 
 	email_message.add_header (
 		"From",
-		"{{ icinga_email_from }}")
+		"{{ icinga_core_email_from }}")
 
 	email_message.add_header (
 		"To",
@@ -163,7 +163,7 @@ def send_email (
 			"localhost"))
 
 	smtp_server.sendmail (
-		"{{ icinga_email_from }}",
+		"{{ icinga_core_email_from }}",
 		[ to_address ],
 		email_message.as_string ())
 

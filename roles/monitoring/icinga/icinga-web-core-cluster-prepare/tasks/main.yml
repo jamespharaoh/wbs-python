@@ -1,0 +1,12 @@
+---
+
+- include: "icinga-web-core-cluster-prepare.yml"
+  tags:
+
+    - "icinga-web-core-cluster-prepare"
+    - "icinga-web-core-cluster"
+    - "icinga-web-core"
+    - "icinga-web"
+    - "icinga"
+
+# ex: et ts=2 filetype=yaml

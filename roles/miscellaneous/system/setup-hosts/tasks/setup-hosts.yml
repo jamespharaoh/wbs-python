@@ -1,11 +1,18 @@
 ---
 
-- name: "configure hosts"
+- name: "system hosts file"
+  register: "system_hosts_file_result"
   become: "yes"
   action:
 
     module: "template"
     dest: "/etc/hosts"
     src: "setup-hosts-file"
+
+- name: "set dnsmasq.needs_restart to 'yes'"
+  when: "system_hosts_file_result | changed"
+  update_resource:
+
+    dnsmasq.needs_restart: "yes"
 
 # ex: et ts=2 filetype=yaml

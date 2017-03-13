@@ -1,6 +1,7 @@
 ---
 
 - include: "install-python-pip.yml"
+  when: "python_install == 'yes'"
   tags:
 
     - "python-pip-install"

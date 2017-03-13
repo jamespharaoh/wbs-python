@@ -9,7 +9,6 @@
     system: "yes"
 
 - name: "add www-data to icingaweb2 group"
-  notify: "restart php"
   become: "yes"
   action:
 

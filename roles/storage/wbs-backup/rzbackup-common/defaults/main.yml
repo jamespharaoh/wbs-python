@@ -25,6 +25,11 @@ rzbackup_max_uncompressed_memory_cache_entries: "256"
 rzbackup_max_compressed_memory_cache_entries: "2048"
 rzbackup_max_compressed_filesystem_cache_entries: "16384"
 
+rzbackup_systemd_after: [ "network.target" ]
+rzbackup_systemd_requires: [ "network.target" ]
+rzbackup_systemd_restart: "always"
+rzbackup_systemd_restart_secs: "60"
+
 # ---------- installation
 
 rzbackup_install_temp: "/opt/rzbackup-install"

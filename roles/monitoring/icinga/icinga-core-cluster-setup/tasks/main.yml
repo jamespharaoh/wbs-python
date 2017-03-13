@@ -1,0 +1,21 @@
+---
+
+- include: "icinga-core-cluster-setup-mysql.yml"
+  when: "icinga_core_database_type == 'mysql'"
+  tags:
+
+    - "icinga-core-cluster-setup"
+    - "icinga-core-cluster"
+    - "icinga-core"
+    - "icinga"
+
+- include: "icinga-core-cluster-setup-postgresql.yml"
+  when: "icinga_core_database_type == 'postgresql'"
+  tags:
+
+    - "icinga-core-cluster-setup"
+    - "icinga-core-cluster"
+    - "icinga-core"
+    - "icinga"
+
+# ex: et ts=2 filetype=yaml

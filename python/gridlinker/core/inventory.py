@@ -79,6 +79,9 @@ class ResourceClass (object):
 
 	def __init__ (self, inventory, data):
 
+		context = inventory.context
+		project_metadata = context.project_metadata
+
 		self.data = data
 
 		self.name = data ["identity"] ["name"]
@@ -106,6 +109,20 @@ class ResourceClass (object):
 			data ["class"].get (
 				"back_references",
 				list ()))
+
+		for section_name, section_data in self.data.items ():
+
+			if section_name in [ "identity", "class" ]:
+
+				continue
+
+			if section_name \
+			not in project_metadata ["resource_section_names"]:
+
+				raise Exception (
+					"Class %s contains unrecognised section: %s" % (
+						self.name,
+						section_name))
 
 	def items (self):
 
@@ -193,61 +210,61 @@ class Resource (object):
 
 		# add class data
 
-		for class_prefix, class_data \
+		for section_name, section_data \
 		in self.resource_class.items ():
 
-			if class_prefix in [ "identity", "class" ]:
+			if section_name in [ "identity", "class" ]:
 				continue
 
-			if not class_prefix in self.unresolved:
+			if not section_name in self.unresolved:
 
-				self.unresolved [class_prefix] = (
-					collections.OrderedDict ())
-
-			if not class_prefix in self.not_yet_resolved:
-
-				self.not_yet_resolved [class_prefix] = (
-					collections.OrderedDict ())
-
-			if not class_prefix in self.combined:
-
-				self.combined [class_prefix] = (
+				self.unresolved [section_name] = (
 					collections.OrderedDict ())
 
 			if not isinstance (
-				self.unresolved [class_prefix],
+				self.unresolved [section_name],
 				dict):
 
 				raise Exception (
 					"Not a dictionary: %s.%s" % (
 						self.unique_name,
-						class_prefix))
+						section_name))
 
-			for section_name, section_value \
-			in class_data.items ():
+			if not section_name in self.not_yet_resolved:
 
-				if section_name in self.unresolved [class_prefix]:
+				self.not_yet_resolved [section_name] = (
+					collections.OrderedDict ())
+
+			if not section_name in self.combined:
+
+				self.combined [section_name] = (
+					collections.OrderedDict ())
+
+			for item_name, item_value \
+			in section_data.items ():
+
+				if item_name in self.unresolved [section_name]:
 					continue
 
-				self.unresolved [class_prefix] [section_name] = (
-					section_value)
+				self.unresolved [section_name] [item_name] = (
+					item_value)
 
-				self.not_yet_resolved [class_prefix] [section_name] = (
-					section_value)
+				self.not_yet_resolved [section_name] [item_name] = (
+					item_value)
 
-				self.combined [class_prefix] [section_name] = (
-					section_value)
+				self.combined [section_name] [item_name] = (
+					item_value)
 
 				full_name = (
 					"%s_%s" % (
-						class_prefix,
-						section_name))
+						section_name,
+						item_name))
 
 				self.unresolved [full_name] = (
-					section_value)
+					item_value)
 
 				self.combined [full_name] = (
-					section_value)
+					item_value)
 
 		# add namespace data
 
@@ -666,7 +683,8 @@ class Inventory (object):
 
 		if not "identity" in class_data:
 
-			raise Exception ()
+			raise Exception (
+				"Invalid class definition: %s" % class_name)
 
 		if class_data ["identity"] ["type"] != "class":
 
@@ -2106,10 +2124,15 @@ class Inventory (object):
 
 			if not isinstance (reference_value, dict):
 
-				raise Exception (
-					"Can't dereference '%s' from a %s" % (
-						token,
-						type (reference_value)))
+				if self.trace:
+
+					uprint (
+						"%sCan't dereference '%s' from a %s" % (
+							indent,
+							token,
+							type (reference_value)))
+
+				return False, None, None
 
 			if token in reference_value:
 
@@ -2121,13 +2144,18 @@ class Inventory (object):
 
 			else:
 
-				raise Exception (
-					"Token '%s' not found in %s reference '%s'" % (
-						token,
-						reference_type,
-						reference_value))
+				if self.trace:
 
-		elif self.trace:
+					uprint (
+						"%sToken '%s' not found in %s reference '%s'" % (
+							indent,
+							token,
+							reference_type,
+							reference_value))
+
+				return False, None, None
+
+		if self.trace:
 
 			uprint (
 				"%svalue not present: %s" % (
