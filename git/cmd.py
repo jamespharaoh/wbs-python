@@ -254,14 +254,15 @@ class Git(LazyMixin):
                 proc.terminate()
                 proc.wait()    # ensure process goes away
             except OSError as ex:
-                log.info("Ignored error after process has dies: %r", ex)
+                log.info("Ignored error after process had died: %r", ex)
                 pass  # ignore error when process already died
             except AttributeError:
                 # try windows
                 # for some reason, providing None for stdout/stderr still prints something. This is why
                 # we simply use the shell and redirect to nul. Its slower than CreateProcess, question
                 # is whether we really want to see all these messages. Its annoying no matter what.
-                call(("TASKKILL /F /T /PID %s 2>nul 1>nul" % str(proc.pid)), shell=True)
+                if is_win:
+                    call(("TASKKILL /F /T /PID %s 2>nul 1>nul" % str(proc.pid)), shell=True)
             # END exception handling
 
         def __getattr__(self, attr):
@@ -539,7 +540,7 @@ class Git(LazyMixin):
             * str(output) if extended_output = False (Default)
             * tuple(int(status), str(stdout), str(stderr)) if extended_output = True
 
-            if ouput_stream is True, the stdout value will be your output stream:
+            if output_stream is True, the stdout value will be your output stream:
             * output_stream if extended_output = False
             * tuple(int(status), output_stream, str(stderr)) if extended_output = True
 
@@ -580,7 +581,7 @@ class Git(LazyMixin):
 
         stdout_sink = (PIPE
                        if with_stdout
-                       else getattr(subprocess, 'DEVNULL', open(os.devnull, 'wb')))
+                       else getattr(subprocess, 'DEVNULL', None) or open(os.devnull, 'wb'))
         log.debug("Popen(%s, cwd=%s, universal_newlines=%s, shell=%s)",
                   command, cwd, universal_newlines, shell)
         try:
@@ -822,27 +823,30 @@ class Git(LazyMixin):
             is realized as non-existent
 
         :param kwargs:
-            is a dict of keyword arguments.
-            This function accepts the same optional keyword arguments
-            as execute().
-
-        ``Examples``::
+            It contains key-values for the following:
+            - the :meth:`execute()` kwds, as listed in :var:`execute_kwargs`;
+            - "command options" to be converted by :meth:`transform_kwargs()`;
+            - the `'insert_kwargs_after'` key which its value must match one of ``*args``,
+              and any cmd-options will be appended after the matched arg.
+        
+        Examples::
+        
             git.rev_list('master', max_count=10, header=True)
+        
+        turns into::
+        
+           git rev-list max-count 10 --header master
 
         :return: Same as ``execute``"""
         # Handle optional arguments prior to calling transform_kwargs
         # otherwise these'll end up in args, which is bad.
-        _kwargs = dict()
-        for kwarg in execute_kwargs:
-            try:
-                _kwargs[kwarg] = kwargs.pop(kwarg)
-            except KeyError:
-                pass
+        exec_kwargs = dict((k, v) for k, v in kwargs.items() if k in execute_kwargs)
+        opts_kwargs = dict((k, v) for k, v in kwargs.items() if k not in execute_kwargs)
 
-        insert_after_this_arg = kwargs.pop('insert_kwargs_after', None)
+        insert_after_this_arg = opts_kwargs.pop('insert_kwargs_after', None)
 
         # Prepare the argument list
-        opt_args = self.transform_kwargs(**kwargs)
+        opt_args = self.transform_kwargs(**opts_kwargs)
         ext_args = self.__unpack_args([a for a in args if a is not None])
 
         if insert_after_this_arg is None:
@@ -851,11 +855,11 @@ class Git(LazyMixin):
             try:
                 index = ext_args.index(insert_after_this_arg)
             except ValueError:
-                raise ValueError("Couldn't find argument '%s' in args %s to insert kwargs after"
+                raise ValueError("Couldn't find argument '%s' in args %s to insert cmd options after"
                                  % (insert_after_this_arg, str(ext_args)))
             # end handle error
             args = ext_args[:index + 1] + opt_args + ext_args[index + 1:]
-        # end handle kwargs
+        # end handle opts_kwargs
 
         call = [self.GIT_PYTHON_GIT_EXECUTABLE]
 
@@ -870,7 +874,7 @@ class Git(LazyMixin):
         call.append(dashify(method))
         call.extend(args)
 
-        return self.execute(call, **_kwargs)
+        return self.execute(call, **exec_kwargs)
 
     def _parse_object_header(self, header_line):
         """

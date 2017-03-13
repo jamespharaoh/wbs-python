@@ -96,7 +96,7 @@ class TestRepo(TestBase):
         Repo(tempfile.gettempdir())
 
     @raises(NoSuchPathError)
-    def test_new_should_raise_on_non_existant_path(self):
+    def test_new_should_raise_on_non_existent_path(self):
         Repo("repos/foobar")
 
     @with_rw_repo('0.3.2.1')
@@ -387,24 +387,26 @@ class TestRepo(TestBase):
 
     @patch.object(Git, '_call_process')
     def test_blame_incremental(self, git):
-        git.return_value = fixture('blame_incremental')
-        blame_output = self.rorepo.blame_incremental('9debf6b0aafb6f7781ea9d1383c86939a1aacde3', 'AUTHORS')
-        blame_output = list(blame_output)
-        self.assertEqual(len(blame_output), 5)
+        # loop over two fixtures, create a test fixture for 2.11.1+ syntax
+        for git_fixture in ('blame_incremental', 'blame_incremental_2.11.1_plus'):
+            git.return_value = fixture(git_fixture)
+            blame_output = self.rorepo.blame_incremental('9debf6b0aafb6f7781ea9d1383c86939a1aacde3', 'AUTHORS')
+            blame_output = list(blame_output)
+            self.assertEqual(len(blame_output), 5)
 
-        # Check all outputted line numbers
-        ranges = flatten([entry.linenos for entry in blame_output])
-        self.assertEqual(ranges, flatten([range(2, 3), range(14, 15), range(1, 2), range(3, 14), range(15, 17)]))
+            # Check all outputted line numbers
+            ranges = flatten([entry.linenos for entry in blame_output])
+            self.assertEqual(ranges, flatten([range(2, 3), range(14, 15), range(1, 2), range(3, 14), range(15, 17)]))
 
-        commits = [entry.commit.hexsha[:7] for entry in blame_output]
-        self.assertEqual(commits, ['82b8902', '82b8902', 'c76852d', 'c76852d', 'c76852d'])
+            commits = [entry.commit.hexsha[:7] for entry in blame_output]
+            self.assertEqual(commits, ['82b8902', '82b8902', 'c76852d', 'c76852d', 'c76852d'])
 
-        # Original filenames
-        self.assertSequenceEqual([entry.orig_path for entry in blame_output], [u'AUTHORS'] * len(blame_output))
+            # Original filenames
+            self.assertSequenceEqual([entry.orig_path for entry in blame_output], [u'AUTHORS'] * len(blame_output))
 
-        # Original line numbers
-        orig_ranges = flatten([entry.orig_linenos for entry in blame_output])
-        self.assertEqual(orig_ranges, flatten([range(2, 3), range(14, 15), range(1, 2), range(2, 13), range(13, 15)]))   # noqa E501
+            # Original line numbers
+            orig_ranges = flatten([entry.orig_linenos for entry in blame_output])
+            self.assertEqual(orig_ranges, flatten([range(2, 3), range(14, 15), range(1, 2), range(2, 13), range(13, 15)]))   # noqa E501
 
     @patch.object(Git, '_call_process')
     def test_blame_complex_revision(self, git):
@@ -925,3 +927,30 @@ class TestRepo(TestBase):
             raise AssertionError(ex, "It's ok if TC not running from `master`.")
 
         self.failUnlessRaises(InvalidGitRepositoryError, Repo, worktree_path)
+
+    @with_rw_directory
+    def test_git_work_tree_env(self, rw_dir):
+        """Check that we yield to GIT_WORK_TREE"""
+        # clone a repo
+        # move .git directory to a subdirectory
+        # set GIT_DIR and GIT_WORK_TREE appropriately
+        # check that repo.working_tree_dir == rw_dir
+        self.rorepo.clone(join_path_native(rw_dir, 'master_repo'))
+
+        repo_dir = join_path_native(rw_dir, 'master_repo')
+        old_git_dir = join_path_native(repo_dir, '.git')
+        new_subdir = join_path_native(repo_dir, 'gitdir')
+        new_git_dir = join_path_native(new_subdir, 'git')
+        os.mkdir(new_subdir)
+        os.rename(old_git_dir, new_git_dir)
+
+        oldenv = os.environ.copy()
+        os.environ['GIT_DIR'] = new_git_dir
+        os.environ['GIT_WORK_TREE'] = repo_dir
+
+        try:
+            r = Repo()
+            self.assertEqual(r.working_tree_dir, repo_dir)
+            self.assertEqual(r.working_dir, repo_dir)
+        finally:
+            os.environ = oldenv
