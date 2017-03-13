@@ -58,7 +58,7 @@ the file and redirects the user to the URL for the uploaded file::
                 return redirect(request.url)
             file = request.files['file']
             # if user does not select file, browser also
-            # submit a empty part without filename
+            # submit an empty part without filename
             if file.filename == '':
                 flash('No selected file')
                 return redirect(request.url)
@@ -72,8 +72,8 @@ the file and redirects the user to the URL for the uploaded file::
         <title>Upload new File</title>
         <h1>Upload new File</h1>
         <form method=post enctype=multipart/form-data>
-          <p><input type=file name=file>
-             <input type=submit value=Upload>
+          <input type=file name=file>
+          <input type=submit value=Upload>
         </form>
         '''
 
