@@ -1,15 +1,19 @@
 # this host
 
 {% if public_address | default ('') %}
-{% for public_hostname in public_hostnames | default ([]) %}
-{{ public_address }} {{ public_hostname }}
-{% endfor %}
+{{ public_address }} {{
+	public_hostnames
+	| union (public_aliases | default ([]))
+	| join (' ')
+}}
 {% endif %}
 
 {% if private_address | default ('') %}
-{% for private_hostname in private_hostnames | default ([]) %}
-{{ private_address }} {{ private_hostname }}
-{% endfor %}
+{{ private_address }} {{
+	private_hostnames
+	| union (private_aliases | default ([]))
+	| join (' ')
+}}
 {% endif %}
 
 # other hosts

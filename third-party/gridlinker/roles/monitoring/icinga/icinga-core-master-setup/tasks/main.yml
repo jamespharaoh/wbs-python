@@ -1,7 +1,7 @@
 ---
 
 - include: "icinga-core-master-setup.yml"
-  when: "icinga_state in [ 'installed', 'enabled', 'disabled' ]"
+  when: "icinga_core_state in [ 'installed', 'enabled', 'disabled' ]"
   tags:
 
     - "icinga-core-master-setup"

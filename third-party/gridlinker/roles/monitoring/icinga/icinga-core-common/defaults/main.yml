@@ -192,11 +192,11 @@ icinga_core_master_security_files:
 
 icinga_core_master_links:
 
-  - link: "{{ icinga_installed_prefix }}/etc"
-    target: "../../etc"
+  - link: "{{ icinga_core_installed_prefix }}/etc/icinga2"
+    target: "../../../etc/icinga2"
 
-  - link: "{{ icinga_installed_prefix }}/var"
-    target: "../../var"
+  - link: "{{ icinga_core_installed_prefix }}/var/lib/icinga2"
+    target: "../../../../var/lib/icinga2"
 
 # ---------- agent configuration
 
@@ -290,14 +290,6 @@ icinga_core_agent_security_files:
   - source: "{{ icinga_core_private_key }}"
     target: "pki/{{ identity_name }}.key"
     mode: "0640"
-
-icinga_core_agent_links:
-
-  - link: "{{ icinga_core_installed_prefix }}/etc"
-    target: "../../etc"
-
-  - link: "{{ icinga_core_installed_prefix }}/var"
-    target: "../../var"
 
 # ---------- agent configuration
 

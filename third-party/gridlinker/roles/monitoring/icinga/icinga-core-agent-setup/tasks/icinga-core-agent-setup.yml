@@ -1,7 +1,7 @@
 ---
 
 - name: "issue icinga agent certificate"
-  when: "icinga_core_certificate = ''"
+  when: "icinga_core_certificate == ''"
   register: "icinga_core_agent_certificate_result"
   action:
 
@@ -40,7 +40,7 @@
     src: "{{ item.template }}"
     dest: "/etc/icinga2/{{ item.target }}"
     owner: "root"
-    group: "nagios"
+    group: "icinga"
 
 - name: "write icinga security config"
   with_items: "{{ icinga_core_agent_security_files }}"
@@ -51,18 +51,7 @@
     dest: "/etc/icinga2/{{ item.target }}"
     content: "{{ lookup ('etcd', item.source) }}"
     owner: "root"
-    group: "nagios"
-
-- name: "create icinga agent links"
-  with_items: "{{ icinga_core_agent_links }}"
-  become: "yes"
-  action:
-
-    module: "file"
-    path: "{{ item.link }}"
-    state: "link"
-
-    src: "{{ item.target }}"
+    group: "icinga"
 
 - name: "set icinga_core.state to 'enabled'"
   when: "icinga_core_state == 'installed'"

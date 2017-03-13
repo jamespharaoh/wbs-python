@@ -11,8 +11,13 @@
 
 - name: "etcd control systemd daemon reload"
   when: "etcd_control_systemd_config_result | changed"
+  register: "etcd_control_systemd_daemon_reload_result"
   become: "yes"
   command: "systemctl daemon-reload"
+
+- name: "etcd control systemd daemon reload pause"
+  when: "etcd_control_systemd_daemon_reload_result | changed"
+  pause: seconds=1
 
 - name: "etcd control systemd stop"
   when: "

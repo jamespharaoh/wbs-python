@@ -16,7 +16,7 @@
 
 	ExecStart = {{ etcd_target }}/etcd
 
-	LimitNOFILE=40000
+	LimitNOFILE = 40000
 
 [Install]
 

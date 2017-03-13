@@ -1,31 +1,32 @@
+{{ ansible_warning ['#'] }}
+
 object Zone "master" {
 	endpoints = [
-{% for host_name in groups [icinga_master_endpoints] %}
-{% set host = hostvars [host_name] %}
-		"{{ host.identity_name }}",
+{% for master in icinga_core_master_config_masters %}
+		"{{ master.name }}",
 {% endfor %}
 	]
 }
 
-{% for host_name in groups [icinga_master_endpoints] %}
-{% set host = hostvars [host_name] %}
+{% for master in icinga_core_master_config_masters %}
 
-object Endpoint "{{ host.identity_name }}" {
-	host = "{{ host.icinga_endpoint_internal }}"
+object Endpoint "{{ master.name }}" {
+	host = "{{ master.host }}"
 }
 
 {% endfor %}
 
-{% for host_name in groups [icinga_master_agents] %}
-{% set host = hostvars [host_name] %}
+{% for agent in icinga_core_master_config_agents %}
 
-object Zone "{{ host.identity_name }}" {
-	endpoints = [ "{{ host.identity_name }}" ]
+object Zone "{{ agent.name }}" {
+	endpoints = [ "{{ agent.name }}" ]
 	parent = "master"
 }
 
-object Endpoint "{{ host.identity_name }}" {
-	host = "{{ host.icinga_endpoint_host }}"
+object Endpoint "{{ agent.name }}" {
+	host = "{{ agent.host }}"
 }
 
 {% endfor %}
+
+# ex: noet ts=4 filetype=icinga2

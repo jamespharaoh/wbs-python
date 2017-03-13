@@ -1,6 +1,7 @@
 ---
 
 - include: "install-python-packages.yml"
+  when: "python_install == 'yes'"
   tags:
 
     - "python-packages-install"

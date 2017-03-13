@@ -1,17 +1,19 @@
-{% for icinga_web_core_role in icinga_web_core_roles.values () %}
-{% if icinga_web_core_role.permissions %}
+{{ ansible_warning ['#'] }}
 
-[{{ icinga_web_core_role.name }}]
+{% for role in icinga_web_core_config_roles %}
 
-{% if icinga_web_core_role.users is defined  %}
-users = "{{ icinga_web_core_role.users | join (',') }}"
+[{{ role.name }}]
+
+{% if role.users %}
+users = "{{ role.users | join (',') }}"
 {% endif %}
 
-{% if icinga_web_core_role.groups is defined %}
-groups = "{{ icinga_web_core_role.groups | join (',') }}"
+{% if role.groups %}
+groups = "{{ role.groups | join (',') }}"
 {% endif %}
 
-permissions = "{{ icinga_web_core_role.permissions | join (',') }}"
+permissions = "{{ role.permissions | join (',') }}"
 
-{% endif %}
 {% endfor %}
+
+# ex: noet ts=2 filetype=icinga2

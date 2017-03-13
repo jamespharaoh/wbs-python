@@ -1,20 +1,37 @@
+{{ ansible_warning ['#'] }}
+
 [Unit]
 
-Description = Icinga monitoring daemon
-After = network.target
+	Description = Icinga monitoring daemon
+
+	After = {{ [
+		'network.target',
+		'network-online.target',
+		'networking.service',
+	] | join (' ') }}
+
+	Requires = {{ [
+		'network.target',
+		'network-online.target',
+		'networking.service',
+	] | join (' ') }}
 
 [Service]
 
-ExecStart = /etc/icinga2/startup-script
-ExecReload = /bin/kill -HUP $MAINPID
+	Type = forking
 
-Type = forking
-PIDFile = /run/icinga2/icinga2.pid
+	ExecStart = /etc/icinga2/startup-script
+	ExecReload = /bin/kill -HUP $MAINPID
 
-RuntimeDirectory = icinga2
+	Restart = always
+	RestartSec = 30
+
+	PIDFile = /run/icinga2/icinga2.pid
+
+	RuntimeDirectory = icinga2
 
 [Install]
 
-WantedBy = multi-user.target
+	WantedBy = multi-user.target
 
 # ex: noet ts=4

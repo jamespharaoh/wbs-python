@@ -30,12 +30,6 @@
 
 	}
 
-{% if icinga_web_core_graphite_upstream != '' %}
-	location /graphite/ {
-		proxy_pass {{ icinga_web_core_graphite_upstream }}/;
-	}
-{% endif %}
-
 {% endmacro %}
 
 server {

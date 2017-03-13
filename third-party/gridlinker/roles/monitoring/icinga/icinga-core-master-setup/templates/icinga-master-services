@@ -10,7 +10,7 @@ template Service "generic-service" {
 
 }
 
-{% for service in icinga_master_services %}
+{% for service in icinga_core_master_services %}
 {% if 'name' in service %}
 apply Service "{{ service.name }}" {
 {% else %}

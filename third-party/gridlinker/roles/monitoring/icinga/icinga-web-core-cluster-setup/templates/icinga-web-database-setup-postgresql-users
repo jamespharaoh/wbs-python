@@ -160,20 +160,20 @@ $$ LANGUAGE plpgsql;
 
 BEGIN TRANSACTION;
 
-{% for icinga_web_group in icinga_web_core_groups.values () %}
+{% for group in icinga_web_core_config_groups %}
 
 SELECT pg_temp.create_group (
-	'{{ icinga_web_group.name }}');
+	'{{ group.name }}');
 
 {% endfor %}
 
-{% for icinga_web_user in icinga_web_core_users.values () %}
+{% for user in icinga_web_core_config_users %}
 
 SELECT pg_temp.create_user (
-	'{{ icinga_web_user.name }}',
-	'{{ icinga_web_user.password_hash }}',
+	'{{ user.name }}',
+	'{{ user.password_hash }}',
 	ARRAY [ {{
-		icinga_web_user.groups
+		user.groups
 		| join3 ('\'', ', ', '\'')
 	}} ] :: text []);
 
