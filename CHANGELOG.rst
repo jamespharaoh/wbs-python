@@ -2,6 +2,62 @@
 CHANGELOG
 =========
 
+1.5.24
+======
+
+* api-change:``codedeploy``: Update codedeploy client to latest version
+* api-change:``emr``: Update emr client to latest version
+
+
+1.5.23
+======
+
+* api-change:``clouddirectory``: Update clouddirectory client to latest version
+* api-change:``apigateway``: Update apigateway client to latest version
+
+
+1.5.22
+======
+
+* api-change:``organizations``: Update organizations client to latest version
+* api-change:``workdocs``: Update workdocs client to latest version
+
+
+1.5.21
+======
+
+* api-change:``rds``: Update rds client to latest version
+
+
+1.5.20
+======
+
+* api-change:``budgets``: Update budgets client to latest version
+* api-change:``cloudtrail``: Update cloudtrail client to latest version
+* api-change:``opsworkscm``: Update opsworkscm client to latest version
+
+
+1.5.19
+======
+
+* api-change:``waf``: Update waf client to latest version
+* api-change:``mturk``: Update mturk client to latest version
+* api-change:``iam``: Update iam client to latest version
+* api-change:``organizations``: Update organizations client to latest version
+* api-change:``waf-regional``: Update waf-regional client to latest version
+* api-change:``dynamodb``: Update dynamodb client to latest version
+* api-change:``gamelift``: Update gamelift client to latest version
+* api-change:``elasticbeanstalk``: Update elasticbeanstalk client to latest version
+* api-change:``ec2``: Update ec2 client to latest version
+* api-change:``dynamodbstreams``: Update dynamodbstreams client to latest version
+
+
+1.5.18
+======
+
+* api-change:``es``: Update es client to latest version
+
+
 1.5.17
 ======
 
