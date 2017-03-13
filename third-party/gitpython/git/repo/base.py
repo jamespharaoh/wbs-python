@@ -33,12 +33,14 @@ from git.util import Actor, finalize_process, decygpath, hex_to_bin
 import os.path as osp
 
 from .fun import rev_parse, is_git_dir, find_submodule_git_dir, touch
+import gc
+import gitdb
 
 
 log = logging.getLogger(__name__)
 
 DefaultDBType = GitCmdObjectDB
-if sys.version_info[:2] < (2, 5):     # python 2.4 compatiblity
+if sys.version_info[:2] < (2, 5):     # python 2.4 compatibility
     DefaultDBType = GitCmdObjectDB
 # END handle python 2.4
 
@@ -133,7 +135,7 @@ class Repo(object):
             # removed. It's just cleaner.
             if is_git_dir(curpath):
                 self.git_dir = curpath
-                self._working_tree_dir = os.path.dirname(self.git_dir)
+                self._working_tree_dir = os.getenv('GIT_WORK_TREE', os.path.dirname(self.git_dir))
                 break
 
             sm_gitpath = find_submodule_git_dir(osp.join(curpath, '.git'))
@@ -177,9 +179,21 @@ class Repo(object):
             args.append(self.git)
         self.odb = odbt(*args)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
     def __del__(self):
+        self.close()
+
+    def close(self):
         if self.git:
             self.git.clear_cache()
+            gc.collect()
+            gitdb.util.mman.collect()
+            gc.collect()
 
     def __eq__(self, rhs):
         if isinstance(rhs, Repo):
@@ -404,7 +418,7 @@ class Repo(object):
 
         :param config_level:
             One of the following values
-            system = sytem wide configuration file
+            system = system wide configuration file
             global = user level configuration file
             repository = configuration file for this repostory only"""
         return GitConfigParser(self._get_config_path(config_level), read_only=False)
@@ -550,7 +564,7 @@ class Repo(object):
 
         :raise NoSuchPathError:
         :note:
-            The method does not check for the existance of the paths in alts
+            The method does not check for the existence of the paths in alts
             as the caller is responsible."""
         alternates_path = osp.join(self.git_dir, 'objects', 'info', 'alternates')
         if not alts:
@@ -615,7 +629,7 @@ class Repo(object):
         return self._get_untracked_files()
 
     def _get_untracked_files(self, *args, **kwargs):
-        # make sure we get all files, no only untracked directores
+        # make sure we get all files, not only untracked directories
         proc = self.git.status(*args,
                                porcelain=True,
                                untracked_files=True,
@@ -667,7 +681,7 @@ class Repo(object):
 
         stream = (line for line in data.split(b'\n') if line)
         while True:
-            line = next(stream)  # when exhausted, casues a StopIteration, terminating this function
+            line = next(stream)  # when exhausted, causes a StopIteration, terminating this function
             hexsha, orig_lineno, lineno, num_lines = line.split()
             lineno = int(lineno)
             num_lines = int(num_lines)
@@ -699,11 +713,14 @@ class Repo(object):
                            committed_date=int(props[b'committer-time']))
                 commits[hexsha] = c
             else:
-                # Discard the next line (it's a filename end tag)
-                line = next(stream)
-                tag, value = line.split(b' ', 1)
-                assert tag == b'filename', 'Unexpected git blame output'
-                orig_filename = value
+                # Discard all lines until we find "filename" which is
+                # guaranteed to be the last line
+                while True:
+                    line = next(stream)  # will fail if we reach the EOF unexpectedly
+                    tag, value = line.split(b' ', 1)
+                    if tag == b'filename':
+                        orig_filename = value
+                        break
 
             yield BlameEntry(commits[hexsha],
                              range(lineno, lineno + num_lines),
@@ -935,7 +952,7 @@ class Repo(object):
             * Use the 'format' argument to define the kind of format. Use
               specialized ostreams to write any format supported by python.
             * You may specify the special **path** keyword, which may either be a repository-relative
-              path to a directory or file to place into the archive, or a list or tuple of multipe paths.
+              path to a directory or file to place into the archive, or a list or tuple of multiple paths.
 
         :raise GitCommandError: in case something went wrong
         :return: self"""
@@ -955,7 +972,7 @@ class Repo(object):
     def has_separate_working_tree(self):
         """
         :return: True if our git_dir is not at the root of our working_tree_dir, but a .git file with a
-            platform agnositic symbolic link. Our git_dir will be whereever the .git file points to
+            platform agnositic symbolic link. Our git_dir will be wherever the .git file points to
         :note: bare repositories will always return False here
         """
         if self.bare:
