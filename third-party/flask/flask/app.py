@@ -314,7 +314,7 @@ class Flask(_PackageBoundObject):
         'PREFERRED_URL_SCHEME':                 'http',
         'JSON_AS_ASCII':                        True,
         'JSON_SORT_KEYS':                       True,
-        'JSONIFY_PRETTYPRINT_REGULAR':          True,
+        'JSONIFY_PRETTYPRINT_REGULAR':          False,
         'JSONIFY_MIMETYPE':                     'application/json',
         'TEMPLATES_AUTO_RELOAD':                None,
     })
@@ -391,7 +391,7 @@ class Flask(_PackageBoundObject):
         #: is the class for the instance check and the second the error handler
         #: function.
         #:
-        #: To register a error handler, use the :meth:`errorhandler`
+        #: To register an error handler, use the :meth:`errorhandler`
         #: decorator.
         self.error_handler_spec = {None: self._error_handlers}
 
@@ -813,7 +813,8 @@ class Flask(_PackageBoundObject):
 
         :param host: the hostname to listen on. Set this to ``'0.0.0.0'`` to
                      have the server available externally as well. Defaults to
-                     ``'127.0.0.1'``.
+                     ``'127.0.0.1'`` or the host in the ``SERVER_NAME`` config
+                     variable if present.
         :param port: the port of the webserver. Defaults to ``5000`` or the
                      port defined in the ``SERVER_NAME`` config variable if
                      present.
@@ -1354,7 +1355,7 @@ class Flask(_PackageBoundObject):
         will have to surround the execution of these code by try/except
         statements and log occurring errors.
 
-        When a teardown function was called because of a exception it will
+        When a teardown function was called because of an exception it will
         be passed an error object.
 
         The return values of teardown functions are ignored.
