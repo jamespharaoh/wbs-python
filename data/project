@@ -100,4 +100,13 @@ project_data:
   node_types: "node-types"
   vpn_clients: "vpn-clients"
 
+resource_section_names:
+
+  - "android_app"
+  - "cluster"
+  - "deployment"
+  - "facebook_app"
+  - "google_project"
+  - "supercluster"
+
 # ex: et ts=2 filetype=yaml
