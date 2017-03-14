@@ -409,7 +409,7 @@
   build_steps:
 
     - "npm install --verbose"
-    - "test -f node_modules"
+    - "test -d node_modules"
 
 # ---------- content
 
