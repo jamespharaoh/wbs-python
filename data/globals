@@ -236,12 +236,12 @@ nginx_build_mirror: "{{ wistla_dist_url }}/nginx"
 
 python:
 
-  version: "2.7.11"
+  install_version: "2.7.11"
   url: "{{ wistla_dist_url }}/python/{{ python_archive }}"
 
 python_pip:
 
-  version: "9.0.1"
+  install_version: "9.0.1"
   archive: "get-pip-{{ python_pip_version }}.py"
   url: "{{ wistla_dist_url }}/python/{{ python_pip_archive }}"
 
