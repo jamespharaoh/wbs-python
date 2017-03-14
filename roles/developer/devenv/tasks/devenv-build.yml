@@ -16,24 +16,21 @@
       '/build-logs; ',
     ] | join,
     [
-      [
-        '(set -x; ',
-        devenv_checkouts
-          | selectattr ('name', 'equalto', item)
-          | map (attribute = 'build_steps')
-          | first
-          | default (['true'])
-          | join (' && '),
-        ') 2>&1',
-      ] | join,
-      [
-        'tee ',
-        WORK,
-        '/build-logs/',
-        item,
-        '.log',
-      ] | join,
-    ] | join (' | '),
+      '(set -x; ',
+      devenv_checkouts
+        | selectattr ('name', 'equalto', item)
+        | map (attribute = 'build_steps')
+        | first
+        | default (['true'])
+        | join (' && '),
+      ') &> ',
+      WORK,
+      '/build-logs/',
+      item,
+      '.log || echo \"Build ',
+      item,
+      ' failed, check build logs for more information\"',
+    ] | join,
   ] | join (' ') }}"
 
 - name: "run build steps (jenkins)"
@@ -52,29 +49,26 @@
       '/wistla-devops/work/build-logs;',
     ] | join,
     [
-      [
-        'ssh 10.190.0.2 ',
-        'set -x \\; cd ',
-        lookup ('env', 'WORKSPACE'),
-        '/',
-        item,
-        \" '&&' \",
-        devenv_checkouts
-          | selectattr ('name', 'equalto', item)
-          | map (attribute = 'build_steps')
-          | first
-          | default (['true'])
-          | join (\" '&&' \"),
-        ' 2>&1',
-      ] | join,
-      [
-        'tee ',
-        lookup ('env', 'WORKSPACE'),
-        '/wistla-devops/work/build-logs/',
-        item,
-        '.log',
-      ] | join,
-    ] | join (' | '),
+      'ssh 10.190.0.2 ',
+      'set -x \\; cd ',
+      lookup ('env', 'WORKSPACE'),
+      '/',
+      item,
+      \" '&&' \",
+      devenv_checkouts
+        | selectattr ('name', 'equalto', item)
+        | map (attribute = 'build_steps')
+        | first
+        | default (['true'])
+        | join (\" '&&' \"),
+      ' &> ',
+      lookup ('env', 'WORKSPACE'),
+      '/wistla-devops/work/build-logs/',
+      item,
+      '.log || echo \"Build ',
+      item,
+      ' failed, check build logs for more information\"',
+    ] | join,
   ] | join }}"
 
 # ex: et ts=2 filetype=yaml
