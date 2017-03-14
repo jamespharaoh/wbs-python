@@ -55,33 +55,33 @@
     ] | join }}"
 
 - name: "create git pre-commit hooks"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   when: "deployment_mode == 'vagrant'"
   action:
 
     module: "template"
-    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/pre-commit"
+    dest: "{{ deployment_home }}/{{ item }}/.git/hooks/pre-commit"
     src: "devenv-git-hook-pre-commit"
     mode: "0755"
 
 - name: "create git post-checkout hooks"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   when: "deployment_mode == 'vagrant'"
   action:
 
     module: "template"
     src: "devenv-git-hook-post-checkout"
-    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/post-checkout"
+    dest: "{{ deployment_home }}/{{ item }}/.git/hooks/post-checkout"
     mode: "0755"
 
 - name: "create git pre-push hooks"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   when: "deployment_mode == 'vagrant'"
   action:
 
     module: "template"
     src: "devenv-git-hook-pre-push"
-    dest: "{{ deployment_home }}/{{ item.name }}/.git/hooks/pre-push"
+    dest: "{{ deployment_home }}/{{ item }}/.git/hooks/pre-push"
     mode: "0755"
 
 - name: "create shared directories"

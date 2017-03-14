@@ -1,6 +1,6 @@
 ---
 
-- name: "run build steps"
+- name: "run build steps (not jenkins)"
   when: "deployment_mode == 'vagrant'"
   with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   args:
@@ -36,7 +36,7 @@
     ] | join (' | '),
   ] | join (' ') }}"
 
-- name: "run build steps"
+- name: "run build steps (jenkins)"
   when: "deployment_mode == 'jenkins'"
   with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   args:
@@ -49,7 +49,7 @@
     [
       'mkdir -p ',
       lookup ('env', 'WORKSPACE'),
-      '/wistla-devops/build-logs;',
+      '/wistla-devops/work/build-logs;',
     ] | join,
     [
       [
