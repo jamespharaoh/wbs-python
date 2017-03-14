@@ -49,19 +49,19 @@
       '/wistla-devops/work/build-logs;',
     ] | join,
     [
-      'ssh 10.190.0.2 ',
-      'set -x \\; cd ',
+      'ssh 10.190.0.2 \\(',
+      'set -ex \\; cd ',
       lookup ('env', 'WORKSPACE'),
       '/',
       item,
-      \" '&&' \",
+      \"\\; \",
       devenv_checkouts
         | selectattr ('name', 'equalto', item)
         | map (attribute = 'build_steps')
         | first
         | default (['true'])
-        | join (\" '&&' \"),
-      ' &> ',
+        | join (\" \\; \"),
+      '\\) &> ',
       lookup ('env', 'WORKSPACE'),
       '/wistla-devops/work/build-logs/',
       item,
