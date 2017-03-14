@@ -44,8 +44,11 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
     - "npm run build"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-blob"
   default_branch: "development"
@@ -59,7 +62,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-data-export"
   short: "export legacy mongo to json files"
@@ -77,7 +82,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-data-import"
   short: "import legacy json into postgres"
@@ -108,8 +115,11 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
     - "npm run build-api"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-db"
   short: "database connection abstractions for mongo and postgres"
@@ -127,7 +137,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-db-daemon"
   default_branch: "development"
@@ -146,7 +158,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-db-schema"
   short: "sql schema definitions"
@@ -164,7 +178,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-email"
   short: "sending emails et al"
@@ -182,7 +198,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-i18n"
   short: "internationalisation"
@@ -198,7 +216,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-logging"
   short: "logging module"
@@ -228,7 +248,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-media-daemon"
   default_branch: "development"
@@ -248,7 +270,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-notification-daemon"
   default_branch: "development"
@@ -270,7 +294,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-notifications"
   short: "send push notifications"
@@ -288,7 +314,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-pubsub"
   short: "wistla pub/sub message queue razzamatazz"
@@ -307,7 +335,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-raml-api"
   short: "wistla api definition in raml"
@@ -323,7 +353,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-raml-server"
   short: "generate api code from json api definition"
@@ -344,7 +376,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-raml-to-api"
   short: "general json api definition from raml"
@@ -364,7 +398,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-share"
   short: "dynamic website content for sharing etc"
@@ -383,7 +419,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-test"
   short: "testing related shizzle"
@@ -396,7 +434,9 @@
 
   build_steps:
 
+    - "test -d ../wistla-util/node_modules"
     - "npm install --verbose"
+    - "test -d ../wistla-util/node_modules"
 
 - name: "wistla-util"
   short: "generic helpers that are used across @wistla/* modules"
