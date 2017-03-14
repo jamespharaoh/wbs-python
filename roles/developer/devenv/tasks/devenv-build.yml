@@ -1,15 +1,8 @@
 ---
 
-- name: "create build logs directory"
-  action:
-
-    module: "file"
-    path: "{{ WORK }}/build-logs"
-    state: "directory"
-
 - name: "run build steps"
   when: "deployment_mode == 'vagrant'"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   args:
 
     executable: "/bin/bash"
@@ -18,23 +11,34 @@
   shell: "{{ [
     'set -euf -o pipefail;',
     [
+      'mkdir -p ',
+      WORK,
+      '/build-logs',
+    ],
+    [
       [
         '(set -x; ',
-        item.build_steps | default (['true']) | join (' && '),
+        devenv_checkouts
+          | selectattr ('name', 'equalto', item)
+          | map (attribute = 'build_steps')
+          | first
+          | default (['true'])
+          | join (' && '),
         ' )',
       ] | join,
       [
         'tee ',
         WORK,
         '/build-logs/',
-        item.name + '.log',
+        item,
+        '.log',
       ] | join,
     ] | join (' | '),
   ] | join (' ') }}"
 
 - name: "run build steps"
   when: "deployment_mode == 'jenkins'"
-  with_items: "{{ devenv_checkouts }}"
+  with_items: "{{ devenv_checkouts | map (attribute = 'name') | list }}"
   args:
 
     executable: "/bin/bash"
@@ -43,14 +47,22 @@
   shell: "{{ [
     'set -euf -o pipefail;',
     [
+      'mkdir ',
+      lookup ('env', 'WORKSPACE'),
+      '/wistla-devops/build-logs',
+    ],
+    [
       [
         'ssh 10.190.0.2 ',
-        'set -x; cd ',
+        'set -x \\; cd ',
         lookup ('env', 'WORKSPACE'),
         '/',
         item.name,
         \" '&&' \",
-        item.build_steps
+        devenv_checkouts
+          | selectattr ('name', 'equalto', item)
+          | map (attribute = 'build_steps')
+          | first
           | default (['true'])
           | join (\" '&&' \"),
       ] | join,
@@ -58,7 +70,7 @@
         'tee ',
         lookup ('env', 'WORKSPACE'),
         '/wistla-devops/work/build-logs/',
-        item.name,
+        item,
         '.log',
       ] | join,
     ] | join (' | '),
