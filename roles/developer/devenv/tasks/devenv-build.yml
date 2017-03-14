@@ -24,7 +24,7 @@
           | first
           | default (['true'])
           | join (' && '),
-        ')',
+        ') 2>&1',
       ] | join,
       [
         'tee ',
@@ -57,7 +57,7 @@
         'set -x \\; cd ',
         lookup ('env', 'WORKSPACE'),
         '/',
-        item.name,
+        item,
         \" '&&' \",
         devenv_checkouts
           | selectattr ('name', 'equalto', item)
@@ -65,6 +65,7 @@
           | first
           | default (['true'])
           | join (\" '&&' \"),
+        ' 2>&1',
       ] | join,
       [
         'tee ',
