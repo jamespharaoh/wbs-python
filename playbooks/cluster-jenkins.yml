@@ -6,8 +6,9 @@
   roles:
 
     - "cluster-create"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
+
+    - "ssh-server-wait"
+    - "ssh-server-keyscan"
 
     - "cluster-system"
     - "system-apt-setup"
