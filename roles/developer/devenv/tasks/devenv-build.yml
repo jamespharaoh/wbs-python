@@ -1,5 +1,12 @@
 ---
 
+- name: "create build logs directory"
+  action:
+
+    module: "file"
+    path: "{{ WORK }}/build-logs"
+    state: "directory"
+
 - name: "run build steps"
   when: "deployment_mode == 'vagrant'"
   with_items: "{{ devenv_checkouts }}"
@@ -8,7 +15,22 @@
     executable: "/bin/bash"
     chdir: "{{ deployment_home }}/{{ item.name }}"
 
-  shell: "{{ item.build_steps | default (['true']) | join (' && ') }}"
+  shell: "{{ [
+    'set -euf -o pipefail;',
+    [
+      [
+        '(set -x; ',
+        item.build_steps | default (['true']) | join (' && '),
+        ' )',
+      ] | join,
+      [
+        'tee ',
+        WORK,
+        '/build-logs/',
+        item.name + '.log',
+      ] | join,
+    ] | join (' | '),
+  ] | join (' ') }}"
 
 - name: "run build steps"
   when: "deployment_mode == 'jenkins'"
@@ -19,15 +41,27 @@
     chdir: "{{ deployment_home }}/{{ item.name }}"
 
   shell: "{{ [
-    'ssh 10.190.0.2 ',
-    'cd ',
-    lookup ('env', 'WORKSPACE'),
-    '/',
-    item.name,
-    \" '&&' \",
-    item.build_steps
-      | default (['true'])
-      | join (\" '&&' \"),
+    'set -euf -o pipefail;',
+    [
+      [
+        'ssh 10.190.0.2 ',
+        'set -x; cd ',
+        lookup ('env', 'WORKSPACE'),
+        '/',
+        item.name,
+        \" '&&' \",
+        item.build_steps
+          | default (['true'])
+          | join (\" '&&' \"),
+      ] | join,
+      [
+        'tee ',
+        lookup ('env', 'WORKSPACE'),
+        '/wistla-devops/work/build-logs/',
+        item.name,
+        '.log',
+      ] | join,
+    ] | join (' | '),
   ] | join }}"
 
 # ex: et ts=2 filetype=yaml
