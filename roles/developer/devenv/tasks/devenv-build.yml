@@ -6,15 +6,15 @@
   args:
 
     executable: "/bin/bash"
-    chdir: "{{ deployment_home }}/{{ item.name }}"
+    chdir: "{{ deployment_home }}/{{ item }}"
 
   shell: "{{ [
     'set -euf -o pipefail;',
     [
       'mkdir -p ',
       WORK,
-      '/build-logs',
-    ],
+      '/build-logs; ',
+    ] | join,
     [
       [
         '(set -x; ',
@@ -24,7 +24,7 @@
           | first
           | default (['true'])
           | join (' && '),
-        ' )',
+        ')',
       ] | join,
       [
         'tee ',
@@ -42,15 +42,15 @@
   args:
 
     executable: "/bin/bash"
-    chdir: "{{ deployment_home }}/{{ item.name }}"
+    chdir: "{{ deployment_home }}/{{ item }}"
 
   shell: "{{ [
     'set -euf -o pipefail;',
     [
-      'mkdir ',
+      'mkdir -p ',
       lookup ('env', 'WORKSPACE'),
-      '/wistla-devops/build-logs',
-    ],
+      '/wistla-devops/build-logs;',
+    ] | join,
     [
       [
         'ssh 10.190.0.2 ',
