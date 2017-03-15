@@ -29,6 +29,7 @@
 - include: "cluster-app/cluster-app-lxc.yml"
 - include: "cluster-app/cluster-app-cron.yml"
 - include: "cluster-app/cluster-app-rzbackup.yml"
+- include: "cluster-app/cluster-app-btrfs-dedupe.yml"
 - include: "cluster-app/cluster-app-activate.yml"
 
 # ex: et ts=2 filetype=yaml
