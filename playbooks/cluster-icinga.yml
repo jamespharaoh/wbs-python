@@ -5,7 +5,7 @@
 - hosts: "cluster-ops-network"
   roles:
 
-    - "icinga-core-database-prepare"
+    - "icinga-core-cluster-prepare"
 
 - hosts:
 
@@ -22,7 +22,7 @@
 - hosts: "cluster-ops-network:&cluster-instance-active"
   roles:
 
-    - "icinga-core-database-setup"
+    - "icinga-core-cluster-setup"
 
 - hosts: "wistla-ops-admin-a:&cluster-instance-active"
   roles:
@@ -52,20 +52,11 @@
 - hosts: "cluster-ops-network"
   roles:
 
-    - "icinga-web-core-database-setup"
+    - "icinga-web-core-cluster-setup"
 
 - hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
     - "icinga-web-core-setup"
-    - "icinga-web-graphite"
-
-# =================== graphite
-
-- hosts: "cluster-ops-admin:&cluster-instance-active"
-  roles:
-
-    - "graphite-carbon"
-    - "graphite-web"
 
 # ex: et ts=2 filetype=yaml
