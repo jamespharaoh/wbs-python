@@ -13,16 +13,7 @@
 ######################################################################
 
 
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "production"
-      cluster_deployment_name: "production"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-production-2-app:&cluster-instance-active"
+- hosts: "cluster-production-2-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -49,34 +40,7 @@
       cluster_deployment_playbook_name: "node-stop"
 
 
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "production-a"
-      cluster_deployment_name: "production-a"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "production-b"
-      cluster_deployment_name: "production-b"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "staging"
-      cluster_deployment_name: "staging"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-staging-2-app:&cluster-instance-active"
+- hosts: "cluster-staging-2-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -100,42 +64,6 @@
     - role: "cluster-deployment-playbook"
       tags: "staging-2-b"
       cluster_deployment_name: "staging-2-b"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "staging-a"
-      cluster_deployment_name: "staging-a"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "staging-b"
-      cluster_deployment_name: "staging-b"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test"
-      cluster_deployment_name: "test"
-      cluster_deployment_playbook_name: "node-stop"
-
-
-- hosts: "cluster-test-2-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      tags: "test-2"
-      cluster_deployment_name: "test-2"
       cluster_deployment_playbook_name: "node-stop"
 
 
