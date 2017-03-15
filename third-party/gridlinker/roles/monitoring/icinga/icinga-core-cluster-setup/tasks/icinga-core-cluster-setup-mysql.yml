@@ -18,7 +18,7 @@
     priv: "{{ icinga_core_database_name }}.*:ALL"
 
 - name: "initialize ido database"
-  when: "icinga_database_initialized == 'no'"
+  when: "icinga_core_database_initialized == 'no'"
   delegate_to: "{{ icinga_core_database_delegate }}"
   args:
 
@@ -29,9 +29,9 @@
     set -euf -o pipefail;
 
     mysql {{ icinga_core_database_name }}
-      </usr/share/icinga2-ido-mysql/schema/mysql.sql;
+      <{{ hostvars [icinga_core_database_delegate].icinga_core_installed_prefix }}/share/icinga2-ido-mysql/schema/mysql.sql;
 
-    mysql {{ icinga_database_name }} --execute "
+    mysql {{ icinga_core_database_name }} --execute "
       ALTER TABLE icinga_instances
       ADD UNIQUE (instance_name);
     ";

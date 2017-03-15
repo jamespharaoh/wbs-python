@@ -4,11 +4,11 @@ amazon_instance_type_running: "m4.large"
 etcd: 
   
   installed_version: "2.2.2"
-  needs_restart: "yes"
+  needs_restart: "no"
   state: "enabled"
 
 etcd_installed_version: "2.2.2"
-etcd_needs_restart: "yes"
+etcd_needs_restart: "no"
 etcd_state: "enabled"
 heka: 
   
@@ -87,10 +87,10 @@ python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
   state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 ssh: 

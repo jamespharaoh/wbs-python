@@ -1,105 +1,57 @@
 ---
 
-amazon_instance_state: "running"
 amazon_instance_type_running: "m3.medium"
 etcd: 
   
   installed_version: "2.2.2"
-  needs_restart: "yes"
+  needs_restart: "no"
   state: "enabled"
 
 etcd_installed_version: "2.2.2"
-etcd_needs_restart: "yes"
+etcd_needs_restart: "no"
 etcd_state: "enabled"
-graphite_carbon: 
-  
-  installed_version: "0.9.15"
-  needs_restart: "no"
-  state: "enabled"
-
-graphite_carbon_installed_version: "0.9.15"
-graphite_carbon_needs_restart: "no"
-graphite_carbon_state: "enabled"
-graphite_web: 
-  
-  installed_version: "0.9.15"
-  needs_restart: "no"
-  state: "enabled"
-
-graphite_web_installed_version: "0.9.15"
-graphite_web_needs_restart: "no"
-graphite_web_state: "enabled"
 heka: 
   
   installed_version: "0.10.0"
-  needs_restart: "no"
+  needs_restart: "yes"
   state: "enabled"
 
 heka_installed_version: "0.10.0"
-heka_needs_restart: "no"
+heka_needs_restart: "yes"
 heka_state: "enabled"
-icinga: 
-  
-  certificate: "/authority/icinga/issue/2/certificate"
-  installed_version: "2.4.10-12-trusty"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/2/key"
-  state: "enabled"
-
-icinga_certificate: "/authority/icinga/issue/2/certificate"
 icinga_core: 
   
-  certificate: "/authority/icinga/issue/108/certificate"
-  installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-  installed_version: "2.4.10-12-trusty"
-  needs_restart: "yes"
-  private_key: "/authority/icinga/issue/108/key"
+  certificate: "/authority/icinga/issue/133/certificate"
+  installed_prefix: "/opt/icinga-2.6.1-xenial-0"
+  installed_version: "2.6.1-xenial-0"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/133/key"
   state: "enabled"
 
-icinga_core_certificate: "/authority/icinga/issue/108/certificate"
-icinga_core_installed_prefix: "/opt/icinga-2.4.10-12-trusty"
-icinga_core_installed_version: "2.4.10-12-trusty"
-icinga_core_needs_restart: "yes"
-icinga_core_private_key: "/authority/icinga/issue/108/key"
+icinga_core_certificate: "/authority/icinga/issue/133/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.6.1-xenial-0"
+icinga_core_installed_version: "2.6.1-xenial-0"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/133/key"
 icinga_core_state: "enabled"
-icinga_installed_version: "2.4.10-12-trusty"
-icinga_needs_restart: "no"
-icinga_private_key: "/authority/icinga/issue/2/key"
-icinga_state: "enabled"
-icinga_web: 
-  
-  installed_version: "2.3.2"
-  state: "enabled"
-
 icinga_web_core: 
   
-  installed_prefix: "/opt/icinga-web-2.3.2"
-  installed_version: "2.3.2"
+  installed_prefix: "/opt/icinga-web-2.4.1"
+  installed_version: "2.4.1"
   state: "enabled"
 
-icinga_web_core_installed_prefix: "/opt/icinga-web-2.3.2"
-icinga_web_core_installed_version: "2.3.2"
+icinga_web_core_installed_prefix: "/opt/icinga-web-2.4.1"
+icinga_web_core_installed_version: "2.4.1"
 icinga_web_core_state: "enabled"
-icinga_web_graphite: 
-  
-  installed_version: "9e9edc02c442f422bec0d1a6ca3bed1e2ebb9d81"
-  state: "installed"
-
-icinga_web_graphite_installed_version: "9e9edc02c442f422bec0d1a6ca3bed1e2ebb9d81"
-icinga_web_graphite_state: "installed"
-icinga_web_installed_version: "2.3.2"
-icinga_web_state: "enabled"
-instance_id: "i-23bbc389"
+instance_id: "i-049125d787fb5e333"
 mysql: 
   
   installed_from: "distro"
   needs_restart: "no"
-  root_password: "ghvawkujrjlehxjrudxy"
   state: "enabled"
 
 mysql_installed_from: "distro"
 mysql_needs_restart: "no"
-mysql_root_password: "ghvawkujrjlehxjrudxy"
 mysql_state: "enabled"
 nginx: 
   
@@ -116,17 +68,17 @@ nginx_needs_restart: "yes"
 nginx_state: "enabled"
 php: 
   
-  fpm_socket: "/var/run/php5-fpm.sock"
+  fpm_socket: "/run/php/php7.0-fpm.sock"
   installed_from: "distro"
-  installed_service: "php5-fpm"
-  installed_version: "5"
+  installed_service: "php7.0-fpm"
+  installed_version: "7.0"
   needs_restart: "yes"
   state: "enabled"
 
-php_fpm_socket: "/var/run/php5-fpm.sock"
+php_fpm_socket: "/run/php/php7.0-fpm.sock"
 php_installed_from: "distro"
-php_installed_service: "php5-fpm"
-php_installed_version: "5"
+php_installed_service: "php7.0-fpm"
+php_installed_version: "7.0"
 php_needs_restart: "yes"
 php_state: "enabled"
 python: 
@@ -136,39 +88,39 @@ python:
 
 python_apt: 
   
-  installed_version: "2.7.11/0.9.3-1"
+  installed_version: "2.7.11/1.1.0~beta1-1"
   state: "installed"
 
-python_apt_installed_version: "2.7.11/0.9.3-1"
+python_apt_installed_version: "2.7.11/1.1.0~beta1-1"
 python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
   state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 ssh: 
   
-  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWWRZ1BMluvsGrWy7VMgZnqrgY="
-  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5RtEA0wMTcsQy2gWOLhErgm/XUfl5ka73K4koV9ZziC6QPYMwkt32mLiWChLFte5OoODOSXWCOzXaBohWaKWDb+pITudlD/GM8GjPPzuOMFIayKHzfynthOZmhqtBWPJ/pEj2nZoBOje8A/v5ZPn9JHNTlCBekOQhGnoWAa4F3nBwujlOT2KNvRDMHDWVt73bStLRRfzVALV++ucVcw3rI9t8Vvo+nkg3D0OS6TDyEh5YF8RDQNcjSwdDgrz8QpdpaO5dpvjfskHA1XOOQlAQ/SXZr6cAV6E924Sb9vTPmbArTTtMJ1C9r5XQSmeflWYJywrEf2N6aes7yixe5gPj"
+  host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGyrtcfbTLzq6vG4ddD2un08bjMWEZYl0mlz/wsyGPjHs40FfDvpOIqkDsnwKABmHbfUAaS2qTzQVAe1OJDYDKA="
+  host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDiVtDmciYPuP/P2WzG5QO+/vbXf0MOzIlKF63Q9UMGl+fpKFG3SV8dSAOGBXxCFzrnhyX+fq+6MedUR9pCdg7OND1mjxHuUXO1dsCTwIMm7U3vY2LYv1sogzZdZlWNV8aibJsP5eZP1mWhig6eRJFQcNXBnb7zsBO1iHnBg2kB6MicWYBcTKbfkbeUpSGOqkH3R5CwySkEA/0QIGYHbDLD7yKB66TYNtKUi+KayxQ5scpb9jAVt+dTjrUeVhZH+D7NJWq2jyR3VaXSx24z6pH4B69RIw/dFeX9fhF1n4T6gALyb3rZ/okPIrBD9rhHqB8IVlr4fqgWZwGcaM79KDjT"
 
-ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWWRZ1BMluvsGrWy7VMgZnqrgY="
-ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5RtEA0wMTcsQy2gWOLhErgm/XUfl5ka73K4koV9ZziC6QPYMwkt32mLiWChLFte5OoODOSXWCOzXaBohWaKWDb+pITudlD/GM8GjPPzuOMFIayKHzfynthOZmhqtBWPJ/pEj2nZoBOje8A/v5ZPn9JHNTlCBekOQhGnoWAa4F3nBwujlOT2KNvRDMHDWVt73bStLRRfzVALV++ucVcw3rI9t8Vvo+nkg3D0OS6TDyEh5YF8RDQNcjSwdDgrz8QpdpaO5dpvjfskHA1XOOQlAQ/SXZr6cAV6E924Sb9vTPmbArTTtMJ1C9r5XQSmeflWYJywrEf2N6aes7yixe5gPj"
+ssh_host_key_ecdsa: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGyrtcfbTLzq6vG4ddD2un08bjMWEZYl0mlz/wsyGPjHs40FfDvpOIqkDsnwKABmHbfUAaS2qTzQVAe1OJDYDKA="
+ssh_host_key_rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDiVtDmciYPuP/P2WzG5QO+/vbXf0MOzIlKF63Q9UMGl+fpKFG3SV8dSAOGBXxCFzrnhyX+fq+6MedUR9pCdg7OND1mjxHuUXO1dsCTwIMm7U3vY2LYv1sogzZdZlWNV8aibJsP5eZP1mWhig6eRJFQcNXBnb7zsBO1iHnBg2kB6MicWYBcTKbfkbeUpSGOqkH3R5CwySkEA/0QIGYHbDLD7yKB66TYNtKUi+KayxQ5scpb9jAVt+dTjrUeVhZH+D7NJWq2jyR3VaXSx24z6pH4B69RIw/dFeX9fhF1n4T6gALyb3rZ/okPIrBD9rhHqB8IVlr4fqgWZwGcaM79KDjT"
 volume_ids: 
   
-  system: "vol-b5e862a6"
+  system: "vol-023834c1853ec7fa7"
 
-volume_ids_system: "vol-b5e862a6"
+volume_ids_system: "vol-023834c1853ec7fa7"
 vpn_server: 
   
-  certificate: "/authority/ops-vpn/issue/27/certificate"
-  private_key: "/authority/ops-vpn/issue/27/key"
+  certificate: "/authority/ops-vpn/issue/56/certificate"
+  private_key: "/authority/ops-vpn/issue/56/key"
 
-vpn_server_certificate: "/authority/ops-vpn/issue/27/certificate"
-vpn_server_private_key: "/authority/ops-vpn/issue/27/key"
+vpn_server_certificate: "/authority/ops-vpn/issue/56/certificate"
+vpn_server_private_key: "/authority/ops-vpn/issue/56/key"
 
 
 # ex: et ts=2 filetype=yaml

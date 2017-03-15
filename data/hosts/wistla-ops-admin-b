@@ -19,7 +19,44 @@ heka:
 heka_installed_version: "0.10.0"
 heka_needs_restart: "yes"
 heka_state: "enabled"
+icinga_core: 
+  
+  certificate: "/authority/icinga/issue/134/certificate"
+  installed_prefix: "/opt/icinga-2.6.1-xenial-0"
+  installed_version: "2.6.1-xenial-0"
+  needs_restart: "no"
+  private_key: "/authority/icinga/issue/134/key"
+  state: "enabled"
+
+icinga_core_certificate: "/authority/icinga/issue/134/certificate"
+icinga_core_installed_prefix: "/opt/icinga-2.6.1-xenial-0"
+icinga_core_installed_version: "2.6.1-xenial-0"
+icinga_core_needs_restart: "no"
+icinga_core_private_key: "/authority/icinga/issue/134/key"
+icinga_core_state: "enabled"
+icinga_web_core: 
+  
+  installed_prefix: "/opt/icinga-web-2.4.1"
+  installed_version: "2.4.1"
+  state: "enabled"
+
+icinga_web_core_installed_prefix: "/opt/icinga-web-2.4.1"
+icinga_web_core_installed_version: "2.4.1"
+icinga_web_core_state: "enabled"
 instance_id: "i-031c0edaabc1546ed"
+nginx: 
+  
+  installed_from: "source"
+  installed_prefix: "/opt/nginx-1.9.14"
+  installed_version: "1.9.14"
+  needs_restart: "yes"
+  state: "enabled"
+
+nginx_installed_from: "source"
+nginx_installed_prefix: "/opt/nginx-1.9.14"
+nginx_installed_version: "1.9.14"
+nginx_needs_restart: "yes"
+nginx_state: "enabled"
 php: 
   
   fpm_socket: "/run/php/php7.0-fpm.sock"

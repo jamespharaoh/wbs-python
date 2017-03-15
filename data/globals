@@ -292,6 +292,9 @@ default:
 
 icinga_core:
 
+  install: "yes"
+  install_version: "2.6.1-{{ ubuntu_release }}-0"
+
   authority: "icinga"
   ca_certificate: "/authority/icinga/certificate"
 
@@ -302,6 +305,9 @@ icinga_core:
   database_delegate: "wistla-ops-admin-a"
 
 icinga_web_core:
+
+  install: "yes"
+  install_version: "2.4.1"
 
   database_type: "mysql"
   database_hostname: "wistla-ops-admin-a"
@@ -315,36 +321,12 @@ icinga_web_core:
   listen_insecure_fragment: "fragments/listen-insecure.conf"
   listen_secure_fragment: "fragments/listen-secure.conf"
 
-  graphite_upstream: "http://graphite.ops.wistla.com"
+  config_roles:
 
-  roles:
-
-    admin:
-
-      name: "admin"
+    - name: "admin"
       users: [ "admin" ]
       permissions: [ "*" ]
-
-icinga_web_graphite:
-
-  version: "9e9edc02c442f422bec0d1a6ca3bed1e2ebb9d81"
-
-  base_url: "https://icinga.ops.wistla.com/graphite"
-
-graphite_carbon:
-
-  version: "0.9.15"
-
-graphite_web:
-
-  version: "0.9.15"
-
-  hostname: "graphite.ops.wistla.com"
-  path: "/graphite"
-  mode: "nginx-site"
-  security: "none"
-
-  secret_key: "{{ cluster.graphite_web_secret_key }}"
+      groups: []
 
 deployment_build_secret_path: "{{
   devops_inventory_deployment_modes [deployment_mode].build_secret_path

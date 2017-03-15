@@ -8,537 +8,18 @@ import itertools
 import re
 import wbs
 
-from wbs import ReportableError
-from wbs import uprint
+#from wbs import ReportableError
+#from wbs import uprint
 
-from gridlinker.ansible.misc import *;
+from gridlinker.ansible.misc import *
+
+from gridlinker.core.resource import *
+from gridlinker.core.resource_class import *
+from gridlinker.core.resource_namespace import *
 
 __all__ = [
 	"Inventory",
 ]
-
-class ResourceNamespace (object):
-
-	__slots__ = [
-
-		"name",
-		"data",
-
-		"groups",
-		"resources",
-
-		"references",
-		"back_references",
-
-	]
-
-	def __init__ (self, name, data):
-
-		assert data ["identity"] ["type"] == "namespace"
-		assert data ["identity"] ["name"] == name
-
-		self.name = name
-		self.data = data
-
-		self.groups = data.get ("namespace", {}).get ("groups", [])
-		self.resources = list ()
-
-		self.references = (
-			data.get ("namespace", {}).get (
-				"references",
-				list ()))
-
-		self.back_references = (
-			data.get ("namespace", {}).get (
-				"back_references",
-				list ()))
-
-	def add_resource (self, resource):
-
-		self.resources.append (
-			resource)
-
-class ResourceClass (object):
-
-	__slots__ = [
-
-		"data",
-
-		"name",
-
-		"groups",
-		"resources",
-		"namespace",
-		"parent_namespace",
-		"resource_identity",
-
-		"references",
-		"back_references",
-
-	]
-
-	def __init__ (self, inventory, data):
-
-		context = inventory.context
-		project_metadata = context.project_metadata
-
-		self.data = data
-
-		self.name = data ["identity"] ["name"]
-
-		self.namespace = data ["class"] ["namespace"]
-		self.groups = data ["class"].get ("groups", [])
-		self.resources = list ()
-
-		self.parent_namespace = (
-			data ["class"].get (
-				"parent_namespace",
-				None))
-
-		self.resource_identity = (
-			data ["class"].get (
-				"resource_identity",
-				dict ()))
-
-		self.references = (
-			data ["class"].get (
-				"references",
-				list ()))
-
-		self.back_references = (
-			data ["class"].get (
-				"back_references",
-				list ()))
-
-		for section_name, section_data in self.data.items ():
-
-			if section_name in [ "identity", "class" ]:
-
-				continue
-
-			if section_name \
-			not in project_metadata ["resource_section_names"]:
-
-				raise Exception (
-					"Class %s contains unrecognised section: %s" % (
-						self.name,
-						section_name))
-
-	def items (self):
-
-		return self.data.items ()
-
-	def add_resource (self, resource):
-
-		self.resources.append (
-			resource)
-
-class Resource (object):
-
-	__slots__ = [
-
-		"data",
-
-		"unique_name",
-		"identity_class",
-		"identity_name",
-		"identity_namespace",
-		"identity_parent",
-
-		"resource_class",
-		"resource_namespace",
-
-		"unresolved",
-		"not_yet_resolved",
-		"resolved",
-		"combined",
-
-	]
-
-	def __init__ (self, inventory, data):
-
-		context = inventory.context
-
-		self.data = data
-
-		self.identity_class = data ["identity"] ["class"]
-		self.identity_name = data ["identity"] ["name"]
-		self.identity_parent = data ["identity"].get ("parent")
-
-		self.resource_class = (
-			inventory.classes [self.identity_class])
-
-		self.identity_namespace = (
-			self.resource_class.namespace)
-
-		self.resource_namespace = (
-			inventory.namespaces [self.identity_namespace])
-
-		data ["identity"] ["namespace"] = (
-			self.resource_namespace.name)
-
-		data ["identity_namespace"] = (
-			self.resource_namespace.name)
-
-		self.unique_name = "/".join ([
-			self.identity_namespace,
-			self.identity_name,
-		])
-
-		data ["unique_name"] = self.unique_name
-
-		# add resource data
-
-		self.unresolved = wbs.deep_copy (data)
-		self.not_yet_resolved = wbs.deep_copy (data)
-		self.combined = wbs.deep_copy (data)
-		self.resolved = dict ()
-
-		for section_name, section_data in data.items ():
-
-			if not isinstance (section_data, dict):
-				continue
-
-			for item_name, item_value \
-			in section_data.items ():
-
-				self.unresolved [section_name + "_" + item_name] = (
-					item_value)
-
-				self.combined [section_name + "_" + item_name] = (
-					item_value)
-
-		# add class data
-
-		for section_name, section_data \
-		in self.resource_class.items ():
-
-			if section_name in [ "identity", "class" ]:
-				continue
-
-			if not section_name in self.unresolved:
-
-				self.unresolved [section_name] = (
-					collections.OrderedDict ())
-
-			if not isinstance (
-				self.unresolved [section_name],
-				dict):
-
-				raise Exception (
-					"Not a dictionary: %s.%s" % (
-						self.unique_name,
-						section_name))
-
-			if not section_name in self.not_yet_resolved:
-
-				self.not_yet_resolved [section_name] = (
-					collections.OrderedDict ())
-
-			if not section_name in self.combined:
-
-				self.combined [section_name] = (
-					collections.OrderedDict ())
-
-			for item_name, item_value \
-			in section_data.items ():
-
-				if item_name in self.unresolved [section_name]:
-					continue
-
-				self.unresolved [section_name] [item_name] = (
-					item_value)
-
-				self.not_yet_resolved [section_name] [item_name] = (
-					item_value)
-
-				self.combined [section_name] [item_name] = (
-					item_value)
-
-				full_name = (
-					"%s_%s" % (
-						section_name,
-						item_name))
-
-				self.unresolved [full_name] = (
-					item_value)
-
-				self.combined [full_name] = (
-					item_value)
-
-		# add namespace data
-
-		for namespace_prefix, namespace_data \
-		in self.resource_namespace.data.items ():
-
-			if namespace_prefix in [ "identity", "namespace" ]:
-				continue
-
-			if not namespace_prefix in self.unresolved:
-
-				self.unresolved [namespace_prefix] = (
-					collections.OrderedDict ())
-
-			if not namespace_prefix in self.not_yet_resolved:
-
-				self.not_yet_resolved [namespace_prefix] = (
-					collections.OrderedDict ())
-
-			if not namespace_prefix in self.combined:
-
-				self.combined [namespace_prefix] = (
-					collections.OrderedDict ())
-
-			if not isinstance (
-				self.unresolved [namespace_prefix],
-				dict):
-
-				raise Exception (
-					"Not a dictionary: %s.%s" % (
-						self.unique_name,
-						namespace_prefix))
-
-			for section_name, section_value \
-			in namespace_data.items ():
-
-				if section_name in self.unresolved [namespace_prefix]:
-					continue
-
-				self.unresolved [namespace_prefix] [section_name] = (
-					section_value)
-
-				self.not_yet_resolved [namespace_prefix] [section_name] = (
-					section_value)
-
-				self.combined [namespace_prefix] [section_name] = (
-					section_value)
-
-				full_name = (
-					"%s_%s" % (
-						namespace_prefix,
-						section_name))
-
-				self.unresolved [full_name] = (
-					section_value)
-
-				self.combined [full_name] = (
-					section_value)
-
-		# add defaults
-
-		for section_name, section_data \
-		in self.combined.items ():
-
-			if not isinstance (section_data, dict):
-				continue
-
-			for item_name, item_value \
-			in context.project_defaults.get (section_name, {}).items ():
-
-				if section_name + "_" + item_name not in self.unresolved:
-
-					self.unresolved [section_name + "_" + item_name] = (
-						wbs.deep_copy (item_value))
-
-				if section_name + "_" + item_name not in self.not_yet_resolved:
-
-					self.not_yet_resolved [section_name + "_" + item_name] = (
-						wbs.deep_copy (item_value))
-
-				if section_name + "_" + item_name not in self.combined:
-
-					self.combined [section_name + "_" + item_name] = (
-						wbs.deep_copy (item_value))
-
-				if item_name not in self.unresolved [section_name]:
-
-					self.unresolved [section_name] [item_name] = (
-						wbs.deep_copy (item_value))
-
-				if item_name not in self.not_yet_resolved [section_name]:
-
-					self.not_yet_resolved [section_name] [item_name] = (
-						wbs.deep_copy (item_value))
-
-				if item_name not in self.combined [section_name]:
-
-					self.combined [section_name] [item_name] = (
-						wbs.deep_copy (item_value))
-
-		for identity_name, identity_value \
-		in self.resource_class.resource_identity.items ():
-
-			if identity_name \
-			not in self.unresolved ["identity"]:
-
-				if identity_name in self.unresolved ["identity"]:
-					continue
-
-				identity_full_name = (
-					"identity_%s" % (
-						identity_name))
-
-				self.unresolved ["identity"] [identity_name] = (
-					identity_value)
-
-				self.not_yet_resolved ["identity"] [identity_name] = (
-					identity_value)
-
-				self.combined ["identity"] [identity_name] = (
-					identity_value)
-
-				self.unresolved [identity_full_name] = (
-					identity_value)
-
-				self.combined [identity_full_name] = (
-					identity_value)
-
-	def resolve (self, name_parts, value):
-
-		name_combined = (
-			"_".join (
-				name_parts))
-
-		if name_combined in self.resolved:
-
-			raise Exception (
-				"Attempt to resolve resource '%s' value '%s' twice" % (
-					self.unique_name,
-					name_combined))
-
-		self.resolved [name_combined] = value
-		self.combined [name_combined] = value
-
-		if name_combined in self.not_yet_resolved:
-
-			del self.not_yet_resolved [name_combined]
-
-		if len (name_parts) == 1:
-
-			pass
-
-		elif len (name_parts) == 2:
-
-			section_name, item_name = name_parts
-
-			if section_name not in self.resolved:
-				self.resolved [section_name] = dict ()
-
-			if section_name not in self.combined:
-				self.combined [section_name] = dict ()
-
-			self.resolved [section_name] [item_name] = value
-			self.combined [section_name] [item_name] = value
-
-			if section_name in self.not_yet_resolved \
-			and item_name in self.not_yet_resolved [section_name]:
-
-				del self.not_yet_resolved [section_name] [item_name]
-
-				if not self.not_yet_resolved [section_name]:
-					del self.not_yet_resolved [section_name]
-
-		else:
-
-			raise Exception ()
-
-	def get_unresolved (self, * name_parts):
-
-		context = self.unresolved
-
-		for name_part in name_parts:
-
-			if not name_part in context:
-
-				raise Exception (
-					"Can't find unresolved '%s' in '%s' for resource '%s'" % (
-						name_part,
-						name_pats.join ("."),
-						self.unique_name))
-
-			context = context [name_part]
-
-		return context
-
-	def has_unresolved (self, * name_parts):
-
-		context = self.unresolved
-
-		for name_part in name_parts:
-
-			if not name_part in context:
-				return False
-
-			context = context [name_part]
-
-		return True
-
-	def get_resolved (self, * name_parts):
-
-		context = self.resolved
-
-		for name_part in name_parts:
-
-			if not name_part in context:
-
-				raise Exception (
-					"Can't find resolved '%s' in '%s' for resource '%s'" % (
-						name_part,
-						".".join (name_parts),
-						self.unique_name))
-
-			context = context [name_part]
-
-		return context
-
-	def has_resolved (self, * name_parts):
-
-		context = self.resolved
-
-		for name_part in name_parts:
-
-			if not name_part in context:
-				return
-
-			context = context [name_part]
-
-		return True
-
-	def get (self, * name_parts):
-
-		if self.has_resolved (* name_parts):
-			return self.get_resolved (* name_parts)
-
-		elif self.has_unresolved (* name_parts):
-			return self.get_unresolved (* name_parts)
-
-		else:
-
-			raise Exception (
-				"Can't find resolved or unresolved '%s' for resource '%s'" % (
-					".".join (name_parts),
-					self.unique_name))
-
-	def has (self, * name_parts):
-
-		context = self.resolved
-
-		for name_part in name_parts:
-
-			if not name_part in context:
-				return
-
-			context = context [name_part]
-
-		return True
-
-	def items (self):
-
-		return self.combined.items ()
-
-	def __unicode__ (self):
-
-		return self.unique_name
 
 class Inventory (object):
 
@@ -665,6 +146,7 @@ class Inventory (object):
 
 			self.namespaces [namespace_name] = (
 				ResourceNamespace (
+					self,
 					namespace_name,
 					namespace_data))
 
@@ -708,6 +190,7 @@ class Inventory (object):
 		resource_class = (
 			ResourceClass (
 				self,
+				class_name,
 				class_data))
 
 		# store class
@@ -739,37 +222,40 @@ class Inventory (object):
 			# create resource
 
 			self.add_resource (
+				resource_name,
 				resource_data)
 
 	def add_resource (
 			self,
+			resource_name,
 			resource_data):
 
 		resource = (
 			Resource (
 				self,
+				resource_name,
 				resource_data))
 
-		if resource.unique_name in self.world:
+		if resource.name () in self.world:
 			raise Exception ()
 
-		self.world [resource.unique_name] = resource
-		self.resources [resource.unique_name] = resource
+		self.world [resource.name ()] = resource
+		self.resources [resource.name ()] = resource
 
-		self.group_members [resource.identity_class].append (
-			resource.unique_name)
+		self.group_members [resource.class_name ()].append (
+			resource.name ())
 
-		if not resource.identity_namespace in self.namespaces:
+		if not resource.namespace_name () in self.namespaces:
 
 			raise Exception (
 				"Resource '%s' has invalid namespace '%s'" % (
-					resource.unique_name,
-					resource.identity_namespace))
+					resource.name (),
+					resource.namespace_name ()))
 
-		self.classes [resource.identity_class].add_resource (
+		self.classes [resource.class_name ()].add_resource (
 			resource)
 
-		self.namespaces [resource.identity_namespace].add_resource (
+		self.namespaces [resource.namespace_name ()].add_resource (
 			resource)
 
 	def load_resources_2 (self):
@@ -781,23 +267,20 @@ class Inventory (object):
 
 			if resource.has_unresolved ("identity", "parent"):
 
-				parent_name = (
-					"%s/%s" % (
-						resource.resource_class.parent_namespace,
-						resource.identity_parent))
-
-				if not parent_name in self.resources:
+				if not resource.parent_name () in self.resources:
 
 					raise Exception (
 						"Can't find parent of %s: %s" % (
 							resource_name,
-							parent_name))
+							resource.parent_name ()))
 
 				parent_resource = (
 					self.resources [
-						parent_name])
+						resource.parent_name ()])
 
-				self.resource_children [parent_name].append (resource_name)
+				self.resource_children [
+					resource.parent_name ()
+				].append (resource_name)
 
 				if parent_resource.has_unresolved ("identity", "parent"):
 
@@ -843,7 +326,7 @@ class Inventory (object):
 		num_resolved = 0
 
 		for prefix, data \
-		in resource.not_yet_resolved.items ():
+		in resource._not_yet_resolved.items ():
 
 			if isinstance (data, dict):
 
@@ -853,7 +336,7 @@ class Inventory (object):
 
 						uprint (
 							"  resolve %s.%s.%s" % (
-								resource.unique_name,
+								resource.name (),
 								prefix,
 								name))
 
@@ -862,7 +345,7 @@ class Inventory (object):
 						name,
 					])
 
-					if full_name in resource.resolved:
+					if full_name in resource._resolved:
 						continue
 
 					success, resolved = (
@@ -891,13 +374,13 @@ class Inventory (object):
 
 					num_resolved += 1
 
-			elif prefix not in resource.resolved:
+			elif prefix not in resource._resolved:
 
 				if self.trace:
 
 					uprint (
 						"  resolve %s.%s" % (
-							resource.unique_name,
+							resource.name (),
 							prefix))
 
 				success, resolved = (
@@ -927,31 +410,21 @@ class Inventory (object):
 		for resource_name, resource \
 		in self.resources.items ():
 
-			if "parent" in resource.data ["identity"]:
-
-				parent_name = (
-					"%s/%s" % (
-						resource.resource_class.parent_namespace,
-						resource.identity_parent))
+			if resource.parent_name ():
 
 				resource.resolve (
 					[ "parent" ],
 					"{{ hostvars ['%s'] }}" % (
-						parent_name))
+						resource.parent_name ()))
 
 				if resource.has ("identity", "grandparent"):
 
-					parent = self.resources [parent_name]
-
-					grandparent_name = (
-						"%s/%s" % (
-							parent.resource_class.parent_namespace,
-							parent.identity_parent))
+					parent = self.resources [resource.parent_name ()]
 
 					resource.resolve (
 						[ "grandparent" ],
 						"{{ hostvars ['%s'] }}" % (
-							grandparent_name))
+							parent.parent_name ()))
 
 	def resolve_references (self):
 
@@ -962,8 +435,8 @@ class Inventory (object):
 
 			for reference \
 			in itertools.chain (
-				resource.resource_class.references,
-				resource.resource_namespace.references,
+				resource.class_references (),
+				resource.namespace_references (),
 			):
 
 				if reference ["name"] in reference_names:
@@ -1019,7 +492,7 @@ class Inventory (object):
 		in self.resources.items ():
 
 			for back_reference \
-			in resource.resource_class.back_references:
+			in resource.class_back_references ():
 
 				if back_reference ["type"] == "resource":
 
@@ -1066,7 +539,7 @@ class Inventory (object):
 			# namespace groups
 
 			for group_template \
-			in resource.resource_namespace.groups:
+			in resource.namespace_groups ():
 
 				group_name = (
 					self.resolve_value_or_none (
@@ -1091,7 +564,7 @@ class Inventory (object):
 			# class groups
 
 			for group_template \
-			in resource.resource_class.groups:
+			in resource.class_group_templates ():
 
 				group_name = (
 					self.resolve_value_or_none (
@@ -1241,7 +714,7 @@ class Inventory (object):
 			raise Exception (
 				"Unable to resolve '%s' for resource '%s'" % (
 					value,
-					resource.unique_name))
+					resource.name ()))
 
 		return resolved
 
@@ -1302,7 +775,7 @@ class Inventory (object):
 			uprint (
 				"%sresolve_value (%s, %s)" % (
 					indent,
-					resource.unique_name,
+					resource.name (),
 					value))
 
 			indent = indent + "  "
@@ -1405,7 +878,7 @@ class Inventory (object):
 			uprint (
 				"%sresolve_expression (%s, %s)" % (
 					indent,
-					resource.unique_name,
+					resource.name (),
 					name))
 
 			indent = indent + "  "
@@ -1488,7 +961,7 @@ class Inventory (object):
 					indent,
 					"', '".join (tokens),
 					token_index,
-					resource.unique_name))
+					resource.name ()))
 
 			indent = indent + "  "
 
@@ -2179,15 +1652,15 @@ class Inventory (object):
 			uprint (
 				"%sdereference_resource (%s, %s)" % (
 					indent,
-					resource.unique_name,
+					resource.name (),
 					token))
 
 		indent = indent + "  "
 
 		for reference \
 		in itertools.chain (
-			resource.resource_class.references,
-			resource.resource_namespace.references,
+			resource.class_references (),
+			resource.namespace_references (),
 		):
 
 			if token != reference ["name"]:
@@ -2244,7 +1717,7 @@ class Inventory (object):
 								indent,
 								token))
 
-					return True, "resource", target_resource.unique_name
+					return True, "resource", target_resource.name ()
 
 			elif reference ["type"] == "simple":
 
