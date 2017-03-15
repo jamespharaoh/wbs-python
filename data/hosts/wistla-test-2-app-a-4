@@ -1,6 +1,15 @@
 ---
 
 amazon_instance_type_running: "r3.large"
+btrfs_dedupe: 
+  
+  installed_prefix: "/opt/btrfs-dedupe-1.1.0-xenial"
+  installed_version: "1.1.0-xenial"
+  state: "enabled"
+
+btrfs_dedupe_installed_prefix: "/opt/btrfs-dedupe-1.1.0-xenial"
+btrfs_dedupe_installed_version: "1.1.0-xenial"
+btrfs_dedupe_state: "enabled"
 heka: 
   
   installed_version: "0.10.0"

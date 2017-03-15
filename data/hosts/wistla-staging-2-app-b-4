@@ -54,21 +54,21 @@ python_apt_state: "installed"
 python_installed_version: "2.7.11"
 python_pip: 
   
-  installed_version: "2.7.11/8.1.1"
+  installed_version: "2.7.11/9.0.1"
   state: "installed"
 
-python_pip_installed_version: "2.7.11/8.1.1"
+python_pip_installed_version: "2.7.11/9.0.1"
 python_pip_state: "installed"
 python_state: "installed"
 rzbackup: 
   
-  installed_prefix: "/opt/rzbackup-2.0.7-xenial"
-  installed_version: "2.0.7-xenial"
+  installed_prefix: "/opt/rzbackup-3.3.0-xenial"
+  installed_version: "3.3.0-xenial"
   needs_restart: "no"
   state: "enabled"
 
-rzbackup_installed_prefix: "/opt/rzbackup-2.0.7-xenial"
-rzbackup_installed_version: "2.0.7-xenial"
+rzbackup_installed_prefix: "/opt/rzbackup-3.3.0-xenial"
+rzbackup_installed_version: "3.3.0-xenial"
 rzbackup_needs_restart: "no"
 rzbackup_state: "enabled"
 ssh: 

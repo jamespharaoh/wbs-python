@@ -21,21 +21,6 @@ heka:
 heka_installed_version: "0.10.0"
 heka_needs_restart: "yes"
 heka_state: "enabled"
-icinga_core: 
-  
-  certificate: "/authority/icinga/issue/136/certificate"
-  installed_prefix: "/opt/icinga-2.6.1-xenial-0"
-  installed_version: "2.6.1-xenial-0"
-  needs_restart: "no"
-  private_key: "/authority/icinga/issue/136/key"
-  state: "enabled"
-
-icinga_core_certificate: "/authority/icinga/issue/136/certificate"
-icinga_core_installed_prefix: "/opt/icinga-2.6.1-xenial-0"
-icinga_core_installed_version: "2.6.1-xenial-0"
-icinga_core_needs_restart: "no"
-icinga_core_private_key: "/authority/icinga/issue/136/key"
-icinga_core_state: "enabled"
 instance_id: "i-049cee96a86d0cf81"
 nginx: 
   

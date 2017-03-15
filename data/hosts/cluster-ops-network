@@ -2,24 +2,30 @@
 
 admin_balancer_hosted_zone_name: "ops-admin-2037886270.eu-west-1.elb.amazonaws.com"
 admin_balancer_hosted_zone_name_id: "Z3NF1Z3NOM5OY2"
-icinga_core: 
+icinga: 
   
   database_initialized: "yes"
+  ticket_salt: "migqyvdljzdbdyvddige"
+
+icinga_core: 
+  
   database_password: "ptndkfnnrpyquocfbnzf"
   ticket_salt: "qclqmcljwivlozksocgf"
 
-icinga_core_database_initialized: "yes"
 icinga_core_database_password: "ptndkfnnrpyquocfbnzf"
 icinga_core_ticket_salt: "qclqmcljwivlozksocgf"
-icinga_web_core: 
+icinga_database_initialized: "yes"
+icinga_database_password: "qqiwmlckafbtaechemji"
+icinga_ticket_salt: "migqyvdljzdbdyvddige"
+icinga_web: 
   
   admin_password: "dahofopovcovfakdxnnx"
-  database_initialized: "yes"
   database_password: "qreihbrfsdytyyxgmygg"
+  main_database_initialized: "yes"
 
-icinga_web_core_admin_password: "dahofopovcovfakdxnnx"
-icinga_web_core_database_initialized: "yes"
-icinga_web_core_database_password: "qreihbrfsdytyyxgmygg"
+icinga_web_admin_password: "dahofopovcovfakdxnnx"
+icinga_web_database_password: "qreihbrfsdytyyxgmygg"
+icinga_web_main_database_initialized: "yes"
 internet_gateway_id: "igw-acf814c9"
 routes_admin_a: "rtb-f6fc3193"
 routes_admin_b: "rtb-f4fc3191"
