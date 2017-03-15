@@ -169,7 +169,7 @@ php_install_version: "{{
   } [ubuntu_release]
 }}"
 
-php_install_packages:
+php_packages:
 
   - "php{{ php_install_version }}-cli"
   - "php{{ php_install_version }}-fpm"
