@@ -1,0 +1,59 @@
+---
+
+- name: "issue etcd client certificate"
+  when: "
+    etcd_secured == 'yes'
+    and etcd_client_certificate is not defined
+  "
+  register: "etcd_client_result"
+  action:
+
+    module: "certificate_authority_issue"
+    authority: "{{ etcd_client_authority }}"
+    common_name: "{{ etcd_client_hostname }}"
+    usage: "mixed"
+    alt_dns: "{{ etcd_client_hostnames }}"
+    alt_ip: "{{ etcd_client_ips }}"
+
+- name: "store etcd client certificate"
+  when: "etcd_client_result | changed"
+  update_resource:
+
+    etcd.client_certificate: "{{ etcd_client_result.certificate }}"
+    etcd.client_private_key: "{{ etcd_client_result.private_key }}"
+
+- name: "create etcd client directories"
+  with_items: "{{ etcd_client_directories }}"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ item.path }}"
+    state: "directory"
+    mode: "{{ item.mode }}"
+
+- name: "write etcd client config templates"
+  with_items: "{{ etcd_client_config_templates }}"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "{{ item.target }}"
+    src: "{{ item.template }}"
+
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+
+- name: "write etcd security config"
+  with_items: "{{ etcd_client_security_config }}"
+  when: "etcd_secured == 'yes'"
+  become: "yes"
+  action:
+
+    module: "copy"
+    dest: "/etc/etcd/{{ item.target }}"
+    content: "{{ lookup ('etcd', item.source) }}"
+    mode: "{{ item.mode }}"
+
+# ex: et ts=2 filetype=yaml

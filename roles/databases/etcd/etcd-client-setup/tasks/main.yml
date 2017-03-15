@@ -1,0 +1,10 @@
+---
+
+- include: "etcd-client-setup.yml"
+  tags:
+
+    - "etcd-client-setup"
+    - "etcd-client"
+    - "etcd"
+
+# ex: et ts=2 filetype=yaml
