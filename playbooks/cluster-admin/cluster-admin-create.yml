@@ -5,6 +5,7 @@
 
     - "cluster-create"
     - "cluster-assign-elastic-ip"
+
     - "ssh-server-wait"
     - "ssh-server-keyscan"
 

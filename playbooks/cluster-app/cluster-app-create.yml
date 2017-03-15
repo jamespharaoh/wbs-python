@@ -4,7 +4,8 @@
   roles:
 
     - "cluster-create"
-    - "wait-for-ssh"
-    - "scan-ssh-key"
+
+    - "ssh-server-wait"
+    - "ssh-server-keyscan"
 
 # ex: et ts=2 filetype=yaml

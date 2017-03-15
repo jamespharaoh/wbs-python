@@ -5,7 +5,7 @@
 - hosts: "cluster-ops-network"
   roles:
 
-    - "icinga-core-cluster-prepare"
+    - "icinga-core-database-prepare"
 
 - hosts:
 
@@ -19,10 +19,10 @@
     - "icinga-core-install"
     - "install-wistla-icinga-plugins"
 
-- hosts: "cluster-ops-network"
+- hosts: "cluster-ops-network:&cluster-instance-active"
   roles:
 
-    - "icinga-core-cluster-setup"
+    - "icinga-core-database-setup"
 
 - hosts: "wistla-ops-admin-a:&cluster-instance-active"
   roles:
@@ -52,24 +52,20 @@
 - hosts: "cluster-ops-network"
   roles:
 
-    - "icinga-web-core-cluster-setup"
+    - "icinga-web-core-database-setup"
 
 - hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
     - "icinga-web-core-setup"
+    - "icinga-web-graphite"
 
-# ==================== wbs monitoring
+# =================== graphite
 
-- hosts:
-
-    - "cluster-admin:&cluster-instance-active"
-    - "cluster-app:&cluster-instance-active"
-    - "cluster-data:&cluster-instance-active"
-    - "cluster-jenkins:&cluster-instance-active"
-
+- hosts: "cluster-ops-admin:&cluster-instance-active"
   roles:
 
-    - "wbs-monitoring"
+    - "graphite-carbon"
+    - "graphite-web"
 
 # ex: et ts=2 filetype=yaml
