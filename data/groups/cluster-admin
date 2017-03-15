@@ -1,5 +1,7 @@
 ---
 
+ansible_ssh_host: "{{ instance_zone }}.{{ cluster.local_domain }}"
+
 instance_type_colour: "196"
 
 ubuntu_apt_proxy_url: "http://localhost:3142"
