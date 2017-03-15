@@ -1,14 +1,14 @@
 ---
 
-- include: "fixtures-mongo.yml"
-  when: "
-    deployment_mode in [ 'jenkins', 'vagrant' ]
-    or deployment.type in [ 'shared2', 'simple2' ]
-  "
-  tags:
-
-    - "fixtures-mongo"
-    - "fixtures"
+#- include: "fixtures-mongo.yml"
+#  when: "
+#    deployment_mode in [ 'jenkins', 'vagrant' ]
+#    or deployment.type in [ 'shared2', 'simple2' ]
+#  "
+#  tags:
+#
+#    - "fixtures-mongo"
+#    - "fixtures"
 
 - include: "fixtures-postgresql-main.yml"
   when: "
