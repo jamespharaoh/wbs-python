@@ -86,6 +86,7 @@ type = "FileOutput"
 path = "/var/log/cluster-system.log"
 message_matcher = 'Fields[Category] == "system"'
 encoder = "encoder-simple"
+rotation_interval = 24
 
 {% for log_name in [
 	'load-nginx-access',
@@ -106,6 +107,7 @@ type = "FileOutput"
 path = "/var/log/cluster-{{ log_name }}.log"
 message_matcher = 'Fields[Category] == "{{ log_name }}"'
 encoder = "encoder-simple"
+rotation_interval = 24
 
 {% endfor %}
 
@@ -116,6 +118,7 @@ type = "FileOutput"
 path = "/var/log/cluster-nginx-{{ nginx_log_type }}.log"
 message_matcher = 'Fields[Category] == "nginx-{{ nginx_log_type }}"'
 encoder = "encoder-simple"
+rotation_interval = 24
 
 {% endfor %}
 

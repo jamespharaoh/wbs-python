@@ -1,7 +1,7 @@
 ---
 
 - include: "icinga-web-core-cluster-setup-mysql.yml"
-  when: "icinga_web_core_main_database_type == 'mysql'"
+  when: "icinga_web_core_database_type == 'mysql'"
   tags:
 
     - "icinga-web-core-cluster-setup"
@@ -11,7 +11,7 @@
     - "icinga"
 
 - include: "icinga-web-core-cluster-setup-postgresql.yml"
-  when: "icinga_web_core_main_database_type == 'postgresql'"
+  when: "icinga_web_core_database_type == 'postgresql'"
   tags:
 
     - "icinga-web-core-cluster-setup"

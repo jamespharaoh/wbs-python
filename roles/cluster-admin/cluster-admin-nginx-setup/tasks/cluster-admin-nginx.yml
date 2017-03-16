@@ -46,7 +46,7 @@
       --rsync-path "sudo rsync"
       --exclude "/fragments"
       "{{ WORK }}/cluster/{{ cluster_name }}/nginx/"
-      "{{ inventory_hostname }}:{{ nginx_config }}/";
+      "{{ ansible_ssh_user }}@{{ ansible_ssh_host }}:{{ nginx_config }}/";
 
 - name: "cluster admin nginx fragments"
   become: "yes"

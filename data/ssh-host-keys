@@ -60,9 +60,9 @@ ops:
   admin:
 
     a:
-      - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"
-      - "BBBNH6hs58lwYsKxiK6W+gpuVqYLr/J7sd5pQZbB2ANuHnEUiVPTmHKxXvmKkBVTWWRZ1B"
-      - "MluvsGrWy7VMgZnqrgY="
+      - "a.admin.ops.wistla.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA"
+      - "yNTYAAAAIbmlzdHAyNTYAAABBBGyrtcfbTLzq6vG4ddD2un08bjMWEZYl0mlz/wsyGPjHs"
+      - "40FfDvpOIqkDsnwKABmHbfUAaS2qTzQVAe1OJDYDKA="
 
     b:
       - "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAA"

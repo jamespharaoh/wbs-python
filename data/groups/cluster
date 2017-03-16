@@ -14,6 +14,20 @@ amazon_account: "{{ amazon_accounts [amazon_account_name] }}"
 amazon_region_name: "{{ cluster.amazon_region }}"
 amazon_key_name: "{{ cluster.amazon_key_name }}"
 
+icinga_core_name: "{{ inventory_hostname }}"
+icinga_core_ticket_salt: "{{ cluster_network.icinga_core_ticket_salt }}"
+
+icinga_core_database_type: "mysql"
+icinga_core_database_hostname: "wistla-{{ cluster_name }}-admin-a"
+icinga_core_database_password: "{{ cluster_network.icinga_core_database_password }}"
+
+icinga_web_core_database_type: "mysql"
+icinga_web_core_database_hostname: "wistla-{{ cluster_name }}-admin-a"
+
+icinga_web_core_database_password: "{{
+  cluster_network.icinga_web_core_database_password
+}}"
+
 node_memory: "{{ cluster_deployment.node_memory }}"
 node_instance_count: "{{ cluster_deployment.node_instance_count }}"
 

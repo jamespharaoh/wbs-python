@@ -4,6 +4,7 @@
 
 {% for cluster_deployment in deployments | dictsort | values %}
 {% if cluster_deployment.cluster_name != 'dev' %}
+{% if cluster_deployment.type in [ 'simple2', 'alias2' ] %}
 
 - hosts: "cluster-{{ cluster_deployment.cluster_name }}-app:&cluster-instance-active"
   roles:
@@ -13,6 +14,17 @@
       cluster_deployment_name: "{{ cluster_deployment.name }}"
       cluster_deployment_playbook_name: "build-down"
 
+{% elif cluster_deployment.type in [ 'shared2' ] %}
+
+- hosts: "cluster-{{ cluster_deployment.cluster_name }}-data:&cluster-instance-active"
+  roles:
+
+    - role: "cluster-deployment-playbook"
+      tags: "{{ cluster_deployment.name }}"
+      cluster_deployment_name: "{{ cluster_deployment.name }}"
+      cluster_deployment_playbook_name: "build-down"
+
+{% endif %}
 {% endif %}
 {% endfor %}
 

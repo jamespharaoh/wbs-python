@@ -6,8 +6,10 @@ from gridlinker.core.context import GenericContext
 
 from gridlinker.core import metadata
 
-from gridlinker.core import inventory
-from gridlinker.core.inventory import Inventory
+from gridlinker.core.inventory import *
+from gridlinker.core.resource import *
+from gridlinker.core.resource_class import *
+from gridlinker.core.resource_namespace import *
 
 from wbs import register_error
 
@@ -79,4 +81,4 @@ register_error (
 		does not exist.
 	""")
 
-# ex: noet ts=4 filetype=yaml
+# ex: noet ts=4 filetype=python

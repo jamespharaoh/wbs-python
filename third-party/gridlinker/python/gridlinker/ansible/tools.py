@@ -119,8 +119,9 @@ def args_inventory (sub_parsers):
 	parser.set_defaults (
 		func = do_inventory)
 
-	group = parser.add_mutually_exclusive_group (
-		required = True)
+	group = (
+		parser.add_mutually_exclusive_group (
+			required = True))
 
 	group.add_argument (
 		"--list",
@@ -173,7 +174,8 @@ def do_inventory_list (context):
 		"vars": inventory.all,
 	}
 
-	for class_name, class_data in inventory.classes.items ():
+	for class_name, class_data \
+	in inventory.classes.items ():
 
 		output [class_name] = {
 			"children": inventory.group_children [class_name],
@@ -191,7 +193,7 @@ def do_inventory_list (context):
 	in inventory.resources.items ():
 
 		output ["_meta"] ["hostvars"] [resource_name] = (
-			resource.combined)
+			resource.combined ())
 
 	for key, value \
 	in context.project_metadata ["project_data"].items ():
@@ -207,7 +209,8 @@ def do_inventory_list (context):
 		"ansible_connection": "local",
 	}
 
-	for group_name in inventory.class_groups:
+	for group_name \
+	in inventory.class_groups:
 
 		output [group_name] = {
 			"hosts": sorted (
@@ -215,24 +218,28 @@ def do_inventory_list (context):
 		}
 
 	output ["all"] ["vars"] ["namespaces"] = dict ([
-		(namespace.name, [
-			resource.identity_name
-			for resource in namespace.resources
+		(namespace.name (), [
+			resource.name ()
+			for resource
+			in namespace.resources()
 		])
 		for namespace in inventory.namespaces.values ()
 	])
 
 	output ["all"] ["vars"] ["classes"] = dict ([
-		(class_data.name, [
-			resource.identity_name
-			for resource in class_data.resources
+		(class_data.name (), [
+			resource.name ()
+			for resource
+			in class_data.resources ()
 		])
-		for class_data in inventory.classes.values ()
+		for class_data \
+		in inventory.classes.values ()
 	])
 
 	output ["all"] ["vars"] ["resources"] = dict ([
-		(resource_name, resource.data ["identity"])
-		for resource_name, resource in inventory.resources.items ()
+		(resource_name, resource._raw_data ["identity"])
+		for resource_name, resource
+		in inventory.resources.items ()
 	])
 
 	print_json (output)
@@ -263,10 +270,10 @@ def resolve_resource_data (context, output):
 
 			resources = map (
 				lambda resource:
-					inventory.resources [resource.unique_name],
+					inventory.resources [resource.name ()],
 				inventory.namespaces [
 					resource_data_value ["group"]
-				].resources)
+				].resources ())
 
 		else:
 

@@ -210,4 +210,16 @@ rzbackup_max_compressed_filesystem_cache_entries: "262144"
 
 icinga_certificate: ""
 
+btrfs_dedupe_install_version: "1.1.0-{{ ubuntu_release }}"
+
+btrfs_dedupe_install_tasks:
+
+  - name: "lxc"
+    user: "root"
+    schedule: "0 * * * *"
+    database_path: "/var/cache/btrfs-dedupe/lxc.json.gz"
+    dedupe_paths:
+
+      - "/var/lib/lxc/*/rootfs"
+
 # ex: et ts=2 filetype=yaml

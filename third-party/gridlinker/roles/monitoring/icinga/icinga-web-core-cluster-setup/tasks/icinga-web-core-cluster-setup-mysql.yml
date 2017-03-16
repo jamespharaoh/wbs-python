@@ -29,7 +29,7 @@
     set -euf -o pipefail;
 
     mysql {{ icinga_web_core_database_name }}
-      </opt/icinga-web-{{ icinga_web_core_version }}/etc/schema/mysql.schema.sql;
+      </opt/icinga-web-{{ icinga_web_core_install_version }}/etc/schema/mysql.schema.sql;
 
     password_hash=$(openssl passwd -1 {{ icinga_web_core_admin_password }});
 

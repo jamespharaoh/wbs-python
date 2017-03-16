@@ -1,16 +1,16 @@
-/var/log/cluster-*.log {
-
-	rotate 7
-	daily
-
-	missingok
-	notifempty
-
-	delaycompress
-	compress
-
-	postrotate
-		reload heka &>/dev/null || true
-	endscript
-
-}
+#/var/log/cluster-*.log {
+#
+#	rotate 7
+#	daily
+#
+#	missingok
+#	notifempty
+#
+#	delaycompress
+#	compress
+#
+#	postrotate
+#		reload heka &>/dev/null || true
+#	endscript
+#
+#}

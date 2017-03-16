@@ -13,17 +13,7 @@
 ######################################################################
 
 
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "production"
-      cluster_deployment_name: "production"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-production-2-app:&cluster-instance-active"
+- hosts: "cluster-production-2-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -53,37 +43,7 @@
       cluster_deployment_playbook_name: "node-start"
 
 
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "production-a"
-      cluster_deployment_name: "production-a"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-production-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "production-b"
-      cluster_deployment_name: "production-b"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "staging"
-      cluster_deployment_name: "staging"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-staging-2-app:&cluster-instance-active"
+- hosts: "cluster-staging-2-data:&cluster-instance-active"
   roles:
 
     - role: "cluster-deployment-playbook"
@@ -110,46 +70,6 @@
       when: "amazon_instance_state == 'running'"
       tags: "staging-2-b"
       cluster_deployment_name: "staging-2-b"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "staging-a"
-      cluster_deployment_name: "staging-a"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-staging-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "staging-b"
-      cluster_deployment_name: "staging-b"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-test-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "test"
-      cluster_deployment_name: "test"
-      cluster_deployment_playbook_name: "node-start"
-
-
-- hosts: "cluster-test-2-app:&cluster-instance-active"
-  roles:
-
-    - role: "cluster-deployment-playbook"
-      when: "amazon_instance_state == 'running'"
-      tags: "test-2"
-      cluster_deployment_name: "test-2"
       cluster_deployment_playbook_name: "node-start"
 
 
