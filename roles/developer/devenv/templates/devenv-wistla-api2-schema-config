@@ -23,6 +23,7 @@ schemas:
       - config
       - computed_table_updates_map
       - dirty_pants
+      - load_test
       - table_weights
       - test_fixtures
       - timezones
