@@ -195,6 +195,12 @@ def do_inventory_list (context):
 		output ["_meta"] ["hostvars"] [resource_name] = (
 			resource.combined ())
 
+	if not "localhost" in output ["_meta"] ["hostvars"]:
+
+		output ["_meta"] ["hostvars"] ["localhost"] = {
+			"ansible_connection": "local",
+		}
+
 	for key, value \
 	in context.project_metadata ["project_data"].items ():
 

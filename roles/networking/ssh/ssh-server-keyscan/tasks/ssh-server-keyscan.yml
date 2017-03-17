@@ -1,7 +1,7 @@
 ---
 
 - name: "retrieve host key {{ scan_ssh_key_type }}"
-  connection: "local"
+  delegate_to: "localhost"
   register: "ssh_keyscan_result"
   args:
 
@@ -15,7 +15,7 @@
     | cut -f2-3 -d' ';
 
 - name: "temporary store host key {{ scan_ssh_key_type }}"
-  connection: "local"
+  delegate_to: "localhost"
   args:
 
     executable: "/bin/bash"
