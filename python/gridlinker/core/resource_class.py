@@ -118,7 +118,7 @@ class ResourceClass (object):
 
 				raise Exception (
 					"Class %s contains unrecognised section: %s" % (
-						self.name,
+						self.name (),
 						section_name))
 
 			self._data.setdefault (
@@ -148,7 +148,7 @@ class ResourceClass (object):
 						type (section_data),
 						section_name))
 
-			for item_name, item_value \
+			for item_name, item_data \
 			in section_data.items ():
 
 				if item_name in self._data [section_name]:

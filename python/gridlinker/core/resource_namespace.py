@@ -6,7 +6,7 @@ from __future__ import with_statement
 #import collections
 #import itertools
 #import re
-#import wbs
+import wbs
 
 #from wbs import ReportableError
 #from wbs import uprint
@@ -53,7 +53,6 @@ class ResourceNamespace (object):
 		self._build_identity ()
 		self._build_data ()
 
-		self._groups = list ()
 		self._resources = list ()
 
 	def _build_identity (self):

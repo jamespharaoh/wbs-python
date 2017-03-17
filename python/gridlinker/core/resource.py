@@ -128,17 +128,20 @@ class Resource (object):
 			self._combined [section_name] = dict ()
 			self._resolved [section_name] = dict ()
 
-			for item_name, item_value \
+			for item_name, item_data \
 			in section_data.items ():
 
 				self._unresolved [section_name] [item_name] = (
-					item_value)
+					wbs.deep_copy (
+						item_data))
 
 				self._not_yet_resolved [section_name] [item_name] = (
-					item_value)
+					wbs.deep_copy (
+						item_data))
 
 				self._combined [section_name] [item_name] = (
-					item_value)
+					wbs.deep_copy (
+						item_data))
 
 				full_name = (
 					"%s_%s" % (
@@ -146,10 +149,12 @@ class Resource (object):
 						item_name))
 
 				self._unresolved [full_name] = (
-					item_value)
+					wbs.deep_copy (
+						item_data))
 
 				self._combined [full_name] = (
-					item_value)
+					wbs.deep_copy (
+						item_data))
 
 	def resolve (self, name_parts, value):
 

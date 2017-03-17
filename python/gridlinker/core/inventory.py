@@ -505,7 +505,7 @@ class Inventory (object):
 					values = []
 
 					for other_resource \
-					in self.namespaces [namespace].resources:
+					in self.namespaces [namespace].resources ():
 
 						if not other_resource.has (field):
 							continue
@@ -517,11 +517,11 @@ class Inventory (object):
 						if not isinstance (other_values, list):
 							other_values = [ other_values ]
 
-						if not resource.identity_name in other_values:
+						if not resource.name () in other_values:
 							continue
 
 						values.append (
-							other_resource.identity_name)
+							other_resource.name ())
 
 					resource.resolve (
 						[ section, name ],
@@ -1750,23 +1750,18 @@ class Inventory (object):
 
 		if token == "parent":
 
-			parent_name = (
-				"%s/%s" % (
-					resource.resource_class.parent_namespace,
-					resource.identity_parent))
-
 			parent = (
 				self.resources [
-					parent_name])
+					resource.parent_name ()])
 
 			if self.trace:
 
 				uprint (
 					"%srecurse parent: %s" % (
 						indent,
-						parent_name))
+						resource.parent_name ()))
 
-			return True, "resource", parent_name
+			return True, "resource", resource.parent_name ()
 
 		if token in self.all:
 

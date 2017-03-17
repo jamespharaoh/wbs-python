@@ -306,7 +306,7 @@ def resolve_resource_data (context, output):
 					inventory.resolve_value_or_fail (
 						resource,
 						resource_data_value ["key"]),
-					resource.combined,
+					resource.combined (),
 				)
 				for resource in resources
 			]
