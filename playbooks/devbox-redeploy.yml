@@ -1,9 +1,0 @@
----
-
-- include: "devbox.yml"
-- include: "node-templates.yml"
-- include: "node-stop.yml"
-- include: "node-start.yml"
-- include: "fixtures.yml"
-
-# ex: et ts=2 filetype=yaml

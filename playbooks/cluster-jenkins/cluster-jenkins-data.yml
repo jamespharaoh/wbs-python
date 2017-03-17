@@ -1,8 +1,0 @@
----
-
-- hosts: "cluster-jenkins"
-  roles:
-
-    - "cluster-jenkins-data"
-
-# ex: et ts=2 filetype=yaml

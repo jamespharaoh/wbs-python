@@ -1,8 +1,0 @@
----
-
-- hosts: "cluster-app"
-  roles:
-
-    - "cluster-system"
-
-# ex: et ts=2 filetype=yaml

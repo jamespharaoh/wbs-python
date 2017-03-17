@@ -1,1 +1,0 @@
-icinga ALL = (ALL) NOPASSWD: /opt/wbs-monitoring/check_lxc_container

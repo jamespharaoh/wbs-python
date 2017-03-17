@@ -1,0 +1,18 @@
+{{ ansible_warning [';'] }}
+
+[logging]
+
+log = "syslog"
+level = "ERROR"
+application = "icingaweb2"
+
+[preferences]
+
+store = "db"
+resource = "icingaweb_db"
+
+[global]
+
+module_path = "{{ icinga_web_core_installed_prefix }}/modules"
+
+; ex: noet ts=4 filetype=icingaweb2

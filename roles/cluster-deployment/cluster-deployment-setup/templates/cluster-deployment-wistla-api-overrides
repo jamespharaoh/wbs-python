@@ -1,8 +1,0 @@
-{{ ansible_warning ['//'] }}
-
-var ROOT = process.cwd ();
-var config = require(ROOT + '/config/config.local');
-
-module.exports = config;
-
-// ex: noet ts=4 filetype=javascript

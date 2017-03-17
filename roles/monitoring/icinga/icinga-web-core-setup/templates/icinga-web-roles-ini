@@ -1,0 +1,19 @@
+{{ ansible_warning [';'] }}
+
+{% for role in icinga_web_core_config_roles %}
+
+[{{ role.name }}]
+
+{% if role.users %}
+users = "{{ role.users | join (',') }}"
+{% endif %}
+
+{% if role.groups %}
+groups = "{{ role.groups | join (',') }}"
+{% endif %}
+
+permissions = "{{ role.permissions | join (',') }}"
+
+{% endfor %}
+
+; ex: noet ts=2 filetype=icinga2

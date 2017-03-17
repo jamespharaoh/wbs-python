@@ -1,8 +1,0 @@
----
-
-- hosts: "cluster-admin"
-  roles:
-
-    - "cluster-activate"
-
-# ex: et ts=2 filetype=yaml

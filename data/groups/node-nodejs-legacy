@@ -1,8 +1,0 @@
----
-
-node_global_config_links:
-
-  - link: "/etc/npmrc"
-    target: "/config/npmrc"
-
-# ex: et ts=2 filetype=yaml

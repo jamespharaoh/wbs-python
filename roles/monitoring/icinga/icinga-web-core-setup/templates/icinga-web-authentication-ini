@@ -1,0 +1,7 @@
+{{ ansible_warning [';'] }}
+
+[icingaweb2]
+backend = "db"
+resource = "icingaweb_db"
+
+; ex: noet ts=4 filetype=icingaweb2

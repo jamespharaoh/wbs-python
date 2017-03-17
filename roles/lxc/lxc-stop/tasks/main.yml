@@ -1,9 +1,0 @@
----
-
-- include: "lxc-stop.yml"
-  tags:
-
-    - "lxc"
-    - "lxc-stop"
-
-# ex: et ts=2 filetype=yaml

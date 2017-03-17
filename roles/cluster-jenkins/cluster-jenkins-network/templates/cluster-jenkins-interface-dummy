@@ -1,7 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-auto dummy0
-iface dummy0 inet static
-	pre-up modprobe dummy
-	address 10.255.255.10
-	netmask 255.255.255.0

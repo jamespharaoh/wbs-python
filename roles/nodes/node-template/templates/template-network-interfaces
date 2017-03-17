@@ -1,4 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-auto lo
-iface lo inet loopback

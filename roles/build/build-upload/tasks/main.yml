@@ -1,6 +1,0 @@
----
-
-- include: "build-upload.yml"
-  tags: [ "build", "build-upload" ]
-
-# ex: et ts=4 filetype=yaml

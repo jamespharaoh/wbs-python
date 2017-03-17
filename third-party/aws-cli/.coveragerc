@@ -1,5 +1,0 @@
-[run]
-branch = True
-include =
-    awscli/*
-omit = awscli/testutils.py

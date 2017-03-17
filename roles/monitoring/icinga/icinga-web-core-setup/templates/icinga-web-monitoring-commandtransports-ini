@@ -1,0 +1,8 @@
+{{ ansible_warning [';'] }}
+
+[icinga]
+
+transport = "local"
+path = "/var/run/icinga2/cmd/icinga2.cmd"
+
+; ex: noet ts=4 filetype=icingaweb2

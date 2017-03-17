@@ -1,8 +1,0 @@
----
-
-identity:
-
-  name: "supercluster"
-  type: "namespace"
-
-# ex: et ts=2 filetype=yaml

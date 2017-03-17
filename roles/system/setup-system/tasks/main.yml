@@ -1,9 +1,0 @@
----
-
-- include: "setup-system.yml"
-  tags:
-
-    - "system"
-    - "setup-system"
-
-# ex: et ts=2 filetype=yaml

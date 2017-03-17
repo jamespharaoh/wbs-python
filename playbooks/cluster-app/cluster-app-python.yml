@@ -1,8 +1,0 @@
----
-
-- hosts: "cluster-app"
-  roles:
-
-    - "python"
-
-# ex: et ts=2 filetype=yaml

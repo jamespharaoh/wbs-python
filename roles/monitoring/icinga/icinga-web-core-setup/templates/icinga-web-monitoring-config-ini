@@ -1,0 +1,7 @@
+{{ ansible_warning [';'] }}
+
+[security]
+
+protected_customvars = "*pw*,*pass*,community"
+
+; ex: noet ts=4 filetype=icingaweb2

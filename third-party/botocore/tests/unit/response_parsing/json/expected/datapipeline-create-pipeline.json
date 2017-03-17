@@ -1,7 +1,0 @@
-{
-    "Error": {
-        "Message": "Operation createPipeline is not allowed to be performed with role identity",
-        "Code": "AccessDeniedException"
-    },
-    "ResponseMetadata": {}
-}

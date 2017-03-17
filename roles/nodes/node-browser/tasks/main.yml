@@ -1,9 +1,0 @@
----
-
-- include: "node-browser.yml"
-  tags:
-
-    - "node"
-    - "node-browser"
-
-# ex: et ts=2 filetype=yaml

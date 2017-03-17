@@ -1,4 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-listen 80;
-listen 8080 proxy_protocol;

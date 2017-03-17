@@ -1,9 +1,0 @@
----
-
-- include: "setup-wistla-icinga-classicui.yml"
-  tags:
-
-    - "icinga"
-    - "setup-wistla-icinga-classicui"
-
-# ex: et ts=2 filetype=yaml

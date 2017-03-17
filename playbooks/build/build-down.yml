@@ -1,6 +1,0 @@
----
-
-- include: "build-download.yml"
-- include: "build-unpack.yml"
-
-# ex: et ts=2 filetype=yaml

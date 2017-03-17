@@ -1,9 +1,0 @@
----
-
-- include: "devops-playbooks.yml"
-  tags:
-
-    - "devops-playbooks"
-    - "devops"
-
-# ex: et ts=2 filetype=yaml

@@ -1,9 +1,0 @@
----
-
-- include: "node-mongo.yml"
-  tags:
-
-    - "node"
-    - "node-mongo"
-
-# ex: et ts=2 filetype=yaml

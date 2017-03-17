@@ -1,3 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-user_allow_other

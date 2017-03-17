@@ -1,9 +1,0 @@
----
-
-- include: "lxc-clone.yml"
-  tags:
-
-    - "lxc"
-    - "lxc-clone"
-
-# ex: et ts=2 filetype=yaml

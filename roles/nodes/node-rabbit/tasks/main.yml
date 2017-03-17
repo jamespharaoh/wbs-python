@@ -1,9 +1,0 @@
----
-
-- include: "node-rabbit.yml"
-  tags:
-
-    - "node"
-    - "node-rabbit"
-
-# ex: et ts=2 filetype=yaml

@@ -1,3 +1,0 @@
-machine github.com
-	login {{ third_parties [supercluster_name].github_username }}
-	password {{ third_parties [supercluster_name].github_password }}

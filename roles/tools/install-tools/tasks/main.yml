@@ -1,6 +1,0 @@
----
-
-- include: "install-tools.yml"
-  tags: "install-tools"
-
-# ex: et ts=2 filetype=yaml

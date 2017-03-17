@@ -1,4 +1,0 @@
-[run]
-branch = True
-include =
-    s3transfer/*

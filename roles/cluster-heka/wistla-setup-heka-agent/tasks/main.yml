@@ -1,9 +1,0 @@
----
-
-- include: "wistla-setup-heka-agent.yml"
-  tags:
-
-    - "heka"
-    - "wistla-setup-heka-agent"
-
-# ex: et ts=2 filetype=yaml

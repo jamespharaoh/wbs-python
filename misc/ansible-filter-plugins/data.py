@@ -1,25 +1,56 @@
 from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 from __future__ import unicode_literals
 
-import collections
 import itertools
+import re
+import types
+
+from wbs import yamlx
+
+__all__ = [
+	"FilterModule",
+]
 
 def flatten_hash (values, * inner_names):
 
 	ret = []
 
-	for outer_key, outer_value in values.items ():
+	if isinstance (values, list) \
+	or isinstance (values, types.GeneratorType):
+
+		outer_list = [
+			(item, item)
+			for item in values
+		]
+
+	elif isinstance (values, dict):
+
+		outer_list = [
+			({ "key": outer_key, "value": outer_value }, outer_value)
+			for outer_key, outer_value in values.items ()
+		]
+
+	else:
+
+		raise Exception (
+			"Don't know how to flatten a %s" % (
+				type (values).__name__))
+
+	for outer_item, outer_value in outer_list:
 
 		for inner_items in itertools.product (* [
 			outer_value [inner_name]
 			for inner_name in inner_names
+			if inner_name in outer_value
 		]):
 
+			if len (inner_items) < len (inner_names):
+				continue
+
 			item = {
-				"outer": {
-					"key": outer_key,
-					"value": outer_value,
-				},
+				"outer": outer_item,
 			}
 
 			for index, inner_name in enumerate (inner_names):
@@ -38,9 +69,9 @@ def flatten_hash (values, * inner_names):
 						"value": inner_collection [inner_item],
 					}
 
-				ret.append (item)
+			ret.append (item)
 
-		return ret
+	return ret
 
 def property_get (value, path):
 
@@ -62,147 +93,110 @@ def list_to_map (items, key_name, value_name):
 
 def dict_map (keys, mapping):
 
-	return list ([
+	return [
 		mapping [key]
 		for key in keys
+	]
+
+def index_by (items, index_key):
+
+	return dict ([
+		(item [index_key], item)
+		for item
+		in items
 	])
 
-def order_by_depends (
-		items,
-		name_function = None,
-		depends_function = None):
+def flatten_list (lists):
 
-	if isinstance (items, dict):
+	return [
+		item
+		for list in lists
+		for item in list
+	]
 
-		if not name_function:
+def keys (item):
 
-			name_function = (
-				lambda (key, value):
-					key)
+	return item.keys ();
 
-		if not depends_function:
+def values (source):
 
-			depends_function = (
-				lambda (key, value):
-					value.get ("depends", []))
+	if isinstance (source, list):
 
-		items = items.items ()
-
-		return_function = (
-			lambda items:
-				collections.OrderedDict (
-					items))
+		return map (
+			lambda item: item [1],
+			source)
 
 	else:
 
-		if not name_function:
+		return source.values ()
 
-			name_function = (
-				lambda item:
-					item ["name"])
+def items (item):
 
-		if not depends_function:
+	return item.items ();
 
-			depends_function = (
-				lambda item:
-					item.get ("depends", []))
+def bytes (source):
 
-		return_function = (
-			lambda items:
-				items)
+	units = {
+		"": 1,
+		"B": 1,
+		"KB": 1000,
+		"MB": 1000 * 1000,
+		"GB": 1000 * 1000 * 1000,
+		"TB": 1000 * 1000 * 1000 * 1000,
+		"KiB": 1024,
+		"MiB": 1024 * 1024,
+		"GiB": 1024 * 1024 * 1024,
+		"TiB": 1024 * 1024 * 1024 * 1024,
+	}
 
-	# sanity check
+	match = (
+		re.match (
+			r"^\s*([0-9]+)\s*(%s)?\s*$" % (
+				"|".join (units.keys ())),
+			source))
 
-	all_names = set ([
-		name_function (item)
-		for item in items
-	])
-
-	all_depends = set ([
-		depends
-		for item in items
-		for depends in depends_function (item)
-	])
-
-	missing_depends = (
-		all_depends - all_names)
-
-	if missing_depends:
+	if not match:
 
 		raise Exception (
-			"Missing dependencies: %s" % (
-				", ".join (missing_depends)))
+			"Cannot convert '%s' to bytes'" % (
+				source))
 
-	# sort by dependencies
+	size = int (match.group (1))
+	unit = match.group (2)
 
-	unordered_items = (
-		list (items))
+	scale = units [unit]
 
-	ordered_items = (
-		list ())
+	return size * scale
 
-	satisfied_items = (
-		set ())
+def to_yamlx (value):
 
-	while unordered_items:
+	return yamlx.encode_simple (None, value)
 
-		progress = False
+def to_dict (items):
 
-		next_unordered_items = (
-			list ())
-
-		for item in unordered_items:
-
-			item_depends = (
-				depends_function (
-					item))
-
-			item_name = (
-				name_function (
-					item))
-
-			if set (item_depends) - satisfied_items:
-
-				next_unordered_items.append (
-					item)
-
-			else:
-
-				ordered_items.append (
-					item)
-
-				satisfied_items.add (
-					item_name)
-
-				progress = True
-
-		if not progress:
-
-			raise Exception (
-				"Circular dependency between: %s" % (
-					", ".join ([
-						name_function (item)
-						for item
-						in unordered_items
-					])))
-
-		unordered_items = (
-			next_unordered_items)
-
-	return return_function (
-		ordered_items)
+	return dict (items)
 
 class FilterModule (object):
 
-	def filters (self):
+    def filters (self):
 
-		return {
+        return {
 
 			"flatten_hash": flatten_hash,
+			"flatten_list": flatten_list,
 			"list_to_map": list_to_map,
 			"dict_map": dict_map,
-			"order_by_depends": order_by_depends,
+			"index_by": index_by,
 
-	}
+			"keys": keys,
+			"values": values,
+			"items": items,
+			"to_dict": to_dict,
+
+			"to_yamlx": to_yamlx,
+
+			"bytes": bytes,
+
+		}
 
 # ex: noet ts=4 filetype=python

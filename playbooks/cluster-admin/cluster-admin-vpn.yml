@@ -1,8 +1,0 @@
----
-
-- hosts: "cluster-admin"
-  roles:
-
-    - "setup-openvpn-server"
-
-# ex: et ts=2 filetype=yaml

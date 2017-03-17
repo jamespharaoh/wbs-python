@@ -1,9 +1,0 @@
----
-
-- include: "node-postgresql.yml"
-  tags:
-
-    - "node"
-    - "node-postgresql"
-
-# ex: et ts=2 filetype=yaml

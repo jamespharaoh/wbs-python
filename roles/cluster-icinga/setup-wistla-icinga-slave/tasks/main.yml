@@ -1,9 +1,0 @@
----
-
-- include: "setup-wistla-icinga-slave.yml"
-  tags:
-
-    - "icinga"
-    - "setup-wistla-icinga-slave"
-
-# ex: et ts=2 filetype=yaml

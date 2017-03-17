@@ -1,5 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-{% for name, lines in ssh_host_keys.general.items () %}
-{{ name }} {{ lines | join }}
-{% endfor %}

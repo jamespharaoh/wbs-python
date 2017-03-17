@@ -1,3 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-nameserver {{ private_gateway }}

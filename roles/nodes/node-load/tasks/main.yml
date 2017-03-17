@@ -1,9 +1,0 @@
----
-
-- include: "node-load.yml"
-  tags:
-
-    - "node"
-    - "node-load"
-
-# ex: et ts=2 filetype=yaml

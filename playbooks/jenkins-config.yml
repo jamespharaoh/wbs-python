@@ -1,8 +1,0 @@
----
-
-- hosts: "localhost"
-  roles:
-
-    - "jenkins-config"
-
-# ex: et ts=2 filetype=yaml

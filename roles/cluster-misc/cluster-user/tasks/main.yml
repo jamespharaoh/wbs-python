@@ -1,9 +1,0 @@
----
-
-- include: "cluster-user.yml"
-  tags:
-
-    - "cluster"
-    - "cluster-user"
-
-# ex: et ts=2 filetype=yaml

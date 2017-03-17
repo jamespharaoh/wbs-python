@@ -1,6 +1,0 @@
----
-
-- include: "node-stop.yml"
-- include: "node-start.yml"
-
-# ex: et ts=2 filetype=yaml

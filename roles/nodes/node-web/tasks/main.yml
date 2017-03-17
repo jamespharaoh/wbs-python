@@ -1,9 +1,0 @@
----
-
-- include: "node-web.yml"
-  tags:
-
-    - "node"
-    - "node-web"
-
-# ex: et ts=2 filetype=yaml

@@ -1,9 +1,0 @@
----
-
-- include: "node-update.yml"
-  tags:
-
-    - "node"
-    - "node-update"
-
-# ex: et ts=2 filetype=yaml

@@ -1,9 +1,0 @@
----
-
-- include: "cluster-stop.yml"
-  tags:
-
-    - "cluster"
-    - "cluster-stop"
-
-# ex: et ts=2 filetype=yaml

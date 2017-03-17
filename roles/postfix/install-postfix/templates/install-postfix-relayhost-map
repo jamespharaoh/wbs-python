@@ -1,3 +1,0 @@
-{{ ansible_warning ['#'] }}
-
-@{{ cluster.super_domain }} {{ cluster.smtp_server }}:587

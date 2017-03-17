@@ -1,6 +1,0 @@
----
-
-- include: "install-kernel.yml"
-  tags: "install-kernel"
-
-# ex: et ts=2 filetype=yaml

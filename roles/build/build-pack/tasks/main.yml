@@ -1,6 +1,0 @@
----
-
-- include: "build-pack.yml"
-  tags: [ "build", "build-pack" ]
-
-# ex: et ts=2 filetype=yaml

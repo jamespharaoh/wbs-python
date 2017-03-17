@@ -1,6 +1,0 @@
----
-
-- include: "deploy-nodejs-node.yml"
-  tags: [ "nodes", "deploy-nodejs-node" ]
-
-# ex: et ts=2 filetype=yaml

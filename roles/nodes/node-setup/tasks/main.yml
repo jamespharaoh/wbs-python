@@ -1,9 +1,0 @@
----
-
-- include: "node-setup.yml"
-  tags:
-
-    - "node"
-    - "node-setup"
-
-# ex: et ts=2 filetype=yaml

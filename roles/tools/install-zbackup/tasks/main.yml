@@ -1,9 +1,0 @@
----
-
-- include: "install-zbackup.yml"
-  tags:
-
-    - "install-zbackup"
-    - "zbackup"
-
-# ex: et ts=2 filetype=yaml

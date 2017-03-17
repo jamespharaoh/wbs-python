@@ -1,9 +1,0 @@
----
-
-- include: "nodejs-stubs.yml"
-  tags:
-
-    - "nodejs"
-    - "nodejs-stubs"
-
-# ex: et ts=2 filetype=yaml

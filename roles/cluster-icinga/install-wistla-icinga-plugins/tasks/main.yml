@@ -1,9 +1,0 @@
----
-
-- include: "install-wistla-icinga-plugins.yml"
-  tags:
-
-    - "icinga"
-    - "install-wistla-icinga-plugins"
-
-# ex: et ts=2 filetype=yaml

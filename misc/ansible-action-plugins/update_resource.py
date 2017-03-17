@@ -1,19 +1,21 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
+import importlib
 import os
-import yaml
 
 from ansible.plugins.action import ActionBase
-
-from wbs import yamlx
 
 class ActionModule (ActionBase):
 
 	TRANSFERS_FILES = False
 
 	def __init__ (self, * arguments, ** keyword_arguments):
+
+		self.support = importlib.import_module (
+			os.environ ["GRIDLINKER_SUPPORT"]).support
+
+		self.context = self.support.get_context ()
 
 		ActionBase.__init__ (
 			self,
@@ -22,75 +24,56 @@ class ActionModule (ActionBase):
 
 	def run (self, tmp = None, task_vars = dict ()):
 
-		options = {}
+		options = dict ()
+
+		resource_name = task_vars.get ("inventory_hostname")
+
+		if not self.context.resources.exists_slow (resource_name):
+			raise Exception ("Not found: " + resource_name)
+
+		resource_data = (
+			self.context.resources.get_slow (
+				resource_name))
+
+		if not resource_data:
+			resource_data = dict ()
+
 		changed = False
-
-		# read in the existing file
-
-		if not os.path.isdir ("data/hosts"):
-			os.mkdir ("data/hosts")
-
-		filename = (
-			"data/hosts/%s" % (
-				task_vars.get ("inventory_hostname")))
-
-		filename_temp = (
-			"data/hosts/.%s.temp" % (
-				task_vars.get ("inventory_hostname")))
-
-		if os.path.isfile (filename):
-
-			with open (filename) as file_handle:
-				runtime_data = yaml.load (file_handle)
-
-		else:
-
-			runtime_data = dict ()
 
 		for key, value in self._task.args.items ():
 
-			dynamic_key = self._templar.template (
-				key)
+			dynamic_path = (
+				self._templar.template (
+					key))
 
-			if "." in dynamic_key:
+			if not "." in dynamic_path:
 
-				prefix, rest = dynamic_key.split (".", 2)
+				raise Exception (
+					"Invalid path for update_resource: %s" % dynamic_path)
 
-				runtime_data.setdefault (prefix, {})
+			prefix, rest = (
+				dynamic_path.split (".", 2))
 
-				if runtime_data [prefix].get (rest) != value \
-				or runtime_data.get (prefix + "_" + rest) != value:
-					changed = True
+			resource_vars = (
+				task_vars ["hostvars"] [resource_name])
 
-				runtime_data [prefix] [rest] = value
-				runtime_data [prefix + "_" + rest] = value
+			options.setdefault (
+				prefix,
+				resource_vars.get (prefix, {}))
 
-				options [prefix] = runtime_data [prefix]
-				options [prefix + "_" + rest] = value
+			if rest in options [prefix] \
+			and options [prefix] [rest] == value:
+				continue
 
-			else:
+			changed = True
 
-				if runtime_data.get (dynamic_key) != value:
-					changed = True
+			resource_data.setdefault (prefix, {})
+			resource_data [prefix] [rest] = value
 
-				runtime_data [dynamic_key] = value
-				options [dynamic_key] = value
+			options [prefix] [rest] = value
+			options [prefix + "_" + rest] = value
 
-		with open (filename_temp, "w") as file_handle:
-
-			file_handle.write (
-				yamlx.encode (
-					None,
-					runtime_data))
-
-			file_handle.write (
-				"\n")
-
-			file_handle.flush ()
-
-			os.fsync (file_handle.fileno ())
-
-		os.rename (filename_temp, filename)
+		self.context.resources.set (resource_name, resource_data)
 
 		return dict (
 			ansible_facts = options,
