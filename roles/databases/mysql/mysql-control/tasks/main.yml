@@ -2,7 +2,8 @@
 
 - include: "mysql-control-upstart.yml"
   when: "
-    system_init == 'upstart'
+    mysql_control == 'yes'
+    and system_init == 'upstart'
     and mysql_install == 'yes'
     and mysql_state in [ 'enabled', 'disabled' ]
   "
@@ -14,7 +15,8 @@
 
 - include: "mysql-control-systemd.yml"
   when: "
-    system_init == 'systemd'
+    mysql_control == 'yes'
+    and system_init == 'systemd'
     and mysql_install == 'yes'
     and mysql_state in [ 'enabled', 'disabled' ]
   "

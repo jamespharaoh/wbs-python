@@ -57,6 +57,13 @@ http {
 
 	client_max_body_size {{ nginx_client_max_body_size }};
 
+	# resolver
+
+{% if nginx_resolver != '' %}
+	resolver {{ nginx_resolver }};
+	resolver_timeout {{ nginx_resolver_timeout }};
+{% endif %}
+
 	# individual configuration
 
 	include /etc/nginx/local/*;

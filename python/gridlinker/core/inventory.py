@@ -4,12 +4,13 @@ from __future__ import unicode_literals
 from __future__ import with_statement
 
 import collections
+import hashlib
 import itertools
 import re
 import wbs
 
 #from wbs import ReportableError
-#from wbs import uprint
+from wbs import uprint
 
 from gridlinker.ansible.misc import *
 
@@ -1040,6 +1041,42 @@ class Inventory (object):
 					token_index += 1
 
 					value = value.values ()
+
+					continue
+
+				if tokens [token_index] == "hash" \
+				and value_type == "value" \
+				and (
+					isinstance (value, str)
+					or isinstance (value, unicode)
+				) and tokens [token_index + 1] == "(":
+
+					token_index += 2
+
+					success, token_index, hash_type = (
+						self.parse_expression (
+							tokens,
+							token_index,
+							resource,
+							indent + "  "))
+
+					if not success:
+
+						return False, None, None
+
+					if hash_type == "sha1":
+
+						value = hashlib.sha1 (value).hexdigest ()
+
+					else:
+
+						return False, None, None
+
+					if tokens [token_index] != ")":
+
+						return False, None, None
+
+					token_index += 1
 
 					continue
 

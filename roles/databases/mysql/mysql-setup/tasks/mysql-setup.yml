@@ -1,5 +1,7 @@
 ---
 
+# ---------- config templates
+
 - name: "install mysql config"
   with_items: "{{ mysql_config_templates }}"
   register: "mysql_setup_config_result"
@@ -20,12 +22,42 @@
 
     mysql.needs_restart: "yes"
 
-  register: "mysql_setup_config_result"
+# ---------- user my.cnf
 
-- name: "set mysql.state to 'enabled'"
+- name: "mysql setup user my.cnf"
+  when: "mysql_create_user_my_cnf == 'yes'"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/home/ubuntu/.my.cnf"
+    src: "mysql-user-config"
+
+    owner: "ubuntu"
+    group: "ubuntu"
+    mode: "0600"
+
+# ---------- root my.cnf
+
+- name: "mysql setup root my.cnf"
+  when: "mysql_create_root_my_cnf == 'yes'"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/root/.my.cnf"
+    src: "mysql-root-config"
+
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+# ---------- default state
+
+- name: "set mysql.state to '{{ mysql_default_state }}'"
   when: "mysql_state == 'installed'"
   update_resource:
 
-    mysql.state: "enabled"
+    mysql.state: "{{ mysql_default_state }}"
 
 # ex: et ts=2 filetype=yaml

@@ -8,6 +8,11 @@ nginx_install_version: ""
 
 nginx_config: "/etc/nginx"
 
+nginx_control: "yes"
+nginx_control_start_stop: "yes"
+
+nginx_default_state: "enabled"
+
 # ---------- state
 
 nginx_installed_version: ""
@@ -39,6 +44,9 @@ nginx_client_max_body_size: "1m"
 nginx_ssl_certificates: []
 
 nginx_default_site_enabled: "yes"
+
+nginx_resolver: ""
+nginx_resolver_timeout: "30s"
 
 # ---------- configuration
 

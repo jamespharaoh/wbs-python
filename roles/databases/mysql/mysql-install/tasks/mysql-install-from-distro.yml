@@ -86,7 +86,7 @@
     set -euf -o pipefail;
 
     test -e /etc/init.d/mysql || { echo "UNCHANGED"; exit 0; };
-    service mysql stop;
+    /etc/init.d/mysql stop;
     rm -f /etc/init.d/mysql /etc/init.d/rc?.d/[KS]??mysql;
 
 - name: "set mysql.state to 'installed'"

@@ -2,7 +2,8 @@
 
 - include: "php-control-upstart.yml"
   when: "
-    system_init == 'upstart'
+    php_control == 'yes'
+    and system_init == 'upstart'
     and php_state in [ 'installed', 'enabled', 'disabled' ]
   "
   tags:
@@ -13,7 +14,8 @@
 
 - include: "php-control-systemd.yml"
   when: "
-    system_init == 'systemd'
+    php_control == 'yes'
+    and system_init == 'systemd'
     and php_state in [ 'installed', 'enabled', 'disabled' ]
   "
   tags:

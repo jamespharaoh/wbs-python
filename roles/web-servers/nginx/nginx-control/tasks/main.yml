@@ -2,7 +2,8 @@
 
 - include: "control-nginx-upstart.yml"
   when: "
-    system_init == 'upstart'
+    nginx_control == 'yes'
+    and system_init == 'upstart'
     and nginx_state in [ 'enabled', 'disabled' ]
   "
   tags:
@@ -13,7 +14,8 @@
 
 - include: "control-nginx-systemd.yml"
   when: "
-    system_init == 'systemd'
+    nginx_control == 'yes'
+    and system_init == 'systemd'
     and nginx_state in [ 'enabled', 'disabled' ]
   "
   tags:

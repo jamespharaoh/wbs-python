@@ -17,7 +17,8 @@
 
 - name: "reload nginx"
   when: "
-    nginx_state == 'enabled'
+    nginx_control_start_stop == 'yes'
+    and nginx_state == 'enabled'
     and nginx_needs_restart != 'yes'
   "
   changed_when: "False"
@@ -30,7 +31,8 @@
 
 - name: "restart nginx"
   when: "
-    nginx_state == 'enabled'
+    nginx_control_start_stop == 'yes'
+    and nginx_state == 'enabled'
     and nginx_needs_restart == 'yes'
   "
   become: "yes"
@@ -41,7 +43,10 @@
     state: "restarted"
 
 - name: "start nginx"
-  when: "nginx_state == 'enabled'"
+  when: "
+    nginx_control_start_stop == 'yes'
+    and nginx_state == 'enabled'
+  "
   become: "yes"
   action:
 
@@ -50,7 +55,10 @@
     state: "started"
 
 - name: "stop nginx"
-  when: "nginx_state == 'disabled'"
+  when: "
+    nginx_control_start_stop == 'yes'
+    and nginx_state == 'disabled'
+  "
   become: "yes"
   action:
 

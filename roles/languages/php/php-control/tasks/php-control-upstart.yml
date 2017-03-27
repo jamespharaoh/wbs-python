@@ -21,7 +21,8 @@
 
 - name: "set php.needs_restart to 'no'"
   when: "
-    php_state != 'enabled'
+    php_control_start_stop == 'yes'
+    and php_state != 'enabled'
     and php_needs_restart == 'yes'
   "
   update_resource:
@@ -29,13 +30,17 @@
     php.needs_restart: "no"
 
 - name: "reload upstart config"
-  when: "php_needs_restart == 'yes'"
+  when: "
+    php_control_start_stop == 'yes'
+    and php_needs_restart == 'yes'
+  "
   become: "yes"
   shell: "initctl reload-configuration"
 
 - name: "restart php"
   when: "
-    php_state == 'enabled'
+    php_control_start_stop == 'yes'
+    and php_state == 'enabled'
     and php_needs_restart == 'yes'
   "
   register: "php_restart_result"
@@ -48,7 +53,8 @@
 
 - name: "start php"
   when: "
-    php_state == 'enabled'
+    php_control_start_stop == 'yes'
+    and php_state == 'enabled'
     and not php_restart_result | changed
   "
   register: "php_start_result"
@@ -61,7 +67,8 @@
 
 - name: "stop php"
   when: "
-    php_state == 'disabled'
+    php_control_start_stop == 'yes'
+    and php_state == 'disabled'
   "
   register: "stop_php_result"
   become: "yes"
@@ -73,7 +80,8 @@
 
 - name: "reload php"
   when: "
-    php_state == 'enabled'
+    php_control_start_stop == 'yes'
+    and php_state == 'enabled'
     and not (
       (php_restart_result | changed)
       or (php_start_result | changed)

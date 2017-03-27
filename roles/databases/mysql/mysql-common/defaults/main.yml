@@ -14,6 +14,13 @@ mysql_install_version_default_by_release:
   trusty: "5.5"
   xenial: "5.7"
 
+mysql_default_state: "enabled"
+mysql_control: "yes"
+mysql_control_start_stop: "yes"
+
+mysql_create_user_my_cnf: "yes"
+mysql_create_root_my_cnf: "yes"
+
 # ---------- state
 
 mysql_state: ""
@@ -39,18 +46,6 @@ mysql_config_templates:
     user: "root"
     group: "root"
     mode: "0644"
-
-  - template: "mysql-root-config"
-    target: "/root/.my.cnf"
-    user: "root"
-    group: "root"
-    mode: "0600"
-
-  - template: "mysql-user-config"
-    target: "/home/ubuntu/.my.cnf"
-    user: "ubuntu"
-    group: "ubuntu"
-    mode: "0600"
 
 # ---------- install from distro
 

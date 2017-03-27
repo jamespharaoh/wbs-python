@@ -17,7 +17,8 @@
 
 - name: "reload mysql"
   when: "
-    mysql_state == 'enabled'
+    mysql_control_start_stop == 'yes'
+    and mysql_state == 'enabled'
     and mysql_needs_restart != 'yes'
   "
   changed_when: "False"
@@ -30,7 +31,8 @@
 
 - name: "restart mysql"
   when: "
-    mysql_state == 'enabled'
+    mysql_control_start_stop == 'yes'
+    and mysql_state == 'enabled'
     and mysql_needs_restart == 'yes'
   "
   become: "yes"
@@ -41,7 +43,10 @@
     state: "restarted"
 
 - name: "start mysql"
-  when: "mysql_state == 'enabled'"
+  when: "
+    mysql_control_start_stop == 'yes'
+    and mysql_state == 'enabled'
+  "
   become: "yes"
   action:
 
@@ -50,7 +55,10 @@
     state: "started"
 
 - name: "stop mysql"
-  when: "mysql_state == 'disabled'"
+  when: "
+    mysql_control_start_stop == 'yes'
+    and mysql_state == 'disabled'
+  "
   become: "yes"
   action:
 
@@ -59,7 +67,10 @@
     state: "stopped"
 
 - name: "set mysql.needs_restart to 'no'"
-  when: "mysql_needs_restart != 'no'"
+  when: "
+    mysql_control_start_stop == 'yes'
+    and mysql_needs_restart != 'no'
+  "
   update_resource:
 
     mysql.needs_restart: "no"

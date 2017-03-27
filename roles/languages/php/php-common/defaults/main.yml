@@ -12,6 +12,11 @@ php_config_directory_map:
   "5": "/etc/php5"
   "7.0": "/etc/php/7.0"
 
+php_control: "yes"
+php_control_start_stop: "yes"
+
+php_default_state: "enabled"
+
 # ---------- state
 
 php_fpm_socket: ""

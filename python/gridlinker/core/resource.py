@@ -166,7 +166,7 @@ class Resource (object):
 
 			raise Exception (
 				"Attempt to resolve resource '%s' value '%s' twice" % (
-					self.name,
+					self.name (),
 					name_combined))
 
 		self._resolved [name_combined] = value
@@ -219,7 +219,7 @@ class Resource (object):
 					"Can't find unresolved '%s' in '%s' for resource '%s'" % (
 						name_part,
 						name_pats.join ("."),
-						self.name))
+						self.name ()))
 
 			context = context [name_part]
 
@@ -250,7 +250,7 @@ class Resource (object):
 					"Can't find resolved '%s' in '%s' for resource '%s'" % (
 						name_part,
 						".".join (name_parts),
-						self.name))
+						self.name ()))
 
 			context = context [name_part]
 
@@ -282,7 +282,7 @@ class Resource (object):
 			raise Exception (
 				"Can't find resolved or unresolved '%s' for resource '%s'" % (
 					".".join (name_parts),
-					self.name))
+					self.name ()))
 
 	# ----- accessors
 
