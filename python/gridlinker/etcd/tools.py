@@ -171,4 +171,4 @@ def do_etcd_control (context, args):
 
 	sys.exit (result)
 
-# ex: noet ts=4 filetype=yaml
+# ex: noet ts=4 filetype=python
