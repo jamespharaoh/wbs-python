@@ -187,7 +187,7 @@ def encode_dict (schema, data, indent, here):
 					yaml += "\n"
 					yaml += indent
 
-			yaml += encode_key (key)
+			yaml += encode_key (field.name)
 			yaml += ": "
 			yaml += encode_real (field.sub_schema, value, next_indent, False)
 
