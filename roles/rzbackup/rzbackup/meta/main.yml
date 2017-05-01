@@ -1,0 +1,12 @@
+---
+
+dependencies: 
+  - "rzbackup-common"
+  - "rzbackup-common"
+  - "rzbackup-install"
+  - "rzbackup-setup"
+  - "rzbackup-control-systemd"
+  - "rzbackup-control-upstart"
+
+
+# ex: et ts=2 filetype=yaml

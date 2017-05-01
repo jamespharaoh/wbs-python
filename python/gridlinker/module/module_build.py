@@ -12,12 +12,12 @@ __all__ = [
 ]
 
 def build_modules (
-		context,
+		home,
 		module_names = None):
 
 	all_modules = (
 		load_modules (
-			context))
+			home))
 
 	for module in all_modules.values ():
 
@@ -26,13 +26,17 @@ def build_modules (
 
 			continue
 
+		print (
+			"===== Building %s =====" % (
+				module.module_name ()))
+
 		module.build ()
 
 class GridlinkerModule (object):
 
 	__slots__ = [
 
-		"_context",
+		"_home",
 
 		"_module_group_name",
 		"_module_name",
@@ -43,13 +47,13 @@ class GridlinkerModule (object):
 
 	def __init__ (
 			self,
-			context,
+			home,
 			module_group_name,
 			module_name,
 			module_path,
 			module_data):
 
-		self._context = context
+		self._home = home
 
 		self._module_group_name = module_group_name
 		self._module_name = module_name
@@ -68,8 +72,8 @@ class GridlinkerModule (object):
 
 		directory_builder = (
 			DirectoryBuilder (
-				"%s/roles/%s" % (
-					self._context.home,
+				self._home,
+				"roles/%s" % (
 					self._module_name)))
 
 		self.build_main (
@@ -92,9 +96,13 @@ class GridlinkerModule (object):
 
 		main_directory_builder = (
 			directory_builder.subdirectory (
+				self._module_name))
+
+		main_meta_directory_builder = (
+			main_directory_builder.subdirectory (
 				"meta"))
 
-		main_directory_builder.create_yaml_file (
+		main_meta_directory_builder.create_yaml_file (
 			"main.yml",
 			{
 				"dependencies": [
@@ -137,9 +145,11 @@ class GridlinkerModule (object):
 					self._module_name,
 					task_data ["name"])))
 
-		self.build_task_meta (
-			task_directory_builder,
-			task_data)
+		if task_data ["name"] != "common":
+
+			self.build_task_meta (
+				task_directory_builder,
+				task_data)
 
 		self.build_task_tasks (
 			task_directory_builder,
@@ -148,6 +158,12 @@ class GridlinkerModule (object):
 		task_directory_builder.create_link (
 			"templates",
 			"../../../modules/%s/%s/templates" % (
+				self._module_group_name,
+				self._module_name))
+
+		task_directory_builder.create_link (
+			"files",
+			"../../../modules/%s/%s/files" % (
 				self._module_group_name,
 				self._module_name))
 
@@ -185,6 +201,14 @@ class GridlinkerModule (object):
 						self._module_name,
 						task_data ["name"]),
 					"tags": task_data ["tags"],
+					"when": "".join ([
+						"(",
+						") and (".join (
+							task_data.get (
+								"when",
+								[ "True" ])),
+						")",
+					]),
 				},
 			])
 
@@ -201,23 +225,29 @@ class GridlinkerModule (object):
 class DirectoryBuilder (object):
 
 	__slots__ = [
-		"_path",
+		"_parent",
+		"_name",
 		"_files",
 	]
 
-	def __init__ (self, path):
+	def __init__ (self, parent, name):
 
-		self._path = path
+		self._parent = parent
+		self._name = name
 		self._files = set ()
 
-		if not os.path.isdir (self._path):
+		path = "%s/%s" % (
+			self._parent,
+			self._name)
+
+		if not os.path.isdir (path):
 
 			print (
 				"Creating directory %s" % (
-					self._path))
+					name))
 
 			os.mkdir (
-				self._path)
+				path)
 
 	def subdirectory (self, name):
 
@@ -237,15 +267,18 @@ class DirectoryBuilder (object):
 			name)
 
 		path = (
-			"%s/%s" % (
-				self._path,
+			"%s/%s/%s" % (
+				self._parent,
+				self._name,
 				name))
 
 		if not os.path.isdir (path):
 
 			print (
 				"Creating directory %s" % (
-					path))
+					"%s/%s" % (
+						self._name,
+						name)))
 
 			os.mkdir (
 				path)
@@ -269,15 +302,17 @@ class DirectoryBuilder (object):
 			name)
 
 		path = (
-			"%s/%s" % (
-				self._path,
+			"%s/%s/%s" % (
+				self._parent,
+				self._name,
 				name))
 
 		if not os.path.islink (path):
 
 			print (
-				"Creating link %s" % (
-					path))
+				"Creating link %s/%s" % (
+					self._name,
+					name))
 
 			os.symlink (
 				new_target,
@@ -292,8 +327,9 @@ class DirectoryBuilder (object):
 			if old_target != new_target:
 
 				print (
-					"Updating link %s" % (
-						path))
+					"Updating link %s/%s" % (
+						self._name,
+						name))
 
 				os.unlink (
 					path)
@@ -308,8 +344,9 @@ class DirectoryBuilder (object):
 			name)
 
 		path = (
-			"%s/%s" % (
-				self._path,
+			"%s/%s/%s" % (
+				self._parent,
+				self._name,
 				name))
 
 		new_content = (
@@ -318,8 +355,9 @@ class DirectoryBuilder (object):
 		if not os.path.isfile (path):
 
 			print (
-				"Creating file %s" % (
-					path))
+				"Creating file %s/%s" % (
+					self._name,
+					name))
 
 			with open (path, "w") as file_handle:
 
@@ -336,8 +374,9 @@ class DirectoryBuilder (object):
 			if new_content != old_content:
 
 				print (
-					"Updating file %s" % (
-						path))
+					"Updating file %s/%s" % (
+						self._name,
+						name))
 
 				with open (path, "w") as file_handle:
 
@@ -396,16 +435,16 @@ class SubDirectoryBuilder (object):
 			content_lines)
 
 def load_modules (
-		context):
+		home):
 
 	modules = dict ()
 
 	for module_group_name \
-	in os.listdir ("%s/modules" % context.home):
+	in os.listdir ("%s/modules" % home):
 
 		module_group_path = (
 			"%s/modules/%s" % (
-				context.home,
+				home,
 				module_group_name))
 
 		for module_name \
@@ -428,7 +467,7 @@ def load_modules (
 
 			modules [module_name] = (
 				GridlinkerModule (
-					context,
+					home,
 					module_group_name,
 					module_name,
 					module_path,

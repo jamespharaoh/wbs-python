@@ -1,0 +1,13 @@
+---
+
+- include: "php-install-distro.yml"
+  tags: 
+    - "php-install-distro"
+    - "php-install"
+    - "php"
+    - "install-distro"
+    - "install"
+  when: "(php_install == 'yes') and (php_install_from == 'distro')"
+
+
+# ex: et ts=2 filetype=yaml

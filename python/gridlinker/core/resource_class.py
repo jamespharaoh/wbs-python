@@ -80,9 +80,13 @@ class ResourceClass (object):
 			self._parent_namespace = None
 
 		self._resource_identity = (
-			self._raw_data ["class"].get (
-				"resource_identity",
-				dict ()))
+			wbs.deep_copy (
+				self._raw_data ["class"].get (
+					"resource_identity",
+					dict ())))
+
+		self._resource_identity ["namespace"] = (
+			self._raw_data ["class"] ["namespace"])
 
 		self._references = (
 			self._raw_data ["class"].get (
@@ -208,6 +212,10 @@ class ResourceClass (object):
 	def references (self):
 
 		return self._references
+
+	def resource_identity (self):
+
+		return self._resource_identity
 
 	def resources (self):
 

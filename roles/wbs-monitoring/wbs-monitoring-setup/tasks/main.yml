@@ -1,0 +1,11 @@
+---
+
+- include: "wbs-monitoring-setup.yml"
+  tags: 
+    - "wbs-monitoring-setup"
+    - "wbs-monitoring"
+    - "setup"
+  when: "(True)"
+
+
+# ex: et ts=2 filetype=yaml

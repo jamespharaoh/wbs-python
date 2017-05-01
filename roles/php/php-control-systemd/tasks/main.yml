@@ -1,0 +1,13 @@
+---
+
+- include: "php-control-systemd.yml"
+  tags: 
+    - "php-control-systemd"
+    - "php-control"
+    - "php"
+    - "control-systemd"
+    - "control"
+  when: "(system_init == 'systemd') and (php_control == 'yes') and (php_state in [ 'installed', 'enabled', 'disabled' ])"
+
+
+# ex: et ts=2 filetype=yaml

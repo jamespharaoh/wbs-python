@@ -1,9 +1,0 @@
----
-
-dependencies:
-
-  - "wbs-monitoring-common"
-  - "wbs-monitoring-install"
-  - "wbs-monitoring-setup"
-
-# ex: et ts=2 filetype=yaml

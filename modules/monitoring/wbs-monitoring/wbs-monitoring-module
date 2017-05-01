@@ -1,0 +1,77 @@
+---
+
+identity:
+
+  type: "module"
+  name: "wbs-monitoring-module"
+
+common:
+
+  # ----- installation settings
+
+  wbs_monitoring_install: "{{ default_install | default ('yes') }}"
+  wbs_monitoring_install_version: ""
+
+  # ----- state
+
+  wbs_monitoring_installed_version: ""
+
+  # ----- installation
+
+  wbs_monitoring_install_version_full: "{{ [
+    wbs_monitoring_install_version,
+    ubuntu_release,
+  ] | join ('-') }}"
+
+  wbs_monitoring_install_directory: "{{ [
+    'wbs-monitoring',
+    wbs_monitoring_install_version_full,
+  ] | join ('-') }}"
+
+  wbs_monitoring_install_archive: "{{ [
+    wbs_monitoring_install_directory,
+    'tar.xz',
+  ] | join ('.') }}"
+
+  wbs_monitoring_install_mirror: "{{
+    'https://dist.wellbehavedsoftware.com/wbs-monitoring'
+  }}"
+
+  wbs_monitoring_install_url: "{{ [
+    wbs_monitoring_install_mirror,
+    wbs_monitoring_install_archive,
+  ] | join ('/') }}"
+
+  wbs_monitoring_install_temp: "/tmp/wbs-monitoring-install"
+
+  wbs_monitoring_install_base: "/opt"
+
+  wbs_monitoring_install_target: "{{ [
+    wbs_monitoring_install_base,
+    wbs_monitoring_install_directory,
+  ] | join ('/') }}"
+
+  wbs_monitoring_install_link: "{{ [
+    wbs_monitoring_install_base,
+    'wbs-monitoring',
+  ] | join ('/') }}"
+
+tasks:
+
+  - name: "install"
+    tags:
+
+      - "wbs-monitoring-install"
+      - "wbs-monitoring"
+
+      - "install"
+
+  - name: "setup"
+    tags:
+
+      - "wbs-monitoring-setup"
+      - "wbs-monitoring"
+
+      - "setup"
+
+# ex: et ts=2 filetype=yaml

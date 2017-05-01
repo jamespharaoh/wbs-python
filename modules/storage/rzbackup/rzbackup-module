@@ -1,0 +1,124 @@
+---
+
+identity:
+
+  name: "rzbackup"
+  type: "module"
+
+common:
+
+  # ---------- installation settings
+
+  rzbackup_install: "{{ default_install | default ('yes') }}"
+  rzbackup_install_version: ""
+
+  # ---------- state
+
+  rzbackup_state: ""
+  rzbackup_needs_restart: ""
+  rzbackup_installed_version: ""
+  rzbackup_installed_prefix: ""
+
+  # ---------- runtime configuration
+
+  rzbackup_user: "root"
+  rzbackup_listen_address: "127.0.0.1"
+  rzbackup_listen_port: "4152"
+  rzbackup_repository: "/var/lib/zbackup"
+  rzbackup_password_file: "/var/lib/zbackup/password-file"
+  rzbackup_log: "/var/log/rzbackup.log"
+  rzbackup_cache: "/var/cache/rzbackup"
+  rzbackup_max_uncompressed_memory_cache_entries: "256"
+  rzbackup_max_compressed_memory_cache_entries: "2048"
+  rzbackup_max_compressed_filesystem_cache_entries: "16384"
+
+  rzbackup_systemd_after: [ "network.target" ]
+  rzbackup_systemd_requires: [ "network.target" ]
+  rzbackup_systemd_restart: "always"
+  rzbackup_systemd_restart_secs: "60"
+
+  # ---------- installation
+
+  rzbackup_install_temp: "/opt/rzbackup-install"
+  rzbackup_install_directory: "rzbackup-{{ rzbackup_install_version }}"
+  rzbackup_install_archive: "{{ rzbackup_install_directory }}.tar.xz"
+  rzbackup_install_mirror: "https://dist.wellbehavedsoftware.com/rzbackup"
+  rzbackup_install_url: "{{ [
+    rzbackup_install_mirror,
+    '/',
+    rzbackup_install_archive,
+  ] | join }}"
+  rzbackup_install_target: "/opt/{{ rzbackup_install_directory }}"
+
+tasks:
+
+  - name: "common"
+    when:
+
+      - "rzbackup_install == 'yes'"
+
+    tags:
+
+      - "rzbackup-common"
+      - "rzbackup"
+
+      - "common"
+
+  - name: "install"
+    when:
+
+      - "rzbackup_install == 'yes'"
+
+    tags:
+
+      - "rzbackup-install"
+      - "rzbackup"
+
+      - "install"
+
+  - name: "setup"
+    when:
+
+      - "rzbackup_install == 'yes'"
+      - "rzbackup_state in [ 'installed', 'enabled', 'disabled' ]"
+
+    tags:
+
+      - "rzbackup-setup"
+      - "rzbackup"
+
+      - "setup"
+
+  - name: "control-systemd"
+    when:
+
+      - "rzbackup_install == 'yes'"
+      - "rzbackup_state in [ 'enabled', 'disabled' ]"
+      - "system_init == 'systemd'"
+
+    tags:
+
+      - "rzbackup-control-systemd"
+      - "rzbackup-control"
+      - "rzbackup"
+
+      - "control-systemd"
+      - "control"
+
+  - name: "control-upstart"
+    when:
+
+      - "rzbackup_install == 'yes'"
+      - "rzbackup_state in [ 'enabled', 'disabled' ]"
+      - "system_init == 'upstart'"
+
+    tags:
+
+      - "rzbackup-control-upstart"
+      - "rzbackup-control"
+      - "rzbackup"
+
+      - "control-upstart"
+      - "control"
+
+# ex: et ts=2 filetype=yaml

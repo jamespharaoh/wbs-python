@@ -91,7 +91,9 @@ class Resource (object):
 			wbs.deep_copy (
 				self._class.data ()))
 
-		self._data ["identity"] = dict ()
+		self._data ["identity"] = (
+			wbs.deep_copy (
+				self._class.resource_identity ()))
 
 		# add resource data
 

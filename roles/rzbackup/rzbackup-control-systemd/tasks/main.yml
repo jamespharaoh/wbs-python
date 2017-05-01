@@ -1,0 +1,13 @@
+---
+
+- include: "rzbackup-control-systemd.yml"
+  tags: 
+    - "rzbackup-control-systemd"
+    - "rzbackup-control"
+    - "rzbackup"
+    - "control-systemd"
+    - "control"
+  when: "(rzbackup_install == 'yes') and (rzbackup_state in [ 'enabled', 'disabled' ]) and (system_init == 'systemd')"
+
+
+# ex: et ts=2 filetype=yaml

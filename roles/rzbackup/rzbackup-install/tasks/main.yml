@@ -1,0 +1,11 @@
+---
+
+- include: "rzbackup-install.yml"
+  tags: 
+    - "rzbackup-install"
+    - "rzbackup"
+    - "install"
+  when: "(rzbackup_install == 'yes')"
+
+
+# ex: et ts=2 filetype=yaml

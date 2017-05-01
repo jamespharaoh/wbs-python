@@ -31,7 +31,11 @@ def args_module_build (sub_parsers):
 def do_module_build (context, args):
 
 	module_build.build_modules (
-		context = context,
+		home = context.home,
+		module_names = None)
+
+	module_build.build_modules (
+		home = context.gridlinker_home,
 		module_names = None)
 
 # ex: noet ts=4 filetype=python

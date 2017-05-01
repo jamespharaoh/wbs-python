@@ -1,0 +1,13 @@
+---
+
+- include: "php-install-source.yml"
+  tags: 
+    - "php-install-source"
+    - "php-install"
+    - "php"
+    - "install-source"
+    - "install"
+  when: "(php_install == 'yes') and (php_install_from == 'source')"
+
+
+# ex: et ts=2 filetype=yaml

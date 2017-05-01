@@ -1,0 +1,60 @@
+---
+
+- name: "wbs monitoring install check install version is set"
+  when: "wbs_monitoring_install_version == ''"
+  fail:
+
+    msg: "Must set wbs_monitoring.install_version"
+
+- name: "unset wbs_monitoring.installed_version"
+  when: "wbs_monitoring_installed_version != wbs_monitoring_install_version"
+  update_resource:
+
+    wbs_monitoring.installed_version: ""
+
+- name: "wbs monitoring install"
+  when: "wbs_monitoring_installed_version != wbs_monitoring_install_version"
+  args:
+
+    executable: "/bin/bash"
+
+  become: "yes"
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf "{{ wbs_monitoring_install_temp }}";
+    mkdir -p "{{ wbs_monitoring_install_temp }}";
+    cd "{{ wbs_monitoring_install_temp }}";
+
+    wget "{{ wbs_monitoring_install_url }}";
+
+    tar
+      --extract
+      --xz
+      --file "{{ wbs_monitoring_install_archive }}";
+
+    rsync
+      --delete
+      --recursive
+      "{{ wbs_monitoring_install_directory }}/"
+      "{{ wbs_monitoring_install_target }}/";
+
+    rm -rf "{{ wbs_monitoring_install_temp }}";
+
+- name: "wbs monitoring install link"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "{{ wbs_monitoring_install_link }}"
+    state: "link"
+
+    src: "{{ wbs_monitoring_install_directory }}"
+
+- name: "set wbs_monitoring.installed_version"
+  update_resource:
+
+    wbs_monitoring.installed_version: "{{ wbs_monitoring_install_version }}"
+
+# ex: et ts=2 filetype=yaml

@@ -385,21 +385,13 @@ class GenericContext (object):
 			"/".join ([
 				self.gridlinker_home,
 				"roles",
-				roles_category_dir,
 				roles_group_dir,
 			])
-
-			for roles_category_dir
-				in os.listdir ("/".join ([
-					self.gridlinker_home,
-					"roles",
-				]))
 
 			for roles_group_dir
 				in os.listdir ("/".join ([
 					self.gridlinker_home,
 					"roles",
-					roles_category_dir,
 				]))
 
 		]

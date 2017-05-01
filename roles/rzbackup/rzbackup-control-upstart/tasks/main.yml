@@ -1,0 +1,13 @@
+---
+
+- include: "rzbackup-control-upstart.yml"
+  tags: 
+    - "rzbackup-control-upstart"
+    - "rzbackup-control"
+    - "rzbackup"
+    - "control-upstart"
+    - "control"
+  when: "(rzbackup_install == 'yes') and (rzbackup_state in [ 'enabled', 'disabled' ]) and (system_init == 'upstart')"
+
+
+# ex: et ts=2 filetype=yaml
