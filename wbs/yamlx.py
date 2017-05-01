@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import codecs
 import collections
 import os
+import re
 import sys
 import yaml
 
@@ -258,11 +259,28 @@ def load_data (path):
 def encode_key (key):
 
 	if isinstance (key, unicode):
-		return key
+		return quote_key (key)
 
 	if isinstance (key, str):
-		return unicode (key, "utf8")
+		return quote_key (unicode (key, "utf8"))
 
 	raise Exception ()
+
+def quote_key (key):
+
+	if KEY_PATTERN.match (key):
+
+		return key
+
+	else:
+
+		return "\"%s\"" % (
+			key
+				.replace ("\\", "\\\\")
+				.replace ("\"", "\\\""))
+
+KEY_PATTERN = (
+	re.compile (
+		r"^[a-zA-Z][-a-zA-Z0-9_:]+$"))
 
 # ex: noet ts=4 filetype=python
