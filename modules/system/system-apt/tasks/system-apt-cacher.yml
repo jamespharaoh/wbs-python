@@ -1,0 +1,63 @@
+---
+
+- name: "system apt cacher update"
+  when: "ubuntu_apt_cacher_installed == 'no'"
+  become: "yes"
+  action:
+
+    module: "apt"
+    update_cache: "yes"
+
+- name: "system apt cacher install"
+  become: "yes"
+  action:
+
+    module: "apt"
+    name: "apt-cacher"
+
+- name: "set ubuntu.apt_cacher_installed to 'yes'"
+  update_resource:
+
+    ubuntu.apt_cacher_installed: "yes"
+
+- name: "system apt cacher config"
+  register: "system_apt_cacher_config_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/apt-cacher/apt-cacher.conf"
+    src: "system-apt-cacher-config"
+
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "set ubuntu.apt_cacher_needs_restart to 'yes'"
+  when: "system_apt_cacher_config_result | changed"
+  update_resource:
+
+    ubuntu.apt_cache_needs_restart: "yes"
+
+- name: "set ubuntu.apt_needs_update to 'yes'"
+  when: "system_apt_cacher_config_result | changed"
+  update_resource:
+
+    ubuntu.apt_needs_update: "yes"
+
+- name: "system apt cacher restart"
+  when: "ubuntu_apt_cacher_needs_restart == 'yes'"
+  become: "yes"
+  action:
+
+    module: "system"
+    name: "apt-cacher"
+    state: "restarted"
+
+- name: "set ubuntu.apt_cacher_needs_restart to 'yes'"
+  when: "system_apt_cacher_config_result | changed"
+  update_resource:
+
+    ubuntu.apt_cache_needs_restart: "no"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,14 @@
+---
+
+- include: "system-apt-upgrade.yml"
+  tags: 
+    - "system-apt-upgrade"
+    - "system-apt"
+    - "system"
+    - "apt-upgrade"
+    - "apt"
+    - "upgrade"
+  when: "(ubuntu_apt_upgrade == 'yes')"
+
+
+# ex: et ts=2 filetype=yaml

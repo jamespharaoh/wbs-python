@@ -1,0 +1,20 @@
+---
+
+- name: "system apt upgrade"
+  when: "ubuntu_apt_needs_upgrade == 'yes'"
+  become: "yes"
+  env:
+
+    DEBIAN_FRONTEND: "noninteractive"
+
+  action:
+
+    module: "apt"
+    upgrade: "dist"
+
+- name: "set ubuntu.apt_needs_upgrade to 'no'"
+  update_resource:
+
+    ubuntu.apt_needs_upgrade: "no"
+
+# ex: et ts=2 filetype=yaml

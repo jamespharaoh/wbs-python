@@ -1,0 +1,12 @@
+---
+
+dependencies: 
+  - "system-apt-common"
+  - "system-apt-setup-sources"
+  - "system-apt-cacher"
+  - "system-apt-setup-proxy"
+  - "system-apt-update"
+  - "system-apt-upgrade"
+
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,130 @@
+---
+
+identity:
+
+  name: "system-apt"
+  type: "module"
+
+common:
+
+  # ---------- ubuntu
+
+  # configuration
+
+  ubuntu_system_packages: []
+
+  ubuntu_keys_extra: []
+
+  ubuntu_archive: "http://archive.ubuntu.com/ubuntu"
+  ubuntu_security: "http://security.ubuntu.com/ubuntu"
+
+  ubuntu_apt_upgrade: "yes"
+  ubuntu_apt_proxy_url: ""
+
+  ubuntu_apt_cacher_install: "no"
+  ubuntu_apt_cacher_user: "www-data"
+  ubuntu_apt_cacher_group: "www-data"
+  ubuntu_apt_cacher_allowed_hosts: "127.0.0.1"
+
+  ubuntu_release: ""
+
+  ubuntu_repositories:
+
+    - "main"
+    - "restricted"
+    - "universe"
+
+  ubuntu_sources:
+
+    - url: "{{ ubuntu_archive }}"
+      source: "{{ ubuntu_release }}"
+      repositories: "{{ ubuntu_repositories }}"
+
+    - url: "{{ ubuntu_archive }}"
+      source: "{{ ubuntu_release }}-updates"
+      repositories: "{{ ubuntu_repositories }}"
+
+    - url: "{{ ubuntu_security }}"
+      source: "{{ ubuntu_release }}-security"
+      repositories: "{{ ubuntu_repositories }}"
+
+  # state
+
+  ubuntu_apt_cacher_installed: "no"
+  ubuntu_apt_cacher_needs_restart: "no"
+
+  ubuntu_apt_needs_update: "yes"
+  ubuntu_apt_needs_upgrade: "yes"
+
+tasks:
+
+  - name: "setup-sources"
+    tags:
+
+      - "system-apt-setup-sources"
+      - "system-apt-setup"
+      - "system-apt"
+      - "system"
+
+      - "apt-setup-sources"
+      - "apt-setup"
+      - "apt"
+
+  - name: "cacher"
+    when:
+
+      - "ubuntu_apt_cacher_install == 'yes'"
+
+    tags:
+
+      - "system-apt-cacher"
+      - "system-apt"
+      - "system"
+
+      - "apt-cacher"
+      - "apt"
+
+  - name: "setup-proxy"
+    tags:
+
+      - "system-apt-setup-proxy"
+      - "system-apt-setup"
+      - "system-apt"
+      - "system"
+
+      - "apt-setup-proxy"
+      - "apt-setup"
+      - "apt"
+
+      - "setup-proxy"
+      - "setup"
+
+  - name: "update"
+    tags:
+
+      - "system-apt-update"
+      - "system-apt"
+      - "system"
+
+      - "apt-update"
+      - "apt"
+
+      - "update"
+
+  - name: "upgrade"
+    when:
+
+      - "ubuntu_apt_upgrade == 'yes'"
+
+    tags:
+
+      - "system-apt-upgrade"
+      - "system-apt"
+      - "system"
+
+      - "apt-upgrade"
+      - "apt"
+
+      - "upgrade"
+
+# ex: et ts=2 filetype=yaml

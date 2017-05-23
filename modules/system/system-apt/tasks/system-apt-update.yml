@@ -1,0 +1,16 @@
+---
+
+- name: "system apt update"
+  when: "ubuntu_apt_needs_update == 'yes'"
+  become: "yes"
+  action:
+
+    module: "apt"
+    update_cache: "yes"
+
+- name: "set ubuntu.apt_needs_update to 'no'"
+  update_resource:
+
+    ubuntu.apt_needs_update: "no"
+
+# ex: et ts=2 filetype=yaml

@@ -1,0 +1,15 @@
+---
+
+- include: "system-apt-setup-sources.yml"
+  tags: 
+    - "system-apt-setup-sources"
+    - "system-apt-setup"
+    - "system-apt"
+    - "system"
+    - "apt-setup-sources"
+    - "apt-setup"
+    - "apt"
+  when: "(True)"
+
+
+# ex: et ts=2 filetype=yaml

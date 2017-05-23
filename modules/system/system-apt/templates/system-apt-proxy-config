@@ -1,0 +1,7 @@
+{{ ansible_warning ['//'] }}
+
+Acquire::http {
+	Proxy "{{ ubuntu_apt_proxy_url }}";
+};
+
+// ex: noet ts=4 filetype=apt

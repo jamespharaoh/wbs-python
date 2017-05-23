@@ -1,0 +1,35 @@
+---
+
+- name: "system apt setup proxy config create"
+  when: "ubuntu_apt_proxy_url != ''"
+  register: "system_apt_setup_proxy_config_create_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/apt/apt.conf.d/02proxy"
+    src: "system-apt-proxy-config"
+
+- name: "set ubuntu.apt_update_required to 'yes'"
+  when: "system_apt_setup_proxy_config_create_result | changed"
+  update_resource:
+
+    ubuntu.apt_update_required: "yes"
+
+- name: "system apt setup proxy config remove"
+  when: "ubuntu_apt_proxy_url == ''"
+  register: "system_apt_setup_proxy_config_remove_result"
+  become: "yes"
+  action:
+
+    module: "file"
+    dest: "/etc/apt/apt.conf.d/02proxy"
+    state: "absent"
+
+- name: "set ubuntu.apt_update_required to 'yes'"
+  when: "system_apt_setup_proxy_config_remove_result | changed"
+  update_resource:
+
+    ubuntu.apt_update_required: "yes"
+
+# ex: et ts=2 filetype=yaml

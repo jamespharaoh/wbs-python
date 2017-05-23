@@ -1,0 +1,60 @@
+---
+
+# ---------- apt key urls
+
+- name: "configure apt keys (url)"
+  with_items: "{{ ubuntu_keys_extra }}"
+  when: "item.url is defined"
+  register: "system_apt_setup_sources_key_urls_result"
+  become: "yes"
+  action:
+
+    module: "apt_key"
+
+    id: "{{ item.id | default (None) }}"
+    keyserver: "{{ item.keyserver | default (None) }}"
+    url: "{{ item.url | default (None) }}"
+
+- name: "set ubuntu.apt_update_required to 'yes'"
+  when: "system_apt_setup_sources_key_urls_result | changed"
+  update_resource:
+
+    ubuntu.apt_update_required: "yes"
+
+# ---------- apt key files
+
+- name: "configure apt keys (file)"
+  with_items: "{{ ubuntu_keys_extra }}"
+  when: "item.file is defined"
+  register: "system_apt_setup_sources_key_files_result"
+  become: "yes"
+  action:
+
+    module: "apt_key"
+
+    data: "{{ lookup ('file', HOME + '/' + item.file) }}"
+
+- name: "set ubuntu.apt_update_required to 'yes'"
+  when: "system_apt_setup_sources_key_files_result | changed"
+  update_resource:
+
+    ubuntu.apt_update_required: "yes"
+
+# ---------- apt sources
+
+- name: "configure apt sources"
+  register: "system_apt_setup_sources_config_result"
+  become: "yes"
+  action:
+
+    module: "template"
+    dest: "/etc/apt/sources.list"
+    src: "system-apt-sources-list"
+
+- name: "set ubuntu.apt_update_required to 'yes'"
+  when: "system_apt_setup_sources_config_result | changed"
+  update_resource:
+
+    ubuntu.apt_update_required: "yes"
+
+# ex: et ts=2 filetype=yaml

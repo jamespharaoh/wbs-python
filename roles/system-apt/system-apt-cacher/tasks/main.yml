@@ -1,0 +1,13 @@
+---
+
+- include: "system-apt-cacher.yml"
+  tags: 
+    - "system-apt-cacher"
+    - "system-apt"
+    - "system"
+    - "apt-cacher"
+    - "apt"
+  when: "(ubuntu_apt_cacher_install == 'yes')"
+
+
+# ex: et ts=2 filetype=yaml

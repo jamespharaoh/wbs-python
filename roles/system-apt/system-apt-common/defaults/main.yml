@@ -1,0 +1,37 @@
+---
+
+ubuntu_apt_cacher_allowed_hosts: "127.0.0.1"
+ubuntu_apt_cacher_group: "www-data"
+ubuntu_apt_cacher_install: "no"
+ubuntu_apt_cacher_installed: "no"
+ubuntu_apt_cacher_needs_restart: "no"
+ubuntu_apt_cacher_user: "www-data"
+ubuntu_apt_needs_update: "yes"
+ubuntu_apt_needs_upgrade: "yes"
+ubuntu_apt_proxy_url: ""
+ubuntu_apt_upgrade: "yes"
+ubuntu_archive: "http://archive.ubuntu.com/ubuntu"
+ubuntu_keys_extra: []
+ubuntu_release: ""
+ubuntu_repositories: 
+  - "main"
+  - "restricted"
+  - "universe"
+ubuntu_security: "http://security.ubuntu.com/ubuntu"
+ubuntu_sources: 
+  - repositories: "{{ ubuntu_repositories }}"
+    source: "{{ ubuntu_release }}"
+    url: "{{ ubuntu_archive }}"
+
+  - repositories: "{{ ubuntu_repositories }}"
+    source: "{{ ubuntu_release }}-updates"
+    url: "{{ ubuntu_archive }}"
+
+  - repositories: "{{ ubuntu_repositories }}"
+    source: "{{ ubuntu_release }}-security"
+    url: "{{ ubuntu_security }}"
+
+ubuntu_system_packages: []
+
+
+# ex: et ts=2 filetype=yaml

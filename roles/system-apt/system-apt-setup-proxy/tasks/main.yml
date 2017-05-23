@@ -1,0 +1,17 @@
+---
+
+- include: "system-apt-setup-proxy.yml"
+  tags: 
+    - "system-apt-setup-proxy"
+    - "system-apt-setup"
+    - "system-apt"
+    - "system"
+    - "apt-setup-proxy"
+    - "apt-setup"
+    - "apt"
+    - "setup-proxy"
+    - "setup"
+  when: "(True)"
+
+
+# ex: et ts=2 filetype=yaml
