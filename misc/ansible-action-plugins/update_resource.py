@@ -24,6 +24,26 @@ class ActionModule (ActionBase):
 
 	def run (self, tmp = None, task_vars = dict ()):
 
+		resource_name = task_vars.get ("inventory_hostname")
+
+		if self.context.resources.exists_slow (resource_name):
+
+			return self.run_resource (
+				tmp,
+				task_vars)
+
+		else:
+
+			return self.run_local (
+				tmp,
+				task_vars)
+
+	def run_local (self, tmp, task_vars):
+
+		raise Exception ("Not found: " + resource_name)
+
+	def run_resource (self, tmp, task_vars):
+
 		options = dict ()
 
 		resource_name = task_vars.get ("inventory_hostname")
@@ -34,9 +54,6 @@ class ActionModule (ActionBase):
 		resource_data = (
 			self.context.resources.get_slow (
 				resource_name))
-
-		if not resource_data:
-			resource_data = dict ()
 
 		changed = False
 

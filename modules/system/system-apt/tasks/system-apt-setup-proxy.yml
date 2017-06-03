@@ -10,11 +10,11 @@
     dest: "/etc/apt/apt.conf.d/02proxy"
     src: "system-apt-proxy-config"
 
-- name: "set ubuntu.apt_update_required to 'yes'"
+- name: "set ubuntu.apt_needs_update to 'yes'"
   when: "system_apt_setup_proxy_config_create_result | changed"
   update_resource:
 
-    ubuntu.apt_update_required: "yes"
+    ubuntu.apt_needs_update: "yes"
 
 - name: "system apt setup proxy config remove"
   when: "ubuntu_apt_proxy_url == ''"
@@ -26,10 +26,10 @@
     dest: "/etc/apt/apt.conf.d/02proxy"
     state: "absent"
 
-- name: "set ubuntu.apt_update_required to 'yes'"
+- name: "set ubuntu.apt_needs_update to 'yes'"
   when: "system_apt_setup_proxy_config_remove_result | changed"
   update_resource:
 
-    ubuntu.apt_update_required: "yes"
+    ubuntu.apt_needs_update: "yes"
 
 # ex: et ts=2 filetype=yaml

@@ -1381,6 +1381,39 @@ class Inventory (object):
 
 						continue
 
+				elif value_type == "resource-data":
+
+					project_resource_data = (
+						self.context.project_metadata ["resource_data"] [value])
+
+					if project_resource_data ["group"] not in self.namespaces:
+
+						continue
+
+					if project_resource_data ["key"] != "{{ identity_name }}":
+
+						continue
+
+					success, value_type, value = (
+						self.dereference_resource (
+						"%s/%s" % (
+							project_resource_data ["group"],
+							resolved_value),
+						project_resource_data ["section"],
+						indent + "  "))
+
+					if success:
+
+						if self.trace:
+
+							uprint (
+								"%sresult: [%s] = %s" % (
+									indent,
+									resolved_value,
+									value))
+
+						continue
+
 				elif value_type == "value":
 
 					if resolved_value in value:
@@ -1575,6 +1608,20 @@ class Inventory (object):
 			else:
 
 				return True, token_index + 1, "value", resolved_value
+
+		if token in self.context.project_metadata ["resource_data"]:
+
+			if self.trace:
+
+				uprint (
+					"%sfound in resource data: %s" % (
+						indent,
+						token))
+
+			resource_definition = (
+				self.context.project_metadata ["resource_data"] [token])
+
+			return True, token_index + 1, "resource-data", token
 
 		success, value_type, value = (
 			self.dereference_resource (

@@ -39,7 +39,7 @@
 
     ubuntu.apt_cache_needs_restart: "yes"
 
-- name: "set ubuntu.apt_needs_update to 'yes'"
+- name: "set system.apt_needs_update to 'yes'"
   when: "system_apt_cacher_config_result | changed"
   update_resource:
 

@@ -15,11 +15,11 @@
     keyserver: "{{ item.keyserver | default (None) }}"
     url: "{{ item.url | default (None) }}"
 
-- name: "set ubuntu.apt_update_required to 'yes'"
+- name: "set ubuntu.apt_needs_update to 'yes'"
   when: "system_apt_setup_sources_key_urls_result | changed"
   update_resource:
 
-    ubuntu.apt_update_required: "yes"
+    ubuntu.apt_needs_update: "yes"
 
 # ---------- apt key files
 
@@ -34,11 +34,11 @@
 
     data: "{{ lookup ('file', HOME + '/' + item.file) }}"
 
-- name: "set ubuntu.apt_update_required to 'yes'"
+- name: "set ubuntu.apt_needs_update to 'yes'"
   when: "system_apt_setup_sources_key_files_result | changed"
   update_resource:
 
-    ubuntu.apt_update_required: "yes"
+    ubuntu.apt_needs_update: "yes"
 
 # ---------- apt sources
 
@@ -51,10 +51,10 @@
     dest: "/etc/apt/sources.list"
     src: "system-apt-sources-list"
 
-- name: "set ubuntu.apt_update_required to 'yes'"
+- name: "set ubuntu.apt_needs_update to 'yes'"
   when: "system_apt_setup_sources_config_result | changed"
   update_resource:
 
-    ubuntu.apt_update_required: "yes"
+    ubuntu.apt_needs_update: "yes"
 
 # ex: et ts=2 filetype=yaml

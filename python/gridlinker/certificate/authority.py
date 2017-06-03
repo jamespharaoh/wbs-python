@@ -751,6 +751,7 @@ def args_issue (sub_parsers):
 			is generated locally. This is normally used when the certificate is
 			to be used by a subordinate, such as an employee or a server
 			belonging to the entity that controls the certificate authority.
+			Exits with 100 if the certificate already exists.
 		""")
 
 	parser.set_defaults (
@@ -864,7 +865,7 @@ def do_issue (context, args):
 		print ("Certificate already exists for %s" % (
 			args.common_name))
 
-		sys.exit (1)
+		sys.exit (100)
 
 	print ("Issued certificate %s %s %s" % (
 		certificate.serial,

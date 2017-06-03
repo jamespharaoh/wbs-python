@@ -201,14 +201,10 @@ class GridlinkerModule (object):
 						self._module_name,
 						task_data ["name"]),
 					"tags": task_data ["tags"],
-					"when": "".join ([
-						"(",
-						") and (".join (
-							task_data.get (
-								"when",
-								[ "True" ])),
-						")",
-					]),
+					"when": "(%s)" % ") and (".join (
+						task_data.get (
+							"when",
+							[ "True" ])),
 				},
 			])
 

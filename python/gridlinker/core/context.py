@@ -413,10 +413,11 @@ class GenericContext (object):
 				"ansible_python_interpreter": "/usr/bin/env python",
 				"display_skipped_hosts": "False",
 				"force_color": "True",
-				"forks": "12",
+				"forks": "24",
 				"gathering": "explicit",
 				"retry_files_save_path": "%s/work/retry" % self.home,
 				"sudo_flags": "--set-home",
+				"timeout": "60",
 
 				"library": ":".join (self.ansible_library),
 				"roles_path": ":".join (self.ansible_roles_path),
@@ -528,7 +529,7 @@ class GenericContext (object):
 
 		return self.project_metadata.get ("ansible", {}).get ("ssh_args", [
 			"-o ControlMaster=auto",
-			"-o ControlPersist=60s",
+			"-o ControlPersist=600s",
 			"-o ForwardAgent=yes",
 			"-o StrictHostKeyChecking=yes",
 			"-o UserKnownHostsFile=%s/work/known-hosts" % self.home,
