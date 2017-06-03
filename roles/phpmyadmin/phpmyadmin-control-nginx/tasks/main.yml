@@ -1,0 +1,13 @@
+---
+
+- include: "phpmyadmin-control-nginx.yml"
+  tags: 
+    - "phpmyadmin-control-nginx"
+    - "phpmyadmin-control"
+    - "phpmyadmin"
+    - "control-nginx"
+    - "control"
+  when: "(phpmyadmin_install == 'yes') and (phpmyadmin_state in [ 'enabled', 'disabled' ]) and (phpmyadmin_webserver == 'nginx')"
+
+
+# ex: et ts=2 filetype=yaml

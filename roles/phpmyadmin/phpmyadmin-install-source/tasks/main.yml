@@ -1,0 +1,13 @@
+---
+
+- include: "phpmyadmin-install-source.yml"
+  tags: 
+    - "phpmyadmin-install-source"
+    - "phpmyadmin-install"
+    - "phpmyadmin"
+    - "install-source"
+    - "install"
+  when: "(phpmyadmin_install == 'yes') and (phpmyadmin_install_from == 'source')"
+
+
+# ex: et ts=2 filetype=yaml

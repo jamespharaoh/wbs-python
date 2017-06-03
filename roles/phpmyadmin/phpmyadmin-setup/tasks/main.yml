@@ -1,0 +1,11 @@
+---
+
+- include: "phpmyadmin-setup.yml"
+  tags: 
+    - "phpmyadmin-setup"
+    - "phpmyadmin"
+    - "setup"
+  when: "(phpmyadmin_install == 'yes') and (phpmyadmin_installed_from == 'source')"
+
+
+# ex: et ts=2 filetype=yaml

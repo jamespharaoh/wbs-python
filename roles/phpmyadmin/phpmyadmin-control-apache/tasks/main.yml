@@ -1,0 +1,13 @@
+---
+
+- include: "phpmyadmin-control-apache.yml"
+  tags: 
+    - "phpmyadmin"
+    - "phpmyadmin-control"
+    - "phpmyadmin-control-apache"
+    - "control-apache"
+    - "control"
+  when: "(phpmyadmin_install == 'yes') and (phpmyadmin_state in [ 'enabled', 'disabled' ]) and (phpmyadmin_webserver == 'apache')"
+
+
+# ex: et ts=2 filetype=yaml

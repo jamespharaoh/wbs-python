@@ -1,0 +1,71 @@
+---
+
+- name: "check required variables"
+  when: "phpmyadmin_install_version == ''"
+  fail:
+
+    msg: "please set phpmyadmin_install_version"
+
+- name: "set phpmyadmin.installed_version to ''"
+  when: "phpmyadmin_installed_version != phpmyadmin_install_version"
+  update_resource:
+
+    phpmyadmin.installed_version: ""
+
+- name: "install phpmyadmin"
+  when: "phpmyadmin_installed_version != phpmyadmin_install_version"
+  become: "yes"
+  args:
+
+    executable: "/bin/bash"
+
+  shell:
+
+    set -euf -o pipefail;
+
+    rm -rf {{ phpmyadmin_build_temp }};
+    mkdir -p {{ phpmyadmin_build_temp }};
+    cd {{ phpmyadmin_build_temp }};
+
+    wget {{ phpmyadmin_build_url }};
+
+    tar
+      --extract
+      --xz
+      --no-same-owner
+      --file "{{ phpmyadmin_build_archive }}";
+
+    mkdir -p "{{ phpmyadmin_install_target }}";
+
+    rsync
+      --archive
+      "{{ phpmyadmin_build_directory }}/"
+      "{{ phpmyadmin_install_target }}/";
+
+    rm -rf "{{ phpmyadmin_build_temp }}";
+
+- name: "set phpmyadmin.installed_from"
+  when: "phpmyadmin_installed_from != 'source'"
+  update_resource:
+
+    phpmyadmin.installed_from: "source"
+
+- name: "set phpmyadmin.installed_target"
+  when: "phpmyadmin_installed_target != phpmyadmin_install_target"
+  update_resource:
+
+    phpmyadmin.installed_target: "{{ phpmyadmin_install_target }}"
+
+- name: "set phpmyadmin_installed_version"
+  when: "phpmyadmin_installed_version != phpmyadmin_install_version"
+  update_resource:
+
+    phpmyadmin.installed_version: "{{ phpmyadmin_install_version }}"
+
+- name: "set phpmyadmin.state to 'installed'"
+  when: "phpmyadmin_state == ''"
+  update_resource:
+
+    phpmyadmin.state: "installed"
+
+# ex: et ts=2 filetype=yaml

@@ -1,9 +1,0 @@
----
-
-- include: "phpmyadmin-setup.yml"
-  tags:
-
-    - "phpmyadmin"
-    - "phpmyadmin-setup"
-
-# ex: et ts=2 filetype=yaml

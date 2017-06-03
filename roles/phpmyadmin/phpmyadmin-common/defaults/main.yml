@@ -1,0 +1,53 @@
+---
+
+phpmyadmin_blowfish_secret: ""
+phpmyadmin_build_archive: "{{ phpmyadmin_build_directory }}.tar.xz"
+phpmyadmin_build_directory: "phpMyAdmin-{{ phpmyadmin_install_version }}"
+phpmyadmin_build_mirror: "https://dist.wellbehavedsoftware.com/phpmyadmin"
+phpmyadmin_build_temp: "/tmp/phpmyadmin-install"
+phpmyadmin_build_url: "{{ phpmyadmin_build_mirror }}/{{ phpmyadmin_build_archive }}"
+phpmyadmin_config: "/etc/phpmyadmin"
+phpmyadmin_config_directories: 
+  - directory: "{{ phpmyadmin_config }}"
+    group: "root"
+    mode: "0755"
+    user: "root"
+
+phpmyadmin_config_links: 
+  - link: "{{ phpmyadmin_installed_target }}/config.inc.php"
+    target: "{{ phpmyadmin_config }}/config.inc.php"
+
+phpmyadmin_config_templates: 
+  - group: "www-data"
+    mode: "0640"
+    target: "{{ phpmyadmin_config }}/config.inc.php"
+    template: "phpmyadmin-config"
+    user: "root"
+
+  - group: "root"
+    mode: "0644"
+    target: "{{ phpmyadmin_config }}/apache-site.conf"
+    template: "phpmyadmin-apache-site"
+    user: "root"
+    when: "{{ phpmyadmin_webserver == 'apache' }}"
+
+  - group: "root"
+    mode: "0644"
+    target: "{{ phpmyadmin_config }}/nginx-site.conf"
+    template: "phpmyadmin-nginx-site"
+    user: "root"
+    when: "{{ phpmyadmin_webserver == 'nginx' }}"
+
+phpmyadmin_hostname: "{{ identity_name }}-phpmyadmin.wellbehavedsoftware.com"
+phpmyadmin_install: "{{ default.install | default ('yes') }}"
+phpmyadmin_install_from: "source"
+phpmyadmin_install_target: "/opt/phpmyadmin-{{ phpmyadmin_install_version }}"
+phpmyadmin_install_version: ""
+phpmyadmin_installed_from: ""
+phpmyadmin_installed_target: ""
+phpmyadmin_installed_version: ""
+phpmyadmin_state: ""
+phpmyadmin_webserver: ""
+
+
+# ex: et ts=2 filetype=yaml

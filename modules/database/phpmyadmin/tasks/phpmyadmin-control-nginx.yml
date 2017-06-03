@@ -1,0 +1,31 @@
+---
+
+- name: "phpmyadmin control nginx site enable"
+  when: "phpmyadmin_state == 'enabled'"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/nginx/sites/phpmyadmin.conf"
+    state: "link"
+
+    src: "{{ phpmyadmin_config }}/nginx-site.conf"
+
+- name: "phpmyadmin control nginx site disable"
+  when: "phpmyadmin_state != 'enabled'"
+  become: "yes"
+  action:
+
+    module: "file"
+    path: "/etc/nginx/sites/phpmyadmin.conf"
+    state: "absent"
+
+- name: "reload nginx"
+  become: "yes"
+  action:
+
+    module: "service"
+    name: "nginx"
+    state: "reloaded"
+
+# ex: et ts=2 filetype=yaml

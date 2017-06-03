@@ -547,48 +547,21 @@ class CertificateDatabase:
 
 		if self.client.exists (subject_path + "/current"):
 
-			raise Exception ("TODO need to move chain somehow")
+			current_tree = (
+				self.client.get_tree (
+					subject_path + "/current"))
 
-			# read current
+			archive_path, archive_index = (
+				self.client.mkdir_queue (
+					subject_path + "/archive"))
 
-			archive_csr_string = self.client.get_raw (
-				subject_path + "/current/request")
+			for item_path, item_value in current_tree:
 
-			archive_certificate_string = self.client.get_raw (
-				subject_path + "/current/certificate")
+				self.client.set_raw (
+					archive_path + item_path,
+					item_value)
 
-			archive_key_string = self.client.get_raw (
-				subject_path + "/current/key")
-
-			# write to archive
-
-			archive_path, archive_index = self.client.make_queue_dir (
-				subject_path + "/archive")
-
-			self.client.set_raw (
-				archive_path + "/request",
-				archive_csr_string)
-
-			self.client.set_raw (
-				archive_path + "/certificate",
-				archive_certificate_string)
-
-			self.client.set_raw (
-				archive_path + "/key",
-				archive_key_string)
-
-			# remove current
-
-			self.client.rm (
-				subject_path + "/current/request")
-
-			self.client.rm (
-				subject_path + "/current/certificate")
-
-			self.client.rm (
-				subject_path + "/current/key")
-
-			self.client.rmdir (
+			self.client.rm_recursive (
 				subject_path + "/current")
 
 		# store new certificate
@@ -1215,7 +1188,9 @@ def args_import (sub_parsers):
 		"--certificate",
 		action = "append",
 		required = True,
-		help = "path to signed certificate file, specify once for each in chain")
+		help = "".join ([
+			"path to signed certificate file, specify once for each in chain",
+		]))
 
 	parser.add_argument (
 		"--private-key",
@@ -1225,7 +1200,10 @@ def args_import (sub_parsers):
 	parser.add_argument (
 		"--ignore-common-name-mismatch",
 		action = "store_true",
-		help = "unless set, the signed certificate common name must exactly match the one specified")
+		help = "".join ([
+			"unless set, the signed certificate common name must exactly ",
+			"match the one specified",
+		]))
 
 def do_import (context, args):
 
