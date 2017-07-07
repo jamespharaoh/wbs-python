@@ -266,6 +266,9 @@ class ThirdPartySetup (object):
 			if names and library_name not in names:
 				continue
 
+			git_remote = (
+				self.git_repo.remotes [library_name])
+
 			if "version" in library_data:
 
 				with log.status (
@@ -273,7 +276,7 @@ class ThirdPartySetup (object):
 						library_name,
 						library_data ["version"])):
 
-					self.git_repo.remotes [library_name].fetch (
+					git_remote.fetch (
 						"refs/tags/%s:refs/remotes/%s/%s" % (
 							library_data ["version"],
 							library_name,
@@ -286,12 +289,40 @@ class ThirdPartySetup (object):
 						library_name,
 						library_data ["branch"])):
 
-					self.git_repo.remotes [library_name].fetch (
+					git_remote.fetch (
 						"refs/heads/%s:refs/%s/%s" % (
 							library_data ["branch"],
 							library_name,
 							library_data ["branch"]),
 						no_tags = True)
+
+				if "upstream" in library_data:
+
+					with log.status (
+						"Fetch remote: %s (%s)" % (
+							library_name,
+							library_data ["upstream"])):
+
+						self.git_repo.remotes [library_name].fetch (
+							"refs/heads/%s:refs/%s/%s" % (
+								library_data ["upstream"],
+								library_name,
+								library_data ["upstream"]),
+							no_tags = True)
+
+					branch_ref = (
+						git_remote.refs [library_data ["branch"]])
+
+					upstream_ref = (
+						git_remote.refs [library_data ["upstream"]])
+
+					if not self.git_repo.is_ancestor (
+						upstream_ref,
+						branch_ref):
+
+						log.notice (
+							"Library %s has unmerged upstream changes" % (
+								library_name))
 
 			else:
 
