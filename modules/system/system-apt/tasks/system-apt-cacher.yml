@@ -37,7 +37,7 @@
   when: "system_apt_cacher_config_result | changed"
   update_resource:
 
-    ubuntu.apt_cache_needs_restart: "yes"
+    ubuntu.apt_cacher_needs_restart: "yes"
 
 - name: "set system.apt_needs_update to 'yes'"
   when: "system_apt_cacher_config_result | changed"
@@ -50,7 +50,7 @@
   become: "yes"
   action:
 
-    module: "system"
+    module: "service"
     name: "apt-cacher"
     state: "restarted"
 
@@ -58,6 +58,6 @@
   when: "system_apt_cacher_config_result | changed"
   update_resource:
 
-    ubuntu.apt_cache_needs_restart: "no"
+    ubuntu.apt_cacher_needs_restart: "no"
 
 # ex: et ts=2 filetype=yaml
