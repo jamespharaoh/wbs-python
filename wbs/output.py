@@ -36,11 +36,11 @@ class ConsoleLog (object):
 		if self.current_status:
 
 			raise Exception (
-				"Status set without being cleared")
+				"Status sent without being cleaderd")
 
 		self.current_status = value
 
-		self.write (
+		self.stream.write (
 			"%s ...\n" % self.current_status)
 
 		return WithStatus ()
@@ -59,7 +59,7 @@ class ConsoleLog (object):
 
 		if self.temporary_status:
 
-			self.write (
+			self.stream.write (
 				"\x1b[1A\x1b[K")
 
 		self.current_status = None
@@ -72,16 +72,16 @@ class ConsoleLog (object):
 		if self.current_status \
 		and self.temporary_status:
 
-			self.write (
+			self.stream.write (
 				"\x1b[1A\x1b[K")
 
-		self.write (
+		self.stream.write (
 			"%s\n" % value)
 
 		if self.current_status \
 		and self.temporary_status:
 
-			self.write (
+			self.stream.write (
 				"%s\n" % self.current_status)
 
 	def output (self, value):
@@ -92,22 +92,17 @@ class ConsoleLog (object):
 		if self.current_status \
 		and self.temporary_status:
 
-			self.write (
+			self.stream.write (
 				"\x1b[1A\x1b[K")
 
-		self.write (
+		self.stream.write (
 			value)
 
 		if self.current_status \
 		and self.temporary_status:
 
-			self.write (
+			self.stream.write (
 				"%s\n" % self.current_status)
-
-	def write (self, message):
-
-		self.stream.write (
-			message.encode ("utf-8"))
 
 class WithStatus (object):
 

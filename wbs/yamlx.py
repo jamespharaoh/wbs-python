@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import codecs
 import collections
 import os
-import re
 import sys
 import yaml
 
@@ -88,10 +87,6 @@ def parse (string):
 		string,
 		OrderedDictYAMLLoader)
 
-def encode_simple (schema, data):
-
-	return encode_real (schema, data, "", True)
-
 def encode (schema, data):
 
 	yaml = "---\n\n"
@@ -104,14 +99,9 @@ def encode (schema, data):
 
 def encode_real (schema, data, indent, here):
 
-	if isinstance (data, unicode):
+	if isinstance (data, str) \
+	or isinstance (data, unicode):
 		return encode_str (schema, data, indent, here)
-
-	if isinstance (data, str):
-		return encode_str (schema, unicode (data, "utf8"), indent, here)
-
-	if isinstance (data, int):
-		return encode_str (schema, unicode (data), indent, here)
 
 	if isinstance (data, dict):
 		return encode_dict (schema, data, indent, here)
@@ -188,7 +178,7 @@ def encode_dict (schema, data, indent, here):
 					yaml += "\n"
 					yaml += indent
 
-			yaml += encode_key (field.name)
+			yaml += field.name
 			yaml += ": "
 			yaml += encode_real (field.sub_schema, value, next_indent, False)
 
@@ -218,7 +208,7 @@ def encode_dict (schema, data, indent, here):
 				yaml += "\n"
 				yaml += indent
 
-		yaml += encode_key (key)
+		yaml += key
 		yaml += ": "
 		yaml += encode_real (None, data [key], next_indent, False)
 
@@ -255,32 +245,5 @@ def load_data (path):
 		raise Exception (
 			"File or directory doesn't exist: %s" % (
 				path))
-
-def encode_key (key):
-
-	if isinstance (key, unicode):
-		return quote_key (key)
-
-	if isinstance (key, str):
-		return quote_key (unicode (key, "utf8"))
-
-	raise Exception ()
-
-def quote_key (key):
-
-	if KEY_PATTERN.match (key):
-
-		return key
-
-	else:
-
-		return "\"%s\"" % (
-			key
-				.replace ("\\", "\\\\")
-				.replace ("\"", "\\\""))
-
-KEY_PATTERN = (
-	re.compile (
-		r"^[a-zA-Z][-a-zA-Z0-9_:]+$"))
 
 # ex: noet ts=4 filetype=python
