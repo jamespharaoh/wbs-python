@@ -336,6 +336,7 @@ class ThirdPartySetup (object):
 								library_prefix,
 								library_name,
 								self.project_name,
+								library_data ["branch"],
 							],
 							stderr = subprocess.STDOUT)
 
