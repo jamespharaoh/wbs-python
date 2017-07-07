@@ -335,27 +335,6 @@ class ThirdPartySetup (object):
 								"--prefix",
 								library_prefix,
 								library_name,
-								library_data ["branch"],
-								"--squash",
-								"--message",
-								"push changes from %s" % (
-									self.project_name),
-							],
-							stderr = subprocess.STDOUT)
-
-						subprocess.check_call (
-							[
-								"git",
-								"subtree",
-								"pull",
-								"--prefix",
-								library_prefix,
-								library_name,
-								library_data ["branch"],
-								"--squash",
-								"--message",
-								"pull for push of %s" % (
-									library_name),
 							],
 							stderr = subprocess.STDOUT)
 
