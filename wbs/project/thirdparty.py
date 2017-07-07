@@ -324,6 +324,12 @@ class ThirdPartySetup (object):
 							"Library %s has unmerged upstream changes" % (
 								library_name))
 
+					elif branch_ref.commit.tree != upstream_ref.commit.tree:
+
+						log.notice (
+							"Library %s has local unmerged changes" % (
+								library_name))
+
 			else:
 
 				raise Exception ()
