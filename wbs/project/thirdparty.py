@@ -316,15 +316,7 @@ class ThirdPartySetup (object):
 					upstream_ref = (
 						git_remote.refs [library_data ["upstream"]])
 
-					if not self.git_repo.is_ancestor (
-						upstream_ref,
-						branch_ref):
-
-						log.notice (
-							"Library %s has unmerged upstream changes" % (
-								library_name))
-
-					elif branch_ref.commit.tree != upstream_ref.commit.tree:
+					if branch_ref.commit.tree != upstream_ref.commit.tree:
 
 						log.notice (
 							"Library %s has local unmerged changes" % (
