@@ -372,7 +372,6 @@ class ThirdPartySetup (object):
 								"--prefix",
 								library_prefix,
 								library_name,
-								self.project_name,
 								library_data ["branch"],
 							],
 							stderr = subprocess.STDOUT)
@@ -550,8 +549,15 @@ class ThirdPartySetup (object):
 
 		elif "branch" in library_data:
 
-			library_version = (
-				library_data ["branch"])
+			if "upstream" in library_data:
+
+				library_version = (
+					library_data ["upstream"])
+
+			else:
+
+				library_version = (
+					library_data ["branch"])
 
 		else:
 
