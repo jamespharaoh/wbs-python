@@ -308,7 +308,8 @@ class ThirdPartySetup (object):
 								library_data ["push"],
 								library_name,
 								library_data ["push"]),
-							no_tags = True)
+							no_tags = True,
+							force = True)
 
 					branch_ref = (
 						git_remote.refs [library_data ["branch"]])
