@@ -296,35 +296,27 @@ class ThirdPartySetup (object):
 							library_data ["branch"]),
 						no_tags = True)
 
-				if "upstream" in library_data:
+				if "push" in library_data:
 
 					with log.status (
 						"Fetch remote: %s (%s)" % (
 							library_name,
-							library_data ["upstream"])):
+							library_data ["push"])):
 
 						self.git_repo.remotes [library_name].fetch (
 							"refs/heads/%s:refs/%s/%s" % (
-								library_data ["upstream"],
+								library_data ["push"],
 								library_name,
-								library_data ["upstream"]),
+								library_data ["push"]),
 							no_tags = True)
 
 					branch_ref = (
 						git_remote.refs [library_data ["branch"]])
 
 					upstream_ref = (
-						git_remote.refs [library_data ["upstream"]])
+						git_remote.refs [library_data ["push"]])
 
-					if not self.git_repo.is_ancestor (
-						upstream_ref,
-						branch_ref):
-
-						log.notice (
-							"Library %s has unmerged upstream changes" % (
-								library_name))
-
-					elif branch_ref.commit.tree != upstream_ref.commit.tree:
+					if branch_ref.commit.tree != upstream_ref.commit.tree:
 
 						log.notice (
 							"Library %s has local unmerged changes" % (
@@ -362,23 +354,17 @@ class ThirdPartySetup (object):
 					"Pushing changes for %s" % (
 						library_name)):
 
-					if library_data ["push"] == "simple":
-
-						subprocess.check_call (
-							[
-								"git",
-								"subtree",
-								"push",
-								"--prefix",
-								library_prefix,
-								library_name,
-								library_data ["branch"],
-							],
-							stderr = subprocess.STDOUT)
-
-					else:
-
-						raise Exception ()
+					subprocess.check_call (
+						[
+							"git",
+							"subtree",
+							"push",
+							"--prefix",
+							library_prefix,
+							library_name,
+							library_data ["push"],
+						],
+						stderr = subprocess.STDOUT)
 
 				num_pushed += 1
 
@@ -549,15 +535,8 @@ class ThirdPartySetup (object):
 
 		elif "branch" in library_data:
 
-			if "upstream" in library_data:
-
-				library_version = (
-					library_data ["upstream"])
-
-			else:
-
-				library_version = (
-					library_data ["branch"])
+			library_version = (
+				library_data ["branch"])
 
 		else:
 
